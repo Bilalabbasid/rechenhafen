@@ -1,0 +1,12 @@
+{
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml",
+  "/_not-found/page": "/_not-found",
+  "/[kategorie]/page": "/[kategorie]",
+  "/datenschutz/page": "/datenschutz",
+  "/page": "/",
+  "/rechner/[slug]/page": "/rechner/[slug]",
+  "/ueber-uns/page": "/ueber-uns",
+  "/impressum/page": "/impressum",
+  "/methodik/page": "/methodik"
+}

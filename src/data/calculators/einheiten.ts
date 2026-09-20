@@ -1,0 +1,128 @@
+import { CalculatorDefinition } from '@/types/calculator';
+import {
+  calculateLengthConversion,
+  calculateTemperatureConversion,
+} from '@/lib/calculators/einheiten';
+
+export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
+  {
+    id: 'laengen-umrechner',
+    slug: 'laengen-umrechner',
+    name: 'Längenumrechner (Meter, Zoll, Fuß, Meilen)',
+    shortName: 'Längenumrechner',
+    category: 'einheiten',
+    subcategory: 'Länge & Distanz',
+    metaTitle: 'Längenumrechner – Meter, Zentimeter, Zoll, Fuß & Meilen umrechnen',
+    metaDescription: 'Rechnen Sie metrische und angloamerikanische Längeneinheiten schnell um: Zoll (Inch) in cm, Fuß in Meter, Meilen in km.',
+    h1: 'Längenumrechner – Alle Maßeinheiten umrechnen',
+    shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um.',
+    searchKeywords: ['längenumrechner', 'zoll in cm umrechnen', 'inch in cm rechner', 'fuß in meter', 'meilen in km'],
+    inputs: [
+      { id: 'value', label: 'Eingabewert', type: 'number', defaultValue: 1, step: 0.1 },
+      {
+        id: 'fromUnit',
+        label: 'Ausgangseinheit (Von)',
+        type: 'select',
+        defaultValue: 'in',
+        options: [
+          { value: 'in', label: 'Zoll / Inch (in)' },
+          { value: 'cm', label: 'Zentimeter (cm)' },
+          { value: 'm', label: 'Meter (m)' },
+          { value: 'ft', label: 'Fuß (ft)' },
+          { value: 'km', label: 'Kilometer (km)' },
+          { value: 'mi', label: 'Meilen (mi)' },
+          { value: 'mm', label: 'Millimeter (mm)' },
+          { value: 'yd', label: 'Yard (yd)' },
+        ],
+      },
+      {
+        id: 'toUnit',
+        label: 'Zieleinheit (Nach)',
+        type: 'select',
+        defaultValue: 'cm',
+        options: [
+          { value: 'cm', label: 'Zentimeter (cm)' },
+          { value: 'in', label: 'Zoll / Inch (in)' },
+          { value: 'm', label: 'Meter (m)' },
+          { value: 'ft', label: 'Fuß (ft)' },
+          { value: 'km', label: 'Kilometer (km)' },
+          { value: 'mi', label: 'Meilen (mi)' },
+          { value: 'mm', label: 'Millimeter (mm)' },
+          { value: 'yd', label: 'Yard (yd)' },
+        ],
+      },
+    ],
+    calculate: calculateLengthConversion,
+    formula: 'Zielwert = Wert × Umrechnungsfaktor',
+    formulaExplanation: '1 Zoll (Inch) = exakt 2,54 cm | 1 Fuß (Foot) = exakt 30,48 cm | 1 Meile = 1.609,344 Meter.',
+    workedExample: {
+      title: 'Beispiel: 55 Zoll (TV-Bildschirmdiagonale)',
+      description: '55 in × 2,54 = 139,70 cm.',
+      inputs: { value: 55, fromUnit: 'in', toUnit: 'cm' },
+      resultSummary: '139,70 cm',
+    },
+    content: {
+      intro: 'Ob Bildschirmgrößen in Zoll, Flughöhen in Fuß oder US-Rezeptmaße: Unser Längenumrechner rechnet alle weltweiten Längeneinheiten präzise um.',
+      details: 'Alle Umrechnungsfaktoren basieren auf den internationalen Standarddefinitionen des SI-Systems.',
+    },
+    faqs: [
+      { question: 'Wie viel cm sind 1 Zoll?', answer: '1 Zoll (im Englischen Inch) ist international exakt als 25,4 Millimeter bzw. 2,54 Zentimeter definiert.' },
+    ],
+    relatedSlugs: ['temperatur-umrechner'],
+  },
+  {
+    id: 'temperatur-umrechner',
+    slug: 'temperatur-umrechner',
+    name: 'Temperatur-Umrechner (Celsius, Fahrenheit & Kelvin)',
+    shortName: 'Temperatur-Umrechner',
+    category: 'einheiten',
+    subcategory: 'Temperatur',
+    metaTitle: 'Temperatur-Umrechner – Celsius (°C), Fahrenheit (°F) & Kelvin (K)',
+    metaDescription: 'Rechnen Sie Temperaturen zwischen Grad Celsius, Fahrenheit und Kelvin um. Inklusive Umrechnungsformeln und Siedepunkten.',
+    h1: 'Temperatur-Umrechner (°C, °F & Kelvin)',
+    shortDescription: 'Wandelt Temperaturwerte zwischen Celsius, Fahrenheit und Kelvin um.',
+    searchKeywords: ['temperatur umrechner', 'celsius in fahrenheit rechner', 'fahrenheit in celsius formel', 'kelvin umrechnen'],
+    inputs: [
+      { id: 'value', label: 'Temperaturwert', type: 'number', defaultValue: 25, step: 0.5 },
+      {
+        id: 'fromUnit',
+        label: 'Ausgangsskala',
+        type: 'select',
+        defaultValue: 'C',
+        options: [
+          { value: 'C', label: 'Grad Celsius (°C)' },
+          { value: 'F', label: 'Grad Fahrenheit (°F)' },
+          { value: 'K', label: 'Kelvin (K)' },
+        ],
+      },
+      {
+        id: 'toUnit',
+        label: 'Zielskala',
+        type: 'select',
+        defaultValue: 'F',
+        options: [
+          { value: 'F', label: 'Grad Fahrenheit (°F)' },
+          { value: 'C', label: 'Grad Celsius (°C)' },
+          { value: 'K', label: 'Kelvin (K)' },
+        ],
+      },
+    ],
+    calculate: calculateTemperatureConversion,
+    formula: '°F = °C × 1,8 + 32 | °C = (°F - 32) / 1,8 | K = °C + 273,15',
+    formulaExplanation: 'Im Gegensatz zu anderen Maßeinheiten erfordert die Temperaturumrechnung neben einer Skalierung auch eine Nullpunktverschiebung (Offset 32 bzw. 273,15).',
+    workedExample: {
+      title: 'Beispiel: 25 °C (Zimmertemperatur)',
+      description: '25 × 1,8 + 32 = 77,00 °F.',
+      inputs: { value: 25, fromUnit: 'C', toUnit: 'F' },
+      resultSummary: '77,00 °F',
+    },
+    content: {
+      intro: 'Reisen Sie in die USA oder lesen Sie amerikanische Backrezepte? Mit diesem Rechner wandeln Sie Grad Fahrenheit im Nu in vertraute Grad Celsius um.',
+      details: 'Kelvin ist die offizielle Basiseinheit des internationalen Einheitensystems (SI) mit dem absoluten Nullpunkt bei 0 Kelvin (-273,15 °C).',
+    },
+    faqs: [
+      { question: 'Bei welcher Temperatur sind Celsius und Fahrenheit gleich?', answer: 'Bei genau -40 Grad stimmen beide Skalen überein: -40 °C ist identisch mit -40 °F.' },
+    ],
+    relatedSlugs: ['laengen-umrechner'],
+  },
+];

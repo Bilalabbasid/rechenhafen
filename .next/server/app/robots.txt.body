@@ -1,0 +1,5 @@
+User-Agent: *
+Allow: /
+
+Host: https://rechenhafen.de
+Sitemap: https://rechenhafen.de/sitemap.xml

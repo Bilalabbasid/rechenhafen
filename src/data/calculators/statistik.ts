@@ -1,0 +1,121 @@
+import { CalculatorDefinition } from '@/types/calculator';
+import {
+  calculateGradeAverage,
+  calculateStandardDeviation,
+  calculateOhmsLaw,
+} from '@/lib/calculators/statistik';
+
+export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
+  {
+    id: 'notendurchschnitt-rechner',
+    slug: 'notendurchschnitt-rechner',
+    name: 'Notendurchschnitt-Rechner (Schulnoten & Uni)',
+    shortName: 'Notendurchschnitt',
+    category: 'statistik-wissenschaft',
+    subcategory: 'Schulnoten & Studium',
+    metaTitle: 'Notendurchschnitt Rechner – Zeugnisnoten & Schnitt online berechnen',
+    metaDescription: 'Berechnen Sie Ihren Notendurchschnitt für Schule, Abitur und Studium. Geben Sie Schulnoten (1 bis 6) einfach mit Komma getrennt ein.',
+    h1: 'Notendurchschnitt Rechner für Schule & Zeugnis',
+    shortDescription: 'Ermittelt das arithmetische Mittel aus Ihren Zeugnis- und Prüfungsnoten.',
+    searchKeywords: ['notendurchschnitt rechner', 'zeugnisnoten rechner', 'notenschnitt berechnen schule', 'abitur notendurchschnitt'],
+    inputs: [
+      { id: 'grades', label: 'Noten eingeben (z.B. 1; 2; 3; 2.3; 1.7)', type: 'text', defaultValue: '2; 1; 3; 2; 1.5; 2.7', placeholder: '2; 1; 3; 2; 1.5; 2.7', helpText: 'Trennen Sie die Noten mit Semikolon oder Leerzeichen' },
+    ],
+    calculate: calculateGradeAverage,
+    formula: 'Notenschnitt = Summe aller Noten / Anzahl der Noten',
+    formulaExplanation: 'Arithmetisches Mittel aller Notenwerte im deutschen Schulsystem (1,0 bis 6,0).',
+    workedExample: {
+      title: 'Beispiel: Noten 1, 2, 3, 2, 2, 1',
+      description: 'Summe = 11. 11 geteilt durch 6 Noten = 1,83.',
+      inputs: { grades: '1; 2; 3; 2; 2; 1' },
+      resultSummary: 'Schnitt: 1,83',
+    },
+    content: {
+      intro: 'Schnelle Notenberechnung vor der Zeugniskonferenz oder zur Überprüfung des Zwischenstands im Halbjahr.',
+      details: 'Der Rechner unterstützt auch Dezimalnoten wie 1,3, 1,7 oder 2,3.',
+    },
+    faqs: [
+      { question: 'Wird der Notendurchschnitt kaufmännisch gerundet?', answer: 'In der Regel werden Notenschnitte auf zwei Nachkommastellen berechnet. Die Zeugnis-Endnote unterliegt oft landesspezifischen Rundungsregeln der Schulgesetze.' },
+    ],
+    relatedSlugs: ['durchschnittsrechner', 'standardabweichung-rechner'],
+  },
+  {
+    id: 'standardabweichung-rechner',
+    slug: 'standardabweichung-rechner',
+    name: 'Standardabweichung- & Varianz-Rechner',
+    shortName: 'Standardabweichung',
+    category: 'statistik-wissenschaft',
+    subcategory: 'Deskriptive Statistik',
+    metaTitle: 'Standardabweichung Rechner – Stichproben- & Populationsstreuung',
+    metaDescription: 'Berechnen Sie empirische Standardabweichung (s), Varianz (s²) und Mittelwert für jede beliebige Zahlenreihe online.',
+    h1: 'Standardabweichung & Varianz berechnen',
+    shortDescription: 'Ermittelt die Streuungsmaße einer Stichprobe oder Gesamtheit.',
+    searchKeywords: ['standardabweichung rechner', 'varianz berechnen online', 'stichproben standardabweichung', 'streuung statistik formel'],
+    inputs: [
+      { id: 'values', label: 'Zahlenreihe eingeben', type: 'text', defaultValue: '12; 15; 18; 11; 19; 14; 16', placeholder: '12; 15; 18; 11; 19; 14; 16', helpText: 'Zahlen getrennt durch Semikolon eingeben' },
+    ],
+    calculate: calculateStandardDeviation,
+    formula: 's = √[ (1 / (n - 1)) × Σ (xᵢ - x̄)² ]',
+    formulaExplanation: 'Die Stichproben-Standardabweichung nutzt die Bessel-Korrektur (Teilung durch n - 1), um eine unverzerrte Schätzung der Populationsstreuung zu gewährleisten.',
+    workedExample: {
+      title: 'Beispiel: 7 Werte (11, 12, 14, 15, 16, 18, 19)',
+      description: 'Mittelwert: 15,0. Stichproben-Standardabweichung: s = 3,00. Varianz: s² = 9,00.',
+      inputs: { values: '12; 15; 18; 11; 19; 14; 16' },
+      resultSummary: 's = 3,0000',
+    },
+    content: {
+      intro: 'Die Standardabweichung ist das wichtigste statistische Maß für die Streuung von Messwerten um ihren arithmetischen Mittelwert.',
+      details: 'Der Rechner gibt sowohl die Stichprobenstreuung (n - 1) als auch die Populationsstreuung (n) aus.',
+    },
+    faqs: [
+      { question: 'Was ist der Unterschied zwischen Varianz und Standardabweichung?', answer: 'Die Varianz ist der quadrierte Durchschnitt der Abweichungen vom Mittelwert (hat eine quadrierte Maßeinheit). Die Standardabweichung ist die Quadratwurzel der Varianz und hat dieselbe Einheit wie die Ausgangsdaten.' },
+    ],
+    relatedSlugs: ['durchschnittsrechner', 'notendurchschnitt-rechner'],
+  },
+  {
+    id: 'ohmsches-gesetz-rechner',
+    slug: 'ohmsches-gesetz-rechner',
+    name: 'Ohmsches-Gesetz-Rechner (U = R · I)',
+    shortName: 'Ohmsches Gesetz',
+    category: 'statistik-wissenschaft',
+    subcategory: 'Physik & Naturwissenschaft',
+    metaTitle: 'Ohmsches Gesetz Rechner – Spannung (U), Strom (I), Widerstand (R)',
+    metaDescription: 'Berechnen Sie Spannung (Volt), Stromstärke (Ampere), Widerstand (Ohm) und elektrische Leistung (Watt) nach dem Ohmschen Dreieck.',
+    h1: 'Ohmsches Gesetz Rechner (U = R · I & P = U · I)',
+    shortDescription: 'Berechnet elektrische Grundgrößen wie Spannung, Stromstärke, Widerstand und Leistung.',
+    searchKeywords: ['ohmsches gesetz rechner', 'u r i rechner', 'volt ampere ohm berechnen', 'elektrische leistung watt formel'],
+    inputs: [
+      {
+        id: 'target',
+        label: 'Gesuchte Größe',
+        type: 'select',
+        defaultValue: 'voltage',
+        options: [
+          { value: 'voltage', label: 'Spannung U (Volt)' },
+          { value: 'current', label: 'Stromstärke I (Ampere)' },
+          { value: 'resistance', label: 'Widerstand R (Ohm)' },
+        ],
+      },
+      { id: 'voltage', label: 'Spannung U in Volt (V)', type: 'number', defaultValue: 230, step: 1, unit: 'V' },
+      { id: 'current', label: 'Stromstärke I in Ampere (A)', type: 'number', defaultValue: 10, step: 0.1, unit: 'A' },
+      { id: 'resistance', label: 'Widerstand R in Ohm (Ω)', type: 'number', defaultValue: 23, step: 0.1, unit: 'Ω' },
+    ],
+    calculate: calculateOhmsLaw,
+    formula: 'U = R × I | P = U × I',
+    formulaExplanation: 'Elektrische Spannung ist das Produkt aus Widerstand und Stromstärke. Die elektrische Leistung in Watt ergibt sich aus Spannung mal Strom.',
+    workedExample: {
+      title: 'Beispiel: 230 Volt Steckdose bei 23 Ohm Widerstand',
+      description: 'I = 230 V / 23 Ω = 10,00 A. Leistung P = 230 V × 10 A = 2.300 Watt (2,3 kW).',
+      inputs: { target: 'voltage', voltage: 230, current: 10, resistance: 23 },
+      resultSummary: '230 V | 2.300 W',
+    },
+    content: {
+      intro: 'Das Ohmsche Gesetz beschreibt die fundamentale Beziehung zwischen Spannung, Strom und Widerstand in Gleichstrom- und ohmschen Wechselstromkreisen.',
+      details: 'Automatisch wird auch die thermische/elektrische Wirkleistung in Watt und Kilowatt berechnet.',
+    },
+    faqs: [
+      { question: 'Was besagt das Ohmsche Gesetz?', answer: 'Bei konstanter Temperatur ist die elektrische Stromstärke I in einem Leiter direkt proportional zur anliegenden Spannung U (I ~ U). Der Proportionalitätsfaktor ist der Kehrwert des Widerstands (Leitwert).' },
+    ],
+    relatedSlugs: ['stromkostenrechner', 'durchschnittsrechner'],
+  },
+];

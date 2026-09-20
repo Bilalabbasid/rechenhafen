@@ -1,0 +1,833 @@
+[
+  {
+    "id": "alkohol-verkochungs-rechner",
+    "slug": "alkohol-verkochungs-rechner",
+    "name": "Alkohol Verkochen Rechner (Restalkohol in Saucen & Schmorgerichten)",
+    "shortName": "Alkohol verkochen",
+    "category": "kochen-backen",
+    "subcategory": "Kochen & Garen",
+    "metaTitle": "Alkohol Verkochen Rechner – Restalkohol nach Kochzeit berechnen (USDA)",
+    "metaDescription": "Berechnen Sie, wie viel Alkohol beim Kochen mit Wein oder Bier wirklich verdampft. Wissenschaftliche Werte nach USDA-Studie: Restalkohol nach 15 bis 120 Minuten Köcheln.",
+    "h1": "Alkohol Verkochen Rechner – Wie viel Restalkohol bleibt im Essen?",
+    "shortDescription": "Berechnet den verbleibenden Restalkoholgehalt in Gerichten nach Kochzeit.",
+    "searchKeywords": [
+      "alkohol verkochen rechner usda tabelle",
+      "wieviel restalkohol nach 30 minuten kochen rotwein",
+      "verkocht alkohol vollstaendig schmorgericht",
+      "sauce mit wein fuer kinder schwangere restalkohol"
+    ],
+    "inputs": [
+      {
+        "id": "alcoholMl",
+        "label": "Zugegebene Alkoholmenge (z. B. Rotwein, Weißwein, Bier)",
+        "type": "number",
+        "defaultValue": 250,
+        "min": 10,
+        "max": 2000,
+        "step": 25,
+        "unit": "ml"
+      },
+      {
+        "id": "volPercent",
+        "label": "Alkoholgehalt des Getränks",
+        "type": "number",
+        "defaultValue": 13,
+        "min": 1,
+        "max": 80,
+        "step": 0.5,
+        "unit": "Vol.-%"
+      },
+      {
+        "id": "cookingMethod",
+        "label": "Zubereitungsart & Kochzeit (nach USDA Nutrient Data)",
+        "type": "select",
+        "defaultValue": "simmer30",
+        "options": [
+          {
+            "value": "flambee",
+            "label": "Flambieren (kurz angezündet – ca. 75 % Restalkohol)"
+          },
+          {
+            "value": "stir15",
+            "label": "Kurz aufgekocht / 15 Min. köcheln (ca. 40 % Restalkohol)"
+          },
+          {
+            "value": "simmer30",
+            "label": "30 Minuten leicht köcheln (ca. 35 % Restalkohol)"
+          },
+          {
+            "value": "simmer60",
+            "label": "1 Stunde köcheln (ca. 25 % Restalkohol)"
+          },
+          {
+            "value": "simmer120",
+            "label": "2 Stunden Schmorgericht (ca. 10 % Restalkohol)"
+          },
+          {
+            "value": "simmer150",
+            "label": "Über 2,5 Stunden geschmort (ca. 5 % Restalkohol)"
+          }
+        ]
+      },
+      {
+        "id": "portionsCount",
+        "label": "Anzahl Portionen des Gerichts",
+        "type": "number",
+        "defaultValue": 4,
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "unit": "Portionen"
+      }
+    ],
+    "calculateCode": "const ml = Number(inputs.alcoholMl) || 0;\nconst vol = Number(inputs.volPercent) || 0;\nconst portions = Number(inputs.portionsCount) || 4;\n\n// Reines Ethanol in Gramm (Dichte Ethanol ≈ 0.789 g/ml):\n// Reines Alkoholvolumen: ml * (vol / 100)\nconst pureAlcoholMl = ml * (vol / 100);\nconst pureAlcoholGramsInitial = pureAlcoholMl * 0.789;\n\nlet retentionRate = 0.35; // 30 Min.\nif (inputs.cookingMethod === 'flambee') retentionRate = 0.75;\nelse if (inputs.cookingMethod === 'stir15') retentionRate = 0.40;\nelse if (inputs.cookingMethod === 'simmer60') retentionRate = 0.25;\nelse if (inputs.cookingMethod === 'simmer120') retentionRate = 0.10;\nelse if (inputs.cookingMethod === 'simmer150') retentionRate = 0.05;\n\nconst remainingAlcoholGrams = pureAlcoholGramsInitial * retentionRate;\nconst remainingPerPortionG = remainingAlcoholGrams / portions;\n// Zum Vergleich: 1 kleines Glas Bier (0.2l 5%) hat ca. 8g reinen Alkohol\nconst beerGlassEquiv = remainingPerPortionG / 8.0;\n\nreturn {\n  primary: { id: 'remainingGrams', label: 'Verbleibender Restalkohol gesamt', value: remainingAlcoholGrams, formattedValue: formatNumber(remainingAlcoholGrams, 1) + ' g reiner Alkohol', highlight: true },\n  secondary: [\n    { id: 'perPortion', label: 'Restalkohol pro Portion', value: remainingPerPortionG, formattedValue: formatNumber(remainingPerPortionG, 2) + ' g je Portion' },\n    { id: 'retentionPct', label: 'Verbliebener Prozentanteil', value: retentionRate * 100, formattedValue: (retentionRate * 100) + ' % des Alkohols' },\n    { id: 'safetyHint', label: 'Eignung für Kinder & Schwangere', value: 0, formattedValue: remainingPerPortionG < 0.2 ? 'Spuren (vergleichbar mit reifem Fruchtsaft)' : 'Nicht empfohlen für Schwangere & Kinder' },\n  ],\n  summaryText: 'Von ursprünglich ' + formatNumber(pureAlcoholGramsInitial, 1) + ' g Alkohol verbleiben nach dem Garen noch rund ' + formatNumber(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im Essen – das sind ca. ' + formatNumber(remainingPerPortionG, 2) + ' g pro Portion.',\n};",
+    "formula": "Restalkohol = Zugegebene Menge × Vol.-% × 0,789 × Rückhaltefaktor (nach USDA-Studie)",
+    "formulaExplanation": "Entgegen dem weit verbreiteten Mythos verkocht Alkohol beim Kochen keineswegs vollständig. Selbst nach 2 Stunden Schmoren verbleiben noch ca. 10 % des ursprünglichen Alkohols im Gericht.",
+    "workedExample": {
+      "title": "Beispiel: 250 ml Rotwein (13 Vol.-%) in 4 Portionen Gulasch, 2 Stunden geschmort",
+      "inputValues": [
+        {
+          "label": "Wein",
+          "value": "250 ml"
+        },
+        {
+          "label": "Alkohol",
+          "value": "13 Vol.-%"
+        },
+        {
+          "label": "Kochzeit",
+          "value": "2 Stunden (10 % Rest)"
+        }
+      ],
+      "steps": [
+        "Ausgangsalkohol = 250 × 0,13 × 0,789 = 25,6 g reines Ethanol",
+        "Rest nach 2h = 25,6 g × 0,10 = 2,56 g gesamt",
+        "Pro Portion (bei 4 Portionen) = 2,56 / 4 = 0,64 g Alkohol"
+      ],
+      "result": "0,64 g reiner Alkohol pro Portion"
+    },
+    "faqs": [
+      {
+        "question": "Verkocht Alkohol beim Flambieren?",
+        "answer": "Nein, beim kurzen Flambieren verbrennt fast nur der Alkoholdampf an der Oberfläche. Rund 75 % des gesamten Alkohols verbleiben in der Speise."
+      },
+      {
+        "question": "Dürfen Kinder Gerichte essen, die mit Wein gekocht wurden?",
+        "answer": "Aus toxikologischer Sicht ist die Dosis nach langem Schmoren gering, Suchtexperten und Kinderärzte raten jedoch ab, um Kinder nicht frühzeitig an den typischen Weingeschmack zu gewöhnen."
+      }
+    ],
+    "relatedSlugs": [
+      "cocktail-alkoholgehalt-rechner",
+      "fleisch-kerntemperatur-garzeit-rechner",
+      "portionsrechner"
+    ]
+  },
+  {
+    "id": "eiweiss-eigelb-ersatz-rechner",
+    "slug": "eiweiss-eigelb-ersatz-rechner",
+    "name": "Ei-Ersatz Rechner (Vegane Alternativen für Backen & Kochen)",
+    "shortName": "Ei-Ersatz Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Ernährung & Diät",
+    "metaTitle": "Ei-Ersatz Rechner – Eier vegan ersetzen beim Backen & Kochen",
+    "metaDescription": "Berechnen Sie die optimale Menge an Ei-Ersatz für 1 bis 10 Eier: Apfelmark (60 bis 80 g), reife Banane (1/2 Stk.), Chiasamen, gemahlene Leinsamen oder Seidentofu.",
+    "h1": "Ei-Ersatz Rechner – Vegane Alternativen für Rührkuchen & Waffeln",
+    "shortDescription": "Ermittelt Mengenangaben für pflanzliche Ei-Alternativen beim Backen.",
+    "searchKeywords": [
+      "ei ersatz rechner vegan backen",
+      "1 ei ersetzen durch apfelmus banane chiasamen",
+      "veganer eiersatz rührkuchen menge",
+      "leinsamen eiersatz verhaeltnis wasser"
+    ],
+    "inputs": [
+      {
+        "id": "eggsCount",
+        "label": "Anzahl zu ersetzender Eier (Größe M)",
+        "type": "number",
+        "defaultValue": 2,
+        "min": 1,
+        "max": 12,
+        "step": 1,
+        "unit": "Eier"
+      },
+      {
+        "id": "subType",
+        "label": "Bevorzugter Ei-Ersatz",
+        "type": "select",
+        "defaultValue": "applesauce",
+        "options": [
+          {
+            "value": "applesauce",
+            "label": "Apfelmark / Apfelmus (saftig für Rührkuchen – 60 bis 80 g je Ei)"
+          },
+          {
+            "value": "banana",
+            "label": "Reife Banane püriert (für süße Kuchen/Pancakes – 1/2 Banane je Ei)"
+          },
+          {
+            "value": "flaxseed",
+            "label": "Leinsamen-Ei / Chia-Ei (1 EL gemahlen + 3 EL Wasser je Ei)"
+          },
+          {
+            "value": "silkenTofu",
+            "label": "Seidentofu püriert (neutral für Quiches/Kuchen – 60 g je Ei)"
+          },
+          {
+            "value": "aquafaba",
+            "label": "Aquafaba / Kichererbsenwasser (für Eischnee/Baiser – 3 EL je Eiweiß)"
+          }
+        ]
+      }
+    ],
+    "calculateCode": "const count = Number(inputs.eggsCount) || 1;\nconst sub = inputs.subType;\n\nlet amountStr = '';\nlet unitStr = '';\nlet tip = '';\n\nif (sub === 'applesauce') {\n  amountStr = (count * 70) + ' g';\n  tip = 'Macht Rührteige wunderbar saftig. Ideal für Schoko- und Gewürzkuchen; kein Eigengeschmack spürbar.';\n} else if (sub === 'banana') {\n  amountStr = (count * 0.5) + ' Banane(n) (ca. ' + (count * 50) + ' g)';\n  tip = 'Sehr reife Banane mit der Gabel zerdrücken. Bringt Eigensüße mit – Zuckermenge im Teig evtl. leicht reduzieren!';\n} else if (sub === 'flaxseed') {\n  amountStr = (count * 1) + ' EL gemahlene Leinsamen + ' + (count * 3) + ' EL warmes Wasser';\n  tip = 'Leinsamen mit Wasser verrühren und 10 Minuten quellen lassen, bis eine gelartige Masse entsteht (hervorragende Bindung).';\n} else if (sub === 'silkenTofu') {\n  amountStr = (count * 60) + ' g pürierter Seidentofu';\n  tip = 'Perfekt für dichte Teige, Käsekuchen, Tartes und herzhafte Aufläufe, da völlig geschmacksneutral.';\n} else if (sub === 'aquafaba') {\n  amountStr = (count * 3) + ' EL Kichererbsenwasser (ca. ' + (count * 45) + ' ml)';\n  tip = 'Mit etwas Weinstein oder Zitronensaft aufschlagen wie echten Eischnee für Macarons, Mousse au Chocolat und Baiser.';\n}\n\nreturn {\n  primary: { id: 'subAmount', label: 'Benötigte Ersatzmenge', value: count, formattedValue: amountStr, highlight: true },\n  secondary: [\n    { id: 'tip', label: 'Praxistipp zur Zubereitung', value: 0, formattedValue: tip },\n    { id: 'standardEggs', label: 'Entspricht Hühnereiern', value: count, formattedValue: count + ' Ei(er) Größe M (ca. ' + (count * 55) + ' g)' },\n  ],\n  summaryText: 'Um ' + count + ' Ei(er) zu ersetzen, benötigen Sie ' + amountStr + '. ' + tip,\n};",
+    "formula": "1 Ei (M) ≈ 70 g Apfelmark ≈ 1/2 Banane ≈ 1 EL Leinsamen + 3 EL Wasser ≈ 60 g Seidentofu",
+    "formulaExplanation": "Hühnereier erfüllen beim Backen mehrere Funktionen: Bindung (Emulgator Lezithin im Eigelb), Feuchtigkeit und Triebkraft. Je nach Gebäckart eignet sich ein anderer Ersatz am besten.",
+    "workedExample": {
+      "title": "Beispiel: Vegane Waffeln mit Ersatz für 2 Eier",
+      "inputValues": [
+        {
+          "label": "Eier",
+          "value": "2 Eier (Größe M)"
+        },
+        {
+          "label": "Ersatz",
+          "value": "Apfelmark"
+        }
+      ],
+      "steps": [
+        "2 Eier × 70 g Apfelmark = 140 g Apfelmark",
+        "Teig wie gewohnt mit 1 TL extra Backpulver anrühren"
+      ],
+      "result": "140 g Apfelmark (ca. 4-5 gehäufte Esslöffel)"
+    },
+    "faqs": [
+      {
+        "question": "Was ist Aquafaba?",
+        "answer": "Aquafaba ist das dickflüssige Kochwasser von Kichererbsen (oder Bohnen aus der Dose). Aufgrund seiner Eiweiß- und Stärkestruktur lässt es sich wie echter Eischnee steif schlagen."
+      },
+      {
+        "question": "Kann man mit Bananen-Ei auch Biskuit backen?",
+        "answer": "Nein, für lockeren Biskuit eignen sich schwere Fruchtpürees nicht. Hier nutzt man besser aufgeschlagenes Aquafaba oder spezielles Ei-Ersatzpulver auf Lupinen-/Stärkebasis."
+      }
+    ],
+    "relatedSlugs": [
+      "zucker-ersatz-rechner",
+      "cups-in-gramm-rechner",
+      "portionsrechner"
+    ]
+  },
+  {
+    "id": "wasser-reis-verhaeltnis-rechner",
+    "slug": "wasser-reis-verhaeltnis-rechner",
+    "name": "Reis kochen Rechner (Wasser-Reis-Verhältnis & Garzeit nach Reissorte)",
+    "shortName": "Reis kochen Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Kochen & Garen",
+    "metaTitle": "Reis kochen Rechner – Wasser-Reis-Verhältnis nach Quellmethode berechnen",
+    "metaDescription": "Berechnen Sie die perfekte Wassermenge und Kochzeit für Basmatireis (1:1,5), Jasminreis (1:1,25), Vollkornreis (1:2) und Milchreis nach der Quellmethode.",
+    "h1": "Reis kochen Rechner – Perfektes Wasser-Reis-Verhältnis ermitteln",
+    "shortDescription": "Berechnet die genaue Wassermenge und Garzeit für alle Reissorten.",
+    "searchKeywords": [
+      "reis kochen verhaeltnis wasser reis",
+      "quellmethode reis wasser berechnen",
+      "basmati reis wasser menge gramm ml",
+      "naturreis vollstreis garzeit wasser"
+    ],
+    "inputs": [
+      {
+        "id": "riceGrams",
+        "label": "Reismenge (ungekocht)",
+        "type": "number",
+        "defaultValue": 200,
+        "min": 50,
+        "max": 2000,
+        "step": 25,
+        "unit": "g Reis"
+      },
+      {
+        "id": "riceType",
+        "label": "Reissorte",
+        "type": "select",
+        "defaultValue": "basmati",
+        "options": [
+          {
+            "value": "basmati",
+            "label": "Basmati-Reis (Verhältnis 1 : 1,5 – ca. 12-15 Min.)"
+          },
+          {
+            "value": "jasmine",
+            "label": "Jasmin-Reis / Duftreis (Verhältnis 1 : 1,3 – ca. 12-14 Min.)"
+          },
+          {
+            "value": "wholegrain",
+            "label": "Vollkornreis / Naturreis (Verhältnis 1 : 2,0 – ca. 35-45 Min.)"
+          },
+          {
+            "value": "sushi",
+            "label": "Sushireis / Rundkorn (Verhältnis 1 : 1,2 – ca. 15 Min. + Dämpfen)"
+          },
+          {
+            "value": "risotto",
+            "label": "Risotto-Reis (Arborio/Carnaroli – Verhältnis 1 : 3,0 Brühe)"
+          }
+        ]
+      }
+    ],
+    "calculateCode": "const riceG = Number(inputs.riceGrams) || 200;\nconst type = inputs.riceType;\n\nlet waterRatio = 1.5;\nlet cookMins = 14;\nlet tip = 'Vor dem Kochen 2-3 Mal gründlich mit kaltem Wasser waschen, bis das Wasser klar bleibt.';\n\nif (type === 'jasmine') {\n  waterRatio = 1.3;\n  cookMins = 13;\n  tip = 'Nicht zu viel Wasser verwenden, damit Jasminreis schön klebrig und aromatisch bleibt.';\n} else if (type === 'wholegrain') {\n  waterRatio = 2.0;\n  cookMins = 40;\n  tip = 'Vollkornreis behält den Keimling und die Silberhaut und braucht daher deutlich mehr Wasser und Garzeit.';\n} else if (type === 'sushi') {\n  waterRatio = 1.2;\n  cookMins = 15;\n  tip = 'Nach dem Kochen 10 Min. bei geschlossenem Deckel ruhen lassen, danach vorsichtig mit Sushi-Essig würzen.';\n} else if (type === 'risotto') {\n  waterRatio = 3.0;\n  cookMins = 20;\n  tip = 'Heiße Brühe kellenweise unter ständigem Rühren nachgießen, bis der Reis cremig mit bissfestem Kern ist.';\n}\n\nconst waterMl = Math.round(riceG * waterRatio);\nconst saltG = Math.round((riceG / 100) * 1.5); // ca. 1.5 g Salz je 100g Reis\nconst cookedWeightG = Math.round(riceG * (1 + (waterRatio * 0.9)));\nconst portions = Math.max(1, Math.round(riceG / 65)); // ca. 60-70g Beilage p.P.\n\nreturn {\n  primary: { id: 'waterMl', label: 'Benötigtes Wasser / Flüssigkeit', value: waterMl, formattedValue: waterMl + ' ml (g)', highlight: true },\n  secondary: [\n    { id: 'cookTime', label: 'Garzeit bei geringer Hitze', value: cookMins, formattedValue: cookMins + ' Minuten (mit Deckel)' },\n    { id: 'saltG', label: 'Empfohlenes Salz', value: saltG, formattedValue: 'ca. ' + saltG + ' g (1 gestr. TL)' },\n    { id: 'cookedYield', label: 'Ergibt gekochten Reis', value: cookedWeightG, formattedValue: 'ca. ' + cookedWeightG + ' g (für ca. ' + portions + ' Personen)' },\n  ],\n  summaryText: 'Für ' + riceG + ' g Reis benötigen Sie genau ' + waterMl + ' ml Wasser und ca. ' + saltG + ' g Salz. Bei geschlossenem Deckel auf kleinster Stufe ca. ' + cookMins + ' Minuten sanft köcheln lassen.',\n};",
+    "formula": "Wassermenge (ml) = Reismenge (g) × Sortenspezifisches Verhältnis (1,2 bis 2,0)",
+    "formulaExplanation": "Bei der Quellmethode verdampft kaum Wasser, da der Topfdeckel stets geschlossen bleibt. Der Reis nimmt die gesamte Flüssigkeit und die Nährstoffe vollständig auf.",
+    "workedExample": {
+      "title": "Beispiel: 200 g Basmatireis für 3 Personen kochen",
+      "inputValues": [
+        {
+          "label": "Reis",
+          "value": "200 g"
+        },
+        {
+          "label": "Sorte",
+          "value": "Basmati (1:1,5)"
+        }
+      ],
+      "steps": [
+        "Wasser = 200 g × 1,5 = 300 ml Wasser",
+        "1 Mal aufkochen, dann Deckel drauf und 12-14 Min. auf kleinster Stufe ziehen lassen"
+      ],
+      "result": "300 ml Wasser (ergibt ca. 500 g lockeren Reis)"
+    },
+    "faqs": [
+      {
+        "question": "Warum sollte man Reis vor dem Kochen waschen?",
+        "answer": "Durch das Waschen wird überschüssige Oberflächenstärke entfernt. Dadurch klebt der Reis nach dem Kochen nicht klumpig zusammen, sondern bleibt wunderbar körnig und locker."
+      },
+      {
+        "question": "Darf man beim Reis kochen den Deckel anheben?",
+        "answer": "Nein! Wenn der Deckel vor Ablauf der Garzeit geöffnet wird, entweicht der notwendige heiße Dampf und der Reis gart ungleichmäßig oder brennt am Boden an."
+      }
+    ],
+    "relatedSlugs": [
+      "portionsrechner",
+      "nudeln-rohmaerk-gewicht-rechner",
+      "gramm-in-ml-rechner"
+    ]
+  },
+  {
+    "id": "nudeln-rohmaerk-gewicht-rechner",
+    "slug": "nudeln-rohmaerk-gewicht-rechner",
+    "name": "Nudeln Rechner (Trocken- vs. Gekocht-Gewicht & Portionsgröße)",
+    "shortName": "Nudeln Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Kochen & Garen",
+    "metaTitle": "Nudeln Rechner – Rohgewicht in gekochtes Gewicht & Portionen pro Person",
+    "metaDescription": "Berechnen Sie, wie viel Gramm trockene Nudeln gekocht ergeben (Faktor ca. 2,3) und wie viel Gramm Pasta Sie pro Person für Vorspeise oder Hauptgericht brauchen.",
+    "h1": "Nudeln Rechner – Nudelportionen & Gekochtes Gewicht berechnen",
+    "shortDescription": "Ermittelt Nudelgewicht trocken vs. gekocht und Portionsgrößen.",
+    "searchKeywords": [
+      "nudeln rechner trocken gekocht gewicht faktor",
+      "wieviel gramm nudeln pro person hauptgericht",
+      "nudelportionen berechnen kinder erwachsene",
+      "spaghetti menge gramm pro person"
+    ],
+    "inputs": [
+      {
+        "id": "personsCount",
+        "label": "Anzahl Personen",
+        "type": "number",
+        "defaultValue": 4,
+        "min": 1,
+        "max": 50,
+        "step": 1,
+        "unit": "Personen"
+      },
+      {
+        "id": "mealType",
+        "label": "Mahlzeiten-Art",
+        "type": "select",
+        "defaultValue": "mainDish",
+        "options": [
+          {
+            "value": "mainDish",
+            "label": "Hauptgericht / normaler Hunger (ca. 100 bis 125 g p.P.)"
+          },
+          {
+            "value": "bigHunger",
+            "label": "Großer Hunger / Sportler (ca. 150 g p.P.)"
+          },
+          {
+            "value": "sideDish",
+            "label": "Beilage / Vorspeise (ca. 60 bis 80 g p.P.)"
+          },
+          {
+            "value": "kids",
+            "label": "Kinderportion (ca. 50 bis 60 g p.P.)"
+          }
+        ]
+      }
+    ],
+    "calculateCode": "const persons = Number(inputs.personsCount) || 1;\nconst meal = inputs.mealType;\n\nlet dryPerPersonG = 110;\nif (meal === 'bigHunger') dryPerPersonG = 150;\nelse if (meal === 'sideDish') dryPerPersonG = 70;\nelse if (meal === 'kids') dryPerPersonG = 55;\n\nconst totalDryG = persons * dryPerPersonG;\n// Trockene Nudeln saugen ca. das 1.2- bis 1.4-fache ihres Eigengewichts an Wasser auf:\n// Faktor gekocht ≈ 2.25 bis 2.30\nconst cookedWeightG = Math.round(totalDryG * 2.28);\n// Faustregel Wasser & Salz: Pro 100g Nudeln = 1 Liter Wasser und 10g Salz\nconst waterLiters = Math.max(1.5, Math.ceil((totalDryG / 100) * 1.0));\nconst saltG = Math.round(waterLiters * 10);\n\nreturn {\n  primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: totalDryG, formattedValue: totalDryG + ' g (ca. ' + formatNumber(totalDryG / 500, 1) + ' Packungen à 500g)', highlight: true },\n  secondary: [\n    { id: 'cookedPasta', label: 'Ergibt gekochte Pasta ca.', value: cookedWeightG, formattedValue: formatNumber(cookedWeightG, 0) + ' g gekocht' },\n    { id: 'waterReq', label: 'Kochwasser (1l je 100g Nudeln)', value: waterLiters, formattedValue: waterLiters + ' Liter Wasser' },\n    { id: 'saltReq', label: 'Salzmenge für Kochwasser', value: saltG, formattedValue: saltG + ' g Salz (10g / Liter)' },\n  ],\n  summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalDryG + ' g trockene Nudeln (' + dryPerPersonG + ' g p.P.). Beim Kochen saugen sie Wasser auf und ergeben ca. ' + formatNumber(cookedWeightG, 0) + ' g fertige Pasta.',\n};",
+    "formula": "Gekochte Nudeln ≈ Trockengewicht × 2,28; Wasser = 1 l je 100 g; Salz = 10 g je Liter Wasser",
+    "formulaExplanation": "Hartweizengrieß-Nudeln verdoppeln bis verdreifachen ihr Gewicht beim Kochen \"al dente\" durch die Quellung der Stärke.",
+    "workedExample": {
+      "title": "Beispiel: Nudeln für 4 Erwachsene als Hauptgericht",
+      "inputValues": [
+        {
+          "label": "Personen",
+          "value": "4"
+        },
+        {
+          "label": "Hunger",
+          "value": "Normal (110 g)"
+        }
+      ],
+      "steps": [
+        "Trockengewicht = 4 × 110 g = 440 g (fast 1 Paket à 500 g)",
+        "Gekochtes Gewicht = 440 × 2,28 ≈ 1.000 g Pasta",
+        "Wasser = 4 bis 5 Liter Wasser mit 40 g Salz"
+      ],
+      "result": "440 g Trockennudeln (ca. 1 kg gekocht)"
+    },
+    "faqs": [
+      {
+        "question": "Sollte man Öl ins Nudelwasser geben?",
+        "answer": "Nein! Öl schwimmt nur auf dem Wasser und legt sich beim Abgießen wie ein Film um die Nudeln. Dadurch kann die Nudeloberfläche die Sauce später viel schlechter aufnehmen."
+      },
+      {
+        "question": "Sollte man Nudeln nach dem Kochen mit kaltem Wasser abschrecken?",
+        "answer": "Nein, niemals abschrecken (außer bei kaltem Nudelsalat)! Das Abschrecken spült die wertvolle Oberflächenstärke ab, die für die Saucenbindung unverzichtbar ist."
+      }
+    ],
+    "relatedSlugs": [
+      "portionsrechner",
+      "wasser-reis-verhaeltnis-rechner",
+      "kalorien-rezept-rechner"
+    ]
+  },
+  {
+    "id": "sauerteig-anstellgut-rechner",
+    "slug": "sauerteig-anstellgut-rechner",
+    "name": "Sauerteig Rechner (Anstellgut füttern & Sauerteigführung 1:1:1)",
+    "shortName": "Sauerteig Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Backzutaten",
+    "metaTitle": "Sauerteig Rechner – Anstellgut füttern & Sauerteigführung 1:1:1",
+    "metaDescription": "Berechnen Sie die exakten Mehl- und Wassermengen zur Sauerteig-Führung nach gewünschter Sauerteigmenge und Fütterungsverhältnis (1:1:1, 1:2:2 oder 1:5:5).",
+    "h1": "Sauerteig Rechner – Anstellgut füttern & Sauerteigmenge berechnen",
+    "shortDescription": "Berechnet Mehl, Wasser und Anstellgut zur Sauerteig-Herstellung.",
+    "searchKeywords": [
+      "sauerteig rechner anstellgut fuettern",
+      "sauerteig fuehrung verhaeltnis 1 zu 1 zu 1",
+      "roggensauerteig weizensauerteig menge mehl wasser",
+      "anstellgut auffrischen gramm rechner"
+    ],
+    "inputs": [
+      {
+        "id": "desiredSourdoughG",
+        "label": "Benötigte Sauerteigmenge laut Rezept",
+        "type": "number",
+        "defaultValue": 200,
+        "min": 20,
+        "max": 2000,
+        "step": 10,
+        "unit": "g Sauerteig"
+      },
+      {
+        "id": "feedingRatio",
+        "label": "Fütterungs-Verhältnis (Anstellgut : Mehl : Wasser)",
+        "type": "select",
+        "defaultValue": "1_1_1",
+        "options": [
+          {
+            "value": "1_1_1",
+            "label": "1 : 1 : 1 (Klassisch – schnelle Reife in ca. 4-6 Stunden)"
+          },
+          {
+            "value": "1_2_2",
+            "label": "1 : 2 : 2 (Mittlere Reife in ca. 6-8 Stunden)"
+          },
+          {
+            "value": "1_5_5",
+            "label": "1 : 5 : 5 (Sehr milde Führung über Nacht / ca. 10-12 Stunden)"
+          }
+        ]
+      },
+      {
+        "id": "reserveG",
+        "label": "Zusätzliche Reserve für nächstes Anstellgut",
+        "type": "number",
+        "defaultValue": 30,
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "unit": "g Reserve"
+      }
+    ],
+    "calculateCode": "const targetG = Number(inputs.desiredSourdoughG) || 200;\nconst reserveG = Number(inputs.reserveG) || 30;\nconst totalToProduceG = targetG + reserveG;\n\nlet ratioParts = 3; // 1:1:1\nlet starterPart = 1;\nlet flourPart = 1;\nlet waterPart = 1;\n\nif (inputs.feedingRatio === '1_2_2') {\n  starterPart = 1;\n  flourPart = 2;\n  waterPart = 2;\n  ratioParts = 5;\n} else if (inputs.feedingRatio === '1_5_5') {\n  starterPart = 1;\n  flourPart = 5;\n  waterPart = 5;\n  ratioParts = 11;\n}\n\nconst onePartG = totalToProduceG / ratioParts;\nconst starterG = Math.round(onePartG * starterPart);\nconst flourG = Math.round(onePartG * flourPart);\nconst waterG = Math.round(onePartG * waterPart);\nconst actualTotal = starterG + flourG + waterG;\n\nreturn {\n  primary: { id: 'starter', label: 'Benötigtes Anstellgut (Starter)', value: starterG, formattedValue: starterG + ' g Anstellgut', highlight: true },\n  secondary: [\n    { id: 'flour', label: 'Mehl (Roggen- oder Weizenvollkorn)', value: flourG, formattedValue: flourG + ' g Mehl', highlight: true },\n    { id: 'water', label: 'Handwarmes Wasser (ca. 30-35 °C)', value: waterG, formattedValue: waterG + ' g (ml) Wasser', highlight: true },\n    { id: 'totalProduced', label: 'Ergibt aktiven Sauerteig', value: actualTotal, formattedValue: actualTotal + ' g (' + targetG + ' g fürs Brot + ' + reserveG + ' g Reserve)' },\n  ],\n  summaryText: 'Mischen Sie ' + starterG + ' g Anstellgut mit ' + flourG + ' g Mehl und ' + waterG + ' g handwarmem Wasser. Ergibt ' + actualTotal + ' g reifen Sauerteig (' + targetG + ' g fürs Rezept, ' + reserveG + ' g zurück ins Glas als Reserve).',\n};",
+    "formula": "Teile = Anstellgut + Mehl + Wasser; Einzelgewicht = Gesamtmenge / Summe der Teile",
+    "formulaExplanation": "Die Sauerteig-Hydratation beträgt bei Standardführung (1:1:1) exakt 100 % (TA 200), da Mehl und Wasser zu gleichen Teilen zugegeben werden.",
+    "workedExample": {
+      "title": "Beispiel: 200 g Sauerteig fürs Brot + 30 g Reserve nach 1:1:1",
+      "inputValues": [
+        {
+          "label": "Zielmenge",
+          "value": "230 g gesamt"
+        },
+        {
+          "label": "Verhältnis",
+          "value": "1:1:1 (3 Teile)"
+        }
+      ],
+      "steps": [
+        "1 Teil = 230 g / 3 ≈ 77 g",
+        "77 g Anstellgut + 77 g Mehl + 77 g Wasser = 231 g Sauerteig"
+      ],
+      "result": "je 77 g Anstellgut, Mehl und Wasser"
+    },
+    "faqs": [
+      {
+        "question": "Wann ist der Sauerteig backbereit (Peak)?",
+        "answer": "Der Sauerteig ist backbereit, wenn er sein Volumen verdoppelt bis verdreifacht hat, eine kuppelförmige Oberfläche mit vielen Bläschen zeigt und kurz vor dem Wiederabsinken steht."
+      },
+      {
+        "question": "Wie übersteht Anstellgut den Urlaub?",
+        "answer": "Gut gefüttert hält sich Anstellgut im Schraubglas im Kühlschrank problemlos 2 bis 3 Wochen. Für längere Pausen kann man ihn dünn auf Backpapier verstreichen, trocknen und als Trockensauerteig jahrelang aufbewahren."
+      }
+    ],
+    "relatedSlugs": [
+      "brot-backen-baeckermass-rechner",
+      "pizza-teig-rechner",
+      "hefe-umrechner"
+    ]
+  },
+  {
+    "id": "marmelade-geliermittel-rechner",
+    "slug": "marmelade-geliermittel-rechner",
+    "name": "Marmelade & Gelierzucker Rechner (1:1, 2:1 & 3:1 Zucker)",
+    "shortName": "Marmelade Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Einkochen & Haltbarkeit",
+    "metaTitle": "Marmelade Rechner – Gelierzucker 1:1, 2:1, 3:1 & Gläseranzahl berechnen",
+    "metaDescription": "Berechnen Sie die benötigte Menge Gelierzucker (1:1, 2:1 oder 3:1) nach Fruchtgewicht in Gramm, Zitronensaft-Zugabe und die Anzahl benötigter Schraubgläser.",
+    "h1": "Marmelade Rechner – Gelierzucker nach Fruchtgewicht ermitteln",
+    "shortDescription": "Berechnet Gelierzucker und Gläseranzahl für Marmelade und Konfitüre.",
+    "searchKeywords": [
+      "marmelade rechner gelierzucker 1 zu 1 2 zu 1 3 zu 1",
+      "wieviel gelierzucker fuer 1 kg erdbeeren",
+      "marmeladenglaeser anzahl berechnen",
+      "gelierprobe zitronensaeure marmelade"
+    ],
+    "inputs": [
+      {
+        "id": "fruitGrams",
+        "label": "Vorbereitete Früchte (geputzt & entsteint)",
+        "type": "number",
+        "defaultValue": 1000,
+        "min": 100,
+        "max": 20000,
+        "step": 50,
+        "unit": "g Früchte"
+      },
+      {
+        "id": "sugarType",
+        "label": "Gelierzucker-Verhältnis",
+        "type": "select",
+        "defaultValue": "2_1",
+        "options": [
+          {
+            "value": "2_1",
+            "label": "Gelierzucker 2:1 (Fruchtig-süß – 500 g Zucker auf 1.000 g Frucht – Empfehlung)"
+          },
+          {
+            "value": "3_1",
+            "label": "Gelierzucker 3:1 (Sehr fruchtig, weniger süß – 333 g Zucker auf 1.000 g Frucht)"
+          },
+          {
+            "value": "1_1",
+            "label": "Gelierzucker 1:1 (Klassisch süß, extrem lange haltbar – 1.000 g Zucker auf 1.000 g Frucht)"
+          }
+        ]
+      },
+      {
+        "id": "jarSizeMl",
+        "label": "Fassungsvermögen der Marmeladengläser",
+        "type": "select",
+        "defaultValue": "250",
+        "options": [
+          {
+            "value": "200",
+            "label": "Kleine Gläser (200 ml)"
+          },
+          {
+            "value": "250",
+            "label": "Standardgläser (250 ml)"
+          },
+          {
+            "value": "350",
+            "label": "Große Gläser (350 ml)"
+          }
+        ]
+      }
+    ],
+    "calculateCode": "const fruitG = Number(inputs.fruitGrams) || 0;\nconst sugarType = inputs.sugarType;\n\nlet sugarFactor = 0.5; // 2:1\nif (sugarType === '1_1') sugarFactor = 1.0;\nelse if (sugarType === '3_1') sugarFactor = 1 / 3;\n\nconst sugarG = Math.round(fruitG * sugarFactor);\nconst lemonJuiceMl = Math.round((fruitG / 1000) * 20); // 1-2 EL je kg\n// Gesamtmasse vor Kochverlust:\nconst rawTotalG = fruitG + sugarG;\n// Kochverlust durch Verdampfen ca. 8-10 %:\nconst finalJamG = Math.round(rawTotalG * 0.92);\n\nconst jarMl = Number(inputs.jarSizeMl) || 250;\n// Dichte Marmelade ca. 1.25 g/ml (Zucker erhöht Dichte)\nconst jamVolumeMl = finalJamG / 1.25;\nconst jarsCount = Math.ceil(jamVolumeMl / jarMl);\n\nreturn {\n  primary: { id: 'sugarAmount', label: 'Benötigter Gelierzucker (' + (sugarType.replace('_', ':')) + ')', value: sugarG, formattedValue: sugarG + ' g Gelierzucker', highlight: true },\n  secondary: [\n    { id: 'jars', label: 'Benötigte Schraubgläser (à ' + jarMl + ' ml)', value: jarsCount, formattedValue: jarsCount + ' Gläser' },\n    { id: 'lemon', label: 'Zitronensaft / Zitronensäure', value: lemonJuiceMl, formattedValue: 'ca. ' + lemonJuiceMl + ' ml (1-2 EL)' },\n    { id: 'yield', label: 'Fertige Marmeladenmenge ca.', value: finalJamG, formattedValue: formatNumber(finalJamG, 0) + ' g' },\n  ],\n  summaryText: 'Für ' + fruitG + ' g Früchte benötigen Sie ' + sugarG + ' g Gelierzucker ' + (sugarType.replace('_', ':')) + ' und ca. ' + lemonJuiceMl + ' ml Zitronensaft. Ergibt rund ' + jarsCount + ' Gläser à ' + jarMl + ' ml.',\n};",
+    "formula": "2:1 Zucker = Fruchtgewicht / 2; 3:1 Zucker = Fruchtgewicht / 3; Gläser = (Gesamtmasse / 1,25) / Glasvolumen",
+    "formulaExplanation": "Gelierzucker 2:1 und 3:1 enthält zusätzlich pflanzliches Pektin (aus Äpfeln oder Zitrusfrüchten) und Zitronensäure, damit die Marmelade trotz geringerem Zuckergehalt zuverlässig geliert.",
+    "workedExample": {
+      "title": "Beispiel: 1.500 g Erdbeeren mit 2:1 Gelierzucker",
+      "inputValues": [
+        {
+          "label": "Früchte",
+          "value": "1.500 g"
+        },
+        {
+          "label": "Zucker",
+          "value": "2:1"
+        }
+      ],
+      "steps": [
+        "Gelierzucker = 1.500 / 2 = 750 g Zucker",
+        "Marmelade ca. 2.070 g -> ca. 7 Gläser à 250 ml"
+      ],
+      "result": "750 g Gelierzucker (7 Gläser)"
+    },
+    "faqs": [
+      {
+        "question": "Wie funktioniert die Gelierprobe richtig?",
+        "answer": "Geben Sie nach 4 Minuten sprudelndem Kochen 1 Teelöffel heiße Marmelade auf einen eiskalten Teller aus dem Tiefkühlfach. Wird die Masse nach 1 Minute fest, ist die Marmelade fertig!"
+      },
+      {
+        "question": "Muss man heiße Marmeladengläser auf den Kopf stellen?",
+        "answer": "Nein, nach heutigem Stand der Hygiene ist das nicht nötig und kann sogar Schadstoffe aus dem Deckelgummi lösen. Gründlich sterilisierte Gläser und heißes Einfüllen genügen völlig für ein Vakuum."
+      }
+    ],
+    "relatedSlugs": [
+      "kuehlschrank-haltbarkeit-rechner",
+      "portionsrechner",
+      "zucker-ersatz-rechner"
+    ]
+  },
+  {
+    "id": "kaffee-wasser-verhaeltnis-rechner",
+    "slug": "kaffee-wasser-verhaeltnis-rechner",
+    "name": "Kaffee Rechner (Golden Cup Ratio Kaffeemehl in g nach Tassenanzahl)",
+    "shortName": "Kaffee Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Getränke",
+    "metaTitle": "Kaffee Rechner – Golden Cup Ratio Kaffeemehl in Gramm nach Tassen berechnen",
+    "metaDescription": "Berechnen Sie das optimale Verhältnis von Kaffeemehl zu Wasser nach SCA Golden Cup Standard (60 g Kaffee auf 1 Liter Wasser) für Filterkaffee, French Press und V60.",
+    "h1": "Kaffee Rechner – Wie viel Kaffeepulver brauche ich pro Tasse?",
+    "shortDescription": "Berechnet Kaffeemehl in Gramm nach Tassenanzahl und Brühmethode.",
+    "searchKeywords": [
+      "kaffee rechner kaffeemehl gramm pro tasse",
+      "golden cup ratio sca 60g pro liter",
+      "french press kaffee menge berechnen",
+      "filterkaffee wieviel kaffeepulver pro tasse"
+    ],
+    "inputs": [
+      {
+        "id": "cupsCount",
+        "label": "Anzahl Kaffeetassen",
+        "type": "number",
+        "defaultValue": 4,
+        "min": 1,
+        "max": 30,
+        "step": 1,
+        "unit": "Tassen"
+      },
+      {
+        "id": "cupSizeMl",
+        "label": "Tassengröße",
+        "type": "select",
+        "defaultValue": "150",
+        "options": [
+          {
+            "value": "125",
+            "label": "Kleine Kaffeetasse (125 ml – Kaffeemaschinen-Norm)"
+          },
+          {
+            "value": "150",
+            "label": "Standard Kaffeetasse (150 ml)"
+          },
+          {
+            "value": "250",
+            "label": "Großer Kaffeebecher / Mug (250 ml)"
+          }
+        ]
+      },
+      {
+        "id": "strength",
+        "label": "Gewünschte Kaffeestärke (Brew Ratio)",
+        "type": "select",
+        "defaultValue": "standard",
+        "options": [
+          {
+            "value": "mild",
+            "label": "Mild (ca. 55 g Kaffee / 1.000 ml Wasser – Verhältnis 1:18)"
+          },
+          {
+            "value": "standard",
+            "label": "Ausgewogen / SCA Golden Cup (60 g / 1.000 ml – Verhältnis 1:16,7)"
+          },
+          {
+            "value": "strong",
+            "label": "Kräftig (ca. 65 g Kaffee / 1.000 ml – Verhältnis 1:15)"
+          }
+        ]
+      }
+    ],
+    "calculateCode": "const cups = Number(inputs.cupsCount) || 1;\nconst cupMl = Number(inputs.cupSizeMl) || 150;\nconst totalWaterMl = cups * cupMl;\n\nlet ratioGPerLiter = 60; // SCA Golden Cup\nif (inputs.strength === 'mild') ratioGPerLiter = 55;\nelse if (inputs.strength === 'strong') ratioGPerLiter = 65;\n\nconst coffeeGrams = (totalWaterMl / 1000) * ratioGPerLiter;\nconst spoonsCount = Math.round((coffeeGrams / 7) * 10) / 10; // Kaffeelot / gehäufter EL ca. 7g\n\nreturn {\n  primary: { id: 'coffeeG', label: 'Benötigtes Kaffeemehl', value: coffeeGrams, formattedValue: formatNumber(coffeeGrams, 1) + ' g', highlight: true },\n  secondary: [\n    { id: 'waterMl', label: 'Gesamte Wassermenge', value: totalWaterMl, formattedValue: totalWaterMl + ' ml (' + formatNumber(totalWaterMl / 1000, 2) + ' Liter)' },\n    { id: 'coffeeSpoons', label: 'Kaffeelote / gehäufte EL (ca. 7g)', value: spoonsCount, formattedValue: 'ca. ' + spoonsCount + ' Lote' },\n    { id: 'waterTemp', label: 'Optimale Wassertemperatur', value: 94, formattedValue: '92 °C bis 96 °C (nicht kochend!)' },\n  ],\n  summaryText: 'Für ' + cups + ' Tassen Kaffee (' + totalWaterMl + ' ml Wasser) benötigen Sie exakt ' + formatNumber(coffeeGrams, 1) + ' g frisch gemahlenes Kaffeemehl (ca. ' + spoonsCount + ' Kaffeelote).',\n};",
+    "formula": "Kaffeemehl (g) = (Wassermenge in ml / 1.000) × Brühverhältnis (55 bis 65 g/l)",
+    "formulaExplanation": "Die Specialty Coffee Association (SCA) empfiehlt die \"Golden Cup Ratio\" von 60 Gramm Kaffee pro 1.000 ml Wasser für eine ideale Extraktion von 18 % bis 22 % der Aromastoffe.",
+    "workedExample": {
+      "title": "Beispiel: 4 Standard-Tassen (à 150 ml = 600 ml Wasser) nach Golden Cup Ratio",
+      "inputValues": [
+        {
+          "label": "Tassen",
+          "value": "4 (600 ml)"
+        },
+        {
+          "label": "Stärke",
+          "value": "Golden Cup (60 g/l)"
+        }
+      ],
+      "steps": [
+        "Kaffee = 0,6 Liter × 60 g/l = 36 g Kaffeemehl",
+        "Entspricht ca. 5 Kaffeeloten"
+      ],
+      "result": "36,0 g Kaffeemehl"
+    },
+    "faqs": [
+      {
+        "question": "Warum sollte Kaffeewasser nicht kochend heiß sein?",
+        "answer": "Kochendes Wasser (100°C) verbrennt die feinen Kaffeearomen und löst übermäßig viele Bitterstoffe und Gerbsäuren. Warten Sie nach dem Aufkochen ca. 45 bis 60 Sekunden, bis das Wasser 92-96°C hat."
+      },
+      {
+        "question": "Wie fein sollte der Kaffee für die French Press gemahlen werden?",
+        "answer": "Für die French Press benötigt man einen groben Mahlgrad (wie Meersalz), damit das Kaffeepulver nicht durch das Metallsieb rutscht und der Kaffee nicht überextrahiert."
+      }
+    ],
+    "relatedSlugs": [
+      "tee-ziehzeit-temperatur-rechner",
+      "essloeffel-teeloeffel-gramm-rechner",
+      "portionsrechner"
+    ]
+  },
+  {
+    "id": "cocktail-alkoholgehalt-rechner",
+    "slug": "cocktail-alkoholgehalt-rechner",
+    "name": "Cocktail Alkoholgehalt Rechner (Vol.-% & Gramm reiner Alkohol)",
+    "shortName": "Cocktail Rechner",
+    "category": "kochen-backen",
+    "subcategory": "Getränke",
+    "metaTitle": "Cocktail Alkoholgehalt Rechner – Vol.-% & Promille-Potenzial berechnen",
+    "metaDescription": "Berechnen Sie den exakten Alkoholgehalt (Vol.-% und Gramm reiner Alkohol) von Cocktails und Longdrinks nach Spirituosen (Gin, Wodka, Rum), Likören, Saft und Schmelzwasser.",
+    "h1": "Cocktail Rechner – Wie stark ist mein Drink wirklich?",
+    "shortDescription": "Berechnet den Alkoholgehalt in Vol.-% und Gramm für Cocktails.",
+    "searchKeywords": [
+      "cocktail alkoholgehalt rechner vol prozent",
+      "wieviel alkohol hat ein gin tonic aperol spritz",
+      "cocktail reine gramm alkohol berechnen",
+      "schmelzwasser eiswuerfel cocktail verduennung"
+    ],
+    "inputs": [
+      {
+        "id": "spiritMl",
+        "label": "Basis-Spirituose (z. B. Gin, Wodka, Rum 40 Vol.-%)",
+        "type": "number",
+        "defaultValue": 50,
+        "min": 0,
+        "max": 250,
+        "step": 5,
+        "unit": "ml"
+      },
+      {
+        "id": "spiritVolPct",
+        "label": "Alkoholgehalt Spirituose",
+        "type": "number",
+        "defaultValue": 40,
+        "min": 15,
+        "max": 80,
+        "step": 0.5,
+        "unit": "Vol.-%"
+      },
+      {
+        "id": "liqueurMl",
+        "label": "Likör / Wermut (z. B. Aperol, Triple Sec 15-20 Vol.-%)",
+        "type": "number",
+        "defaultValue": 0,
+        "min": 0,
+        "max": 150,
+        "step": 5,
+        "unit": "ml"
+      },
+      {
+        "id": "liqueurVolPct",
+        "label": "Alkoholgehalt Likör",
+        "type": "number",
+        "defaultValue": 20,
+        "min": 10,
+        "max": 50,
+        "step": 0.5,
+        "unit": "Vol.-%"
+      },
+      {
+        "id": "fillerMl",
+        "label": "Alkoholfreier Filler (Tonic, Cola, Saft, Soda)",
+        "type": "number",
+        "defaultValue": 150,
+        "min": 0,
+        "max": 500,
+        "step": 10,
+        "unit": "ml"
+      },
+      {
+        "id": "iceMeltMl",
+        "label": "Schmelzwasser durch Eiswürfel ca.",
+        "type": "number",
+        "defaultValue": 30,
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "unit": "ml"
+      }
+    ],
+    "calculateCode": "const sMl = Number(inputs.spiritMl) || 0;\nconst sVol = Number(inputs.spiritVolPct) || 0;\nconst lMl = Number(inputs.liqueurMl) || 0;\nconst lVol = Number(inputs.liqueurVolPct) || 0;\nconst fMl = Number(inputs.fillerMl) || 0;\nconst iceMl = Number(inputs.iceMeltMl) || 0;\n\nconst pureEthanolMl = (sMl * (sVol / 100)) + (lMl * (lVol / 100));\nconst totalDrinkVolumeMl = sMl + lMl + fMl + iceMl;\n\nconst volPercentFinal = totalDrinkVolumeMl > 0 ? (pureEthanolMl / totalDrinkVolumeMl) * 100 : 0;\nconst pureGrams = pureEthanolMl * 0.789;\n\n// Vergleich mit Bier (0.33l 5% = ca. 13g) oder Wein (0.2l 12% = ca. 19g)\nconst beerBottles = pureGrams / 13.0;\n\nreturn {\n  primary: { id: 'finalVol', label: 'Alkoholgehalt des fertigen Drinks', value: volPercentFinal, formattedValue: formatNumber(volPercentFinal, 1) + ' Vol.-%', highlight: true },\n  secondary: [\n    { id: 'pureAlcohol', label: 'Reiner Alkohol im Glas', value: pureGrams, formattedValue: formatNumber(pureGrams, 1) + ' g Ethanol' },\n    { id: 'drinkSize', label: 'Gesamtvolumen des Drinks', value: totalDrinkVolumeMl, formattedValue: totalDrinkVolumeMl + ' ml' },\n    { id: 'beerEquiv', label: 'Entspricht etwa Bier (0,33l Flaschen)', value: beerBottles, formattedValue: 'ca. ' + formatNumber(beerBottles, 1) + ' Flaschen Bier' },\n  ],\n  summaryText: 'Ihr Cocktail (Gesamtvolumen ' + totalDrinkVolumeMl + ' ml) hat einen Alkoholgehalt von ca. ' + formatNumber(volPercentFinal, 1) + ' Vol.-% und enthält ' + formatNumber(pureGrams, 1) + ' g reinen Alkohol (entspricht ca. ' + formatNumber(beerBottles, 1) + ' Flaschen Bier).',\n};",
+    "formula": "Vol.-% = (Σ (Menge_i × Vol%_i)) / Gesamtvolumen; Reiner Alkohol (g) = Reines Ethanol (ml) × 0,789",
+    "formulaExplanation": "Eiswürfel kühlen den Drink nicht nur, sondern verwässern ihn beim Rühren oder Shaken ganz bewusst um ca. 20 bis 40 ml Schmelzwasser, was den Cocktail harmonisch abrundet.",
+    "workedExample": {
+      "title": "Beispiel: Klassischer Gin Tonic (50 ml Gin 40% + 150 ml Tonic + 30 ml Schmelzwasser)",
+      "inputValues": [
+        {
+          "label": "Gin",
+          "value": "50 ml (40 %)"
+        },
+        {
+          "label": "Tonic",
+          "value": "150 ml"
+        },
+        {
+          "label": "Eis",
+          "value": "30 ml Schmelzwasser"
+        }
+      ],
+      "steps": [
+        "Ethanol = 50 × 0,40 = 20 ml reines Ethanol",
+        "Gesamtvolumen = 50 + 150 + 30 = 230 ml",
+        "Vol.-% = (20 / 230) × 100 = 8,7 Vol.-%"
+      ],
+      "result": "8,7 Vol.-% (15,8 g reiner Alkohol)"
+    },
+    "faqs": [
+      {
+        "question": "Wie viel Schmelzwasser entsteht beim Shaken eines Cocktails?",
+        "answer": "Beim kräftigen Shaken mit Eis schmelzen pro Drink etwa 25 bis 35 ml Wasser. Profi-Barkeeper berechnen diese Verdünnung fest in ihre Rezepturen ein."
+      },
+      {
+        "question": "Wie viel reiner Alkohol gilt für Erwachsene als risikoarm?",
+        "answer": "Nach den Leitlinien der DGE sollten gesunde Frauen maximal 10 bis 12 g Alkohol pro Tag (ca. 1 kleines Bier oder 1 kleines Glas Wein) und gesunde Männer maximal 20 bis 24 g Alkohol pro Tag trinken, mit mindestens zwei alkoholfreien Tagen pro Woche."
+      }
+    ],
+    "relatedSlugs": [
+      "alkohol-verkochungs-rechner",
+      "promillerechner",
+      "portionsrechner"
+    ]
+  }
+]

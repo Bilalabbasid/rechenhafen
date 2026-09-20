@@ -1,0 +1,638 @@
+const fs = require('fs');
+const path = require('path');
+
+const calcs = [
+  {
+    id: 'putz-rechner',
+    slug: 'putz-rechner',
+    name: 'Putz Rechner (Innen- & Außenputz kg, Säcke & Ergiebigkeit)',
+    shortName: 'Putz Rechner',
+    category: 'bauen-renovieren',
+    subcategory: 'Ausbau & Wand',
+    metaTitle: 'Putz Rechner – Innenputz & Außenputz Sackanzahl & kg berechnen',
+    metaDescription: 'Berechnen Sie den Putzmörtel-Bedarf in kg und 25-kg-/30-kg-Säcken für Gipsputz, Kalk-Zement-Putz und Zementputz nach Wandfläche und Auftragsdicke.',
+    h1: 'Putz Rechner – Putzbedarf & Sackanzahl für Wand & Decke',
+    shortDescription: 'Ermittelt den Mörtelbedarf für Verputzarbeiten nach Fläche und Putzdicke.',
+    searchKeywords: ['putz rechner verbrauch kg m2', 'kalk zement putz saecke berechnen', 'gipsputz bedarf wandflaeche', 'putzmörtel dicke berechnen'],
+    inputs: [
+      { id: 'area', label: 'Zu verputzende Wandfläche', type: 'number', defaultValue: 35, min: 1, max: 1000, step: 1, unit: 'm²' },
+      { id: 'thickness', label: 'Mittlere Putzdicke', type: 'number', defaultValue: 12, min: 5, max: 35, step: 1, unit: 'mm' },
+      {
+        id: 'plasterType',
+        label: 'Putzart',
+        type: 'select',
+        defaultValue: 'limeCement',
+        options: [
+          { value: 'gypsum', label: 'Gipsputz / Innen (ca. 10 kg/m² je 10 mm Dicke)' },
+          { value: 'limeCement', label: 'Kalk-Zement-Putz / Bad & Außen (ca. 13 kg/m² je 10 mm Dicke)' },
+          { value: 'cement', label: 'Zementputz / Sockel & Keller (ca. 15 kg/m² je 10 mm Dicke)' },
+        ],
+      },
+      { id: 'sackSize', label: 'Sackgröße', type: 'select', defaultValue: '30', options: [{ value: '25', label: '25 kg Sack' }, { value: '30', label: '30 kg Sack' }] },
+      { id: 'waste', label: 'Spritzverlust & Ausgleich', type: 'number', defaultValue: 10, min: 0, max: 20, step: 1, unit: '%' },
+    ],
+    calculateCode: `const a = Number(inputs.area) || 0;
+const tMm = Number(inputs.thickness) || 0;
+const sackKg = Number(inputs.sackSize) || 30;
+const waste = 1 + ((Number(inputs.waste) || 0) / 100);
+
+let baseKgPer10mm = 13;
+if (inputs.plasterType === 'gypsum') baseKgPer10mm = 10;
+else if (inputs.plasterType === 'cement') baseKgPer10mm = 15;
+
+const kgPerM2 = (baseKgPer10mm / 10) * tMm;
+const totalKg = a * kgPerM2 * waste;
+const sacks = Math.ceil(totalKg / sackKg);
+
+return {
+  primary: { id: 'sacks', label: 'Benötigte Säcke Trockenmörtel', value: sacks, formattedValue: sacks + ' Säcke (' + sackKg + ' kg)', highlight: true },
+  secondary: [
+    { id: 'totalKg', label: 'Gesamtgewicht Trockenputz', value: totalKg, formattedValue: formatNumber(totalKg, 1) + ' kg (' + formatNumber(totalKg / 1000, 2) + ' t)' },
+    { id: 'waterReq', label: 'Wasserbedarf beim Anmischen ca.', value: totalKg * 0.25, formattedValue: 'ca. ' + Math.round(totalKg * 0.25) + ' Liter' },
+  ],
+  summaryText: 'Für ' + a + ' m² Wandfläche bei ' + tMm + ' mm Putzdicke benötigen Sie ca. ' + formatNumber(totalKg, 0) + ' kg Trockenmörtel (' + sacks + ' Säcke à ' + sackKg + ' kg).',
+};`,
+    formula: 'Mörtel (kg) = Fläche (m²) × (Putzdicke in mm / 10) × Spezifischer Verbrauch × 1,10',
+    formulaExplanation: 'Ein Puffer von 10 % fängt Spritzverluste und das Ausfüllen von Fugen und Unebenheiten im Mauerwerk zuverlässig ab.',
+    workedExample: {
+      title: 'Beispiel: 35 m² Kellerwand mit 12 mm Kalk-Zement-Putz',
+      inputValues: [{ label: 'Fläche', value: '35 m²' }, { label: 'Dicke', value: '12 mm' }, { label: 'Sack', value: '30 kg' }],
+      steps: ['Verbrauch: 35 × (12/10) × 13 kg × 1,10 = 600,6 kg', 'Säcke: 600,6 / 30 = 20,02 -> 21 Säcke'],
+      result: '21 Säcke à 30 kg (ca. 600 kg)',
+    },
+    faqs: [
+      { question: 'Welcher Putz eignet sich am besten für Nassräume?', answer: 'Im Badezimmer und in Feuchträumen ist wasserabweisender Kalk-Zement-Putz oder reiner Zementputz vorgeschrieben. Gipsputz verliert bei dauerhafter Durchfeuchtung seine Festigkeit.' },
+      { question: 'Braucht Mauerwerk vor dem Verputzen einen Vorspritzmörtel?', answer: 'Bei stark saugendem oder ungleichmäßigem Mauerwerk verbessert ein zementärer Spritzbewurf die Haftung und verhindert das vorzeitige Verdursten des Putzes.' },
+    ],
+    relatedSlugs: ['bausteine-mauerwerk-rechner', 'farbmengen-rechner', 'estrich-rechner'],
+  },
+
+  {
+    id: 'zaun-pfosten-rechner',
+    slug: 'zaun-pfosten-rechner',
+    name: 'Zaun & Pfosten Rechner (Doppelstabmatten & Pfostenanzahl)',
+    shortName: 'Zaun & Pfosten',
+    category: 'bauen-renovieren',
+    subcategory: 'Garten & Außenanlagen',
+    metaTitle: 'Zaun Rechner – Doppelstabmatten, Pfosten & Ruck-Zuck-Beton berechnen',
+    metaDescription: 'Berechnen Sie die Anzahl Doppelstabmatten (2,50 m Normlänge), Zaunpfosten, Eckpfosten und Säcke Ruck-Zuck-Beton nach Gesamt-Zaunlänge und Zaunhöhe.',
+    h1: 'Zaun Rechner – Doppelstabmatten, Pfosten & Betonbedarf',
+    shortDescription: 'Ermittelt Mattenanzahl, Pfosten und Beton für Doppelstabmattenzäune.',
+    searchKeywords: ['zaun rechner doppelstabmatten', 'zaunpfosten anzahl berechnen', 'beton fuer zaunpfosten ruck zuck beton', 'zaunlaenge mattenanzahl'],
+    inputs: [
+      { id: 'fenceLength', label: 'Gesamtlänge des Zauns', type: 'number', defaultValue: 25, min: 2, max: 200, step: 0.5, unit: 'm' },
+      { id: 'cornersCount', label: 'Anzahl Ecken (90° Richtungswechsel)', type: 'number', defaultValue: 2, min: 0, max: 20, step: 1, unit: 'Ecken' },
+      { id: 'gatesCount', label: 'Anzahl Gartentore / Pforten (z. B. 1,00 m Breite)', type: 'number', defaultValue: 1, min: 0, max: 5, step: 1, unit: 'Tore' },
+      {
+        id: 'fenceHeight',
+        label: 'Zaunhöhe',
+        type: 'select',
+        defaultValue: '1230',
+        options: [
+          { value: '1030', label: '1,03 m Höhe (Standard Vorgarten)' },
+          { value: '1230', label: '1,23 m Höhe (Garten standard)' },
+          { value: '1630', label: '1,63 m Höhe (Sichtschutz)' },
+          { value: '1830', label: '1,83 m Höhe (hoher Sichtschutz)' },
+        ],
+      },
+    ],
+    calculateCode: `const totalLen = Number(inputs.fenceLength) || 0;
+const corners = Number(inputs.cornersCount) || 0;
+const gates = Number(inputs.gatesCount) || 0;
+// Jedes Tor spart ca. 1.0 m Zaunmatte ein
+const fenceNetLength = Math.max(0, totalLen - (gates * 1.0));
+
+// Doppelstabmatten haben standardmäßig 2,50 m Achsmaß
+const matten = Math.ceil(fenceNetLength / 2.50);
+// Pfosten = Anzahl Matten + 1 (Startpfosten) + Torelemente
+const standardPosts = Math.max(0, matten + 1 - corners);
+const cornerPosts = corners;
+const totalPosts = standardPosts + cornerPosts;
+
+// Beton: ca. 2 bis 3 Säcke à 25 kg Ruck-Zuck-Beton pro Pfostenloch
+const concreteSacksPerPost = Number(inputs.fenceHeight) >= 1630 ? 3 : 2;
+const totalConcreteSacks = totalPosts * concreteSacksPerPost;
+
+return {
+  primary: { id: 'matten', label: 'Benötigte Doppelstabmatten (2,50 m)', value: matten, formattedValue: matten + ' Matten', highlight: true },
+  secondary: [
+    { id: 'posts', label: 'Zaunpfosten Gesamtanzahl', value: totalPosts, formattedValue: totalPosts + ' Pfosten (' + cornerPosts + ' Eckpfosten + ' + standardPosts + ' Standardpfosten)' },
+    { id: 'concrete', label: 'Ruck-Zuck-Beton (25-kg-Säcke)', value: totalConcreteSacks, formattedValue: totalConcreteSacks + ' Säcke (' + (totalConcreteSacks * 25) + ' kg)' },
+    { id: 'height', label: 'Ausgewählte Mattenhöhe', value: Number(inputs.fenceHeight) / 1000, formattedValue: formatNumber(Number(inputs.fenceHeight) / 1000, 2) + ' m' },
+  ],
+  summaryText: 'Für ' + totalLen + ' m Zaunverlauf benötigen Sie ' + matten + ' Doppelstabmatten, ' + totalPosts + ' Pfosten und ' + totalConcreteSacks + ' Säcke Zaunbaubeton.',
+};`,
+    formula: 'Matten = ceil((Zaunlänge - Torbreiten) / 2,50 m); Pfosten = Matten + 1',
+    formulaExplanation: 'Genormte Doppelstabmatten sind exakt 2.510 mm breit. Das Achsmaß von Pfostenmitte zu Pfostenmitte beträgt bei fachgerechter Montage genau 2,52 m.',
+    workedExample: {
+      title: 'Beispiel: 25 m Gartenzaun mit 2 Ecken und 1 Tor (1,0 m)',
+      inputValues: [{ label: 'Zaunlänge', value: '25 m' }, { label: 'Tore', value: '1 Tor (1 m)' }, { label: 'Ecken', value: '2' }],
+      steps: ['Reine Mattenlänge = 25 - 1 = 24 m', 'Matten = 24 / 2,5 = 9,6 -> 10 Matten', 'Pfosten = 10 + 1 = 11 Pfosten (2 Eckpfosten + 9 Normal)', 'Beton = 11 × 2 = 22 Säcke Ruck-Zuck-Beton'],
+      result: '10 Matten, 11 Pfosten, 22 Säcke Beton',
+    },
+    faqs: [
+      { question: 'Was bedeutet die Bezeichnung 6/5/6 oder 8/6/8 bei Doppelstabmatten?', answer: 'Sie bezeichnet die Drahtstärken in Millimetern: Zwei waagerechte Drähte (z. B. 6 mm) schließen einen senkrechten Draht (z. B. 5 mm) ein. 8/6/8 ist die besonders stabile Industrieausführung.' },
+      { question: 'Muss Ruck-Zuck-Beton vorgemischt werden?', answer: 'Nein, Schnelltrockenbeton wird trocken schichtweise ins Erdloch geschüttet und mit Wasser begossen, ohne zeitaufwendiges Anrühren in der Mischmaschine.' },
+    ],
+    relatedSlugs: ['fundament-rechner', 'betonrechner', 'pflastersteine-rechner'],
+  },
+
+  {
+    id: 'regenwasser-zisterne-rechner',
+    slug: 'regenwasser-zisterne-rechner',
+    name: 'Regenwasser Zisterne Rechner (Tankgröße nach DIN 1989)',
+    shortName: 'Zisternengröße',
+    category: 'bauen-renovieren',
+    subcategory: 'Garten & Außenanlagen',
+    metaTitle: 'Zisternen Rechner – Optimale Zisternengröße in Litern nach DIN 1989',
+    metaDescription: 'Berechnen Sie das ideale Zisternenvolumen nach Dachfläche, Bedachungsart (Ziegel/Gründach), Jahresniederschlag und Verwendungszweck (Gartenbewässerung, WC, Waschmaschine).',
+    h1: 'Zisternen Rechner – Ideales Tankvolumen für Regenwassernutzung',
+    shortDescription: 'Berechnet die optimale Zisternengröße nach Dachfläche und Niederschlag.',
+    searchKeywords: ['zisternengroesse berechnen din 1989', 'regenwasser zisterne rechner liter', 'dachflaeche zisterne groesse', 'gartenbewaesserung zisterne volumen'],
+    inputs: [
+      { id: 'roofArea', label: 'Projizierte Dachfläche', type: 'number', defaultValue: 120, min: 20, max: 1000, step: 5, unit: 'm²' },
+      {
+        id: 'roofCovering',
+        label: 'Dacheindeckung (Abflussbeiwert)',
+        type: 'select',
+        defaultValue: 'tile',
+        options: [
+          { value: 'tile', label: 'Tondachziegel / Betondachsteine / Schiefer (Beiwert 0,85)' },
+          { value: 'metal', label: 'Blechdach / Zink / Glas (Beiwert 0,90)' },
+          { value: 'flat', label: 'Kiesdach / Bitumen-Flachdach (Beiwert 0,60)' },
+          { value: 'green', label: 'Gründach extensiv (Beiwert 0,40)' },
+        ],
+      },
+      { id: 'annualRain', label: 'Jährlicher Niederschlag (Bundesdurchschnitt ca. 750 mm)', type: 'number', defaultValue: 750, min: 450, max: 1800, step: 25, unit: 'mm (l/m²)' },
+      { id: 'gardenArea', label: 'Zu bewässernde Gartenfläche', type: 'number', defaultValue: 250, min: 0, max: 2000, step: 25, unit: 'm²' },
+      {
+        id: 'useInHouse',
+        label: 'Hausnutzung (WC-Spülung & Waschmaschine)',
+        type: 'select',
+        defaultValue: 'no',
+        options: [
+          { value: 'no', label: 'Nur Gartenbewässerung' },
+          { value: 'yes', label: 'Garten + WC-Spülung & Waschmaschine (4 Personen)' },
+        ],
+      },
+    ],
+    calculateCode: `const roof = Number(inputs.roofArea) || 0;
+const rain = Number(inputs.annualRain) || 750;
+const garden = Number(inputs.gardenArea) || 0;
+
+let runOff = 0.85;
+if (inputs.roofCovering === 'metal') runOff = 0.90;
+else if (inputs.roofCovering === 'flat') runOff = 0.60;
+else if (inputs.roofCovering === 'green') runOff = 0.40;
+
+const filterCoeff = 0.90; // Schmutzfilter-Wirkungsgrad
+// Jährlicher Regenwasserertrag in Litern:
+const annualYield = roof * rain * runOff * filterCoeff;
+
+// Bedarf:
+// Garten: ca. 60 Liter / m² pro Jahr
+let annualDemand = garden * 60;
+if (inputs.useInHouse === 'yes') {
+  // 4 Personen: WC (24 l/Tag) + Waschen (10 l/Tag) = 34 l/Person/Tag * 4 * 365 = ca. 50.000 Liter
+  annualDemand += 49640;
+}
+
+// Relevanter Jahreswert = min(Ertrag, Bedarf)
+const relevantAnnualVolume = Math.min(annualYield, annualDemand);
+// Nach DIN 1989: Speichergröße = Relevanter Jahreswert × (21 Tage / 365 Tage)
+const optimalVolumeLiters = Math.round((relevantAnnualVolume * 21) / 365);
+const roundedTankLiters = Math.ceil(optimalVolumeLiters / 500) * 500;
+
+return {
+  primary: { id: 'tankSize', label: 'Empfohlenes Zisternenvolumen', value: roundedTankLiters, formattedValue: formatNumber(roundedTankLiters, 0) + ' Liter (' + formatNumber(roundedTankLiters / 1000, 1) + ' m³)', highlight: true },
+  secondary: [
+    { id: 'annualYield', label: 'Jährlicher Regenwasserertrag', value: annualYield, formattedValue: formatNumber(annualYield, 0) + ' Liter/Jahr' },
+    { id: 'annualDemand', label: 'Jährlicher Wasserbedarf', value: annualDemand, formattedValue: formatNumber(annualDemand, 0) + ' Liter/Jahr' },
+    { id: 'safetyDays', label: 'Berechnungsgrundlage Trockenzeitpuffer', value: 21, formattedValue: '21 Tage Speichervorrat (DIN 1989)' },
+  ],
+  summaryText: 'Ihr Dach liefert ca. ' + formatNumber(annualYield, 0) + ' Liter Regenwasser pro Jahr. Für einen 21-Tage-Sicherheitsvorrat wird ein Tankvolumen von ' + roundedTankLiters + ' Litern empfohlen.',
+};`,
+    formula: 'Speichervolumen = min(Ertrag, Bedarf) × (21 / 365); Ertrag = Dachfläche × Niederschlag × Abflussbeiwert × Filterfaktor',
+    formulaExplanation: 'DIN 1989 empfiehlt einen Vorrat für 21 Trockentage. Eine zu große Zisterne läuft selten über, was jedoch zur Selbstreinigung der Oberfläche (Schwimmschichtabscheidung) wichtig ist.',
+    workedExample: {
+      title: 'Beispiel: 120 m² Ziegeldach, 750 mm Regen, 250 m² Garten',
+      inputValues: [{ label: 'Dach', value: '120 m²' }, { label: 'Regen', value: '750 mm' }, { label: 'Garten', value: '250 m²' }],
+      steps: ['Ertrag = 120 × 750 × 0,85 × 0,90 = 68.850 Liter', 'Gartenbedarf = 250 m² × 60 l = 15.000 Liter', 'Speicher = 15.000 × (21 / 365) = 863 Liter -> mind. 1.500 l empfohlen'],
+      result: '1.500 bis 3.000 Liter Zisterne',
+    },
+    faqs: [
+      { question: 'Was ist besser: Betonzisterne oder Kunststoffzisterne?', answer: 'Betonzisternen sind extrem formstabil, PKW-befahrbar und neutralisieren durch den Kalk im Beton sauren Regen. Kunststofftanks (PE) sind leichter zu transportieren und einzubauen.' },
+      { question: 'Kann man Regenwasser für die Waschmaschine nutzen?', answer: 'Ja, Regenwasser ist kalkfrei. Dadurch verkalkt die Waschmaschine nicht, und es wird bis zu 50 % weniger Waschmittel benötigt.' },
+    ],
+    relatedSlugs: ['dachflaeche-rechner', 'fundament-rechner', 'aushub-erdarbeiten-rechner'],
+  },
+
+  {
+    id: 'treppen-stufen-rechner',
+    slug: 'treppen-stufen-rechner',
+    name: 'Treppenstufen Rechner (Schrittmaßregel 2s + a = 63 cm nach DIN 18065)',
+    shortName: 'Treppen Rechner',
+    category: 'bauen-renovieren',
+    subcategory: 'Ausbau & Wand',
+    metaTitle: 'Treppenstufen Rechner – Steigung & Auftritt berechnen nach DIN 18065',
+    metaDescription: 'Berechnen Sie die Stufenanzahl, Steigungshöhe (s), Auftrittstiefe (a) und Treppenlänge nach der Schrittmaßregel (2s + a = 63 cm) und Treppensteigungswinkel.',
+    h1: 'Treppen Rechner – Stufenanzahl, Steigung & Auftritt nach Schrittmaß',
+    shortDescription: 'Berechnet Stufenanzahl, Steigung und Auftritt nach der DIN 18065.',
+    searchKeywords: ['treppen rechner schrittmassregel', 'stufenhoehe berechnen 2s plus a', 'treppenstufen anzahl auftritt din 18065', 'treppenlauf laenge geschosshoehe'],
+    inputs: [
+      { id: 'floorHeight', label: 'Geschosshöhe (Oberkante Fertigfußboden zu Fertigfußboden)', type: 'number', defaultValue: 270, min: 50, max: 500, step: 1, unit: 'cm' },
+      { id: 'idealStepHeight', label: 'Angestrebte ideale Stufenhöhe', type: 'number', defaultValue: 17.5, min: 14, max: 21, step: 0.1, unit: 'cm' },
+      { id: 'stepFormulaConstant', label: 'Schrittmaß nach DIN (Standard 63 cm)', type: 'number', defaultValue: 63, min: 59, max: 65, step: 0.5, unit: 'cm' },
+    ],
+    calculateCode: `const h = Number(inputs.floorHeight) || 0;
+const idealS = Number(inputs.idealStepHeight) || 17.5;
+const stepConst = Number(inputs.stepFormulaConstant) || 63;
+
+// Stufenanzahl (Steigungen):
+const stepsCount = Math.round(h / idealS);
+const actualStepHeight = h / stepsCount;
+// Schrittmaßregel: 2 * s + a = 63 cm => a = 63 - 2 * s
+const actualTreadDepth = stepConst - (2 * actualStepHeight);
+
+// Lauflänge (ohne obersten Austritt): (stepsCount - 1) * a
+const runLength = (stepsCount - 1) * actualTreadDepth;
+// Steigungswinkel: tan(alpha) = h / runLength
+const angleRad = Math.atan(h / runLength);
+const angleDeg = (angleRad * 180) / Math.PI;
+
+const isComfortable = actualStepHeight >= 16 && actualStepHeight <= 18.5 && actualTreadDepth >= 26 && actualTreadDepth <= 30;
+
+return {
+  primary: { id: 'stepsCount', label: 'Anzahl der Steigungen (Stufen)', value: stepsCount, formattedValue: stepsCount + ' Steigungen (' + (stepsCount - 1) + ' Trittstufen)', highlight: true },
+  secondary: [
+    { id: 'stepHeight', label: 'Exakte Stufenhöhe (Steigung s)', value: actualStepHeight, formattedValue: formatNumber(actualStepHeight, 2) + ' cm' },
+    { id: 'treadDepth', label: 'Stufenauftritt (Tiefe a)', value: actualTreadDepth, formattedValue: formatNumber(actualTreadDepth, 2) + ' cm' },
+    { id: 'runLength', label: 'Treppen-Lauflänge Grundriss', value: runLength / 100, formattedValue: formatNumber(runLength / 100, 2) + ' m' },
+    { id: 'pitchAngle', label: 'Treppen-Neigungswinkel', value: angleDeg, formattedValue: formatNumber(angleDeg, 1) + '° (' + (isComfortable ? 'bequeme Treppe' : 'Normgrenze') + ')' },
+  ],
+  summaryText: 'Bei ' + h + ' cm Geschosshöhe planen Sie mit ' + stepsCount + ' Steigungen à ' + formatNumber(actualStepHeight, 2) + ' cm Höhe und ' + formatNumber(actualTreadDepth, 2) + ' cm Auftrittstiefe (Lauflänge ' + formatNumber(runLength / 100, 2) + ' m).',
+};`,
+    formula: 'Schrittmaß: 2 × s + a = 63 cm; Stufenanzahl = round(Geschosshöhe / Wunschsteigung)',
+    formulaExplanation: 'Die Schrittmaßregel basiert auf der menschlichen Schrittlänge beim Gehen (ca. 63 cm). Beim Treppensteigen verdoppelt sich der Höhenaufwand gegenüber der Vorwärtsbewegung.',
+    workedExample: {
+      title: 'Beispiel: 270 cm Geschosshöhe mit Ziel 17,5 cm Steigung',
+      inputValues: [{ label: 'Geschosshöhe', value: '270 cm' }, { label: 'Zielsteigung', value: '17,5 cm' }],
+      steps: ['Stufenanzahl = 270 / 17,5 = 15,43 -> 15 Stufen', 'Exakte Steigung s = 270 / 15 = 18,00 cm', 'Auftritt a = 63 - (2 × 18,00) = 27,00 cm', 'Lauflänge = 14 × 27 cm = 378 cm (3,78 m)'],
+      result: '15 Steigungen (s = 18 cm, a = 27 cm)',
+    },
+    faqs: [
+      { question: 'Welche Steigung ist nach DIN 18065 für Wohnhaustreppen zulässig?', answer: 'In baurechtlich notwendigen Treppen für Einfamilienhäuser gilt eine Steigung von 14 bis 20 cm und ein Auftritt von 23 bis 37 cm. Als Idealmaß gelten 17 cm Steigung und 29 cm Auftritt.' },
+      { question: 'Wie viel Durchgangshöhe (Kopffreiheit) ist vorgeschrieben?', answer: 'Die lichte Durchgangshöhe senkrecht über der Treppenlauflinie muss an jeder Stelle mindestens 2,00 Meter betragen.' },
+    ],
+    relatedSlugs: ['parkett-laminat-rechner', 'estrich-rechner', 'bodenbelag-rechner'],
+  },
+
+  {
+    id: 'kies-splitt-rechner',
+    slug: 'kies-splitt-rechner',
+    name: 'Kies & Splitt Rechner (Menge in Tonnen & m³ nach Schütthöhe)',
+    shortName: 'Kies & Splitt',
+    category: 'bauen-renovieren',
+    subcategory: 'Garten & Außenanlagen',
+    metaTitle: 'Kies & Splitt Rechner – Bedarf in Tonnen & m³ für Garten & Hof berechnen',
+    metaDescription: 'Berechnen Sie das Gewicht in Tonnen und Volumen in m³ für Kies, Splitt, Schotter oder Rindenmulch nach Fläche in m² und Einbauhöhe.',
+    h1: 'Kies & Splitt Rechner – Tonnen & Schüttvolumen berechnen',
+    shortDescription: 'Ermittelt das Gewicht und Schüttvolumen von Kies, Splitt und Schotter.',
+    searchKeywords: ['kies rechner tonnen m3', 'splitt bedarf berechnen terrasse', 'schotter gewicht volumen dichte', 'zierkies menge quadratmeter'],
+    inputs: [
+      { id: 'area', label: 'Fläche', type: 'number', defaultValue: 30, min: 1, max: 1000, step: 1, unit: 'm²' },
+      { id: 'depth', label: 'Schütthöhe / Schichtdicke', type: 'number', defaultValue: 5, min: 2, max: 50, step: 0.5, unit: 'cm' },
+      {
+        id: 'materialType',
+        label: 'Material & Rohdichte',
+        type: 'select',
+        defaultValue: 'grit',
+        options: [
+          { value: 'gravel', label: 'Kies / Rollkies 16/32 (Dichte ca. 1,60 t/m³)' },
+          { value: 'grit', label: 'Splitt / Edelsplitt 2/5 (Dichte ca. 1,55 t/m³)' },
+          { value: 'crushed', label: 'Schotter / Frostschutz 0/32 verdichtet (Dichte ca. 1,85 t/m³)' },
+          { value: 'bark', label: 'Rindenmulch (Dichte ca. 0,40 t/m³)' },
+        ],
+      },
+      { id: 'compaction', label: 'Verdichtungs- / Setzungszuschlag', type: 'number', defaultValue: 10, min: 0, max: 25, step: 1, unit: '%' },
+    ],
+    calculateCode: `const a = Number(inputs.area) || 0;
+const dM = (Number(inputs.depth) || 0) / 100;
+const comp = 1 + ((Number(inputs.compaction) || 0) / 100);
+
+const volumeM3 = a * dM * comp;
+
+let density = 1.55;
+if (inputs.materialType === 'gravel') density = 1.60;
+else if (inputs.materialType === 'crushed') density = 1.85;
+else if (inputs.materialType === 'bark') density = 0.40;
+
+const totalTonnes = volumeM3 * density;
+const bigBags = Math.ceil(totalTonnes / 1.0); // 1-Tonnen-Big-Bag
+
+return {
+  primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: totalTonnes, formattedValue: formatNumber(totalTonnes, 2) + ' Tonnen', highlight: true },
+  secondary: [
+    { id: 'volume', label: 'Einbauvolumen inkl. Setzung', value: volumeM3, formattedValue: formatNumber(volumeM3, 2) + ' m³' },
+    { id: 'bigbags', label: 'Lieferung in Big Bags (à 1.000 kg)', value: bigBags, formattedValue: bigBags + ' Big Bag(s)' },
+    { id: 'sacks25', label: 'Alternativ: 25-kg-Säcke', value: Math.ceil((totalTonnes * 1000) / 25), formattedValue: Math.ceil((totalTonnes * 1000) / 25) + ' Säcke' },
+  ],
+  summaryText: 'Für ' + a + ' m² Fläche bei ' + inputs.depth + ' cm Schütthöhe benötigen Sie ca. ' + formatNumber(volumeM3, 2) + ' m³ Material (' + formatNumber(totalTonnes, 2) + ' Tonnen).',
+};`,
+    formula: 'Gewicht (t) = Fläche (m²) × Schütthöhe (m) × Verdichtungsfaktor × Schüttdichte (t/m³)',
+    formulaExplanation: 'Beim Rütteln oder natürlichen Setzen durch Regen verdichtet sich Schotter und Splitt um 10 % bis 15 %, was bei der Bestellmenge berücksichtigt werden muss.',
+    workedExample: {
+      title: 'Beispiel: 30 m² Gartenweg mit 5 cm Edelsplitt (10 % Setzung)',
+      inputValues: [{ label: 'Fläche', value: '30 m²' }, { label: 'Höhe', value: '5 cm' }, { label: 'Material', value: 'Splitt (1,55 t/m³)' }],
+      steps: ['Volumen = 30 × 0,05 × 1,10 = 1,65 m³', 'Gewicht = 1,65 m³ × 1,55 t/m³ = 2,56 Tonnen'],
+      result: '2,56 Tonnen Splitt (3 Big Bags)',
+    },
+    faqs: [
+      { question: 'Wie dick sollte Zierkies im Garten aufgeschüttet werden?', answer: 'Als Daumenregel gilt die doppelte Korngröße: Bei Kies 16/32 mm empfiehlt sich eine Schütthöhe von mindestens 5 bis 6 cm, damit das darunterliegende Unkrautvlies nicht durchscheint.' },
+      { question: 'Braucht man ein Unkrautvlies unter Kiesflächen?', answer: 'Ja, ein Geotextil-Unkrautvlies verhindert das Durchwachsen von Wurzeln und sorgt dafür, dass die Kieselsteine nicht im darunterliegenden Erdreich versinken.' },
+    ],
+    relatedSlugs: ['pflastersteine-rechner', 'aushub-erdarbeiten-rechner', 'fundament-rechner'],
+  },
+
+  {
+    id: 'drainage-gefaelle-rechner',
+    slug: 'drainage-gefaelle-rechner',
+    name: 'Drainage & Gefälle Rechner (Prozent, cm/m & Höhenunterschied)',
+    shortName: 'Gefälle Rechner',
+    category: 'bauen-renovieren',
+    subcategory: 'Rohbau & Boden',
+    metaTitle: 'Gefälle Rechner – Steigung in Prozent, Promille & cm pro Meter berechnen',
+    metaDescription: 'Berechnen Sie das Gefälle von Terrassen (min. 2 %), Abwasserrohren nach DIN EN 12056 (1-2 cm/m) und Garagenauffahrten nach Länge und Höhenunterschied.',
+    h1: 'Gefälle Rechner – Gefälle in %, cm/m & Höhenunterschied ermitteln',
+    shortDescription: 'Berechnet Gefälle in Prozent, Grad und Höhenunterschied in Zentimetern.',
+    searchKeywords: ['gefaelle rechner prozent cm m', 'terrasse gefaelle berechnen 2 prozent', 'abwasserrohr gefaelle din 12056', 'hoehenunterschied laenge gefaelle'],
+    inputs: [
+      { id: 'distance', label: 'Horizontale Strecke / Rohrlänge', type: 'number', defaultValue: 10, min: 0.5, max: 200, step: 0.5, unit: 'm' },
+      {
+        id: 'calcMode',
+        label: 'Berechnungsmodus',
+        type: 'select',
+        defaultValue: 'fromPercent',
+        options: [
+          { value: 'fromPercent', label: 'Gefälle vorgegeben (Höhenunterschied berechnen)' },
+          { value: 'fromHeight', label: 'Höhenunterschied gemessen (Gefälle berechnen)' },
+        ],
+      },
+      { id: 'slopePercent', label: 'Gefälle (z. B. 2 % für Terrasse, 1,5 % für Abwasser)', type: 'number', defaultValue: 2, min: 0.1, max: 50, step: 0.1, unit: '%' },
+      { id: 'heightDiffCm', label: 'Höhenunterschied (nur bei Modus "gemessen")', type: 'number', defaultValue: 20, min: 0.5, max: 500, step: 0.5, unit: 'cm' },
+    ],
+    calculateCode: `const dist = Number(inputs.distance) || 0;
+const mode = inputs.calcMode;
+
+let slopePct = Number(inputs.slopePercent) || 2;
+let hCm = Number(inputs.heightDiffCm) || 20;
+
+if (mode === 'fromPercent') {
+  // h = dist (m) * (slopePct / 100) in Metern -> in cm:
+  hCm = dist * slopePct;
+} else {
+  // slopePct = (hCm / 100) / dist * 100 = hCm / dist
+  slopePct = hCm / dist;
+}
+
+const cmPerMeter = slopePct;
+const angleDeg = Math.atan((slopePct / 100)) * (180 / Math.PI);
+
+return {
+  primary: { id: 'heightDiff', label: 'Höhenunterschied (Gefällehöhe)', value: hCm, formattedValue: formatNumber(hCm, 1) + ' cm', highlight: true },
+  secondary: [
+    { id: 'slopePercent', label: 'Gefälle in Prozent', value: slopePct, formattedValue: formatNumber(slopePct, 2) + ' %' },
+    { id: 'cmPerM', label: 'Gefälle pro Meter Strecke', value: cmPerMeter, formattedValue: formatNumber(cmPerMeter, 2) + ' cm/m' },
+    { id: 'angleDeg', label: 'Neigungswinkel', value: angleDeg, formattedValue: formatNumber(angleDeg, 2) + '°' },
+  ],
+  summaryText: 'Über eine Strecke von ' + dist + ' m ergibt ein Gefälle von ' + formatNumber(slopePct, 2) + ' % (' + formatNumber(cmPerMeter, 2) + ' cm/m) einen Gesamthöhenunterschied von ' + formatNumber(hCm, 1) + ' cm.',
+};`,
+    formula: 'Gefälle (%) = (Höhenunterschied in m / Strecke in m) × 100; Höhenunterschied (cm) = Strecke (m) × Gefälle (%)',
+    formulaExplanation: 'Ein Gefälle von 2 % bedeutet genau 2 cm Höhenunterschied pro 1 Meter Lauflänge.',
+    workedExample: {
+      title: 'Beispiel: 4 Meter Terrassentiefe mit 2 % Gefälle vom Haus weg',
+      inputValues: [{ label: 'Strecke', value: '4 m' }, { label: 'Gefälle', value: '2 %' }],
+      steps: ['Gefälle pro Meter = 2 cm/m', 'Gesamtabfall = 4 m × 2 cm/m = 8 cm'],
+      result: '8 cm Höhenunterschied',
+    },
+    faqs: [
+      { question: 'Warum benötigt eine Terrasse mindestens 2 % Gefälle?', answer: 'Damit Regenwasser zügig vom Haus wegfließt, sich keine Pfützen bilden und im Winter kein gefrierendes Wasser Fliesen absprengt oder Terrassendielen vermosen lässt.' },
+      { question: 'Wie viel Gefälle muss ein Abwasserrohr im Haus haben?', answer: 'Nach DIN EN 12056 beträgt das empfohlene Gefälle für Schmutzwasserleitungen 1 bis 2 cm pro Meter (1 % bis 2 %). Zu viel Gefälle (> 5 %) führt dazu, dass Wasser abfließt, Feststoffe aber liegen bleiben.' },
+    ],
+    relatedSlugs: ['pflastersteine-rechner', 'regenwasser-zisterne-rechner', 'fundament-rechner'],
+  },
+
+  {
+    id: 'baugrund-tragfaehigkeit-rechner',
+    slug: 'baugrund-tragfaehigkeit-rechner',
+    name: 'Baugrund & Bodenpressung Rechner (Fundamentbelastung nach DIN 1054)',
+    shortName: 'Bodenpressung Rechner',
+    category: 'bauen-renovieren',
+    subcategory: 'Rohbau & Boden',
+    metaTitle: 'Bodenpressung Rechner – Baugrund-Tragfähigkeit & Fundamentfläche DIN 1054',
+    metaDescription: 'Berechnen Sie die vorhandene Bodenpressung (kN/m²) unter Fundamenten und vergleichen Sie diese mit der zulässigen Bodenpressung nach DIN 1054.',
+    h1: 'Baugrund Rechner – Bodenpressung & Tragfähigkeit berechnen',
+    shortDescription: 'Ermittelt die Bodenpressung unter Fundamenten und prüft die Tragfähigkeit.',
+    searchKeywords: ['bodenpressung rechner din 1054', 'baugrund tragfaehigkeit kn m2', 'fundamentbelastung berechnen', 'zulaessige bodenpressung tabelle'],
+    inputs: [
+      { id: 'loadKn', label: 'Auflast auf das Fundament (inkl. Eigengewicht)', type: 'number', defaultValue: 150, min: 10, max: 5000, step: 10, unit: 'kN (ca. t × 10)' },
+      { id: 'fundamentLength', label: 'Fundamentlänge', type: 'number', defaultValue: 2.0, min: 0.3, max: 20, step: 0.1, unit: 'm' },
+      { id: 'fundamentWidth', label: 'Fundamentbreite', type: 'number', defaultValue: 0.8, min: 0.2, max: 10, step: 0.05, unit: 'm' },
+      {
+        id: 'soilClass',
+        label: 'Bodenart nach Bodengutachten',
+        type: 'select',
+        defaultValue: 'sand',
+        options: [
+          { value: 'sand', label: 'Kies / Sand dicht gelagert (zulässig ca. 300 kN/m²)' },
+          { value: 'mediumSand', label: 'Sand mitteldicht gelagert (zulässig ca. 200 kN/m²)' },
+          { value: 'loamFirm', label: 'Lehm / Ton halbfest bis fest (zulässig ca. 180 kN/m²)' },
+          { value: 'loamSoft', label: 'Schluff / weicher Lehm (zulässig ca. 100 kN/m²)' },
+        ],
+      },
+    ],
+    calculateCode: `const fKn = Number(inputs.loadKn) || 0;
+const l = Number(inputs.fundamentLength) || 0;
+const w = Number(inputs.fundamentWidth) || 0;
+const area = l * w;
+
+// Bodenpressung sigma = F / A
+const sigma = area > 0 ? fKn / area : 0;
+
+let sigmaMax = 300;
+if (inputs.soilClass === 'mediumSand') sigmaMax = 200;
+else if (inputs.soilClass === 'loamFirm') sigmaMax = 180;
+else if (inputs.soilClass === 'loamSoft') sigmaMax = 100;
+
+const utilization = (sigma / sigmaMax) * 100;
+const isSafe = sigma <= sigmaMax;
+
+return {
+  primary: { id: 'sigma', label: 'Vorhandene Bodenpressung σ', value: sigma, formattedValue: formatNumber(sigma, 1) + ' kN/m²', highlight: true },
+  secondary: [
+    { id: 'utilization', label: 'Auslastung des Baugrunds', value: utilization, formattedValue: formatNumber(utilization, 1) + ' % (' + (isSafe ? 'sicher' : 'Überlastung!') + ')' },
+    { id: 'sigmaMax', label: 'Zulässige Bodenpressung σ_zul', value: sigmaMax, formattedValue: sigmaMax + ' kN/m²' },
+    { id: 'fundamentArea', label: 'Fundament-Auflagefläche', value: area, formattedValue: formatNumber(area, 2) + ' m²' },
+  ],
+  summaryText: 'Die Belastung erzeugt eine Bodenpressung von ' + formatNumber(sigma, 1) + ' kN/m². Der Baugrund wird zu ' + formatNumber(utilization, 1) + ' % ausgelastet (' + (isSafe ? 'statisch im sicheren Bereich' : 'Achtung: Fundamentfläche vergrößern!') + ').',
+};`,
+    formula: 'Bodenpressung σ = Last F (kN) / Fundamentfläche A (m²) <= σ_zul',
+    formulaExplanation: 'Übersteigt die tatsächliche Bodenpressung die Tragfähigkeit des Bodens, kann es zu ungleichmäßigen Setzungen, Schiefstellung und Rissen im Mauerwerk kommen.',
+    workedExample: {
+      title: 'Beispiel: 150 kN Last auf 2,0 m × 0,8 m Fundament in dichtem Sand',
+      inputValues: [{ label: 'Last', value: '150 kN' }, { label: 'Fläche', value: '1,6 m²' }, { label: 'Boden', value: 'Sand (300 kN/m²)' }],
+      steps: ['σ = 150 kN / 1,6 m² = 93,75 kN/m²', 'Auslastung = 93,75 / 300 = 31,3 % (vollständig sicher)'],
+      result: '93,8 kN/m² (ausreichende Standsicherheit)',
+    },
+    faqs: [
+      { question: 'Wie rechnet man Tonnen in Kilonewton (kN) um?', answer: '1 Tonne Masse entspricht auf der Erde einer Gewichtskraft von ca. 9,81 kN, in der Praxis rechnet man überschlägig mit: 1 Tonne ≈ 10 kN.' },
+      { question: 'Wann ist ein geologisches Bodengutachten zwingend erforderlich?', answer: 'Vor jedem Neubau oder größeren Anbau ist ein Baugrundgutachten dringend anzuraten, um teure Überraschungen wie Torflinsen, Schichtenwasser oder geringe Tragfähigkeit auszuschließen.' },
+    ],
+    relatedSlugs: ['fundament-rechner', 'betonrechner', 'aushub-erdarbeiten-rechner'],
+  },
+
+  {
+    id: 'holz-balken-durchbiegung-rechner',
+    slug: 'holz-balken-durchbiegung-rechner',
+    name: 'Holzbalken Durchbiegung Rechner (Dimensionierung nach Eurocode 5)',
+    shortName: 'Holzbalken Rechner',
+    category: 'bauen-renovieren',
+    subcategory: 'Rohbau & Boden',
+    metaTitle: 'Holzbalken Durchbiegung Rechner – Balken dimensionieren nach Eurocode 5',
+    metaDescription: 'Berechnen Sie die Durchbiegung von Holzdeckenbalken (C24 Nadelholz) nach Spannweite, Balkenbreite, Balkenhöhe und Last nach DIN EN 1995-1-1.',
+    h1: 'Holzbalken Rechner – Balkenquerschnitt & Durchbiegung prüfen',
+    shortDescription: 'Berechnet die Durchbiegung von Holzbalken und prüft Grenzwerte nach DIN.',
+    searchKeywords: ['holzbalken durchbiegung rechner', 'holzbalkendecke dimensionierung spanne', 'traegheitsmoment holzbalken b h3 12', 'eurocode 5 holz durchbiegung l 300'],
+    inputs: [
+      { id: 'spanMeters', label: 'Spannweite des Balkens', type: 'number', defaultValue: 4.0, min: 1.0, max: 10.0, step: 0.1, unit: 'm' },
+      { id: 'beamWidthCm', label: 'Balkenbreite (b)', type: 'number', defaultValue: 10, min: 4, max: 40, step: 1, unit: 'cm' },
+      { id: 'beamHeightCm', label: 'Balkenhöhe (h)', type: 'number', defaultValue: 20, min: 6, max: 60, step: 1, unit: 'cm' },
+      { id: 'beamSpacingM', label: 'Balkenabstand (Achsmaß)', type: 'number', defaultValue: 0.65, min: 0.3, max: 1.5, step: 0.05, unit: 'm' },
+      { id: 'totalLoadKnM2', label: 'Gesamtflächenlast (Eigengewicht + Verkehrslast)', type: 'number', defaultValue: 2.5, min: 0.5, max: 10, step: 0.1, unit: 'kN/m²' },
+    ],
+    calculateCode: `const lM = Number(inputs.spanMeters) || 0;
+const bCm = Number(inputs.beamWidthCm) || 0;
+const hCm = Number(inputs.beamHeightCm) || 0;
+const eM = Number(inputs.beamSpacingM) || 0.65;
+const qM2 = Number(inputs.totalLoadKnM2) || 2.5;
+
+// Linienlast q in N/mm: q = qM2 (kN/m²) * eM (m) = kN/m = N/mm
+const qNmm = qM2 * eM;
+const lMm = lM * 1000;
+const bMm = bCm * 10;
+const hMm = hCm * 10;
+
+// Flächenträgheitsmoment I = (b * h^3) / 12 in mm^4:
+const iMoment = (bMm * Math.pow(hMm, 3)) / 12;
+// E-Modul Konstruktionsvollholz C24 E_0,mean = 11.000 N/mm²:
+const eModul = 11000;
+
+// Durchbiegung f = (5 * q * L^4) / (384 * E * I)
+const fMm = (5 * qNmm * Math.pow(lMm, 4)) / (384 * eModul * iMoment);
+
+// Grenzwert nach DIN EN 1995-1-1 (Eurocode 5): meist w_inst <= L / 300 bis L / 400
+const limitMm = lMm / 300;
+const isCompliant = fMm <= limitMm;
+
+return {
+  primary: { id: 'deflection', label: 'Berechnete Durchbiegung f', value: fMm, formattedValue: formatNumber(fMm, 1) + ' mm', highlight: true },
+  secondary: [
+    { id: 'limit', label: 'Zulässiger Grenzwert (L / 300)', value: limitMm, formattedValue: formatNumber(limitMm, 1) + ' mm (' + (isCompliant ? 'eingehalten' : 'zu stark!') + ')' },
+    { id: 'ratio', label: 'Verhältnis f / L', value: limitMm > 0 ? (fMm / limitMm) * 100 : 0, formattedValue: formatNumber((fMm / limitMm) * 100, 1) + ' % des Limits' },
+    { id: 'iMoment', label: 'Flächenträgheitsmoment I', value: iMoment / 10000, formattedValue: formatNumber(iMoment / 10000, 0) + ' cm⁴' },
+  ],
+  summaryText: 'Unter Last biegt sich der Balken um ' + formatNumber(fMm, 1) + ' mm durch. Grenzwert nach Eurocode 5 (L/300 = ' + formatNumber(limitMm, 1) + ' mm) ist ' + (isCompliant ? 'vollständig erfüllt.' : 'überschritten! Bitte Balkenhöhe vergrößern.'),
+};`,
+    formula: 'f = (5 × q × L⁴) / (384 × E × I); I = (b × h³) / 12',
+    formulaExplanation: 'Die Balkenhöhe h geht in der dritten Potenz (h³) in das Trägheitsmoment ein. Eine Verdoppelung der Balkenhöhe verachtfacht die Steifigkeit!',
+    workedExample: {
+      title: 'Beispiel: Balken 10×20 cm, 4 m Spannweite, 65 cm Abstand bei 2,5 kN/m²',
+      inputValues: [{ label: 'Spanne', value: '4 m' }, { label: 'Querschnitt', value: '10 × 20 cm' }, { label: 'Last', value: '2,5 kN/m²' }],
+      steps: ['I = (100 × 200³) / 12 = 66.666.667 mm⁴', 'q = 2,5 × 0,65 = 1,625 N/mm', 'f = (5 × 1,625 × 4000⁴) / (384 × 11000 × 66,67 Mio) = 7,37 mm', 'Limit L/300 = 4000 / 300 = 13,33 mm'],
+      result: '7,4 mm Durchbiegung (weit unter dem Limit 13,3 mm)',
+    },
+    faqs: [
+      { question: 'Was ist wichtiger für die Tragfähigkeit: Breite oder Höhe?', answer: 'Eindeutig die Höhe! Die Höhe geht hoch 3 in die Steifigkeit ein. Ein 12×24 cm Balken ist fast doppelt so steif wie ein 16×20 cm Balken bei gleichem Holzverbrauch.' },
+      { question: 'Was bedeutet Konstruktionsvollholz C24?', answer: 'C24 ist die in Mitteleuropa gängigste Güteklasse für Nadelholz (Fichte/Tanne) im konstruktiven Holzbau mit einer Biegefestigkeit von 24 N/mm².' },
+    ],
+    relatedSlugs: ['dachflaeche-rechner', 'daemmung-u-wert-rechner', 'fundament-rechner'],
+  },
+
+  {
+    id: 'beton-mischungsverhaeltnis-rechner',
+    slug: 'beton-mischungsverhaeltnis-rechner',
+    name: 'Beton Mischungsverhältnis Rechner (Zement, Sand, Kies & Wasser)',
+    shortName: 'Beton mischen',
+    category: 'bauen-renovieren',
+    subcategory: 'Rohbau & Boden',
+    metaTitle: 'Beton mischen Rechner – Mischungsverhältnis Zement & Kies nach Schaufeln',
+    metaDescription: 'Berechnen Sie das optimale Mischungsverhältnis für Beton (1:4 Regel) in Schaufeln, Litern und kg Zement, Betonkies (0/16 oder 0/32) und Anmachwasser (w/z-Wert).',
+    h1: 'Beton mischen Rechner – Mischverhältnis in Schaufeln & kg',
+    shortDescription: 'Berechnet Schaufeln und Gewichte für das Selbstanmischen von Beton.',
+    searchKeywords: ['beton mischungsverhaeltnis schaufeln rechner', 'beton selber mischen verhaeltnis 1 zu 4', 'zement kies wasser rechner', 'w z wert beton anmachwasser'],
+    inputs: [
+      { id: 'desiredM3', label: 'Benötigtes Fertigbeton-Volumen', type: 'number', defaultValue: 0.5, min: 0.05, max: 5.0, step: 0.05, unit: 'm³' },
+      {
+        id: 'mixRatio',
+        label: 'Festigkeitsklasse & Mischungsverhältnis',
+        type: 'select',
+        defaultValue: 'standard',
+        options: [
+          { value: 'standard', label: 'Standardbeton C20/25 (Mischung 1 : 4 Zement zu Kies)' },
+          { value: 'strong', label: 'Hochfester Beton C25/30 (Mischung 1 : 3 Zement zu Kies)' },
+          { value: 'lean', label: 'Magerbeton / Sauberkeitsschicht (Mischung 1 : 6 bis 1 : 8)' },
+        ],
+      },
+    ],
+    calculateCode: `const m3 = Number(inputs.desiredM3) || 0;
+
+let cementKgPerM3 = 300;
+let gravelKgPerM3 = 1800;
+let waterLitersPerM3 = 165;
+let shovelsGravelPerCement = 4;
+
+if (inputs.mixRatio === 'strong') {
+  cementKgPerM3 = 350;
+  gravelKgPerM3 = 1750;
+  waterLitersPerM3 = 175;
+  shovelsGravelPerCement = 3;
+} else if (inputs.mixRatio === 'lean') {
+  cementKgPerM3 = 180;
+  gravelKgPerM3 = 1950;
+  waterLitersPerM3 = 140;
+  shovelsGravelPerCement = 7;
+}
+
+const totalCementKg = Math.round(m3 * cementKgPerM3);
+const totalGravelKg = Math.round(m3 * gravelKgPerM3);
+const totalWaterL = Math.round(m3 * waterLitersPerM3);
+const cementSacks25 = Math.ceil(totalCementKg / 25);
+
+return {
+  primary: { id: 'cementSacks', label: 'Zementbedarf (25-kg-Säcke)', value: cementSacks25, formattedValue: cementSacks25 + ' Säcke (' + totalCementKg + ' kg)', highlight: true },
+  secondary: [
+    { id: 'gravelKg', label: 'Betonkies / Sand-Kies-Gemisch (0-16 mm)', value: totalGravelKg, formattedValue: formatNumber(totalGravelKg, 0) + ' kg (' + formatNumber(totalGravelKg / 1000, 2) + ' t)' },
+    { id: 'waterL', label: 'Anmachwasser ca.', value: totalWaterL, formattedValue: totalWaterL + ' Liter (w/z ca. 0,55)' },
+    { id: 'shovelRatio', label: 'Praxis-Faustformel in Schaufeln', value: shovelsGravelPerCement, formattedValue: '1 Schaufel Zement auf ' + shovelsGravelPerCement + ' Schaufeln Kies' },
+  ],
+  summaryText: 'Für ' + m3 + ' m³ Beton benötigen Sie ' + cementSacks25 + ' Säcke Zement (' + totalCementKg + ' kg), ca. ' + formatNumber(totalGravelKg / 1000, 2) + ' Tonnen Kies und rund ' + totalWaterL + ' Liter Wasser.',
+};`,
+    formula: 'Standardbeton C20/25: ca. 300 kg Zement + 1.800 kg Betonkies + 165 l Wasser je m³',
+    formulaExplanation: 'Der Wasser-Zement-Wert (w/z) sollte für optimale Festigkeit zwischen 0,50 und 0,60 liegen. Zu viel Wasser schwächt den Beton und fördert Risse.',
+    workedExample: {
+      title: 'Beispiel: 0,5 m³ Beton für Gartenmauer-Fundament',
+      inputValues: [{ label: 'Volumen', value: '0,5 m³' }, { label: 'Güte', value: 'C20/25 (1:4)' }],
+      steps: ['Zement: 0,5 × 300 kg = 150 kg -> 6 Säcke à 25 kg', 'Kies: 0,5 × 1.800 kg = 900 kg (ca. 0,9 Tonnen)', 'Wasser: 0,5 × 165 l = 82,5 Liter'],
+      result: '6 Säcke Zement, 900 kg Kies, 83 l Wasser',
+    },
+    faqs: [
+      { question: 'Welche Körnung hat Betonkies üblicherweise?', answer: 'Für Standardbeton im Hoch- und Gartenbau wird Fertigbetonkies der Körnung 0/16 mm oder 0/32 mm verwendet, der bereits die ideale Sieblinie aus Sand und Steinen enthält.' },
+      { question: 'Wie lange muss Beton feucht gehalten werden?', answer: 'In den ersten Tagen nach dem Gießen muss Beton vor schnellem Austrocknen durch Sonne oder Wind geschützt werden (Nachbehandlung mit Folie oder Befeuchten), um Schwindrisse zu verhindern.' },
+    ],
+    relatedSlugs: ['betonrechner', 'fundament-rechner', 'estrich-rechner'],
+  },
+];
+
+console.log('Building part 2 with', calcs.length, 'calculators');
+fs.writeFileSync(path.join(__dirname, 'calcs-bauen-part2.json'), JSON.stringify(calcs, null, 2), 'utf8');
+console.log('Saved calcs-bauen-part2.json');
