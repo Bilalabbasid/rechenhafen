@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { ALL_CALCULATORS } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
+import { getAllArticles } from '@/data/ratgeber/articles';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://rechenhafen.de';
@@ -16,6 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/rechner/`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/ratgeber/`,
       lastModified: now,
       changeFrequency: 'daily',
       priority: 0.9,
@@ -62,5 +69,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...categoryPages, ...calculatorPages];
+  // Ratgeberseiten
+  const ratgeberPages: MetadataRoute.Sitemap = getAllArticles().map((article) => ({
+    url: `${baseUrl}/ratgeber/${article.slug}/`,
+    lastModified: new Date(article.updatedAt),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...categoryPages, ...calculatorPages, ...ratgeberPages];
 }
+

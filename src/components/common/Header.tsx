@@ -9,11 +9,11 @@ import SearchBar from './SearchBar';
 
 const PRIMARY_NAV_ITEMS = [
   { label: 'Alle Rechner', href: '/rechner/' },
+  { label: 'Ratgeber', href: '/ratgeber/' },
   { label: 'Finanzen', href: '/finanzen/' },
   { label: 'Steuern & Gehalt', href: '/steuern-gehalt/' },
   { label: 'Auto & Verkehr', href: '/auto-verkehr/' },
   { label: 'Wohnen & Immobilien', href: '/wohnen-immobilien/' },
-  { label: 'Gesundheit & Fitness', href: '/gesundheit-fitness/' },
   { label: 'Kredite & Zinsen', href: '/kredit-schulden/' },
 ];
 

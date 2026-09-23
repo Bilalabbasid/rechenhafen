@@ -57,6 +57,7 @@ export default function Footer() {
           <h4 className={styles.footerColTitle}>Plattform & Recht</h4>
           <ul className={styles.footerList}>
             <li><Link href="/rechner/" className={styles.footerLink}>Alle Rechner (Verzeichnis)</Link></li>
+            <li><Link href="/ratgeber/" className={styles.footerLink}>Ratgeber & Magazin</Link></li>
             <li><Link href="/ueber-uns/" className={styles.footerLink}>Über RechenHafen</Link></li>
             <li><Link href="/methodik/" className={styles.footerLink}>Methodik & Quellen</Link></li>
             <li><Link href="/impressum/" className={styles.footerLink}>Impressum</Link></li>
