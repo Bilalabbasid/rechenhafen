@@ -41,7 +41,4 @@ Thumbs.db
 # Audit & temporary reports
 audit-results.json
 seo-audit-report.json
-scripts/calcs-by-category.json
-scripts/calculators-inventory.json
-scripts/missing-calcs.json
-scripts/original-content.json
+
