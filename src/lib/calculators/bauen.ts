@@ -7,7 +7,10 @@ export function calculatePaintAmount(inputs: Record<string, any>): CalculationRe
   const height = parseFloat(inputs.roomHeight) || 2.5;
   const coats = parseInt(inputs.coats || '2', 10);
   const coveragePerLiter = parseFloat(inputs.coveragePerLiter) || 7.0; // 7 m² pro Liter
-  const openingDeductionSqm = parseFloat(inputs.openingDeductionSqm) || 5.0; // Fenster und Türen
+  const deductOpenings = inputs.deductOpenings !== 'no' && inputs.deductOpenings !== false;
+  const openingDeductionSqm = deductOpenings ? (parseFloat(inputs.openingDeductionSqm) || 5.0) : 0;
+  const includeCeiling = inputs.includeCeiling === 'yes' || inputs.includeCeiling === true;
+  const wastePercent = parseFloat(inputs.wasteReservePercent || '10'); // 0%, 5%, 10%, 15%
 
   if (length <= 0 || width <= 0 || height <= 0 || coveragePerLiter <= 0) {
     return {
@@ -16,12 +19,17 @@ export function calculatePaintAmount(inputs: Record<string, any>): CalculationRe
     };
   }
 
-  // Wandfläche = 2 * (Länge + Breite) * Höhe - Öffnungen
-  const grossWallArea = 2 * (length + width) * height;
-  const netWallArea = Math.max(0, grossWallArea - openingDeductionSqm);
-  const totalPaintArea = netWallArea * coats;
+  // Wandfläche = 2 * (Länge + Breite) * Höhe
+  const wallArea = 2 * (length + width) * height;
+  const ceilingArea = includeCeiling ? length * width : 0;
+  const grossArea = wallArea + ceilingArea;
+  const netArea = Math.max(0, grossArea - openingDeductionSqm);
+  
+  // Berücksichtigung von Anstrichen und Sicherheitsreserve
+  const totalPaintArea = netArea * coats;
+  const totalAreaWithReserve = totalPaintArea * (1 + wastePercent / 100);
 
-  const litersNeeded = totalPaintArea / coveragePerLiter;
+  const litersNeeded = totalAreaWithReserve / coveragePerLiter;
   const buckets10L = Math.ceil(litersNeeded / 10);
   const buckets5L = Math.ceil(litersNeeded / 5);
 
@@ -34,12 +42,13 @@ export function calculatePaintAmount(inputs: Record<string, any>): CalculationRe
       highlight: true,
     },
     secondary: [
-      { id: 'netArea', label: 'Zu streichende Netto-Wandfläche', value: netWallArea, formattedValue: `${formatNumber(netWallArea, 1)} m²` },
+      { id: 'netArea', label: `Zu streichende Fläche (${includeCeiling ? 'Wände + Decke' : 'nur Wände'})`, value: netArea, formattedValue: `${formatNumber(netArea, 1)} m²` },
       { id: 'totalAreaCoats', label: `Gesamtfläche bei ${coats} Anstrichen`, value: totalPaintArea, formattedValue: `${formatNumber(totalPaintArea, 1)} m²` },
+      { id: 'reserve', label: `Sicherheitsreserve (${wastePercent} %)`, value: wastePercent, formattedValue: `+${formatNumber(totalAreaWithReserve - totalPaintArea, 1)} m² Reserve` },
       { id: 'buckets10', label: 'Empfohlene Gebindegröße (10-Liter-Eimer)', value: buckets10L, formattedValue: `${buckets10L} × 10-Liter-Eimer` },
       { id: 'buckets5', label: 'Alternativ (5-Liter-Eimer)', value: buckets5L, formattedValue: `${buckets5L} × 5-Liter-Eimer` },
     ],
-    summaryText: `Für ${formatNumber(netWallArea, 1)} m² Wandfläche benötigen Sie bei ${coats} Anstrichen rund ${formatNumber(litersNeeded, 1)} Liter Wandfarbe (ca. ${buckets10L} Eimer à 10 Liter).`,
+    summaryText: `Für ${formatNumber(netArea, 1)} m² Fläche (${includeCeiling ? 'inkl. Decke, ' : ''}abzgl. ${formatNumber(openingDeductionSqm, 1)} m² Türen/Fenster) benötigen Sie bei ${coats} Anstrichen und ${wastePercent} % Reserve rund ${formatNumber(litersNeeded, 1)} Liter Farbe (ca. ${buckets10L} Eimer à 10 Liter).`,
   };
 }
 

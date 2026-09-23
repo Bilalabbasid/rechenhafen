@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function ImpressumPage() {
   return (
     <div className={styles.container}>
-      <Breadcrumbs items={[{ label: 'Impressum' }]} />
+      <Breadcrumbs items={[{ label: 'Impressum', href: '/impressum/' }]} />
 
       <article style={{ maxWidth: '800px', margin: '0 auto var(--space-12)', lineHeight: 1.7, color: 'var(--color-text-secondary)' }}>
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: 'var(--space-4)' }}>

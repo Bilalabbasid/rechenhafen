@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "RechenHafen.de – Zentraler SEO-Keyword-Plan",
-    "generated": "2026-09-20",
+    "generated": "2026-09-22",
     "version": "1.1.0",
     "totalCalculators": 405,
     "target": "Deutschland · Google · Deutsch",
@@ -164,11 +164,11 @@
         "slug": "autokreditrechner",
         "competing": [
           "kreditrechner",
-          "autokredit-rechner"
+          "ballonfinanzierung-rechner"
         ]
       },
       {
-        "slug": "autokredit-rechner",
+        "slug": "ballonfinanzierung-rechner",
         "competing": [
           "autokreditrechner"
         ]
@@ -179,18 +179,18 @@
           "zinseszinsrechner",
           "etf-sparplan-rechner",
           "sparzielrechner",
-          "sparziel-rechner"
+          "spardauer-rechner"
         ]
       },
       {
         "slug": "sparzielrechner",
         "competing": [
           "sparrechner",
-          "sparziel-rechner"
+          "spardauer-rechner"
         ]
       },
       {
-        "slug": "sparziel-rechner",
+        "slug": "spardauer-rechner",
         "competing": [
           "sparzielrechner"
         ]
@@ -297,6 +297,13 @@
         ]
       },
       {
+        "keyword": "arbeitstage rechner",
+        "competingPages": [
+          "tage-zwischen-zwei-daten",
+          "arbeitstage-rechner"
+        ]
+      },
+      {
         "keyword": "prozent von prozent rechner",
         "competingPages": [
           "prozentrechner",
@@ -328,7 +335,7 @@
         "keyword": "sparziel rechner",
         "competingPages": [
           "sparzielrechner",
-          "sparziel-rechner"
+          "spardauer-rechner"
         ]
       },
       {
@@ -356,7 +363,7 @@
         "keyword": "autokredit rechner",
         "competingPages": [
           "kreditrechner",
-          "autokredit-rechner"
+          "ballonfinanzierung-rechner"
         ]
       },
       {
@@ -669,14 +676,16 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "tage bis geburtstag",
+      "primaryKeyword": "tage bis zum geburtstag",
       "secondaryKeywords": [
+        "tage bis geburtstag",
         "geburtstag countdown",
         "wann habe ich wieder geburtstag"
       ],
       "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "tage bis zum geburtstag",
         "tage bis geburtstag",
         "geburtstag countdown",
         "wann habe ich wieder geburtstag"
@@ -700,15 +709,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "datumsdifferenz rechner",
+      "primaryKeyword": "datumsdifferenz",
       "secondaryKeywords": [
+        "datumsdifferenz rechner",
         "zeitspanne zwischen zwei daten",
-        "tage zwischen zwei daten",
+        "tage zwischen zwei daten"
+      ],
+      "longtailKeywords": [
         "abstand zwischen daten"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "datumsdifferenz",
         "datumsdifferenz rechner",
         "zeitspanne zwischen zwei daten",
         "tage zwischen zwei daten",
@@ -859,15 +871,20 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "tage zwischen zwei daten",
+      "primaryKeyword": "tage zwischen zwei daten rechner",
       "secondaryKeywords": [
-        "anzahl tage berechnen",
+        "arbeitstage rechner",
+        "tage zwischen zwei daten",
+        "anzahl tage berechnen"
+      ],
+      "longtailKeywords": [
         "wieviele tage zwischen",
         "kalendertage rechner"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "tage zwischen zwei daten rechner",
+        "arbeitstage rechner",
         "tage zwischen zwei daten",
         "anzahl tage berechnen",
         "wieviele tage zwischen",
@@ -917,6 +934,7 @@
         "arbeitstage berechnen mit feiertagen",
         "wie viele arbeitstage hat 2026",
         "wie viele werktage zwischen datum",
+        "arbeitstage rechner bundesland",
         "arbeitstage berechnen",
         "werktage mo fr rechner",
         "arbeitstage monat"
@@ -1808,7 +1826,7 @@
         "zinseszinsrechner",
         "etf-sparplan-rechner",
         "sparzielrechner",
-        "sparziel-rechner"
+        "spardauer-rechner"
       ],
       "cannibalizationNote": "zinseszinsrechner — intent overlap; differentiate: sparrechner=monthly savings goal, zinseszinsrechner=compound growth visualisation",
       "seoNotes": null
@@ -1844,7 +1862,7 @@
       "cpcEur": "NOT VERIFIED",
       "cannibalizationRisk": [
         "sparrechner",
-        "sparziel-rechner"
+        "spardauer-rechner"
       ],
       "cannibalizationNote": null,
       "seoNotes": null
@@ -2097,7 +2115,7 @@
       "cpcEur": "NOT VERIFIED",
       "cannibalizationRisk": [
         "kreditrechner",
-        "autokredit-rechner"
+        "ballonfinanzierung-rechner"
       ],
       "cannibalizationNote": null,
       "seoNotes": null
@@ -2204,15 +2222,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "restschuld rechner",
+      "primaryKeyword": "restschuld rechner baufinanzierung",
       "secondaryKeywords": [
+        "restschuld rechner",
         "restdarlehen berechnen",
-        "restschuld nach 10 jahren",
+        "restschuld nach 10 jahren"
+      ],
+      "longtailKeywords": [
         "anschlussfinanzierung rechner"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "restschuld rechner baufinanzierung",
         "restschuld rechner",
         "restdarlehen berechnen",
         "restschuld nach 10 jahren",
@@ -4591,28 +4612,33 @@
       "seoNotes": null
     },
     {
-      "slug": "sparziel-rechner",
-      "name": "Sparziel-Rechner (Wie viel muss ich monatlich sparen?)",
-      "url": "/rechner/sparziel-rechner/",
+      "slug": "spardauer-rechner",
+      "name": "Spardauer-Rechner (Dauer bis zum Sparziel)",
+      "url": "/rechner/spardauer-rechner/",
       "category": "finanzen",
       "categoryName": "Finanzen & Sparen",
       "tier": 2,
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "sparziel rechner",
+      "primaryKeyword": "spardauer rechner",
       "secondaryKeywords": [
-        "wie viel muss ich monatlich sparen",
-        "sparrate fuer sparziel",
-        "vermoegen ansparen formel"
+        "spardauer berechnen",
+        "wie lange muss ich sparen",
+        "dauer bis sparziel"
       ],
-      "longtailKeywords": [],
-      "questionKeywords": [],
+      "longtailKeywords": [
+        "sparzeit bis wunschsumme rechner"
+      ],
+      "questionKeywords": [
+        "wie lange muss ich monatlich sparen"
+      ],
       "allKeywords": [
-        "sparziel rechner",
-        "wie viel muss ich monatlich sparen",
-        "sparrate fuer sparziel",
-        "vermoegen ansparen formel"
+        "spardauer rechner",
+        "spardauer berechnen",
+        "wie lange muss ich sparen",
+        "dauer bis sparziel",
+        "sparzeit berechnen"
       ],
       "serpCompetitors": [],
       "volumeDeMonthlyEstimate": "NOT VERIFIED",
@@ -4620,10 +4646,11 @@
       "kd": "NOT VERIFIED",
       "cpcEur": "NOT VERIFIED",
       "cannibalizationRisk": [
-        "sparzielrechner"
+        "sparzielrechner",
+        "sparrechner"
       ],
       "cannibalizationNote": null,
-      "seoNotes": null
+      "seoNotes": "Inverse calculation to Sparzielrechner: determines duration in years and months for a given monthly savings rate."
     },
     {
       "slug": "kaufkraftverlust-rechner",
@@ -4635,15 +4662,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "kaufkraftverlust rechner",
+      "primaryKeyword": "kaufkraftverlust ersparnisse",
       "secondaryKeywords": [
+        "kaufkraftverlust rechner",
         "was ist mein geld in zukunft wert",
-        "inflation vermoegensverlust berechnen",
+        "inflation vermoegensverlust berechnen"
+      ],
+      "longtailKeywords": [
         "kaufkraft nach jahren"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "kaufkraftverlust ersparnisse",
         "kaufkraftverlust rechner",
         "was ist mein geld in zukunft wert",
         "inflation vermoegensverlust berechnen",
@@ -4934,15 +4964,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "notgroschen rechner",
+      "primaryKeyword": "liquiditaetsreserve rechner",
       "secondaryKeywords": [
+        "notgroschen rechner",
         "wie viel notgroschen tagesgeld",
-        "liquiditaetsreserve berechnen",
+        "liquiditaetsreserve berechnen"
+      ],
+      "longtailKeywords": [
         "finanzielle sicherheit polster"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "liquiditaetsreserve rechner",
         "notgroschen rechner",
         "wie viel notgroschen tagesgeld",
         "liquiditaetsreserve berechnen",
@@ -5143,28 +5176,32 @@
       "seoNotes": null
     },
     {
-      "slug": "autokredit-rechner",
-      "name": "Autokredit-Rechner (Klassisch vs. Ballonfinanzierung)",
-      "url": "/rechner/autokredit-rechner/",
+      "slug": "ballonfinanzierung-rechner",
+      "name": "Ballonfinanzierung Rechner (Kfz-Kredit mit Schlussrate)",
+      "url": "/rechner/ballonfinanzierung-rechner/",
       "category": "kredit-schulden",
       "categoryName": "Kredit & Schulden",
       "tier": 2,
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "autokredit rechner",
+      "primaryKeyword": "ballonfinanzierung rechner",
       "secondaryKeywords": [
+        "autokredit mit schlussrate",
         "kfz finanzierung monatsrate",
         "ballonfinanzierung rechner schlussrate",
-        "autokauf kredit zinsen"
+        "schlussratenfinanzierung auto"
       ],
-      "longtailKeywords": [],
+      "longtailKeywords": [
+        "autokauf kredit schlussrate vergleich"
+      ],
       "questionKeywords": [],
       "allKeywords": [
-        "autokredit rechner",
+        "ballonfinanzierung rechner",
+        "autokredit mit schlussrate",
         "kfz finanzierung monatsrate",
         "ballonfinanzierung rechner schlussrate",
-        "autokauf kredit zinsen"
+        "schlussratenfinanzierung auto"
       ],
       "serpCompetitors": [],
       "volumeDeMonthlyEstimate": "NOT VERIFIED",
@@ -5175,7 +5212,7 @@
         "autokreditrechner"
       ],
       "cannibalizationNote": null,
-      "seoNotes": null
+      "seoNotes": "Focused on vehicle balloon loans with large final payment (Schlussrate). Differentiated from standard amortizing autokreditrechner."
     },
     {
       "slug": "umschuldung-rechner",
@@ -5451,15 +5488,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "vorfaelligkeitsentschaedigung rechner",
+      "primaryKeyword": "vorfaelligkeitsentschaedigung ratenkredit",
       "secondaryKeywords": [
+        "vorfaelligkeitsentschaedigung rechner",
         "kredit vorzeitig kuendigen kosten",
-        "502 bgb vorfaelligkeit",
+        "502 bgb vorfaelligkeit"
+      ],
+      "longtailKeywords": [
         "ausloesegebuehr kredit"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "vorfaelligkeitsentschaedigung ratenkredit",
         "vorfaelligkeitsentschaedigung rechner",
         "kredit vorzeitig kuendigen kosten",
         "502 bgb vorfaelligkeit",
@@ -5583,15 +5623,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "restschuld rechner",
+      "primaryKeyword": "restschuld stichtag rechner",
       "secondaryKeywords": [
+        "restschuld rechner",
         "kredit restschuld berechnen",
-        "darlehen restschuld stichtag",
+        "darlehen restschuld stichtag"
+      ],
+      "longtailKeywords": [
         "tilgungsplan restbetrag"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "restschuld stichtag rechner",
         "restschuld rechner",
         "kredit restschuld berechnen",
         "darlehen restschuld stichtag",
@@ -6276,15 +6319,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "vorfaelligkeitsentschaedigung rechner",
+      "primaryKeyword": "vorfaelligkeitsentschaedigung baufinanzierung",
       "secondaryKeywords": [
+        "vorfaelligkeitsentschaedigung rechner",
         "baufinanzierung vorzeitig kuendigen kosten",
-        "aktiv passiv methode bgh",
+        "aktiv passiv methode bgh"
+      ],
+      "longtailKeywords": [
         "schadensersatz bank zinsverlust"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "vorfaelligkeitsentschaedigung baufinanzierung",
         "vorfaelligkeitsentschaedigung rechner",
         "baufinanzierung vorzeitig kuendigen kosten",
         "aktiv passiv methode bgh",
@@ -10493,15 +10539,18 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "zisternengroesse berechnen din 1989",
+      "primaryKeyword": "regenwasser zisterne rechner",
       "secondaryKeywords": [
+        "zisternengroesse berechnen din 1989",
         "regenwasser zisterne rechner liter",
-        "dachflaeche zisterne groesse",
+        "dachflaeche zisterne groesse"
+      ],
+      "longtailKeywords": [
         "gartenbewaesserung zisterne volumen"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "regenwasser zisterne rechner",
         "zisternengroesse berechnen din 1989",
         "regenwasser zisterne rechner liter",
         "dachflaeche zisterne groesse",
@@ -10757,15 +10806,18 @@
       "intent": "informational",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "kreisumfang rechner formel",
+      "primaryKeyword": "kreisumfang rechner",
       "secondaryKeywords": [
+        "kreisumfang rechner formel",
         "umfang kreis durchmesser pi",
-        "kreisumfang u 2 pi r berechnen",
+        "kreisumfang u 2 pi r berechnen"
+      ],
+      "longtailKeywords": [
         "kreis flaeche umfang umrechnen"
       ],
-      "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "kreisumfang rechner",
         "kreisumfang rechner formel",
         "umfang kreis durchmesser pi",
         "kreisumfang u 2 pi r berechnen",
@@ -13787,17 +13839,19 @@
       "intent": "informational",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "varianz rechner",
+      "primaryKeyword": "stichprobenvarianz rechner",
       "secondaryKeywords": [
+        "varianz rechner",
         "stichprobenvarianz",
-        "populationsvarianz berechnen",
-        "streuungsmaße formel"
+        "populationsvarianz berechnen"
       ],
       "longtailKeywords": [
+        "streuungsmaße formel",
         "standardabweichung stichprobe"
       ],
       "questionKeywords": [],
       "allKeywords": [
+        "stichprobenvarianz rechner",
         "varianz rechner",
         "stichprobenvarianz",
         "populationsvarianz berechnen",

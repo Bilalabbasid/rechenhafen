@@ -19,7 +19,7 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Marge Rechner – Handelsspanne, Aufschlag & Rohgewinn berechnen',
     metaDescription: 'Ermitteln Sie Handelsmarge (auf Verkaufspreis), Kalkulationsaufschlag (auf Einkaufspreis) und Rohertrag in Euro und Prozent.',
     h1: 'Marge & Handelsspanne Rechner',
-    shortDescription: 'Berechnet Handelsspanne, Kalkulationsaufschlag und Gewinnspanne im Handel und E-Commerce.',
+    shortDescription: 'Berechnet Handelsspanne, Kalkulationsaufschlag und Gewinnspanne im Handel und E-Commerce mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['marge rechner', 'handelsspanne berechnen', 'aufschlag berechnen einkaufspreis', 'gewinnmarge formel'],
     inputs: [
       { id: 'purchasePrice', label: 'Einkaufspreis netto (EK)', type: 'number', defaultValue: 40.0, step: 0.5, unit: '€' },
@@ -35,11 +35,12 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Marge: 60,00 % | Aufschlag: 150,00 %',
     },
     content: {
-      intro: 'Die Verwechslung von Handelsspanne (Marge) und Aufschlag ist einer der teuersten Fehler in kaufmännischen Verhandlungen.',
-      details: 'Wer 50 % Aufschlag kalkuliert, erzielt keineswegs 50 % Marge, sondern lediglich 33,33 % Marge bezogen auf den Verkaufspreis.',
+      intro: 'Dieser Margenrechner unterscheidet strikt zwischen Handelsspanne (Bruttomarge auf den Verkaufspreis) und dem prozentualen Kalkulationsaufschlag auf den Einkaufspreis.',
+      details: 'Handelsspanne (Marge) = (Verkaufspreis - Einkaufspreis) / Verkaufspreis · 100. Kalkulationszuschlag = (Verkaufspreis - Einkaufspreis) / Einkaufspreis · 100. Ein Aufschlag von 100 % (Verdopplung) entspricht exakt einer Marge von 50 %.',
     },
     faqs: [
-      { question: 'Kann eine Handelsmarge 100 % betragen?', answer: 'Nein, eine Marge von 100 % würde bedeuten, dass die Ware völlig kostenlos eingekauft wurde (EK = 0). Ein Aufschlag kann hingegen 200 %, 500 % oder mehr betragen.' },
+      { question: 'Warum verwechseln viele Gründer Marge und Aufschlag?', answer: 'Weil die Euro-Differenz identisch ist, sich der Prozentsatz aber auf unterschiedliche Basen bezieht: 50 € Gewinn bei 100 € Einkaufspreis sind 50 % Aufschlag, aber nur 33,3 % Marge vom 150 € Verkaufspreis.' },
+      { question: 'Was ist die Rohertragsmarge (Gross Profit Margin)?', answer: 'Der prozentuale Anteil des Umsatzerlöses, der nach Abzug der direkten Herstellungskosten (COGS) zur Deckung der Fixkosten verbleibt.' },
     ],
     relatedSlugs: ['mwst-rechner', 'break-even-rechner', 'prozentrechner'],
   },
@@ -88,11 +89,12 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Netto: 100,00 € | MwSt: 19,00 €',
     },
     content: {
-      intro: 'Klassischer Rechenfehler im Geschäftsleben: Wer von einem Bruttobetrag von 119 Euro einfach 19 % abzieht, erhält fälschlicherweise 96,39 Euro statt der korrekten 100 Euro Netto.',
-      details: 'Unser MwSt-Rechner rechnet nach den amtlichen Vorgaben des deutschen Umsatzsteuergesetzes (UStG).',
+      intro: 'Dieser Mehrwertsteuerrechner ermittelt Vorsteuer, Umsatzsteuer und Nettobeträge für den regulären Steuersatz von 19 % und den ermäßigten Satz von 7 % nach § 12 UStG.',
+      details: 'Aus Brutto zu Netto: Netto = Brutto / 1,19 (bei 19 %) bzw. Brutto / 1,07 (bei 7 %). Niemals darf man 19 % vom Bruttobetrag abziehen, da die 19 % auf den 100-Prozent-Nettobetrag aufgeschlagen wurden (19/119 ≈ 15,966 %).',
     },
     faqs: [
-      { question: 'Welche Produkte unterliegen in Deutschland dem ermäßigten Satz von 7 %?', answer: 'Der ermäßigte Satz gilt vor allem für fast alle Grundnahrungsmittel, Bücher, Zeitschriften und den öffentlichen Nahverkehr.' },
+      { question: 'Welche Produkte unterliegen in Deutschland dem ermäßigten Steuersatz von 7 %?', answer: 'Grundnahrungsmittel (Milch, Brot, Fleisch, Gemüse), Bücher, Zeitungen, Fahrkarten im Nahverkehr und Übernachtungen in Hotels.' },
+      { question: 'Was ist der Unterschied zwischen Vorsteuer und Umsatzsteuer?', answer: 'Umsatzsteuer nimmt der Unternehmer von seinen Kunden ein; Vorsteuer zahlt er selbst auf Einkäufe an andere Firmen; an das Finanzamt wird nur die Zahllast (Umsatzsteuer minus Vorsteuer) überwiesen.' },
     ],
     relatedSlugs: ['marge-rechner', 'prozentrechner', 'stundenlohnrechner'],
     isTimeSensitive: true,
@@ -130,13 +132,14 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '120 Stück (9.600 € Mindestumsatz)',
     },
     content: {
-      intro: 'Ab wann schreibt Ihr Unternehmen oder Ihr neues Produkt schwarze Zahlen? Der Break-Even-Rechner ermittelt die entscheidende Schwelle zwischen Verlust und Gewinn.',
-      details: 'Jede verkaufte Einheit oberhalb der Gewinnschwelle fließt als reiner operativer Gewinn ins Unternehmen.',
+      intro: 'Die Gewinnschwellenanalyse (Break-Even-Point) berechnet die exakte Absatzmenge und den Mindestumsatz, ab dem ein Unternehmen alle Fixkosten und variablen Kosten deckt.',
+      details: 'Break-Even-Menge = Fixkosten / Deckungsbeitrag pro Stück (Verkaufspreis - variable Stückkosten). Jedes darüber hinaus verkaufte Stück erwirtschaftet reinen Unternehmensgewinn.',
     },
     faqs: [
-      { question: 'Was sind typische fixe Kosten?', answer: 'Fixkosten fallen unabhängig von der Produktionsmenge an. Dazu gehören Büromiete, feste Mitarbeitergehälter, Versicherungsbeiträge, Leasingraten und Software-Abonnements.' },
+      { question: 'Wie kann man den Break-Even-Point senken?', answer: 'Durch Senkung der fixen Gemeinkosten (Miete, Gehälter), Verhandlung günstigerer Einkaufspreise (Senkung variabler Kosten) oder Preiserhöhungen beim Verkaufspreis.' },
+      { question: 'Was ist die Sicherheitsmarge (Margin of Safety)?', answer: 'Der prozentuale Puffer, um den der aktuelle Absatz einbrechen darf, bevor das Unternehmen in die Verlustzone rutscht: (Ist-Umsatz - Break-Even-Umsatz) / Ist-Umsatz · 100.' },
     ],
-    relatedSlugs: ['marge-rechner', 'mwst-rechner'],
+    relatedSlugs: ['marge-rechner', 'mwst-rechner', 'rabattrechner'],
   },
   {
     id: 'rabattrechner',
@@ -164,11 +167,12 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '96,00 € Endpreis (24,00 € Ersparnis)',
     },
     content: {
-      intro: 'Ob beim Einkaufen, im Schlussverkauf (Sale) oder bei Preisverhandlungen: Mit dem Rabattrechner sehen Sie sofort, wie viel Geld Sie sparen und wie hoch der reale Zahlbetrag ist.',
-      details: 'Geben Sie einfach den Originalpreis und den Rabattsatz ein, um den reduzierten Preis sofort zu ermitteln.',
+      intro: 'Dieser Rabattrechner ermittelt den reduzierten Endpreis, die absolute Ersparnis in Euro und kumulierte Staffelrabatte im Handel.',
+      details: 'Endpreis = Ausgangspreis · (1 - Rabattprozentsatz / 100). Bei aufeinanderfolgenden Rabatten (z. B. 20 % Sale plus 10 % Treuerabatt) werden die Prozente multiplikativ verknüpft: 0,80 · 0,90 = 0,72 (Gesamtrabatt: 28 %).',
     },
     faqs: [
-      { question: 'Wie rechne ich einen Rabatt im Kopf aus?', answer: 'Für 10 % teilen Sie den Preis einfach durch 10. Für 20 % verdoppeln Sie den 10%-Wert und ziehen diesen Betrag vom Originalpreis ab.' },
+      { question: 'Warum schadet übermäßiges Rabattieren der Marge überproportional?', answer: 'Bei 20 % Marge vernichtet ein Preisnachlass von 10 % genau die Hälfte des gesamten Gewinns: Um denselben Deckungsbeitrag zu erzielen, muss der Absatz verdoppelt werden.' },
+      { question: 'Was ist ein Naturalrabatt (Zugabe oder Draufgabe)?', answer: 'Bei Draufgabe erhält der Kunde bei Kauf von z. B. 10 Stück 2 Stück kostenlos dazu; bei Zugabe erhält er 10 Stück, zahlt aber nur 8 (entspricht rechnerisch 20 % Rabatt).' },
     ],
     relatedSlugs: ['skontorechner', 'mwst-rechner', 'prozentrechner', 'marge-rechner'],
   },
@@ -200,13 +204,14 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '980,00 € Zahlbetrag (36,7 % Effektivzins)',
     },
     content: {
-      intro: 'Skonto ist ein Preisnachlass, den Lieferanten für besonders schnelle Rechnungsbegleichung gewähren. Wer Skonto nutzt, spart nicht nur bares Geld, sondern nutzt einen unschlagbaren rechnerischen Jahreszins.',
-      details: 'Sogar ein kurzzeitiger Kontokorrentkredit bei der Bank ist fast immer deutlich günstiger, als auf den Skontoabzug zu verzichten.',
+      intro: 'Skonto ist ein prozentualer Preisnachlass (meist 2 bis 3 Prozent), den Lieferanten für eine vorfristige Rechnungsbegleichung (z. B. innerhalb von 10 bis 14 Tagen) gewähren.',
+      details: 'Zahlbetrag = Rechnungsbruttobetrag · (1 - Skontosatz / 100). Das Ziehen von Skonto entspricht auf das Jahr hochgerechnet oft einer extrem lukrativen Rendite von über 30 bis 50 Prozent p.a.',
     },
     faqs: [
-      { question: 'Zieht man Skonto vom Brutto- oder Nettobetrag ab?', answer: 'In der kaufmännischen Praxis wird Skonto vom Bruttoendbetrag der Rechnung abgezogen. Dadurch mindert sich auch die abzuführende bzw. abzugsfähige Umsatzsteuer anteilig.' },
+      { question: 'Darf man Skonto vom Brutto- oder Nettobetrag abziehen?', answer: 'In der kaufmännischen Praxis wird Skonto vom Bruttorechnungsbetrag abgezogen; buchhalterisch mindert das Skonto nachträglich auch die abzugsfähige Vorsteuer anteilig.' },
+      { question: 'Lohnt es sich, für das Skontoziehen den Kontokorrentkredit (Dispo) zu nutzen?', answer: 'Fast immer ja! Die Skontoersparnis (oft 2–3 % für 20 Tage Fristvorteil) entspricht rechnerisch einem Jahreszins von 36–54 %; der Kontokorrentkredit kostet meist nur 9–14 % Zinsen p.a.' },
     ],
-    relatedSlugs: ['rabattrechner', 'mwst-rechner', 'marge-rechner'],
+    relatedSlugs: ['skonto-jahreszins-rechner', 'rabattrechner', 'mwst-rechner', 'marge-rechner'],
   },
 ];
 

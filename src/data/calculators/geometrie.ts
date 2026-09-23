@@ -14,10 +14,10 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Kreis berechnen',
     category: 'geometrie',
     subcategory: '2D-Flächen & Umfang',
-    metaTitle: 'Kreisrechner – Kreisfläche (A), Umfang (U) & Durchmesser berechnen',
-    metaDescription: 'Berechnen Sie Fläche und Umfang eines Kreises aus Radius oder Durchmesser. Formeln, Rechenweg & exakte Kreiszahl Pi (π).',
-    h1: 'Kreisrechner – Flächeninhalt & Umfang online berechnen',
-    shortDescription: 'Ermittelt Kreisfläche, Umfang und Durchmesser aus dem Radius.',
+    metaTitle: 'Kreisrechner – Radius, Durchmesser, Fläche & Umfang',
+    metaDescription: 'Berechnen Sie Radius, Durchmesser, Kreisfläche und Kreisumfang aus einem beliebigen bekannten Wert mit Formel und Rechenweg.',
+    h1: 'Kreisrechner – Alle Kreiswerte aus einer Angabe berechnen',
+    shortDescription: 'Ermittelt Radius, Durchmesser, Flächeninhalt und Kreisumfang aus einer einzigen beliebigen Eingabegröße mit Rechenweg.',
     searchKeywords: ['kreisrechner', 'kreisfläche berechnen', 'umfang kreis formel', 'kreis radius berechnen pi'],
     inputs: [
       { id: 'radius', label: 'Kreisradius (r) in cm', type: 'number', defaultValue: 6.0, min: 0.01, step: 0.1, unit: 'cm' },
@@ -32,13 +32,14 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'A = 113,10 cm² | U = 37,70 cm',
     },
     content: {
-      intro: 'Berechnen Sie alle geometrischen Eigenschaften eines Kreises blitzschnell aus dem Radius.',
-      details: 'Als Grundform der Geometrie findet die Kreisberechnung in Technik, Handwerk und Alltag ständige Anwendung.',
+      intro: 'Dieser Kreisrechner berechnet Flächeninhalt, Umfang, Durchmesser und Radius eines ebenen Kreises über die Kreiszahl Pi (pi ≈ 3,14159265).',
+      details: 'Fundamentale Formeln: Fläche A = pi · r², Umfang U = 2 · pi · r = pi · d. Wird der Radius eines Kreises verdoppelt, vervierfacht sich dessen Flächeninhalt.',
     },
     faqs: [
-      { question: 'Wie hängen Radius und Durchmesser zusammen?', answer: 'Der Durchmesser d ist exakt doppelt so lang wie der Radius r (d = 2 · r).' },
+      { question: 'Wie berechnet man den Radius, wenn nur die Fläche bekannt ist?', answer: 'Man teilt den Flächeninhalt durch Pi und zieht aus dem Zwischenergebnis die Quadratwurzel: r = Wurzel(A / pi).' },
+      { question: 'Woher stammt die Kreiszahl Pi?', answer: 'Pi ist das konstante Verhältnis des Umfangs eines beliebigen Kreises zu seinem Durchmesser, eine irrationale und transzendente mathematische Konstante.' },
     ],
-    relatedSlugs: ['zylinderrechner', 'rechteckrechner', 'pythagoras-rechner'],
+    relatedSlugs: ['goldener-schnitt-rechner', 'ellipse-flaeche-rechner', 'zylinderrechner', 'rechteckrechner', 'pythagoras-rechner'],
   },
   {
     id: 'zylinderrechner',
@@ -47,7 +48,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Zylinder berechnen',
     category: 'geometrie',
     subcategory: '3D-Körper & Volumen',
-    metaTitle: 'Zylinder Rechner – Zylindervolumen & Oberfläche online berechnen',
+    metaTitle: 'Zylinder Rechner – Zylindervolumen & Oberfläche',
     metaDescription: 'Ermitteln Sie Volumen (in cm³ und Litern), Mantelfläche und Gesamtoberfläche eines Zylinders aus Radius und Höhe.',
     h1: 'Zylinder Rechner – Volumen & Oberfläche berechnen',
     shortDescription: 'Berechnet Volumen, Füllmenge in Litern und Oberfläche von Rundkörpern und Zylindern.',
@@ -66,13 +67,14 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'V = 1,18 Liter',
     },
     content: {
-      intro: 'Ob Getränkedose, Regentonne, Silo oder Rohrleitung: Der Zylinder ist einer der gebräuchlichsten 3D-Körper in Industrie und Haushalt.',
-      details: 'Der Rechner gibt das Volumen sowohl in Kubikzentimetern als auch direkt in Litern an.',
+      intro: 'Der Zylinderrechner ermittelt Rauminhalt (Volumen), Mantelfläche und gesamte Oberfläche gerader Kreiszylinder (Tanks, Rohre, Dosen).',
+      details: 'Volumen V = pi · r² · h. Mantelfläche M = 2 · pi · r · h. Gesamtoberfläche O = 2 · pi · r² + 2 · pi · r · h. 1 Kubikdezimeter (dm³) Zylindervolumen entspricht exakt einem Liter Flüssigkeit.',
     },
     faqs: [
-      { question: 'Wie rechne ich cm³ in Liter um?', answer: '1.000 cm³ (Kubikzentimeter) entsprechen genau 1 Liter (1 dm³).' },
+      { question: 'Wie berechnet man das Fassungsvermögen einer Regentonne in Litern?', answer: 'Messen Sie Innenradius r und Füllhöhe h in Dezimetern (dm): Das berechnete Volumen in dm³ entspricht direkt der Literzahl (z. B. r=3 dm, h=8 dm -> V ≈ 226 Liter).' },
+      { question: 'Was ist ein gleichseitiger Zylinder?', answer: 'Ein Zylinder, dessen Höhe h exakt seinem Durchmesser d (h = 2r) entspricht; er besitzt das minimale Oberflächen-zu-Volumen-Verhältnis aller Kreiszylinder.' },
     ],
-    relatedSlugs: ['kreisrechner', 'rechteckrechner', 'betonrechner'],
+    relatedSlugs: ['stumpf-kegel-rechner', 'torus-volumen-rechner', 'prisma-volumen-rechner', 'kreisrechner', 'rechteckrechner', 'betonrechner'],
   },
   {
     id: 'rechteckrechner',
@@ -84,7 +86,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Rechteck Rechner – Flächeninhalt (A), Umfang (U) & Diagonale',
     metaDescription: 'Rechteckflächen online berechnen: Länge und Breite eingeben und sofort Fläche, Umfang und Diagonale ermitteln.',
     h1: 'Rechteck Rechner – Fläche & Diagonale berechnen',
-    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonale von Rechtecken und Quadraten.',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonale von Rechtecken und Quadraten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['rechteckrechner', 'rechteck fläche berechnen', 'umfang rechteck formel', 'diagonale rechteck berechnen'],
     inputs: [
       { id: 'lengthA', label: 'Länge (Seite a)', type: 'number', defaultValue: 8.0, step: 0.1, unit: 'm' },
@@ -100,12 +102,13 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'A = 36,00 m²',
     },
     content: {
-      intro: 'Die Rechteckberechnung ist die Grundlage für jede Raum-, Grundstücks- und Materialplanung.',
-      details: 'Mit diesem Rechner erfahren Sie sofort die Quadratmeterzahl und die exakte Eck-zu-Eck-Diagonale.',
+      intro: 'Dieser Rechteckrechner ermittelt Flächeninhalt, Umfang und die Diagonale (Satz des Pythagoras) rechtwinkliger Vierecke.',
+      details: 'Fläche A = a · b; Umfang U = 2 · (a + b); Diagonale d = Wurzel(a² + b²). Das Rechteck mit dem größten Flächeninhalt bei gegebenem Umfang ist stets das regelmäßige Quadrat (a = b).',
     },
     faqs: [
-      { question: 'Ist jedes Quadrat ein Rechteck?', answer: 'Ja, jedes Quadrat ist ein spezielles Rechteck, bei dem alle vier Seiten exakt gleich lang sind (a = b).' },
+      { question: 'Wie berechnet man die Diagonale eines 4 × 3 Meter großen Raumes?', answer: 'd = Wurzel(4² + 3²) = Wurzel(16 + 9) = Wurzel(25) = 5,00 Meter (klassisches 3-4-5-Dreieck zur Prüfung rechter Winkel auf Baustellen).' },
+      { question: 'Wie rechnet man Quadratmeter in Hektar um?', answer: 'Ein Hektar umfasst genau 10.000 Quadratmeter (z. B. ein quadratisches Grundstück mit 100 × 100 Metern Seitenlänge).' },
     ],
-    relatedSlugs: ['kreisrechner', 'pythagoras-rechner', 'farbmengen-rechner', 'bodenbelag-rechner'],
+    relatedSlugs: ['goldener-schnitt-rechner', 'kreisrechner', 'pythagoras-rechner', 'farbmengen-rechner', 'bodenbelag-rechner'],
   },
 ];

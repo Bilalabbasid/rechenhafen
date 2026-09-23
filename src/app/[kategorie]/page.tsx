@@ -5,9 +5,12 @@ import { Metadata } from 'next';
 import { CATEGORIES, getCategoryBySlug } from '@/data/categories';
 import { getCalculatorsByCategory } from '@/data/calculators';
 import Breadcrumbs from '@/components/calculator/Breadcrumbs';
-import * as LucideIcons from 'lucide-react';
+import CategoryIcon from '@/components/common/CategoryIcon';
+import CategoryCard from '@/components/common/CategoryCard';
+import CategoryCalculatorsView from '@/components/calculator/CategoryCalculatorsView';
+import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
-import compStyles from '@/styles/components.module.css';
+import cardsStyles from '@/styles/cards.module.css';
 
 interface PageProps {
   params: Promise<{ kategorie: string }>;
@@ -57,34 +60,37 @@ export default async function CategoryPage({ params }: PageProps) {
   }
 
   const calculators = getCalculatorsByCategory(cat.slug);
-  const IconComponent = (LucideIcons as any)[cat.iconName] || LucideIcons.Calculator;
 
-  // Group calculators by subcategory
-  const subcategoryGroups: Record<string, typeof calculators> = {};
-  for (const c of calculators) {
-    const sub = c.subcategory || 'Weitere Rechner';
-    if (!subcategoryGroups[sub]) {
-      subcategoryGroups[sub] = [];
-    }
-    subcategoryGroups[sub].push(c);
-  }
+  // Serializable calculator list
+  const serializedCalcs = calculators.map((c) => ({
+    id: c.id,
+    slug: c.slug,
+    name: c.name,
+    shortName: c.shortName,
+    shortDescription: c.shortDescription,
+    category: c.category,
+    subcategory: c.subcategory,
+  }));
+
+  // Related categories (excluding current)
+  const relatedCategories = CATEGORIES.filter((c) => c.slug !== cat.slug).slice(0, 4);
 
   return (
     <div className={styles.container}>
       {/* Breadcrumbs */}
-      <Breadcrumbs items={[{ label: cat.name }]} />
+      <Breadcrumbs items={[{ label: cat.name, href: `/${cat.slug}/` }]} />
 
-      {/* Header */}
-      <div style={{
-        padding: 'var(--space-6) 0 var(--space-8)',
+      {/* Category Hero Header */}
+      <section style={{
+        padding: 'var(--space-6) 0 var(--space-6)',
         borderBottom: '1px solid var(--color-border)',
-        marginBottom: 'var(--space-8)'
+        marginBottom: 'var(--space-6)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: 'var(--space-4)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: 'var(--space-3)' }}>
           <div style={{
-            width: '54px',
-            height: '54px',
-            borderRadius: '14px',
+            width: '46px',
+            height: '46px',
+            borderRadius: 'var(--radius-md)',
             background: 'var(--color-primary-light)',
             color: 'var(--color-primary)',
             display: 'flex',
@@ -92,11 +98,11 @@ export default async function CategoryPage({ params }: PageProps) {
             justifyContent: 'center',
             flexShrink: 0
           }}>
-            <IconComponent size={28} />
+            <CategoryIcon name={cat.iconName} size={24} />
           </div>
           <div>
             <h1 style={{
-              fontSize: 'clamp(1.85rem, 4vw, 2.65rem)',
+              fontSize: 'clamp(1.6rem, 3.5vw, 2.25rem)',
               fontWeight: 800,
               letterSpacing: '-0.02em',
               margin: 0,
@@ -104,97 +110,72 @@ export default async function CategoryPage({ params }: PageProps) {
             }}>
               {cat.name}
             </h1>
-            <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
-              {calculators.length} spezialisierte Online-Rechner
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+              {calculators.length} {calculators.length === 1 ? 'Online-Rechner' : 'Online-Rechner'} in diesem Bereich
             </span>
           </div>
         </div>
 
         <p style={{
-          fontSize: '1.1rem',
+          fontSize: '1.05rem',
           lineHeight: 1.6,
           color: 'var(--color-text-secondary)',
-          maxWidth: '820px',
+          maxWidth: '780px',
           margin: 0
         }}>
           {cat.description}
         </p>
+      </section>
 
-        {/* Subcategories pill bar */}
-        {cat.subcategories && cat.subcategories.length > 0 && (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: 'var(--space-4)' }}>
-            {cat.subcategories.map((sub) => (
-              <span
-                key={sub}
-                style={{
-                  fontSize: '0.8rem',
-                  padding: '4px 12px',
-                  borderRadius: 'var(--radius-full)',
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  color: 'var(--color-text-secondary)',
-                  fontWeight: 500
-                }}
-              >
-                {sub}
-              </span>
-            ))}
-          </div>
-        )}
+      {/* Interactive Category Search & Calculators Grid */}
+      <CategoryCalculatorsView
+        calculators={serializedCalcs}
+        subcategories={cat.subcategories}
+        categoryName={cat.name}
+      />
+
+      {/* Zero-CLS Werbefläche am Ende der Rechnerliste */}
+      <div style={{ margin: 'var(--space-8) 0' }}>
+        <AdSlot format="top-banner" slotId={`cat-${cat.slug}-bottom`} />
       </div>
 
-      {/* Grouped Calculators */}
-      {Object.entries(subcategoryGroups).map(([subName, calcs]) => (
-        <section key={subName} style={{ marginBottom: 'var(--space-10)' }}>
-          <h2 style={{
-            fontSize: '1.35rem',
-            fontWeight: 700,
-            marginBottom: 'var(--space-4)',
-            color: 'var(--color-text-primary)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}>
-            <span style={{ width: '4px', height: '18px', background: 'var(--color-primary)', borderRadius: '2px', display: 'inline-block' }}></span>
-            {subName}
-            <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--color-text-muted)' }}>
-              ({calcs.length})
-            </span>
-          </h2>
-
-          <div className={compStyles.relatedGrid}>
-            {calcs.map((calc) => (
-              <Link
-                key={calc.id}
-                href={`/rechner/${calc.slug}/`}
-                className={compStyles.relatedCard}
-              >
-                <div className={compStyles.relatedCardHeader}>
-                  <LucideIcons.Calculator size={18} className={compStyles.relatedIcon} />
-                  <h3 className={compStyles.relatedCardTitle}>{calc.name}</h3>
-                </div>
-                <p className={compStyles.relatedCardDesc}>{calc.shortDescription}</p>
-                <div className={compStyles.relatedCardAction}>
-                  <span>Jetzt berechnen</span>
-                  <span>→</span>
-                </div>
-              </Link>
-            ))}
+      {/* Related Categories */}
+      <section style={{
+        marginTop: 'var(--space-10)',
+        marginBottom: 'var(--space-10)',
+        borderTop: '1px solid var(--color-border)',
+        paddingTop: 'var(--space-8)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 'var(--space-4)' }}>
+          <div>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
+              Weitere passende Themenbereiche
+            </h2>
+            <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+              Entdecken Sie weitere spezialisierte Online-Rechner
+            </p>
           </div>
-        </section>
-      ))}
-
-      {/* Fallback if no calculators yet */}
-      {calculators.length === 0 && (
-        <div style={{ textAlign: 'center', padding: 'var(--space-12) 0' }}>
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>
-            In dieser Kategorie stehen in Kürze weitere Rechner bereit.
-          </p>
-          <Link href="/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-            ← Zurück zur Startseite
+          <Link href="/rechner/" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+            Alle Kategorien →
           </Link>
         </div>
-      )}
+
+        <div className={cardsStyles.categoryGrid}>
+          {relatedCategories.map((rCat) => {
+            const count = getCalculatorsByCategory(rCat.slug).length;
+            return (
+              <CategoryCard
+                key={rCat.id}
+                slug={rCat.slug}
+                name={rCat.name}
+                iconName={rCat.iconName}
+                description={rCat.description}
+                calculatorCount={count}
+              />
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

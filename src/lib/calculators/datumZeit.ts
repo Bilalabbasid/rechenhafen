@@ -1,5 +1,6 @@
 import { CalculationResult } from '@/types/calculator';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
+import { getGermanHolidays, FederalState, FEDERAL_STATES } from '@/lib/holidays';
 
 export function calculateAge(inputs: Record<string, any>): CalculationResult {
   const birthDateStr = inputs.birthDate || '1990-01-01';
@@ -115,8 +116,15 @@ export function calculateDateDifference(inputs: Record<string, any>): Calculatio
   const tStart = isReversed ? end : start;
   const tEnd = isReversed ? start : end;
 
+  const includeEndDay = inputs.includeEndDay === true || inputs.includeEndDay === 'true';
+  const outputUnit = inputs.outputUnit || 'days';
+
   const diffMs = tEnd.getTime() - tStart.getTime();
-  const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  let totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (includeEndDay) {
+    totalDays += 1;
+  }
+
   const totalWeeks = Math.floor(totalDays / 7);
   const remDays = totalDays % 7;
 
@@ -133,32 +141,63 @@ export function calculateDateDifference(inputs: Record<string, any>): Calculatio
     years--;
     months += 12;
   }
+  if (includeEndDay) {
+    days += 1;
+  }
+
+  const totalMonths = years * 12 + months;
+  const totalHours = totalDays * 24;
+
+  let primaryVal = totalDays;
+  let primaryLabel = 'Tage';
+  let primaryFormatted = `${formatNumber(totalDays, 0)} Tage`;
+
+  if (outputUnit === 'detailed') {
+    primaryLabel = 'Detaillierte Zeitspanne';
+    primaryFormatted = `${years} Jahre, ${months} Monate, ${days} Tage`;
+  } else if (outputUnit === 'weeks') {
+    primaryLabel = 'Wochen';
+    primaryVal = totalWeeks;
+    primaryFormatted = `${formatNumber(totalWeeks, 0)} Wochen (${remDays} Resttage)`;
+  } else if (outputUnit === 'months') {
+    primaryLabel = 'Monate';
+    primaryVal = totalMonths;
+    primaryFormatted = `ca. ${formatNumber(totalMonths, 0)} Monate`;
+  } else if (outputUnit === 'years') {
+    const decYears = totalDays / 365.25;
+    primaryLabel = 'Jahre';
+    primaryVal = parseFloat(decYears.toFixed(2));
+    primaryFormatted = `${formatNumber(primaryVal, 2)} Jahre`;
+  }
 
   return {
     primary: {
-      id: 'days',
-      label: 'Gesamttage',
-      value: totalDays,
-      formattedValue: `${formatNumber(totalDays, 0)} Tage`,
+      id: 'diff',
+      label: primaryLabel,
+      value: primaryVal,
+      formattedValue: primaryFormatted,
       highlight: true,
     },
     secondary: [
+      { id: 'totalDays', label: 'Tage gesamt', value: totalDays, formattedValue: `${formatNumber(totalDays, 0)} Tage` },
       { id: 'detailed', label: 'Kalendarische Spanne', value: totalDays, formattedValue: `${years} J, ${months} M, ${days} T` },
       { id: 'weeks', label: 'Wochen & Tage', value: totalWeeks, formattedValue: `${totalWeeks} Wochen und ${remDays} Tage` },
-      { id: 'hours', label: 'Stunden', value: totalDays * 24, formattedValue: `${formatNumber(totalDays * 24, 0)} Std.` },
+      { id: 'hours', label: 'Stunden gesamt', value: totalHours, formattedValue: `${formatNumber(totalHours, 0)} Std.` },
     ],
-    summaryText: `Zwischen dem ${formatDateDe(start)} und dem ${formatDateDe(end)} liegen ${formatNumber(totalDays, 0)} Tage.`,
+    summaryText: `Zwischen dem ${formatDateDe(start)} und dem ${formatDateDe(end)} liegen ${formatNumber(totalDays, 0)} Tage (${years} Jahre, ${months} Monate und ${days} Tage).${includeEndDay ? ' (inklusive Endtag)' : ''}`,
   };
 }
 
-export function calculateWorkdays(inputs: Record<string, any>): CalculationResult {
-  const start = new Date(inputs.startDate || '2026-01-01');
-  const end = new Date(inputs.endDate || '2026-01-31');
+export function calculateWorkdaysAndHolidays(inputs: Record<string, any>): CalculationResult {
+  const startStr = inputs.startDate || '2026-02-01';
+  const endStr = inputs.endDate || '2026-02-28';
+  const start = new Date(startStr);
+  const end = new Date(endStr);
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     return {
-      primary: { id: 'workdays', label: 'Arbeitstage', value: 0, formattedValue: '0 Tage' },
-      error: 'Ungültige Datumsangaben.',
+      primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: 'Ungültiges Datum' },
+      error: 'Bitte geben Sie ein gültiges Start- und Enddatum ein.',
     };
   }
 
@@ -166,39 +205,163 @@ export function calculateWorkdays(inputs: Record<string, any>): CalculationResul
   const dStart = isReversed ? new Date(end) : new Date(start);
   const dEnd = isReversed ? new Date(start) : new Date(end);
 
+  const boundary = inputs.includeBoundary || 'both';
+  const workweek = inputs.workweek || 'mo-sa'; // Default: Mo–Sa für Werktage, Mo–Fr für Arbeitstage
+  const excludeHolidays = inputs.excludeHolidays !== false && inputs.excludeHolidays !== 'false';
+  const federalState: FederalState = inputs.federalState || 'bundesweit';
+
+  // Aktive Tage (0 = Sonntag, 1 = Montag, ..., 6 = Samstag)
+  const activeDays = new Set<number>();
+  if (workweek === 'mo-fr') {
+    activeDays.add(1).add(2).add(3).add(4).add(5);
+  } else if (workweek === 'mo-sa') {
+    activeDays.add(1).add(2).add(3).add(4).add(5).add(6);
+  } else {
+    // Custom
+    if (inputs.includeMonday !== false && inputs.includeMonday !== 'false') activeDays.add(1);
+    if (inputs.includeTuesday !== false && inputs.includeTuesday !== 'false') activeDays.add(2);
+    if (inputs.includeWednesday !== false && inputs.includeWednesday !== 'false') activeDays.add(3);
+    if (inputs.includeThursday !== false && inputs.includeThursday !== 'false') activeDays.add(4);
+    if (inputs.includeFriday !== false && inputs.includeFriday !== 'false') activeDays.add(5);
+    if (inputs.includeSaturday === true || inputs.includeSaturday === 'true') activeDays.add(6);
+    if (inputs.includeSunday === true || inputs.includeSunday === 'true') activeDays.add(0);
+  }
+
+  // Feiertage für alle Kalenderjahre im Zeitraum laden
+  const holidaysMap = new Map<string, string>();
+  if (excludeHolidays) {
+    for (let y = dStart.getFullYear(); y <= dEnd.getFullYear(); y++) {
+      const yearHolidays = getGermanHolidays(y, federalState);
+      for (const [k, v] of yearHolidays.entries()) {
+        holidaysMap.set(k, v);
+      }
+    }
+  }
+
+  let totalCalendarDays = 0;
   let workdays = 0;
-  let weekendDays = 0;
-  let totalDays = 0;
+  let saturdays = 0;
+  let sundays = 0;
+  let holidaysOnWorkdays = 0;
+  let holidaysOnFreeDays = 0;
 
   const cur = new Date(dStart);
   while (cur <= dEnd) {
-    const dayOfWeek = cur.getDay(); // 0 = So, 6 = Sa
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      weekendDays++;
-    } else {
-      workdays++;
+    const isStartDay = cur.getTime() === dStart.getTime();
+    const isEndDay = cur.getTime() === dEnd.getTime();
+
+    let countThisDay = true;
+    if (boundary === 'startOnly' && isEndDay && dStart.getTime() !== dEnd.getTime()) countThisDay = false;
+    if (boundary === 'endOnly' && isStartDay && dStart.getTime() !== dEnd.getTime()) countThisDay = false;
+    if (boundary === 'neither' && (isStartDay || isEndDay) && dStart.getTime() !== dEnd.getTime()) countThisDay = false;
+
+    if (countThisDay) {
+      totalCalendarDays++;
+      const dayOfWeek = cur.getDay(); // 0 = So, 6 = Sa
+      if (dayOfWeek === 6) saturdays++;
+      if (dayOfWeek === 0) sundays++;
+
+      const y = cur.getFullYear();
+      const m = String(cur.getMonth() + 1).padStart(2, '0');
+      const d = String(cur.getDate()).padStart(2, '0');
+      const dateKey = `${y}-${m}-${d}`;
+
+      const isHoliday = holidaysMap.has(dateKey);
+      const isRegularWorkday = activeDays.has(dayOfWeek);
+
+      if (isHoliday) {
+        if (isRegularWorkday) {
+          holidaysOnWorkdays++;
+        } else {
+          // Feiertag fiel auf einen ohnehin freien Tag (z. B. Samstag oder Sonntag)
+          holidaysOnFreeDays++;
+        }
+      }
+
+      // Ein Tag zählt NUR DANN als Arbeits-/Werktag, wenn er ein aktiver Wochentag UND KEIN Feiertag ist
+      if (isRegularWorkday && !isHoliday) {
+        workdays++;
+      }
     }
-    totalDays++;
+
     cur.setDate(cur.getDate() + 1);
   }
 
-  const workHours = workdays * (parseFloat(inputs.hoursPerDay) || 8);
+  const hoursPerDay = parseFloat(inputs.hoursPerDay) || 0;
+  const totalHours = hoursPerDay > 0 ? workdays * hoursPerDay : 0;
+
+  // Primäre Benennung
+  let primaryLabel = 'Berechnete Tage';
+  let unitName = 'Tage';
+  if (workweek === 'mo-sa') {
+    primaryLabel = 'Gesetzliche Werktage (Mo–Sa)';
+    unitName = 'Werktage';
+  } else if (workweek === 'mo-fr') {
+    primaryLabel = 'Arbeitstage (Mo–Fr)';
+    unitName = 'Arbeitstage';
+  }
+
+  const secondary = [
+    { id: 'totalDays', label: 'Kalendertage gesamt', value: totalCalendarDays, formattedValue: `${totalCalendarDays} Tage` },
+    { id: 'calculatedWorkdays', label: primaryLabel, value: workdays, formattedValue: `${workdays} ${unitName}` },
+    { id: 'saturdays', label: 'Samstage', value: saturdays, formattedValue: `${saturdays} Tage` },
+    { id: 'sundays', label: 'Sonntage', value: sundays, formattedValue: `${sundays} Tage` },
+  ];
+
+  if (excludeHolidays) {
+    secondary.push({
+      id: 'holidaysOnWorkdays',
+      label: 'Gesetzliche Feiertage (an Arbeitstagen)',
+      value: holidaysOnWorkdays,
+      formattedValue: `${holidaysOnWorkdays} Tage`,
+    });
+    if (holidaysOnFreeDays > 0) {
+      secondary.push({
+        id: 'holidaysOnFreeDays',
+        label: 'Feiertage am Wochenende / freien Tagen',
+        value: holidaysOnFreeDays,
+        formattedValue: `${holidaysOnFreeDays} Tage (nicht doppelt abgezogen)`,
+      });
+    }
+  }
+
+  if (totalHours > 0) {
+    secondary.push({
+      id: 'totalHours',
+      label: `Arbeitsstunden (${hoursPerDay} Std./Tag)`,
+      value: totalHours,
+      formattedValue: `${formatNumber(totalHours, 1)} Std.`,
+    });
+  }
+
+  const stateName = FEDERAL_STATES.find((s) => s.code === federalState)?.name || 'Bundesweit';
+  let summary = `Im Zeitraum vom ${formatDateDe(dStart)} bis ${formatDateDe(dEnd)} (${totalCalendarDays} Kalendertage) gibt es ${workdays} ${unitName}.`;
+  if (excludeHolidays && holidaysOnWorkdays > 0) {
+    summary += ` Dabei wurden ${holidaysOnWorkdays} gesetzliche Feiertage (${stateName}) berücksichtigt.`;
+  }
+  if (holidaysOnFreeDays > 0) {
+    summary += ` ${holidaysOnFreeDays} Feiertag(e) fielen auf ohnehin arbeitsfreie Tage und minderten das Ergebnis nicht doppelt.`;
+  }
 
   return {
     primary: {
       id: 'workdays',
-      label: 'Arbeitstage (Mo–Fr)',
+      label: primaryLabel,
       value: workdays,
-      formattedValue: `${workdays} Tage`,
+      formattedValue: `${workdays} ${unitName}`,
       highlight: true,
     },
-    secondary: [
-      { id: 'totalDays', label: 'Gesamte Kalendertage', value: totalDays, formattedValue: `${totalDays} Tage` },
-      { id: 'weekendDays', label: 'Wochenendtage (Sa/So)', value: weekendDays, formattedValue: `${weekendDays} Tage` },
-      { id: 'workHours', label: 'Reguläre Arbeitsstunden', value: workHours, formattedValue: `${formatNumber(workHours, 1)} Std.` },
-    ],
-    summaryText: `Im gewählten Zeitraum von ${totalDays} Kalendertagen gibt es ${workdays} Arbeitstage (Montag bis Freitag) und ${weekendDays} Wochenendtage.`,
+    secondary,
+    summaryText: summary,
   };
+}
+
+export function calculateWorkdays(inputs: Record<string, any>): CalculationResult {
+  // Arbeitstage-Rechner: Standardmäßig Mo–Fr
+  return calculateWorkdaysAndHolidays({
+    workweek: 'mo-fr',
+    ...inputs,
+  });
 }
 
 export function calculateDateAdd(inputs: Record<string, any>): CalculationResult {

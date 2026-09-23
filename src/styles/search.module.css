@@ -12,22 +12,37 @@
 
 .searchIcon {
   position: absolute;
-  left: 12px;
+  left: 14px;
   color: var(--color-text-muted);
   pointer-events: none;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.inputWrapper:focus-within .searchIcon {
+  color: var(--color-primary);
 }
 
 .searchInput {
   width: 100%;
-  height: 40px;
-  padding-left: 38px;
-  padding-right: 36px;
+  height: 44px;
+  min-height: 44px;
+  padding-left: 42px;
+  padding-right: 76px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border-subtle);
-  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
   color: var(--color-text-primary);
-  font-size: 0.875rem;
+  font-size: 0.925rem;
   transition: all 0.15s ease;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .searchInput {
+    font-size: 1rem; /* Prevents auto-zoom on iOS Safari */
+    padding-right: 44px;
+  }
 }
 
 .searchInput:focus {
@@ -37,9 +52,52 @@
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-.clearBtn {
+/* Large Hero Search Variant */
+.heroSearch .searchInput {
+  height: 52px;
+  min-height: 52px;
+  font-size: 1.05rem;
+  padding-left: 48px;
+  padding-right: 90px;
+  border-radius: var(--radius-lg);
+  border-color: var(--color-border-strong);
+  box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.08);
+}
+
+.heroSearch .searchIcon {
+  left: 16px;
+}
+
+.inputActions {
   position: absolute;
-  right: 10px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kbdBadge {
+  display: none;
+  align-items: center;
+  padding: 2px 6px;
+  font-size: 0.725rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .kbdBadge {
+    display: inline-flex;
+  }
+}
+
+.clearBtn {
   background: none;
   border: none;
   color: var(--color-text-muted);
@@ -47,11 +105,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
 
 .clearBtn:hover {
   color: var(--color-text-primary);
+  background-color: var(--color-surface-subtle);
 }
 
 .resultsDropdown {
@@ -61,15 +123,21 @@
   right: 0;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  max-height: 360px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+  max-height: min(440px, 70vh);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   z-index: 100;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .resultsHeader {
-  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-text-muted);
@@ -77,6 +145,14 @@
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--color-border);
   background-color: var(--color-surface-subtle);
+}
+
+.resultsHeaderHint {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .resultsList {
@@ -90,16 +166,21 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 14px;
+  min-height: 52px;
+  padding: 10px 14px;
   border: none;
   background: none;
   text-align: left;
   cursor: pointer;
   transition: background-color 0.1s ease;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: inherit;
 }
 
 .resultItem:hover,
-.resultItem:focus {
+.resultItem:focus,
+.resultItemActive {
   background-color: var(--color-surface-subtle);
   outline: none;
 }
@@ -107,20 +188,119 @@
 .resultIcon {
   color: var(--color-primary);
   flex-shrink: 0;
+  width: 20px;
+  height: 20px;
 }
 
 .resultText {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.resultTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .resultName {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.highlightMark {
+  background-color: #fef08a;
+  color: #854d0e;
+  font-weight: 700;
+  padding: 0 1px;
+  border-radius: 2px;
 }
 
 .resultCategory {
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.resultItemActive .resultCategory {
+  background-color: var(--color-border);
+}
+
+.resultDesc {
+  font-size: 0.775rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.resultArrow {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin-left: 6px;
+  flex-shrink: 0;
+  transition: transform 0.1s ease, color 0.1s ease;
+}
+
+.resultItem:hover .resultArrow,
+.resultItemActive .resultArrow {
+  color: var(--color-primary);
+  transform: translateX(2px);
+}
+
+/* Empty State */
+.emptyState {
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.suggestionsTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.suggestionChips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.suggestionChip {
+  font-size: 0.775rem;
+  padding: 4px 10px;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.12s ease;
+}
+
+.suggestionChip:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary-border);
+  text-decoration: none;
 }

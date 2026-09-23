@@ -13,10 +13,10 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Notendurchschnitt',
     category: 'statistik-wissenschaft',
     subcategory: 'Schulnoten & Studium',
-    metaTitle: 'Notendurchschnitt Rechner – Zeugnisnoten & Schnitt online berechnen',
+    metaTitle: 'Notendurchschnitt Rechner – Zeugnisnoten & Schnitt',
     metaDescription: 'Berechnen Sie Ihren Notendurchschnitt für Schule, Abitur und Studium. Geben Sie Schulnoten (1 bis 6) einfach mit Komma getrennt ein.',
     h1: 'Notendurchschnitt Rechner für Schule & Zeugnis',
-    shortDescription: 'Ermittelt das arithmetische Mittel aus Ihren Zeugnis- und Prüfungsnoten.',
+    shortDescription: 'Ermittelt das arithmetische Mittel aus Ihren Zeugnis- und Prüfungsnoten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['notendurchschnitt rechner', 'zeugnisnoten rechner', 'notenschnitt berechnen schule', 'abitur notendurchschnitt'],
     inputs: [
       { id: 'grades', label: 'Noten eingeben (z.B. 1; 2; 3; 2.3; 1.7)', type: 'text', defaultValue: '2; 1; 3; 2; 1.5; 2.7', placeholder: '2; 1; 3; 2; 1.5; 2.7', helpText: 'Trennen Sie die Noten mit Semikolon oder Leerzeichen' },
@@ -31,13 +31,14 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Schnitt: 1,83',
     },
     content: {
-      intro: 'Schnelle Notenberechnung vor der Zeugniskonferenz oder zur Überprüfung des Zwischenstands im Halbjahr.',
-      details: 'Der Rechner unterstützt auch Dezimalnoten wie 1,3, 1,7 oder 2,3.',
+      intro: 'Dieser Schul- und Unirechner ermittelt den arithmetischen und ECTS-gewichteten Notendurchschnitt für Zeugnisse, Abitur und Bachelor-/Masterabschlüsse.',
+      details: 'Gewichteter Notendurchschnitt = Summe(Note · ECTS-Punkte oder Gewichtungsfaktor) / Gesamtsumme der ECTS-Punkte. Bei einfacher Zeugnisberechnung wird die Summe aller Noten schlicht durch die Anzahl der Schulfächer geteilt.',
     },
     faqs: [
-      { question: 'Wird der Notendurchschnitt kaufmännisch gerundet?', answer: 'In der Regel werden Notenschnitte auf zwei Nachkommastellen berechnet. Die Zeugnis-Endnote unterliegt oft landesspezifischen Rundungsregeln der Schulgesetze.' },
+      { question: 'Wie rechnet man MSS-Punkte der Oberstufe (0 bis 15 Punkte) in Schulnoten um?', answer: 'Formel der KMK: Note = (17 - Punktzahl) / 3 (z. B. 15 Punkte = 0,66 -> 1+; 14 Punkte = 1,0; 10 Punkte = 2,3; 5 Punkte = 4,0).' },
+      { question: 'Zählen unbenotete Studienleistungen (Pass/Fail) in den Notenschnitt?', answer: 'Nein, Module mit "bestanden" ohne Note werden bei der Durchschnittsberechnung komplett ignoriert; sie steuern nur ECTS-Credits zum Studienabschluss bei.' },
     ],
-    relatedSlugs: ['durchschnittsrechner', 'standardabweichung-rechner'],
+    relatedSlugs: ['durchschnittsrechner', 'standardabweichung-rechner', 'ohmsches-gesetz-rechner'],
   },
   {
     id: 'standardabweichung-rechner',
@@ -46,10 +47,10 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Standardabweichung',
     category: 'statistik-wissenschaft',
     subcategory: 'Deskriptive Statistik',
-    metaTitle: 'Standardabweichung Rechner – Stichproben- & Populationsstreuung',
-    metaDescription: 'Berechnen Sie empirische Standardabweichung (s), Varianz (s²) und Mittelwert für jede beliebige Zahlenreihe online.',
-    h1: 'Standardabweichung & Varianz berechnen',
-    shortDescription: 'Ermittelt die Streuungsmaße einer Stichprobe oder Gesamtheit.',
+    metaTitle: 'Standardabweichung Rechner – Grundgesamtheit (Population σ)',
+    metaDescription: 'Berechnen Sie Varianz σ² und Standardabweichung σ für die Grundgesamtheit mit Schritt-für-Schritt-Rechenweg und Datenreihe.',
+    h1: 'Standardabweichung Rechner – Populationsstreuung berechnen',
+    shortDescription: 'Berechnet Varianz und Standardabweichung einer vollständigen Population (N) mit detailliertem Rechenweg und Mittelwert.',
     searchKeywords: ['standardabweichung rechner', 'varianz berechnen online', 'stichproben standardabweichung', 'streuung statistik formel'],
     inputs: [
       { id: 'values', label: 'Zahlenreihe eingeben', type: 'text', defaultValue: '12; 15; 18; 11; 19; 14; 16', placeholder: '12; 15; 18; 11; 19; 14; 16', helpText: 'Zahlen getrennt durch Semikolon eingeben' },
@@ -64,13 +65,14 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 's = 3,0000',
     },
     content: {
-      intro: 'Die Standardabweichung ist das wichtigste statistische Maß für die Streuung von Messwerten um ihren arithmetischen Mittelwert.',
-      details: 'Der Rechner gibt sowohl die Stichprobenstreuung (n - 1) als auch die Populationsstreuung (n) aus.',
+      intro: 'Die Standardabweichung (Sigma s) misst die typische Streubreite einzelner Messwerte um ihren gemeinsamen arithmetischen Mittelwert.',
+      details: 'Formel für die empirische Standardabweichung der Stichprobe (Bessel-Korrektur mit n-1): s = Wurzel[ (1 / (n-1)) · Summe(x_i - Mittelwert)² ]. Je kleiner die Standardabweichung, desto homogener und präziser liegen die Daten beieinander.',
     },
     faqs: [
-      { question: 'Was ist der Unterschied zwischen Varianz und Standardabweichung?', answer: 'Die Varianz ist der quadrierte Durchschnitt der Abweichungen vom Mittelwert (hat eine quadrierte Maßeinheit). Die Standardabweichung ist die Quadratwurzel der Varianz und hat dieselbe Einheit wie die Ausgangsdaten.' },
+      { question: 'Warum teilt man bei Stichproben durch n-1 statt durch n?', answer: 'Die Bessel-Korrektur gleicht den systematischen Schätzfehler (Bias) aus, da der Mittelwert der Stichprobe bereits einen Freiheitsgrad verbraucht hat.' },
+      { question: 'Was besagt die 68-95-99,7-Regel bei Normalverteilung?', answer: 'Bei normalverteilten Daten liegen rund 68,3 % aller Messwerte innerhalb von ±1 Standardabweichung um den Mittelwert; 95,4 % innerhalb von ±2 Sigma und 99,7 % innerhalb von ±3 Sigma.' },
     ],
-    relatedSlugs: ['durchschnittsrechner', 'notendurchschnitt-rechner'],
+    relatedSlugs: ['durchschnittsrechner', 'notendurchschnitt-rechner', 'ohmsches-gesetz-rechner'],
   },
   {
     id: 'ohmsches-gesetz-rechner',
@@ -79,10 +81,10 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Ohmsches Gesetz',
     category: 'statistik-wissenschaft',
     subcategory: 'Physik & Naturwissenschaft',
-    metaTitle: 'Ohmsches Gesetz Rechner – Spannung (U), Strom (I), Widerstand (R)',
+    metaTitle: 'Ohmsches Gesetz Rechner – Spannung, Strom, Widerstand',
     metaDescription: 'Berechnen Sie Spannung (Volt), Stromstärke (Ampere), Widerstand (Ohm) und elektrische Leistung (Watt) nach dem Ohmschen Dreieck.',
     h1: 'Ohmsches Gesetz Rechner (U = R · I & P = U · I)',
-    shortDescription: 'Berechnet elektrische Grundgrößen wie Spannung, Stromstärke, Widerstand und Leistung.',
+    shortDescription: 'Berechnet elektrische Grundgrößen wie Spannung, Stromstärke, Widerstand und Leistung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['ohmsches gesetz rechner', 'u r i rechner', 'volt ampere ohm berechnen', 'elektrische leistung watt formel'],
     inputs: [
       {
@@ -110,12 +112,13 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '230 V | 2.300 W',
     },
     content: {
-      intro: 'Das Ohmsche Gesetz beschreibt die fundamentale Beziehung zwischen Spannung, Strom und Widerstand in Gleichstrom- und ohmschen Wechselstromkreisen.',
-      details: 'Automatisch wird auch die thermische/elektrische Wirkleistung in Watt und Kilowatt berechnet.',
+      intro: 'Das Ohmsche Gesetz (U = R · I) beschreibt die fundamentale lineare Beziehung zwischen elektrischer Spannung (Volt), Stromstärke (Ampere) und Widerstand (Ohm).',
+      details: 'Formeln im URI-Dreieck: U = R · I; I = U / R; R = U / I. Elektrische Leistung P = U · I = I² · R = U² / R (Leistung wächst quadratisch mit der Spannung).',
     },
     faqs: [
-      { question: 'Was besagt das Ohmsche Gesetz?', answer: 'Bei konstanter Temperatur ist die elektrische Stromstärke I in einem Leiter direkt proportional zur anliegenden Spannung U (I ~ U). Der Proportionalitätsfaktor ist der Kehrwert des Widerstands (Leitwert).' },
+      { question: 'Wie viel Strom fließt durch einen 2.000-Watt-Wasserkocher an 230 Volt?', answer: 'Stromstärke I = P / U = 2.000 Watt / 230 Volt ≈ 8,70 Ampere.' },
+      { question: 'Was ist der Innenwiderstand einer Leitung?', answer: 'Jedes Kupferkabel besitzt einen spezifischen Widerstand; bei langen Kabeln und hohen Strömen führt dies zu spürbarem Spannungsabfall und Erwärmung der Leitung.' },
     ],
-    relatedSlugs: ['stromkostenrechner', 'durchschnittsrechner'],
+    relatedSlugs: ['stromkostenrechner', 'durchschnittsrechner', 'notendurchschnitt-rechner'],
   },
 ];

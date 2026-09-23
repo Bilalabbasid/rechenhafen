@@ -9,10 +9,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Gewicht Umrechner",
     category: "einheiten",
     subcategory: "Masse & Gewicht",
-    metaTitle: "Gewicht Umrechner – Kilogramm, Gramm, Pfund (lbs) & Unzen (oz)",
-    metaDescription: "Rechnen Sie Gewichte sekundenschnell um zwischen Kilogramm (kg), Gramm (g), Milligramm (mg), Tonnen (t), englischen Pfund (lbs) und Unzen (oz).",
-    h1: "Gewicht Umrechner – kg, g, lbs & oz präzise umrechnen",
-    shortDescription: "Konvertiert Gewichtseinheiten zwischen metrischem und angloamerikanischem System.",
+    metaTitle: 'Gewicht Umrechner – Kilogramm, Gramm, Pfund (lbs) & Unzen (oz)',
+    metaDescription: 'Rechnen Sie Gewichte sekundenschnell um zwischen Kilogramm (kg), Gramm (g), Milligramm (mg), Tonnen (t), englischen Pfund (lbs) und Unzen (oz).',
+    h1: 'Gewicht Umrechner – kg, g, lbs & oz präzise umrechnen',
+    shortDescription: 'Konvertiert Gewichtseinheiten zwischen metrischem und angloamerikanischem System mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["gewicht umrechner kg in lbs","pfund in kilogramm umrechnen formel","unzen oz in gramm umrechner","tonnen in kilogramm berechnen"],
     inputs: [
           {
@@ -101,17 +101,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "68,04 kg"
     },
+    content: {
+      intro: 'Dieser Massenkonverter rechnet physikalische Massen zwischen Milligramm, Gramm, Kilogramm, Tonnen sowie imperialen Pfund (lb), Unzen (oz) und Steinen (Stone) um.',
+      details: 'Seit dem International Avoirdupois Agreement gilt: 1 englisches Pfund (Pound lb) = exakt 0,45359237 kg. 1 Unze (Ounce oz) = 1/16 lb ≈ 28,3495 Gramm. Das deutsche Apotheker- oder Zollpfund wurde historisch auf genau 500 g gerundet.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen deutschem Pfund und englischem Pound?",
-                "answer": "Das umgangssprachliche deutsche Pfund beträgt genau 500 Gramm (0,5 kg). Das englische Pound (lb) ist leichter und wiegt exakt 453,59 Gramm."
-          },
-          {
-                "question": "Was ist eine Feinunze (oz tr)?",
-                "answer": "Im Edelmetallhandel (Gold, Silber) gilt die Feinunze (Troy Ounce): Sie wiegt exakt 31,1035 Gramm und ist schwerer als die gewöhnliche Handelsunze (28,35 g)."
-          }
+      { question: 'Was ist der Unterschied zwischen einer Feinunze (Troy Ounce) und einer normalen Unze?', answer: 'Gold und Silber werden in Feinunzen (oz. tr.) gehandelt: 1 Feinunze wiegt exakt 31,1034768 Gramm, während eine gewöhnliche Handelsunze nur ca. 28,35 g wiegt.' },
+      { question: 'Was ist der physikalische Unterschied zwischen Masse und Gewichtskraft?', answer: 'Die Masse (in kg) ist überall im Universum unveränderlich; die Gewichtskraft (in Newton) hängt von der lokalen Gravitation ab (auf dem Mond wiegt ein Mensch nur 1/6 so viel wie auf der Erde).' },
     ],
-    relatedSlugs: ["laengen-umrechner","volumen-umrechner","kraft-umrechner"],
+    relatedSlugs: ['papierformat-din-rechner', 'laengen-umrechner', 'volumen-umrechner', 'kraft-umrechner', 'dichte-umrechner'],
   },
   {
     id: "druck-umrechner",
@@ -120,10 +118,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Druck Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Druck Umrechner – bar, PSI, Pascal (Pa), hPa & Torr umrechnen",
-    metaDescription: "Rechnen Sie Druckeinheiten exakt um zwischen bar, Millibar (mbar), Pascal (Pa), Hektopascal (hPa), PSI (Pound-force per square inch) und Torr/mmHg.",
-    h1: "Druck Umrechner – bar, PSI, Pascal & mbar sofort umrechnen",
-    shortDescription: "Konvertiert bar, PSI, Pascal, hPa und Torr.",
+    metaTitle: 'Druck Umrechner – bar, PSI, Pascal (Pa), hPa & Torr umrechnen',
+    metaDescription: 'Rechnen Sie Druckeinheiten exakt um zwischen bar, Millibar (mbar), Pascal (Pa), Hektopascal (hPa), PSI (Pound-force per square inch) und Torr/mmHg.',
+    h1: 'Druck Umrechner – bar, PSI, Pascal & mbar sofort umrechnen',
+    shortDescription: 'Konvertiert bar, PSI, Pascal, hPa und Torr mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["druck umrechner bar psi","psi in bar umrechnen formel reifendruck","pascal in bar hpa mbar","bar in torr mmhg rechner"],
     inputs: [
           {
@@ -213,17 +211,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "2,21 bar Reifendruck"
     },
+    content: {
+      intro: 'Dieser Druckrechner konvertiert Drücke zwischen Pascal (Pa), Bar (bar), technischer Atmosphäre (at), Millimeter Quecksilbersäule (mmHg/Torr) und PSI (Pound-force per square inch).',
+      details: '1 bar = 100.000 Pascal = 100 kPa = 1.000 hPa (Standardmaß in der Meteorologie). 1 physikalische Standardatmosphäre (1 atm) = 1.013,25 hPa = 760 mmHg. 1 bar ≈ 14,5038 PSI.',
+    },
     faqs: [
-          {
-                "question": "Was bedeutet der Unterschied zwischen absolutem Druck und Relativdruck?",
-                "answer": "Relativdruck (wie beim Manometer an der Tankstelle) misst die Druckdifferenz zum umgebenden Atmosphärendruck (1 bar). Absoluter Druck = Relativdruck + Atmosphärendruck."
-          },
-          {
-                "question": "Warum ist 1 Hektopascal gleich 1 Millibar?",
-                "answer": "1 Hekto = 100 (100 Pa). 1 Bar = 100.000 Pa, somit ist 1 Millibar (1/1.000 Bar) = 100 Pa. Daher gilt exakt: 1 hPa = 1 mbar."
-          }
+      { question: 'Welcher Reifendruck ist in PSI angegeben und was entspricht 32 PSI in Bar?', answer: 'Viele US- und Fahrradreifen nutzen PSI: 32 PSI geteilt durch 14,5038 ergibt ca. 2,21 bar Reifendruck.' },
+      { question: 'Was bedeutet der Blutdruckwert "120 zu 80" in echten Druckeinheiten?', answer: 'Es handelt sich um Millimeter Quecksilbersäule (mmHg): 120 mmHg entsprechen ca. 160 hPa oder 0,16 bar Druck.' },
     ],
-    relatedSlugs: ["temperatur-umrechner","kraft-umrechner","geschwindigkeit-umrechner"],
+    relatedSlugs: ['dezibel-schalldruck-umrechner', 'viskositaet-umrechner', 'temperatur-umrechner', 'kraft-umrechner', 'geschwindigkeit-umrechner'],
   },
   {
     id: "geschwindigkeit-umrechner",
@@ -232,10 +228,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Geschwindigkeit Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Geschwindigkeit Umrechner – km/h, m/s, mph (Meilen) & Knoten umrechnen",
-    metaDescription: "Rechnen Sie Geschwindigkeiten sekundenschnell um zwischen km/h, Meter pro Sekunde (m/s), Meilen pro Stunde (mph), Seemeilen/Knoten (kn) und Mach.",
-    h1: "Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten ermitteln",
-    shortDescription: "Konvertiert km/h in m/s, Meilen pro Stunde und Seemeilen-Knoten.",
+    metaTitle: 'Geschwindigkeit Umrechner – km/h, m/s, mph',
+    metaDescription: 'Rechnen Sie Geschwindigkeiten sekundenschnell um zwischen km/h, Meter pro Sekunde (m/s), Meilen pro Stunde (mph), Seemeilen/Knoten (kn) und Mach.',
+    h1: 'Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten ermitteln',
+    shortDescription: 'Konvertiert km/h in m/s, Meilen pro Stunde und Seemeilen-Knoten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["geschwindigkeit umrechnen kmh ms formel","mph in kmh umrechnen meilen pro stunde","knoten in kmh seemeilen umrechner","meter pro sekunde in kmh teilen 3 6"],
     inputs: [
           {
@@ -319,17 +315,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "96,56 km/h"
     },
+    content: {
+      intro: 'Dieser Geschwindigkeitsrechner transformiert Werte zwischen km/h, Metern pro Sekunde (m/s), Meilen pro Stunde (mph) und Knoten (Knoten kn, Seemeilen pro Stunde).',
+      details: 'Zentrale Faustregel: km/h geteilt durch 3,6 ergibt m/s (z. B. 36 km/h = 10 m/s; 100 km/h ≈ 27,78 m/s). 1 Knoten = 1 Seemeile pro Stunde = 1,852 km/h. 1 mph ≈ 1,609 km/h.',
+    },
     faqs: [
-          {
-                "question": "Wie rechnet man im Kopf schnell km/h in m/s um?",
-                "answer": "Teilen Sie durch 4 und addieren Sie 10 %: 100 km/h / 4 = 25; 25 + 2,5 = 27,5 m/s (exakter Wert: 27,78 m/s)."
-          },
-          {
-                "question": "Was ist ein Knoten in der Schifffahrt?",
-                "answer": "Ein Knoten entspricht einer Geschwindigkeit von einer Seemeile (1.852 Meter) pro Stunde. Der Begriff stammt vom Auswerfen einer Messleine mit Knoten ins Meer."
-          }
+      { question: 'Wie schnell ist Mach 1 (Schallgeschwindigkeit)?', answer: 'In trockener Luft bei 20 °C auf Meereshöhe beträgt die Schallgeschwindigkeit ca. 343 m/s bzw. 1.235 km/h.' },
+      { question: 'Was bedeutet die Geschwindigkeitsangabe 55 mph auf US-Highways in km/h?', answer: '55 Meilen pro Stunde entsprechen ca. 88,5 km/h.' },
     ],
-    relatedSlugs: ["laengen-umrechner","kraftstoffverbrauch-umrechner","zeit-umrechner"],
+    relatedSlugs: ['drehzahl-umfangsgeschwindigkeit-rechner', 'laengen-umrechner', 'kraftstoffverbrauch-umrechner', 'zeit-umrechner'],
   },
   {
     id: "volumen-umrechner",
@@ -338,10 +332,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Volumen Umrechner",
     category: "einheiten",
     subcategory: "Raummaße & Hohlmaße",
-    metaTitle: "Volumen Umrechner – Liter (l), Milliliter (ml), m³ & US Gallons",
-    metaDescription: "Rechnen Sie Hohlmaße und Raummaße um zwischen Liter, Milliliter, Kubikmeter (m³), US-Gallonen, UK-Gallonen, Fluid Ounces (fl oz) und Kubikfuß.",
-    h1: "Volumen Umrechner – Liter, m³, Gallonen & fl oz berechnen",
-    shortDescription: "Konvertiert Liter, Kubikmeter, Gallonen und flüssige Unzen.",
+    metaTitle: 'Volumen Umrechner – Liter, Milliliter, m³',
+    metaDescription: 'Rechnen Sie Hohlmaße und Raummaße um zwischen Liter, Milliliter, Kubikmeter (m³), US-Gallonen, UK-Gallonen, Fluid Ounces (fl oz) und Kubikfuß.',
+    h1: 'Volumen Umrechner – Liter, m³, Gallonen & fl oz berechnen',
+    shortDescription: 'Konvertiert Liter, Kubikmeter, Gallonen und flüssige Unzen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["volumen umrechner liter m3 gallonen","us gallon in liter umrechnen formel","kubikmeter in liter m3","fluid ounces fl oz in ml"],
     inputs: [
           {
@@ -431,17 +425,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "18,93 Liter"
     },
+    content: {
+      intro: 'Dieser Raummaß-Konverter rechnet Kubikmeter, Liter, Milliliter sowie amerikanische Gallonen (US gal), Pints und Flüssigunzen (fl oz) um.',
+      details: '1 Kubikmeter (m³) = 1.000 Kubikdezimeter (dm³) = 1.000 Liter. 1 US-Flüssiggallone (Liquid Gallon) = 3,78541 Liter; 1 britische Imperial Gallon = 4,54609 Liter.',
+    },
     faqs: [
-          {
-                "question": "Wie viele Liter passen in einen Kubikmeter?",
-                "answer": "Exakt 1.000 Liter passen in einen Kubikmeter Wasser (1 m³ = 1.000 l = 1 Tonne Wasser bei 4°C)."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen US Gallon und UK Imperial Gallon?",
-                "answer": "Die britische Gallone (Imperial Gallon = 4,546 l) ist ca. 20 % größer als die US-Gallone (3,785 l)."
-          }
+      { question: 'Wie viel Liter fasst ein US-Öl-Barrel (bbl)?', answer: 'Ein Standard-Rohöl-Barrel fasst exakt 42 US-Gallonen, was genau 158,9873 Litern entspricht.' },
+      { question: 'Wie viele Milliliter sind eine amerikanische Flüssigunze (fl. oz.)?', answer: '1 US fluid ounce entspricht ca. 29,57 ml; eine britische Imperial fl oz misst ca. 28,41 ml.' },
     ],
-    relatedSlugs: ["gewicht-masse-umrechner","laengen-umrechner","gramm-in-ml-rechner"],
+    relatedSlugs: ['gewicht-masse-umrechner', 'laengen-umrechner', 'gramm-in-ml-rechner', 'dichte-umrechner'],
   },
   {
     id: "flaeche-umrechner",
@@ -450,10 +442,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Flächen Umrechner",
     category: "einheiten",
     subcategory: "Geometrische Maße",
-    metaTitle: "Flächen Umrechner – Quadratmeter (m²), Hektar (ha), Ar & Acres",
-    metaDescription: "Rechnen Sie Flächenmaße präzise um zwischen Quadratmetern (m²), Quadratkilometern (km²), Hektar (ha), Ar (a), Acres und Quadratfuß (sq ft).",
-    h1: "Flächen Umrechner – m², Hektar, Ar & Acres sofort umrechnen",
-    shortDescription: "Konvertiert Quadratmeter, Hektar, Ar und angloamerikanische Acres.",
+    metaTitle: 'Flächen Umrechner – Quadratmeter (m²), Hektar (ha), Ar & Acres',
+    metaDescription: 'Rechnen Sie Flächenmaße präzise um zwischen Quadratmetern (m²), Quadratkilometern (km²), Hektar (ha), Ar (a), Acres und Quadratfuß (sq ft).',
+    h1: 'Flächen Umrechner – m², Hektar, Ar & Acres sofort umrechnen',
+    shortDescription: 'Konvertiert Quadratmeter, Hektar, Ar und angloamerikanische Acres mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["flaechen umrechner m2 hektar","hektar in quadratmeter umrechnen 10000","ar in m2 umrechner","acre in hektar quadratmeter"],
     inputs: [
           {
@@ -543,17 +535,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "25.000 m²"
     },
+    content: {
+      intro: 'Dieser Flächenumrechner transformiert Flächenmaße zwischen Quadratmillimetern, Quadratzentimetern, Quadratmetern, Ar, Hektar, Quadratkilometern und angloamerikanischen Acres.',
+      details: 'Umrechnungsfaktor bei metrischen Flächen ist stets 100: 1 km² = 100 Hektar (ha); 1 ha = 100 Ar (a); 1 a = 100 Quadratmeter (m²). 1 Acre entspricht ca. 4.046,86 m² (ca. 0,405 Hektar).',
+    },
     faqs: [
-          {
-                "question": "Wie groß ist 1 Ar?",
-                "answer": "1 Ar entspricht exakt 100 Quadratmetern (ein Quadrat von 10 m × 10 m). 100 Ar ergeben 1 Hektar."
-          },
-          {
-                "question": "Wie viele Quadratmeter hat ein Acre?",
-                "answer": "Ein US/UK Acre entspricht historisch der Fläche, die ein Ochsengespann an einem Tag pflügen konnte, heute normiert auf exakt 4.046,856 Quadratmeter (ca. 0,405 ha)."
-          }
+      { question: 'Wie groß ist ein Hektar im Vergleich zu einem Fußballfeld?', answer: 'Ein Hektar misst exakt 10.000 m² (100 × 100 m); ein Standard-FIFA-Fußballfeld (105 × 68 m = 7.140 m²) entspricht ca. 0,71 Hektar.' },
+      { question: 'Wie viele Quadratfuß (sq ft) sind ein Quadratmeter?', answer: '1 m² entspricht ca. 10,764 Quadratfuß (oft in US-Immobilienanzeigen als square feet angegeben).' },
     ],
-    relatedSlugs: ["laengen-umrechner","volumen-umrechner","dachflaeche-rechner"],
+    relatedSlugs: ['papierformat-din-rechner', 'laengen-umrechner', 'volumen-umrechner', 'dachflaeche-rechner'],
   },
   {
     id: "energie-arbeit-umrechner",
@@ -562,10 +552,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Energie Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Energie Umrechner – Joule (J), Kilowattstunden (kWh), kcal & BTU",
-    metaDescription: "Rechnen Sie Energie und mechanische Arbeit um zwischen Joule (J), Kilojoule (kJ), Kilowattstunden (kWh), Kilokalorien (kcal) und British Thermal Units (BTU).",
-    h1: "Energie Umrechner – Joule, kWh, kcal & BTU berechnen",
-    shortDescription: "Konvertiert Joule in kWh, Kilokalorien und BTU.",
+    metaTitle: 'Energie Umrechner – Joule, Kilowattstunden, kcal',
+    metaDescription: 'Rechnen Sie Energie und mechanische Arbeit um zwischen Joule (J), Kilojoule (kJ), Kilowattstunden (kWh), Kilokalorien (kcal) und British Thermal Units.',
+    h1: 'Energie Umrechner – Joule, kWh, kcal & BTU berechnen',
+    shortDescription: 'Konvertiert Joule in kWh, Kilokalorien und BTU mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["energie umrechner joule kwh formel","kwh in joule megajoule umrechnen","kilokalorien in kwh berechnen heizung","btu in wattstunden joule rechner"],
     inputs: [
           {
@@ -656,17 +646,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "2,32 kWh (entspricht der Dauerleistung einer 100W-Lampe für fast 24h)"
     },
+    content: {
+      intro: 'Dieser Energierechner konvertiert Energie, Arbeit und Wärmemengen zwischen Joule (J), Kilowattstunden (kWh), Kilokalorien (kcal), Wattsekunden und British Thermal Units (BTU).',
+      details: '1 Kilowattstunde (kWh) = 3.600.000 Joule = 3,6 Megajoule (MJ). 1 Kilokalorie (kcal) = exakt 4.186,8 Joule (internationale Kalorie). 1 BTU ≈ 1.055 Joule.',
+    },
     faqs: [
-          {
-                "question": "Wie hängen Leistung (Watt) und Energie (Joule/kWh) zusammen?",
-                "answer": "Leistung ist Energie pro Zeit: 1 Watt = 1 Joule pro Sekunde. Energie = Leistung × Zeit (1 W × 1 h = 1 Wh = 3.600 J)."
-          },
-          {
-                "question": "Was ist 1 BTU?",
-                "answer": "1 British Thermal Unit ist die Wärmemenge, die benötigt wird, um ein englisches Pfund Wasser um 1 Grad Fahrenheit zu erwärmen (ca. 1.055 Joule)."
-          }
+      { question: 'Wie viel Kilowattstunden Energie stecken in 1.000 Kilokalorien Nahrung?', answer: '1.000 kcal entsprechen exakt 1,163 Kilowattstunden chemischer Energie.' },
+      { question: 'Was ist ein Elektronenvolt (eV)?', answer: 'Eine winzige Energieeinheit der Atom- und Teilchenphysik: 1 eV ≈ 1,602 · 10⁻¹⁹ Joule (die kinetische Energie eines Elektrons beim Durchlaufen von 1 Volt Spannung).' },
     ],
-    relatedSlugs: ["leistung-umrechner","stromkostenrechner","kalorien-rezept-rechner"],
+    relatedSlugs: ['radioaktivitaet-strahlendosis-rechner', 'elektrische-ladung-kapazitaet-rechner', 'beleuchtungsstaerke-lux-lumen-rechner', 'leistung-umrechner', 'stromkostenrechner', 'kalorien-rezept-rechner'],
   },
   {
     id: "leistung-umrechner",
@@ -675,10 +663,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Leistung Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Leistung Umrechner – kW in PS, Watt & mechanische Horsepower (hp)",
-    metaDescription: "Rechnen Sie Motor- und Heizleistung exakt um zwischen Kilowatt (kW), DIN-Pferdestärke (PS), Watt (W) und angloamerikanischen Horsepower (hp).",
-    h1: "Leistung Umrechner – kW in PS & Horsepower präzise umrechnen",
-    shortDescription: "Konvertiert Kilowatt (kW) in Pferdestärken (PS) und Watt.",
+    metaTitle: 'Leistung Umrechner – kW in PS, Watt',
+    metaDescription: 'Rechnen Sie Motor- und Heizleistung exakt um zwischen Kilowatt (kW), DIN-Pferdestärke (PS), Watt (W) und angloamerikanischen Horsepower (hp).',
+    h1: 'Leistung Umrechner – kW in PS & Horsepower präzise umrechnen',
+    shortDescription: 'Konvertiert Kilowatt (kW) in Pferdestärken (PS) und Watt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["leistung umrechner kw in ps formel 1 36","ps in kw umrechnen auto","horsepower hp in kw rechner","watt in kilowatt pferdestaerke"],
     inputs: [
           {
@@ -755,17 +743,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "110,32 kW"
     },
+    content: {
+      intro: 'Dieser Leistungskonverter rechnet mechanische und elektrische Leistung zwischen Watt (W), Kilowatt (kW), Megawatt (MW) und Pferdestärken (PS / hp) um.',
+      details: 'In Deutschland gilt nach DIN 66036: 1 metrische PS = exakt 735,49875 Watt ≈ 0,7355 kW. Umgekehrt entspricht 1 kW exakt 1,35962 PS. Die angloamerikanische Mechanical Horsepower (hp) ist mit ca. 745,7 Watt minimal größer.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen PS und HP?",
-                "answer": "Metrische PS (DIN) basieren auf 75 kg·m/s = 735,5 Watt. Angloamerikanische HP (Imperial Horsepower) basieren auf 550 ft·lb/s = 745,7 Watt. 100 PS entsprechen ca. 98,6 HP."
-          },
-          {
-                "question": "Warum steht in Fahrzeugpapieren nur noch kW?",
-                "answer": "Seit der EU-Richtlinie 80/181/EWG ist das Kilowatt (kW) die gesetzliche Primäreinheit für Leistung im Fahrzeugschein. PS darf nur noch als zusätzliche Angabe verwendet werden."
-          }
+      { question: 'Wie rechnet man kW im Auto-Fahrzeugschein schnell im Kopf in PS um?', answer: 'Multiplizieren Sie die kW-Zahl mit 1,36 (z. B. 110 kW × 1,36 ≈ 150 PS).' },
+      { question: 'Was bedeutet die Einheit Gigawatt (GW)?', answer: '1 Gigawatt entspricht 1.000 Megawatt bzw. 1 Milliarde Watt (entspricht der elektrischen Dauerleistung eines typischen Kernkraftwerksblocks).' },
     ],
-    relatedSlugs: ["energie-arbeit-umrechner","drehmoment-umrechner","stromkostenrechner"],
+    relatedSlugs: ['dezibel-schalldruck-umrechner', 'elektrische-ladung-kapazitaet-rechner', 'beleuchtungsstaerke-lux-lumen-rechner', 'energie-arbeit-umrechner', 'drehmoment-umrechner', 'stromkostenrechner'],
   },
   {
     id: "daten-speicher-umrechner",
@@ -774,10 +760,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Datenspeicher Umrechner",
     category: "einheiten",
     subcategory: "Informatik & Digital",
-    metaTitle: "Datenspeicher Umrechner – Byte, KB, MB, GB, TB, PB & KiB, GiB",
-    metaDescription: "Rechnen Sie Speicherkapazitäten um: Dezimal (1.000er Basis: KB, MB, GB, TB) und Binär (1.024er Basis: KiB, MiB, GiB, TiB) inklusive Bit-Umrechnung.",
-    h1: "Datenspeicher Umrechner – Byte, MB, GB & TB präzise umrechnen",
-    shortDescription: "Konvertiert Byte in KB, MB, GB, TB nach Dezimal- und Binärstandard.",
+    metaTitle: 'Datenspeicher Umrechner – Byte, KB, MB, GB, TB, PB & KiB, GiB',
+    metaDescription: 'Rechnen Sie Speicherkapazitäten um: Dezimal (1.000er Basis: KB, MB, GB, TB) und Binär (1.024er Basis: KiB, MiB, GiB, TiB) inklusive Bit-Umrechnung.',
+    h1: 'Datenspeicher Umrechner – Byte, MB, GB & TB präzise umrechnen',
+    shortDescription: 'Konvertiert Byte in KB, MB, GB, TB nach Dezimal- und Binärstandard.',
     searchKeywords: ["daten speicher umrechner gigabyte terabyte","gb in mb umrechnen 1024 oder 1000","kibibyte mebibyte gibibyte rechner","byte in bit umrechnen"],
     inputs: [
           {
@@ -868,17 +854,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "931,32 GiB nutzbare Kapazität in Windows"
     },
+    content: {
+      intro: 'Dieser Speichergrößenrechner unterscheidet strikt zwischen binären Präfixen (Kibi-, Mebi-, Gibibyte auf Basis 1024) und dezimalen SI-Präfixen (Kilo-, Mega-, Gigabyte auf Basis 1000).',
+      details: 'Festplattenhersteller verkaufen nach Dezimalsystem: 1 TB = 1.000.000.000.000 Byte. Betriebssysteme (Windows) rechnen jedoch binär (1 TiB = 1.024⁴ Byte ≈ 1,0995 · 10¹² Byte). Daher zeigt Windows bei einer 1-TB-Festplatte nur ca. 931 GB an.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Bit und Byte?",
-                "answer": "1 Byte besteht immer aus genau 8 Bits. Ein Bit kann den Zustand 0 oder 1 annehmen, ein Byte kann 256 verschiedene Zustände (0 bis 255) darstellen."
-          },
-          {
-                "question": "Was bedeutet KiB, MiB und GiB?",
-                "answer": "Das sind die offiziellen IEC-Binärpräfixe: Kibi (1.024), Mebi (1.024²), Gibi (1.024³). Sie verhindern Verwechslungen mit den metrischen Dezimalpräfixen Kilo, Mega und Giga."
-          }
+      { question: 'Was ist der Unterschied zwischen Bit und Byte?', answer: 'Ein Bit ist die kleinste binäre Informationseinheit (0 oder 1); ein Byte besteht aus 8 Bit und kann genau ein ASCII-Schriftzeichen codieren.' },
+      { question: 'Was bedeutet GiB vs. GB?', answer: 'GB steht für Gigabyte (10⁹ = 1.000.000.000 Byte nach SI-Standard); GiB steht für Gibibyte (2³⁰ = 1.073.741.824 Byte nach IEC-Norm).' },
     ],
-    relatedSlugs: ["datenrate-bandbreite-umrechner","binaer-hex-dezimal-umrechner","zeit-umrechner"],
+    relatedSlugs: ['datenrate-bandbreite-umrechner', 'binaer-hex-dezimal-umrechner', 'zeit-umrechner'],
   },
   {
     id: "datenrate-bandbreite-umrechner",
@@ -887,10 +871,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Downloadzeit-Rechner",
     category: "einheiten",
     subcategory: "Informatik & Digital",
-    metaTitle: "Downloadzeit Rechner – Mbit/s in MB/s umrechnen & Download-Dauer",
-    metaDescription: "Berechnen Sie die echte Downloadzeit für Spiele, Filme und Backups nach Dateigröße (GB) und Internet-Bandbreite (z. B. DSL 50, Glasfaser 250 Mbit/s, Gigabit).",
-    h1: "Downloadzeit Rechner – Wie lange dauert mein Download?",
-    shortDescription: "Berechnet Downloadzeit aus Bandbreite (Mbit/s) und Dateigröße (GB).",
+    metaTitle: 'Downloadzeit Rechner – Mbit/s in MB/s umrechnen',
+    metaDescription: 'Berechnen Sie die echte Downloadzeit für Spiele, Filme und Backups nach Dateigröße (GB) und Internet-Bandbreite (z. B.',
+    h1: 'Downloadzeit Rechner – Wie lange dauert mein Download?',
+    shortDescription: 'Berechnet Downloadzeit aus Bandbreite (Mbit/s) und Dateigröße (GB) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["downloadzeit rechner wie lange dauert download","mbits in mbs umrechnen faktor 8","glasfaser download dauer spiel 100 gb","dsl geschwindigkeit megabyte pro sekunde"],
     inputs: [
           {
@@ -996,17 +980,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "ca. 1 Stunde und 13 Minuten"
     },
+    content: {
+      intro: 'Dieser Bandbreitenrechner konvertiert Internet-Übertragungsgeschwindigkeiten zwischen Mbit/s (Megabit pro Sekunde) und realer Downloadgeschwindigkeit in MB/s (Megabyte pro Sekunde).',
+      details: 'Da 1 Byte aus 8 Bit besteht, muss die nominelle Leitungsbandbreite durch 8 geteilt werden: Ein Internetanschluss mit 250 Mbit/s lädt Daten maximal mit theoretisch 31,25 Megabyte pro Sekunde (MB/s) herunter.',
+    },
     faqs: [
-          {
-                "question": "Warum erreiche ich beim Download selten die volle Mbit/s-Zahl?",
-                "answer": "WLAN-Verluste, Server-Auslastung des Anbieters, andere Geräte im Heimnetzwerk und TCP/IP-Protokoll-Overhead (ca. 5-10 %) reduzieren die praktische Transferrate."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen Upload und Download?",
-                "answer": "Download ist die Geschwindigkeit beim Herunterladen aus dem Internet (z. B. Netflix-Stream). Upload ist die Geschwindigkeit beim Hochladen (z. B. Backup in die Cloud, Videoanruf)."
-          }
+      { question: 'Wie lange dauert der Download eines 50-GB-Spiels bei einer 100-Mbit/s-Leitung?', answer: '100 Mbit/s liefern netto ca. 12,5 MB/s. 50.000 MB geteilt durch 12,5 MB/s = 4.000 Sekunden, also etwa 1 Stunde und 7 Minuten.' },
+      { question: 'Warum erreichen Speedtests selten die gebuchte maximale Bandbreite?', answer: 'Durch Netzwerk-Overhead (TCP/IP-Header verbrauchen ca. 5–10 % der Bandbreite), WLAN-Störungen oder Auslastung der Server des Anbieters.' },
     ],
-    relatedSlugs: ["daten-speicher-umrechner","zeit-umrechner","stromkostenrechner"],
+    relatedSlugs: ['daten-speicher-umrechner', 'zeit-umrechner', 'stromkostenrechner'],
   },
   {
     id: "drehmoment-umrechner",
@@ -1015,10 +997,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Drehmoment Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Drehmoment Umrechner – Newtonmeter (Nm) in ft-lb, in-lb & kpm",
-    metaDescription: "Rechnen Sie Drehmomente für Drehmomentschlüssel und Kfz um: Newtonmeter (Nm), Foot-Pounds (ft-lb / lbf-ft), Inch-Pounds (in-lb) und Kilopondmeter (kpm).",
-    h1: "Drehmoment Umrechner – Nm, ft-lb & in-lb präzise umrechnen",
-    shortDescription: "Konvertiert Newtonmeter in Foot-Pounds für Werkzeug und Kraftfahrzeuge.",
+    metaTitle: 'Drehmoment Umrechner – Newtonmeter (Nm) in ft-lb, in-lb & kpm',
+    metaDescription: 'Rechnen Sie Drehmomente für Drehmomentschlüssel und Kfz um: Newtonmeter (Nm), Foot-Pounds (ft-lb / lbf-ft), Inch-Pounds (in-lb) und Kilopondmeter (kpm).',
+    h1: 'Drehmoment Umrechner – Nm, ft-lb & in-lb präzise umrechnen',
+    shortDescription: 'Konvertiert Newtonmeter in Foot-Pounds für Werkzeug und Kraftfahrzeuge mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["drehmoment umrechner nm in ft lb","newtonmeter in foot pounds umrechnen","drehmomentschluessel tabelle nm in lb","drehmoment kpm newtonmeter"],
     inputs: [
           {
@@ -1095,17 +1077,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "88,5 ft-lb"
     },
+    content: {
+      intro: 'Dieser Drehmomentkonverter rechnet Drehmomente zwischen Newtonmetern (Nm), Kilonewtonmetern (kNm) und imperialen Foot-Pounds (ft-lb) um.',
+      details: '1 Newtonmeter (Nm) ist das Drehmoment, das eine Kraft von 1 Newton bei einem Hebelarm von 1 Meter erzeugt. 1 Foot-Pound (ft-lb) entspricht ca. 1,3558 Nm; 1 Nm entspricht ca. 0,7376 ft-lb.',
+    },
     faqs: [
-          {
-                "question": "Mit wie viel Nm zieht man Alufelgen beim Auto fest?",
-                "answer": "Bei den meisten PKW liegt das vorgeschriebene Anzugsdrehmoment für Radschrauben bei Alufelgen zwischen 110 und 140 Nm (siehe Fahrzeughandbuch)."
-          },
-          {
-                "question": "Muss ein Drehmomentschlüssel nach der Benutzung entspannt werden?",
-                "answer": "Ja! Mechanische Drehmomentschlüssel müssen nach der Arbeit immer auf den kleinsten Einstellwert zurückgedreht werden, damit die interne Feder nicht ermüdet und ungenau wird."
-          }
+      { question: 'Mit wie viel Drehmoment zieht man Alufelgen beim Auto an?', answer: 'Bei den meisten PKW liegt das vorgeschriebene Anzugsdrehmoment mit dem Drehmomentschlüssel zwischen 110 und 130 Newtonmetern (Herstellerangaben im Handbuch beachten!).' },
+      { question: 'Wie hängt das Drehmoment mit der Motorleistung zusammen?', answer: 'Leistung in kW = (Drehmoment in Nm · Drehzahl in U/min) / 9549. Bei gleicher Drehzahl erzeugt mehr Drehmoment direkt mehr mechanische Leistung.' },
     ],
-    relatedSlugs: ["leistung-umrechner","kraft-umrechner","reifen-abrollumfang-rechner"],
+    relatedSlugs: ['drehzahl-umfangsgeschwindigkeit-rechner', 'leistung-umrechner', 'kraft-umrechner', 'reifen-abrollumfang-rechner'],
   },
   {
     id: "kraft-umrechner",
@@ -1114,10 +1094,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Kraft Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Kraft Umrechner – Newton (N), Kilonewton (kN), Kilopond (kp) & lbf",
-    metaDescription: "Rechnen Sie physikalische Kräfte und Zugkräfte um: Newton (N), Kilonewton (kN), Meganewton (MN), Kilopond (kp), Pound-force (lbf) und Dyn (dyn).",
-    h1: "Kraft Umrechner – Newton, kN, Kilopond & Pound-force",
-    shortDescription: "Konvertiert physikalische Kräfte zwischen Newton, kN und lbf.",
+    metaTitle: 'Kraft Umrechner – Newton, Kilonewton, Kilopond',
+    metaDescription: 'Rechnen Sie physikalische Kräfte und Zugkräfte um: Newton (N), Kilonewton (kN), Meganewton (MN), Kilopond (kp), Pound-force (lbf) und Dyn (dyn).',
+    h1: 'Kraft Umrechner – Newton, kN, Kilopond & Pound-force',
+    shortDescription: 'Konvertiert physikalische Kräfte zwischen Newton, kN und lbf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kraft umrechner newton kilonewton kn","kilonewton in tonnen umrechnen fahrstuhllast","kilopond kp in newton n","pound force lbf in newton rechner"],
     inputs: [
           {
@@ -1201,17 +1181,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "1,02 Tonnen Belastbarkeit"
     },
+    content: {
+      intro: 'Dieser physikalische Kraftrechner transformiert Einheiten zwischen Newton (N), Kilonewton (kN), Dyn und veralteten Einheiten wie Kilopond (kp) und Pound-force (lbf).',
+      details: 'Nach dem 2. Newtonschen Axiom (F = m · a) beschleunigt 1 Newton eine Masse von 1 kg um 1 m/s². 1 Kilopond (kp) entspricht der Gewichtskraft von 1 kg auf der Erde: 1 kp = 9,80665 N.',
+    },
     faqs: [
-          {
-                "question": "Warum wird im Bauwesen mit kN statt mit kg gerechnet?",
-                "answer": "Weil Bauwerke wie Decken und Brücken Kräften (Gewichtskräfte, Windlast, Erdbeben) widerstehen müssen. 1 kN entspricht in der Praxis der Gewichtskraft von ca. 100 kg."
-          },
-          {
-                "question": "Was war das Kilopond?",
-                "answer": "Das Kilopond (kp) war die historische Krafteinheit vor Einführung des SI-Systems: 1 kp war definiert als die Gewichtskraft von 1 kg Masse auf Meereshöhe."
-          }
+      { question: 'Wie viel Newton Gewichtskraft übt eine Tafel Schokolade (100 g) aus?', answer: 'Auf der Erdoberfläche üben 100 Gramm Masse durch die Erdbeschleunigung (g ≈ 9,81 m/s²) eine Schwerkraft von ziemlich genau 1 Newton (ca. 0,981 N) aus.' },
+      { question: 'Was hält ein Kletterkarabiner mit der Angabe 24 kN aus?', answer: '24 Kilonewton entsprechen einer Bruchlast von ca. 2.447 kg Gewichtskraft (statisch fast 2,5 Tonnen).' },
     ],
-    relatedSlugs: ["druck-umrechner","drehmoment-umrechner","baugrund-tragfaehigkeit-rechner"],
+    relatedSlugs: ['druck-umrechner', 'drehmoment-umrechner', 'baugrund-tragfaehigkeit-rechner'],
   },
   {
     id: "kraftstoffverbrauch-umrechner",
@@ -1220,10 +1198,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Verbrauch Umrechner",
     category: "einheiten",
     subcategory: "Fahrzeuge & Mobilität",
-    metaTitle: "Spritverbrauch Umrechner – l/100km in MPG (US & UK) umrechnen",
-    metaDescription: "Rechnen Sie den Kraftstoffverbrauch um zwischen Litern pro 100 Kilometer (l/100km), US Miles per Gallon (MPG), UK Imperial MPG und km pro Liter.",
-    h1: "Spritverbrauch Umrechner – l/100km in MPG umrechnen",
-    shortDescription: "Konvertiert l/100km in US- und UK-Miles-per-Gallon (MPG).",
+    metaTitle: 'Spritverbrauch Umrechner – l/100km in MPG (US & UK) umrechnen',
+    metaDescription: 'Rechnen Sie den Kraftstoffverbrauch um zwischen Litern pro 100 Kilometer (l/100km), US Miles per Gallon (MPG), UK Imperial MPG und km pro Liter.',
+    h1: 'Spritverbrauch Umrechner – l/100km in MPG umrechnen',
+    shortDescription: 'Konvertiert l/100km in US- und UK-Miles-per-Gallon (MPG) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["spritverbrauch umrechner l 100km in mpg","miles per gallon in liter pro 100 km","us mpg in liter umrechnen","kraftstoffverbrauch rechner umrechnung"],
     inputs: [
           {
@@ -1300,17 +1278,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "7,84 l/100km"
     },
+    content: {
+      intro: 'Dieser Verbrauchsrechner transformiert den europäischen Kraftstoffverbrauch in l/100 km in die angloamerikanischen Einheiten MPG (US Miles per Gallon) und UK MPG.',
+      details: 'Aufgrund der inversen Relation (l/100 km misst verbrauchten Sprit pro Distanz; MPG misst Reichweite pro Spritmenge) gilt die reziproke Formel: MPG (US) = 235,215 / (l/100 km). Ein Verbrauch von 5 l/100 km entspricht ca. 47,04 US-MPG.',
+    },
     faqs: [
-          {
-                "question": "Bedeutet ein höherer MPG-Wert mehr oder weniger Verbrauch?",
-                "answer": "Umgekehrt als in Europa: Ein HÖHERER MPG-Wert bedeutet besseren Wirkungsgrad, da Sie mit einer Gallone weiter fahren können! Bei l/100km ist ein niedriger Wert besser."
-          },
-          {
-                "question": "Warum unterscheidet sich US MPG von UK MPG?",
-                "answer": "Weil die britische Imperial Gallon (4,55 l) größer ist als die US Liquid Gallon (3,79 l). Daher hat dasselbe Auto in Großbritannien eine um ca. 20 % höhere MPG-Zahl."
-          }
+      { question: 'Warum sinkt der MPG-Wert, wenn das Auto mehr Sprit verbraucht?', answer: 'Weil MPG angibt, wie viele Meilen man mit einer einzigen Gallone weit fahren kann: Ein sparsameres Fahrzeug fährt weiter und hat daher einen höheren MPG-Wert.' },
+      { question: 'Was entspricht ein Verbrauch von 8 Litern auf 100 km in US-MPG?', answer: '235,215 / 8 = 29,40 US-MPG.' },
     ],
-    relatedSlugs: ["spritkostenrechner","geschwindigkeit-umrechner","volumen-umrechner"],
+    relatedSlugs: ['spritkostenrechner', 'geschwindigkeit-umrechner', 'volumen-umrechner', 'fahrtkostenrechner', 'pendlerpauschale-rechner', 'kraftstoffverbrauch-rechner'],
   },
   {
     id: "roemische-zahlen-umrechner",
@@ -1319,10 +1295,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Römische Zahlen",
     category: "einheiten",
     subcategory: "Zahlensysteme",
-    metaTitle: "Römische Zahlen Umrechner – Arabische Zahlen 1–3999 in Römisch",
-    metaDescription: "Konvertieren Sie arabische Dezimalzahlen (1 bis 3999) in römische Ziffern (I, V, X, L, C, D, M) mit Subtraktionsregel und detaillierter Zusammensetzung.",
-    h1: "Römische Zahlen Umrechner – Arabisch in Römisch sofort umrechnen",
-    shortDescription: "Wandelt Dezimalzahlen in römische Ziffern um.",
+    metaTitle: 'Römische Zahlen Umrechner – Arabische Zahlen 1–3999 in Römisch',
+    metaDescription: 'Konvertieren Sie arabische Dezimalzahlen (1 bis 3999) in römische Ziffern (I, V, X, L, C, D, M) mit Subtraktionsregel und detaillierter Zusammensetzung.',
+    h1: 'Römische Zahlen Umrechner – Arabisch in Römisch sofort umrechnen',
+    shortDescription: 'Wandelt Dezimalzahlen in römische Ziffern um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["roemische zahlen umrechner dezimal","arabische zahlen in roemische ziffern umwandeln","roemische zahlen tabelle m d c l x v i","jahr 2026 roemische zahlen mmxxvi"],
     inputs: [
           {
@@ -1394,17 +1370,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "MMXXVI"
     },
+    content: {
+      intro: 'Dieser Zahlenwandler übersetzt arabische Dezimalzahlen (1 bis 3999) in korrekte römische Ziffern (I, V, X, L, C, D, M) und decodiert historische Inschriften.',
+      details: 'Die Werte der Grundzeichen lauten: I=1, V=5, X=10, L=50, C=100, D=500, M=1.000. Nach der Subtraktionsregel darf ein kleineres Zeichen vor einem größeren stehen, um 4 (IV), 9 (IX), 40 (XL), 90 (XC), 400 (CD) oder 900 (CM) darzustellen.',
+    },
     faqs: [
-          {
-                "question": "Gibt es eine römische Ziffer für die Null?",
-                "answer": "Nein, das römische Zahlensystem kennt keine Ziffer für Null. Im Mittelalter wurde gelegentlich das lateinische Wort \"nulla\" (nichts) verwendet."
-          },
-          {
-                "question": "Warum gibt es keine Zahlen über 3.999 im Standard-System?",
-                "answer": "Da nach den klassischen Regeln ein Buchstabe maximal dreimal hintereinander stehen darf (MMM = 3000), endet das Standardsystem bei MMMCMXCIX (3.999)."
-          }
+      { question: 'Wie schreibt man das Jahr 2026 in römischen Zahlen?', answer: 'MMXXVI (M=1000 + M=1000 + X=10 + X=10 + V=5 + I=1 = 2026).' },
+      { question: 'Gibt es im römischen Zahlensystem eine Ziffer für die Null?', answer: 'Nein, die antiken Römer kannten kein Zeichen für die Null; das Konzept der Null als Ziffer wurde erst im Mittelalter über das indisch-arabische Zahlensystem in Europa eingeführt.' },
     ],
-    relatedSlugs: ["binaer-hex-dezimal-umrechner","zeit-umrechner","daten-speicher-umrechner"],
+    relatedSlugs: ['binaer-hex-dezimal-umrechner', 'zeit-umrechner', 'daten-speicher-umrechner', 'hexadezimal-rechner'],
   },
   {
     id: "binaer-hex-dezimal-umrechner",
@@ -1413,10 +1387,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Binär & Hex Umrechner",
     category: "einheiten",
     subcategory: "Zahlensysteme",
-    metaTitle: "Binär & Hexadezimal Umrechner – Dezimal, Binär (Dual) & Hex",
-    metaDescription: "Rechnen Sie Zahlen um zwischen Dezimalsystem (Basis 10), Binärsystem / Dualsystem (Basis 2), Hexadezimalsystem (Basis 16) und Oktalsystem (Basis 8).",
-    h1: "Binär & Hexadezimal Umrechner – Zahlensysteme umrechnen",
-    shortDescription: "Konvertiert Zahlen zwischen Dezimal, Binär, Hexadezimal und Oktal.",
+    metaTitle: 'Binär & Hexadezimal Umrechner – Dezimal, Binär (Dual) & Hex',
+    metaDescription: 'Rechnen Sie Zahlen um zwischen Dezimalsystem (Basis 10), Binärsystem / Dualsystem (Basis 2), Hexadezimalsystem (Basis 16) und Oktalsystem (Basis 8).',
+    h1: 'Binär & Hexadezimal Umrechner – Zahlensysteme umrechnen',
+    shortDescription: 'Konvertiert Zahlen zwischen Dezimal, Binär, Hexadezimal und Oktal mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["binaer umrechner dualsystem dezimal in binaer","hexadezimal in dezimal umrechnen hex rechner","binaer hex oktal umrechner basis 2 8 16","dezimal in dualzahl umwandeln"],
     inputs: [
           {
@@ -1467,17 +1441,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "Binär: 11111111, Hex: 0xFF"
     },
+    content: {
+      intro: 'Dieser Zahlensystem-Konverter transformiert Zahlenwerte synchron zwischen dem Dezimalsystem (Basis 10), Binärsystem (Basis 2), Oktalsystem (Basis 8) und Hexadezimalsystem (Basis 16).',
+      details: 'In der Computertechnik entspricht eine Binärstelle einem Bit. Vier Bits (ein Nibble) lassen sich exakt durch eine einzige Hexadezimalziffer (0–9, A–F) darstellen: Die Binärzahl 1111 1111 entspricht im Hexadezimalsystem FF und dezimal 255.',
+    },
     faqs: [
-          {
-                "question": "Warum nutzen Computer das Binärsystem?",
-                "answer": "Weil elektronische Transistoren zuverlässig zwei physikalische Zustände darstellen können: Strom an (1) oder Strom aus (0)."
-          },
-          {
-                "question": "Wo begegnen einem Hexadezimalzahlen im Alltag?",
-                "answer": "Bei HTML/CSS-Farbcodes (#FF5733), MAC-Adressen von Netzwerkadaptern und IPv6-Internetadressen."
-          }
+      { question: 'Wie rechnet man die Binärzahl 10110 in eine Dezimalzahl um?', answer: 'Von rechts nach links: (0×1) + (1×2) + (1×4) + (0×8) + (1×16) = 0 + 2 + 4 + 0 + 16 = 22.' },
+      { question: 'Wofür wird das Oktalsystem (Basis 8) noch heute genutzt?', answer: 'Vor allem in Linux- und Unix-Dateisystemen zur Vergabe von Zugriffsrechten (z. B. chmod 755 oder 644).' },
     ],
-    relatedSlugs: ["daten-speicher-umrechner","roemische-zahlen-umrechner","datenrate-bandbreite-umrechner"],
+    relatedSlugs: ['hexadezimal-rechner', 'daten-speicher-umrechner', 'roemische-zahlen-umrechner', 'datenrate-bandbreite-umrechner'],
   },
   {
     id: "zoll-in-cm-rechner",
@@ -1486,10 +1458,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Zoll-in-cm-Rechner",
     category: "einheiten",
     subcategory: "Geometrische Maße",
-    metaTitle: "Zoll in cm Rechner – Inch in Zentimeter & TV-Bildschirmdiagonale",
-    metaDescription: "Rechnen Sie Zoll (Inch) in Zentimeter und Millimeter um. Inklusive Bildschirm-Rechner für TVs und Handys: Breite und Höhe im 16:9 Format.",
-    h1: "Zoll in cm Rechner – Inch in cm & Bildschirmmaße berechnen",
-    shortDescription: "Konvertiert Zoll (Inch) in cm und ermittelt Maße von 16:9 Displays.",
+    metaTitle: 'Zoll in cm Rechner – Inch in Zentimeter',
+    metaDescription: 'Rechnen Sie Zoll (Inch) in Zentimeter und Millimeter um. Inklusive Bildschirm-Rechner für TVs und Handys: Breite und Höhe im 16:9 Format.',
+    h1: 'Zoll in cm Rechner – Inch in cm & Bildschirmmaße berechnen',
+    shortDescription: 'Konvertiert Zoll (Inch) in cm und ermittelt Maße von 16:9 Displays.',
     searchKeywords: ["zoll in cm rechner inch umrechnen","fernseher zoll in cm bildschirmdiagonale","display breite hoehe 16 zu 9 zoll","1 zoll wieviel cm 2 54"],
     inputs: [
           {
@@ -1545,17 +1517,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "139,7 cm Diagonale (122 × 69 cm)"
     },
+    content: {
+      intro: 'Dieser Längenrechner wandelt Zollmaße (Inch) in Zentimeter um und berechnet die Abmessungen von Bildschirmen, TV-Geräten, Felgen und Werkzeugen.',
+      details: '1 Zoll = exakt 2,54 Zentimeter. Die Bildschirmdiagonale eines 65-Zoll-Fernsehers beträgt exakt 65 · 2,54 = 165,1 cm. Bei einem Seitenverhältnis von 16:9 ist das Display ca. 144 cm breit und 81 cm hoch.',
+    },
     faqs: [
-          {
-                "question": "Welcher Sitzabstand empfiehlt sich für einen 55- oder 65-Zoll-4K-Fernseher?",
-                "answer": "Bei 4K/UHD-Auflösung empfiehlt sich ein Sitzabstand vom ca. 1,5-fachen der Bildschirmdiagonale: Für 55 Zoll (140 cm) ca. 2,1 Meter, für 65 Zoll (165 cm) ca. 2,5 Meter."
-          },
-          {
-                "question": "Gilt die Zoll-Formel auch für Rohre und Reifen?",
-                "answer": "Ja, das Zollmaß (25,4 mm) gilt für alle technischen Anwendungen, z. B. 19-Zoll-Felgen, 1/2-Zoll-Wasserrohre oder 28-Zoll-Fahrradreifen."
-          }
+      { question: 'Wie viel cm sind ein 15-Zoll-Laptop-Display?', answer: '15 Zoll entsprechen einer Bildschirmdiagonale von 15 × 2,54 = 38,1 cm; ein 13,3-Zoll-Display misst 33,78 cm Diagonale.' },
+      { question: 'Wie rechnet man Zentimeter im Kopf schnell in Zoll um?', answer: 'Teilen Sie die Zentimeter durch 2,5 (oder verdoppeln Sie und teilen durch 5): 10 cm / 2,5 = ca. 4 Zoll (exakt 3,94 Zoll).' },
     ],
-    relatedSlugs: ["laengen-umrechner","rechteckrechner","daten-speicher-umrechner"],
+    relatedSlugs: ['schuhe-kleidergroessen-umrechner', 'laengen-umrechner', 'rechteckrechner', 'daten-speicher-umrechner'],
   },
   {
     id: "zeit-umrechner",
@@ -1564,10 +1534,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Zeit Umrechner",
     category: "einheiten",
     subcategory: "Alltag & Kalender",
-    metaTitle: "Zeit Umrechner – Sekunden, Minuten, Stunden, Tage & Wochen",
-    metaDescription: "Rechnen Sie Zeiteinheiten präzise um: Sekunden, Minuten, Stunden, Tage, Wochen und Jahre inklusive Dezimalstunden in Stunden und Minuten.",
-    h1: "Zeit Umrechner – Sekunden, Stunden, Tage & Wochen umrechnen",
-    shortDescription: "Konvertiert Zeiteinheiten und Dezimalstunden.",
+    metaTitle: 'Zeit Umrechner – Sekunden, Minuten, Stunden, Tage & Wochen',
+    metaDescription: 'Rechnen Sie Zeiteinheiten präzise um: Sekunden, Minuten, Stunden, Tage, Wochen und Jahre inklusive Dezimalstunden in Stunden und Minuten.',
+    h1: 'Zeit Umrechner – Sekunden, Stunden, Tage & Wochen umrechnen',
+    shortDescription: 'Konvertiert Zeiteinheiten und Dezimalstunden mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["zeit umrechner sekunden minuten stunden tage","stunden in sekunden umrechnen 3600","dezimalstunden in stunden und minuten","tage in stunden umrechnen rechner"],
     inputs: [
           {
@@ -1660,17 +1630,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "450 Minuten = 27.000 Sekunden (7 Std. 30 Min.)"
     },
+    content: {
+      intro: 'Dieser Zeiteinheiten-Konverter rechnet Zeitspannen deterministisch zwischen Nanosekunden, Millisekunden, Sekunden, Minuten, Stunden, Tagen und Kalenderjahren um.',
+      details: '1 Tag = 24 Stunden = 1.440 Minuten = 86.400 Sekunden = 86.400.000 Millisekunden. Ein durchschnittliches julianisches Jahr umfasst exakt 31.557.600 Sekunden.',
+    },
     faqs: [
-          {
-                "question": "Wie rechnet man 8,75 Stunden in Stunden und Minuten um?",
-                "answer": "Die 8 bleibt erhalten. Die Dezimalstellen multipliziert man mit 60: 0,75 × 60 = 45 Minuten. Ergebnis: 8 Stunden und 45 Minuten."
-          },
-          {
-                "question": "Wie viele Sekunden hat ein ganzes Jahr?",
-                "answer": "Ein normales Jahr mit 365 Tagen hat 31.536.000 Sekunden (365 × 86.400). Ein Schaltjahr hat 31.622.400 Sekunden."
-          }
+      { question: 'Wie viele Sekunden vergehen in einer Arbeitswoche mit 40 Stunden?', answer: '40 Stunden × 3.600 Sekunden/Stunde = exakt 144.000 Sekunden reine Arbeitszeit.' },
+      { question: 'Wie schnell vergeht eine Nanosekunde im Computer?', answer: 'Eine Nanosekunde ist ein Milliardstel einer Sekunde (10⁻⁹ s); das Licht legt in einer Nanosekunde im Vakuum eine Strecke von ca. 30 cm zurück.' },
     ],
-    relatedSlugs: ["arbeitszeitrechner","urlaubstage-rechner","datenrate-bandbreite-umrechner"],
+    relatedSlugs: ['radioaktivitaet-strahlendosis-rechner', 'arbeitszeitrechner', 'urlaubstage-rechner', 'datenrate-bandbreite-umrechner'],
   },
   {
     id: "dichte-umrechner",
@@ -1679,10 +1647,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Dichte Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Dichte Umrechner – g/cm³ in kg/m³, kg/l & lb/cu ft umrechnen",
-    metaDescription: "Rechnen Sie physikalische Dichten um zwischen Gramm pro Kubikzentimeter (g/cm³), Kilogramm pro Kubikmeter (kg/m³), kg pro Liter und Pounds per cubic foot.",
-    h1: "Dichte Umrechner – g/cm³, kg/m³ & kg/l präzise umrechnen",
-    shortDescription: "Konvertiert Dichteeinheiten zwischen metrischen und angloamerikanischen Werten.",
+    metaTitle: 'Dichte Umrechner – g/cm³ in kg/m³, kg/l & lb/cu ft umrechnen',
+    metaDescription: 'Rechnen Sie physikalische Dichten um zwischen Gramm pro Kubikzentimeter (g/cm³), Kilogramm pro Kubikmeter (kg/m³), kg pro Liter und Pounds per cubic foot.',
+    h1: 'Dichte Umrechner – g/cm³, kg/m³ & kg/l präzise umrechnen',
+    shortDescription: 'Konvertiert Dichteeinheiten zwischen metrischen und angloamerikanischen Werten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["dichte umrechner g cm3 in kg m3","spezifisches gewicht dichte wasser 1 g cm3","dichte umrechnen kg pro liter","density converter lb cu ft"],
     inputs: [
           {
@@ -1759,17 +1727,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "7,85 g/cm³"
     },
+    content: {
+      intro: 'Dieser Dichterechner konvertiert Stoffdichten zwischen kg/m³, g/cm³, g/ml, kg/l sowie imperialen pounds per cubic foot (lb/ft³).',
+      details: '1 g/cm³ = 1.000 kg/m³ = 1 kg/Liter. Reines flüssiges Wasser besitzt bei 4 °C (Dichteanomalie) seine höchste Dichte von exakt 1.000 kg/m³ (1 g/cm³). Metalle wie Gold erreichen 19,3 g/cm³, Blei 11,3 g/cm³.',
+    },
     faqs: [
-          {
-                "question": "Warum schwimmt Eis auf flüssigem Wasser?",
-                "answer": "Wegen der Dichteanomalie des Wassers: Eis hat bei 0°C eine Dichte von ca. 0,917 g/cm³ und ist somit leichter als flüssiges Wasser (ca. 1,000 g/cm³)."
-          },
-          {
-                "question": "Welches Metall hat die höchste Dichte?",
-                "answer": "Osmium hat mit 22,59 g/cm³ die höchste Dichte aller chemischen Elemente, dicht gefolgt von Iridium (22,56 g/cm³) und Platin (21,45 g/cm³)."
-          }
+      { question: 'Warum schwimmt Eis auf flüssigem Wasser?', answer: 'Wegen der Dichteanomalie: Die hexagonale Kristallstruktur von Eis benötigt mehr Raum; Eis hat mit ca. 0,917 g/cm³ eine geringere Dichte als flüssiges Wasser und treibt daher oben.' },
+      { question: 'Wie viel wiegt ein 10-Liter-Eimer voll Sand im Vergleich zu Wasser?', answer: 'Wasser wiegt genau 10 kg; trockener Sand hat eine Dichte von ca. 1,6 g/cm³, der Eimer wiegt somit ca. 16 Kilogramm.' },
     ],
-    relatedSlugs: ["gewicht-masse-umrechner","volumen-umrechner","kies-splitt-rechner"],
+    relatedSlugs: ['viskositaet-umrechner', 'gewicht-masse-umrechner', 'volumen-umrechner', 'kies-splitt-rechner'],
   },
   {
     id: "drehzahl-umfangsgeschwindigkeit-rechner",
@@ -1778,10 +1744,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Drehzahl & Schnitt",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Drehzahl Rechner – RPM, Umfangs- & Schnittgeschwindigkeit v = π·d·n",
-    metaDescription: "Berechnen Sie die Schnittgeschwindigkeit und Umfangsgeschwindigkeit v in m/min und m/s aus Werkzeugdurchmesser d (mm) und Drehzahl n (U/min / RPM) für Bohren und Fräsen.",
-    h1: "Drehzahl Rechner – Schnittgeschwindigkeit & RPM berechnen",
-    shortDescription: "Ermittelt Schnittgeschwindigkeit und Umfangsgeschwindigkeit aus Drehzahl.",
+    metaTitle: 'Drehzahl Rechner – RPM, Umfangs- – RechenHafen',
+    metaDescription: 'Berechnen Sie die Schnittgeschwindigkeit und Umfangsgeschwindigkeit v in m/min und m/s aus Werkzeugdurchmesser d (mm) und Drehzahl n (U/min / RPM) für.',
+    h1: 'Drehzahl Rechner – Schnittgeschwindigkeit & RPM berechnen',
+    shortDescription: 'Ermittelt Schnittgeschwindigkeit und Umfangsgeschwindigkeit aus Drehzahl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["drehzahl rechner schnittgeschwindigkeit formel","rpm in m s umrechnen durchmesser","v pi d n durch 1000 schnittgeschwindigkeit bohren","umfangsgeschwindigkeit berechnen"],
     inputs: [
           {
@@ -1848,17 +1814,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "72,0 m/s Umfangsgeschwindigkeit"
     },
+    content: {
+      intro: 'Dieser Rechner verknüpft Rotationsdrehzahl in U/min mit dem Außendurchmesser zur Berechnung der Umfangs- und Schnittgeschwindigkeit in m/s für Sägeblätter, Bohrer und Fräser.',
+      details: 'Umfangsgeschwindigkeit v = (pi · d · n) / 60. Ein Trennschleifer (Flex) mit 230-mm-Scheibe bei 6.600 U/min erreicht eine Umfangsgeschwindigkeit von ca. 80 m/s (knapp 290 km/h) an den Schleifkörnern.',
+    },
     faqs: [
-          {
-                "question": "Warum ist die maximale Umfangsgeschwindigkeit bei Schleifscheiben begrenzt?",
-                "answer": "Trenn- und Schruppscheiben dürfen meist mit maximal 80 m/s betrieben werden, da bei höheren Drehzahlen die Fliehkräfte das Scheibengefüge sprengen können."
-          },
-          {
-                "question": "Wie berechnet man die ideale Drehzahl für Bohrer in Stahl?",
-                "answer": "Formel: n = (v_c × 1.000) / (π × d). Bei HSS-Bohrern in Baustahl rechnet man mit einer Schnittgeschwindigkeit v_c von ca. 25 bis 30 m/min."
-          }
+      { question: 'Warum ist die maximale Schnittgeschwindigkeit bei Werkzeugen strikt begrenzt?', answer: 'Überschreitet die Fliehkraft die Festigkeit der Scheibe, kann sie explosionsartig bersten; die Berufsgenossenschaft begrenzt Trennscheiben typisch auf max. 80 m/s.' },
+      { question: 'Wie berechnet man die optimale Drehzahl für einen Bohrer in Metall?', answer: 'Drehzahl n = (Schnittgeschwindigkeit v_c in m/min · 1.000) / (pi · Bohrerdurchmesser d in mm).' },
     ],
-    relatedSlugs: ["geschwindigkeit-umrechner","drehmoment-umrechner","leistung-umrechner"],
+    relatedSlugs: ['geschwindigkeit-umrechner', 'drehmoment-umrechner', 'leistung-umrechner'],
   },
   {
     id: "beleuchtungsstaerke-lux-lumen-rechner",
@@ -1867,10 +1831,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Lux- & Lumen-Rechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Lux & Lumen Rechner – Beleuchtungsstärke (lx) & Lichtstrom (lm)",
-    metaDescription: "Berechnen Sie den benötigten Lichtstrom in Lumen nach Raumfläche in m² und Beleuchtungsstärke nach DIN EN 12464 (Küche 300 lx, Büro 500 lx, Wohnzimmer 100 lx).",
-    h1: "Lux & Lumen Rechner – Wie viele Lumen brauche ich pro Raum?",
-    shortDescription: "Berechnet den Lumen-Bedarf nach Raumfläche und DIN EN 12464.",
+    metaTitle: 'Lux & Lumen Rechner – Beleuchtungsstärke',
+    metaDescription: 'Berechnen Sie den benötigten Lichtstrom in Lumen nach Raumfläche in m² und Beleuchtungsstärke nach DIN EN 12464 (Küche 300 lx, Büro 500 lx',
+    h1: 'Lux & Lumen Rechner – Wie viele Lumen brauche ich pro Raum?',
+    shortDescription: 'Berechnet den Lumen-Bedarf nach Raumfläche und DIN EN 12464 mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["lux in lumen umrechnen formel","wieviel lumen pro m2 wohnzimmer kueche buero","beleuchtungsstaerke din en 12464 lux","lumen watt led rechner"],
     inputs: [
           {
@@ -1963,17 +1927,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "ca. 15.000 Lumen"
     },
+    content: {
+      intro: 'Dieser lichttechnische Rechner transformiert den Lichtstrom einer Lampe in Lumen (lm) in die resultierende Beleuchtungsstärke in Lux (lx) auf einer Zielfläche.',
+      details: '1 Lux = 1 Lumen pro Quadratmeter (lx = lm / m²). Nach der Arbeitsstättenverordnung (ASR A3.4) sind für normale Büroarbeitsplätze mindestens 500 Lux, für feine technische Zeichnungen mindestens 750 bis 1.000 Lux vorgeschrieben.',
+    },
     faqs: [
-          {
-                "question": "Wie viele Lumen hat eine klassische alte 60-Watt-Glühbirne?",
-                "answer": "Eine alte 60-Watt-Glühlampe erzeugte ca. 806 Lumen. Eine moderne LED erreicht dieselbe Helligkeit bereits mit nur ca. 7 bis 9 Watt Stromverbrauch."
-          },
-          {
-                "question": "Welche Lichtfarbe (Farbtemperatur) eignet sich für welchen Raum?",
-                "answer": "Warmweiß (2.700K) sorgt für Gemütlichkeit im Wohn- und Schlafzimmer. Neutralweiß (4.000K) fördert die Konzentration in Küche, Bad und Homeoffice. Tageslichtweiß (>5.300K) eignet sich für Werkstätten."
-          }
+      { question: 'Wie viel Lux liefert das natürliche Sonnenlicht im Freien?', answer: 'An einem sonnigen Sommertag erreicht die Beleuchtungsstärke bis zu 100.000 Lux; an einem trüben Wintertag ca. 3.000 bis 5.000 Lux; Vollmondlicht liefert nur ca. 0,25 Lux.' },
+      { question: 'Wie viele LED-Lumen benötigt man für ein 20 m² großes Wohnzimmer?', answer: 'Für stimmungsvolle Wohnraumbeleuchtung (ca. 150 Lux) werden 150 lx × 20 m² = ca. 3.000 Lumen Gesamtlichtstrom aus verschiedenen Lampen benötigt.' },
     ],
-    relatedSlugs: ["leistung-umrechner","energie-arbeit-umrechner","stromkostenrechner"],
+    relatedSlugs: ['leistung-umrechner', 'energie-arbeit-umrechner', 'stromkostenrechner'],
   },
   {
     id: "elektrische-ladung-kapazitaet-rechner",
@@ -1982,10 +1944,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Akku Kapazität-Rechner",
     category: "einheiten",
     subcategory: "Informatik & Digital",
-    metaTitle: "Akku Kapazität Rechner – mAh in Wh, Wattstunden & Coulomb umrechnen",
-    metaDescription: "Rechnen Sie die Akkukapazität um zwischen Milliamperestunden (mAh), Amperestunden (Ah), Wattstunden (Wh) nach Akkuspannung (3,7V Li-Ion, 12V Blei, 48V E-Bike) und Coulomb.",
-    h1: "Akku Kapazität Rechner – mAh in Wh & Wattstunden ermitteln",
-    shortDescription: "Konvertiert mAh und Ah in Wattstunden (Wh) nach Zellenspannung.",
+    metaTitle: 'Akku Kapazität Rechner – mAh in Wh, Wattstunden',
+    metaDescription: 'Rechnen Sie die Akkukapazität um zwischen Milliamperestunden (mAh), Amperestunden (Ah), Wattstunden (Wh) nach Akkuspannung (3,7V Li-Ion, 12V Blei',
+    h1: 'Akku Kapazität Rechner – mAh in Wh & Wattstunden ermitteln',
+    shortDescription: 'Konvertiert mAh und Ah in Wattstunden (Wh) nach Zellenspannung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["mah in wh umrechnen formel akku powerbank","amperestunden in wattstunden rechner 12v 3 7v","akku kapazitaet coulomb berechnen","powerbank flugzeug grenze 100 wh"],
     inputs: [
           {
@@ -2074,17 +2036,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "74,0 Wh"
     },
+    content: {
+      intro: 'Dieser Elektro-Rechner transformiert Kapazitäten und elektrische Ladungsmengen zwischen Farad (F), Milliamperestunden (mAh), Amperestunden (Ah) und Coulomb (C).',
+      details: '1 Coulomb = 1 Amperesekunde (A·s). 1 Amperestunde (Ah) = 3.600 Coulomb. Ein Smartphone-Akku mit 5.000 mAh speichert bei einer Nennspannung von 3,7 Volt eine Energie von 18,5 Wattstunden (Wh).',
+    },
     faqs: [
-          {
-                "question": "Darf ich eine 20.000-mAh-Powerbank ins Flugzeug mitnehmen?",
-                "answer": "Ja! Eine 20.000 mAh Li-Ion Powerbank hat 74 Wh. Die internationale IATA-Grenze für Handgepäck liegt bei 100 Wh (ohne Anmeldung) bzw. maximal 160 Wh mit Airline-Genehmigung."
-          },
-          {
-                "question": "Warum schrumpft die Nutzkapazität beim Laden eines Handys?",
-                "answer": "Weil die 3,7V der Akkuzelle auf 5V USB hochkonvertiert und im Smartphone wieder heruntergeregelt werden müssen. Dabei entstehen ca. 15 % bis 25 % Umwandlungsverluste."
-          }
+      { question: 'Wie rechnet man mAh in Wattstunden (Wh) für Powerbanks im Flugzeug um?', answer: 'Wattstunden = (Kapazität in mAh · Zellspannung in Volt) / 1.000. Die IATA-Grenze für Handgepäck liegt meist bei 100 Wh (ca. 27.000 mAh bei 3,7 V).' },
+      { question: 'Was ist die Einheit Farad bei Kondensatoren?', answer: 'Ein Kondensator hat eine Kapazität von 1 Farad, wenn das Laden mit einer Ladung von 1 Coulomb eine Spannung von 1 Volt erzeugt (C = Q / U).' },
     ],
-    relatedSlugs: ["energie-arbeit-umrechner","leistung-umrechner","stromkostenrechner"],
+    relatedSlugs: ['energie-arbeit-umrechner', 'leistung-umrechner', 'stromkostenrechner'],
   },
   {
     id: "radioaktivitaet-strahlendosis-rechner",
@@ -2093,10 +2053,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Strahlendosis-Rechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Strahlendosis Rechner – Sievert (Sv), Becquerel (Bq), Gray (Gy) & Curie",
-    metaDescription: "Rechnen Sie ionisierende Strahlung um: Aktivität (Becquerel Bq, Curie Ci), Energiedosis (Gray Gy, Rad) und Äquivalentdosis (Sievert Sv, Millisievert mSv, Rem).",
-    h1: "Strahlendosis Rechner – Becquerel, Sievert & Gray umrechnen",
-    shortDescription: "Konvertiert Aktivität (Bq/Ci) und Äquivalentdosis (Sv/mSv/rem).",
+    metaTitle: 'Strahlendosis Rechner – Sievert, Becquerel, Gray',
+    metaDescription: 'Rechnen Sie ionisierende Strahlung um: Aktivität (Becquerel Bq, Curie Ci), Energiedosis (Gray Gy, Rad) und Äquivalentdosis (Sievert Sv',
+    h1: 'Strahlendosis Rechner – Becquerel, Sievert & Gray umrechnen',
+    shortDescription: 'Konvertiert Aktivität (Bq/Ci) und Äquivalentdosis (Sv/mSv/rem) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["radioaktivitaet umrechner becquerel curie","sievert in millisievert mikrosievert umrechnen","gray in sievert strahlendosis rechner","natuerliche strahlenbelastung deutschland msv"],
     inputs: [
           {
@@ -2183,17 +2143,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "7.000 µSv"
     },
+    content: {
+      intro: 'Dieser Strahlenschutzrechner konvertiert Aktivität in Becquerel (Bq) und biologische Strahlendosen zwischen Sievert (Sv), Millisievert (mSv) und Gray (Gy).',
+      details: '1 Becquerel entspricht einem Atomzerfall pro Sekunde. Das Sievert bewertet die biologische Schädigungswirkung auf menschliches Gewebe: Die durchschnittliche natürliche Strahlenbelastung in Deutschland beträgt ca. 2,1 mSv pro Person und Jahr.',
+    },
     faqs: [
-          {
-                "question": "Wie hoch ist die natürliche Strahlenbelastung in Deutschland?",
-                "answer": "Im Bundesdurchschnitt liegt die natürliche Strahlenexposition bei rund 2,1 Millisievert (mSv) pro Jahr, hauptsächlich verursacht durch Radon in Gebäuden, kosmische Strahlung und Nahrung."
-          },
-          {
-                "question": "Was ist das Bananen-Äquivalent?",
-                "answer": "Bananen enthalten natürlich vorkommendes radioaktives Kalium-40. Der Verzehr einer Banane führt zu einer Dosis von ca. 0,1 Mikrosievert (0,0001 mSv)."
-          }
+      { question: 'Wie viel Strahlung verursacht ein Langstreckenflug nach New York?', answer: 'Durch die Höhenstrahlung in 10 bis 12 km Höhe beträgt die Dosis eines Hin- und Rückflugs Frankfurt–New York ca. 0,05 bis 0,10 Millisievert (entspricht etwa einer Röntgenaufnahme der Lunge).' },
+      { question: 'Welcher gesetzliche Dosisgrenzwert gilt für beruflich strahlenexponierte Personen?', answer: 'Nach der Strahlenschutzverordnung (StrlSchV) maximal 20 Millisievert pro Kalenderjahr.' },
     ],
-    relatedSlugs: ["energie-arbeit-umrechner","zeit-umrechner","gewicht-masse-umrechner"],
+    relatedSlugs: ['energie-arbeit-umrechner', 'zeit-umrechner', 'gewicht-masse-umrechner'],
   },
   {
     id: "viskositaet-umrechner",
@@ -2202,10 +2160,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Viskosität Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Viskosität Umrechner – mPa·s in Centipoise (cP) & Stokes (cSt)",
-    metaDescription: "Rechnen Sie Viskositäten von Flüssigkeiten, Ölen und Farben um: Dynamische Viskosität (Pa·s, mPa·s, Centipoise cP) und kinematische Viskosität (mm²/s, Centistokes cSt).",
-    h1: "Viskosität Umrechner – mPa·s, Centipoise & Centistokes",
-    shortDescription: "Konvertiert dynamische (mPa·s, cP) und kinematische Viskosität (cSt).",
+    metaTitle: 'Viskosität Umrechner – mPa·s in Centipoise (cP) & Stokes (cSt)',
+    metaDescription: 'Rechnen Sie Viskositäten von Flüssigkeiten, Ölen und Farben um: Dynamische Viskosität (Pa·s, mPa·s, Centipoise cP) und kinematische Viskosität (mm²/s',
+    h1: 'Viskosität Umrechner – mPa·s, Centipoise & Centistokes',
+    shortDescription: 'Konvertiert dynamische (mPa·s, cP) und kinematische Viskosität (cSt) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["viskositaet umrechner mpa s centipoise cp","kinematische viskositaet centistokes cst mm2 s","viskositaet motoroel getriebeoel wasser","pascal sekunden in centipoise umrechnen"],
     inputs: [
           {
@@ -2291,17 +2249,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "1.200 mPa·s (1.200 cP)"
     },
+    content: {
+      intro: 'Dieser Strömungsrechner transformiert die dynamische Viskosität (Pascal-Sekunden Pa·s, Centipoise cP) und kinematische Viskosität (m²/s, Centistokes cSt) von Fluiden und Schmierölen.',
+      details: 'Kinematische Viskosität nu = Dynamische Viskosität eta / Dichte rho. Wasser bei 20 °C besitzt eine dynamische Viskosität von ca. 1,0 mPa·s (1 cP); Motoröl 10W-40 liegt bei ca. 100 bis 200 mPa·s.',
+    },
     faqs: [
-          {
-                "question": "Warum ist 1 mPa·s gleich 1 cP?",
-                "answer": "Weil 1 Poise = 0,1 Pa·s = 100 mPa·s definiert ist. 1 Centipoise (1/100 Poise) ist somit exakt gleich 1 mPa·s."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen newtonschen und nicht-newtonschen Flüssigkeiten?",
-                "answer": "Bei newtonschen Fluiden (wie Wasser oder Öl) bleibt die Viskosität bei Bewegung konstant. Nicht-newtonsche Fluide (wie Ketchup oder Zahnpasta) werden bei Scherung dünnflüssiger (Thixotropie)."
-          }
+      { question: 'Wie ändert sich die Viskosität von Flüssigkeiten bei Erwärmung?', answer: 'Bei fast allen Flüssigkeiten sinkt die Viskosität bei Erwärmung drastisch (sie werden dünnflüssiger); bei Gasen steigt die Viskosität hingegen bei höherer Temperatur leicht an.' },
+      { question: 'Was bedeuten die Zahlen bei Motoröl wie 5W-30?', answer: 'Die Zahl vor dem W (Winter) gibt das Kaltfließverhalten bei Minustemperaturen an; die hintere Zahl die Hochtemperatur-Viskosität bei 100 °C Betriebstemperatur nach SAE J300.' },
     ],
-    relatedSlugs: ["dichte-umrechner","druck-umrechner","temperatur-umrechner"],
+    relatedSlugs: ['dichte-umrechner', 'druck-umrechner', 'temperatur-umrechner'],
   },
   {
     id: "schuhe-kleidergroessen-umrechner",
@@ -2310,10 +2266,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Schuhgrößen Umrechner",
     category: "einheiten",
     subcategory: "Alltag & Kleidung",
-    metaTitle: "Schuhgrößen Umrechner – EU in US, UK & Fußlänge (Mondopoint cm)",
-    metaDescription: "Rechnen Sie Schuhgrößen für Damen, Herren und Kinder um: Deutsche/EU-Größe (35 bis 48), US Men, US Women, UK-Größe und Fußlänge in cm (Mondopoint).",
-    h1: "Schuhgrößen Umrechner – EU, US, UK & cm sofort ermitteln",
-    shortDescription: "Konvertiert Schuhgrößen zwischen EU, US, UK und Fußlänge in cm.",
+    metaTitle: 'Schuhgrößen Umrechner – EU in US, UK',
+    metaDescription: 'Rechnen Sie Schuhgrößen für Damen, Herren und Kinder um: Deutsche/EU-Größe (35 bis 48), US Men, US Women, UK-Größe und Fußlänge in cm (Mondopoint).',
+    h1: 'Schuhgrößen Umrechner – EU, US, UK & cm sofort ermitteln',
+    shortDescription: 'Konvertiert Schuhgrößen zwischen EU, US, UK und Fußlänge in cm.',
     searchKeywords: ["schuhgroessen umrechner eu in us uk","schuhgroesse us herren damen tabelle","fusslaenge in schuhgroesse cm mondopoint","deutsche schuhgroesse 42 us"],
     inputs: [
           {
@@ -2393,17 +2349,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "US 8.5 / UK 8.0 (27,0 cm Fußlänge)"
     },
+    content: {
+      intro: 'Dieser Größenumrechner gleicht internationale Konfektions- und Schuhgrößen zwischen EU (Paris-Stich), US, UK und Fußlänge in Zentimetern (Mondopoint) ab.',
+      details: 'Die europäische Schuhgröße basiert auf dem Pariser Stich (1 Stich = 2/3 cm ≈ 6,67 mm): EU-Größe = (Fußlänge in cm + 1,5 cm Abrollzugabe) · 1,5. Eine Fußlänge von 27 cm entspricht EU-Größe 42.',
+    },
     faqs: [
-          {
-                "question": "Wie misst man seine Fußlänge richtig?",
-                "answer": "Stellen Sie sich am späten Nachmittag auf ein Blatt Papier an eine Wand, markieren Sie die längste Zehe mit einem Stift und messen Sie den Abstand zur Wand in Zentimetern."
-          },
-          {
-                "question": "Warum fallen Laufschuhe oft kleiner aus?",
-                "answer": "Da sich der Fuß beim Laufen nach vorne schiebt und durch die Durchblutung anschwillt, wählt man Laufschuhe in der Regel eine bis anderthalb Nummern größer als Straßenschuhe."
-          }
+      { question: 'Warum fallen Schuhgrößen verschiedener Hersteller so unterschiedlich aus?', answer: 'Weil Hersteller unterschiedliche Leistenformen verwenden und US/UK-Größen oft mit gerundeten Umrechnungsfaktoren in EU-Größen übersetzen.' },
+      { question: 'Was ist das Mondopoint-System?', answer: 'Das internationale ISO-9407-Normsystem für Schuhe (z. B. bei Skischuhen und Bundeswehr): Es gibt schlicht die reale Fußlänge und Fußbreite direkt in Millimetern an.' },
     ],
-    relatedSlugs: ["laengen-umrechner","zoll-in-cm-rechner","gewicht-masse-umrechner"],
+    relatedSlugs: ['laengen-umrechner', 'zoll-in-cm-rechner', 'gewicht-masse-umrechner'],
   },
   {
     id: "papierformat-din-rechner",
@@ -2412,10 +2366,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Papierformat DIN",
     category: "einheiten",
     subcategory: "Geometrische Maße",
-    metaTitle: "Papierformat Rechner – DIN A0 bis A8 Maße (mm, cm) & Blattgewicht",
-    metaDescription: "Berechnen Sie die exakten Abmessungen in Millimetern und Zentimetern für DIN A4, A3, A5 etc. nach DIN 476 / ISO 216 sowie das Blattgewicht nach Grammatur (80g, 120g/m²).",
-    h1: "Papierformat Rechner – DIN A Maße & Briefgewicht berechnen",
-    shortDescription: "Berechnet DIN A0 bis A8 Abmessungen in mm und Blattgewicht.",
+    metaTitle: 'Papierformat Rechner – DIN A0 bis A8 Maße',
+    metaDescription: 'Berechnen Sie die exakten Abmessungen in Millimetern und Zentimetern für DIN A4, A3, A5 etc. nach DIN 476 / ISO 216 sowie das Blattgewicht nach.',
+    h1: 'Papierformat Rechner – DIN A Maße & Briefgewicht berechnen',
+    shortDescription: 'Berechnet DIN A0 bis A8 Abmessungen in mm und Blattgewicht.',
     searchKeywords: ["papierformat din rechner din a4 maße mm cm","din a3 din a5 masse tabelle","briefgewicht berechnen blattanzahl 80g m2","seitenverhaeltnis wurzel 2 din papier"],
     inputs: [
           {
@@ -2535,17 +2489,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "15 g Papiergewicht (Standardbrief portofrei)"
     },
+    content: {
+      intro: 'Die deutsche Norm DIN 476 (international ISO 216) definiert die Standard-Papierformate der Reihe A mit dem konstanten Seitenverhältnis 1 zu Wurzel aus 2 (1 : 1,414).',
+      details: 'Das Ausgangsformat DIN A0 hat eine Fläche von exakt 1 Quadratmeter (841 × 1.189 mm). Durch mittiges Falten entsteht die jeweils nächstkleinere Größe mit exakt identischem Seitenverhältnis (DIN A4 = 210 × 297 mm).',
+    },
     faqs: [
-          {
-                "question": "Wie viele Blätter DIN A4 darf man im Standardbrief verschicken?",
-                "answer": "Ein Standardbrief der Deutschen Post darf inklusive Umschlag (ca. 4 bis 5 g) maximal 20 Gramm wiegen. Bei 80g-Papier passen somit bis zu 3 gefaltete Blätter in den Umschlag."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen DIN A, DIN B und DIN C?",
-                "answer": "DIN A ist das Papierformat (A4). DIN C ist das Briefumschlagformat (C4, C6), in das ungedruckte A-Bögen genau hineinpassen. DIN B ist das Zwischenformat für Schnellhefter und Mappen."
-          }
+      { question: 'Wie viel wiegt ein DIN-A4-Blatt Normalpapier (80 g/m²)?', answer: 'Aus 1 m² (DIN A0) entstehen durch viermaliges Halbieren genau 16 DIN-A4-Blätter. Ein Blatt wiegt: 80 g / 16 = exakt 5,0 Gramm.' },
+      { question: 'Welches Format passt in einen Standard-Briefumschlag DIN lang?', answer: 'Ein zweimal horizontal gefaltetes DIN-A4-Blatt (105 × 210 mm) passt exakt in einen DIN-lang-Umschlag (110 × 220 mm).' },
     ],
-    relatedSlugs: ["gewicht-masse-umrechner","flaeche-umrechner","laengen-umrechner"],
+    relatedSlugs: ['gewicht-masse-umrechner', 'flaeche-umrechner', 'laengen-umrechner'],
   },
   {
     id: "ringgroesse-umrechner",
@@ -2554,10 +2506,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Ringgrößen Umrechner",
     category: "einheiten",
     subcategory: "Alltag & Kleidung",
-    metaTitle: "Ringgröße Umrechner – EU-Umfang (48–70) in US, UK & Innendurchmesser",
-    metaDescription: "Rechnen Sie Ringgrößen um: Deutsche Größe / Innenumfang in Millimetern (z. B. 54 = 54 mm), Innendurchmesser in mm (d = Umfang / π), US-Größe und UK-Ringgröße.",
-    h1: "Ringgröße Umrechner – Innenumfang & Durchmesser bestimmen",
-    shortDescription: "Konvertiert Ringgrößen zwischen EU-Umfang, Durchmesser, US und UK.",
+    metaTitle: 'Ringgröße Umrechner – EU-Umfang in US, UK',
+    metaDescription: 'Rechnen Sie Ringgrößen um: Deutsche Größe / Innenumfang in Millimetern (z. B. 54 = 54 mm), Innendurchmesser in mm (d = Umfang / π)',
+    h1: 'Ringgröße Umrechner – Innenumfang & Durchmesser bestimmen',
+    shortDescription: 'Konvertiert Ringgrößen zwischen EU-Umfang, Durchmesser, US und UK mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["ringgroesse umrechnen tabelle mm","ringgroesse 54 in durchmesser","us ringgroesse in deutsche ringgroesse","ring innenumfang messen"],
     inputs: [
           {
@@ -2619,17 +2571,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "17,2 mm Durchmesser (US 7)"
     },
+    content: {
+      intro: 'Dieser Schmuckrechner konvertiert Ringmaße zwischen dem deutschen Innenumfang in Millimetern, dem Innendurchmesser sowie US- und UK-Ringgrößen.',
+      details: 'Die deutsche Ringgröße entspricht exakt dem inneren Fingerumfang in Millimetern (Ringgröße 54 = 54 mm Innenumfang). Der Innendurchmesser beträgt d = Umfang / pi (bei Größe 54 entspricht das ca. 17,2 mm).',
+    },
     faqs: [
-          {
-                "question": "Wie messe ich die Ringgröße heimlich für einen Verlobungsring?",
-                "answer": "Nehmen Sie einen gut passenden Ring des Partners und messen Sie mit einem Messschieber oder Lineal den inneren Durchmesser auf den Millimeter genau. Multiplizieren Sie mit 3,14 für die EU-Größe."
-          },
-          {
-                "question": "Wann sind Finger dicker?",
-                "answer": "Finger sind im Sommer bei Hitze und am Abend deutlich dicker als morgens bei Kälte. Messen Sie die Ringgröße daher idealerweise am späten Nachmittag bei normaler Zimmertemperatur."
-          }
+      { question: 'Zu welcher Tageszeit sollte man die Ringgröße am besten messen?', answer: 'Am späten Nachmittag oder Abend bei normaler Zimmertemperatur; morgens oder bei Kälte sind die Finger meist etwas dünner, bei Sommerhitze geschwollen.' },
+      { question: 'Wie misst man die Ringgröße heimlich für einen Heiratsantrag?', answer: 'Nehmen Sie einen gut sitzenden Ring der Partnerin und messen Sie mit einem präzisen Messschieber den inneren Durchmesser auf den Zehntelmillimeter genau ab.' },
     ],
-    relatedSlugs: ["kreis-umfang-rechner","laengen-umrechner","zoll-in-cm-rechner"],
+    relatedSlugs: ['kreis-umfang-rechner', 'laengen-umrechner', 'zoll-in-cm-rechner'],
   },
   {
     id: "dezibel-schalldruck-umrechner",
@@ -2638,10 +2588,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Dezibel-Rechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: "Dezibel Rechner – dB Schalldruckpegel, Pascal (Pa) & Lautstärke",
-    metaDescription: "Berechnen Sie den Schalldruckpegel L_p in Dezibel dB(A) aus Schalldruck in Pascal (Pa) und ermitteln Sie die physikalische Energie- und Lautstärkeverdopplung (+3 dB / +10 dB).",
-    h1: "Dezibel Rechner – Schallpegel dB, Schalldruck & Lautstärke",
-    shortDescription: "Berechnet Schalldruckpegel in Dezibel und vergleicht Lärmquellen.",
+    metaTitle: 'Dezibel Rechner – dB Schalldruckpegel, Pascal',
+    metaDescription: 'Berechnen Sie den Schalldruckpegel L_p in Dezibel dB(A) aus Schalldruck in Pascal (Pa) und ermitteln Sie die physikalische Energie- und.',
+    h1: 'Dezibel Rechner – Schallpegel dB, Schalldruck & Lautstärke',
+    shortDescription: 'Berechnet Schalldruckpegel in Dezibel und vergleicht Lärmquellen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["dezibel rechner schallpegel db a","lautstaerkeverdopplung 3 db 10 db","schalldruck pascal in dezibel berechnen","laerm tabelle dezibel fluestern duese"],
     inputs: [
           {
@@ -2705,17 +2655,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "63 dB (nicht 120 dB!)"
     },
+    content: {
+      intro: 'Das Dezibel (dB) ist eine logarithmische Maßeinheit für den Schalldruckpegel bezogen auf die menschliche Hörschwelle (20 Mikropascal bei 1.000 Hz).',
+      details: 'Schalldruckpegel L_p = 20 · log10(p / p0). Eine Pegelerhöhung um +6 dB verdoppelt den physikalischen Schalldruck; eine Erhöhung um +10 dB wird vom menschlichen Gehör subjektiv als Verdopplung der Lautstärke empfunden.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen +3 dB und +10 dB?",
-                "answer": "+3 dB bedeutet eine Verdoppelung der physikalischen Schallleistung (z. B. zwei Maschinen statt einer). +10 dB empfindet das menschliche Ohr subjektiv als doppelt so laut."
-          },
-          {
-                "question": "Ab welcher Lautstärke drohen Gehörschäden?",
-                "answer": "Dauerhafter Lärm ab 85 dB(A) am Arbeitsplatz erfordert nach den Unfallverhütungsvorschriften Gehörschutz. Ab 120 dB(A) liegt die Schmerzschwelle des Gehörs."
-          }
+      { question: 'Ab welcher Lautstärke drohen dauerhafte Gehörschäden?', answer: 'Dauerlärm ab 85 dB(A) am Arbeitsplatz erfordert gesetzlichen Gehörschutz; ab 120 dB(A) (z. B. Flugzeugstart, Clubbox) liegt die Schmerzschwelle und es können akute Knalltraumata entstehen.' },
+      { question: 'Was ergibt die Summe von zwei identischen 60-dB-Schallquellen?', answer: 'Wegen der logarithmischen Addition verdoppelt sich die Schallleistung: 60 dB + 60 dB = exakt 63 dB (nicht 120 dB!).' },
     ],
-    relatedSlugs: ["druck-umrechner","leistung-umrechner","energie-arbeit-umrechner"],
+    relatedSlugs: ['druck-umrechner', 'leistung-umrechner', 'energie-arbeit-umrechner'],
   },
   {
     id: "hefe-umrechner",
@@ -2724,10 +2672,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Hefe-Rechner",
     category: "kochen-backen",
     subcategory: "Backzutaten",
-    metaTitle: "Hefe Rechner – Frische Hefe in Trockenhefe umrechnen (1 Würfel = 42g)",
-    metaDescription: "Rechnen Sie frische Hefe in Trockenhefe und umgekehrt um: Faustformel 1 Würfel frische Hefe (42 g) = 2 Beutel Trockenhefe (14 g) für 1 kg Mehl.",
-    h1: "Hefe Rechner – Frische Hefe in Trockenhefe & Mehlmenge",
-    shortDescription: "Konvertiert frische Hefe in Trockenhefe und berechnet die Hefe nach Mehlmenge.",
+    metaTitle: 'Hefe Rechner – Frische Hefe in Trockenhefe umrechnen',
+    metaDescription: 'Rechnen Sie frische Hefe in Trockenhefe und umgekehrt um: Faustformel 1 Würfel frische Hefe (42 g) = 2 Beutel Trockenhefe (14 g) für 1 kg Mehl.',
+    h1: 'Hefe Rechner – Frische Hefe in Trockenhefe & Mehlmenge',
+    shortDescription: 'Konvertiert frische Hefe in Trockenhefe und berechnet die Hefe nach Mehlmenge.',
     searchKeywords: ["hefe umrechner frisch in trockenhefe","1 wuerfel hefe wieviel trockenhefe 42g","trockenhefe in frische hefe umrechnen","hefemenge pro 500g mehl pizza brot"],
     inputs: [
           {
@@ -2807,17 +2755,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "1 Päckchen Trockenhefe (7 g)"
     },
+    content: {
+      intro: 'Dieser Hefe-Konverter rechnet zwischen frischer Hefe (Hefewürfel), Trockenhefe und langer kalter Teigführung um.',
+      details: 'Verhältnis: 1 Würfel Frischhefe (42 Gramm) entspricht exakt 2 Päckchen Trockenhefe (je 7 Gramm). 1 Päckchen Trockenhefe reicht für 500 g Weizenmehl.',
+    },
     faqs: [
-          {
-                "question": "Muss Trockenhefe angerührt werden?",
-                "answer": "Nein, moderne Trockenhefe kann direkt trocken unter das Mehl gemischt werden. Frische Hefe löst man am besten vorher in handwarmem Wasser oder Milch (max. 38°C) mit etwas Zucker auf."
-          },
-          {
-                "question": "Ab welcher Temperatur stirbt Hefe ab?",
-                "answer": "Hefezellen sterben ab ca. 45°C unwiderruflich ab. Verwenden Sie beim Anrühren niemals kochendes oder zu heißes Wasser."
-          }
+      { question: 'Kann man Hefe durch längere Gehzeit drastisch reduzieren?', answer: 'Ja, bei langer kalter Teigführung über Nacht im Kühlschrank (18 bis 24 Stunden) reichen oft 1 bis 2 Gramm Frischhefe auf 500 g Mehl für bekömmliche, aromatische Teige.' },
+      { question: 'Wie testet man, ob alte Frischhefe noch Triebkraft besitzt?', answer: 'Lösen Sie die Hefe in etwas lauwarmem Wasser mit einer Prise Zucker auf: Bilden sich nach 10 Minuten deutliche Schaumbläschen, ist die Hefe vital und backfähig.' },
     ],
-    relatedSlugs: ["pizza-teig-rechner","brot-backen-baeckermass-rechner","sauerteig-anstellgut-rechner"],
+    relatedSlugs: ['pizza-teig-rechner', 'brot-backen-baeckermass-rechner', 'sauerteig-anstellgut-rechner'],
   },
   {
     id: "essloeffel-teeloeffel-gramm-rechner",
@@ -2826,10 +2772,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "EL & TL in Gramm",
     category: "kochen-backen",
     subcategory: "Küchenmaße",
-    metaTitle: "Esslöffel & Teelöffel in Gramm Rechner – EL & TL in g für Zucker, Mehl & Öl",
-    metaDescription: "Rechnen Sie Esslöffel (EL) und Teelöffel (TL) in Gramm um für Mehl, Zucker, Salz, Olivenöl, Butter, Backpulver, Honig und Kakaopulver.",
-    h1: "Esslöffel & Teelöffel in Gramm Rechner – Zutaten ohne Waage wiegen",
-    shortDescription: "Wandelt Esslöffel und Teelöffel in Gramm für beliebige Backzutaten um.",
+    metaTitle: 'Esslöffel & Teelöffel in Gramm Rechner – EL',
+    metaDescription: 'Rechnen Sie Esslöffel (EL) und Teelöffel (TL) in Gramm um für Mehl, Zucker, Salz, Olivenöl, Butter, Backpulver, Honig und Kakaopulver.',
+    h1: 'Esslöffel & Teelöffel in Gramm Rechner – Zutaten ohne Waage wiegen',
+    shortDescription: 'Wandelt Esslöffel und Teelöffel in Gramm für beliebige Backzutaten um.',
     searchKeywords: ["essloeffel in gramm rechner zucker mehl","teeloeffel in gramm el tl tabelle","1 el mehl wieviel gramm zucker","1 tl salz backpulver gramm wiegen"],
     inputs: [
           {
@@ -2957,17 +2903,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "45 g Mehl"
     },
+    content: {
+      intro: 'Dieser Löffelrechner transformiert gestrichene und gehäufte Esslöffel (EL) und Teelöffel (TL) in exakte Gramm-Gewichte für Salz, Zucker, Mehl, Öl und Backpulver.',
+      details: 'Volumina nach DIN: 1 gestrichener TL fasst ca. 5 ml; 1 gestrichener EL fasst ca. 15 ml. 1 gestrichener TL Salz wiegt ca. 5 g, Zucker ca. 4 g, Mehl ca. 3 g. 1 EL Öl wiegt ca. 12 g, Honig ca. 20 g.',
+    },
     faqs: [
-          {
-                "question": "Wie viele Teelöffel passen in einen Esslöffel?",
-                "answer": "Genau 3 Teelöffel entsprechen dem Volumen eines Esslöffels (1 TL = 5 ml, 1 EL = 15 ml)."
-          },
-          {
-                "question": "Was wiegt 1 Prise Salz?",
-                "answer": "Eine Prise Salz (zwischen Daumen und Zeigefinger) wiegt je nach Fingergröße etwa 0,3 bis 0,5 Gramm."
-          }
+      { question: 'Wie viel wiegt ein gehäufter Esslöffel Mehl?', answer: 'Ein gehäufter EL Mehl bringt etwa 12 bis 15 Gramm auf die Waage (etwa das Doppelte eines glatt gestrichenen Löffels).' },
+      { question: 'Wie viel Gramm Backpulver enthält ein normales Tütchen?', answer: 'Ein handelsüblicher Beutel Backpulver in Deutschland wiegt exakt 15 bis 16 Gramm und reicht für 500 g Mehl.' },
     ],
-    relatedSlugs: ["cups-in-gramm-rechner","gramm-in-ml-rechner","portionsrechner"],
+    relatedSlugs: ['cups-in-gramm-rechner', 'gramm-in-ml-rechner', 'portionsrechner'],
   },
   {
     id: "cups-in-gramm-rechner",
@@ -2976,10 +2920,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Cups in Gramm",
     category: "kochen-backen",
     subcategory: "Küchenmaße",
-    metaTitle: "Cups in Gramm Rechner – US Cups in g für Mehl, Zucker & Butter",
-    metaDescription: "Rechnen Sie amerikanische Rezepte um: US Cups in Gramm für Mehl (125g), Kristallzucker (200g), braunen Zucker (220g), Butter (227g), Haferflocken und Kakao.",
-    h1: "Cups in Gramm Rechner – Amerikanische Cups in Gramm wiegen",
-    shortDescription: "Wandelt US Cups in Gramm nach Zutat für US-Backrezepte um.",
+    metaTitle: 'Cups in Gramm Rechner – US Cups in g für Mehl, Zucker & Butter',
+    metaDescription: 'Rechnen Sie amerikanische Rezepte um: US Cups in Gramm für Mehl (125g), Kristallzucker (200g), braunen Zucker (220g), Butter (227g)',
+    h1: 'Cups in Gramm Rechner – Amerikanische Cups in Gramm wiegen',
+    shortDescription: 'Wandelt US Cups in Gramm nach Zutat für US-Backrezepte um.',
     searchKeywords: ["cups in gramm rechner us cups mehl zucker","1 cup mehl in gramm wieviel","1 cup butter in gramm 227g","amerikanischer cup umrechner backen"],
     inputs: [
           {
@@ -3082,17 +3026,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "330 g brauner Zucker und 125 g Mehl"
     },
+    content: {
+      intro: 'Dieser US-Backrechner übersetzt amerikanische Cup-Volumenmaße in Gramm für Mehl, braunen Zucker, Butter und Haferflocken.',
+      details: '1 US Legal Cup = 240 ml (Customary Cup = 236,6 ml). 1 Cup Mehl (All-Purpose Flour) wiegt ca. 125 g; 1 Cup Kristallzucker wiegt 200 g; 1 Cup Butter wiegt 227 g (exakt 2 Sticks à 1/2 Cup).',
+    },
     faqs: [
-          {
-                "question": "Was ist 1 Stick of Butter in US-Rezepten?",
-                "answer": "In den USA wird Butter in Stangen (\"Sticks\") verkauft. 1 Stick Butter entspricht genau 1/2 Cup = 8 Esslöffel = 113,4 Gramm. Ein ganzes deutsches Butterstück (250 g) entspricht ca. 2,2 Sticks."
-          },
-          {
-                "question": "Was bedeutet \"packed brown sugar\"?",
-                "answer": "Bei braunem Zucker bedeutet \"packed\", dass der feuchte Zucker mit dem Löffel fest in den Cup gedrückt werden muss, bis keine Hohlräume mehr vorhanden sind."
-          }
+      { question: 'Warum scheitern US-Rezepte oft, wenn man Cups mit dem Messbecher abmisst?', answer: 'Weil Mehl im Cup "gescoopt" (geschaufelt) bis zu 150 g wiegen kann, gelöffelt und abgestrichen aber nur 120 g (Abweichung bis zu 25 % Trockenmasse).' },
+      { question: 'Was wiegt 1 Stick Butter in US-Rezepten?', answer: '1 Stick Butter entspricht exakt 1/2 Cup bzw. 8 US-Esslöffeln und wiegt genau 113,4 Gramm.' },
     ],
-    relatedSlugs: ["essloeffel-teeloeffel-gramm-rechner","gramm-in-ml-rechner","portionsrechner"],
+    relatedSlugs: ['eiweiss-eigelb-ersatz-rechner', 'essloeffel-teeloeffel-gramm-rechner', 'gramm-in-ml-rechner', 'portionsrechner'],
   },
   {
     id: "zucker-ersatz-rechner",
@@ -3101,10 +3043,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Zuckerersatz-Rechner",
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
-    metaTitle: "Zuckerersatz Rechner – Zucker in Erythrit, Xylit & Stevia umrechnen",
-    metaDescription: "Rechnen Sie Haushaltszucker um in Erythrit (70 % Süßkraft), Birkenzucker/Xylit (100 %), Honig, Stevia und Agavendicksaft inklusive Kalorieneinsparung.",
-    h1: "Zuckerersatz Rechner – Süßkraft & Kalorieneinsparung berechnen",
-    shortDescription: "Ermittelt die Menge von Erythrit, Xylit, Honig und Stevia als Zuckerersatz.",
+    metaTitle: 'Zuckerersatz Rechner – Zucker in Erythrit, Xylit',
+    metaDescription: 'Rechnen Sie Haushaltszucker um in Erythrit (70 % Süßkraft), Birkenzucker/Xylit (100 %), Honig, Stevia und Agavendicksaft inklusive Kalorieneinsparung.',
+    h1: 'Zuckerersatz Rechner – Süßkraft & Kalorieneinsparung berechnen',
+    shortDescription: 'Ermittelt die Menge von Erythrit, Xylit, Honig und Stevia als Zuckerersatz.',
     searchKeywords: ["zuckerersatz rechner erythrit xylit","zucker in birkenzucker umrechnen 1 zu 1","erythrit suesskraft 70 prozent berechnen","zucker durch honig ersetzen backen"],
     inputs: [
           {
@@ -3204,17 +3146,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "200 g Erythrit (600 kcal gespart)"
     },
+    content: {
+      intro: 'Dieser Süßungsrechner konvertiert Haushaltszucker (Saccharose) in kalorienarme Alternativen wie Erythrit, Xylit (Birkenzucker), Stevia, Agavendicksaft und Honig.',
+      details: 'Süßkraftfaktoren bezogen auf Haushaltszucker (100 %): Xylit 100 % (1:1 Austausch), Erythrit ca. 70 % (benötigt ca. 130 bis 140 g Erythrit für 100 g Zucker), Honig ca. 120 % Süßkraft (80 g Honig ersetzen 100 g Zucker, Flüssigkeit im Teig leicht reduzieren).',
+    },
     faqs: [
-          {
-                "question": "Ist Xylit giftig für Hunde?",
-                "answer": "JA, LEBENSGEFÄHRLICH! Xylit (Birkenzucker) führt bei Hunden schon in kleinsten Mengen zu einer massiven Insulinausschüttung, schwerem Schock und akutem Leberversagen. Halten Sie Xylit-Gebäck streng von Haustieren fern!"
-          },
-          {
-                "question": "Karameillisiert Erythrit beim Backen wie Zucker?",
-                "answer": "Nein, Erythrit karamellisiert nicht und bräunt das Gebäck kaum. Zudem kann es bei höherer Dosierung einen leicht kühlen Nachgeschmack auf der Zunge hinterlassen."
-          }
+      { question: 'Welche Nebenwirkungen können Erythrit und Xylit haben?', answer: 'Zuckeralkohole können bei übermäßigem Verzehr abführend wirken; Xylit ist zudem für Hunde und Katzen hochgradig lebensgefährlich giftig.' },
+      { question: 'Karadellisiert Erythrit beim Backen wie normaler Zucker?', answer: 'Nein, Erythrit karamellisiert nicht und neigt beim Abkühlen zum Auskristallisieren ("kühler Schmelzeffekt" auf der Zunge).' },
     ],
-    relatedSlugs: ["kalorien-rezept-rechner","cups-in-gramm-rechner","portionsrechner"],
+    relatedSlugs: ['eiweiss-eigelb-ersatz-rechner', 'kalorien-rezept-rechner', 'cups-in-gramm-rechner', 'portionsrechner'],
   },
   {
     id: "backzeit-temperatur-umluft-oberhitze-rechner",
@@ -3223,10 +3163,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Backofen Umrechner",
     category: "kochen-backen",
     subcategory: "Backzutaten",
-    metaTitle: "Backofen Umrechner – Umluft in Ober-/Unterhitze & Gasstufe umrechnen",
-    metaDescription: "Rechnen Sie Backofentemperaturen um: Umluft / Heißluft zu Ober-/Unterhitze (Faustregel: 20°C Unterschied) inklusive Backzeitanpassung und Gasbackofen-Stufen 1–8.",
-    h1: "Backofen Umrechner – Umluft & Ober-/Unterhitze anpassen",
-    shortDescription: "Wandelt Backtemperatur und Backzeit zwischen Umluft und Ober-/Unterhitze um.",
+    metaTitle: 'Backofen Umrechner – Umluft in Ober-/Unterhitze',
+    metaDescription: 'Rechnen Sie Backofentemperaturen um: Umluft / Heißluft zu Ober-/Unterhitze (Faustregel: 20°C Unterschied) inklusive Backzeitanpassung und.',
+    h1: 'Backofen Umrechner – Umluft & Ober-/Unterhitze anpassen',
+    shortDescription: 'Wandelt Backtemperatur und Backzeit zwischen Umluft und Ober-/Unterhitze um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["backofen umrechner umluft in ober unterhitze","temperatur heissluft oberhitze 20 grad weniger","gasbackofen stufe temperatur tabelle","backzeit anpassen umluft heissluft"],
     inputs: [
           {
@@ -3319,17 +3259,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "160 °C Umluft für ca. 45 Minuten"
     },
+    content: {
+      intro: 'Dieser Ofenrechner rechnet Backtemperaturen und Backzeiten zwischen Umluft (Heißluft) und Ober-/Unterhitze verlässlich um.',
+      details: 'Faustregel: Umluft = Ober-/Unterhitze minus 20 °C (z. B. 200 °C Ober-/Unterhitze entsprechen 180 °C Umluft). Durch den beschleunigten Wärmetransport per Gebläse verkürzt sich die Backzeit oft zusätzlich um 10 bis 15 Prozent.',
+    },
     faqs: [
-          {
-                "question": "Wann sollte man Ober-/Unterhitze statt Umluft bevorzugen?",
-                "answer": "Für empfindliche Biskuitböden, Soufflés, Brandteig (Windbeutel) und Käsekuchen ist Ober-/Unterhitze besser geeignet, da der Luftstrom bei Umluft das Gebäck austrocknen oder ungleichmäßig aufgehen lassen kann."
-          },
-          {
-                "question": "Kann man bei Umluft auf mehreren Blechen gleichzeitig backen?",
-                "answer": "Ja! Das ist der größte Vorteil von Umluft: Durch die gleichmäßige Hitzeverteilung können 2 bis 3 Bleche Plätzchen oder Pizzen problemlos gleichzeitig gebacken werden."
-          }
+      { question: 'Wann sollte man Ober-/Unterhitze statt Umluft wählen?', answer: 'Für empfindliche Teige (Biskuit, Soufflés, Brot), da das Umluftgebläse die Teigoberfläche vorzeitig austrocknet und das Aufgehen behindern kann.' },
+      { question: 'Kann man bei Umluft mehrere Bleche gleichzeitig backen?', answer: 'Ja, das ist der Hauptvorteil von Umluft: Da die heiße Luft zirkuliert, können 2 bis 3 Bleche auf verschiedenen Einschubebenen gleichmäßig gebacken werden.' },
     ],
-    relatedSlugs: ["temperatur-umrechner","backform-umrechner","pizza-teig-rechner"],
+    relatedSlugs: ['schokolade-temperieren-rechner', 'frittieroel-temperatur-rauchpunkt-rechner', 'temperatur-umrechner', 'backform-umrechner', 'pizza-teig-rechner'],
   },
   {
     id: "fleisch-kerntemperatur-garzeit-rechner",
@@ -3338,10 +3276,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Kerntemperatur-Rechner",
     category: "kochen-backen",
     subcategory: "Fleisch & Fisch",
-    metaTitle: "Kerntemperatur Rechner – Rind, Schwein, Hähnchen, Lamm & Roastbeef",
-    metaDescription: "Finden Sie die perfekte Kerntemperatur und Garzeit für Rindersteak, Roastbeef, Schweinebraten, Pulled Pork, Hähnchen und Lammkeule nach Garstufen.",
-    h1: "Kerntemperatur Rechner – Perfekte Garstufe für Braten & Steak",
-    shortDescription: "Ermittelt Ziel-Kerntemperatur und Garzeit nach Fleischart und Garstufe.",
+    metaTitle: 'Kerntemperatur Rechner – Rind, Schwein, Hähnchen, Lamm',
+    metaDescription: 'Finden Sie die perfekte Kerntemperatur und Garzeit für Rindersteak, Roastbeef, Schweinebraten, Pulled Pork, Hähnchen und Lammkeule nach Garstufen.',
+    h1: 'Kerntemperatur Rechner – Perfekte Garstufe für Braten & Steak',
+    shortDescription: 'Ermittelt Ziel-Kerntemperatur und Garzeit nach Fleischart und Garstufe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kerntemperatur fleisch tabelle rechner","roastbeef kerntemperatur medium 56 grad","schweinebraten kerntemperatur garzeit rechner","haehnchen gefluegel kerntemperatur sicher"],
     inputs: [
           {
@@ -3487,17 +3425,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "55 °C Kerntemperatur (ca. 2 Stunden Garzeit)"
     },
+    content: {
+      intro: 'Dieser Garzeitrechner ermittelt die Ziel-Kerntemperaturen für Rind, Schwein, Geflügel und Lamm mit Einstichthermometer für das perfekte Garergebnis (Rare, Medium, Well Done).',
+      details: 'Rindermedaillons Medium: 54–56 °C (Rosa). Schweinefilet: 58–62 °C. Geflügel (Hähnchen, Pute): Aus Hygienegründen (Salmonellen-Abtötung) zwingend durchgaren auf mindestens 72–75 °C Kerntemperatur.',
+    },
     faqs: [
-          {
-                "question": "Warum muss Fleisch nach dem Braten ruhen?",
-                "answer": "Beim Garen drängt der Fleischsaft ins Zentrum des Fleisches. Während der 5-10 Minuten Ruhezeit entspannen sich die Muskelfasern und der Saft verteilt sich wieder gleichmäßig, sodass er beim Anschnitt nicht ausläuft."
-          },
-          {
-                "question": "Ab welcher Kerntemperatur ist Geflügel sicher gegen Salmonellen?",
-                "answer": "Geflügel muss an allen Stellen eine Mindestkerntemperatur von 72 bis 75 °C für mindestens 2 Minuten erreichen, um Salmonellen zuverlässig abzutöten."
-          }
+      { question: 'Steigt die Kerntemperatur während der Ruhephase nach dem Braten noch an?', answer: 'Ja, durch den Temperaturausgleich zwischen heißer Fleischkruste und dem Kern steigt die Temperatur beim Ruhen in Alufolie noch um 2 bis 4 °C an (vorher aus der Pfanne nehmen!).' },
+      { question: 'Wo sticht man das Fleischthermometer korrekt ein?', answer: 'Immer an der dicksten Stelle des Fleischstücks, ohne Knochen oder größere Fettpolster zu berühren, da Knochen Hitze schneller leiten und Messwerte verfälschen.' },
     ],
-    relatedSlugs: ["backzeit-temperatur-umluft-oberhitze-rechner","portionsrechner","salz-lake-poekel-rechner"],
+    relatedSlugs: ['fondue-raclette-mengen-rechner', 'frittieroel-temperatur-rauchpunkt-rechner', 'backzeit-temperatur-umluft-oberhitze-rechner', 'portionsrechner', 'salz-lake-poekel-rechner'],
   },
   {
     id: "pizza-teig-rechner",
@@ -3506,10 +3442,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Pizzateig-Rechner",
     category: "kochen-backen",
     subcategory: "Backzutaten",
-    metaTitle: "Pizza Teig Rechner – Neapolitanische Pizza Teigausbeute & Hydratation",
-    metaDescription: "Berechnen Sie die exakten Zutaten für echten neapolitanischen Pizzateig nach Ballenanzahl, Ballengewicht (z. B. 260 g), Teighydratation (Wassergehalt 60-70 %) und Reifezeit.",
-    h1: "Pizza Teig Rechner – Mehl, Wasser, Hefe & Salz für Neapel-Pizza",
-    shortDescription: "Berechnet Pizzateig-Zutaten nach Hydratation und Ballenanzahl.",
+    metaTitle: 'Pizza Teig Rechner – Neapolitanische Pizza Teigausbeute',
+    metaDescription: 'Berechnen Sie die exakten Zutaten für echten neapolitanischen Pizzateig nach Ballenanzahl, Ballengewicht (z. B.',
+    h1: 'Pizza Teig Rechner – Mehl, Wasser, Hefe & Salz für Neapel-Pizza',
+    shortDescription: 'Berechnet Pizzateig-Zutaten nach Hydratation und Ballenanzahl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["pizza teig rechner neapolitanisch hydratation","pizzateig mehl wasser hefe salz berechnen","ballengewicht pizza 260g","pizzateig fuehrung reifezeit hefe gramm"],
     inputs: [
           {
@@ -3608,17 +3544,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "618 g Mehl, 402 g Wasser, 18,5 g Salz, ca. 1,2 g Hefe"
     },
+    content: {
+      intro: 'Dieser Teigrechner berechnet die neapolitanische Pizza nach Bäckerprozenten (Hydratation 60–70 %, Mehl Tipo 00, Hefe und Meersalz).',
+      details: 'Hydratation = (Wassermenge / Mehlmenge) · 100. Für eine echte Pizza Napoletana werden ca. 60–65 % Wasser, 2,8–3,0 % Salz und minimale Hefemengen (0,1–0,2 % bei 24 Std. Teigruhe) verwendet. Ein Teigling wiegt idealerweise 250 bis 280 Gramm.',
+    },
     faqs: [
-          {
-                "question": "Welches Mehl eignet sich am besten für neapolitanische Pizza?",
-                "answer": "Italienisches Weizenmehl vom Typ \"Tipo 00\" mit hohem Proteingehalt (W-Wert 280 bis 320, ca. 12-14 % Eiweiß) bildet ein dehnbares Glutengerüst für große Luftblasen im Rand (Cornicione)."
-          },
-          {
-                "question": "Warum benötigt man für 24 Stunden Teigruhe so wenig Hefe?",
-                "answer": "Bei langer, kühler Stück- und Stockgare (z. B. im Kühlschrank) haben die Hefebakterien viel Zeit, sich langsam zu vermehren. Dadurch wird der Teig extrem bekömmlich und aromatisch."
-          }
+      { question: 'Warum ist Mehl mit hohem W-Wert (z. B. Caputo Cuoco W > 300) für Pizza wichtig?', answer: 'Der W-Wert misst die Glutenstärke: Nur mehlstarke Weizenmehle können lange Gärzeiten von 24 bis 48 Stunden aushalten, ohne dass das Klebergerüst reißt.' },
+      { question: 'Warum gehört in echten neapolitanischen Pizzateig kein Olivenöl?', answer: 'Bei extrem heißen Pizzaöfen (450–500 °C) verbrennt Öl und macht den Teig speckig; Öl wird nur bei Haushaltsöfen (250 °C) für mürbere Krusten empfohlen.' },
     ],
-    relatedSlugs: ["hefe-umrechner","brot-backen-baeckermass-rechner","sauerteig-anstellgut-rechner"],
+    relatedSlugs: ['hefe-umrechner', 'brot-backen-baeckermass-rechner', 'sauerteig-anstellgut-rechner'],
   },
   {
     id: "brot-backen-baeckermass-rechner",
@@ -3627,10 +3561,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Bäckerprozente-Rechner",
     category: "kochen-backen",
     subcategory: "Backzutaten",
-    metaTitle: "Bäckerprozente Rechner – Bäckermaß, Teigausbeute (TA) & Zutaten berechnen",
-    metaDescription: "Berechnen Sie Brotteige nach professionellen Bäckerprozenten (Mehl = 100 %) und Teigausbeute (TA 160 bis TA 180) für Mehl, Wasser, Hefe, Salz und Sauerteig.",
-    h1: "Bäckerprozente Rechner – Teigausbeute (TA) & Rezeptskalierung",
-    shortDescription: "Berechnet Brotrezepte nach Bäckerprozenten bezogen auf 100 % Mehl.",
+    metaTitle: 'Bäckerprozente Rechner – Bäckermaß, Teigausbeute',
+    metaDescription: 'Berechnen Sie Brotteige nach professionellen Bäckerprozenten (Mehl = 100 %) und Teigausbeute (TA 160 bis TA 180) für Mehl, Wasser, Hefe',
+    h1: 'Bäckerprozente Rechner – Teigausbeute (TA) & Rezeptskalierung',
+    shortDescription: 'Berechnet Brotrezepte nach Bäckerprozenten bezogen auf 100 % Mehl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["baeckerprozente rechner brot backen","teigausbeute ta berechnen formel ta 170","baeckermath zutaten mehl 100 prozent","brotteig zutaten rechner sauerteig"],
     inputs: [
           {
@@ -3723,17 +3657,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "521 g Mehl, 365 g Wasser, 104 g Sauerteig, 10,4 g Salz"
     },
+    content: {
+      intro: 'Die Bäckerprozente (Baker\'s Percentage) setzen alle Rezeptzutaten (Wasser, Salz, Hefe, Sauerteig) ins prozentuale Verhältnis zur Gesamtmehlmenge (Mehl = 100 %).',
+      details: 'Beispiel: 1.000 g Mehl (100 %) mit 70 % Hydratation (700 g Wasser), 2 % Salz (20 g Salz) und 20 % Sauerteig (200 g Sauerteig) ergeben 1.920 g Gesamtteigmasse.',
+    },
     faqs: [
-          {
-                "question": "Was bedeutet eine hohe Teigausbeute (z. B. TA 175)?",
-                "answer": "Je höher die Teigausbeute, desto weicher und saftiger ist der Teig und desto länger bleibt das gebackene Brot frisch. Sehr weiche Teige (hohe TA) erfordern jedoch Dehnen und Falten."
-          },
-          {
-                "question": "Warum wiegen Bäcker Wasser in Gramm statt Millilitern?",
-                "answer": "Da 1 Gramm Wasser bei Küchentemperatur exakt 1 Milliliter entspricht, ist das Wiegen auf der digitalen Küchenwaage viel präziser als das Ablesen am Messbecher."
-          }
+      { question: 'Was ist der Vorteil von Bäckerprozenten?', answer: 'Rezepte lassen sich blitzschnell auf jedes beliebige Teiggewicht skalieren, und der Bäcker erkennt sofort an den Prozentwerten die Teigausbeute und Teigkonsistenz.' },
+      { question: 'Was bedeutet die Teigausbeute (TA)?', answer: 'TA = (Gesamtteiggewicht / Mehlmenge) · 100. Bei 1.000 g Mehl und 650 g Wasser beträgt die TA genau 165 (feste Teige TA 150–160, weiche Teige TA 170–185).' },
     ],
-    relatedSlugs: ["pizza-teig-rechner","sauerteig-anstellgut-rechner","hefe-umrechner"],
+    relatedSlugs: ['pizza-teig-rechner', 'sauerteig-anstellgut-rechner', 'hefe-umrechner'],
   },
   {
     id: "alkohol-verkochungs-rechner",
@@ -3742,10 +3674,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Alkohol verkochen",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: "Alkohol Verkochen Rechner – Restalkohol nach Kochzeit berechnen (USDA)",
-    metaDescription: "Berechnen Sie, wie viel Alkohol beim Kochen mit Wein oder Bier wirklich verdampft. Wissenschaftliche Werte nach USDA-Studie: Restalkohol nach 15 bis 120 Minuten Köcheln.",
-    h1: "Alkohol Verkochen Rechner – Wie viel Restalkohol bleibt im Essen?",
-    shortDescription: "Berechnet den verbleibenden Restalkoholgehalt in Gerichten nach Kochzeit.",
+    metaTitle: 'Alkohol Verkochen Rechner – Restalkohol nach Kochzeit berec...',
+    metaDescription: 'Berechnen Sie, wie viel Alkohol beim Kochen mit Wein oder Bier wirklich verdampft. Wissenschaftliche Werte nach USDA-Studie: Restalkohol nach 15 bis.',
+    h1: 'Alkohol Verkochen Rechner – Wie viel Restalkohol bleibt im Essen?',
+    shortDescription: 'Berechnet den verbleibenden Restalkoholgehalt in Gerichten nach Kochzeit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["alkohol verkochen rechner usda tabelle","wieviel restalkohol nach 30 minuten kochen rotwein","verkocht alkohol vollstaendig schmorgericht","sauce mit wein fuer kinder schwangere restalkohol"],
     inputs: [
           {
@@ -3868,17 +3800,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "0,64 g reiner Alkohol pro Portion"
     },
+    content: {
+      intro: 'Entgegen der Annahme verkocht Alkohol beim Kochen und Schmoren von Wein- oder Biersaucen nur langsam und bleibt über längere Zeit nachweisbar.',
+      details: 'Untersuchungen des US Department of Agriculture (USDA): Nach kurzem Aufkochen (Flambieren) verbleiben ca. 75 % Alkohol; nach 30 Minuten Köcheln noch ca. 35 %; erst nach 2,5 bis 3 Stunden Schmoren sinkt der Restalkohol auf unter 5 Prozent.',
+    },
     faqs: [
-          {
-                "question": "Verkocht Alkohol beim Flambieren?",
-                "answer": "Nein, beim kurzen Flambieren verbrennt fast nur der Alkoholdampf an der Oberfläche. Rund 75 % des gesamten Alkohols verbleiben in der Speise."
-          },
-          {
-                "question": "Dürfen Kinder Gerichte essen, die mit Wein gekocht wurden?",
-                "answer": "Aus toxikologischer Sicht ist die Dosis nach langem Schmoren gering, Suchtexperten und Kinderärzte raten jedoch ab, um Kinder nicht frühzeitig an den typischen Weingeschmack zu gewöhnen."
-          }
+      { question: 'Dürfen Kinder Gerichte essen, die mit Rotwein abgelöscht wurden?', answer: 'Da auch nach einer Stunde Kochen noch ca. 25 % des Alkohols in der Sauce enthalten sind, sollten Speisen für Kinder, Schwangere oder trockene Alkoholiker alkoholfrei zubereitet werden (z. B. Traubensaft mit Balsamico).' },
+      { question: 'Warum verdampft Alkohol im Wasser-Gemisch nicht komplett bei 78 °C?', answer: 'Weil Wasser und Ethanol ein azeotropes Gemisch bilden, dessen Siedepunkt zwischen 78 °C und 100 °C liegt; der Alkohol entweicht nur kontinuierlich gemeinsam mit dem Wasserdampf.' },
     ],
-    relatedSlugs: ["cocktail-alkoholgehalt-rechner","fleisch-kerntemperatur-garzeit-rechner","portionsrechner"],
+    relatedSlugs: ['cocktail-alkoholgehalt-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'portionsrechner'],
   },
   {
     id: "eiweiss-eigelb-ersatz-rechner",
@@ -3887,10 +3817,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Ei-Ersatz-Rechner",
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
-    metaTitle: "Ei-Ersatz Rechner – Eier vegan ersetzen beim Backen & Kochen",
-    metaDescription: "Berechnen Sie die optimale Menge an Ei-Ersatz für 1 bis 10 Eier: Apfelmark (60 bis 80 g), reife Banane (1/2 Stk.), Chiasamen, gemahlene Leinsamen oder Seidentofu.",
-    h1: "Ei-Ersatz Rechner – Vegane Alternativen für Rührkuchen & Waffeln",
-    shortDescription: "Ermittelt Mengenangaben für pflanzliche Ei-Alternativen beim Backen.",
+    metaTitle: 'Ei-Ersatz Rechner – Eier vegan ersetzen beim Backen & Kochen',
+    metaDescription: 'Berechnen Sie die optimale Menge an Ei-Ersatz für 1 bis 10 Eier: Apfelmark (60 bis 80 g), reife Banane (1/2 Stk.',
+    h1: 'Ei-Ersatz Rechner – Vegane Alternativen für Rührkuchen & Waffeln',
+    shortDescription: 'Ermittelt Mengenangaben für pflanzliche Ei-Alternativen beim Backen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["ei ersatz rechner vegan backen","1 ei ersetzen durch apfelmus banane chiasamen","veganer eiersatz rührkuchen menge","leinsamen eiersatz verhaeltnis wasser"],
     inputs: [
           {
@@ -3986,17 +3916,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "140 g Apfelmark (ca. 4-5 gehäufte Esslöffel)"
     },
+    content: {
+      intro: 'Dieser Rezeptrechner kalkuliert die Aufteilung und den Ersatz von Hühnereiern (Größe M ca. 50 g: 30 g Eiklar, 20 g Eidotter) oder vegane Alternativen (Aquafaba, Leinsamen, Apfelmus).',
+      details: '1 ganzes Ei lässt sich beim Backen durch 1 EL geschrotete Leinsamen in 3 EL Wasser (Leinsamen-Ei), 60 g Apfelmus oder eine halbe reife Banane ersetzen. Eischnee lässt sich 1:1 durch aufgeschlagenes Kichererbsenwasser (Aquafaba) ersetzen.',
+    },
     faqs: [
-          {
-                "question": "Was ist Aquafaba?",
-                "answer": "Aquafaba ist das dickflüssige Kochwasser von Kichererbsen (oder Bohnen aus der Dose). Aufgrund seiner Eiweiß- und Stärkestruktur lässt es sich wie echter Eischnee steif schlagen."
-          },
-          {
-                "question": "Kann man mit Bananen-Ei auch Biskuit backen?",
-                "answer": "Nein, für lockeren Biskuit eignen sich schwere Fruchtpürees nicht. Hier nutzt man besser aufgeschlagenes Aquafaba oder spezielles Ei-Ersatzpulver auf Lupinen-/Stärkebasis."
-          }
+      { question: 'Was kann man mit übrig gebliebenem Eiklar machen?', answer: 'Baisers (Meringue), Macarons, Eiweiß-Omelettes zubereiten oder portionsweise in Eiswürfelbehältern einfrieren (aufgetaut normal aufschlagbar).' },
+      { question: 'Warum schlägt sich Eischnee nicht steif, wenn Spuren von Eigelb hineingelangen?', answer: 'Das Fett im Eigelb stört die Bildung des stabilen Proteingitters an den Luftbläschen; Schüssel und Rührbesen müssen absolut fettfrei sein.' },
     ],
-    relatedSlugs: ["zucker-ersatz-rechner","cups-in-gramm-rechner","portionsrechner"],
+    relatedSlugs: ['zucker-ersatz-rechner', 'cups-in-gramm-rechner', 'portionsrechner'],
   },
   {
     id: "wasser-reis-verhaeltnis-rechner",
@@ -4005,10 +3933,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Reiskoch-Rechner",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: "Reis kochen Rechner – Wasser-Reis-Verhältnis nach Quellmethode berechnen",
-    metaDescription: "Berechnen Sie die perfekte Wassermenge und Kochzeit für Basmatireis (1:1,5), Jasminreis (1:1,25), Vollkornreis (1:2) und Milchreis nach der Quellmethode.",
-    h1: "Reis kochen Rechner – Perfektes Wasser-Reis-Verhältnis ermitteln",
-    shortDescription: "Berechnet die genaue Wassermenge und Garzeit für alle Reissorten.",
+    metaTitle: 'Reis kochen Rechner – Wasser-Reis-Verhältnis nach Quellmeth...',
+    metaDescription: 'Berechnen Sie die perfekte Wassermenge und Kochzeit für Basmatireis (1:1,5), Jasminreis (1:1,25), Vollkornreis (1:2) und Milchreis nach der Quellmethode.',
+    h1: 'Reis kochen Rechner – Perfektes Wasser-Reis-Verhältnis ermitteln',
+    shortDescription: 'Berechnet die genaue Wassermenge und Garzeit für alle Reissorten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["reis kochen verhaeltnis wasser reis","quellmethode reis wasser berechnen","basmati reis wasser menge gramm ml","naturreis vollstreis garzeit wasser"],
     inputs: [
           {
@@ -4111,17 +4039,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "300 ml Wasser (ergibt ca. 500 g lockeren Reis)"
     },
+    content: {
+      intro: 'Die Quellmethode gart Reis ohne Nährstoffverlust im geschlossenen Topf mit dem exakt passenden Verhältnis von Reis zu Wasser.',
+      details: 'Richtwerte: Weißer Langkornreis (Basmati, Jasmin) = 1 Teil Reis auf 1,5 Teile Wasser. Rundkornreis (Milchreis, Sushi) = 1 : 1,75 bis 2,0. Naturreis (Vollkornreis) = 1 : 2,25 bei ca. 35 bis 45 Minuten Garzeit.',
+    },
     faqs: [
-          {
-                "question": "Warum sollte man Reis vor dem Kochen waschen?",
-                "answer": "Durch das Waschen wird überschüssige Oberflächenstärke entfernt. Dadurch klebt der Reis nach dem Kochen nicht klumpig zusammen, sondern bleibt wunderbar körnig und locker."
-          },
-          {
-                "question": "Darf man beim Reis kochen den Deckel anheben?",
-                "answer": "Nein! Wenn der Deckel vor Ablauf der Garzeit geöffnet wird, entweicht der notwendige heiße Dampf und der Reis gart ungleichmäßig oder brennt am Boden an."
-          }
+      { question: 'Muss man Reis vor dem Kochen waschen?', answer: 'Ja, gründliches Waschen im Sieb spült überschüssige Stärke ab (verhindert klebrigen Matschreis) und reduziert eventuelle anorganische Arsen-Rückstände.' },
+      { question: 'Darf man während der Quellmethode den Topfdeckel öffnen?', answer: 'Nein, der heiße Wasserdampf entweicht sofort, wodurch die Temperatur abfällt und das Wasser-Verdampfungsverhältnis gestört wird.' },
     ],
-    relatedSlugs: ["portionsrechner","nudeln-rohmaerk-gewicht-rechner","gramm-in-ml-rechner"],
+    relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'gramm-in-ml-rechner'],
   },
   {
     id: "nudeln-rohmaerk-gewicht-rechner",
@@ -4130,10 +4056,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Nudelportions-Rechner",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: "Nudeln Rechner – Rohgewicht in gekochtes Gewicht & Portionen pro Person",
-    metaDescription: "Berechnen Sie, wie viel Gramm trockene Nudeln gekocht ergeben (Faktor ca. 2,3) und wie viel Gramm Pasta Sie pro Person für Vorspeise oder Hauptgericht brauchen.",
-    h1: "Nudeln Rechner – Nudelportionen & Gekochtes Gewicht berechnen",
-    shortDescription: "Ermittelt Nudelgewicht trocken vs. gekocht und Portionsgrößen.",
+    metaTitle: 'Nudeln Rechner – Rohgewicht in gekochtes Gewicht',
+    metaDescription: 'Berechnen Sie, wie viel Gramm trockene Nudeln gekocht ergeben (Faktor ca. 2,3) und wie viel Gramm Pasta Sie pro Person für Vorspeise oder Hauptgericht.',
+    h1: 'Nudeln Rechner – Nudelportionen & Gekochtes Gewicht berechnen',
+    shortDescription: 'Ermittelt Nudelgewicht trocken vs. gekocht und Portionsgrößen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["nudeln rechner trocken gekocht gewicht faktor","wieviel gramm nudeln pro person hauptgericht","nudelportionen berechnen kinder erwachsene","spaghetti menge gramm pro person"],
     inputs: [
           {
@@ -4219,17 +4145,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "440 g Trockennudeln (ca. 1 kg gekocht)"
     },
+    content: {
+      intro: 'Dieser Mengenkalkulator berechnet das Trockengewicht von Roh-Nudeln und das fertige Serviergewicht nach dem Kochen im Salzwasser.',
+      details: 'Getrocknete Hartweizennudeln nehmen beim Kochen Wasser auf und verdoppeln bis verdreifachen ihr Gewicht (Faktor 2,2 bis 2,5): Aus 100 g trockener Pasta entstehen ca. 220 bis 250 g gekochte Nudeln. Portionsgröße: 80–100 g trocken als Hauptgericht.',
+    },
     faqs: [
-          {
-                "question": "Sollte man Öl ins Nudelwasser geben?",
-                "answer": "Nein! Öl schwimmt nur auf dem Wasser und legt sich beim Abgießen wie ein Film um die Nudeln. Dadurch kann die Nudeloberfläche die Sauce später viel schlechter aufnehmen."
-          },
-          {
-                "question": "Sollte man Nudeln nach dem Kochen mit kaltem Wasser abschrecken?",
-                "answer": "Nein, niemals abschrecken (außer bei kaltem Nudelsalat)! Das Abschrecken spült die wertvolle Oberflächenstärke ab, die für die Saucenbindung unverzichtbar ist."
-          }
+      { question: 'Wie viel Wasser und Salz benötigt man zum Nudelkochen?', answer: 'Klassische italienische Faustregel: 10-100-1000: 10 Gramm Salz auf 100 Gramm Pasta in 1.000 Milliliter (1 Liter) kochendem Wasser.' },
+      { question: 'Wie viel wiegen frische Eierteig-Nudeln nach dem Kochen?', answer: 'Frische Pasta enthält bereits Eigenfeuchte und quillt nur um ca. 50 bis 70 Prozent (Faktor 1,5 bis 1,7); eine Hauptgericht-Portion frische Nudeln beträgt ca. 130 bis 150 Gramm.' },
     ],
-    relatedSlugs: ["portionsrechner","wasser-reis-verhaeltnis-rechner","kalorien-rezept-rechner"],
+    relatedSlugs: ['portionsrechner', 'wasser-reis-verhaeltnis-rechner', 'kalorien-rezept-rechner'],
   },
   {
     id: "sauerteig-anstellgut-rechner",
@@ -4238,10 +4162,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Sauerteig-Rechner",
     category: "kochen-backen",
     subcategory: "Backzutaten",
-    metaTitle: "Sauerteig Rechner – Anstellgut füttern & Sauerteigführung 1:1:1",
-    metaDescription: "Berechnen Sie die exakten Mehl- und Wassermengen zur Sauerteig-Führung nach gewünschter Sauerteigmenge und Fütterungsverhältnis (1:1:1, 1:2:2 oder 1:5:5).",
-    h1: "Sauerteig Rechner – Anstellgut füttern & Sauerteigmenge berechnen",
-    shortDescription: "Berechnet Mehl, Wasser und Anstellgut zur Sauerteig-Herstellung.",
+    metaTitle: 'Sauerteig Rechner – Anstellgut füttern',
+    metaDescription: 'Berechnen Sie die exakten Mehl- und Wassermengen zur Sauerteig-Führung nach gewünschter Sauerteigmenge und Fütterungsverhältnis (1:1:1, 1:2:2 oder 1:5:5).',
+    h1: 'Sauerteig Rechner – Anstellgut füttern & Sauerteigmenge berechnen',
+    shortDescription: 'Berechnet Mehl, Wasser und Anstellgut zur Sauerteig-Herstellung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["sauerteig rechner anstellgut fuettern","sauerteig fuehrung verhaeltnis 1 zu 1 zu 1","roggensauerteig weizensauerteig menge mehl wasser","anstellgut auffrischen gramm rechner"],
     inputs: [
           {
@@ -4343,17 +4267,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "je 77 g Anstellgut, Mehl und Wasser"
     },
+    content: {
+      intro: 'Dieser Sauerteigrechner steuert die dreistufige oder einstufige Sauerteigführung (Anstellgut, Mehl, Wasser) für Roggen- und Weizensauerteige.',
+      details: 'Formel: Sauerteig-Hydratation = (Wasser / Mehl) · 100. Standard-Sauerteig wird meist mit TA 200 (100 % Hydratation, 1:1 Mehl zu Wasser) geführt. Der Sauerteiganteil am Gesamtrezept liegt üblicherweise bei 15 bis 35 Prozent des Gesamtmehls.',
+    },
     faqs: [
-          {
-                "question": "Wann ist der Sauerteig backbereit (Peak)?",
-                "answer": "Der Sauerteig ist backbereit, wenn er sein Volumen verdoppelt bis verdreifacht hat, eine kuppelförmige Oberfläche mit vielen Bläschen zeigt und kurz vor dem Wiederabsinken steht."
-          },
-          {
-                "question": "Wie übersteht Anstellgut den Urlaub?",
-                "answer": "Gut gefüttert hält sich Anstellgut im Schraubglas im Kühlschrank problemlos 2 bis 3 Wochen. Für längere Pausen kann man ihn dünn auf Backpapier verstreichen, trocknen und als Trockensauerteig jahrelang aufbewahren."
-          }
+      { question: 'Wie oft muss man Anstellgut im Kühlschrank füttern?', answer: 'Ein gesundes Anstellgut sollte mindestens alle 7 bis 10 Tage mit gleichen Teilen Mehl und lauwarmem Wasser (z. B. 50 g Mehl + 50 g Wasser auf 10–20 g Anstellgut) aufgefrischt werden.' },
+      { question: 'Woran erkennt man, dass der Sauerteig backreif ist?', answer: 'Er hat sein Volumen verdoppelt, riecht angenehm fruchtig-säuerlich und schwimmt beim Wassertest oben auf der Wasseroberfläche (Float-Test).' },
     ],
-    relatedSlugs: ["brot-backen-baeckermass-rechner","pizza-teig-rechner","hefe-umrechner"],
+    relatedSlugs: ['brot-backen-baeckermass-rechner', 'pizza-teig-rechner', 'hefe-umrechner'],
   },
   {
     id: "marmelade-geliermittel-rechner",
@@ -4362,10 +4284,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Marmelade-Rechner",
     category: "kochen-backen",
     subcategory: "Einkochen & Haltbarkeit",
-    metaTitle: "Marmelade Rechner – Gelierzucker 1:1, 2:1, 3:1 & Gläseranzahl berechnen",
-    metaDescription: "Berechnen Sie die benötigte Menge Gelierzucker (1:1, 2:1 oder 3:1) nach Fruchtgewicht in Gramm, Zitronensaft-Zugabe und die Anzahl benötigter Schraubgläser.",
-    h1: "Marmelade Rechner – Gelierzucker nach Fruchtgewicht ermitteln",
-    shortDescription: "Berechnet Gelierzucker und Gläseranzahl für Marmelade und Konfitüre.",
+    metaTitle: 'Marmelade Rechner – Gelierzucker 1:1, 2:1, 3:1',
+    metaDescription: 'Berechnen Sie die benötigte Menge Gelierzucker (1:1, 2:1 oder 3:1) nach Fruchtgewicht in Gramm, Zitronensaft-Zugabe und die Anzahl benötigter.',
+    h1: 'Marmelade Rechner – Gelierzucker nach Fruchtgewicht ermitteln',
+    shortDescription: 'Berechnet Gelierzucker und Gläseranzahl für Marmelade und Konfitüre mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["marmelade rechner gelierzucker 1 zu 1 2 zu 1 3 zu 1","wieviel gelierzucker fuer 1 kg erdbeeren","marmeladenglaeser anzahl berechnen","gelierprobe zitronensaeure marmelade"],
     inputs: [
           {
@@ -4469,17 +4391,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "750 g Gelierzucker (7 Gläser)"
     },
+    content: {
+      intro: 'Dieser Einkochrechner kalkuliert die Frucht- und Zuckermengen für Konfitüren und Gelees bei 1:1, 2:1 oder 3:1 Gelierzucker.',
+      details: 'Beim 2:1-Gelierzucker kommen auf 1.000 g vorbereitete Früchte exakt 500 g Gelierzucker. 3:1 verwendet nur 333 g Gelierzucker auf 1 kg Frucht (fruchtiger, aber kürzere Haltbarkeit nach dem Öffnen).',
+    },
     faqs: [
-          {
-                "question": "Wie funktioniert die Gelierprobe richtig?",
-                "answer": "Geben Sie nach 4 Minuten sprudelndem Kochen 1 Teelöffel heiße Marmelade auf einen eiskalten Teller aus dem Tiefkühlfach. Wird die Masse nach 1 Minute fest, ist die Marmelade fertig!"
-          },
-          {
-                "question": "Muss man heiße Marmeladengläser auf den Kopf stellen?",
-                "answer": "Nein, nach heutigem Stand der Hygiene ist das nicht nötig und kann sogar Schadstoffe aus dem Deckelgummi lösen. Gründlich sterilisierte Gläser und heißes Einfüllen genügen völlig für ein Vakuum."
-          }
+      { question: 'Warum benötigt man Zitronensaft beim Marmeladekochen?', answer: 'Pektin benötigt ein saures Milieu (pH-Wert ca. 3,0 bis 3,3), um sein stabiles Geliermolekülgitter auszubilden; zudem intensiviert Säure die Fruchtfarben.' },
+      { question: 'Wie funktioniert die Gelierprobe?', answer: 'Geben Sie nach 4 Minuten Kochen einen Teelöffel heiße Marmelade auf einen eiskalten Teller: Wird die Masse innerhalb von 1 bis 2 Minuten fest, ist die Konfitüre fertig.' },
     ],
-    relatedSlugs: ["kuehlschrank-haltbarkeit-rechner","portionsrechner","zucker-ersatz-rechner"],
+    relatedSlugs: ['kuehlschrank-haltbarkeit-rechner', 'portionsrechner', 'zucker-ersatz-rechner'],
   },
   {
     id: "kaffee-wasser-verhaeltnis-rechner",
@@ -4488,10 +4408,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Kaffee-Rechner",
     category: "kochen-backen",
     subcategory: "Getränke",
-    metaTitle: "Kaffee Rechner – Golden Cup Ratio Kaffeemehl in Gramm nach Tassen berechnen",
-    metaDescription: "Berechnen Sie das optimale Verhältnis von Kaffeemehl zu Wasser nach SCA Golden Cup Standard (60 g Kaffee auf 1 Liter Wasser) für Filterkaffee, French Press und V60.",
-    h1: "Kaffee Rechner – Wie viel Kaffeepulver brauche ich pro Tasse?",
-    shortDescription: "Berechnet Kaffeemehl in Gramm nach Tassenanzahl und Brühmethode.",
+    metaTitle: 'Kaffee Rechner – Golden Cup Ratio Kaffeemehl in Gramm nach...',
+    metaDescription: 'Berechnen Sie das optimale Verhältnis von Kaffeemehl zu Wasser nach SCA Golden Cup Standard (60 g Kaffee auf 1 Liter Wasser) für Filterkaffee',
+    h1: 'Kaffee Rechner – Wie viel Kaffeepulver brauche ich pro Tasse?',
+    shortDescription: 'Berechnet Kaffeemehl in Gramm nach Tassenanzahl und Brühmethode mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kaffee rechner kaffeemehl gramm pro tasse","golden cup ratio sca 60g pro liter","french press kaffee menge berechnen","filterkaffee wieviel kaffeepulver pro tasse"],
     inputs: [
           {
@@ -4587,17 +4507,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "36,0 g Kaffeemehl"
     },
+    content: {
+      intro: 'Das Brew-Ratio (Brühverhältnis) nach den Standards der Specialty Coffee Association (SCA) garantiert die optimale Extraktion von Aromastoffen ohne Bitterkeit.',
+      details: 'Goldener SCA-Standard: 60 Gramm gemahlener Röstkaffee auf 1.000 Gramm (1 Liter) Wasser (Verhältnis 1:16,6). Für Espresso in der Siebträgermaschine gilt ein Brühverhältnis von 1:2 bis 1:2,5 (z. B. 18 g Kaffeemehl ergeben 36 g flüssigen Espresso in 25–30 Sekunden).',
+    },
     faqs: [
-          {
-                "question": "Warum sollte Kaffeewasser nicht kochend heiß sein?",
-                "answer": "Kochendes Wasser (100°C) verbrennt die feinen Kaffeearomen und löst übermäßig viele Bitterstoffe und Gerbsäuren. Warten Sie nach dem Aufkochen ca. 45 bis 60 Sekunden, bis das Wasser 92-96°C hat."
-          },
-          {
-                "question": "Wie fein sollte der Kaffee für die French Press gemahlen werden?",
-                "answer": "Für die French Press benötigt man einen groben Mahlgrad (wie Meersalz), damit das Kaffeepulver nicht durch das Metallsieb rutscht und der Kaffee nicht überextrahiert."
-          }
+      { question: 'Welche Wassertemperatur ist für Filterkaffee optimal?', answer: 'Zwischen 92 °C und 96 °C; kochendes Wasser (100 °C) verbrennt Kaffeebestandteile und löst bittere Gerbstoffe, zu kaltes Wasser (< 90 °C) führt zu säuerlichem, unterextrahiertem Kaffee.' },
+      { question: 'Warum wiegt man Kaffee in Gramm statt Esslöffeln?', answer: 'Weil verschiedene Röstungen (helle vs. dunkle Röstung) und Bohnengrößen stark unterschiedliche Schüttdichten aufweisen.' },
     ],
-    relatedSlugs: ["tee-ziehzeit-temperatur-rechner","essloeffel-teeloeffel-gramm-rechner","portionsrechner"],
+    relatedSlugs: ['tee-ziehzeit-temperatur-rechner', 'essloeffel-teeloeffel-gramm-rechner', 'portionsrechner'],
   },
   {
     id: "cocktail-alkoholgehalt-rechner",
@@ -4606,10 +4524,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Cocktail-Rechner",
     category: "kochen-backen",
     subcategory: "Getränke",
-    metaTitle: "Cocktail Alkoholgehalt Rechner – Vol.-% & Promille-Potenzial berechnen",
-    metaDescription: "Berechnen Sie den exakten Alkoholgehalt (Vol.-% und Gramm reiner Alkohol) von Cocktails und Longdrinks nach Spirituosen (Gin, Wodka, Rum), Likören, Saft und Schmelzwasser.",
-    h1: "Cocktail Rechner – Wie stark ist mein Drink wirklich?",
-    shortDescription: "Berechnet den Alkoholgehalt in Vol.-% und Gramm für Cocktails.",
+    metaTitle: 'Cocktail Alkoholgehalt Rechner – Vol.-%',
+    metaDescription: 'Berechnen Sie den exakten Alkoholgehalt (Vol.-% und Gramm reiner Alkohol) von Cocktails und Longdrinks nach Spirituosen (Gin, Wodka, Rum), Likören',
+    h1: 'Cocktail Rechner – Wie stark ist mein Drink wirklich?',
+    shortDescription: 'Berechnet den Alkoholgehalt in Vol.-% und Gramm für Cocktails mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["cocktail alkoholgehalt rechner vol prozent","wieviel alkohol hat ein gin tonic aperol spritz","cocktail reine gramm alkohol berechnen","schmelzwasser eiswuerfel cocktail verduennung"],
     inputs: [
           {
@@ -4725,17 +4643,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "8,7 Vol.-% (15,8 g reiner Alkohol)"
     },
+    content: {
+      intro: 'Dieser Mischungsrechner ermittelt den resultierenden Gesamt-Alkoholgehalt in Volumenprozent (Vol.-%) und die reine Alkoholmasse eines Cocktails.',
+      details: 'Alkoholgehalt = Summe(Menge in ml · Vol.-% / 100) / Gesamtvolumen des Drinks. Durch das Schütteln auf Eis schmilzt Schmelzwasser (ca. 25–35 ml Schmelzwasserverdünnung), was den Alkoholgehalt sensorisch abrundet.',
+    },
     faqs: [
-          {
-                "question": "Wie viel Schmelzwasser entsteht beim Shaken eines Cocktails?",
-                "answer": "Beim kräftigen Shaken mit Eis schmelzen pro Drink etwa 25 bis 35 ml Wasser. Profi-Barkeeper berechnen diese Verdünnung fest in ihre Rezepturen ein."
-          },
-          {
-                "question": "Wie viel reiner Alkohol gilt für Erwachsene als risikoarm?",
-                "answer": "Nach den Leitlinien der DGE sollten gesunde Frauen maximal 10 bis 12 g Alkohol pro Tag (ca. 1 kleines Bier oder 1 kleines Glas Wein) und gesunde Männer maximal 20 bis 24 g Alkohol pro Tag trinken, mit mindestens zwei alkoholfreien Tagen pro Woche."
-          }
+      { question: 'Wie viel Alkohol hat ein klassischer Gin Tonic?', answer: '40 ml Gin (40 Vol.-%) gemischt mit 160 ml Tonic Water ergibt ca. 8,0 Vol.-% Alkohol im 200-ml-Glas.' },
+      { question: 'Was ist der Unterschied zwischen Shaken und Rühren (Stirring)?', answer: 'Klare Spirituosen-Cocktails (Martini, Manhattan) werden gerührt, um die Textur klar und samtig ohne Trübung zu halten; Cocktails mit Zitrussäften oder Sahne werden kräftig geschüttelt.' },
     ],
-    relatedSlugs: ["alkohol-verkochungs-rechner","promillerechner","portionsrechner"],
+    relatedSlugs: ['alkohol-verkochungs-rechner', 'promillerechner', 'portionsrechner'],
   },
   {
     id: "salz-lake-poekel-rechner",
@@ -4744,10 +4660,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Salzlake-Rechner",
     category: "kochen-backen",
     subcategory: "Einkochen & Haltbarkeit",
-    metaTitle: "Salzlake Rechner – Salzgehalt in % für Räuchern, Fermentieren & Pökeln",
-    metaDescription: "Berechnen Sie die exakte Salzmenge in Gramm nach Wasservolumen (Liter) und gewünschter Lakekonzentration (z. B. 2-3 % Fermentation, 5-8 % Räucherfisch, 10-15 % Schinken).",
-    h1: "Salzlake Rechner – Exakte Salzmenge für Lake & Fermentation",
-    shortDescription: "Berechnet Salzmenge nach Wasservolumen und Prozentgehalt der Lake.",
+    metaTitle: 'Salzlake Rechner – Salzgehalt in % für Räuchern, Fermentieren',
+    metaDescription: 'Berechnen Sie die exakte Salzmenge in Gramm nach Wasservolumen (Liter) und gewünschter Lakekonzentration (z. B.',
+    h1: 'Salzlake Rechner – Exakte Salzmenge für Lake & Fermentation',
+    shortDescription: 'Berechnet Salzmenge nach Wasservolumen und Prozentgehalt der Lake mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["salzlake rechner gramm salz pro liter wasser","poekellake prozent berechnen schinken","forelle raeuchern salzlake 5 bis 7 prozent","gemuese fermentieren salzgehalt 2 prozent"],
     inputs: [
           {
@@ -4841,17 +4757,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "180 g Salz (ca. 10 Esslöffel)"
     },
+    content: {
+      intro: 'Dieser Pökelrechner ermittelt die exakte Salzkonzentration (Grad Baumé / Prozent) für Nasspökellaken zur Haltbarmachung von Fleisch, Fisch und Käse.',
+      details: 'Salzgehalt in % = (Salzgewicht / Gesamtgewicht aus Wasser + Salz) · 100. Für Schinken und Pastrami werden Laken mit 8 bis 12 % Salzgehalt verwendet; bei Nitritpökelsalz (NPS mit 0,5 % NaNO2) schützt das Nitrit vor Clostridium botulinum.',
+    },
     faqs: [
-          {
-                "question": "Welches Salz eignet sich am besten zum Pökeln und Räuchern?",
-                "answer": "Reines Steinsalz oder Meersalz ohne Jod, Fluorid und Rieselhilfen. Rieselhilfen können die Lake trüben und dem Räuchergut einen bitteren Beigeschmack verleihen."
-          },
-          {
-                "question": "Was bewirkt das Brining (Einlegen in Salzlake) bei Hähnchen oder Pute?",
-                "answer": "Das Salz verändert durch Osmose die Proteinstruktur im Fleisch, sodass das Geflügel beim Braten oder Grillen bis zu 40 % mehr Fleischsaft bindet und extrem saftig bleibt."
-          }
+      { question: 'Wie lange muss Fleisch in der Lake reifen?', answer: 'Als Richtwert gilt ca. 1 Tag Pökelzeit pro Zentimeter Fleischdicke an der dicksten Stelle bei konstanter Kühlschranktemperatur von 4 bis 6 °C.' },
+      { question: 'Wie viel Salz benötigt man für eine 10-prozentige Pökellake mit 5 Litern Wasser?', answer: 'Auf 5.000 g Wasser kommen 555 Gramm Salz (denn 555 / 5555 ≈ 10,0 %).' },
     ],
-    relatedSlugs: ["fleisch-kerntemperatur-garzeit-rechner","kuehlschrank-haltbarkeit-rechner","portionsrechner"],
+    relatedSlugs: ['fleisch-kerntemperatur-garzeit-rechner', 'kuehlschrank-haltbarkeit-rechner', 'portionsrechner'],
   },
   {
     id: "frittieroel-temperatur-rauchpunkt-rechner",
@@ -4860,10 +4774,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Rauchpunkt & Öl",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: "Rauchpunkt Rechner – Speiseöle, Rauchpunkt (°C) & Frittiertemperatur",
-    metaDescription: "Finden Sie den Rauchpunkt und die maximale Erhitzbarkeit für Rapsöl, Olivenöl, Butterschmalz, Sonnenblumenöl, Kokosöl und Erdnussöl für Braten und Frittieren.",
-    h1: "Rauchpunkt Rechner – Welches Speiseöl eignet sich zum Braten?",
-    shortDescription: "Ermittelt den Rauchpunkt und die Hitzestabilität von Speiseölen.",
+    metaTitle: 'Rauchpunkt Rechner – Speiseöle, Rauchpunkt',
+    metaDescription: 'Finden Sie den Rauchpunkt und die maximale Erhitzbarkeit für Rapsöl, Olivenöl, Butterschmalz, Sonnenblumenöl, Kokosöl und Erdnussöl für Braten und.',
+    h1: 'Rauchpunkt Rechner – Welches Speiseöl eignet sich zum Braten?',
+    shortDescription: 'Ermittelt den Rauchpunkt und die Hitzestabilität von Speiseölen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["rauchpunkt speiseoele tabelle rechner","welches oel zum scharfen anbraten rapsolivenoel","frittieroel temperatur 175 grad acrylarmid","butterschmalz rauchpunkt grad"],
     inputs: [
           {
@@ -4956,17 +4870,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "Butterschmalz oder Erdnussöl verwenden"
     },
+    content: {
+      intro: 'Dieser Frittier-Ratgeber vergleicht die Rauchpunkte verschiedener Speiseöle und Fette und bestimmt die optimale Frittiertemperatur.',
+      details: 'Die ideale Frittiertemperatur liegt bei 160 °C bis 175 °C. Oberhalb von 180 °C entsteht bei stärkehaltigen Lebensmitteln (Pommes) gesundheitsschädliches Acrylamid; bei Erreichen des Rauchpunkts zersetzt sich das Öl in giftiges Acrolein.',
+    },
     faqs: [
-          {
-                "question": "Warum verbrennt normale Butter so schnell in der Pfanne?",
-                "answer": "Butter besteht zu ca. 16 % aus Wasser und enthält Milcheiweiß und Milchzucker. Das Eiweiß verbrennt bereits ab ca. 150 °C und wird schwarz und bitter. Butterschmalz ist geklärtes, reines Butterfett und verträgt 205 °C!"
-          },
-          {
-                "question": "Wie entsorgt man altes Frittieröl umweltgerecht?",
-                "answer": "Niemals in den Abfluss oder die Toilette gießen, da das Fett erkaltet und Rohre verstopft! Füllen Sie erkaltetes Öl in eine alte Plastikflasche und werfen Sie diese in den Restmüll."
-          }
+      { question: 'Welche Öle haben den höchsten Rauchpunkt zum Frittieren?', answer: 'Raffiniertes Erdnussöl (ca. 230 °C), raffiniertes Rapsöl (ca. 220 °C) und Kokosfett; kaltgepresste native Öle und Butter eignen sich wegen früher Rauchbildung (< 160 °C) nicht zum Frittieren.' },
+      { question: 'Wie erkennt man ohne Thermometer, ob das Frittieröl heiß genug ist?', answer: 'Halten Sie den Stiel eines Holzkochlöffels ins heiße Fett: Steigen sofort gleichmäßige, kleine Bläschen am Holz auf, ist die Temperatur von ca. 170 °C erreicht.' },
     ],
-    relatedSlugs: ["backzeit-temperatur-umluft-oberhitze-rechner","fleisch-kerntemperatur-garzeit-rechner","temperatur-umrechner"],
+    relatedSlugs: ['backzeit-temperatur-umluft-oberhitze-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'temperatur-umrechner'],
   },
   {
     id: "fondue-raclette-mengen-rechner",
@@ -4975,10 +4887,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Raclette & Fondue",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: "Raclette & Fondue Rechner – Käse- & Fleischmenge pro Person berechnen",
-    metaDescription: "Berechnen Sie die perfekten Mengen für Silvester & Feiern: Raclettekäse (200 bis 250 g p.P.), Fleisch (200 bis 250 g p.P.), Pellkartoffeln, Baguette und Dips nach Gästeanzahl.",
-    h1: "Raclette & Fondue Rechner – Einkaufsmenge für Party & Silvester",
-    shortDescription: "Ermittelt Käse-, Fleisch- und Beilagenmengen pro Person.",
+    metaTitle: 'Raclette & Fondue Rechner – Käse- – RechenHafen',
+    metaDescription: 'Berechnen Sie die perfekten Mengen für Silvester & Feiern: Raclettekäse (200 bis 250 g p.P.), Fleisch (200 bis 250 g p.P.',
+    h1: 'Raclette & Fondue Rechner – Einkaufsmenge für Party & Silvester',
+    shortDescription: 'Ermittelt Käse-, Fleisch- und Beilagenmengen pro Person mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["raclette mengen rechner wieviel kaese pro person 200g","fondue fleischmenge pro person 250g","raclette zutaten einkaufsliste berechnen silvester","kartoffeln baguette pro person raclette"],
     inputs: [
           {
@@ -5090,17 +5002,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "ca. 1,3 kg Käse, 1,2 kg Kartoffeln, 3 Baguettes"
     },
+    content: {
+      intro: 'Dieser Mengenplaner kalkuliert Fleisch-, Käse-, Kartoffel- und Beilagenmengen für gesellige Fondue- und Raclette-Abende ohne Reste oder Engpässe.',
+      details: 'Pro erwachsener Person kalkuliert man: Käsefondue ca. 200 bis 250 g Käse; Fleischfondue (Chinoise/Fett) ca. 250 bis 300 g Fleisch; Raclette ca. 200 bis 250 g Raclettekäse plus 200 g Kartoffeln und 150 g Beilagen.',
+    },
     faqs: [
-          {
-                "question": "Wie viele Scheiben Raclettekäse sind 200 Gramm?",
-                "answer": "Eine Standardscheibe abgepackter Raclettekäse wiegt etwa 25 bis 30 Gramm. 200 Gramm entsprechen somit ca. 7 bis 8 Käsescheiben pro Person."
-          },
-          {
-                "question": "Welcher Käse eignet sich neben original Schweizer Raclettekäse?",
-                "answer": "Gouda mittelalt, milder Bergkäse, Cheddar oder Gorgonzola eignen sich hervorragend für Pfännchen-Variationen, da sie ebenfalls wunderbar schmelzen."
-          }
+      { question: 'Welche Käsesorten eignen sich für das klassische Schweizer Fondue Moitié-Moitié?', answer: 'Traditionell zu gleichen Teilen (50/50) reifer Vacherin Fribourgeois AOP und Gruyère AOP, geschmolzen in trockenem Weißwein mit einem Schuss Kirschwasser.' },
+      { question: 'Was verhindert, dass Käsefondue gerinnt oder sich Fett absetzt?', answer: 'Ausreichend Säure aus dem Weißwein oder ein Spritzer Zitronensaft sowie ein Teelöffel Speisestärke, die die Emulsion stabil binden.' },
     ],
-    relatedSlugs: ["portionsrechner","fleisch-kerntemperatur-garzeit-rechner","nudeln-rohmaerk-gewicht-rechner"],
+    relatedSlugs: ['portionsrechner', 'fleisch-kerntemperatur-garzeit-rechner', 'nudeln-rohmaerk-gewicht-rechner'],
   },
   {
     id: "kuehlschrank-haltbarkeit-rechner",
@@ -5109,10 +5019,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Kühlschrank Haltbarkeit",
     category: "kochen-backen",
     subcategory: "Einkochen & Haltbarkeit",
-    metaTitle: "Kühlschrank Haltbarkeit Rechner – Wie lange halten geöffnete Lebensmittel?",
-    metaDescription: "Finden Sie die empfohlene Kühlschrank-Haltbarkeit in Tagen für Hackfleisch, Geflügel, geöffnete Milch, gekochte Reste, Eier und angebrochene Gläser.",
-    h1: "Kühlschrank Haltbarkeit Rechner – Haltbarkeitsdauer & Lagertipps",
-    shortDescription: "Ermittelt Haltbarkeitstage im Kühlschrank (2-7 °C) und Einfrierzeiten.",
+    metaTitle: 'Kühlschrank Haltbarkeit Rechner – Wie lange halten geöffnet...',
+    metaDescription: 'Finden Sie die empfohlene Kühlschrank-Haltbarkeit in Tagen für Hackfleisch, Geflügel, geöffnete Milch, gekochte Reste, Eier und angebrochene Gläser.',
+    h1: 'Kühlschrank Haltbarkeit Rechner – Haltbarkeitsdauer & Lagertipps',
+    shortDescription: 'Ermittelt Haltbarkeitstage im Kühlschrank (2-7 °C) und Einfrierzeiten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kuehlschrank haltbarkeit rechner geoffnet tage","hackfleisch wie lange haltbar kuehlschrank 1 tag","gekochte reste wieviele tage im kuehlschrank","haltbarkeit milch geoffnet verbrauchen"],
     inputs: [
           {
@@ -5219,17 +5129,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "ca. 3 Tage Haltbarkeit"
     },
+    content: {
+      intro: 'Dieser Frischeplaner bestimmt die sichere Haltbarkeit von geöffneten Lebensmitteln, Fleisch, Fisch und Speiseresten bei 4 °C bis 7 °C Kühlschranktemperatur.',
+      details: 'Roher Fisch und Hackfleisch müssen am Tag des Einkaufs verzehrt werden. Gekochte Speisereste halten 2 bis 3 Tage in dichten Behältern; geöffnete H-Milch 4 bis 5 Tage; Hartkäse am Stück mehrere Wochen.',
+    },
     faqs: [
-          {
-                "question": "Wie erkennt man, ob ein Ei noch frisch ist?",
-                "answer": "Der Wassertest: Legen Sie das Ei in ein Glas kaltes Wasser. Bleibt es am Boden liegen, ist es frisch. Richtet es sich schräg auf, ist es älter aber essbar. Schwimmt es an der Oberfläche, hat sich zu viel Fäulnisgas gebildet -> nicht mehr essen!"
-          },
-          {
-                "question": "Darf man heiße Speisen direkt in den Kühlschrank stellen?",
-                "answer": "Nein, heiße Speisen erwärmen das gesamte Kühlschrankinnere und gefährden andere Lebensmittel. Lassen Sie Töpfe erst auf Zimmertemperatur abkühlen."
-          }
+      { question: 'Welche Zone im Kühlschrank ist die kälteste?', answer: 'Die Glasplatte direkt über dem Gemüsefach (ca. 2 bis 3 °C); hier gehören leicht verderblicher Fisch und Fleisch hin; ganz oben und in der Tür ist es mit 7 bis 9 °C am wärmsten.' },
+      { question: 'Darf man heiße Speisen direkt in den Kühlschrank stellen?', answer: 'Nein, heiße Töpfe erwärmen den gesamten Kühlschrankinnenraum und gefährden andere Lebensmittel; Speisen zuerst im kalten Wasserbad auf Raumtemperatur abkühlen lassen.' },
     ],
-    relatedSlugs: ["marmelade-geliermittel-rechner","fleisch-kerntemperatur-garzeit-rechner","salz-lake-poekel-rechner"],
+    relatedSlugs: ['marmelade-geliermittel-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'salz-lake-poekel-rechner'],
   },
   {
     id: "tee-ziehzeit-temperatur-rechner",
@@ -5238,10 +5146,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Tee Ziehzeit-Rechner",
     category: "kochen-backen",
     subcategory: "Getränke",
-    metaTitle: "Tee Ziehzeit Rechner – Wassertemperatur (°C) & Ziehdauer nach Teesorte",
-    metaDescription: "Finden Sie die perfekte Wassertemperatur und Ziehzeit für Grünen Tee (70-80 °C, 2 Min.), Schwarzen Tee (95 °C, 3 Min.), Weißen Tee, Kräutertee und Früchtetee (100 °C, 8 Min.).",
-    h1: "Tee Ziehzeit Rechner – Temperatur & Ziehdauer für besten Geschmack",
-    shortDescription: "Ermittelt Wassertemperatur und Ziehzeit nach Teesorte.",
+    metaTitle: 'Tee Ziehzeit Rechner – Wassertemperatur',
+    metaDescription: 'Finden Sie die perfekte Wassertemperatur und Ziehzeit für Grünen Tee (70-80 °C, 2 Min.), Schwarzen Tee (95 °C, 3 Min.',
+    h1: 'Tee Ziehzeit Rechner – Temperatur & Ziehdauer für besten Geschmack',
+    shortDescription: 'Ermittelt Wassertemperatur und Ziehzeit nach Teesorte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["tee ziehzeit rechner wassertemperatur grad","gruener tee temperatur 70 grad nicht bitter","schwarzer tee ziehzeit 3 minuten anregend","kraeutertee sprudelnd kochend ziehen lassen"],
     inputs: [
           {
@@ -5360,17 +5268,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "75 °C Wassertemperatur, 2 Minuten Ziehzeit"
     },
+    content: {
+      intro: 'Dieser Teerechner optimiert Wassertemperatur und Ziehdauer für Grüntee, Schwarztee, Weißen Tee, Oolong und Kräuteraufgüsse.',
+      details: 'Grüner Tee (Sencha, Gyokuro) verlangt 60 °C bis 75 °C und 1,5 bis 2 Minuten Ziehzeit (kochendes Wasser macht ihn bitter). Schwarzer Tee benötigt 95 °C bis 100 °C für 3 bis 4 Minuten. Kräuter- und Früchtetees müssen zwingend mit sprudelnd kochendem Wasser (100 °C) für 8 bis 10 Minuten aufgegossen werden (Keimabtötung).',
+    },
     faqs: [
-          {
-                "question": "Wie lange dauert es, bis kochendes Wasser auf 80 °C abkühlt?",
-                "answer": "Ein frisch gekochter Wasserkocher (1 Liter Wasser mit geöffnetem Deckel) benötigt bei Zimmertemperatur etwa 6 bis 8 Minuten, um von 100 °C auf ca. 75-80 °C abzukühlen."
-          },
-          {
-                "question": "Warum muss Kräutertee mit kochendem Wasser aufgegossen werden?",
-                "answer": "Kräuter- und Früchtetees sind getrocknete Naturprodukte, die Sporen und Keime enthalten können. Nur sprudelnd kochendes Wasser (100 °C) und mindestens 5 Minuten Ziehzeit garantieren mikrobiologische Sicherheit."
-          }
+      { question: 'Warum darf man Früchtetee nicht mit 70 °C aufgießen?', answer: 'Kräuter und Trockenfrüchte sind Naturprodukte, die Sporen enthalten können; das Bundesinstitut für Risikobewertung (BfR) empfiehlt sprudelnd kochendes Wasser zur Keimsicherheit.' },
+      { question: 'Wirkt schwarzer Tee nach 5 Minuten Ziehzeit beruhigend?', answer: 'Koffein löst sich in den ersten 2 Minuten vollkommen; danach lösen sich vermehrt Gerbstoffe (Tannine), die das Koffein im Magen-Darm-Trakt langsamer resorbieren lassen und den Geschmack herb machen.' },
     ],
-    relatedSlugs: ["kaffee-wasser-verhaeltnis-rechner","temperatur-umrechner","zeit-umrechner"],
+    relatedSlugs: ['kaffee-wasser-verhaeltnis-rechner', 'temperatur-umrechner', 'zeit-umrechner'],
   },
   {
     id: "kalorien-rezept-rechner",
@@ -5379,10 +5285,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Rezept-Kalorien-Rechner",
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
-    metaTitle: "Rezept Kalorien Rechner – kcal & Makronährstoffe pro Portion berechnen",
-    metaDescription: "Berechnen Sie die Gesamtkalorien (kcal) und Makronährstoffe (Kohlenhydrate, Eiweiß, Fett) eines Rezepts nach Hauptzutaten und Portionen.",
-    h1: "Rezept Kalorien Rechner – Nährwerte & Makros pro Portion ermitteln",
-    shortDescription: "Berechnet Kalorien und Makros pro Portion für eigene Rezepte.",
+    metaTitle: 'Rezept Kalorien Rechner – kcal – RechenHafen',
+    metaDescription: 'Berechnen Sie die Gesamtkalorien (kcal) und Makronährstoffe (Kohlenhydrate, Eiweiß, Fett) eines Rezepts nach Hauptzutaten und Portionen.',
+    h1: 'Rezept Kalorien Rechner – Nährwerte & Makros pro Portion ermitteln',
+    shortDescription: 'Berechnet Kalorien und Makros pro Portion für eigene Rezepte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["rezept kalorien rechner kcal pro portion berechnen","makros rezept kohlenhydrate eiweiss fett gramm","rezept naehrwerte selbst berechnen online","kalorien pro teller mahlzeit rechner"],
     inputs: [
           {
@@ -5483,17 +5389,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "547 kcal pro Portion"
     },
+    content: {
+      intro: 'Dieser Nährwertrechner summiert alle Zutaten eines Rezepts und ermittelt Gesamtkalorien, Makronährstoffe und die Nährwerttabelle pro 100 Gramm und pro Portion.',
+      details: 'Formel: Nährwert pro 100 g = (Gesamtnährwert aller Zutaten / Fertiges Gesamtgewicht) · 100. Berücksichtigt den typischen Feuchtigkeits- und Wasserverlust beim Backen und Schmoren.',
+    },
     faqs: [
-          {
-                "question": "Wie rechnet man Kilokalorien in Kilojoule um?",
-                "answer": "Multiplizieren Sie die Kalorienzahl mit 4,184: 1 kcal = 4,184 kJ. 500 kcal entsprechen rund 2.092 kJ."
-          },
-          {
-                "question": "Verändern sich die Kalorien von Nudeln oder Reis beim Kochen?",
-                "answer": "Nein, das Nahrungsmittel saugt nur kalorienfreies Wasser auf. 100 g trockene Nudeln (ca. 350 kcal) ergeben gekocht ca. 230 g Pasta, die zusammen immer noch exakt dieselben 350 kcal enthalten."
-          }
+      { question: 'Warum wiegt das fertige Gericht weniger als die Summe der rohen Zutaten?', answer: 'Beim Braten und Backen verdampft Wasser; die Kalorienkonzentration pro 100 Gramm Fertiggericht steigt dadurch an, während die Gesamtkalorienzahl unverändert bleibt.' },
+      { question: 'Müssen Gewürze bei der Kalorienberechnung mitgezählt werden?', answer: 'Salz, Pfeffer und getrocknete Kräuter in üblichen Haushaltsmengen haben vernachlässigbar geringe Kalorienwerte; Bratfette und Zucker müssen jedoch grammgenau erfasst werden.' },
     ],
-    relatedSlugs: ["portionsrechner","nudeln-rohmaerk-gewicht-rechner","zucker-ersatz-rechner"],
+    relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'zucker-ersatz-rechner'],
   },
   {
     id: "schokolade-temperieren-rechner",
@@ -5502,10 +5406,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Schokolade temperieren",
     category: "kochen-backen",
     subcategory: "Backzutaten",
-    metaTitle: "Schokolade temperieren Rechner – Impfmethode, Kuvertüre & Gradzahlen",
-    metaDescription: "Berechnen Sie die exakten Temperaturen und Impfmengen (2/3 schmelzen bei 45 °C, 1/3 Impfschokolade bei 27 °C zugeben) für Zartbitter-, Vollmilch- und weiße Kuvertüre.",
-    h1: "Schokolade temperieren Rechner – Perfekter Glanz & Knack nach Impfmethode",
-    shortDescription: "Ermittelt Impfmengen und Arbeitstemperaturen für Kuvertüre.",
+    metaTitle: 'Schokolade temperieren Rechner – Impfmethode, Kuvertüre',
+    metaDescription: 'Berechnen Sie die exakten Temperaturen und Impfmengen (2/3 schmelzen bei 45 °C, 1/3 Impfschokolade bei 27 °C zugeben) für Zartbitter-',
+    h1: 'Schokolade temperieren Rechner – Perfekter Glanz & Knack nach Impfmethode',
+    shortDescription: 'Ermittelt Impfmengen und Arbeitstemperaturen für Kuvertüre mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["schokolade temperieren rechner impfmethode","kuvertuere schmelzen temperatur zartbitter vollmilch weiss","schokolade impfen mengenverhaeltnis 2 drittel 1 drittel","pralinen schokolade glanz knack beta kristalle"],
     inputs: [
           {
@@ -5592,16 +5496,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "200 g schmelzen, 100 g impfen (31-32 °C)"
     },
+    content: {
+      intro: 'Das Temperieren von Kuvertüre schmilzt Schokolade kontrolliert, um stabile Kristallformen (Form-V-Kristalle) für knackigen Bruch und seidigen Glanz ohne grauen Fettreif zu erzeugen.',
+      details: 'Drei-Stufen-Methode (Zartbitter): 1. Schmelzen auf 45–48 °C (alle alten Kristalle lösen); 2. Abkühlen unter Rühren (Impfen) auf 27–28 °C (Kristallkeime bilden); 3. Wiedererwärmen auf Arbeitstemperatur 31–32 °C (Vollmilch: 29–30 °C, Weiß: 28–29 °C).',
+    },
     faqs: [
-          {
-                "question": "Was tun, wenn auch nur ein Tropfen Wasser in die geschmolzene Schokolade gelangt?",
-                "answer": "Wasser ist der Feind geschmolzener Schokolade! Schon ein kleiner Wassertropfen lässt die Schokolade sofort \"gerinnen\" und zu einer festen, klumpigen Masse erstarren."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen Kuvertüre und normaler Tafelschokolade?",
-                "answer": "Kuvertüre enthält gesetzlich mindestens 31 % Kakaobutter (Tafelschokolade meist nur 18-25 %). Durch den höheren Fettgehalt ist Kuvertüre flüssiger und bildet einen viel dünneren, knackigen Überzug."
-          }
+      { question: 'Was passiert, wenn nur ein einziger Wassertropfen in die geschmolzene Schokolade gelangt?', answer: 'Die Schokolade "stockt" augenblicklich zu einem zähen, klumpigen Teig: Der Zucker löst sich im Wasser und trennt sich vom Kakaofett.' },
+      { question: 'Was ist die Impfmethode beim Temperieren?', answer: 'Zwei Drittel der Kuvertüre im Wasserbad schmelzen, von der Hitze nehmen und das restliche feingehackte Drittel kalte Kuvertüre unterrühren, bis die perfekte Arbeitstemperatur erreicht ist.' },
     ],
-    relatedSlugs: ["backzeit-temperatur-umluft-oberhitze-rechner","temperatur-umrechner","cups-in-gramm-rechner"],
+    relatedSlugs: ['backzeit-temperatur-umluft-oberhitze-rechner', 'temperatur-umrechner', 'cups-in-gramm-rechner'],
   },
 ];

@@ -2,10 +2,20 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
 export function calculateBMI(inputs: Record<string, any>): CalculationResult {
-  const weight = parseFloat(inputs.weight) || 75;
-  const heightCm = parseFloat(inputs.height) || 178;
+  const unitSystem = inputs.unitSystem || 'metric'; // 'metric' (kg, cm) vs 'imperial' (lbs, inch)
+  let rawWeight = parseFloat(inputs.weight) || 75;
+  let rawHeight = parseFloat(inputs.height) || 178;
 
-  if (weight <= 0 || heightCm <= 0) {
+  let weightKg = rawWeight;
+  let heightCm = rawHeight;
+
+  if (unitSystem === 'imperial') {
+    // rawWeight in lbs, rawHeight in inches
+    weightKg = rawWeight * 0.45359237;
+    heightCm = rawHeight * 2.54;
+  }
+
+  if (weightKg <= 0 || heightCm <= 0) {
     return {
       primary: { id: 'bmi', label: 'BMI', value: 0, formattedValue: '0' },
       error: 'Bitte positive Werte für Gewicht und Körpergröße eingeben.',
@@ -13,35 +23,32 @@ export function calculateBMI(inputs: Record<string, any>): CalculationResult {
   }
 
   const heightM = heightCm / 100;
-  const bmi = weight / (heightM * heightM);
+  const bmi = weightKg / (heightM * heightM);
 
   // WHO Klassifikation
   let category = 'Normalgewicht';
-  let color = 'green';
 
   if (bmi < 18.5) {
     category = 'Untergewicht';
-    color = 'blue';
   } else if (bmi >= 18.5 && bmi < 25) {
     category = 'Normalgewicht';
-    color = 'green';
   } else if (bmi >= 25 && bmi < 30) {
     category = 'Übergewicht (Präadipositas)';
-    color = 'orange';
   } else if (bmi >= 30 && bmi < 35) {
     category = 'Adipositas Grad I';
-    color = 'red';
   } else if (bmi >= 35 && bmi < 40) {
     category = 'Adipositas Grad II';
-    color = 'red';
   } else {
     category = 'Adipositas Grad III (starke Adipositas)';
-    color = 'red';
   }
 
   // Normalgewichtsbereich nach WHO (BMI 18.5 bis 24.9)
-  const minNormalWeight = 18.5 * (heightM * heightM);
-  const maxNormalWeight = 24.9 * (heightM * heightM);
+  const minNormalKg = 18.5 * (heightM * heightM);
+  const maxNormalKg = 24.9 * (heightM * heightM);
+
+  const normalRangeText = unitSystem === 'imperial'
+    ? `${formatNumber(minNormalKg * 2.20462, 1)} lbs – ${formatNumber(maxNormalKg * 2.20462, 1)} lbs`
+    : `${formatNumber(minNormalKg, 1)} kg – ${formatNumber(maxNormalKg, 1)} kg`;
 
   return {
     primary: {
@@ -53,8 +60,8 @@ export function calculateBMI(inputs: Record<string, any>): CalculationResult {
     },
     secondary: [
       { id: 'category', label: 'WHO-Klassifikation', value: category, formattedValue: category },
-      { id: 'normalRange', label: `Normalgewichtsbereich (bei ${formatNumber(heightCm, 0)} cm)`, value: minNormalWeight, formattedValue: `${formatNumber(minNormalWeight, 1)} kg – ${formatNumber(maxNormalWeight, 1)} kg` },
-      { id: 'formula', label: 'Verwendete Formel', value: 'kg / m²', formattedValue: 'Gewicht in kg / (Größe in m)²' },
+      { id: 'normalRange', label: `Normalgewichtsbereich (bei ${formatNumber(rawHeight, 0)} ${unitSystem === 'imperial' ? 'Zoll' : 'cm'})`, value: minNormalKg, formattedValue: normalRangeText },
+      { id: 'formula', label: 'Verwendete Formel', value: 'kg / m²', formattedValue: unitSystem === 'imperial' ? '703 × Gewicht (lbs) / Größe (in)²' : 'Gewicht in kg / (Größe in m)²' },
       { id: 'disclaimer', label: 'Medizinischer Hinweis', value: 'Hinweis', formattedValue: 'Dient der Orientierung, ersetzt keine ärztliche Diagnose.' },
     ],
     summaryText: `Ihr Body-Mass-Index beträgt ${formatNumber(bmi, 1)}. Nach der Klassifikation der Weltgesundheitsorganisation (WHO) entspricht dies der Kategorie „${category}“.`,
@@ -66,7 +73,9 @@ export function calculateCalorieNeeds(inputs: Record<string, any>): CalculationR
   const weight = parseFloat(inputs.weight) || 75;
   const heightCm = parseFloat(inputs.height) || 178;
   const age = parseInt(inputs.age || '30', 10);
-  const pal = parseFloat(inputs.activityLevel) || 1.4; // PAL (Physical Activity Level) 1.2 sitzend, 1.4 leicht, 1.6 mäßig, 1.8 schwer
+  const pal = parseFloat(inputs.activityLevel) || 1.4; // PAL
+  const formula = inputs.formula || 'mifflin'; // 'mifflin' vs 'harris_benedict'
+  const goal = inputs.goal || 'maintain'; // 'maintain', 'lose', 'gain'
 
   if (weight <= 0 || heightCm <= 0 || age <= 0) {
     return {
@@ -75,32 +84,56 @@ export function calculateCalorieNeeds(inputs: Record<string, any>): CalculationR
     };
   }
 
-  // Mifflin-St Jeor Formel:
-  // BMR = 10 * Gewicht (kg) + 6.25 * Größe (cm) - 5 * Alter (Jahre) + s
-  // s = +5 für Männer, -161 für Frauen
-  const s = gender === 'male' ? 5 : -161;
-  const bmr = 10 * weight + 6.25 * heightCm - 5 * age + s;
-  const tdee = bmr * pal; // Gesamtenergieumsatz
+  let bmr = 0;
+  let formulaName = 'Mifflin-St Jeor Formel';
 
-  // Ziele:
+  if (formula === 'harris_benedict') {
+    // Revidierte Harris-Benedict-Formel (Roza und Shizgal, 1984):
+    // Männer: BMR = 88.362 + (13.397 × kg) + (4.799 × cm) - (5.677 × Alter)
+    // Frauen: BMR = 447.593 + (9.247 × kg) + (3.098 × cm) - (4.330 × Alter)
+    if (gender === 'male') {
+      bmr = 88.362 + (13.397 * weight) + (4.799 * heightCm) - (5.677 * age);
+    } else {
+      bmr = 447.593 + (9.247 * weight) + (3.098 * heightCm) - (4.330 * age);
+    }
+    formulaName = 'Revidierte Harris-Benedict-Formel';
+  } else {
+    // Mifflin-St Jeor Formel:
+    const s = gender === 'male' ? 5 : -161;
+    bmr = 10 * weight + 6.25 * heightCm - 5 * age + s;
+    formulaName = 'Mifflin-St Jeor Formel (Goldstandard)';
+  }
+
+  const tdee = bmr * pal; // Gesamtenergieumsatz
   const deficit = Math.max(1200, tdee - 500); // Gesundes Abnehmen ca. 500 kcal Defizit
   const surplus = tdee + 300; // Moderater Muskelaufbau
 
+  let targetCalories = tdee;
+  let primaryLabel = 'Gesamtenergiebedarf (Gewicht halten)';
+  if (goal === 'lose') {
+    targetCalories = deficit;
+    primaryLabel = 'Zielkalorien zum gesunden Abnehmen (-500 kcal)';
+  } else if (goal === 'gain') {
+    targetCalories = surplus;
+    primaryLabel = 'Zielkalorien zum Muskelaufbau (+300 kcal)';
+  }
+
   return {
     primary: {
-      id: 'tdee',
-      label: 'Gesamtenergiebedarf (TDEE)',
-      value: tdee,
-      formattedValue: `${formatNumber(tdee, 0)} kcal / Tag`,
+      id: 'targetCal',
+      label: primaryLabel,
+      value: targetCalories,
+      formattedValue: `${formatNumber(targetCalories, 0)} kcal / Tag`,
       highlight: true,
     },
     secondary: [
+      { id: 'tdee', label: 'Täglicher Erhaltungsbedarf (TDEE)', value: tdee, formattedValue: `${formatNumber(tdee, 0)} kcal / Tag` },
       { id: 'bmr', label: 'Grundumsatz (BMR bei völliger Ruhe)', value: bmr, formattedValue: `${formatNumber(bmr, 0)} kcal / Tag` },
-      { id: 'deficit', label: 'Kalorienziel zum gesunden Abnehmen (-500 kcal)', value: deficit, formattedValue: `${formatNumber(deficit, 0)} kcal` },
-      { id: 'surplus', label: 'Kalorienziel zum Muskelaufbau (+300 kcal)', value: surplus, formattedValue: `${formatNumber(surplus, 0)} kcal` },
-      { id: 'formula', label: 'Wissenschaftliche Berechnung', value: 'Mifflin-St Jeor', formattedValue: 'Mifflin-St Jeor Formel' },
+      { id: 'deficit', label: 'Abnehm-Ziel (-500 kcal Defizit)', value: deficit, formattedValue: `${formatNumber(deficit, 0)} kcal / Tag` },
+      { id: 'surplus', label: 'Aufbau-Ziel (+300 kcal Überschuss)', value: surplus, formattedValue: `${formatNumber(surplus, 0)} kcal / Tag` },
+      { id: 'formulaUsed', label: 'Berechnungsmethode', value: formulaName, formattedValue: formulaName },
     ],
-    summaryText: `Ihr täglicher Grundumsatz beträgt ${formatNumber(bmr, 0)} kcal. Unter Berücksichtigung Ihres Aktivitätslevels (PAL ${pal}) liegt Ihr Gesamtumsatz (TDEE) bei ${formatNumber(tdee, 0)} kcal pro Tag.`,
+    summaryText: `Ihr täglicher Grundumsatz beträgt ${formatNumber(bmr, 0)} kcal (${formulaName}). Mit Ihrem Aktivitätslevel (PAL ${pal}) liegt Ihr Erhaltungsbedarf bei ${formatNumber(tdee, 0)} kcal/Tag. Für Ihr gewähltes Ziel (${goal === 'lose' ? 'Abnehmen' : goal === 'gain' ? 'Muskelaufbau' : 'Gewicht halten'}) werden täglich ${formatNumber(targetCalories, 0)} kcal empfohlen.`,
   };
 }
 

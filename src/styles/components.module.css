@@ -2,6 +2,7 @@
 .breadcrumbsNav {
   margin-bottom: var(--space-4);
   font-size: 0.85rem;
+  width: 100%;
 }
 
 .breadcrumbList {
@@ -9,22 +10,27 @@
   flex-wrap: wrap;
   align-items: center;
   list-style: none;
-  gap: var(--space-2);
+  gap: var(--space-1) var(--space-2);
+  padding: 0;
+  margin: 0;
 }
 
 .breadcrumbItem {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .breadcrumbSeparator {
   color: var(--color-text-muted);
+  flex-shrink: 0;
 }
 
 .breadcrumbLink {
   color: var(--color-text-muted);
   text-decoration: none;
+  overflow-wrap: break-word;
 }
 
 .breadcrumbLink:hover {
@@ -35,20 +41,23 @@
 .breadcrumbCurrent {
   color: var(--color-text-secondary);
   font-weight: 500;
+  overflow-wrap: break-word;
 }
 
 /* Formula Box */
 .formulaSection {
   margin-top: var(--space-8);
   margin-bottom: var(--space-8);
+  width: 100%;
 }
 
 .sectionTitle {
-  font-size: 1.35rem;
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
   font-weight: 700;
   margin-top: 0;
   margin-bottom: var(--space-4);
   color: var(--color-text-primary);
+  overflow-wrap: break-word;
 }
 
 .formulaBox {
@@ -59,25 +68,42 @@
   padding: var(--space-4) var(--space-5);
   margin-bottom: var(--space-3);
   box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .formulaBox {
+    padding: var(--space-3) var(--space-4);
+  }
 }
 
 .formulaCode {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: clamp(0.85rem, 2.5vw, 1.05rem);
   font-weight: 600;
   color: var(--color-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: block;
+  line-height: 1.5;
 }
 
 .formulaDescription {
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--color-text-secondary);
+  overflow-wrap: break-word;
 }
 
-/* FAQ */
+/* FAQ with Mobile Touch Target */
 .faqSection {
   margin-top: var(--space-8);
   margin-bottom: var(--space-8);
+  width: 100%;
 }
 
 .faqList {
@@ -99,9 +125,10 @@
 }
 
 .faqQuestion {
-  padding: var(--space-4);
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.975rem;
   color: var(--color-text-primary);
   cursor: pointer;
   user-select: none;
@@ -109,6 +136,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-3);
+  box-sizing: border-box;
 }
 
 .faqQuestion::-webkit-details-marker {
@@ -119,6 +148,7 @@
   content: "+";
   font-size: 1.25rem;
   color: var(--color-text-muted);
+  flex-shrink: 0;
   transition: transform 0.2s ease;
 }
 
@@ -131,6 +161,7 @@
   color: var(--color-text-secondary);
   font-size: 0.925rem;
   line-height: 1.6;
+  overflow-wrap: break-word;
 }
 
 .faqAnswer p {
@@ -143,6 +174,7 @@
   margin-bottom: var(--space-10);
   border-top: 1px solid var(--color-border);
   padding-top: var(--space-8);
+  width: 100%;
 }
 
 .relatedHeader {
@@ -161,12 +193,14 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-primary);
+  min-height: 36px;
 }
 
 .relatedGrid {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-4);
+  width: 100%;
 }
 
 @media (min-width: 640px) {
@@ -189,6 +223,9 @@
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
@@ -212,10 +249,12 @@
 }
 
 .relatedCardTitle {
-  font-size: 1rem;
+  font-size: 0.975rem;
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .relatedCardDesc {
@@ -224,6 +263,7 @@
   color: var(--color-text-secondary);
   flex-grow: 1;
   margin-bottom: var(--space-3);
+  overflow-wrap: break-word;
 }
 
 .relatedCardAction {
@@ -233,4 +273,5 @@
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-primary);
+  min-height: 32px;
 }

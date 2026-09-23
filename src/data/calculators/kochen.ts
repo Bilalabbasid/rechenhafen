@@ -47,13 +47,14 @@ export const KOCHEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '750,0 g',
     },
     content: {
-      intro: 'Kochen für Gäste oder eine kleinere Runde? Mit dem Portionsrechner müssen Sie nicht mehr mühsam im Kopf Dreisatz rechnen.',
-      details: 'Geben Sie einfach die Mengenangabe der Zutat ein und erhalten Sie sofort das auf Ihre Gästezahl abgestimmte Ergebnis.',
+      intro: 'Dieser Portionsrechner skaliert alle Rezeptzutaten linear auf jede gewünschte Personenanzahl oder Tellerportion.',
+      details: 'Menge neu = Originalmenge · (Neue Portionen / Originalportionen). Bei Gewürzen, Salz und Schärfe (Chili) empfiehlt sich ein leicht unterproportionaler Faktor, um ein Überwürzen großer Mengen zu verhindern.',
     },
     faqs: [
-      { question: 'Müssen Gewürze und Salz exakt linear skaliert werden?', answer: 'Vorsicht bei Gewürzen, Chili und Salz: Bei großen Mengen (z.B. für 20 Personen) verhält sich die Würzkraft oft intensiver. Würzen Sie zunächst mit etwas weniger als dem errechneten Wert und schmecken Sie ab.' },
+      { question: 'Muss man Garzeiten verdoppeln, wenn man für doppelt so viele Personen kocht?', answer: 'Nein! Garzeiten hängen von der Dicke des Garguts und der Temperatur ab, nicht von der Gesamtmenge im Topf (sofern der Topf groß genug ist).' },
+      { question: 'Wie skaliert man Eier bei ungeraden Portionszahlen (z. B. 1,5 Eier)?', answer: 'Verquirlen Sie ein ganzes Ei mit der Gabel in einer Tasse und wiegen Sie die Hälfte des verquirlten Eies ab (ein Ei Gr. M wiegt ca. 50 g ohne Schale).' },
     ],
-    relatedSlugs: ['backform-umrechner', 'gramm-in-ml-rechner', 'dreisatzrechner'],
+    relatedSlugs: ['fondue-raclette-mengen-rechner', 'backform-umrechner', 'gramm-in-ml-rechner', 'dreisatzrechner'],
   },
   {
     id: 'backform-umrechner',
@@ -81,11 +82,12 @@ export const KOCHEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Faktor: 0,59 × (ca. 40 % weniger Teig)',
     },
     content: {
-      intro: 'Ein Rezept ist für eine 26-cm-Springform geschrieben, Sie haben aber nur eine kleine 20-cm-Form? Wer hier nur den Durchmesser vergleicht, backt falsch.',
-      details: 'Die Teighöhe bleibt nur dann gleich, wenn das Flächenverhältnis beider Formen exakt berechnet wird.',
+      intro: 'Dieser Backform-Umrechner skaliert Zutatenmengen quadratisch anhand des Durchmessers runder Springformen oder rechteckiger Backbleche.',
+      details: 'Umrechnungsfaktor = Neue Grundfläche / Alte Grundfläche = (d_neu / d_alt)². Der Wechsel von einer 26-cm-Springform auf eine 28-cm-Form verlangt ca. 16 Prozent mehr Teig; der Wechsel von 26 cm auf 20 cm spart 41 Prozent Teig.',
     },
     faqs: [
-      { question: 'Verändert sich die Backzeit bei kleineren Backformen?', answer: 'Ja. Wenn die Teighöhe gleich bleibt, backt ein kleinerer Kuchen meist etwa 5 bis 10 Minuten schneller durch. Machen Sie rechtzeitig die Stäbchenprobe.' },
+      { question: 'Wie ändert sich die Backzeit bei einer kleineren oder größeren Backform?', answer: 'Wird der Teig in einer größeren Form flacher, verkürzt sich die Backzeit um ca. 15 bis 20 %; wird der Kuchen in einer kleineren Form dicker, verlängert sich die Backzeit bei evtl. leicht reduzierter Hitze.' },
+      { question: 'Welchem Springform-Durchmesser entspricht ein normales Backblech (ca. 40 × 30 cm)?', answer: 'Ein Backblech hat ca. 1.200 cm² Fläche; das entspricht exakt dem Teigvolumen von zwei 28-cm-Springformen (je ca. 615 cm²).' },
     ],
     relatedSlugs: ['portionsrechner', 'gramm-in-ml-rechner', 'kreisrechner'],
   },
@@ -130,12 +132,13 @@ export const KOCHEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'ca. 377 ml',
     },
     content: {
-      intro: 'Sie haben keine Küchenwaage zur Hand, sondern nur einen Messbecher mit Milliliter-Skala? Achtung: 100 g Mehl sind keineswegs 100 ml!',
-      details: 'Dieser Rechner berücksichtigt die reale Schüttdichte jeder Zutat für perfekte Back- und Kochergebnisse.',
+      intro: 'Dieser Küchenumrechner transformiert Gramm in Milliliter und umgekehrt unter Berücksichtigung der physikalischen Schütt- und Flüssigkeitsdichte der Zutat.',
+      details: 'Volumen in ml = Masse in Gramm / Dichte in g/ml. Während 100 ml Wasser exakt 100 g wiegen, wiegen 100 ml Pflanzenöl nur ca. 92 g, 100 ml Bienenhonig ca. 142 g und 100 ml Mehl locker geschüttet nur rund 60 g.',
     },
     faqs: [
-      { question: 'Gilt 1 Gramm = 1 Milliliter für alle Flüssigkeiten?', answer: 'Nein, das gilt nur für Wasser (und annähernd für Milch). Speiseöl ist leichter als Wasser (100 ml Öl wiegen ca. 92 g), Honig ist schwerer (100 ml Honig wiegen ca. 142 g).' },
+      { question: 'Warum kann man Mehl auf dem Messbecher nicht millimetergenau ablesen?', answer: 'Weil Mehl kompressibel ist: Gesiebtes oder locker geschüttetes Mehl hat eine Dichte von ca. 0,55 g/ml; fest gerütteltes Mehl bis zu 0,75 g/ml (Präzisionsbacken erfordert eine Küchenwaage).' },
+      { question: 'Wie viel wiegt 1 Liter Vollmilch?', answer: 'Aufgrund des Gehalts an Milchzucker, Proteinen und Mineralstoffen wiegt 1 Liter Milch ca. 1.030 Gramm.' },
     ],
-    relatedSlugs: ['portionsrechner', 'backform-umrechner'],
+    relatedSlugs: ['portionsrechner', 'backform-umrechner', 'hefe-umrechner'],
   },
 ];

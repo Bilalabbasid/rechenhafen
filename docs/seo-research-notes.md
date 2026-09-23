@@ -102,15 +102,27 @@ Die folgenden Paare sind echte funktionale Duplikate und sollten konsolidiert od
 
 ## 5. SEO-Strategie-Empfehlungen
 
-### 5.1 Priorisierung nach Opportunitäts-Matrix
+### 5.1 Aktualisierte Priorisierungs-Roadmap nach 3-Tier-Modell
 
-| Priorität | Aktion | Reasoning |
-|---|---|---|
-| 1 | Brutto-Netto-Rechner bauen | Kritische Lücke, höchstes Suchvolumen |
-| 2 | Kannibalisierung beheben (sparziel, inflationsrechner, datumsdifferenz) | Google kann momentan nicht entscheiden — Autorität wird gesplittet |
-| 3 | Tier-1-Rechner Content-Depth erhöhen | Titel, FAQ, Erklärtext, Beispielrechnungen |
-| 4 | Zinsrechner (einfache Zinsen) ergänzen | Lücke im Intent-Cluster |
-| 5 | Pendlerpauschale-Rechner | Saisonales Volumen, gut abzugrenzen |
+#### Tier 1: Quick Wins (Sofortige organische Traktion / Schwache SERP-Konkurrenz)
+1. **Kündigungsfrist-Rechner (§ 622 BGB)**: Juristische Seiten bieten nur Text ohne Rechner; interaktiver Fristenrechner bietet sofortigen Mehrwert.
+2. **Balkonkraftwerk-Rechner (800 W Stecker-Solar)**: Neutraler Ertrags- und Amortisationsrechner ohne Händler-Upselling oder Vendor-Bias.
+3. **Spardauer-Rechner**: Löst das inverse Problem („Wie lange muss ich sparen?“) mit logarithmischer Formel in Echtzeit.
+4. **Urlaubsabgeltungs-Rechner (§ 11 BUrlG)**: Exakte Auszahlung verbleibender Urlaubstage bei Jobwechsel/Kündigung.
+5. **Skonto-Jahreszins & Kreditvergleich**: B2B/Selbstständigen-Entscheidungslogik (Skonto ziehen vs. Kontokorrent nutzen).
+
+#### Tier 2: Medium Opportunities (Topische Cluster-Autorität & Modernes UX)
+6. **Teilzeit-Gehaltsrechner**: Stundenreduzierung (40 h → 32 h) mit Netto-Vergleich und Steuerprogressions-Puffer.
+7. **Ballonfinanzierung-Rechner**: Kfz-Kredit mit Schlussrate – 100 % werbefrei und ohne Datenabfrage (Gegenentwurf zu Check24).
+8. **Pendlerpauschale-Rechner (2026)**: Berücksichtigung von 0,30 € / 0,38 € ab km 21 und Homeoffice-Pauschale.
+9. **Photovoltaik-Amortisationsrechner**: Unabhängiger Dachanlagen-Rechner mit Speicher und realistischer Einspeisevergütung.
+10. **Kaufkraftverlust-Rechner**: Reale Restkaufkraft von Ersparnissen unter Berücksichtigung von Tagesgeldzins vs. Inflation.
+
+#### Tier 3: Long-Term Competitive Head Terms (YMYL Säulen mit hoher Autoritätsbarriere)
+11. **Zinseszinsrechner**: Interaktive Vermögenswachstum-Visualisierung für ETF- und Sparplan-Anleger.
+12. **Tilgungsrechner / Baufinanzierung**: Hypothekendarlehen mit jährlicher Sondertilgung und vollständigem Tilgungsplan-Export.
+13. **BMI-Rechner**: Alters- und geschlechtsbereinigter Body-Mass-Index mit WHtR-Ergänzung für Sportler.
+14. **Brutto-Netto-Rechner (2026)**: Vollständige 2026-Steuer- und Sozialversicherungsberechnung als zentrales Traffic-Fundament.
 
 ### 5.2 Technische SEO-Prioritäten (bereits implementiert laut Vorarbeit)
 - ✅ Statisches Rendering (Next.js SSG) — schnelle Core Web Vitals
@@ -158,3 +170,27 @@ Um die NOT VERIFIED-Metriken in `seo-map.json` mit echten Daten zu befüllen:
 ```bash
 npx tsx scripts/generate-seo-map.ts
 ```
+
+---
+
+## 8. Ethische Off-Page-SEO-Strategie & Verifizierter Prospecting-Framework
+
+### 8.1 Grundsätze
+- Keine PBNs, automatisierte Tools, Foren-Spam, Linkkauf oder manipulierte Einträge.
+- Backlinks werden durch **nützliche Datenressourcen (Linkable Assets)**, didaktische Visualisierungen und journalistische Studien verdient.
+
+### 8.2 Verifizierte Prospecting-Matrix (DACH)
+
+| Domain | Relevante Seite / Rubrik | Organisationstyp | Relevantes Asset | Outreach-Grund | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **bildungsserver.de** | `/mathematik/` (Unterrichtsmaterialien) | Staatliches Bildungsportal | Stromkosten-Matrix / Mathe-Tools | Didaktische, werbefreie Online-Rechner für Schulen | Prospect / Uncontacted |
+| **vcd.org** | Mobilitätsberatung & Service | Verkehrsclub Deutschland e. V. | Pendler-Kosten-Report 2026 | Unabhängiger Vergleich Pkw vs. ÖPNV vs. Deutschlandticket | Prospect / Uncontacted |
+| **verbraucherzentrale.de** | Energie & Stecker-Solar Ratgeber | Verbraucherzentrale Bundesverband | Balkonkraftwerk Amortisationsstudie | Neutrale Amortisationsrechnung ohne Verkaufsdruck | Prospect / Uncontacted |
+| **tum.de** | Fachschafts-Wikis & Service-Seiten | Technische Universität München | BGB-Kündigungsfristen / Urlaubsabgeltung | Hilfestellung für Werkstudenten & SHKs | Prospect / Uncontacted |
+| **uni-heidelberg.de** | Studierendenwerk / Sozialberatung | Universität Heidelberg | Arbeitsrecht & Nebenjob-Rechner | Fristen und Urlaubsabgeltung bei studentischen Hilfskräften | Prospect / Uncontacted |
+| **gruendung.de** | `/finanzen/` Gründer-Ressourcen | Fachportal für Existenzgründer | Skonto-Jahreszins & Stundensatz-Rechner | B2B-Liquiditäts- und Skonto-Entscheidungshilfe | Prospect / Uncontacted |
+| **lehrer-online.de** | Mathematik & Wirtschaft | Bildungsportal für digitale Medien | Kaufkraft- & Zinseszins-Visualisierung | Veranschaulichung von Zinseszins und Realzins im Unterricht | Prospect / Uncontacted |
+| **mieterbund.de** | Ratgeber Energie & Nebenkosten | Deutscher Mieterbund (DMB) | Stecker-Solar & Haushaltsstrom | Orientierung für Mieter bei Balkonkraftwerken & Stromkosten | Prospect / Uncontacted |
+| **dgb-jugend.de** | Portal `Dr. Azubi` | DGB Jugend | Kündigungsfristen & Urlaubsabgeltung | Arbeitsrechtliche Unterstützung junger Beschäftigter | Prospect / Uncontacted |
+| **webrechner.de** | Umrechner- & Tool-Verzeichnis | Kuriertes Tool-Verzeichnis | Plattform-Katalog | Gepflegtes Qualitätsverzeichnis für deutsche Web-Tools | Prospect / Uncontacted |
+

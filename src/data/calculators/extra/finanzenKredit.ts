@@ -13,7 +13,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Tagesgeld Rechner – Zinsen & Zinsertrag online berechnen',
     metaDescription: 'Berechnen Sie Ihren Zinsertrag auf Tagesgeldkonten: Monatliche, vierteljährliche oder jährliche Zinsgutschrift mit Zinseszinseffekt.',
     h1: 'Tagesgeld Rechner (Zinsertrag & Zinsintervall)',
-    shortDescription: 'Ermittelt die Zinserträge für Tagesgeldanlagen unter Berücksichtigung des Zinsgutschrift-Intervalls.',
+    shortDescription: 'Ermittelt die Zinserträge für Tagesgeldanlagen unter Berücksichtigung des Zinsgutschrift-Intervalls mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['tagesgeld rechner', 'tagesgeld zinsen berechnen', 'zinsertrag tagesgeld monatlich', 'zinseszins tagesgeld'],
     inputs: [
       { id: 'deposit', label: 'Anlagebetrag', type: 'number', defaultValue: 10000, min: 100, step: 500, unit: '€' },
@@ -61,13 +61,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 354,62 € Zinsertrag',
     },
     content: {
-      intro: 'Tagesgeld ist die beliebteste Form der flexiblen Geldanlage in Deutschland. Ihr Erspartes bleibt täglich verfügbar.',
-      details: 'Durch die gesetzliche Einlagensicherung sind Guthaben bis 100.000 Euro pro Bank geschützt.',
+      intro: 'Tagesgeld bietet tägliche Verfügbarkeit bei voller Einlagensicherung bis 100.000 € je Kunde und Bank nach EU-Recht.',
+      details: 'Zinsertrag = Anlagebetrag · (Zinssatz / 100) · (Tage / 360) nach deutscher Zinsmethode. Bei vierteljährlicher oder monatlicher Zinsgutschrift entsteht ein spürbarer Zinseszinseffekt.',
     },
     faqs: [
-      { question: 'Wie sicher ist Tagesgeld?', answer: 'Einlagen bis 100.000 Euro pro Person und Bank sind gesetzlich durch die Entschädigungseinrichtung deutscher Banken (EdB) abgesichert.' },
+      { question: 'Wie sicher ist Tagesgeld bei Banken in der EU?', answer: 'Über die gesetzliche Einlagensicherung (EdB in Deutschland) sind Einlagen bis 100.000 € pro Person und Kreditinstitut gesetzlich garantiert abgesichert.' },
+      { question: 'Was ist der Unterschied zwischen Aktionszins und Bestandskundenzins?', answer: 'Banken locken Neukunden oft mit zeitlich befristeten Zinsgarantien (z. B. für 3 bis 6 Monate); danach fällt der Zins auf das variable Niveau für Bestandskunden zurück.' },
     ],
-    relatedSlugs: ['zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['liquiditaetsreserve-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
   },
   {
     id: 'festgeld-rechner',
@@ -110,69 +111,110 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '1.486,81 € Zinsgewinn',
     },
     content: {
-      intro: 'Festgeld bietet planbare Erträge für Gelder, die über einen festen Zeitraum nicht benötigt werden.',
-      details: 'Festgeld unterliegt keinen Kursschwankungen und ist bis 100.000 € gesetzlich geschützt.',
+      intro: 'Festgeld garantiert einen festen Zinssatz über eine fest vereinbarte Laufzeit (z. B. 6, 12, 24 oder 36 Monate) ohne Zinsänderungsrisiko.',
+      details: 'Da das Kapital während der Laufzeit unkündbar gebunden ist, belohnen Banken Festgeld typischerweise mit planbaren Zinsen, die unabhängig von EZB-Zinssenkungen konstant bleiben.',
     },
     faqs: [
-      { question: 'Kann man vorzeitig an das Festgeld?', answer: 'In der Regel nein. Bei vorzeitiger Auflösung aus Kulanz entfallen meist die Zinsen.' },
+      { question: 'Kann man ein Festgeldkonto vor Ablauf der Laufzeit vorzeitig kündigen?', answer: 'Grundsätzlich nein. Nur in extremen Härtefällen (§ 314 BGB) stimmen Banken einer vorzeitigen Auflösung zu, meist unter vollständigem Verlust aller aufgelaufenen Zinsen.' },
+      { question: 'Was ist die Festgeld-Treppen-Strategie?', answer: 'Man teilt das Sparvermögen auf mehrere Festgelder mit gestaffelten Laufzeiten (1, 2, 3 Jahre) auf; so wird jedes Jahr ein Teilbetrag fällig und liquide wiederanlegbar.' },
     ],
-    relatedSlugs: ['tagesgeld-rechner', 'zinseszinsrechner', 'sparziel-rechner'],
+    relatedSlugs: ['tagesgeld-rechner', 'zinseszinsrechner', 'spardauer-rechner'],
   },
   {
-    id: 'sparziel-rechner',
-    slug: 'sparziel-rechner',
-    name: 'Sparziel-Rechner (Wie viel muss ich monatlich sparen?)',
-    shortName: 'Sparziel berechnen',
+    id: 'spardauer-rechner',
+    slug: 'spardauer-rechner',
+    name: 'Spardauer-Rechner (Dauer bis zum Sparziel)',
+    shortName: 'Spardauer berechnen',
     category: 'finanzen',
     subcategory: 'Sparen & Vermögensaufbau',
-    metaTitle: 'Sparziel Rechner – Benötigte monatliche Sparrate online ermitteln',
-    metaDescription: 'Ermitteln Sie die erforderliche Monatsrate, um Ihr Sparziel (z. B. 20.000 € für Autokauf oder Eigenkapital) in X Jahren zu erreichen.',
-    h1: 'Sparziel Rechner (Monatliche Sparrate)',
-    shortDescription: 'Berechnet die notwendige monatliche Einzahlung, um ein Wunschvermögen termingerecht aufzubauen.',
-    searchKeywords: ['sparziel rechner', 'wie viel muss ich monatlich sparen', 'sparrate fuer sparziel', 'vermoegen ansparen formel'],
+    metaTitle: 'Spardauer Rechner – Dauer bis zum Sparziel berechnen',
+    metaDescription: 'Berechnen Sie, wie viele Jahre und Monate Sie mit einer festen monatlichen Sparrate und Zinseszins sparen müssen, um Ihr Sparziel zu erreichen.',
+    h1: 'Spardauer Rechner – Dauer bis zum Sparziel exakt ermitteln',
+    shortDescription: 'Berechnet die exakte Spardauer in Jahren und Monaten, um mit einer regelmäßigen monatlichen Sparrate Ihr Sparziel zu erreichen.',
+    searchKeywords: ['spardauer rechner', 'spardauer berechnen', 'wie lange muss ich sparen', 'dauer bis sparziel', 'sparzeit berechnen'],
     inputs: [
       { id: 'targetAmount', label: 'Gewünschtes Sparziel', type: 'number', defaultValue: 25000, min: 1000, step: 1000, unit: '€' },
+      { id: 'monthlyContribution', label: 'Monatliche Sparrate', type: 'number', defaultValue: 350, min: 25, step: 25, unit: '€' },
       { id: 'initialCapital', label: 'Bereits vorhandenes Startkapital', type: 'number', defaultValue: 2000, min: 0, step: 500, unit: '€' },
-      { id: 'years', label: 'Anlagehorizont in Jahren', type: 'number', defaultValue: 5, min: 1, max: 40, step: 1, unit: 'Jahre' },
-      { id: 'expectedReturn', label: 'Erwartete Rendite p.a.', type: 'number', defaultValue: 4.0, min: 0, max: 15, step: 0.5, unit: '%' },
+      { id: 'expectedReturn', label: 'Erwartete Rendite / Zins p.a.', type: 'number', defaultValue: 4.0, min: 0, max: 15, step: 0.5, unit: '%' },
     ],
     calculate: (inputs) => {
       const target = parseFloat(inputs.targetAmount) || 25000;
+      const monthly = parseFloat(inputs.monthlyContribution) || 350;
       const start = parseFloat(inputs.initialCapital) || 0;
-      const years = parseInt(inputs.years, 10) || 5;
-      const ret = parseFloat(inputs.expectedReturn) || 4.0;
-      const months = years * 12;
+      const ret = parseFloat(inputs.expectedReturn) || 0;
+
+      if (start >= target) {
+        return {
+          primary: { id: 'duration', label: 'Benötigte Spardauer', value: 0, formattedValue: '0 Monate (Ziel bereits erreicht)', highlight: true },
+          secondary: [
+            { id: 'totalDeposits', label: 'Eigene Einzahlungen', value: start, formattedValue: formatCurrency(start) },
+            { id: 'interest', label: 'Erwirtschaftete Zinsen', value: 0, formattedValue: formatCurrency(0) },
+          ],
+          summaryText: `Ihr Startkapital von ${formatCurrency(start)} deckt das gewünschte Sparziel von ${formatCurrency(target)} bereits vollständig ab.`,
+        };
+      }
+
+      if (monthly <= 0) {
+        return {
+          primary: { id: 'duration', label: 'Benötigte Spardauer', value: 0, formattedValue: 'Nicht erreichbar', highlight: true },
+          error: 'Die monatliche Sparrate muss größer als 0 € sein.',
+        };
+      }
+
       const r = (ret / 100) / 12;
-      const futureStart = start * Math.pow(1 + r, months);
-      const remainingTarget = Math.max(0, target - futureStart);
-      const monthlyRate = r > 0 ? remainingTarget * (r / (Math.pow(1 + r, months) - 1)) : remainingTarget / months;
-      const totalDeposited = start + (monthlyRate * months);
-      const totalInterest = target - totalDeposited;
+      let totalMonths = 0;
+
+      if (r > 0) {
+        const num = target * r + monthly;
+        const den = start * r + monthly;
+        totalMonths = Math.ceil(Math.log(num / den) / Math.log(1 + r));
+      } else {
+        totalMonths = Math.ceil((target - start) / monthly);
+      }
+
+      const years = Math.floor(totalMonths / 12);
+      const remainingMonths = totalMonths % 12;
+
+      let durationText = '';
+      if (years > 0 && remainingMonths > 0) {
+        durationText = `${years} ${years === 1 ? 'Jahr' : 'Jahre'} und ${remainingMonths} ${remainingMonths === 1 ? 'Monat' : 'Monate'}`;
+      } else if (years > 0) {
+        durationText = `${years} ${years === 1 ? 'Jahr' : 'Jahre'}`;
+      } else {
+        durationText = `${remainingMonths} ${remainingMonths === 1 ? 'Monat' : 'Monate'}`;
+      }
+
+      const totalDeposited = start + (monthly * totalMonths);
+      const totalInterest = Math.max(0, target - totalDeposited);
+
       return {
-        primary: { id: 'rate', label: 'Erforderliche monatliche Sparrate', value: monthlyRate, formattedValue: formatCurrency(monthlyRate), highlight: true },
+        primary: { id: 'duration', label: 'Benötigte Spardauer', value: totalMonths, formattedValue: `${durationText} (${totalMonths} Monate)`, highlight: true },
         secondary: [
-          { id: 'own', label: 'Eigene Einzahlungen insgesamt', value: totalDeposited, formattedValue: formatCurrency(totalDeposited) },
-          { id: 'gains', label: 'Erwirtschaftete Zinsen/Rendite', value: Math.max(0, totalInterest), formattedValue: formatCurrency(Math.max(0, totalInterest)) },
+          { id: 'totalDeposits', label: 'Eigene Einzahlungen insgesamt', value: totalDeposited, formattedValue: formatCurrency(totalDeposited) },
+          { id: 'interest', label: 'Erwirtschaftete Zinsen/Rendite', value: totalInterest, formattedValue: formatCurrency(totalInterest) },
+          { id: 'totalMonths', label: 'Gesamtlaufzeit in Monaten', value: totalMonths, formattedValue: `${totalMonths} Monatsraten` },
         ],
-        summaryText: `Um in ${years} Jahren Ihr Ziel von ${formatCurrency(target)} zu erreichen, müssen Sie monatlich ${formatCurrency(monthlyRate)} ansparen.`,
+        summaryText: `Bei einer Sparrate von ${formatCurrency(monthly)} und ${formatPercent(ret)} Zinsen erreichen Sie Ihr Sparziel von ${formatCurrency(target)} in ${durationText}.`,
       };
     },
-    formula: 'Sparrate = (Ziel - Start × (1+r)^n) / Rentenendwertfaktor',
-    formulaExplanation: 'Ermittelt die monatliche Annuität zur Erreichung des Zielkapitals unter Berücksichtigung des Zinseszinses.',
+    formula: 'm = ln((Ziel · r + Rate) / (Start · r + Rate)) / ln(1 + r)',
+    formulaExplanation: 'Ermittelt die exakte Laufzeit n in Monaten, die erforderlich ist, um ein Kapitalziel bei monatlicher Einzahlung und Zinseszinseffekt zu erreichen.',
     workedExample: {
-      title: 'Beispiel: 25.000 € Ziel in 5 Jahren bei 4 % Rendite',
-      description: 'Monatliche Sparrate ca. 344 €.',
-      inputs: { targetAmount: 25000, initialCapital: 2000, years: 5, expectedReturn: 4.0 },
-      resultSummary: 'ca. 344 € / Monat',
+      title: 'Beispiel: 25.000 € Sparziel mit 350 € Monatsrate bei 4 % Rendite',
+      description: 'Benötigte Spardauer: ca. 4 Jahre und 11 Monate (59 Monate) bei 2.000 € Startkapital.',
+      inputs: { targetAmount: 25000, monthlyContribution: 350, initialCapital: 2000, expectedReturn: 4.0 },
+      resultSummary: 'ca. 4 Jahre und 11 Monate (59 Monate)',
     },
     content: {
-      intro: 'Ob Notgroschen, Traumreise oder Eigenkapital: Mit dem Sparziel-Rechner planen Sie Ihr Vorhaben realistisch.',
-      details: 'Durch den Zinseszinseffekt fällt die monatliche Sparrate spürbar geringer aus als beim zinslosen Sparen.',
+      intro: 'Der Spardauer-Rechner ermittelt, wie viele Monate und Jahre Sie regelmäßig Geld anlegen müssen, um ein definiertes Vermögensziel inklusive Zinseszins zu erreichen.',
+      details: 'Im Gegensatz zum Sparzielrechner (der die erforderliche Rate bei fixer Laufzeit berechnet) bestimmt dieser Rechner die Zeitdauer bei gegebener Monatsrate – ideal zur realistischen Lebens- und Anschaffungsplanung.',
     },
     faqs: [
-      { question: 'Welche Rendite sollte man ansetzen?', answer: 'Kurzfristig (1-3 Jahre) 2 bis 3,5 % auf Tagesgeld. Langfristig (ab 10 Jahren) mit ETFs ca. 5 bis 7 %.' },
+      { question: 'Wie verkürzt eine Zinserhöhung die Spardauer?', answer: 'Durch den Zinseszinseffekt wächst der Ertragsanteil exponentiell; bereits 1 bis 2 Prozentpunkte mehr Jahresrendite können die Spardauer um mehrere Jahre verkürzen.' },
+      { question: 'Was passiert bei einer Einmalzahlung zu Beginn?', answer: 'Ein höheres Startkapital arbeitet von Tag 1 an mit vollem Zinseszins und reduziert die verbleibende Spardauer überproportional stark.' },
     ],
-    relatedSlugs: ['etf-sparplan-rechner', 'zinseszinsrechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['sparzielrechner', 'sparrechner', 'zinseszinsrechner', 'etf-sparplan-rechner'],
   },
   {
     id: 'kaufkraftverlust-rechner',
@@ -181,46 +223,51 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Kaufkraftverlust',
     category: 'finanzen',
     subcategory: 'Inflation & Rendite',
-    metaTitle: 'Kaufkraftverlust Rechner – Was ist mein Geld in 10, 20 Jahren noch wert?',
-    metaDescription: 'Berechnen Sie den realen Kaufkraftverlust Ihres Vermögens durch Inflation über 5 bis 30 Jahre. Wie viel 10.000 € künftig real wert sind.',
-    h1: 'Kaufkraftverlust Rechner (Reale Inflation)',
-    shortDescription: 'Veranschaulicht die schleichende Entwertung von Ersparnissen bei gegebener Inflationsrate.',
-    searchKeywords: ['kaufkraftverlust rechner', 'was ist mein geld in zukunft wert', 'inflation vermoegensverlust berechnen', 'kaufkraft nach jahren'],
+    metaTitle: 'Kaufkraftverlust Rechner – Realwert von Ersparnissen',
+    metaDescription: 'Ermitteln Sie den realen Wertverlust von Sparvermögen, Tagesgeld und Festgeld unter Berücksichtigung von Zins und Inflationsrate.',
+    h1: 'Kaufkraftverlust Rechner – Reale Rendite nach Inflation',
+    shortDescription: 'Berechnet den inflationsbereinigten Realwert Ihrer Ersparnisse und Festgelder nach Abzug der jährlichen Teuerungsrate.',
+    searchKeywords: ['kaufkraftverlust ersparnisse', 'kaufkraftverlust rechner', 'was ist mein geld in zukunft wert', 'inflation vermoegensverlust berechnen', 'kaufkraft nach jahren'],
     inputs: [
       { id: 'amount', label: 'Heutiger Geldbetrag', type: 'number', defaultValue: 50000, min: 1000, step: 1000, unit: '€' },
+      { id: 'interestRate', label: 'Jährlicher Anlagezins (Tagesgeld/Festgeld)', type: 'number', defaultValue: 1.5, min: 0, step: 0.1, unit: '%' },
       { id: 'inflationRate', label: 'Angenommene jährliche Inflation', type: 'number', defaultValue: 2.5, min: 0.5, step: 0.1, unit: '%' },
       { id: 'years', label: 'Zeithorizont in Jahren', type: 'number', defaultValue: 15, min: 1, max: 50, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
       const a = parseFloat(inputs.amount) || 50000;
+      const rate = parseFloat(inputs.interestRate) || 0;
       const inf = parseFloat(inputs.inflationRate) || 2.5;
       const y = parseInt(inputs.years, 10) || 15;
-      const futurePurchasingPower = a / Math.pow(1 + inf / 100, y);
-      const loss = a - futurePurchasingPower;
-      const lossPercent = (loss / a) * 100;
+      const nominalEnd = a * Math.pow(1 + rate / 100, y);
+      const futurePurchasingPower = nominalEnd / Math.pow(1 + inf / 100, y);
+      const realLoss = a - futurePurchasingPower;
+      const lossPercent = (realLoss / a) * 100;
       return {
-        primary: { id: 'realVal', label: 'Reale Restkaufkraft', value: futurePurchasingPower, formattedValue: formatCurrency(futurePurchasingPower), highlight: true },
+        primary: { id: 'realVal', label: 'Reale Restkaufkraft nach Inflation', value: futurePurchasingPower, formattedValue: formatCurrency(futurePurchasingPower), highlight: true },
         secondary: [
-          { id: 'loss', label: 'Absoluter Kaufkraftverlust', value: loss, formattedValue: formatCurrency(loss) },
-          { id: 'lossPct', label: 'Entwertung in Prozent', value: lossPercent, formattedValue: formatPercent(lossPercent, 1) },
+          { id: 'nominalEnd', label: 'Nominaler Kontostand (inkl. Zinsen)', value: nominalEnd, formattedValue: formatCurrency(nominalEnd) },
+          { id: 'loss', label: 'Realer Kaufkraftverlust zum Startwert', value: realLoss, formattedValue: formatCurrency(realLoss) },
+          { id: 'lossPct', label: 'Reale Entwertung in Prozent', value: lossPercent, formattedValue: formatPercent(lossPercent, 1) },
         ],
-        summaryText: `Durch eine Inflation von ${formatPercent(inf)} p.a. sinkt die reale Kaufkraft von ${formatCurrency(a)} in ${y} Jahren auf nur noch ${formatCurrency(futurePurchasingPower)}.`,
+        summaryText: `Trotz ${formatPercent(rate)} Zinsertrag sinkt die reale Kaufkraft von ${formatCurrency(a)} bei ${formatPercent(inf)} Inflation in ${y} Jahren auf ${formatCurrency(futurePurchasingPower)}.`,
       };
     },
-    formula: 'Reale Kaufkraft = Betrag / (1 + Inflationsrate/100)^n',
-    formulaExplanation: 'Um den realen Gegenwert künftiger Geldbeträge zu ermitteln, wird der Nominalwert mit der Teuerungsrate abgezinst.',
+    formula: 'Kaufkraft = Betrag × (1 + Zins/100)^n / (1 + Inflation/100)^n',
+    formulaExplanation: 'Um den realen Gegenwert von verzinsten Ersparnissen zu ermitteln, wird das nominale Endguthaben mit der Inflationsrate abgezinst.',
     workedExample: {
-      title: 'Beispiel: 50.000 € bei 2,5 % Inflation über 15 Jahre',
-      description: 'Reale Restkaufkraft: ca. 34.523 €. Kaufkraftverlust: 30,95 %.',
-      inputs: { amount: 50000, inflationRate: 2.5, years: 15 },
-      resultSummary: 'ca. 34.523 € Restkaufkraft (-31 %)',
+      title: 'Beispiel: 50.000 € bei 1,5 % Zins und 2,5 % Inflation über 15 Jahre',
+      description: 'Nominaler Endwert: 62.511 €. Reale Restkaufkraft: ca. 43.161 € (Realer Verlust: ca. 6.839 € bzw. -13,7 %).',
+      inputs: { amount: 50000, interestRate: 1.5, inflationRate: 2.5, years: 15 },
+      resultSummary: 'ca. 43.161 € Restkaufkraft (-13,7 % real)',
     },
     content: {
-      intro: 'Inflation ist die schleichende Steuer auf Ersparnisse: Wer Geld unverzinst liegen lässt, verliert über die Jahre Kaufkraft.',
-      details: 'Der Rechner zeigt, welchen realen Wert Ihr Geld künftig noch besitzt.',
+      intro: 'Der Kaufkraftverlust-Rechner ermittelt, wie viel Kaufkraft Ersparnisse auf Sparbüchern, Tagesgeldern oder Festgeldern trotz erhaltener Zinsen durch die Inflation einbüßen.',
+      details: 'Liegt die Verzinsung unter der Inflationsrate (Negativer Realzins), steigt der Kontostand zwar nominal an, der tatsächliche Warenwert sinkt jedoch Jahr für Jahr kontinuierlich.',
     },
     faqs: [
-      { question: 'Was ist das Inflationsziel der EZB?', answer: 'Die Europäische Zentralbank strebt eine Teuerungsrate von 2,0 % pro Jahr an.' },
+      { question: 'Warum verliert Bargeld auf dem Girokonto kontinuierlich an Wert?', answer: 'Weil ein unverzinstes Girokonto keine Erträge abwirft, während steigende Konsumentenpreise dafür sorgen, dass man für denselben Euro-Betrag jedes Jahr weniger Güter kaufen kann.' },
+      { question: 'Wie gleicht man den Kaufkraftverlust bei der Altersvorsorge aus?', answer: 'Indem man die künftig benötigte Rentensumme um die erwartete Teuerungsrate erhöht oder gezielt in ertragsstarke Anlageklassen investiert.' },
     ],
     relatedSlugs: ['inflationsrechner', 'realzins-rechner', 'zinseszinsrechner'],
   },
@@ -231,7 +278,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Realzins berechnen',
     category: 'finanzen',
     subcategory: 'Inflation & Rendite',
-    metaTitle: 'Realzins Rechner – Reale Rendite nach Inflation online berechnen',
+    metaTitle: 'Realzins Rechner – Reale Rendite nach Inflation',
     metaDescription: 'Ermitteln Sie Ihren tatsächlichen Realzins nach Fisher-Formel: Nominaler Zinsertrag abzüglich Inflationsrate. Exakt in Prozent.',
     h1: 'Realzins Rechner (Reale Vermögensentwicklung)',
     shortDescription: 'Berechnet die reale Verzinsung Ihres Kapitals nach Bereinigung um die Preissteigerungsrate.',
@@ -263,11 +310,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '+1,27 % Realzins p.a.',
     },
     content: {
-      intro: 'Erst der Realzins zeigt, ob Ihr Vermögen real wächst oder trotz Zinsen an Wert verliert.',
-      details: 'Liegt die Inflationsrate über dem Sparzins, entsteht ein realer Kaufkraftverlust.',
+      intro: 'Der Realzins drückt den tatsächlichen Vermögenszuwachs nach Bereinigung um die Inflationsrate aus (Fisher-Gleichung).',
+      details: 'Exakte Formel: (1 + Nominalzins) / (1 + Inflation) - 1. Näherungsweise gilt: Realzins ≈ Nominalzins - Inflationsrate. Liegt der Sparzins bei 3 % und die Inflation bei 4 %, ist der Realzins mit ca. -1 % negativ.',
     },
     faqs: [
-      { question: 'Was bedeutet ein negativer Realzins?', answer: 'Bei 1 % Zinsen und 3 % Inflation liegt der Realzins bei ca. -2 %. Die Kaufkraft sinkt trotz Zinsgutschrift.' },
+      { question: 'Was bedeutet finanzielle Repression?', answer: 'Ein Zustand, in dem die Zinsen für sichere Sparanlagen bewusst dauerhaft unterhalb der Inflationsrate gehalten werden, sodass Sparer real schleichend entwertet werden.' },
+      { question: 'Kann der Realzins auch positiv sein?', answer: 'Ja, sobald der Zinsertrag oder die Rendite einer Geldanlage die laufende Teuerungsrate übersteigt, wächst das reale Vermögen (Kaufkraftzuwachs).' },
     ],
     relatedSlugs: ['inflationsrechner', 'kaufkraftverlust-rechner', 'renditerechner'],
   },
@@ -278,7 +326,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Dividendenrendite',
     category: 'finanzen',
     subcategory: 'Inflation & Rendite',
-    metaTitle: 'Dividendenrendite Rechner – Ausschüttungsrendite von Aktien berechnen',
+    metaTitle: 'Dividendenrendite Rechner – Ausschüttungsrendite von Aktien...',
     metaDescription: 'Berechnen Sie die Dividendenrendite in Prozent aus Dividende je Aktie und aktuellem Aktienkurs oder Kaufkurs (Persönliche Dividendenrendite).',
     h1: 'Dividendenrendite Rechner (Aktien & ETFs)',
     shortDescription: 'Ermittelt das Verhältnis der jährlichen Dividendenzahlung zum aktuellen Börsenkurs oder Einstiegskurs.',
@@ -313,13 +361,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '4,00 % Rendite (240 € / Jahr)',
     },
     content: {
-      intro: 'Die Dividendenrendite ist die Kernkennzahl für Dividendenstrategien und passives Einkommen mit Aktien.',
-      details: 'Liegt der historische Einstiegspreis unter dem heutigen Kurs, ist die persönliche Dividendenrendite auf das eingesetzte Kapital noch höher.',
+      intro: 'Die Dividendenrendite misst die laufende Ausschüttung einer Aktie bezogen auf ihren aktuellen Börsenkurs.',
+      details: 'Dividendenrendite = (Dividende je Aktie / Aktienkurs) · 100. Eine Aktie mit 3 € Dividende bei 60 € Kurs hat eine Dividendenrendite von 5,0 %. Reinvestierte Dividenden tragen historisch maßgeblich zum Gesamterfolg von Aktienportfolios bei.',
     },
     faqs: [
-      { question: 'Wann wird die Dividende in Deutschland ausgezahlt?', answer: 'Bei deutschen AGs meist einmal jährlich am dritten Bankarbeitstag nach der Hauptversammlung.' },
+      { question: 'Wann wird die Dividende in Deutschland ausgezahlt?', answer: 'Bei deutschen Aktiengesellschaften (AG) wird die Dividende einmal jährlich am dritten Werktag nach der ordentlichen Hauptversammlung (§ 58 Abs. 4 AktG) gutgeschrieben.' },
+      { question: 'Ist eine extrem hohe Dividendenrendite immer ein gutes Zeichen?', answer: 'Nicht zwingend: Eine ungewöhnlich hohe Dividendenrendite (> 8 %) entsteht oft durch einen drastischen Kurseinbruch der Aktie wegen operativer Krisen, was Vorbote einer Dividendenkürzung sein kann.' },
     ],
-    relatedSlugs: ['renditerechner', 'etf-sparplan-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['renditerechner', 'etf-sparplan-rechner', 'zinseszinsrechner'],
   },
   {
     id: 'ewige-rente-rechner',
@@ -328,7 +377,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Ewige Rente',
     category: 'finanzen',
     subcategory: 'Ruhestand & Entnahme',
-    metaTitle: 'Ewige Rente Rechner – Wie viel Kapital für monatliche Zinserträge?',
+    metaTitle: 'Ewige Rente Rechner – Wie viel Kapital für monatliche Zinse...',
     metaDescription: 'Berechnen Sie das erforderliche Vermögen für eine ewige Rente ohne Kapitalverzehr. Von Zinsen und Dividenden leben.',
     h1: 'Ewige Rente Rechner (Kapitalerhalt)',
     shortDescription: 'Ermittelt das notwendige Vermögen, um einen festen Monatsbetrag rein aus Zinserträgen ohne Kapitalverzehr zu entnehmen.',
@@ -361,13 +410,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 857.143 € Kapitalbedarf',
     },
     content: {
-      intro: 'Von den Zinsen leben, ohne das Vermögen aufzuzehren: Der Traum der finanziellen Unabhängigkeit.',
-      details: 'Um die Kaufkraft gegen die Inflation abzusichern, sollte ein Teil der Bruttorendite reinvestiert werden.',
+      intro: 'Die ewige Rente bezeichnet eine Auszahlungsform, bei der das Grundkapital unberührt bleibt und die Auszahlungen ausschließlich aus den Zinsen oder Dividenden bestritten werden.',
+      details: 'Formel: Notwendiges Kapital = Jährliche Wunschrente / (Zinssatz / 100). Um beispielsweise bei 4 % Ertrag jährlich 24.000 € (2.000 € monatlich) ewig zu entnehmen, wird ein Kapitalstock von 600.000 € benötigt.',
     },
     faqs: [
-      { question: 'Was unterscheidet die ewige Rente vom Auszahlplan?', answer: 'Bei der ewigen Rente bleibt das Stammkapital unangetastet. Beim Auszahlplan wird es über Jahre aufgebraucht.' },
+      { question: 'Berücksichtigt die klassische ewige Rente die Inflation?', answer: 'Die Basisformel ignoriert die Inflation. Um den realen Auszahlungsbetrag kaufkraftbereinigt konstant zu halten, muss die Entnahmerate um die Inflationsrate gekürzt werden (Netto-Kapitalerhalt).' },
+      { question: 'Welche Ertragsquellen eignen sich für eine ewige Rente?', answer: 'Breit gestreute Dividenden-ETFs, Mietüberschüsse aus schuldenfreien Immobilien sowie Anleihekupons.' },
     ],
-    relatedSlugs: ['ewige-rente-rechner', 'finanzielle-freiheit-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['finanzielle-freiheit-rechner', 'etf-sparplan-rechner', 'zinseszinsrechner'],
   },
   {
     id: 'finanzielle-freiheit-rechner',
@@ -376,7 +426,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'FIRE 4%-Regel',
     category: 'finanzen',
     subcategory: 'Ruhestand & Entnahme',
-    metaTitle: 'Finanzielle Freiheit Rechner – FIRE-Zahl & 4%-Regel online berechnen',
+    metaTitle: 'Finanzielle Freiheit Rechner – FIRE-Zahl & 4%-Regel',
     metaDescription: 'Berechnen Sie Ihre persönliche FIRE-Zahl für finanzielle Freiheit: Das 25-fache Ihrer Jahresausgaben nach der wissenschaftlichen Trinity-Studie.',
     h1: 'Finanzielle Freiheit Rechner (FIRE-Bewegung)',
     shortDescription: 'Kalkuliert die erforderliche Vermögensgröße für den vorzeitigen Ruhestand basierend auf jährlichen Lebenshaltungskosten.',
@@ -413,13 +463,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 754.286 € Zielvermögen',
     },
     content: {
-      intro: 'FIRE steht für „Financial Independence, Retire Early“. Das Ziel ist finanzielle Unabhängigkeit durch Investitionen.',
-      details: 'Konservative Planer wählen meist 3,25 % bis 3,5 % Entnahmerate für mehrjährige Sicherheit.',
+      intro: 'Dieser FIRE-Rechner (Financial Independence, Retire Early) kalkuliert das Zielvermögen, ab dem Erträge aus dem Kapitalstock die gesamten Lebenshaltungskosten decken.',
+      details: 'Basierend auf der Trinity-Studie gilt eine sichere Entnahmerate (Safe Withdrawal Rate, SWR) von 3,5 bis 4,0 Prozent p.a. Das FIRE-Vermögen entspricht dem 25- bis 28-Fachen der jährlichen Gesamtausgaben.',
     },
     faqs: [
-      { question: 'Was ist die 4%-Regel?', answer: 'Sie besagt, dass man jährlich 4 % des Depots entnehmen kann, ohne dass es vorzeitig aufgezehrt wird.' },
+      { question: 'Was besagt die bekannte 4-Prozent-Regel?', answer: 'Wer im ersten Ruhestandsjahr 4 % seines Aktien/Anleihen-Portfolios entnimmt und den Betrag in den Folgejahren inflationsbereinigt anpasst, hatte in den letzten 100 Jahren eine 95-prozentige Wahrscheinlichkeit, dass das Geld 30 Jahre lang reichte.' },
+      { question: 'Was ist Lean-FIRE vs. Fat-FIRE?', answer: 'Lean-FIRE zielt auf finanzielle Freiheit bei sehr sparsamem Lebensstil ab; Fat-FIRE kalkuliert mit großzügigen Budgets von 4.000 € oder mehr pro Monat im Ruhestand.' },
     ],
-    relatedSlugs: ['ewige-rente-rechner', 'ewige-rente-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['ewige-rente-rechner', 'etf-sparplan-rechner', 'zinseszinsrechner'],
   },
   {
     id: 'freistellungsauftrag-rechner',
@@ -428,7 +479,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Sparerpauschbetrag',
     category: 'finanzen',
     subcategory: 'Sparen & Vermögensaufbau',
-    metaTitle: 'Freistellungsauftrag Rechner – 1.000 € / 2.000 € Sparerpauschbetrag',
+    metaTitle: 'Freistellungsauftrag Rechner – 1.000 € / 2.000 € Sparerpaus...',
     metaDescription: 'Berechnen Sie die Steuerersparnis durch den gesetzlichen Sparerpauschbetrag (1.000 € für Singles, 2.000 € für Verheiratete) auf Kapitalerträge.',
     h1: 'Freistellungsauftrag & Sparerpauschbetrag Rechner',
     shortDescription: 'Kalkuliert die Steuerersparnis durch den Sparerpauschbetrag (§ 20 Abs. 9 EStG) bei Zinsen, Dividenden und ETF-Gewinnen.',
@@ -476,11 +527,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '263,75 € Steuerersparnis',
     },
     content: {
-      intro: 'Mit einem Freistellungsauftrag verhindern Sie den automatischen Steuerabzug auf Zinsen und Dividenden.',
-      details: 'Ohne Freistellungsauftrag behält die Bank automatisch 25 % Abgeltungsteuer plus Solidaritätszuschlag ein.',
+      intro: 'Mit dem Freistellungsauftrag schöpfen Sparer und Anleger den gesetzlichen Sparer-Pauschbetrag aus, um Kapitalerträge ohne Steuerabzug zu erhalten.',
+      details: 'Nach § 20 Abs. 9 EStG beträgt der Sparer-Pauschbetrag 1.000 € für Alleinstehende und 2.000 € für zusammenveranlagte Ehegatten. Ersparnis: Bis zu 263,75 € (Single) bzw. 527,50 € (Verheiratete) pro Jahr.',
     },
     faqs: [
-      { question: 'Kann man den Betrag aufteilen?', answer: 'Ja, Sie können den Freistellungsauftrag auf beliebig viele Banken und Depots verteilen.' },
+      { question: 'Kann man den Freistellungsauftrag auf mehrere Banken aufteilen?', answer: 'Ja, Sie können Ihren Freibetrag beliebig auf verschiedene Banken und Broker verteilen, solange die Gesamtsumme 1.000 € bzw. 2.000 € nicht übersteigt.' },
+      { question: 'Was passiert, wenn man keinen Freistellungsauftrag erteilt hat?', answer: 'Die Bank führt 25 % Abgeltungsteuer plus Solidaritätszuschlag automatisch an das Finanzamt ab. Sie können sich das Geld über die Anlage KAP der Einkommensteuererklärung zurückholen.' },
     ],
     relatedSlugs: ['kapitalertragsteuer-rechner', 'etf-sparplan-rechner', 'zinseszinsrechner'],
   },
@@ -491,7 +543,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Abgeltungsteuer',
     category: 'finanzen',
     subcategory: 'Sparen & Vermögensaufbau',
-    metaTitle: 'Kapitalertragsteuer Rechner – Abgeltungsteuer, Soli & Kirchensteuer',
+    metaTitle: 'Kapitalertragsteuer Rechner – Abgeltungsteuer, Soli',
     metaDescription: 'Berechnen Sie die exakte Steuerlast auf Kapitalerträge: 25 % Abgeltungsteuer, 5,5 % Soli und optionale Kirchensteuer in Bayern & NRW.',
     h1: 'Kapitalertragsteuer & Abgeltungsteuer Rechner',
     shortDescription: 'Ermittelt die gesetzliche Steuerbelastung auf Zinsen, Dividenden und Aktiengewinne nach § 32d EStG.',
@@ -536,13 +588,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '791,25 € Steuer (26,38 %)',
     },
     content: {
-      intro: 'Gewinne aus Wertpapieren und Zinsen unterliegen der Abgeltungsteuer, die Banken automatisch abführen.',
-      details: 'Liegt Ihr persönlicher Steuersatz unter 25 %, lohnt sich die Günstigerprüfung in der Steuererklärung.',
+      intro: 'Die Abgeltungsteuer auf Kapitalerträge (Zinsen, Dividenden, realisierte Kursgewinne) beträgt in Deutschland pauschal 25 Prozent zuzüglich Solidaritätszuschlag und Kirchensteuer.',
+      details: 'Der reguläre Steuersatz beträgt 26,375 % (25 % Abgeltungsteuer + 5,5 % Soli darauf). Bei Kirchensteuerpflicht sinkt die Abgeltungsteuerformel leicht auf 24,45 % (bei 9 % KiSt in Bayern/Baden-Württemberg: 24,51 %).',
     },
     faqs: [
-      { question: 'Gilt der Solidaritätszuschlag noch auf Kapitalerträge?', answer: 'Ja, auf Kapitalerträge fällt der Soli weiterhin in voller Höhe an.' },
+      { question: 'Wann lohnt sich die Günstigerprüfung in der Steuererklärung?', answer: 'Wenn Ihr persönlicher Grenzsteuersatz unter 25 % liegt (zu versteuerndes Einkommen unter ca. 20.000 €), werden Kapitalerträge mit Ihrem niedrigeren individuellen Tarif besteuert.' },
+      { question: 'Werden Verluste aus Aktienverkäufen mit Zinserträgen verrechnet?', answer: 'Nein, nach deutschem Steuerrecht (§ 20 Abs. 6 EStG) dürfen Aktienverluste nur mit Gewinnen aus anderen Aktienverkäufen verrechnet werden (separater Verlustverrechnungstopf).' },
     ],
-    relatedSlugs: ['freistellungsauftrag-rechner', 'etf-sparplan-rechner', 'renditerechner'],
+    relatedSlugs: ['kirchensteuer-rechner', 'freistellungsauftrag-rechner', 'etf-sparplan-rechner', 'renditerechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -599,11 +652,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 6.274 € Kostenverlust',
     },
     content: {
-      intro: 'Kleine Nachkommastellen bei den Gebühren kosten Anleger über Jahrzehnte zehntausende Euro.',
-      details: 'Günstige ETFs mit niedriger TER minimieren diesen Renditeverlust.',
+      intro: 'Dieser Kostenrechner quantifiziert, wie stark prozentuale Depotgebühren, Orderkosten und Fonds-TER das Endvermögen über die Jahre schmälern.',
+      details: 'Laufende Gebühren mindern nicht nur den unmittelbaren Barwert, sondern entziehen dem Depot kontinuierlich künftiges Zinseszins-Potenzial. 1 % Mehrkosten pro Jahr kann über 30 Jahre rund 25 % des Endkapitals vernichten.',
     },
     faqs: [
-      { question: 'Was ist die TER?', answer: 'Die Total Expense Ratio (Gesamtkostenquote) beziffert alle laufenden Kosten eines Fonds in Prozent pro Jahr.' },
+      { question: 'Warum sind Neobroker oft so viel günstiger als Filialbanken?', answer: 'Moderne Neobroker verzichten auf Filialnetze, wickeln Orders rein digital ab und erhalten Rückvergütungen (Payment for Order Flow) von Handelsplätzen.' },
+      { question: 'Wie wirken sich Ausgabeaufschläge bei aktiv gemanagten Fonds aus?', answer: 'Ein Ausgabeaufschlag von 5 % bedeutet, dass von 10.000 € Einzahlung nur 9.524 € investiert werden; der Fonds muss zunächst rund 5,3 % Rendite erwirtschaften, nur um die Anfangskosten auszugleichen.' },
     ],
     relatedSlugs: ['etf-sparplan-rechner', 'renditerechner', 'zinseszinsrechner'],
   },
@@ -649,13 +703,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '20,00 % Sparquote (Optimal)',
     },
     content: {
-      intro: 'Die Sparquote bestimmt maßgeblich, wie schnell Sie finanzielle Sicherheit und Unabhängigkeit erreichen.',
-      details: 'Finanzexperten empfehlen als gesunden Richtwert 15 % bis 20 % des Nettoeinkommens.',
+      intro: 'Die Sparquote beziffert den prozentualen Anteil des Nettoeinkommens, der monatlich für Vermögensaufbau, Tilgung oder Altersvorsorge zurückgelegt wird.',
+      details: 'Sparquote = (Monatliche Ersparnis / Nettoeinkommen) · 100. Während der Bundesdurchschnitt in Deutschland bei rund 10–11 % liegt, streben FIRE-Anhänger Quoten von 30 bis 60 % an.',
     },
     faqs: [
-      { question: 'Zählt Kredittilgung zur Sparquote?', answer: 'Ja, der reine Tilgungsanteil baut Vermögen auf und zählt vollwertig dazu.' },
+      { question: 'Zählt die Tilgung eines Immobilienkredits zur Sparrate?', answer: 'Ja, der reine Tilgungsanteil der monatlichen Kreditrate baut Nettovermögen auf und zählt zur Ersparnis; der Zinsanteil hingegen ist Aufwand (Wohnkosten).' },
+      { question: 'Wie viel Prozent seines Gehalts sollte man mindestens sparen?', answer: 'Finanzexperten empfehlen als Faustregel die 50/30/20-Regel: 50 % für Fixkosten, 30 % für Freizeit und Konsum, mindestens 20 % für Sparen und Vermögensaufbau.' },
     ],
-    relatedSlugs: ['sparziel-rechner', 'etf-sparplan-rechner', 'notgroschen-rechner'],
+    relatedSlugs: ['sparrechner', 'sparzielrechner', 'zinseszinsrechner', 'etf-sparplan-rechner', 'notgroschen-rechner'],
   },
   {
     id: 'liquiditaetsreserve-rechner',
@@ -664,11 +719,11 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Liquiditätsreserve',
     category: 'finanzen',
     subcategory: 'Sparen & Vermögensaufbau',
-    metaTitle: 'Liquiditätsreserve Rechner – Optimale Rücklage auf dem Tagesgeld',
-    metaDescription: 'Ermitteln Sie die optimale Höhe Ihrer Liquiditätsreserve nach Berufsstatus (Angestellter, Selbstständiger, Familie) und monatlichen Fixkosten.',
-    h1: 'Liquiditätsreserve Rechner (Finanzielle Absicherung)',
-    shortDescription: 'Berechnet die empfohlene Sicherheitsreserve (3 bis 6 Monatsausgaben) für unvorhergesehene Notfälle.',
-    searchKeywords: ['notgroschen rechner', 'wie viel notgroschen tagesgeld', 'liquiditaetsreserve berechnen', 'finanzielle sicherheit polster'],
+    metaTitle: 'Liquiditätsreserve Rechner für Selbstständige & Haushalte',
+    metaDescription: 'Berechnen Sie die notwendige Liquiditätsreserve für Selbstständige und Unternehmer zur Absicherung von Steuern und Fixkosten.',
+    h1: 'Liquiditätsreserve Rechner – Puffer für Steuern & Fixkosten',
+    shortDescription: 'Kalkuliert die erforderliche Liquiditätsreserve für Freiberufler und Gewerbetreibende zur Absicherung von Steuerrücklagen.',
+    searchKeywords: ['liquiditaetsreserve rechner', 'notgroschen rechner', 'wie viel notgroschen tagesgeld', 'liquiditaetsreserve berechnen', 'finanzielle sicherheit polster'],
     inputs: [
       { id: 'monthlyExpenses', label: 'Monatliche feste Lebenshaltungskosten', type: 'number', defaultValue: 1800, min: 200, step: 50, unit: '€' },
       {
@@ -710,13 +765,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 5.400 € Notgroschen',
     },
     content: {
-      intro: 'Ein Notgroschen schützt vor teuren Dispokrediten, wenn unerwartete Ausgaben anfallen.',
-      details: 'Parken Sie Ihren Notgroschen auf einem täglich verfügbaren Tagesgeldkonto.',
+      intro: 'Die Liquiditätsreserve ermittelt den optimalen Puffer auf Giro- und Tagesgeldkonten zur Abdeckung fixer Zahlungsverpflichtungen und kurzfristiger Risiken.',
+      details: 'Zur Berechnung werden alle regelmäßigen Fixkosten (Miete, Versicherungen, Kredite, Abos) erfasst. Eine gesunde Reserve verhindert teure Rücklastschriften und Verzugszinsen.',
     },
     faqs: [
-      { question: 'Sollte man den Notgroschen in Aktien anlegen?', answer: 'Nein, Wertpapiere unterliegen Kursschwankungen. Der Notgroschen gehört risikofrei aufs Tagesgeld.' },
+      { question: 'Wie viel Geld sollte maximal auf dem Girokonto verbleiben?', answer: 'Empfohlen wird ein Puffer von 1 bis 1,5 Monatsgehältern auf dem Girokonto; alle darüber hinausgehenden Beträge gehören aufs verzinste Tagesgeld oder in Anlageprodukte.' },
+      { question: 'Warum schadet eine zu große Liquiditätsreserve dem Vermögensaufbau?', answer: 'Überschüssige Barbestände unterliegen der Cash-Drag: Das Geld verliert real durch Inflation an Kaufkraft, statt an den Ertragschancen der Kapitalmärkte teilzuhaben.' },
     ],
-    relatedSlugs: ['tagesgeld-rechner', 'sparrate-rechner', 'sparziel-rechner'],
+    relatedSlugs: ['tagesgeld-rechner', 'sparrate-rechner', 'spardauer-rechner'],
   },
   {
     id: 'verdopplungszeit-rechner',
@@ -759,13 +815,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 10,2 Jahre (Verdopplung auf 20.000 €)',
     },
     content: {
-      intro: 'Wie lange dauert es, bis aus 10.000 Euro 20.000 Euro werden? Dieser Rechner liefert die exakte mathematische Antwort.',
-      details: 'Die 72er-Regel bietet eine hervorragende Kopfrechen-Näherung (72 / Rendite).',
+      intro: 'Die Verdopplungszeit beziffert die exakte Dauer in Jahren, bis sich eine Kapitalanlage bei konstanter jährlicher Rendite verdoppelt.',
+      details: 'Exakte Formel: t = ln(2) / ln(1 + p/100). Bei 7 % Jahresrendite verdoppelt sich das Kapital nach ca. 10,24 Jahren. Bei 3 % Zinsen dauert es hingegen rund 23,45 Jahre.',
     },
     faqs: [
-      { question: 'Wie lautet die 72er-Regel?', answer: '72 geteilt durch Zinssatz ergibt näherungsweise die Jahre bis zur Verdopplung.' },
+      { question: 'Wie präzise ist die 72er-Faustformel?', answer: 'Sehr präzise im Bereich von 4 % bis 10 % Rendite: Bei 8 % ergibt 72 / 8 = 9,0 Jahre (exakter Wert: 9,01 Jahre).' },
+      { question: 'Wie lange dauert eine Vervierfachung des Kapitals?', answer: 'Genau zwei Verdopplungszyklen: Bei 7 % Rendite vervierfacht sich das Startkapital nach rund 20,5 Jahren.' },
     ],
-    relatedSlugs: ['zinseszinsrechner', 'zinseszinsrechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['zinseszinsrechner', 'etf-sparplan-rechner', 'sparrechner'],
   },
   {
     id: 'thesaurierend-vs-ausschuettend-rechner',
@@ -774,10 +831,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Thesaurierend vs. Ausschüttend',
     category: 'finanzen',
     subcategory: 'Inflation & Rendite',
-    metaTitle: 'Thesaurierend vs. Ausschüttend Rechner – ETF-Ausschüttungsart vergleichen',
+    metaTitle: 'Thesaurierend vs. Ausschüttend Rechner – ETF-Ausschüttungsa...',
     metaDescription: 'Vergleichen Sie thesaurierende und ausschüttende ETFs: Vorabpauschale, Zinseszins bei automatischer Reinvestition und Steuern.',
     h1: 'Thesaurierend vs. Ausschüttend Rechner',
-    shortDescription: 'Vergleicht die langfristige Vermögensentwicklung von thesaurierenden und ausschüttenden Fonds.',
+    shortDescription: 'Vergleicht die langfristige Vermögensentwicklung von thesaurierenden und ausschüttenden Fonds mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['thesaurierend vs ausschuettend rechner', 'etf ausschuettungsart vergleich', 'vorabpauschale thesaurierer', 'etf reinvestieren rechner'],
     inputs: [
       { id: 'monthlyRate', label: 'Monatliche Sparrate', type: 'number', defaultValue: 300, min: 25, step: 25, unit: '€' },
@@ -812,13 +869,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 243.000 € Endvermögen',
     },
     content: {
-      intro: 'Soll ich einen thesaurierenden (Acc) oder ausschüttenden (Dist) ETF wählen?',
-      details: 'Thesaurierer nutzen den Zinseszins optimal durch gebührenfreie automatische Wiederanlage.',
+      intro: 'Dieser Rechner vergleicht die Steuer- und Vermögensentwicklung von wiederanlegenden (thesaurierenden) und auszahlenden (ausschüttenden) Investmentfonds.',
+      details: 'Seit der Investmentsteuerreform 2018 unterliegen thesaurierende Fonds der jährlichen Vorabpauschale nach dem Basiszins der Bundesbank. Ausschütter nutzen den Sparer-Pauschbetrag durch direkte Dividendenzahlungen oft einfacher aus.',
     },
     faqs: [
-      { question: 'Was ist die Vorabpauschale?', answer: 'Eine jährliche Mindestbesteuerung auf thesaurierende Fonds, basierend auf dem Basiszins der Bundesbank.' },
+      { question: 'Was ist die Vorabpauschale bei thesaurierenden ETFs?', answer: 'Eine fiktive Mindestertragsbesteuerung zu Jahresbeginn: Sie errechnet sich aus Basisertrag (70 % des Basiszinses × Portfoliowert) abzüglich tatsächlicher Ausschüttungen, gedeckelt auf den tatsächlichen Wertzuwachs.' },
+      { question: 'Wann lohnt sich ein ausschüttender ETF mehr als ein Thesaurierer?', answer: 'Solange der Sparer-Pauschbetrag (1.000 € / 2.000 €) noch nicht anderweitig voll ausgeschöpft ist, lassen sich Dividenden bis zu dieser Grenze steuerfrei vereinnahmen und sofort wiederanlegen.' },
     ],
-    relatedSlugs: ['etf-sparplan-rechner', 'etf-sparplan-rechner', 'freistellungsauftrag-rechner'],
+    relatedSlugs: ['etf-sparplan-rechner', 'freistellungsauftrag-rechner', 'zinseszinsrechner'],
   },
   {
     id: 'rentenluecke-rechner',
@@ -827,7 +885,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Rentenlücke berechnen',
     category: 'finanzen',
     subcategory: 'Ruhestand & Entnahme',
-    metaTitle: 'Rentenlücke Rechner – Versorgungslücke zur gesetzlichen Rente berechnen',
+    metaTitle: 'Rentenlücke Rechner – Versorgungslücke zur gesetzlichen Ren...',
     metaDescription: 'Ermitteln Sie Ihre monatliche Rentenlücke im Alter: Wunsch-Nettoeinkommen abzüglich gesetzlicher Rente. Schließen Sie Ihre Vorsorgelücke.',
     h1: 'Rentenlücke Rechner (Versorgungslücke)',
     shortDescription: 'Berechnet die monatliche Differenz zwischen Ihrem gewünschten Netto-Ruhestandseinkommen und der gesetzlichen Rente.',
@@ -859,13 +917,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 1.088 € monatliche Lücke',
     },
     content: {
-      intro: 'Das Rentenniveau sinkt. Wer seinen Lebensstandard halten will, muss die Versorgungslücke kennen.',
-      details: 'Schließen lässt sich die Lücke durch private Altersvorsorge und ETF-Sparpläne.',
+      intro: 'Die Rentenlücke ist die Differenz zwischen Ihrem gewünschten Nettoeinkommen im Ruhestand und der voraussichtlichen gesetzlichen Nettorente.',
+      details: 'Die gesetzliche Rente liegt für Standardrentner (Eckrentner mit 45 Beitragsjahren) vor Steuern bei rund 48 Prozent des Durchschnittsentgelts. Nach Abzug von Kranken- und Pflegeversicherungsbeiträgen (ca. 11–12 %) und Einkommensteuer verbleibt eine erhebliche Deckungslücke.',
     },
     faqs: [
-      { question: 'Muss man auf die gesetzliche Rente Steuern zahlen?', answer: 'Ja, Renten unterliegen der nachgelagerten Besteuerung.' },
+      { question: 'Wie viel Prozent des letzten Nettoeinkommens benötigt man im Ruhestand?', answer: 'Finanzplaner kalkulieren in der Regel mit 75 bis 85 Prozent des letzten Nettoeinkommens, da Berufsaufwendungen (Pendeln, Arbeitskleidung) entfallen, aber Gesundheits- und Freizeitkosten steigen können.' },
+      { question: 'Wird die gesetzliche Rente in voller Höhe versteuert?', answer: 'Für Neurentner steigt der Besteuerungsanteil der Rente jährlich schrittweise an; ab dem Jahrgang 2058 (bzw. nach geplanten Reformen 2040) wird die Rente zu 100 % der Einkommensteuer unterliegen.' },
     ],
-    relatedSlugs: ['renteneintritt-rechner', 'sparziel-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['renteneintritt-rechner', 'spardauer-rechner', 'etf-sparplan-rechner', 'betriebliche-altersvorsorge-rechner'],
   },
   {
     id: 'gold-rendite-rechner',
@@ -874,7 +933,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Goldrendite berechnen',
     category: 'finanzen',
     subcategory: 'Inflation & Rendite',
-    metaTitle: 'Gold Rendite Rechner – Wertentwicklung & Feinunzen in Euro berechnen',
+    metaTitle: 'Gold Rendite Rechner – Wertentwicklung',
     metaDescription: 'Ermitteln Sie die Rendite und Wertentwicklung Ihrer Goldanlage nach Feinunzen (oz) oder Gramm in Euro. Steuerfrei nach 1 Jahr Haltedauer.',
     h1: 'Gold Rendite Rechner (Feinunze & Gramm)',
     shortDescription: 'Berechnet den Gewinn, die Gesamtrendite und die steuerfreie Haltefrist von physischem Gold.',
@@ -910,11 +969,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '+622,07 € Gewinn (+36,4 %)',
     },
     content: {
-      intro: 'Gold gilt als Wertspeicher. In Deutschland sind Gewinne nach 1 Jahr Haltedauer komplett steuerfrei.',
-      details: '1 Feinunze wiegt exakt 31,1035 Gramm Feingold.',
+      intro: 'Gold dient seit Jahrtausenden als Wertspeicher und Absicherung gegen Währungskrisen, wirft jedoch selbst weder Zinsen noch Dividenden ab.',
+      details: 'Gewinne aus physischem Gold (Münzen, Barren) sind in Deutschland nach § 23 Abs. 1 Nr. 2 EStG nach einer Haltedauer von mehr als einem Jahr vollkommen steuerfrei (keine Abgeltungsteuer).',
     },
     faqs: [
-      { question: 'Fällt beim Goldkauf Mehrwertsteuer an?', answer: 'Nein, Anlagegold ist nach § 25c UStG von der Mehrwertsteuer befreit.' },
+      { question: 'Gilt die Steuerfreiheit nach 1 Jahr auch für Gold-ETCs wie Xetra-Gold oder Euwax Gold?', answer: 'Ja, nach ständiger BFH-Rechtsprechung sind physisch hinterlegte Gold-Inhaberschuldverschreibungen mit Lieferanspruch nach 1 Jahr Haltedauer steuerfrei veräußerbar.' },
+      { question: 'Wie hoch sind die typischen Ankauf-Verkauf-Spannen (Spread) bei Goldmünzen?', answer: 'Bei gängigen 1-Unzen-Anlagemünzen (Krügerrand, Maple Leaf) liegt der Spread oft bei 2 bis 4 %; bei kleinen Stückelungen (1 Gramm) kann er über 15 % betragen.' },
     ],
     relatedSlugs: ['inflationsrechner', 'renditerechner', 'kaufkraftverlust-rechner'],
   },
@@ -927,10 +987,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Baufinanzierung',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Baufinanzierung Rechner – Monatsrate, Zinsbindung & Tilgungsplan',
-    metaDescription: 'Berechnen Sie Ihre Baufinanzierung für Hauskauf oder Neubau: Monatliche Rate, Restschuld nach 10, 15 oder 20 Jahren Zinsbindung und Gesamtzinsen.',
-    h1: 'Baufinanzierungsrechner (Immobiliendarlehen)',
-    shortDescription: 'Ermittelt die monatliche Kreditrate und die Restschuld zum Ende der Zinsbindungsfrist.',
+    metaTitle: 'Baufinanzierungsrechner – Immobilienkredit & Nebenkosten',
+    metaDescription: 'Berechnen Sie Ihre Immobilienfinanzierung inklusive Kaufpreis, Nebenkosten, Eigenkapitalquote und monatlicher Annuitätenrate.',
+    h1: 'Baufinanzierungsrechner – Gesamte Immobilienfinanzierung',
+    shortDescription: 'Kalkuliert die ganzheitliche Baufinanzierung inklusive Kaufnebenkosten, Eigenkapitaleinsatz und monatlicher Finanzierungsrate.',
     searchKeywords: ['baufinanzierung rechner', 'immobiliendarlehen monatsrate', 'baugeld zinsbindung rechner', 'tilgungsplan hauskauf'],
     inputs: [
       { id: 'loanAmount', label: 'Darlehensbetrag (Kreditsumme)', type: 'number', defaultValue: 300000, min: 10000, step: 5000, unit: '€' },
@@ -973,26 +1033,27 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '1.400,00 € Monatsrate | ca. 182.250 € Restschuld',
     },
     content: {
-      intro: 'Die Baufinanzierung ist für die meisten Menschen die größte finanzielle Entscheidung ihres Lebens.',
-      details: 'Banken verlangen meist mindestens 2,0 % anfängliche Tilgung.',
+      intro: 'Der Baufinanzierungsrechner ermittelt die monatliche Darlehensrate, Zinskosten und den Zins- und Tilgungsverlauf für Immobilienkauf oder Hausbau.',
+      details: 'Neben dem Kaufpreis müssen Kaufnebenkosten (Grunderwerbsteuer je nach Bundesland 3,5–6,5 %, Notar- und Grundbuchkosten ca. 1,5–2 %, Maklerprovision bis 3,57 %) durch Eigenkapital abgedeckt werden.',
     },
     faqs: [
-      { question: 'Wie lang sollte die Zinsbindung sein?', answer: 'Bei moderaten Zinsen empfehlen Experten 10 bis 15 Jahre für Planungssicherheit.' },
+      { question: 'Wie viel Eigenkapital sollte man in eine Baufinanzierung einbringen?', answer: 'Banken empfehlen, mindestens die Kaufnebenkosten (ca. 10 bis 15 Prozent des Kaufpreises) sowie idealerweise weitere 10 bis 20 Prozent als Eigenkapital mitzubringen.' },
+      { question: 'Welche Zinsbindung ist bei Baufinanzierungen ratsam?', answer: 'In Niedrigzinsphasen empfiehlt sich eine lange Zinsbindung von 15 bis 20 Jahren zur Planungssicherheit; bei hohen Zinsen bieten 10-jährige Laufzeiten mehr Flexibilität.' },
     ],
-    relatedSlugs: ['tilgungsrechner', 'kaufnebenkosten-rechner', 'restschuld-rechner'],
+    relatedSlugs: ['zwischenfinanzierung-rechner', 'kreditrechner-ohne-eigenkapital', 'forward-darlehen-rechner', 'modernisierungskredit-rechner', 'volltilger-darlehen-rechner', 'tilgungsrechner'],
   },
   {
-    id: 'autokredit-rechner',
-    slug: 'autokredit-rechner',
-    name: 'Autokredit-Rechner (Klassisch vs. Ballonfinanzierung)',
-    shortName: 'Autokredit berechnen',
+    id: 'ballonfinanzierung-rechner',
+    slug: 'ballonfinanzierung-rechner',
+    name: 'Ballonfinanzierung Rechner (Kfz-Kredit mit Schlussrate)',
+    shortName: 'Ballonfinanzierung',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Autokredit Rechner – Monatsrate & Ballonfinanzierung fürs Auto',
-    metaDescription: 'Berechnen Sie die Rate für Ihren Autokredit: Klassischer Ratenkredit oder Ballonfinanzierung mit Schlussrate im transparenten Zinsvergleich.',
-    h1: 'Autokredit Rechner (Kfz-Finanzierung)',
-    shortDescription: 'Ermittelt Ratenhöhe und Gesamtkosten für Neu- und Gebrauchtwagen-Kredite.',
-    searchKeywords: ['autokredit rechner', 'kfz finanzierung monatsrate', 'ballonfinanzierung rechner schlussrate', 'autokauf kredit zinsen'],
+    metaTitle: 'Ballonfinanzierung Rechner – Autokredit mit Schlussrate',
+    metaDescription: 'Berechnen Sie Ihre Kfz-Ballonfinanzierung: Niedrige Monatsraten während der Laufzeit und transparente Schlussrate im Zinsvergleich.',
+    h1: 'Ballonfinanzierung Rechner – Kfz-Kredit mit Schlussrate',
+    shortDescription: 'Ermittelt Ratenhöhe und Gesamtkosten für eine Kfz-Ballonfinanzierung mit vereinbarter Schlussrate im Vergleich zum Ratenkredit.',
+    searchKeywords: ['ballonfinanzierung rechner', 'autokredit mit schlussrate', 'kfz finanzierung monatsrate', 'ballonfinanzierung rechner schlussrate', 'schlussratenfinanzierung auto'],
     inputs: [
       { id: 'carPrice', label: 'Fahrzeugpreis', type: 'number', defaultValue: 28000, min: 1000, step: 500, unit: '€' },
       { id: 'downPayment', label: 'Anzahlung / Inzahlungnahme', type: 'number', defaultValue: 5000, min: 0, step: 500, unit: '€' },
@@ -1034,13 +1095,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 367 € / Monat (Schlussrate: 8.000 €)',
     },
     content: {
-      intro: 'Kalkulieren Sie die tatsächliche Monatsbelastung für Neu- oder Gebrauchtwagen.',
-      details: 'Achten Sie darauf, dass der Fahrzeugwert am Ende die Schlussrate deckt.',
+      intro: 'Die Ballonfinanzierung (Schlussratenfinanzierung) kombiniert niedrige monatliche Raten während der Vertragslaufzeit mit einer vorab vereinbarten, hohen Schlussrate.',
+      details: 'Da die hohe Schlussrate während der gesamten Laufzeit mitverzinst werden muss, liegen die kumulierten Gesamtzinskosten einer Ballonfinanzierung spürbar über denen eines Standardkredits.',
     },
     faqs: [
-      { question: 'Lohnt sich Barzahlung beim Händler?', answer: 'Oft ja, da Sie als Barzahler häufig Rabatte aushandeln können.' },
+      { question: 'Was passiert, wenn der Fahrzeugwert am Ende unter der Schlussrate liegt?', answer: 'Reicht der Verkaufserlös des Autos nicht zur Begleichung der Schlussrate aus, muss die Differenz aus eigenen Mitteln beglichen oder per Ratenkredit weiterfinanziert werden.' },
+      { question: 'Für wen ist ein Autokredit mit Schlussrate sinnvoll?', answer: 'Für Personen, die während der Laufzeit geringe monatliche Belastungen wünschen und sicher wissen, dass zum Laufzeitende eine größere Summe (z. B. aus Fälligkeit einer Anlage) bereitsteht.' },
     ],
-    relatedSlugs: ['kreditrechner', 'leasingfaktor-rechner', 'auto-gesamtkosten-rechner'],
+    relatedSlugs: ['autokreditrechner', 'kreditrechner', 'leasingfaktor-rechner', 'auto-gesamtkosten-rechner'],
   },
   {
     id: 'umschuldung-rechner',
@@ -1049,7 +1111,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Umschuldung berechnen',
     category: 'kredit-schulden',
     subcategory: 'Umschuldung',
-    metaTitle: 'Umschuldungsrechner – Zinsersparnis bei Kreditablösung berechnen',
+    metaTitle: 'Umschuldungsrechner – Zinsersparnis bei Kreditablösung bere...',
     metaDescription: 'Lohnt sich das Umschulden? Berechnen Sie Ihre Zinsersparnis beim Ablösen teurer Alt- und Ratenkredite durch ein günstiges Neudarlehen.',
     h1: 'Umschuldungsrechner (Kreditablösung)',
     shortDescription: 'Vergleicht Ihren bestehenden Kredit mit einem günstigeren Neukredit und weist die Netto-Zinsersparnis aus.',
@@ -1089,13 +1151,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 1.160 € Netto-Ersparnis',
     },
     content: {
-      intro: 'Kredite bündeln senkt die Zinskosten und schafft finanzielle Übersicht.',
-      details: 'Verbraucherkredite können jederzeit vorzeitig abgelöst werden.',
+      intro: 'Eine Umschuldung löst bestehende, teure Kredite oder den Dispositionskredit durch ein neues Darlehen mit spürbar günstigeren Konditionen ab.',
+      details: 'Der Rechner vergleicht die verbleibenden Restzinsen des Altkredits mit den Zinskosten des Neukredits abzüglich eventuell anfallender Vorfälligkeitsentschädigungen (§ 502 BGB).',
     },
     faqs: [
-      { question: 'Darf ich einen Ratenkredit jederzeit kündigen?', answer: 'Ja, nach § 500 BGB ist die vorzeitige Rückzahlung jederzeit gestattet.' },
+      { question: 'Wann lohnt sich eine Kreditumschuldung besonders?', answer: 'Besonders bei älteren Ratenkrediten mit hohen Zinssätzen, bei der Zusammenfassung mehrerer kleiner Kredite zu einer übersichtlichen Rate oder bei dauerhafter Nutzung des teuren Girokontodispos.' },
+      { question: 'Fallen bei der Ablösung von Ratenkrediten Kosten an?', answer: 'Die Bank darf nach § 502 BGB maximal 1 Prozent der vorzeitig zurückgezahlten Restsumme (bei Restlaufzeit unter einem Jahr maximal 0,5 Prozent) als Vorfälligkeitsentschädigung verlangen.' },
     ],
-    relatedSlugs: ['kreditrechner', 'dispozins-rechner', 'restschuld-rechner'],
+    relatedSlugs: ['vorfaelligkeitsentschaedigung-rechner', 'kreditrechner', 'dispozins-rechner', 'restschuld-rechner'],
   },
   {
     id: 'dispozins-rechner',
@@ -1104,10 +1167,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Dispozins berechnen',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Dispozins Rechner – Zinskosten für Dispokredit online berechnen',
+    metaTitle: 'Dispozins Rechner – Zinskosten für Dispokredit',
     metaDescription: 'Berechnen Sie die Zinskosten für Ihre Kontoüberziehung (Dispositionskredit): Taggenaue Abrechnung nach deutscher Zinsmethode.',
     h1: 'Dispozins Rechner (Kontoüberziehung)',
-    shortDescription: 'Ermittelt die Zinskosten für geduldete und vereinbarte Kontoüberziehungen.',
+    shortDescription: 'Ermittelt die Zinskosten für geduldete und vereinbarte Kontoüberziehungen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['dispozins rechner', 'dispokredit zinsen berechnen', 'konto ueberziehung kosten', 'dispozinsen pro tag'],
     inputs: [
       { id: 'overdraftAmount', label: 'In Anspruch genommener Dispo-Betrag', type: 'number', defaultValue: 1500, min: 50, step: 50, unit: '€' },
@@ -1137,11 +1200,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '21,56 € Dispozinsen',
     },
     content: {
-      intro: 'Der Dispokredit ist bequem, aber die mit Abstand teuerste Kreditform in Deutschland.',
-      details: 'Dauerhaftes Verweilen im Dispo sollte durch einen günstigen Ratenkredit abgelöst werden.',
+      intro: 'Der Dispositionskredit (Dispo) auf dem Girokonto ist flexibel, gehört mit durchschnittlich 10 bis 14 Prozent Effektivzins jedoch zu den teuersten Kreditformen in Deutschland.',
+      details: 'Dispozinsen werden taggenau auf den beanspruchten Überziehungsbetrag berechnet: Zinsen = Überziehungsbetrag · (Dispozinssatz / 100) · (Tage / 360).',
     },
     faqs: [
-      { question: 'Was ist der Unterschied zur geduldeten Überziehung?', answer: 'Überziehen Sie über den Disporahmen hinaus, verlangen Banken oft noch höhere Zinsen.' },
+      { question: 'Was ist der Unterschied zwischen Dispo- und Überziehungszins?', answer: 'Der Dispozinssatz gilt innerhalb des vereinbarten Rahmens (z. B. bis 3 Monatsgehälter). Wird dieser Rahmen noch weiter überzogen (geduldete Überziehung), verlangen Banken oft zusätzliche Strafzinsen.' },
+      { question: 'Ab wann sollte ein Dispositionskredit umgeschuldet werden?', answer: 'Sobald das Konto länger als zwei bis drei Monate im Minus verharrt, ist ein günstiger Ratenkredit rechnerisch fast immer die wirtschaftlichere Wahl.' },
     ],
     relatedSlugs: ['umschuldung-rechner', 'kreditrechner', 'kaufkraftverlust-rechner'],
   },
@@ -1152,10 +1216,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Maximaler Kredit',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Maximaler Kredit Rechner – Wie viel Kredit bekomme ich mit meinem Gehalt?',
+    metaTitle: 'Maximaler Kredit Rechner – Wie viel Kredit bekomme ich mit...',
     metaDescription: 'Ermitteln Sie Ihren maximalen Darlehensbetrag: Wie viel Kredit Sie sich anhand Ihrer monatlichen Wunschrate und Laufzeit leisten können.',
     h1: 'Maximaler Kredit Rechner (Kreditrahmen prüfen)',
-    shortDescription: 'Berechnet die maximal finanzierbare Kreditsumme aus Ihrem monatlichen Budget.',
+    shortDescription: 'Berechnet die maximal finanzierbare Kreditsumme aus Ihrem monatlichen Budget mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['maximaler kredit rechner', 'wie viel kredit bekomme ich', 'leistbare kredithoehe berechnen', 'kreditrahmen gehalt rechner'],
     inputs: [
       { id: 'monthlyBudget', label: 'Monatlich leistbare Kreditrate', type: 'number', defaultValue: 500, min: 50, step: 25, unit: '€' },
@@ -1187,11 +1251,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 26.860 € Darlehenssumme',
     },
     content: {
-      intro: 'Klären Sie vor dem Kauf: Wie viel Darlehen kann ich mir mit meinem Einkommen leisten?',
-      details: 'Kreditraten sollten maximal 35 % bis 40 % des Haushaltsnettoeinkommens betragen.',
+      intro: 'Dieser Budgetrechner ermittelt anhand Ihrer monatlichen Haushaltsrechnung (Nettoeinkommen abzüglich Lebenshaltungskosten und Pauschalen), welchen Kreditbetrag Sie maximal stemmen können.',
+      details: 'Banken setzen bei der Haushaltsrechnung Pauschalen für Lebenshaltung (ca. 800–1.200 € für die erste Person, ca. 300–400 € je weitere Person) an. Die tragbare Rate sollte höchstens 35–40 % des Haushaltsnettoeinkommens betragen.',
     },
     faqs: [
-      { question: 'Wie viel Netto muss übrig bleiben?', answer: 'Banken setzen Pauschalen von ca. 800 bis 1.000 € für den Lebensunterhalt an.' },
+      { question: 'Welche Ausgaben fließen in die Haushaltsrechnung der Bank ein?', answer: 'Kranken- und Sachversicherungen, PKW-Kostenpauschalen, Unterhaltsverpflichtungen, bestehende Kredite sowie pauschale Lebenshaltungskosten.' },
+      { question: 'Werden Mieteinnahmen oder Boni voll als Einkommen anerkannt?', answer: 'Mieteinnahmen werden meist mit einem Sicherheitsabschlag von 15 bis 25 Prozent angesetzt; unregelmäßige Boni und Überstundenvergütungen werden oft nur teilweise gewertet.' },
     ],
     relatedSlugs: ['kreditrechner', 'baufinanzierung-rechner', 'tilgungsrechner'],
   },
@@ -1202,10 +1267,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Zinsbindung vergleichen',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Zinsbindung Rechner – Zinsänderungsrisiko & Restschuld vergleichen',
+    metaTitle: 'Zinsbindung Rechner – Zinsänderungsrisiko',
     metaDescription: 'Vergleichen Sie Zinsbindungen (10, 15 oder 20 Jahre): Welche Restschuld verbleibt und wie viel Zinssicherheit kostet der Aufpreis?',
     h1: 'Zinsbindungs-Vergleichsrechner',
-    shortDescription: 'Vergleicht unterschiedliche Zinsbindungsfristen und quantifiziert das Zinsänderungsrisiko der Restschuld.',
+    shortDescription: 'Vergleicht unterschiedliche Zinsbindungsfristen und quantifiziert das Zinsänderungsrisiko der Restschuld mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['zinsbindung rechner', 'sollzinsbindung 10 oder 15 jahre', 'zinsrisiko restschuld berechnen', 'anschlussfinanzierung zinsen'],
     inputs: [
       { id: 'loan', label: 'Darlehenssumme', type: 'number', defaultValue: 250000, min: 10000, step: 5000, unit: '€' },
@@ -1244,13 +1309,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'Vergleich 10 vs. 15 Jahre Zinsbindung',
     },
     content: {
-      intro: 'Soll man Zinsen 10 oder 15 Jahre festschreiben? Der Rechner vergleicht Rate und Restschuld.',
-      details: 'Nach 10 Jahren besteht nach § 489 BGB ein gesetzliches Sonderkündigungsrecht.',
+      intro: 'Dieser Zinsbindungsvergleich stellt die Vor- und Nachteile von 5-, 10-, 15- oder 20-jährigen Zinsbindungen gegenüber.',
+      details: 'Längere Zinsbindungen verlangen von der Bank einen Zinsaufschlag (Liquiditäts- und Risikoprämie), bieten dem Kreditnehmer dafür aber absolute Zinssicherheit vor steigenden Marktzinsen.',
     },
     faqs: [
-      { question: 'Gilt das Sonderkündigungsrecht nach 10 Jahren immer?', answer: 'Ja, nach § 489 BGB können Sie nach 10 Jahren mit 6 Monaten Frist kostenfrei kündigen.' },
+      { question: 'Wann sollte man eine 10-jährige und wann eine 20-jährige Zinsbindung wählen?', answer: 'Bei historisch niedrigen Zinsen und knappem Budget ist eine lange Zinsbindung (15–20 Jahre) sicherer. Bei hohen Zinsen lohnt sich eine 10-jährige Frist, um später günstig umschulden zu können.' },
+      { question: 'Gilt das Kündigungsrecht nach § 489 BGB auch bei 20-jähriger Bindung?', answer: 'Ja, Darlehensnehmer können auch einen 20-Jahres-Kredit nach 10 Jahren mit einer 6-monatigen Frist kostenfrei kündigen – die Bank hingegen bleibt die vollen 20 Jahre an den Zinssatz gebunden.' },
     ],
-    relatedSlugs: ['baufinanzierung-rechner', 'tilgungsrechner', 'restschuld-rechner'],
+    relatedSlugs: ['forward-darlehen-rechner', 'baufinanzierung-rechner', 'tilgungsrechner', 'restschuld-rechner'],
   },
   {
     id: 'volltilger-darlehen-rechner',
@@ -1259,7 +1325,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Volltilgerdarlehen',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Volltilger Rechner – Rate für 100 % Tilgung innerhalb Zinsbindung',
+    metaTitle: 'Volltilger Rechner – Rate für 100 % Tilgung innerhalb Zinsb...',
     metaDescription: 'Berechnen Sie die Rate für ein Volltilgerdarlehen: Schuldenfrei nach 15, 20 oder 25 Jahren ohne jedes Restschuld- und Zinsänderungsrisiko.',
     h1: 'Volltilgerdarlehen Rechner (Schuldenfrei nach Frist)',
     shortDescription: 'Ermittelt die exakte monatliche Rate und den notwendigen Tilgungssatz für die vollständige Darlehenstilgung.',
@@ -1295,11 +1361,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '1.159,92 € / Monat (0 € Restschuld)',
     },
     content: {
-      intro: 'Ein Volltilgerdarlehen bietet maximale Sicherheit: Vom ersten Tag an steht der Termin der Schuldenfreiheit fest.',
-      details: 'Banken bieten für Volltilgerdarlehen oft Zinsabschläge.',
+      intro: 'Ein Volltilgerdarlehen ist so konzipiert, dass die Kreditsumme bis zum Ende der vertraglich vereinbarten Zinsbindung auf exakt null Euro getilgt wird.',
+      details: 'Da keine Restschuld verbleibt, entfällt jedes Zinsänderungsrisiko für eine Anschlussfinanzierung. Dafür verlangt das Volltilgerdarlehen eine überdurchschnittlich hohe monatliche Tilgungsleistung.',
     },
     faqs: [
-      { question: 'Was ist der Hauptvorteil?', answer: 'Kein Zinsänderungsrisiko, da am Ende keine Restschuld verbleibt.' },
+      { question: 'Welche Vorteile bieten Banken für Volltilgerdarlehen?', answer: 'Weil für die Bank das Ausfallrisiko am Laufzeitende entfällt, gewähren viele Kreditinstitute Zinsrabatte von 0,1 bis 0,3 Prozentpunkten auf den regulären Sollzins.' },
+      { question: 'Gibt es Nachteile bei einem Volltilgerdarlehen?', answer: 'Die monatliche Belastung ist starr und hoch; vorzeitige Sondertilgungen sind vertraglich oft eingeschränkt oder ausgeschlossen.' },
     ],
     relatedSlugs: ['baufinanzierung-rechner', 'tilgungsrechner', 'restschuld-rechner'],
   },
@@ -1310,7 +1377,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Modernisierungskredit',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Modernisierungskredit Rechner – Sanierung, Wärmepumpe & Photovoltaik',
+    metaTitle: 'Modernisierungskredit Rechner – Sanierung, Wärmepumpe',
     metaDescription: 'Berechnen Sie die Rate für Ihren Modernisierungskredit ohne Grundbucheintrag (Wohnkredit) für Heizung, Dämmung, Dach und Fenster.',
     h1: 'Modernisierungskredit Rechner (Wohnkredit)',
     shortDescription: 'Kalkuliert Modernisierungsdarlehen für Immobilienbesitzer (meist bis 50.000 € ohne Grundschuldeintrag).',
@@ -1345,11 +1412,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 439,72 € / Monat',
     },
     content: {
-      intro: 'Für Heizungstausch oder Dämmung vergeben Banken Modernisierungskredite zu Sonderkonditionen.',
-      details: 'Ohne Grundschuldeintrag sparen Sie mehrere hundert Euro an Notargebühren.',
+      intro: 'Modernisierungs- und Sanierungskredite finanzieren energetische Maßnahmen (Wärmepumpe, Fenster, Dämmung, PV-Anlage) oder Renovierungen an Bestandsimmobilien.',
+      details: 'Kredite bis 50.000 € werden von vielen Banken als sogenannte Blankodarlehen ohne teure Grundbucheintragung vergeben. Zudem können staatliche Förderungen der KfW oder des BAFA kombiniert werden.',
     },
     faqs: [
-      { question: 'Gibt es staatliche Zuschüsse?', answer: 'Ja, KfW und BAFA fördern Heizungstausch mit bis zu 70 % Zuschuss.' },
+      { question: 'Was ist der Unterschied zwischen Modernisierungskredit und freiem Ratenkredit?', answer: 'Durch den wohnwirtschaftlichen Verwendungsnachweis bieten Modernisierungskredite deutlich günstigere Zinssätze als herkömmliche Ratenkredite zur freien Verfügung.' },
+      { question: 'Welche KfW-Programme unterstützen energetische Sanierungen?', answer: 'Insbesondere das Programm KfW 261 (Wohngebäude-Kredit) mit zinsgünstigen Krediten und hohen Tilgungszuschüssen für Effizienzhäuser.' },
     ],
     relatedSlugs: ['baufinanzierung-rechner', 'kreditrechner', 'tilgungsrechner'],
   },
@@ -1360,10 +1428,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Kreditvergleich',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Kreditvergleich Rechner – Zwei Darlehensangebote objektiv vergleichen',
+    metaTitle: 'Kreditvergleich Rechner – Zwei Darlehensangebote objektiv v...',
     metaDescription: 'Vergleichen Sie zwei Kreditangebote nach Monatsrate, Gesamtzinskosten und Restschuld. Transparenter Rechner für Raten- & Baudarlehen.',
     h1: 'Kreditvergleich Rechner (Angebot A vs. Angebot B)',
-    shortDescription: 'Gegenüberstellung zweier Kreditangebote zur Ermittlung des finanziell günstigsten Darlehens.',
+    shortDescription: 'Gegenüberstellung zweier Kreditangebote zur Ermittlung des finanziell günstigsten Darlehens mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['kreditvergleich rechner', 'zwei kredite vergleichen online', 'kreditangebote zinsen vergleich', 'baufinanzierung angebote gegenueberstellen'],
     inputs: [
       { id: 'loanAmount', label: 'Kreditsumme', type: 'number', defaultValue: 50000, min: 1000, step: 1000, unit: '€' },
@@ -1397,13 +1465,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '1.522,00 € Ersparnis mit Angebot B',
     },
     content: {
-      intro: 'Wenige Zehntel-Prozentpunkte Zinsunterschied summieren sich über Jahre zu tausenden Euro.',
-      details: 'Vergleichen Sie stets den effektiven Jahreszins.',
+      intro: 'Dieser Vergleichsrechner analysiert zwei konkurrierende Kreditangebote auf Zinsunterschiede, monatliche Ratenhöhe und die über die Laufzeit anfallenden Gesamtkosten.',
+      details: 'Bereits ein minimaler Unterschied von 0,25 Prozentpunkten beim effektiven Jahreszins summiert sich bei einer Baufinanzierung über 300.000 € auf viele tausend Euro Mehrkosten.',
     },
     faqs: [
-      { question: 'Sollzins vs. Effektivzins?', answer: 'Der Effektivzins enthält alle Nebenkosten und Zahlungsmodalitäten.' },
+      { question: 'Warum ist der Effektivzins wichtiger als der gebundene Sollzins?', answer: 'Der Sollzins beziffert nur die Netto-Verzinsung; erst der Effektivzins nach PAngV enthält Verrechnungsfristen und Nebenkosten und ermöglicht so einen echten Marktvergleich.' },
+      { question: 'Sollte man zwei Kredite mit unterschiedlicher Laufzeit vergleichen?', answer: 'Vergleichen Sie vorrangig Angebote mit identischer Laufzeit und Zinsbindung, um eine verzerrungsfreie Entscheidungsgrundlage zu erhalten.' },
     ],
-    relatedSlugs: ['kreditrechner', 'umschuldung-rechner', 'maximaler-kredit-rechner'],
+    relatedSlugs: ['effektivzins-kredit-rechner', 'kreditrechner', 'umschuldung-rechner', 'maximaler-kredit-rechner', 'ratenkreditrechner'],
   },
   {
     id: 'gesamtzinsbelastung-rechner',
@@ -1412,7 +1481,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Gesamtzinsbelastung',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Gesamtzinsbelastung Rechner – Wie viel Zinsen zahle ich insgesamt?',
+    metaTitle: 'Gesamtzinsbelastung Rechner – Wie viel Zinsen zahle ich ins...',
     metaDescription: 'Berechnen Sie die gesamte Zinslast Ihres Kredits in Euro und im Verhältnis zur Kreditsumme. Zinskosten transparent aufgeschlüsselt.',
     h1: 'Gesamtzinsbelastung Rechner (Gesamtzinsen)',
     shortDescription: 'Zeigt die absolute Summe aller Zinszahlungen über die gesamte Laufzeit des Darlehens.',
@@ -1449,11 +1518,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '21.494,00 € Gesamtzinsen',
     },
     content: {
-      intro: 'Entscheidend für Kreditkosten ist nicht nur die Monatsrate, sondern die Summe aller Zinsen.',
-      details: 'Höhere Tilgung und Sondertilgungen senken die Gesamtzinslast drastisch.',
+      intro: 'Dieser Rechner summiert alle über die gesamte Kreditlaufzeit anfallenden Zinszahlungen und stellt sie dem geliehenen Nettodarlehensbetrag gegenüber.',
+      details: 'Zinsbelastung = (Monatsrate · Monate) - Kreditsumme. Bei langen Laufzeiten oder geringer Tilgung kann die kumulierte Zinslast die ursprüngliche Kreditsumme erreichen oder sogar übersteigen.',
     },
     faqs: [
-      { question: 'Wie senke ich Gesamtzinsen?', answer: 'Durch höhere Tilgungsraten und jährliche Sondertilgungen.' },
+      { question: 'Wie kann man die Gesamtzinsbelastung am wirksamsten senken?', answer: 'Durch eine Erhöhung der anfänglichen Tilgung, die Vereinbarung von kostenfreien Sondertilgungsrechten und die Wahl einer möglichst kurzen realistischen Gesamtlaufzeit.' },
+      { question: 'Zählt die Zinsbelastung bei vermieteten Immobilien als Werbungskosten?', answer: 'Ja, Kreditzinsen für fremdvermietete Immobilien können in voller Höhe steuerlich als Werbungskosten bei den Einkünften aus Vermietung und Verpachtung geltend gemacht werden.' },
     ],
     relatedSlugs: ['kreditrechner', 'tilgungsrechner', 'sondertilgungsrechner'],
   },
@@ -1464,11 +1534,11 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Vorfälligkeitsentschädigung',
     category: 'kredit-schulden',
     subcategory: 'Umschuldung',
-    metaTitle: 'Vorfälligkeitsentschädigung Rechner – Entschädigung bei Kündigung berechnen',
-    metaDescription: 'Berechnen Sie die gesetzliche Vorfälligkeitsentschädigung nach § 502 BGB bei vorzeitiger Kündigung von Raten- und Verbraucherkrediten.',
-    h1: 'Vorfälligkeitsentschädigung Rechner (§ 502 BGB)',
-    shortDescription: 'Ermittelt die gesetzlich gedeckelte Entschädigung der Bank bei vorzeitiger Ablösung von Ratenkrediten.',
-    searchKeywords: ['vorfaelligkeitsentschaedigung rechner', 'kredit vorzeitig kuendigen kosten', '502 bgb vorfaelligkeit', 'ausloesegebuehr kredit'],
+    metaTitle: 'Vorfälligkeitsentschädigung Ratenkredit (§ 502 BGB)',
+    metaDescription: 'Berechnen Sie die gesetzliche Vorfälligkeitsentschädigung für Ratenkredite nach § 502 BGB mit maximal 1 % bzw. 0,5 % Deckelung.',
+    h1: 'Vorfälligkeitsentschädigung Ratenkredit – Kosten berechnen',
+    shortDescription: 'Berechnet die gesetzliche Obergrenze der Vorfälligkeitsentschädigung bei vorzeitiger Rückzahlung eines Ratenkredits (§ 502 BGB).',
+    searchKeywords: ['vorfaelligkeitsentschaedigung ratenkredit', 'vorfaelligkeitsentschaedigung rechner', 'kredit vorzeitig kuendigen kosten', '502 bgb vorfaelligkeit', 'ausloesegebuehr kredit'],
     inputs: [
       { id: 'remainingDebt', label: 'Verbleibende Restschuld', type: 'number', defaultValue: 12000, min: 100, step: 500, unit: '€' },
       { id: 'remainingMonths', label: 'Restlaufzeit in Monaten', type: 'number', defaultValue: 24, min: 1, max: 120, step: 1, unit: 'Monate' },
@@ -1496,11 +1566,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'Maximal 120,00 € Entschädigung',
     },
     content: {
-      intro: 'Wer einen Ratenkredit vorzeitig ablöst, muss der Bank den Zinsverlust erstatten. Das Gesetz schützt Verbraucher durch Obergrenzen.',
-      details: 'Viele Banken verzichten bei modernen Krediten komplett auf diese Gebühr.',
+      intro: 'Kündigen Verbraucher einen Ratenkredit vorzeitig oder leisten eine Gesamttilgung, darf die Bank nach § 502 BGB einen pauschalierten Zinsschaden verlangen.',
+      details: 'Beträgt die Restlaufzeit mehr als 12 Monate, ist die Entschädigung gesetzlich auf höchstens 1,0 Prozent des vorzeitig getilgten Betrags gedeckelt; bei Restlaufzeiten von 12 Monaten oder weniger auf 0,5 Prozent.',
     },
     faqs: [
-      { question: 'Gilt die 1%-Grenze für Baufinanzierungen?', answer: 'Nein, für grundschuldbesicherte Baudarlehen gilt die freie Schadensberechnung.' },
+      { question: 'Gilt die 1-Prozent-Grenze auch bei vorzeitiger Kündigung von Baufinanzierungen?', answer: 'Nein, für Immobiliendarlehen gilt § 502 BGB nicht in dieser Pauschalform; dort darf die Bank den tatsächlichen Zinsschaden nach der BGH-Aktiv-Passiv-Methode abrechnen.' },
+      { question: 'Muss die Bank vertragliche Sondertilgungsrechte berücksichtigen?', answer: 'Ja, nach ständiger BGH-Rechtsprechung müssen vereinbarte, noch nicht genutzte Sondertilgungen schadensmindernd in die Entschädigungsberechnung einfließen.' },
     ],
     relatedSlugs: ['umschuldung-rechner', 'kreditrechner', 'restschuld-rechner'],
   },
@@ -1511,7 +1582,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Schuldentilgungsdauer',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Schuldentilgungsdauer Rechner – Wann bin ich endlich schuldenfrei?',
+    metaTitle: 'Schuldentilgungsdauer Rechner – Wann bin ich endlich schuld...',
     metaDescription: 'Berechnen Sie, wie viele Monate Sie bei einer festen monatlichen Rate benötigen, um Ihre bestehenden Schulden vollständig zu tilgen.',
     h1: 'Schuldentilgungsdauer Rechner (Schuldenfreiheit planen)',
     shortDescription: 'Kalkuliert die exakte Monatsanzahl bis zur vollständigen Entschuldung bei fester Monatsrate.',
@@ -1548,11 +1619,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 30 Monate (2,5 Jahre)',
     },
     content: {
-      intro: 'Schuldenabbau erfordert Ausdauer. Unser Rechner zeigt Ihnen das genaue Datum Ihrer Schuldenfreiheit.',
-      details: 'Die Monatsrate muss über dem monatlichen Zinsbetrag liegen, damit die Tilgung greift.',
+      intro: 'Dieser Entschuldungsrechner ermittelt die verbleibende Zeitdauer in Jahren und Monaten, bis bestehende Verbindlichkeiten bei einer festgelegten Monatsrate vollständig getilgt sind.',
+      details: 'Formel: Laufzeit n = -ln(1 - (Kreditsumme · Monatszins) / Rate) / ln(1 + Monatszins). Reicht die gewählte Monatsrate nicht einmal zur Deckung der Zinsen aus, tritt eine theoretisch unendliche Verschuldung ein.',
     },
     faqs: [
-      { question: 'Was ist die Schneeball-Methode?', answer: 'Kleinste Schulden zuerst tilgen für schnelle Erfolgserlebnisse.' },
+      { question: 'Was ist die Mindestrate zur Vermeidung einer Zinsfalle?', answer: 'Die Monatsrate muss zwingend höher sein als die monatlich auflaufenden Zinsen (Kreditsumme × Jahreszins / 12), da der Schuldenstand andernfalls Monat für Monat anwächst.' },
+      { question: 'Welche Methode empfiehlt sich bei mehreren Krediten (Schneeball vs. Lawine)?', answer: 'Die Lawinen-Methode tilgt zuerst den Kredit mit dem höchsten Zinssatz (finanziell optimal); die Schneeball-Methode tilgt zuerst den kleinsten Betrag (schnelle psychologische Erfolge).' },
     ],
     relatedSlugs: ['kreditlaufzeit-rechner', 'dispozins-rechner', 'umschuldung-rechner'],
   },
@@ -1563,10 +1635,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Forward-Darlehen',
     category: 'kredit-schulden',
     subcategory: 'Umschuldung',
-    metaTitle: 'Forward-Darlehen Rechner – Zinsaufschlag für Anschlussfinanzierung',
+    metaTitle: 'Forward-Darlehen Rechner – Zinsaufschlag für Anschlussfinan...',
     metaDescription: 'Berechnen Sie den Zinsaufschlag bei Forward-Darlehen bis zu 36 oder 60 Monate vor Ablauf der Zinsbindung. Schutz vor steigenden Zinsen.',
     h1: 'Forward-Darlehen Rechner (Zinssicherung im Voraus)',
-    shortDescription: 'Kalkuliert den monatlichen Zinsaufschlag (Forward-Aufschlag) für die vorzeitige Zinssicherung.',
+    shortDescription: 'Kalkuliert den monatlichen Zinsaufschlag (Forward-Aufschlag) für die vorzeitige Zinssicherung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['forward darlehen rechner', 'forward aufschlag berechnen', 'anschlussfinanzierung zukunft sichern', 'forward zinsrechner'],
     inputs: [
       { id: 'loanAmount', label: 'Erwartete Restschuld zur Anschlussfinanzierung', type: 'number', defaultValue: 180000, min: 10000, step: 5000, unit: '€' },
@@ -1599,11 +1671,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '3,98 % gesicherter Zinssatz',
     },
     content: {
-      intro: 'Sichern Sie sich das heutige Zinsniveau bis zu 3 oder 5 Jahre im Voraus für die Anschlussfinanzierung.',
-      details: 'Ein Forward-Darlehen schützt vor Zinserhöhungen bis zum Ablösetermin.',
+      intro: 'Ein Forward-Darlehen sichert das aktuelle Zinsniveau für eine künftige Anschlussfinanzierung bis zu 36 bis 60 Monate im Voraus ab.',
+      details: 'Für jeden Monat Vorlaufzeit (Forward-Periode) verlangen Banken einen Forward-Aufschlag auf den aktuellen Marktzins (typischerweise 0,01 bis 0,03 Prozentpunkte pro Monat Vorlauf).',
     },
     faqs: [
-      { question: 'Muss man das Darlehen abnehmen?', answer: 'Ja, Forward-Darlehen sind feste Verträge mit verbindlicher Abnahme.' },
+      { question: 'Wann lohnt sich der Abschluss eines Forward-Darlehens?', answer: 'Wenn Sie mit spürbar steigenden Zinsen bis zum Ende Ihrer aktuellen Zinsbindung rechnen und das Risiko höherer Monatsraten verbindlich ausschließen möchten.' },
+      { question: 'Ist ein Forward-Darlehen bindend?', answer: 'Ja, ein Forward-Darlehen ist ein verbindlicher Darlehensvertrag. Sinken die Zinsen unerwartet weiter, muss der Vertrag dennoch zu den vereinbarten Konditionen abgenommen werden (Nichtabnahmeentschädigung).' },
     ],
     relatedSlugs: ['baufinanzierung-rechner', 'zinsbindung-rechner', 'tilgungsrechner'],
   },
@@ -1614,7 +1687,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Kreditlaufzeit',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Kreditlaufzeit Rechner – Wie lange läuft der Kredit bei fester Rate?',
+    metaTitle: 'Kreditlaufzeit Rechner – Wie lange läuft der Kredit bei fes...',
     metaDescription: 'Ermitteln Sie die genaue Kreditlaufzeit in Monaten und Jahren aus Kreditsumme, Zinssatz und monatlicher Rate.',
     h1: 'Kreditlaufzeit Rechner (Dauer bis zur Tilgung)',
     shortDescription: 'Berechnet die genaue Laufzeit eines Kredits anhand der gewählten Monatsrate.',
@@ -1651,13 +1724,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 6 Jahre und 6 Monate',
     },
     content: {
-      intro: 'Ermitteln Sie die genaue Laufzeit eines Kredits bei gegebener Monatsrate.',
-      details: 'Schon kleine Ratenerhöhungen verkürzen die Gesamtlaufzeit merklich.',
+      intro: 'Der Kreditlaufzeitrechner kalkuliert die genaue Monats- und Jahresanzahl zur vollständigen Tilgung eines Kredits bei vorgegebener Wunschrate.',
+      details: 'Durch die Variation der Monatsrate lässt sich der exakte Zeitpunkt der vollständigen Entschuldung interaktiv planen.',
     },
     faqs: [
-      { question: 'Darf die Rate beliebig klein sein?', answer: 'Nein, sie muss höher als die monatlichen Zinsen sein.' },
+      { question: 'Wie wirkt sich eine Erhöhung der Monatsrate um 50 € aus?', answer: 'Bei einem 20.000-€-Kredit zu 6 % Zinsen verkürzt eine Erhöhung der Rate von 300 € auf 350 € die Gesamtlaufzeit um mehr als 14 Monate und spart hunderte Euro Zinsen.' },
+      { question: 'Welche Laufzeit ist für Konsumentenkredite wirtschaftlich sinnvoll?', answer: 'Die Laufzeit sollte die Lebensdauer des finanzierten Konsumguts keinesfalls überschreiten (z. B. Smartphone maximal 24 Monate, Auto maximal 60 Monate).' },
     ],
-    relatedSlugs: ['kreditrechner', 'schuldentilgungsdauer-rechner', 'tilgungsrechner'],
+    relatedSlugs: ['privatkredit-rechner', 'kreditrechner', 'schuldentilgungsdauer-rechner', 'tilgungsrechner'],
   },
   {
     id: 'kredit-restschuld-stichtag-rechner',
@@ -1666,11 +1740,11 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Restschuld zum Stichtag',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Kredit-Restschuld Stichtagsrechner – Verbleibender Kreditbetrag nach Jahren',
-    metaDescription: 'Berechnen Sie die verbleibende Restschuld Ihres Kredits oder Annuitätendarlehens zu einem beliebigen Stichtag online mit exaktem Zinsverlauf.',
-    h1: 'Kredit-Restschuld Stichtagsrechner (Darlehens-Restsumme)',
-    shortDescription: 'Ermittelt die exakte Restschuld nach Ablauf einer bestimmten Monats- oder Jahresanzahl.',
-    searchKeywords: ['restschuld rechner', 'kredit restschuld berechnen', 'darlehen restschuld stichtag', 'tilgungsplan restbetrag'],
+    metaTitle: 'Restschuld zum Stichtag Rechner – Exakte Kreditschuld ermitteln',
+    metaDescription: 'Ermitteln Sie die exakte Darlehensrestschuld zu einem beliebigen Wunsch-Stichtag für Kündigung, Ablösung oder Sondertilgung.',
+    h1: 'Restschuld zum Stichtag Rechner – Kreditsaldo taggenau berechnen',
+    shortDescription: 'Berechnet den exakten Kreditsaldo zu einem individuellen Kalenderstichtag für Umschuldung oder vorzeitige Darlehensablösung.',
+    searchKeywords: ['restschuld stichtag rechner', 'restschuld rechner', 'kredit restschuld berechnen', 'darlehen restschuld stichtag', 'tilgungsplan restbetrag'],
     inputs: [
       { id: 'loanAmount', label: 'Ursprüngliche Kreditsumme', type: 'number', defaultValue: 150000, min: 1000, step: 2500, unit: '€' },
       { id: 'interestRate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.8, min: 0.1, step: 0.1, unit: '%' },
@@ -1706,13 +1780,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 98.450 € Restschuld',
     },
     content: {
-      intro: 'Ermitteln Sie die verbleibende Restschuld für Ihre Anschlussfinanzierung.',
-      details: 'Zu Beginn sinkt die Restschuld langsamer, da die Rate mehr Zinsen als Tilgung enthält.',
+      intro: 'Dieser Stichtagsrechner beziffert die exakte verbleibende Kreditschuld zu einem ganz bestimmten Kalenderdatum in der Zukunft.',
+      details: 'Wichtig für Steuererklärungen, Vermögensaufstellungen, Scheidungsvereinbarungen oder Verhandlungen über vorzeitige Sondertilgungen.',
     },
     faqs: [
-      { question: 'Wann steigt der Tilgungsanteil?', answer: 'Mit jeder Rate sinkt die Restschuld und damit die Zinslast, wodurch der Tilgungsanteil wächst.' },
+      { question: 'Wie berechnet man den Zins- und Tilgungsanteil zu einem bestimmten Monat?', answer: 'Der Monatszins errechnet sich aus der Restschuld des Vormonats mal Monatszinssatz; die Differenz zur vereinbarten festen Monatsrate ist die Tilgung dieses Monats.' },
+      { question: 'Woher erhält man den offiziellen Restschuldsaldo für das Finanzamt?', answer: 'Banken versenden zu Jahresbeginn eine gesetzlich vorgeschriebene Jahresbescheinigung mit dem Restschuldsaldo zum 31. Dezember des Vorjahres.' },
     ],
-    relatedSlugs: ['kreditrechner', 'baufinanzierung-rechner', 'tilgungsrechner'],
+    relatedSlugs: ['vorfaelligkeitsentschaedigung-baufinanzierung-rechner', 'kreditrechner', 'baufinanzierung-rechner', 'tilgungsrechner', 'restschuld-rechner'],
   },
   {
     id: 'kreditrechner-ohne-eigenkapital',
@@ -1721,10 +1796,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Vollfinanzierung',
     category: 'kredit-schulden',
     subcategory: 'Immobilienkauf & Finanzierung',
-    metaTitle: 'Kreditrechner ohne Eigenkapital – 100 % & 110 % Vollfinanzierung',
+    metaTitle: 'Kreditrechner ohne Eigenkapital – 100 %',
     metaDescription: 'Berechnen Sie die Rate für eine Baufinanzierung ohne Eigenkapital (100 % Kaufpreis oder 110 % inkl. Kaufnebenkosten) mit Zinsaufschlag.',
     h1: 'Kreditrechner ohne Eigenkapital (Vollfinanzierung)',
-    shortDescription: 'Ermittelt Ratenhöhe und Zinsaufschlag für Vollfinanzierungen von Immobilien.',
+    shortDescription: 'Ermittelt Ratenhöhe und Zinsaufschlag für Vollfinanzierungen von Immobilien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['kredit ohne eigenkapital rechner', '110 prozent finanzierung rechner', 'vollfinanzierung hauskauf zinsen', 'immobilienkredit ohne erspartes'],
     inputs: [
       { id: 'purchasePrice', label: 'Kaufpreis der Immobilie', type: 'number', defaultValue: 300000, min: 20000, step: 5000, unit: '€' },
@@ -1758,13 +1833,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 1.677,50 € Monatsrate',
     },
     content: {
-      intro: 'Eine Immobilie ohne eigenes Erspartes finanzieren ist möglich, erfordert jedoch ein sehr sicheres und überdurchschnittliches Einkommen.',
-      details: 'Banken prüfen die Haushaltsrechnung bei 110%-Finanzierungen besonders streng.',
+      intro: 'Eine 100%- oder 110%-Baufinanzierung (Vollfinanzierung) finanziert den vollen Kaufpreis oder zusätzlich auch alle Kaufnebenkosten ohne Eigenkapitaleinsatz.',
+      details: 'Wegen des erhöhten Ausfallrisikos für die Bank (Kreditsumme übersteigt den Beleihungswert der Immobilie) verlangen Kreditinstitute deutliche Zinsaufschläge von oft 0,5 bis 1,5 Prozentpunkten.',
     },
     faqs: [
-      { question: 'Was bedeutet 110%-Finanzierung?', answer: 'Die Bank finanziert den kompletten Kaufpreis (100 %) plus alle Kaufnebenkosten (10 %).' },
+      { question: 'Welche Voraussetzungen müssen für eine 110%-Finanzierung erfüllt sein?', answer: 'Ein überdurchschnittlich hohes, unbefristetes Einkommen, ein einwandfreier Schufa-Score sowie eine Immobilie in sehr guter Lage mit stabiler Werterwartung.' },
+      { question: 'Was ist das größte Risiko einer Vollfinanzierung?', answer: 'Die Gefahr einer Überschuldung bei vorzeitigem Verkauf: Sinkt der Immobilienwert leicht, reicht der Verkaufserlös nicht aus, um das Darlehen vollständig abzulösen.' },
     ],
-    relatedSlugs: ['kaufnebenkosten-rechner', 'baufinanzierung-rechner', 'kaufnebenkosten-rechner'],
+    relatedSlugs: ['kaufnebenkosten-rechner', 'baufinanzierung-rechner', 'kreditrechner'],
   },
   {
     id: 'effektivzins-kredit-rechner',
@@ -1773,10 +1849,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Effektivzins Kredit',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Effektivzins Rechner Kredit – Effektiven Jahreszins nach PAngV berechnen',
+    metaTitle: 'Effektivzins Rechner Kredit – Effektiven Jahreszins nach PA...',
     metaDescription: 'Ermitteln Sie den echten effektiven Jahreszins aus Sollzins, Auszahlungskurs (Disagio) und Gebühren nach der Preisangabenverordnung.',
     h1: 'Effektivzins Rechner für Kredite (PAngV)',
-    shortDescription: 'Berechnet den Effektivzins unter Berücksichtigung von Nebenkosten und Verrechnungsintervallen.',
+    shortDescription: 'Berechnet den Effektivzins unter Berücksichtigung von Nebenkosten und Verrechnungsintervallen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['effektivzins kredit rechner', 'effektiver jahreszins berechnen formel', 'pangv kredit zinsen', 'disagio effektivzins rechner'],
     inputs: [
       { id: 'loanAmount', label: 'Nennbetrag des Kredits', type: 'number', defaultValue: 20000, min: 1000, step: 1000, unit: '€' },
@@ -1810,11 +1886,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 5,12 % Effektivzins',
     },
     content: {
-      intro: 'Nur der effektive Jahreszins ermöglicht den objektiven Vergleich verschiedener Kreditangebote.',
-      details: 'Banken sind gesetzlich verpflichtet, den Effektivzins prominent auszuweisen.',
+      intro: 'Der effektive Jahreszins nach der Preisangabenverordnung (PAngV) fasst Sollzins, Auszahlungskurs, Zinsverrechnungstermine und Bearbeitungskosten in einer einheitlichen Vergleichskennzahl zusammen.',
+      details: 'Nach europäischem Recht ermittelt die mathematische Annäherungsformel den internen Zinsfuß (Internal Rate of Return), der die Zahlungsströme exakt auf den Nettodarlehensbetrag abzinst.',
     },
     faqs: [
-      { question: 'Warum ist der Effektivzins höher als der Sollzins?', answer: 'Weil unterjährige monatliche Zinszahlungen und etwaige Nebenkosten eingerechnet werden.' },
+      { question: 'Dürfen Banken Bearbeitungsgebühren in den Kredit einrechnen?', answer: 'Nein, nach ständiger Rechtsprechung des Bundesgerichtshofs (BGH, Az. XI ZR 170/13) sind gesonderte laufzeitunabhängige Bearbeitungsentgelte bei Verbraucherkrediten unzulässig.' },
+      { question: 'Warum weicht der Effektivzins vom Sollzins ab?', answer: 'Weil Zinsen meist monatlich nachschüssig verrechnet werden (unterjährige Zinsverrechnung) und eventuelle Nebenkosten oder Disagios eingerechnet werden.' },
     ],
     relatedSlugs: ['kreditrechner', 'kreditvergleich-rechner', 'umschuldung-rechner'],
   },
@@ -1825,10 +1902,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Privatkredit',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Privatkredit Rechner – Darlehen zwischen Verwandten & Freunden',
-    metaDescription: 'Berechnen Sie Tilgungsplan und Zinsen für Privatdarlehen unter Freunden oder Verwandten. Schenkungssteuerliche Mindestverzinsung prüfen.',
-    h1: 'Privatkredit Rechner (Darlehen unter Verwandten)',
-    shortDescription: 'Kalkuliert Rückzahlungsraten und Zinsen für private Geldleihen im Familien- und Freundeskreis.',
+    metaTitle: 'Privatkredit Rechner – Konsumentenkredit zur freien Verwendung',
+    metaDescription: 'Ermitteln Sie Monatsrate und Kreditkosten für einen Privatkredit zur freien Verwendung für Möbel, Renovierung oder Anschaffungen.',
+    h1: 'Privatkredit Rechner – Konsumentenkredit online planen',
+    shortDescription: 'Kalkuliert die monatliche Kreditbelastung für freie Privatdarlehen ohne Zweckbindung mit flexiblen Laufzeiten.',
     searchKeywords: ['privatkredit rechner', 'darlehen familie zinsen rechner', 'privatdarlehen schenkungssteuer zinsen', 'kredit unter freunden vertrag'],
     inputs: [
       { id: 'loan', label: 'Geliehener Betrag', type: 'number', defaultValue: 10000, min: 100, step: 500, unit: '€' },
@@ -1864,11 +1941,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '286,43 € monatlich',
     },
     content: {
-      intro: 'Geld leihen unter Verwandten oder Freunden: Ein klarer Tilgungsplan bewahrt den Frieden.',
-      details: 'Achtung: Bei zinslosen Darlehen unter Fremden kann das Finanzamt den Zinsvorteil als steuerpflichtige Schenkung einstufen (§ 7 ErbStG).',
+      intro: 'Ein privater Darlehensvertrag zwischen Verwandten, Freunden oder Geschäftspartnern schafft rechtliche Klarheit bei Zinsen, Rückzahlung und Fälligkeiten.',
+      details: 'Aus steuerlicher Sicht (§ 7 Abs. 1 Nr. 1 ErbStG) kann ein zinsloses oder extrem niedrig verzinstes Darlehen vom Finanzamt als steuerpflichtige Schenkung gewertet werden, wenn es den marktüblichen Zinssatz unterschreitet.',
     },
     faqs: [
-      { question: 'Gilt ein zinsloses Darlehen als Schenkung?', answer: 'Der ersparte marktübliche Zins gilt steuerlich als Schenkung und muss unter den Freibeträgen bleiben.' },
+      { question: 'Welcher Mindestzinssatz schützt bei Privatkrediten vor Schenkungsteuer?', answer: 'Die Finanzverwaltung verlangt nach § 15 BewG in der Regel eine Verzinsung von mindestens 5,5 Prozent p.a., wenn kein anderer marktüblicher Zins nachgewiesen wird.' },
+      { question: 'Sollte ein Darlehen unter Verwandten schriftlich fixiert werden?', answer: 'Unbedingt: Ein schriftlicher Darlehensvertrag mit exakter Kreditsumme, Zinssatz, Tilgungsplan und Kündigungsmodalitäten verhindert familiäre Streitigkeiten und dient als Nachweis gegenüber dem Finanzamt.' },
     ],
     relatedSlugs: ['kreditrechner', 'kreditlaufzeit-rechner', 'schuldentilgungsdauer-rechner'],
   },
@@ -1879,7 +1957,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Zwischenfinanzierung',
     category: 'kredit-schulden',
     subcategory: 'Immobilienkauf & Finanzierung',
-    metaTitle: 'Zwischenfinanzierung Rechner – Kosten für kurzfristige Darlehen berechnen',
+    metaTitle: 'Zwischenfinanzierung Rechner – Kosten für kurzfristige Darl...',
     metaDescription: 'Berechnen Sie die Zinskosten für eine Zwischenfinanzierung beim Immobilienkauf: Vorzeitiger Kauf vor Verkauf der alten Immobilie.',
     h1: 'Zwischenfinanzierung Rechner (Immobilienüberbrückung)',
     shortDescription: 'Ermittelt die Zinskosten für endfällige Überbrückungskredite bis zum Zufluss von Eigenkapital.',
@@ -1913,11 +1991,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '520,00 € / Monat (6.240 € Gesamtzins)',
     },
     content: {
-      intro: 'Sie haben Ihr neues Traumhaus gefunden, das alte Haus aber noch nicht verkauft? Eine Zwischenfinanzierung überbrückt die Zeit bis zum Notartermin.',
-      details: 'Zwischenfinanzierungen sind endfällige Darlehen ohne laufende Tilgung.',
+      intro: 'Eine Zwischenfinanzierung überbrückt kurzfristige Liquiditätsengpässe beim Immobilienkauf, bis sichere Mittel (z. B. aus dem Verkauf der bisherigen Immobilie oder Zuteilung eines Bausparvertrags) bereitstehen.',
+      details: 'Es handelt sich um ein endfälliges Darlehen: Während der Laufzeit (meist 6 bis 24 Monate) werden ausschließlich Zinsen gezahlt; die Tilgung erfolgt auf einen Schlag bei Fälligkeit der erwarteten Mittel.',
     },
     faqs: [
-      { question: 'Wie lange kann man zwischenfinanzieren?', answer: 'Banken gewähren Zwischenfinanzierungen meist für 6 bis höchstens 24 Monate.' },
+      { question: 'Wie hoch sind die Zinsen bei einer Zwischenfinanzierung?', answer: 'Da Banken Zwischenkredite flexibel und kurzfristig bereitstellen, liegen die Zinssätze meist 1 bis 2 Prozentpunkte über den Konditionen langfristiger Festzinsdarlehen.' },
+      { question: 'Kann eine Zwischenfinanzierung vorzeitig ohne Vorfälligkeitsentschädigung abgelöst werden?', answer: 'Ja, Zwischenfinanzierungen werden üblicherweise mit variabler Verzinsung oder flexibler Rückzahlungsoption vereinbart, sodass sie bei Geldeingang sofort getilgt werden können.' },
     ],
     relatedSlugs: ['baufinanzierung-rechner', 'kreditrechner', 'kaufnebenkosten-rechner'],
   },

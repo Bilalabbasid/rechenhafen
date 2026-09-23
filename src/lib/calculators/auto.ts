@@ -6,7 +6,9 @@ export function calculateFuelCost(inputs: Record<string, any>): CalculationResul
   const distance = parseFloat(inputs.distance) || 100;
   const consumption = parseFloat(inputs.consumption) || 6.5; // l / 100km
   const pricePerLiter = parseFloat(inputs.pricePerLiter) || 1.75; // € / l
-  const tripsCount = parseInt(inputs.tripsCount || '1', 10);
+  const tripType = inputs.tripType || 'single'; // 'single' vs 'roundtrip'
+  const tripsCount = Math.max(1, parseInt(inputs.tripsCount || '1', 10));
+  const passengers = Math.max(1, parseInt(inputs.passengers || '1', 10));
 
   if (distance <= 0 || consumption <= 0 || pricePerLiter <= 0) {
     return {
@@ -15,40 +17,71 @@ export function calculateFuelCost(inputs: Record<string, any>): CalculationResul
     };
   }
 
-  // Benötigter Sprit für eine einfache Fahrt
-  const litersPerTrip = (distance * consumption) / 100;
-  const costPerTrip = litersPerTrip * pricePerLiter;
-  const costPerKm = costPerTrip / distance;
+  // Effektive Strecke pro Fahrt
+  const effectiveDistancePerTrip = tripType === 'roundtrip' ? distance * 2 : distance;
+  const totalKm = effectiveDistancePerTrip * tripsCount;
 
-  // Gesamtkosten für die eingegebene Anzahl Fahrten
-  const totalCost = costPerTrip * tripsCount;
+  // Kraftstoffbedarf
+  const litersPerTrip = (effectiveDistancePerTrip * consumption) / 100;
   const totalLiters = litersPerTrip * tripsCount;
+  const costPerTrip = litersPerTrip * pricePerLiter;
+  const totalCost = costPerTrip * tripsCount;
+  const costPerKm = costPerTrip / effectiveDistancePerTrip;
+  const costPer100Km = (consumption * pricePerLiter);
+  const costPerPerson = totalCost / passengers;
 
-  // Monatlich und jährlich bei regelmäßigen Fahrten (z.B. 21 Arbeitstage im Monat)
-  const monthlyCost = costPerTrip * 21 * 2; // 21 Tage hin und zurück
-  const yearlyCost = costPerTrip * 220 * 2;
+  const secondary: Array<{ id: string; label: string; value: any; formattedValue: string }> = [
+    { id: 'costPerKm', label: 'Kraftstoffkosten pro Kilometer', value: costPerKm, formattedValue: `${formatCurrency(costPerKm, 3)} / km` },
+    { id: 'costPer100Km', label: 'Kosten pro 100 km', value: costPer100Km, formattedValue: formatCurrency(costPer100Km) },
+    { id: 'totalLiters', label: 'Kraftstoffbedarf gesamt', value: totalLiters, formattedValue: `${formatNumber(totalLiters, 2)} Liter` },
+    { id: 'totalKm', label: 'Fahrstrecke gesamt', value: totalKm, formattedValue: `${formatNumber(totalKm, 1)} km` },
+  ];
+
+  if (passengers > 1) {
+    secondary.unshift({
+      id: 'costPerPerson',
+      label: `Kosten pro Person (${passengers} Mitfahrer)`,
+      value: costPerPerson,
+      formattedValue: formatCurrency(costPerPerson),
+    });
+  }
+
+  // Pendel-Hochrechnung
+  const monthlyCost = (distance * 2 * consumption / 100 * pricePerLiter) * 21;
+  const yearlyCost = (distance * 2 * consumption / 100 * pricePerLiter) * 220;
+  secondary.push(
+    { id: 'monthlyCommute', label: 'Monatlich bei täglichem Pendeln (21 Tage Hin & Zurück)', value: monthlyCost, formattedValue: formatCurrency(monthlyCost) },
+    { id: 'yearlyCommute', label: 'Jährlich bei 220 Pendeltagen (Hin & Zurück)', value: yearlyCost, formattedValue: formatCurrency(yearlyCost) },
+  );
+
+  let labelText = tripType === 'roundtrip' ? 'Spritkosten (Hin- und Rückfahrt)' : 'Spritkosten (Einfache Fahrt)';
+  if (tripsCount > 1) {
+    labelText = `Gesamtkosten für ${tripsCount} Fahrten`;
+  }
+
+  let summary = `Für eine Strecke von ${formatNumber(effectiveDistancePerTrip, 1)} km (${tripType === 'roundtrip' ? 'Hin- und Rückfahrt' : 'einfache Fahrt'}) fallen bei ${formatCurrency(pricePerLiter)} je Liter Spritkosten in Höhe von ${formatCurrency(costPerTrip)} an (${formatCurrency(costPerKm, 3)}/km).`;
+  if (passengers > 1) {
+    summary += ` Bei ${passengers} Mitfahrern beträgt der Anteil ${formatCurrency(costPerPerson)} pro Person.`;
+  }
 
   return {
     primary: {
-      id: 'costPerTrip',
-      label: tripsCount > 1 ? `Gesamtkosten für ${tripsCount} Fahrten` : 'Spritkosten pro Fahrt',
+      id: 'cost',
+      label: labelText,
       value: totalCost,
       formattedValue: formatCurrency(totalCost),
       highlight: true,
     },
-    secondary: [
-      { id: 'costPerKm', label: 'Reine Spritkosten pro Kilometer', value: costPerKm, formattedValue: `${formatCurrency(costPerKm, 3)} / km` },
-      { id: 'liters', label: 'Kraftstoffbedarf', value: totalLiters, formattedValue: `${formatNumber(totalLiters, 2)} Liter` },
-      { id: 'monthlyCommute', label: 'Monatlich bei täglicher Pendelstrecke (Hin & Zurück)', value: monthlyCost, formattedValue: formatCurrency(monthlyCost) },
-      { id: 'yearlyCommute', label: 'Jährlich bei 220 Pendeltagen', value: yearlyCost, formattedValue: formatCurrency(yearlyCost) },
-    ],
-    summaryText: `Für eine Strecke von ${formatNumber(distance, 1)} km verbraucht Ihr Fahrzeug ${formatNumber(litersPerTrip, 2)} Liter Kraftstoff. Bei ${formatCurrency(pricePerLiter)} je Liter kostet eine Einzelfahrt ${formatCurrency(costPerTrip)} (${formatCurrency(costPerKm, 3)} pro km).`,
+    secondary,
+    summaryText: summary,
   };
 }
 
 export function calculateCommuterAllowance(inputs: Record<string, any>): CalculationResult {
   const distanceKm = parseInt(inputs.distanceKm || '25', 10);
   const workdays = parseInt(inputs.workdays || '220', 10);
+  const homeOfficeDays = Math.max(0, parseInt(inputs.homeOfficeDays || '0', 10));
+  const transportMode = inputs.transportMode || 'car'; // 'car' vs 'public'
 
   if (distanceKm <= 0 || workdays <= 0) {
     return {
@@ -57,6 +90,8 @@ export function calculateCommuterAllowance(inputs: Record<string, any>): Calcula
     };
   }
 
+  const effectiveWorkdays = Math.max(0, workdays - homeOfficeDays);
+
   const rateFirst20 = GERMAN_DATA_2026.pendlerpauschale_standard.value; // 0.30 €
   const rateFrom21 = GERMAN_DATA_2026.pendlerpauschale_fernpendler.value; // 0.38 €
 
@@ -64,7 +99,13 @@ export function calculateCommuterAllowance(inputs: Record<string, any>): Calcula
   const kmOver20 = Math.max(0, distanceKm - 20);
 
   const allowancePerDay = (kmFirst20 * rateFirst20) + (kmOver20 * rateFrom21);
-  const totalAllowancePerYear = allowancePerDay * workdays;
+  let totalAllowancePerYear = allowancePerDay * effectiveWorkdays;
+
+  let isCapped = false;
+  if (transportMode === 'public' && totalAllowancePerYear > 4500) {
+    totalAllowancePerYear = 4500;
+    isCapped = true;
+  }
 
   return {
     primary: {
@@ -75,12 +116,13 @@ export function calculateCommuterAllowance(inputs: Record<string, any>): Calcula
       highlight: true,
     },
     secondary: [
-      { id: 'perDay', label: 'Pauschale pro Arbeitstag', value: allowancePerDay, formattedValue: formatCurrency(allowancePerDay) },
+      { id: 'effectiveDays', label: 'Anerkannte Fahrt-Tage (abzgl. Homeoffice)', value: effectiveWorkdays, formattedValue: `${effectiveWorkdays} Tage` },
+      { id: 'perDay', label: 'Pauschale pro tatsächlichem Pendeltag', value: allowancePerDay, formattedValue: formatCurrency(allowancePerDay) },
       { id: 'rate20', label: 'Kilometer 1 bis 20 (0,30 €/km)', value: kmFirst20 * rateFirst20, formattedValue: formatCurrency(kmFirst20 * rateFirst20) },
       { id: 'rateOver20', label: 'Kilometer ab 21 (0,38 €/km)', value: kmOver20 * rateFrom21, formattedValue: formatCurrency(kmOver20 * rateFrom21) },
-      { id: 'source', label: 'Rechtsgrundlage', value: '§ 9 Abs. 1 Nr. 4 EStG', formattedValue: 'EStG (Stand 2026)' },
+      { id: 'modeNotice', label: 'Verkehrsmittel & Höchstbetrag', value: transportMode === 'public' ? (isCapped ? 'Auf 4.500 € gedeckelt' : 'ÖPNV (max. 4.500 €)') : 'PKW (ohne Obergrenze)', formattedValue: transportMode === 'public' ? (isCapped ? '4.500 € Obergrenze greift' : 'ÖPNV / Fahrgemeinschaft') : 'Eigener PKW (unbegrenzt)' },
     ],
-    summaryText: `Bei einer einfachen Strecke von ${distanceKm} km zur Arbeitsstätte und ${workdays} Arbeitstagen im Jahr können Sie ${formatCurrency(totalAllowancePerYear)} als Werbungskosten geltend machen.`,
+    summaryText: `Bei einer einfachen Strecke von ${distanceKm} km zur Arbeitsstätte und ${effectiveWorkdays} Pendeltagen im Jahr beträgt die Entfernungspauschale ${formatCurrency(totalAllowancePerYear)} als Werbungskosten.${isCapped ? ' (Auf die gesetzliche ÖPNV-Höchstgrenze von 4.500 € begrenzt).' : ''}`,
   };
 }
 

@@ -2,34 +2,95 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber, formatPercent } from '@/lib/formatters';
 
 export function calculatePercentage(inputs: Record<string, any>): CalculationResult {
-  const mode = inputs.mode || 'partOf'; // 'partOf', 'change', 'base'
+  const mode = inputs.calculationMode || inputs.mode || 'partOf'; // 'partOf', 'increase', 'decrease', 'shareOf'
   const p = parseFloat(inputs.percent) || 0;
   const base = parseFloat(inputs.base) || 0;
 
-  if (mode === 'partOf') {
-    const result = (p / 100) * base;
+  if (mode === 'shareOf') {
+    // X ist wie viel Prozent von Y? -> (X / Y) * 100
+    if (base === 0) {
+      return {
+        primary: { id: 'result', label: 'Prozentsatz', value: 0, formattedValue: 'Nicht definiert' },
+        error: 'Der Bezugswert (Y) darf nicht null sein (Division durch 0).',
+      };
+    }
+    const percentShare = (p / base) * 100;
     return {
       primary: {
         id: 'result',
-        label: `${formatPercent(p)} von ${formatNumber(base)}`,
-        value: result,
-        formattedValue: formatNumber(result),
+        label: `${formatNumber(p)} von ${formatNumber(base)} in Prozent`,
+        value: percentShare,
+        formattedValue: formatPercent(percentShare, 2),
         highlight: true,
       },
       secondary: [
-        { id: 'sum', label: 'Grundwert + Prozentwert', value: base + result, formattedValue: formatNumber(base + result) },
-        { id: 'diff', label: 'Grundwert - Prozentwert', value: base - result, formattedValue: formatNumber(base - result) },
-        { id: 'factor', label: 'Multiplikationsfaktor', value: p / 100, formattedValue: formatNumber(p / 100, 4) },
+        { id: 'part', label: 'Teilwert (X)', value: p, formattedValue: formatNumber(p) },
+        { id: 'base', label: 'Grundwert (Y)', value: base, formattedValue: formatNumber(base) },
+        { id: 'fraction', label: 'Bruchanteil', value: p / base, formattedValue: `${formatNumber(p / base, 4)}` },
+        { id: 'remainingShare', label: 'Verbleibender Restanteil', value: 100 - percentShare, formattedValue: formatPercent(100 - percentShare, 2) },
       ],
-      summaryText: `${formatPercent(p)} von ${formatNumber(base)} entsprechen exakt ${formatNumber(result)}.`,
+      summaryText: `${formatNumber(p)} sind genau ${formatPercent(percentShare, 2)} von ${formatNumber(base)}.`,
     };
   }
 
-  // Fallback direct calculation
-  const part = (p / 100) * base;
+  if (mode === 'increase') {
+    // Grundwert um X % erhöhen
+    const part = (p / 100) * base;
+    const total = base + part;
+    return {
+      primary: {
+        id: 'result',
+        label: `Neuer Endwert (+${formatPercent(p)})`,
+        value: total,
+        formattedValue: formatNumber(total),
+        highlight: true,
+      },
+      secondary: [
+        { id: 'part', label: `Erhöhung / Aufschlag (${formatPercent(p)})`, value: part, formattedValue: `+${formatNumber(part)}` },
+        { id: 'base', label: 'Ursprünglicher Grundwert (100 %)', value: base, formattedValue: formatNumber(base) },
+        { id: 'factor', label: 'Wachstumsfaktor', value: 1 + (p / 100), formattedValue: `${formatNumber(1 + (p / 100), 4)} ×` },
+      ],
+      summaryText: `Wird der Grundwert ${formatNumber(base)} um ${formatPercent(p)} erhöht (+${formatNumber(part)}), ergibt sich der neue Gesamtwert ${formatNumber(total)}.`,
+    };
+  }
+
+  if (mode === 'decrease') {
+    // Grundwert um X % reduzieren (z. B. Rabatt)
+    const part = (p / 100) * base;
+    const total = base - part;
+    return {
+      primary: {
+        id: 'result',
+        label: `Neuer Endwert (-${formatPercent(p)})`,
+        value: total,
+        formattedValue: formatNumber(total),
+        highlight: true,
+      },
+      secondary: [
+        { id: 'part', label: `Minderung / Rabatt (${formatPercent(p)})`, value: part, formattedValue: `-${formatNumber(part)}` },
+        { id: 'base', label: 'Ursprünglicher Grundwert (100 %)', value: base, formattedValue: formatNumber(base) },
+        { id: 'factor', label: 'Restfaktor', value: 1 - (p / 100), formattedValue: `${formatNumber(1 - (p / 100), 4)} ×` },
+      ],
+      summaryText: `Wird der Grundwert ${formatNumber(base)} um ${formatPercent(p)} reduziert (-${formatNumber(part)}), verbleibt ein neuer Endwert von ${formatNumber(total)}.`,
+    };
+  }
+
+  // Standard: partOf ("Wie viel sind X % von Y?")
+  const result = (p / 100) * base;
   return {
-    primary: { id: 'result', label: 'Prozentwert', value: part, formattedValue: formatNumber(part), highlight: true },
-    summaryText: `${p} % von ${base} ist ${part}.`,
+    primary: {
+      id: 'result',
+      label: `Prozentwert (${formatPercent(p)} von ${formatNumber(base)})`,
+      value: result,
+      formattedValue: formatNumber(result),
+      highlight: true,
+    },
+    secondary: [
+      { id: 'sum', label: 'Grundwert + Prozentwert', value: base + result, formattedValue: formatNumber(base + result) },
+      { id: 'diff', label: 'Grundwert - Prozentwert', value: base - result, formattedValue: formatNumber(base - result) },
+      { id: 'factor', label: 'Multiplikationsfaktor', value: p / 100, formattedValue: formatNumber(p / 100, 4) },
+    ],
+    summaryText: `${formatPercent(p)} von ${formatNumber(base)} entsprechen exakt dem Prozentwert ${formatNumber(result)}.`,
   };
 }
 

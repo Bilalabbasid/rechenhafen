@@ -32,8 +32,8 @@ describe('RechenHafen Calculation Engines', () => {
     });
 
     it('computes workdays excluding weekends', () => {
-      // 2026-01-01 (Do) to 2026-01-07 (Mi) = 7 days, 5 workdays, 2 weekend days
-      const res = calculateWorkdays({ startDate: '2026-01-01', endDate: '2026-01-07' });
+      // 2026-01-01 (Do) to 2026-01-07 (Mi) = 7 days, 5 workdays (without holiday deduction), 2 weekend days
+      const res = calculateWorkdays({ startDate: '2026-01-01', endDate: '2026-01-07', workweek: 'mo-fr', excludeHolidays: false });
       expect(res.primary.value).toBe(5);
     });
   });

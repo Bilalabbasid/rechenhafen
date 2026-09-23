@@ -9,10 +9,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Estrich-Bedarfsrechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Estrich Rechner – Zementestrich & Fließestrich Materialbedarf berechnen",
-    metaDescription: "Berechnen Sie den Estrichbedarf in m³, Tonnen und 25-kg-/40-kg-Säcken nach Fläche und Einbaudicke (z. B. 45 mm, 60 mm) inklusive Trocknungszeit-Richtwert.",
-    h1: "Estrich Rechner – Materialmenge & Sackanzahl für Zementestrich",
-    shortDescription: "Ermittelt den Estrichbedarf nach Raumfläche und Schichtdicke.",
+    metaTitle: 'Estrich Rechner – Zementestrich – RechenHafen',
+    metaDescription: 'Berechnen Sie den Estrichbedarf in m³, Tonnen und 25-kg-/40-kg-Säcken nach Fläche und Einbaudicke (z. B. 45 mm, 60 mm) inklusive Trocknungszeit-Richtwert.',
+    h1: 'Estrich Rechner – Materialmenge & Sackanzahl für Zementestrich',
+    shortDescription: 'Ermittelt den Estrichbedarf nach Raumfläche und Schichtdicke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["estrich rechner sack","zementestrich bedarf berechnen","fliessestrich menge m2","estrich dicke fußbodenheizung"],
     inputs: [
           {
@@ -125,17 +125,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "126 Säcke à 25 kg (ca. 3,15 t)"
     },
+    content: {
+      intro: 'Dieser Estrichrechner kalkuliert den Materialbedarf (Estrichsand, Zement oder Fertig-Trockenestrich in Säcken) basierend auf Raumfläche und Einbaustärke.',
+      details: 'Volumen = Fläche in m² · Estrichdicke in Metern. Bei schwimmendem Zementestrich auf Dämmung nach DIN 18560 ist eine Mindestnenndicke von 40 bis 45 mm (bei Fußbodenheizung meist 45 bis 65 mm Rohrüberdeckung) vorgeschrieben.',
+    },
     faqs: [
-          {
-                "question": "Wann ist Zementestrich belegreif für Fliesen oder Parkett?",
-                "answer": "Zementestrich trocknet die ersten 4 cm ca. 1 Woche pro cm, danach 2 Wochen pro weiterem cm. Für Parkett ist eine Restfeuchte von max. 1,8 CM-% (mit Fußbodenheizung) erforderlich."
-          },
-          {
-                "question": "Was ist besser: Zementestrich oder Fließestrich?",
-                "answer": "Fließestrich umschließt Heizrohre blasenfrei und trocknet schneller, ist jedoch feuchteempfindlich und für Nassräume ungeeignet. Zementestrich ist universell und wasserbeständig."
-          }
+      { question: 'Wie lange muss Zementestrich vor dem Belegen mit Fliesen oder Parkett trocknen?', answer: 'Als Faustregel gilt: Mindestens 1 Woche pro Zentimeter Dicke bis 4 cm, danach 2 Wochen pro weiterem Zentimeter; vor der Belegreife ist eine CM-Feuchtigkeitsmessung Pflicht.' },
+      { question: 'Wie viele 25-kg-Säcke Fertigestrich benötigt man für 1 m² bei 5 cm Dicke?', answer: 'Bei ca. 20 kg Trockenmörtel pro m² und Zentimeter Schichtdicke werden 100 kg Material (exakt 4 Säcke zu je 25 kg) pro Quadratmeter benötigt.' },
     ],
-    relatedSlugs: ["betonrechner","bodenbelag-rechner","fliesenkleber-rechner"],
+    relatedSlugs: ['treppen-stufen-rechner', 'betonrechner', 'bodenbelag-rechner', 'fliesenkleber-rechner'],
   },
   {
     id: "daemmung-u-wert-rechner",
@@ -144,10 +142,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "U-Wert & Dämmung",
     category: "bauen-renovieren",
     subcategory: "Dämmung & Energie",
-    metaTitle: "Dämmung U-Wert Rechner – Dämmstoffdicke & Wärmedurchgangskoeffizient",
-    metaDescription: "Berechnen Sie den U-Wert (W/m²K) und die erforderliche Dämmstärke nach GEG 2024 für WLG 032, WLG 035, WLG 040 an Wand, Dach und Kellerdecke.",
-    h1: "Dämmung U-Wert Rechner – Dämmstärke & Wärmeschutz nach GEG",
-    shortDescription: "Berechnet den U-Wert und die nötige Dämmstoffdicke nach Wärmeleitgruppe.",
+    metaTitle: 'Dämmung U-Wert Rechner – Dämmstoffdicke',
+    metaDescription: 'Berechnen Sie den U-Wert (W/m²K) und die erforderliche Dämmstärke nach GEG 2024 für WLG 032, WLG 035, WLG 040 an Wand, Dach und Kellerdecke.',
+    h1: 'Dämmung U-Wert Rechner – Dämmstärke & Wärmeschutz nach GEG',
+    shortDescription: 'Berechnet den U-Wert und die nötige Dämmstoffdicke nach Wärmeleitgruppe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["u wert rechner daemmung","geg u wert fassade dach","daemmstoffdicke berechnen wlg 035","waermedurchgangskoeffizient rechner"],
     inputs: [
           {
@@ -255,17 +253,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "0,211 W/(m²K) (GEG max. 0,24 erfüllt)"
     },
+    content: {
+      intro: 'Der Wärmedurchgangskoeffizient (U-Wert in W/(m²·K)) beziffert den Wärmeverlust durch ein Bauteil nach den Anforderungen des Gebäudeenergiegesetzes (GEG).',
+      details: 'Formel: U = 1 / (Rsi + Summe(d / lambda) + Rse), wobei d die Schichtdicke in Metern und lambda die Wärmeleitfähigkeit des Dämmstoffs (z. B. 0,032 bis 0,040 W/(m·K)) ist. Je kleiner der U-Wert, desto besser die Dämmung.',
+    },
     faqs: [
-          {
-                "question": "Was bedeutet WLG 035?",
-                "answer": "WLG steht für Wärmeleitgruppe. WLG 035 bedeutet, dass der Dämmstoff eine Wärmeleitfähigkeit von 0,035 Watt pro Meter und Kelvin (W/mK) besitzt. Je niedriger die Zahl, desto schlanker kann die Dämmung sein."
-          },
-          {
-                "question": "Welche Förderung gibt es bei Unterschreiten des GEG-U-Werts?",
-                "answer": "Die KfW und BAFA fördern energetische Sanierungen, wenn der U-Wert die GEG-Mindestanforderungen deutlich übertrifft (z. B. Außenwand U <= 0,20 W/m²K)."
-          }
+      { question: 'Welche U-Werte fordert das GEG für Dach und Fassade bei Sanierung?', answer: 'Das GEG verlangt bei Erneuerung für Außenwände maximal 0,24 W/(m²·K) und für Steildächer bzw. oberste Geschossdecken maximal 0,14 bzw. 0,24 W/(m²·K).' },
+      { question: 'Was ist der Unterschied zwischen Wärmeleitstufe (WLS) und U-Wert?', answer: 'Die WLS (z. B. 035) beschreibt die Materialeigenschaft des Dämmstoffs; der U-Wert ist die Gesamteigenschaft des fertigen Bauteils inklusive Schichtdicke.' },
     ],
-    relatedSlugs: ["farbmengen-rechner","heizkostenvergleich-rechner","gaskostenrechner"],
+    relatedSlugs: ['holz-balken-durchbiegung-rechner', 'fassadenfarbe-rechner', 'trockenbau-gipskarton-rechner', 'farbmengen-rechner', 'heizkostenvergleich-rechner', 'gaskostenrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -281,10 +277,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Dachflächen-Rechner",
     category: "bauen-renovieren",
     subcategory: "Dach & Fassade",
-    metaTitle: "Dachfläche Rechner – Dachflächenberechnung nach Grundfläche & Neigung",
-    metaDescription: "Berechnen Sie die echte Dachfläche für Satteldach, Pultdach und Walmdach nach Grundrissmaßen, Dachneigung in Grad oder Prozent und Dachüberstand.",
-    h1: "Dachfläche Rechner – Echte Dachfläche nach Neigung & Maßen",
-    shortDescription: "Ermittelt die Quadratmeter Dachfläche nach Dachneigung und Grundriss.",
+    metaTitle: 'Dachfläche Rechner – Dachflächenberechnung nach Grundfläche',
+    metaDescription: 'Berechnen Sie die echte Dachfläche für Satteldach, Pultdach und Walmdach nach Grundrissmaßen, Dachneigung in Grad oder Prozent und Dachüberstand.',
+    h1: 'Dachfläche Rechner – Echte Dachfläche nach Neigung & Maßen',
+    shortDescription: 'Ermittelt die Quadratmeter Dachfläche nach Dachneigung und Grundriss mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["dachflaeche rechner neigung","satteldach flaeche berechnen cosinus","dach quadratmeter berechnen dachziegel","dachueberstand dachflaeche"],
     inputs: [
           {
@@ -405,17 +401,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "120,85 m² Dachfläche"
     },
+    content: {
+      intro: 'Dieser Geometrierechner ermittelt die reale Schrägdachfläche von Satteldächern, Pultdächern und Walmdächern aus Grundrissmaß und Dachneigung.',
+      details: 'Wahre Dachlänge = Horizontale Sparrenlänge / cos(Dachneigung in Grad). Hinzu kommen die Dachüberstände an Traufe und Ortgang. Bei 45° Neigung ist die Dachfläche um den Faktor 1,414 größer als die überbaute Grundfläche.',
+    },
     faqs: [
-          {
-                "question": "Wie viele Dachpfannen braucht man pro Quadratmeter?",
-                "answer": "Handelsübliche Tondachziegel und Betondachsteine (wie Frankfurter Pfanne) benötigen zwischen 10 und 14 Stück pro m², im Mittel rechnet man mit 12 Stück/m²."
-          },
-          {
-                "question": "Wie rechnet man Dachneigung von Prozent in Grad um?",
-                "answer": "Winkel (Grad) = arctan(Prozent / 100) × (180 / π). Ein Dach mit 100 % Steigung entspricht exakt 45° Neigung."
-          }
+      { question: 'Wie berechnet man die Anzahl benötigter Dachziegel?', answer: 'Multiplizieren Sie die berechnete Dachfläche mit dem Stückbedarf pro Quadratmeter laut Datenblatt des Ziegelherstellers (typisch ca. 9,5 bis 15 Ziegel/m²) plus 5 % Verschnitt.' },
+      { question: 'Ab welcher Dachneigung ist ein regensicheres Unterdach Pflicht?', answer: 'Unterschreitet die Dachneigung die Regeldachneigung des Ziegels (oft 22°), müssen nach den Fachregeln des ZVDH regensichere oder wasserdichte Unterdächer ausgeführt werden.' },
     ],
-    relatedSlugs: ["daemmung-u-wert-rechner","regenwasser-zisterne-rechner","farbmengen-rechner"],
+    relatedSlugs: ['holz-balken-durchbiegung-rechner', 'daemmung-u-wert-rechner', 'regenwasser-zisterne-rechner', 'farbmengen-rechner'],
   },
   {
     id: "bausteine-mauerwerk-rechner",
@@ -424,10 +418,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Mauerstein-Bedarfsrechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Mauersteine Rechner – Ziegel- & Porenbeton-Bedarf nach Wandfläche",
-    metaDescription: "Berechnen Sie den Bedarf an Mauersteinen (NF, DF, 2DF, Planstein 24er/36er) und Mörtel nach Wandfläche in m² abzüglich Fenster- und Türöffnungen.",
-    h1: "Mauersteine Rechner – Steinanzahl & Mörtelbedarf ermitteln",
-    shortDescription: "Ermittelt die Stückzahl an Mauerziegeln und Mörtel für eine Wand.",
+    metaTitle: 'Mauersteine Rechner – Ziegel- – RechenHafen',
+    metaDescription: 'Berechnen Sie den Bedarf an Mauersteinen (NF, DF, 2DF, Planstein 24er/36er) und Mörtel nach Wandfläche in m² abzüglich Fenster- und Türöffnungen.',
+    h1: 'Mauersteine Rechner – Steinanzahl & Mörtelbedarf ermitteln',
+    shortDescription: 'Ermittelt die Stückzahl an Mauerziegeln und Mörtel für eine Wand.',
     searchKeywords: ["mauersteine bedarf berechnen","ziegelsteine rechner wandflaeche","porenbeton planstein stueckzahl m2","moertel mauerwerk rechner"],
     inputs: [
           {
@@ -549,17 +543,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "504 Steine und 11 Säcke Mörtel (à 25 kg)"
     },
+    content: {
+      intro: 'Dieser Baustoffkalkulator berechnet die Stückzahl von Mauersteinen (Kalksandstein, Porenbeton, Ziegel) und den Mörtelbedarf pro Quadratmeter Wandfläche.',
+      details: 'Bedarf = Wandfläche / (Steinlänge + Stoßfuge) · (Steinhöhe + Lagerfuge). Bei Dünnbettmörtel entfällt die Dicke der Lagerfuge (nur ca. 1 bis 2 mm Fuge), was den Steinbedarf exakt auf das Nennmaß abstimmt.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Dünnbettmörtel und Dickbettmörtel?",
-                "answer": "Dünnbettmörtel wird mit 1 bis 3 mm Schichtdicke bei maßhaltigen Plansteinen aufgetragen. Dickbettmörtel gleicht mit 12 mm Fuge Maßtoleranzen klassischer Ziegel aus."
-          },
-          {
-                "question": "Werden Fensteröffnungen bei Mauerarbeiten voll abgezogen?",
-                "answer": "Nach VOB/C ATV DIN 18330 werden Öffnungen bis zu 2,5 m² Einzelfläche bei der Abrechnung übermessen, für die reine Materialbestellung zieht man jedoch die tatsächliche Fläche ab."
-          }
+      { question: 'Was bedeutet das Mauerwerksmaß nach DIN 4172 (Achtelmeter)?', answer: 'Das deutsche Bauraster basiert auf dem Modul von 12,5 cm (Achtelmeter: 12,5 cm, 25 cm, 37,5 cm etc.), um Bauten ohne aufwendiges Zerschneiden von Steinen zu planen.' },
+      { question: 'Wie viel Mörtel benötigt man für 1 m² Mauerwerk?', answer: 'Bei Dickbettmörtel ca. 30 bis 40 Liter Mörtel pro m² Wand; bei Plansteinen mit Dünnbettmörtel werden nur rund 3 bis 5 kg Trockenkleber benötigt.' },
     ],
-    relatedSlugs: ["betonrechner","estrich-rechner","putz-rechner"],
+    relatedSlugs: ['betonrechner', 'estrich-rechner', 'putz-rechner'],
   },
   {
     id: "fliesenkleber-rechner",
@@ -568,10 +560,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Fliesenkleber-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Fliesenkleber & Fugenmörtel Rechner – Verbrauch in kg & Säcken",
-    metaDescription: "Berechnen Sie den Bedarf an Fliesenkleber und Fugenbunt nach Quadratmetern, Zahnspachtel-Größe (6, 8, 10, 12 mm) und Fliesenabmessungen.",
-    h1: "Fliesenkleber Rechner – Materialbedarf für Fliesen & Fugen",
-    shortDescription: "Berechnet den Fliesenkleber- und Fugenmörtelbedarf nach Fläche und Zahnung.",
+    metaTitle: 'Fliesenkleber & Fugenmörtel Rechner – Verbrauch in kg & Säcken',
+    metaDescription: 'Berechnen Sie den Bedarf an Fliesenkleber und Fugenbunt nach Quadratmetern, Zahnspachtel-Größe (6, 8, 10, 12 mm) und Fliesenabmessungen.',
+    h1: 'Fliesenkleber Rechner – Materialbedarf für Fliesen & Fugen',
+    shortDescription: 'Berechnet den Fliesenkleber- und Fugenmörtelbedarf nach Fläche und Zahnung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["fliesenkleber rechner verbrauch kg m2","fugenmoertel rechner fliesen","zahnung fliesenkleber verbrauch","flexkleber saecke berechnen"],
     inputs: [
           {
@@ -679,17 +671,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "4 Säcke Fliesenkleber (100 kg)"
     },
+    content: {
+      intro: 'Dieser Verbrauchsrechner ermittelt die benötigte Menge an Fliesenkleber in Kilogramm basierend auf Fliesenformat, Zahnspachtelgröße und Untergrund.',
+      details: 'Formel: Verbrauch = Fläche in m² · Kleberverbrauch (kg/m²). Richtwerte: 6-mm-Zahnung ca. 2,0–2,5 kg/m²; 8-mm-Zahnung ca. 3,0–3,5 kg/m²; 10- bis 12-mm-Zahnung für Großformate ca. 4,5–6,0 kg/m².',
+    },
     faqs: [
-          {
-                "question": "Welcher Fliesenkleber eignet sich für Fußbodenheizung?",
-                "answer": "Bei Fußbodenheizungen und auf Holzböden ist zwingend ein flexibler Kleber (Klassifizierung C2 TE S1 oder S2 nach DIN EN 12004) erforderlich, um thermische Spannungen auszugleichen."
-          },
-          {
-                "question": "Wann kann man frisch verlegte Fliesen verfugen?",
-                "answer": "In der Regel nach 24 Stunden Trocknungszeit. Bei Schnellklebern kann bereits nach 3 bis 4 Stunden verfugt werden."
-          }
+      { question: 'Welche Zahnung benötigt man für Fliesen ab 60 × 60 cm?', answer: 'Für großformatige Fliesen empfiehlt sich mindestens eine 10-mm- oder 12-mm-Zahnung sowie das Floating-Buttering-Verfahren (Kleber auf Untergrund und Fliesenrückseite).' },
+      { question: 'Welcher Fliesenkleber eignet sich für Fußbodenheizungen?', answer: 'Zwingend ein flexibler Kleber (Klassifizierung C2 TE S1 nach DIN EN 12004), der thermische Spannungen und Dehnungen des Estrichs rissfrei ausgleicht.' },
     ],
-    relatedSlugs: ["bodenbelag-rechner","estrich-rechner","farbmengen-rechner"],
+    relatedSlugs: ['bodenbelag-rechner', 'estrich-rechner', 'farbmengen-rechner'],
   },
   {
     id: "aushub-erdarbeiten-rechner",
@@ -698,10 +688,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Aushub-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Aushub & Erdarbeiten Rechner – Baugrube m³, Auflockerung & LKW",
-    metaDescription: "Berechnen Sie das Erdreich-Aushubvolumen in m³, die Auflockerung (Auflockerungsfaktor 1,2 bis 1,3), das Gewicht in Tonnen und die Anzahl 4-Achs-LKW-Fahrten.",
-    h1: "Aushub Rechner – Erdvolumen, Tonnen & LKW-Entsorgung",
-    shortDescription: "Berechnet Baugrubenaushub, Auflockerung und benötigte LKW-Ladungen.",
+    metaTitle: 'Aushub & Erdarbeiten Rechner – Baugrube m³, Auflockerung & LKW',
+    metaDescription: 'Berechnen Sie das Erdreich-Aushubvolumen in m³, die Auflockerung (Auflockerungsfaktor 1,2 bis 1,3), das Gewicht in Tonnen und die Anzahl.',
+    h1: 'Aushub Rechner – Erdvolumen, Tonnen & LKW-Entsorgung',
+    shortDescription: 'Berechnet Baugrubenaushub, Auflockerung und benötigte LKW-Ladungen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["aushub rechner m3 tonnen","baugrube aushubvolumen auflockerungsfaktor","erdarbeiten lkw fahrten rechner","erde ausheben gewicht berechnen"],
     inputs: [
           {
@@ -823,17 +813,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "60 m³ loser Aushub (86,4 t, 5 LKW)"
     },
+    content: {
+      intro: 'Dieser Erdbau-Rechner kalkuliert das Aushubvolumen für Baugruben, Streifenfundamente oder Pools und berücksichtigt den Auflockerungsfaktor des Bodens.',
+      details: 'Festes Bodenvolumen = Länge · Breite · Tiefe. Durch das Ausgraben lockert sich Erdreich auf: Der Auflockerungsfaktor beträgt je nach Bodenklasse 1,2 (Sand/Kies) bis 1,4 (bindiger Ton/Lehm). Das Abfuhrvolumen ist entsprechend größer.',
+    },
     faqs: [
-          {
-                "question": "Was kostet die Entsorgung von Erdaushub?",
-                "answer": "Unbelasteter Erdaushub (Bodenklasse Z0) kostet je nach Region und Deponie etwa 15 bis 35 Euro pro Tonne plus Frachtkosten."
-          },
-          {
-                "question": "Muss bei der Baugrube eine Böschung eingeplant werden?",
-                "answer": "Ja, nach DIN 4124 müssen Gruben ab 1,25 m Tiefe abgeböscht (Winkel meist 45° bis 60°) oder verbaut werden, was das Aushubvolumen zusätzlich vergrößert."
-          }
+      { question: 'Warum benötigt man für den Erdaushub einen Böschungswinkel?', answer: 'Nach DIN 4124 dürfen Baugruben ab 1,25 m Tiefe nicht senkrecht abgegraben werden: Bei nichtbindigen Böden ist ein Böschungswinkel von max. 45° einzuhalten, um Einsturzgefahr zu verhindern.' },
+      { question: 'Wie viele LKW-Ladungen entsprechen 50 m³ festem Aushub?', answer: 'Bei einem Auflockerungsfaktor von 1,3 entstehen 65 m³ loses Schüttgut. Ein 4-Achs-Kipper fasst ca. 10 m³, sodass etwa 7 LKW-Fuhren erforderlich sind.' },
     ],
-    relatedSlugs: ["betonrechner","fundament-rechner","pflastersteine-rechner"],
+    relatedSlugs: ['betonrechner', 'fundament-rechner', 'pflastersteine-rechner', 'baugrund-tragfaehigkeit-rechner'],
   },
   {
     id: "pflastersteine-rechner",
@@ -842,10 +830,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Pflasterstein-Rechner",
     category: "bauen-renovieren",
     subcategory: "Garten & Außenanlagen",
-    metaTitle: "Pflastersteine Rechner – Steinbedarf, Quadratmeter & Bettungssplitt",
-    metaDescription: "Berechnen Sie die benötigte Anzahl Pflastersteine, Fläche in m² mit Verschnitt (5-10 %) und die Menge an Splitt/Sand für das Pflasterbett.",
-    h1: "Pflastersteine Rechner – Pflastersteine & Bettungssplitt berechnen",
-    shortDescription: "Ermittelt Steinanzahl und Splittmenge für Hof, Einfahrt oder Terrasse.",
+    metaTitle: 'Pflastersteine Rechner – Steinbedarf, Quadratmeter',
+    metaDescription: 'Berechnen Sie die benötigte Anzahl Pflastersteine, Fläche in m² mit Verschnitt (5-10 %) und die Menge an Splitt/Sand für das Pflasterbett.',
+    h1: 'Pflastersteine Rechner – Pflastersteine & Bettungssplitt berechnen',
+    shortDescription: 'Ermittelt Steinanzahl und Splittmenge für Hof, Einfahrt oder Terrasse mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["pflastersteine rechner quadratmeter","pflaster bedarf berechnen einfahrt terrasse","splittbett dicke menge berechnen","pflaster verschnitt prozent"],
     inputs: [
           {
@@ -951,17 +939,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "2.160 Pflastersteine und 2,56 t Splitt"
     },
+    content: {
+      intro: 'Dieser Mengenrechner ermittelt die Quadratmeter an Pflastersteinen, die Randeinfassungen und den Unterbau (Schottertragschicht und Pflastersplitt).',
+      details: 'Pflasterfläche = Länge · Breite. Für befahrbare PKW-Einfahrten ist ein Unterbau aus mindestens 20 bis 30 cm verdichtetem Frostschutz-Schotter (Körnung 0/32) plus 3 bis 5 cm Pflasterbettung (Splitt 2/5 mm) nach RStO vorgeschrieben.',
+    },
     faqs: [
-          {
-                "question": "Welcher Splitt eignet sich am besten als Pflasterbett?",
-                "answer": "Optimal ist gewaschener Edelsplitt der Körnung 2/5 mm oder Brechsand-Splitt-Gemisch 0/5 mm in einer gleichmäßigen Dicke von 3 bis 5 cm."
-          },
-          {
-                "question": "Wie stabil muss der Unterbau für eine PKW-Einfahrt sein?",
-                "answer": "Für PKW-Befahrung sind 20 bis 30 cm Schotter-Tragschicht (Körnung 0/32 mm Frostschutz), lagenweise verdichtet, zwingend vorgeschrieben."
-          }
+      { question: 'Wie stark müssen Pflastersteine für eine PKW-Einfahrt sein?', answer: 'Für normale PKW-Nutzung genügen 6 cm Steindicke; bei häufigem Rangieren oder gelegentlichem Befahren mit schweren Fahrzeugen sind 8 cm Steindicke erforderlich.' },
+      { question: 'Welches Gefälle sollte eine gepflasterte Fläche aufweisen?', answer: 'Mindestens 2 bis 2,5 Prozent Gefälle vom Haus weg, damit Regenwasser zügig abfließt und nicht ins Mauerwerk oder die Hausdämmung eindringt.' },
     ],
-    relatedSlugs: ["kies-splitt-rechner","aushub-erdarbeiten-rechner","bodenbelag-rechner"],
+    relatedSlugs: ['drainage-gefaelle-rechner', 'kies-splitt-rechner', 'aushub-erdarbeiten-rechner', 'bodenbelag-rechner'],
   },
   {
     id: "trockenbau-gipskarton-rechner",
@@ -970,10 +956,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Trockenbau-Rechner",
     category: "bauen-renovieren",
     subcategory: "Ausbau & Wand",
-    metaTitle: "Trockenbau Gipskarton Rechner – Platten, CW/UW-Profile & Schrauben",
-    metaDescription: "Berechnen Sie den Materialbedarf für Trockenbauwände: Gipskartonplatten (2000/2600 × 600/1250 mm), Ständerprofile (CW/UW), Schnellbauschrauben und Spachtelmasse.",
-    h1: "Trockenbau Rechner – Gipskartonplatten, Ständerwerk & Zubehör",
-    shortDescription: "Berechnet Gipskartonplatten, CW/UW-Profile, Schrauben und Spachtelmasse.",
+    metaTitle: 'Trockenbau Gipskarton Rechner – Platten, CW/UW-Profile',
+    metaDescription: 'Berechnen Sie den Materialbedarf für Trockenbauwände: Gipskartonplatten (2000/2600 × 600/1250 mm), Ständerprofile (CW/UW)',
+    h1: 'Trockenbau Rechner – Gipskartonplatten, Ständerwerk & Zubehör',
+    shortDescription: 'Berechnet Gipskartonplatten, CW/UW-Profile, Schrauben und Spachtelmasse mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["trockenbau rechner gipskarton","staenderwerk cw uw profile berechnen","gipskartonplatten stueckzahl m2","schnellbauschrauben bedarf trockenbau"],
     inputs: [
           {
@@ -1105,17 +1091,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "37 Gipskartonplatten und 9 CW-Ständer"
     },
+    content: {
+      intro: 'Dieser Materialrechner kalkuliert die Anzahl der Gipskartonplatten, UW- und CW-Ständerprofile, Dämmwolle und Schnellbauschrauben für Ständerwände und Decken.',
+      details: 'Wandfläche = Länge · Raumhöhe. Bei beidseitiger Doppelbeplankung (Standard für optimalen Schall- und Brandschutz nach DIN 4102) wird die vierfache Wandfläche an Platten benötigt. Profilabstand: typisch 62,5 cm (halbes Plattenmaß).',
+    },
     faqs: [
-          {
-                "question": "Welche Platten werden in Feuchträumen verwendet?",
-                "answer": "Im Badezimmer müssen grün imprägnierte Gipskartonplatten (Typ GKBI bzw. H2 nach DIN EN 520) verwendet werden, um Schimmel- und Feuchteschäden vorzubeugen."
-          },
-          {
-                "question": "Warum versetzt man die Fugen bei doppelter Beplankung?",
-                "answer": "Durch versetzte Fugen (mindestens 40 cm Versatz) wird Rissbildung verhindert und die Stabilität sowie der Schallschutz der Konstruktion maximiert."
-          }
+      { question: 'Welche Plattenart gehört in Feuchträume (Bad)?', answer: 'Immer imprägnierte Gipskartonplatten (grün, Typ GKBI / DIN EN 520 Typ H2), die Feuchtigkeitsaufnahme und Schimmelbildung hemmen.' },
+      { question: 'Wie viele Schrauben benötigt man pro Quadratmeter Gipskarton?', answer: 'Bei einfacher Beplankung ca. 15 bis 20 Schnellbauschrauben pro m²; bei Doppelbeplankung ca. 30 Schrauben pro m² mit versetzten Fugen.' },
     ],
-    relatedSlugs: ["farbmengen-rechner","daemmung-u-wert-rechner","bausteine-mauerwerk-rechner"],
+    relatedSlugs: ['farbmengen-rechner', 'daemmung-u-wert-rechner', 'bausteine-mauerwerk-rechner'],
   },
   {
     id: "fundament-rechner",
@@ -1124,10 +1108,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Fundament-Beton-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Fundament Rechner – Betonbedarf für Streifen-, Punkt- & Plattenfundament",
-    metaDescription: "Berechnen Sie das Betonvolumen in m³ und Tonnen für Streifenfundament (Gartenmauer/Garage), Punktfundament (Carport/Zaun) und Bodenplatte.",
-    h1: "Fundament Rechner – Betonmenge & Frosttiefe berechnen",
-    shortDescription: "Ermittelt das Betonvolumen für Streifen-, Punkt- und Plattenfundamente.",
+    metaTitle: 'Fundament Rechner – Betonbedarf für Streifen-, Punkt-',
+    metaDescription: 'Berechnen Sie das Betonvolumen in m³ und Tonnen für Streifenfundament (Gartenmauer/Garage), Punktfundament (Carport/Zaun) und Bodenplatte.',
+    h1: 'Fundament Rechner – Betonmenge & Frosttiefe berechnen',
+    shortDescription: 'Ermittelt das Betonvolumen für Streifen-, Punkt- und Plattenfundamente mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["fundament rechner beton m3","streifenfundament betonmenge berechnen","punktfundament carport zaun volumen","frostfreie tiefe fundament 80 cm"],
     inputs: [
           {
@@ -1248,17 +1232,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "2,64 m³ Beton (Transportbeton empfohlen)"
     },
+    content: {
+      intro: 'Dieser Fundamentplaner berechnet das Betonvolumen für Punktfundamente (Zaun, Carport), Streifenfundamente (Gartenmauer) oder durchgehende Fundamentplatten.',
+      details: 'Streifenfundament = Länge · Breite · frostfreie Tiefe (in Deutschland nach DIN 1054 mindestens 80 bis 100 cm unter Geländeoberkante, um Frosthebungen sicher auszuschließen).',
+    },
     faqs: [
-          {
-                "question": "Ab welchem Betonvolumen lohnt sich ein Fahrmischer?",
-                "answer": "Ab etwa 1,0 bis 1,5 m³ ist Transportbeton meist günstiger, zeitsparender und qualitativ hochwertiger als das mühsame Anmischen von 80+ Säcken Trockenbeton von Hand."
-          },
-          {
-                "question": "Welche Betonklasse benötigt man für ein Außenfundament?",
-                "answer": "Für Außenfundamente mit Frostgefahr empfiehlt sich mindestens Beton der Festigkeitsklasse C20/25 oder C25/30 mit Expositionsklasse XF1."
-          }
+      { question: 'Warum muss ein Fundament frostfrei gegründet werden?', answer: 'Wasser im gefrierenden Boden dehnt sich um ca. 9 % aus. Liegt das Fundament oberhalb der Frostgrenze, hebt der gefrierende Boden das Bauwerk im Winter an, was zu schweren Rissen führt.' },
+      { question: 'Muss ein Fundament mit Stahl bewehrt werden?', answer: 'Für schwere Lasten oder ungleichmäßige Baugrundverhältnisse sind Baustahlmatten (z. B. Q188) oder Bewehrungskörbe aus Betonstahl zwingend erforderlich.' },
     ],
-    relatedSlugs: ["betonrechner","estrich-rechner","aushub-erdarbeiten-rechner"],
+    relatedSlugs: ['beton-mischungsverhaeltnis-rechner', 'zaun-pfosten-rechner', 'schalungssteine-rechner', 'betonrechner', 'estrich-rechner', 'aushub-erdarbeiten-rechner'],
   },
   {
     id: "schalungssteine-rechner",
@@ -1267,10 +1249,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Schalungsstein-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Schalungssteine Rechner – Steine, Füllbeton & Bewehrung berechnen",
-    metaDescription: "Berechnen Sie die Anzahl Schalungssteine (17,5er, 24er, 30er), das Verfüllbetonvolumen in m³ und den Bedarf an Baustahl nach Wandmaßen.",
-    h1: "Schalungssteine Rechner – Steine, Füllbeton & Baustahl ermitteln",
-    shortDescription: "Berechnet Schalungssteine und Verfüllbeton für Stützmauern und Poolwände.",
+    metaTitle: 'Schalungssteine Rechner – Steine, Füllbeton',
+    metaDescription: 'Berechnen Sie die Anzahl Schalungssteine (17,5er, 24er, 30er), das Verfüllbetonvolumen in m³ und den Bedarf an Baustahl nach Wandmaßen.',
+    h1: 'Schalungssteine Rechner – Steine, Füllbeton & Baustahl ermitteln',
+    shortDescription: 'Berechnet Schalungssteine und Verfüllbeton für Stützmauern und Poolwände mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["schalungssteine rechner fuellbeton","betonschalungssteine menge stuetzmauer","fuellbeton m3 schalungsstein 24er","bewehrungsstahl schalungsstein"],
     inputs: [
           {
@@ -1379,17 +1361,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "101 Schalungssteine und 1,83 m³ Verfüllbeton"
     },
+    content: {
+      intro: 'Schalungssteine (Hohlblocksteine aus Beton) werden trocken im Verband aufgestellt, bewehrt und anschließend mit flüssigem Beton verfüllt.',
+      details: 'Steinbedarf = Wandfläche in m² · Steine pro m² (typisch 8 Stück bei Standardmaßen 50 × 25 cm). Der Betonfüllbedarf beträgt je nach Steinbreite (17,5 bis 30 cm) ca. 100 bis 180 Liter Beton pro Quadratmeter Wand.',
+    },
     faqs: [
-          {
-                "question": "Wie hoch darf man Schalungssteine auf einmal verfüllen?",
-                "answer": "In der Regel sollten nicht mehr als 3 bis 4 Steinreihen (ca. 75 bis 100 cm Höhe) in einem Durchgang mit Beton verfüllt und verdichtet werden, um ein Bersten der Steine zu vermeiden."
-          },
-          {
-                "question": "Braucht eine Mauer aus Schalungssteinen ein Fundament?",
-                "answer": "Ja, zwingend ein frostsicheres Beton-Streifenfundament (mindestens 80 cm tief), aus dem Anschlussbewehrungseisen in die Schalungssteine ragen."
-          }
+      { question: 'Wie viel Armierungsstahl gehört in Schalungssteine?', answer: 'In der Regel werden horizontal 2 Stäbe Betonstahl (z. B. 10 mm) pro Steinreihe in die Aussparungen gelegt und vertikal alle 25 bis 50 cm Stäbe ins Fundament eingesteckt.' },
+      { question: 'Wie hoch darf man Schalungssteine vor dem Betonieren aufstellen?', answer: 'Um ein Platzen der Steine durch den hydrostatischen Betondruck zu verhindern, sollten maximal 3 bis 4 Steinreihen (ca. 75 bis 100 cm) in einem Guss verfüllt werden.' },
     ],
-    relatedSlugs: ["betonrechner","fundament-rechner","bausteine-mauerwerk-rechner"],
+    relatedSlugs: ['betonrechner', 'fundament-rechner', 'bausteine-mauerwerk-rechner'],
   },
   {
     id: "fassadenfarbe-rechner",
@@ -1398,10 +1378,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Fassadenfarben-Rechner",
     category: "bauen-renovieren",
     subcategory: "Dach & Fassade",
-    metaTitle: "Fassadenfarbe Rechner – Farbbedarf in Litern für Hausfassade berechnen",
-    metaDescription: "Berechnen Sie den Bedarf an Fassadenfarbe in Litern für 1 oder 2 Anstriche nach Hausmaßen, Fensterabzügen und Untergrund (Glattputz, Rauputz, Klinker).",
-    h1: "Fassadenfarbe Rechner – Farbmenge für den Außenanstrich ermitteln",
-    shortDescription: "Berechnet den Fassadenfarben-Bedarf nach Wandfläche und Putzart.",
+    metaTitle: 'Fassadenfarbe Rechner – Farbbedarf in Litern für Hausfassad...',
+    metaDescription: 'Berechnen Sie den Bedarf an Fassadenfarbe in Litern für 1 oder 2 Anstriche nach Hausmaßen, Fensterabzügen und Untergrund (Glattputz, Rauputz, Klinker).',
+    h1: 'Fassadenfarbe Rechner – Farbmenge für den Außenanstrich ermitteln',
+    shortDescription: 'Berechnet den Fassadenfarben-Bedarf nach Wandfläche und Putzart mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["fassadenfarbe rechner liter","hauswand streichen farbmenge berechnen","farbverbrauch rauputz liter m2","fassadenanstrich liter eimer"],
     inputs: [
           {
@@ -1521,17 +1501,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "86 Liter Fassadenfarbe (9 Eimer à 10 l)"
     },
+    content: {
+      intro: 'Dieser Fassadenrechner ermittelt die benötigte Menge an Außenwandfarbe (Silikonharz, Silikat, Acryl) unter Berücksichtigung von Strukturputz und Witterungsschutz.',
+      details: 'Fassadenfläche = 2 · (Hauslänge + Hausbreite) · Traufhöhe + Giebeldreiecke abzüglich Fensteröffnungen. Raue Putzstrukturen (Reibeputz, Kratzputz) erhöhen den Farbverbrauch um 25 bis 40 Prozent gegenüber glatten Wänden.',
+    },
     faqs: [
-          {
-                "question": "Sollte man die Fassade vor dem Streichen grundieren?",
-                "answer": "Ja, stark saugende oder sandende Putze müssen zwingend mit Tiefgrund behandelt werden. Das verfestigt den Untergrund und verhindert fleckige Farbtrocknung."
-          },
-          {
-                "question": "Silikonharz- vs. Silikatfarbe für die Außenwand?",
-                "answer": "Silikonharzfarbe ist stark wasserabweisend und schmutzresistent (Lotus-Effekt). Silikatfarbe verkieselt unlösbar mit mineralischem Putz und ist hoch atmungsaktiv."
-          }
+      { question: 'Welche Fassadenfarbe ist am besten gegen Algen und Pilze geschützt?', answer: 'Silikonharzfarben mit Abperleffekt (Lotuseffekt) oder mineralische Silikatfarben, die durch ihre hohe Alkalität (pH-Wert) Algenbildung natürlich hemmen.' },
+      { question: 'Muss die Fassade vor dem Anstrich grundiert werden?', answer: 'Ja, ein Tiefengrund festigt sandende Bestandsputze, egalisiert die Saugfähigkeit und verhindert streifige Farbunterschiede.' },
     ],
-    relatedSlugs: ["farbmengen-rechner","daemmung-u-wert-rechner","dachflaeche-rechner"],
+    relatedSlugs: ['farbmengen-rechner', 'daemmung-u-wert-rechner', 'dachflaeche-rechner'],
   },
   {
     id: "parkett-laminat-rechner",
@@ -1540,10 +1518,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Parkett & Laminat",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Parkett & Laminat Rechner – Pakete, Quadratmeter & Verschnitt berechnen",
-    metaDescription: "Berechnen Sie den genauen Bedarf an Laminat, Parkett oder Klick-Vinyl: Quadratmeter, Paketanzahl, Verschnitt (5-15 %) und Sockelleisten in Metern.",
-    h1: "Parkett & Laminat Rechner – Paketanzahl & Fußleisten ermitteln",
-    shortDescription: "Ermittelt Quadratmeter, Pakete und Sockelleisten für Bodenbeläge.",
+    metaTitle: 'Parkett & Laminat Rechner – Pakete, Quadratmeter',
+    metaDescription: 'Berechnen Sie den genauen Bedarf an Laminat, Parkett oder Klick-Vinyl: Quadratmeter, Paketanzahl, Verschnitt (5-15 %) und Sockelleisten in Metern.',
+    h1: 'Parkett & Laminat Rechner – Paketanzahl & Fußleisten ermitteln',
+    shortDescription: 'Ermittelt Quadratmeter, Pakete und Sockelleisten für Bodenbeläge mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["laminat rechner pakete m2","parkett bedarf berechnen verschnitt","sockelleisten meter berechnen","klick vinyl quadratmeter pakete"],
     inputs: [
           {
@@ -1657,17 +1635,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "12 Pakete Laminat/Parkett"
     },
+    content: {
+      intro: 'Dieser Rechner plant den Bedarf an Parkett-, Laminat- oder Korkdielen, Trittschalldämmung und Fußleisten für Ihre Wohnräume.',
+      details: 'Fläche = Raumlänge · Raumbreite plus 5 bis 8 % Verschnitt. Bei Verlegung auf mineralischem Untergrund (Estrich) ist nach DIN 18202 zwingend eine Dampfbremsfolie (PE-Folie mit SD-Wert > 100 m) vorgeschrieben.',
+    },
     faqs: [
-          {
-                "question": "Sollte man immer ein Paket Reserve aufbewahren?",
-                "answer": "Ja, unbedingt 1 ungeöffnetes Paket aufheben! Falls nach Jahren ein Wasserschaden oder Kratzer entsteht, ist dieselbe Charge im Handel meist nicht mehr erhältlich."
-          },
-          {
-                "question": "Braucht man eine Dampfsperre unter Laminat?",
-                "answer": "Auf mineralischen Untergründen (wie Beton oder Estrich) ist eine PE-Folie als Dampfbremse unverzichtbar, um den Boden vor aufsteigender Restfeuchte zu schützen."
-          }
+      { question: 'Wie berechnet man die laufenden Meter für Sockelleisten?', answer: 'Umfang des Raumes = 2 · (Länge + Breite) abzüglich aller Türöffnungen plus ca. 10 Prozent Verschnitt für Gehrungsschnitte.' },
+      { question: 'Warum ist eine Dehnungsfuge an den Wänden unverzichtbar?', answer: 'Holz und Laminat dehnen sich bei feuchter Raumluft aus; ohne Dehnungsfuge von mindestens 10 bis 15 mm zu Wänden und Rohren wölbt sich der Boden auf.' },
     ],
-    relatedSlugs: ["bodenbelag-rechner","estrich-rechner","farbmengen-rechner"],
+    relatedSlugs: ['treppen-stufen-rechner', 'bodenbelag-rechner', 'estrich-rechner', 'farbmengen-rechner'],
   },
   {
     id: "tapetenrollen-rechner",
@@ -1676,10 +1652,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Tapeten-Bedarfsrechner",
     category: "bauen-renovieren",
     subcategory: "Ausbau & Wand",
-    metaTitle: "Tapeten Rechner – Rollenbedarf (Euro-Rolle 10,05 × 0,53 m) berechnen",
-    metaDescription: "Berechnen Sie die benötigte Anzahl Tapetenrollen nach Raumumfang, Deckenhöhe, Fensterabzug und Musterversatz (Rapport) für Euro-Rollen.",
-    h1: "Tapeten Rechner – Rollenanzahl für Euro-Normrollen ermitteln",
-    shortDescription: "Berechnet die Anzahl Tapetenrollen nach Raumumfang und Rapport.",
+    metaTitle: 'Tapeten Rechner – Rollenbedarf berechnen',
+    metaDescription: 'Berechnen Sie die benötigte Anzahl Tapetenrollen nach Raumumfang, Deckenhöhe, Fensterabzug und Musterversatz (Rapport) für Euro-Rollen.',
+    h1: 'Tapeten Rechner – Rollenanzahl für Euro-Normrollen ermitteln',
+    shortDescription: 'Berechnet die Anzahl Tapetenrollen nach Raumumfang und Rapport mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["tapeten rechner rollen bedarf","eurorolle tapete berechnen rapport","tapetenrollen anzahl raumumfang","mustertapete verschnitt berechnen"],
     inputs: [
           {
@@ -1788,17 +1764,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "10 Euro-Rollen Tapete"
     },
+    content: {
+      intro: 'Dieser Tapetenrechner kalkuliert die Anzahl der Euro-Rollen (Eurorolle: 10,05 m Länge × 0,53 m Breite) inklusive Wandhöhe und Musterversatz (Rapport).',
+      details: 'Formel ohne Rapport: Raumumfang geteilt durch 0,53 m ergibt die Bahnenanzahl; aus einer Rolle erhält man bei 2,50 m Raumhöhe exakt 3 bis 4 Bahnen. Bei Musterversatz fällt für jede Bahn der Rapport-Abfall an.',
+    },
     faqs: [
-          {
-                "question": "Was ist eine Euro-Normrolle?",
-                "answer": "Die klassische Euro-Rolle (Euronorm) hat eine Standardlänge von 10,05 Metern und eine Breite von 0,53 Metern, was ca. 5,33 m² Gesamtfläche pro Rolle entspricht."
-          },
-          {
-                "question": "Was bedeutet die Anfertigungsnummer / Chargennummer?",
-                "answer": "Beim Tapetenkauf müssen alle Rollen dieselbe Chargennummer aufweisen, da es sonst zu leichten Nuancenunterschieden im Farbton an den Stößen kommen kann."
-          }
+      { question: 'Was bedeutet die Angabe "Versetzter Ansatz 64/32 cm" auf der Tapete?', answer: 'Das Muster wiederholt sich alle 64 cm und muss bei jeder zweiten Bahn um 32 cm in der Höhe versetzt geklebt werden; dies erfordert ca. 1 bis 2 Rollen Mehrbedarf.' },
+      { question: 'Werden Fenster und Türen von der Tapetenfläche abgezogen?', answer: 'Bei Standardfenstern und Türen zieht man die Flächen meist nicht ab, da die Abschnitte über und unter Fenstern aus den Rollenresten geschnitten werden.' },
     ],
-    relatedSlugs: ["farbmengen-rechner","bodenbelag-rechner","parkett-laminat-rechner"],
+    relatedSlugs: ['farbmengen-rechner', 'bodenbelag-rechner', 'parkett-laminat-rechner'],
   },
   {
     id: "brennholz-raummeter-rechner",
@@ -1807,10 +1781,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Brennholz- & Raummeter-Rechner",
     category: "bauen-renovieren",
     subcategory: "Heizung & Energie",
-    metaTitle: "Brennholz Rechner – Festmeter, Raummeter (RM) & Schüttraummeter (SRM)",
-    metaDescription: "Rechnen Sie Brennholz-Einheiten um: Festmeter (FM), Raummeter (RM) und Schüttraummeter (SRM) inklusive Heizwert in kWh und Öl-/Gas-Äquivalent.",
-    h1: "Brennholz Rechner – Umrechnung FM, RM, SRM & Energiegehalt",
-    shortDescription: "Rechnet Brennholz-Raummaße um und ermittelt den Heizwert in kWh.",
+    metaTitle: 'Brennholz Rechner – Festmeter, Raummeter',
+    metaDescription: 'Rechnen Sie Brennholz-Einheiten um: Festmeter (FM), Raummeter (RM) und Schüttraummeter (SRM) inklusive Heizwert in kWh und Öl-/Gas-Äquivalent.',
+    h1: 'Brennholz Rechner – Umrechnung FM, RM, SRM & Energiegehalt',
+    shortDescription: 'Rechnet Brennholz-Raummaße um und ermittelt den Heizwert in kWh mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["brennholz umrechner srm rm fm","schuettraummeter in raummeter umrechnen","heizwert buche fichte kwh raummeter","brennholz heizoel aequivalent"],
     inputs: [
           {
@@ -1925,17 +1899,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "3,55 RM (7.455 kWh Energie)"
     },
+    content: {
+      intro: 'Dieser Holzumrechner transformiert die forstwirtschaftlichen Maße Festmeter (FM), Raummeter (RM) und Schüttraummeter (SRM) deterministisch ineinander.',
+      details: '1 Festmeter (1 m³ massives Holz ohne Luft) entspricht ca. 1,4 bis 1,5 Raummetern (geschichtetes Scheitholz mit Luft) und ca. 2,3 bis 2,5 Schüttraummetern (lose geschüttete Scheite im Container).',
+    },
     faqs: [
-          {
-                "question": "Wie viel Restfeuchte darf Kaminholz haben?",
-                "answer": "Nach § 3 der 1. BImSchV darf Brennholz in Deutschland maximal 20 % Restfeuchte aufweisen (optimal sind unter 18 %), was nach 1 bis 2 Jahren regengeschützter Lagerung erreicht wird."
-          },
-          {
-                "question": "Was ist günstiger: Raummeter oder Schüttraummeter?",
-                "answer": "Scheinbar billige SRM-Preise täuschen oft: 1 SRM enthält etwa 30 % weniger Holz als 1 RM. Vergleichen Sie immer den umgerechneten Preis pro Raummeter oder Festmeter."
-          }
+      { question: 'Welcher Brennwertunterschied besteht zwischen Buche und Fichte?', answer: 'Buchenholz liefert rund 2.100 kWh pro Raummeter und brennt ruhig mit langanhaltender Glut; Fichtenholz liefert nur ca. 1.500 kWh/RM, brennt schnell an und eignet sich ideal als Anzündholz.' },
+      { question: 'Wie trocken muss Kaminholz nach Bundes-Immissionsschutzgesetz (BImSchV) sein?', answer: 'Nach § 3 Abs. 1 Nr. 4 der 1. BImSchV darf der Feuchtegehalt von Brennholz maximal 25 Prozent (entspricht einem Wassergehalt unter 20 %) betragen.' },
     ],
-    relatedSlugs: ["heizkostenvergleich-rechner","gaskostenrechner","stromkostenrechner"],
+    relatedSlugs: ['heizkostenvergleich-rechner', 'gaskostenrechner', 'stromkostenrechner'],
   },
   {
     id: "putz-rechner",
@@ -1944,10 +1916,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Putz- & Mörtel-Rechner",
     category: "bauen-renovieren",
     subcategory: "Ausbau & Wand",
-    metaTitle: "Putz Rechner – Innenputz & Außenputz Sackanzahl & kg berechnen",
-    metaDescription: "Berechnen Sie den Putzmörtel-Bedarf in kg und 25-kg-/30-kg-Säcken für Gipsputz, Kalk-Zement-Putz und Zementputz nach Wandfläche und Auftragsdicke.",
-    h1: "Putz Rechner – Putzbedarf & Sackanzahl für Wand & Decke",
-    shortDescription: "Ermittelt den Mörtelbedarf für Verputzarbeiten nach Fläche und Putzdicke.",
+    metaTitle: 'Putz Rechner – Innenputz & Außenputz Sackanzahl & kg berechnen',
+    metaDescription: 'Berechnen Sie den Putzmörtel-Bedarf in kg und 25-kg-/30-kg-Säcken für Gipsputz, Kalk-Zement-Putz und Zementputz nach Wandfläche und Auftragsdicke.',
+    h1: 'Putz Rechner – Putzbedarf & Sackanzahl für Wand & Decke',
+    shortDescription: 'Ermittelt den Mörtelbedarf für Verputzarbeiten nach Fläche und Putzdicke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["putz rechner verbrauch kg m2","kalk zement putz saecke berechnen","gipsputz bedarf wandflaeche","putzmörtel dicke berechnen"],
     inputs: [
           {
@@ -2064,17 +2036,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "21 Säcke à 30 kg (ca. 600 kg)"
     },
+    content: {
+      intro: 'Dieser Mörtelrechner ermittelt den Trockenmörtelbedarf in Kilogramm und Säcken für Grundputz, Unterputz und mineralischen Oberputz.',
+      details: 'Menge in kg = Wandfläche in m² · Schichtdicke in mm · spezifischer Materialverbrauch (typisch ca. 1,3 bis 1,5 kg pro m² und mm Schichtdicke). Ein 25-kg-Sack reicht bei 10 mm Dicke für rund 1,7 m² Wandfläche.',
+    },
     faqs: [
-          {
-                "question": "Welcher Putz eignet sich am besten für Nassräume?",
-                "answer": "Im Badezimmer und in Feuchträumen ist wasserabweisender Kalk-Zement-Putz oder reiner Zementputz vorgeschrieben. Gipsputz verliert bei dauerhafter Durchfeuchtung seine Festigkeit."
-          },
-          {
-                "question": "Braucht Mauerwerk vor dem Verputzen einen Vorspritzmörtel?",
-                "answer": "Bei stark saugendem oder ungleichmäßigem Mauerwerk verbessert ein zementärer Spritzbewurf die Haftung und verhindert das vorzeitige Verdursten des Putzes."
-          }
+      { question: 'Wie dick muss Innenputz auf Mauerwerk aufgetragen werden?', answer: 'Nach DIN V 18550 beträgt die durchschnittliche Mindestputzdicke bei einlagigem Innenputz 10 mm, um Unebenheiten des Mauerwerks auszugleichen.' },
+      { question: 'Wann benötigt man ein Armierungsgewebe im Putz?', answer: 'Zwingend bei Materialwechseln im Untergrund (z. B. Übergang von Beton auf Ziegel), über Rollladenkästen und bei Wärmedämmverbundsystemen (WDVS).' },
     ],
-    relatedSlugs: ["bausteine-mauerwerk-rechner","farbmengen-rechner","estrich-rechner"],
+    relatedSlugs: ['bausteine-mauerwerk-rechner', 'farbmengen-rechner', 'estrich-rechner'],
   },
   {
     id: "zaun-pfosten-rechner",
@@ -2083,10 +2053,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Zaun & Pfosten",
     category: "bauen-renovieren",
     subcategory: "Garten & Außenanlagen",
-    metaTitle: "Zaun Rechner – Doppelstabmatten, Pfosten & Ruck-Zuck-Beton berechnen",
-    metaDescription: "Berechnen Sie die Anzahl Doppelstabmatten (2,50 m Normlänge), Zaunpfosten, Eckpfosten und Säcke Ruck-Zuck-Beton nach Gesamt-Zaunlänge und Zaunhöhe.",
-    h1: "Zaun Rechner – Doppelstabmatten, Pfosten & Betonbedarf",
-    shortDescription: "Ermittelt Mattenanzahl, Pfosten und Beton für Doppelstabmattenzäune.",
+    metaTitle: 'Zaun Rechner – Doppelstabmatten, Pfosten',
+    metaDescription: 'Berechnen Sie die Anzahl Doppelstabmatten (2,50 m Normlänge), Zaunpfosten, Eckpfosten und Säcke Ruck-Zuck-Beton nach Gesamt-Zaunlänge und Zaunhöhe.',
+    h1: 'Zaun Rechner – Doppelstabmatten, Pfosten & Betonbedarf',
+    shortDescription: 'Ermittelt Mattenanzahl, Pfosten und Beton für Doppelstabmattenzäune mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["zaun rechner doppelstabmatten","zaunpfosten anzahl berechnen","beton fuer zaunpfosten ruck zuck beton","zaunlaenge mattenanzahl"],
     inputs: [
           {
@@ -2198,17 +2168,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "10 Matten, 11 Pfosten, 22 Säcke Beton"
     },
+    content: {
+      intro: 'Dieser Zaunrechner kalkuliert die Anzahl der Zaunpfosten, Zaunmatten (Doppelstabmatten) und Pfostenfundamente entlang der Grundstücksgrenze.',
+      details: 'Pfostenanzahl = Abrunden(Zaunlänge / Pfostenabstand) + 1 (für den Endpfosten) plus Zusatzpfosten für Tore und Ecken. Standard-Doppelstabmatten haben eine Breite von exakt 2,50 Metern.',
+    },
     faqs: [
-          {
-                "question": "Was bedeutet die Bezeichnung 6/5/6 oder 8/6/8 bei Doppelstabmatten?",
-                "answer": "Sie bezeichnet die Drahtstärken in Millimetern: Zwei waagerechte Drähte (z. B. 6 mm) schließen einen senkrechten Draht (z. B. 5 mm) ein. 8/6/8 ist die besonders stabile Industrieausführung."
-          },
-          {
-                "question": "Muss Ruck-Zuck-Beton vorgemischt werden?",
-                "answer": "Nein, Schnelltrockenbeton wird trocken schichtweise ins Erdloch geschüttet und mit Wasser begossen, ohne zeitaufwendiges Anrühren in der Mischmaschine."
-          }
+      { question: 'Wie tief müssen Zaunpfosten einbetoniert werden?', answer: 'Mindestens 60 bis 80 cm tief, um eine frostfreie und sturmsichere Verankerung gegen Hebelkräfte bei Windlast zu gewährleisten.' },
+      { question: 'Was ist der Unterschied zwischen 6/5/6 und 8/6/8 Doppelstabmatten?', answer: 'Die Zahlen beziffern den Drahtdurchmesser in Millimetern (waagerecht/senkrecht/waagerecht): 8/6/8 mm ist die schwere Gewerbeausführung, 6/5/6 mm die leichtere Privatausführung.' },
     ],
-    relatedSlugs: ["fundament-rechner","betonrechner","pflastersteine-rechner"],
+    relatedSlugs: ['fundament-rechner', 'betonrechner', 'pflastersteine-rechner'],
   },
   {
     id: "regenwasser-zisterne-rechner",
@@ -2217,11 +2185,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Zisternengröße",
     category: "bauen-renovieren",
     subcategory: "Garten & Außenanlagen",
-    metaTitle: "Zisternen Rechner – Optimale Zisternengröße in Litern nach DIN 1989",
-    metaDescription: "Berechnen Sie das ideale Zisternenvolumen nach Dachfläche, Bedachungsart (Ziegel/Gründach), Jahresniederschlag und Verwendungszweck (Gartenbewässerung, WC, Waschmaschine).",
-    h1: "Zisternen Rechner – Ideales Tankvolumen für Regenwassernutzung",
-    shortDescription: "Berechnet die optimale Zisternengröße nach Dachfläche und Niederschlag.",
-    searchKeywords: ["zisternengroesse berechnen din 1989","regenwasser zisterne rechner liter","dachflaeche zisterne groesse","gartenbewaesserung zisterne volumen"],
+    metaTitle: 'Zisternen Rechner – Ideales Tankvolumen für Regenwasser',
+    metaDescription: 'Berechnen Sie die optimale Zisternengröße nach Dachfläche, Bedachungsart, Niederschlag und Nutzung (Garten, WC, Haushalt).',
+    h1: 'Zisternen Rechner – Tankvolumen für Regenwassernutzung',
+    shortDescription: 'Berechnet das empfohlene Speichervolumen einer Regenwasserzisterne nach DIN 1989 für Gartenbewässerung und Haustechnik.',
+    searchKeywords: ['regenwasser zisterne rechner', 'zisternengroesse berechnen din 1989', 'regenwasser zisterne rechner liter', 'dachflaeche zisterne groesse', 'gartenbewaesserung zisterne volumen'],
     inputs: [
           {
                 "id": "roofArea",
@@ -2357,17 +2325,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "1.500 bis 3.000 Liter Zisterne"
     },
+    content: {
+      intro: 'Dieser Dimensionierungsrechner ermittelt das optimale Speichervolumen einer Regenwasserzisterne nach DIN 1989-1 aus Dachfläche, Standort und Wasserbedarf.',
+      details: 'Zisternengröße = Min(Jährlicher Regenertrag, Jährlicher Betriebswasserbedarf) · 0,06 (für 21 bis 22 Tage Sicherheitsreserve bei Trockenheit). Typische Behältergrößen liegen zwischen 3.000 und 6.000 Litern.',
+    },
     faqs: [
-          {
-                "question": "Was ist besser: Betonzisterne oder Kunststoffzisterne?",
-                "answer": "Betonzisternen sind extrem formstabil, PKW-befahrbar und neutralisieren durch den Kalk im Beton sauren Regen. Kunststofftanks (PE) sind leichter zu transportieren und einzubauen."
-          },
-          {
-                "question": "Kann man Regenwasser für die Waschmaschine nutzen?",
-                "answer": "Ja, Regenwasser ist kalkfrei. Dadurch verkalkt die Waschmaschine nicht, und es wird bis zu 50 % weniger Waschmittel benötigt."
-          }
+      { question: 'Welche Verbraucher im Haus dürfen mit Zisternenwasser betrieben werden?', answer: 'Nach der Trinkwasserverordnung darf Regenwasser für Toilettenspülung, Waschmaschine und Gartenbewässerung genutzt werden; eine Verwechslung mit Trinkwasserleitungen muss ausgeschlossen sein.' },
+      { question: 'Wie viel Prozent Trinkwasser spart eine Zisterne im Einfamilienhaus?', answer: 'Bis zu 50 Prozent des gesamten häuslichen Trinkwasserbedarfs können durch Regenwassernutzung für WC, Garten und Waschmaschine eingespart werden.' },
     ],
-    relatedSlugs: ["dachflaeche-rechner","fundament-rechner","aushub-erdarbeiten-rechner"],
+    relatedSlugs: ['drainage-gefaelle-rechner', 'dachflaeche-rechner', 'fundament-rechner', 'aushub-erdarbeiten-rechner'],
   },
   {
     id: "treppen-stufen-rechner",
@@ -2376,10 +2342,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Treppen-Rechner",
     category: "bauen-renovieren",
     subcategory: "Ausbau & Wand",
-    metaTitle: "Treppenstufen Rechner – Steigung & Auftritt berechnen nach DIN 18065",
-    metaDescription: "Berechnen Sie die Stufenanzahl, Steigungshöhe (s), Auftrittstiefe (a) und Treppenlänge nach der Schrittmaßregel (2s + a = 63 cm) und Treppensteigungswinkel.",
-    h1: "Treppen Rechner – Stufenanzahl, Steigung & Auftritt nach Schrittmaß",
-    shortDescription: "Berechnet Stufenanzahl, Steigung und Auftritt nach der DIN 18065.",
+    metaTitle: 'Treppenstufen Rechner – Steigung – RechenHafen',
+    metaDescription: 'Berechnen Sie die Stufenanzahl, Steigungshöhe (s), Auftrittstiefe (a) und Treppenlänge nach der Schrittmaßregel (2s + a = 63 cm) und.',
+    h1: 'Treppen Rechner – Stufenanzahl, Steigung & Auftritt nach Schrittmaß',
+    shortDescription: 'Berechnet Stufenanzahl, Steigung und Auftritt nach der DIN 18065 mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["treppen rechner schrittmassregel","stufenhoehe berechnen 2s plus a","treppenstufen anzahl auftritt din 18065","treppenlauf laenge geschosshoehe"],
     inputs: [
           {
@@ -2465,17 +2431,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "15 Steigungen (s = 18 cm, a = 27 cm)"
     },
+    content: {
+      intro: 'Die Schrittmaßformel nach DIN 18065 (2 · Steigung + Auftritt = 63 cm) gewährleistet die bequeme und ergonomisch sichere Begehbarkeit von Treppen.',
+      details: 'Stufenanzahl = Geschosshöhe / Steigungshöhe (ideal: 17 bis 18 cm). Der Auftritt (Stufentiefe) sollte 27 bis 29 cm betragen. Das Schrittmaß 2s + a muss im Intervall von 59 bis 65 cm liegen.',
+    },
     faqs: [
-          {
-                "question": "Welche Steigung ist nach DIN 18065 für Wohnhaustreppen zulässig?",
-                "answer": "In baurechtlich notwendigen Treppen für Einfamilienhäuser gilt eine Steigung von 14 bis 20 cm und ein Auftritt von 23 bis 37 cm. Als Idealmaß gelten 17 cm Steigung und 29 cm Auftritt."
-          },
-          {
-                "question": "Wie viel Durchgangshöhe (Kopffreiheit) ist vorgeschrieben?",
-                "answer": "Die lichte Durchgangshöhe senkrecht über der Treppenlauflinie muss an jeder Stelle mindestens 2,00 Meter betragen."
-          }
+      { question: 'Welche Mindest-Durchgangshöhe schreibt die DIN 18065 für Treppen vor?', answer: 'Die lichte Durchgangshöhe senkrecht über der Stufenvorderkante muss über den gesamten Treppenlauf mindestens 2,00 Meter betragen.' },
+      { question: 'Was ist der Treppensteigungswinkel?', answer: 'Das Verhältnis von Steigung zu Auftritt; für normale Wohnungstreppen gilt ein Neigungswinkel von 30° bis 37° als optimal.' },
     ],
-    relatedSlugs: ["parkett-laminat-rechner","estrich-rechner","bodenbelag-rechner"],
+    relatedSlugs: ['parkett-laminat-rechner', 'estrich-rechner', 'bodenbelag-rechner'],
   },
   {
     id: "kies-splitt-rechner",
@@ -2484,10 +2448,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kies & Splitt",
     category: "bauen-renovieren",
     subcategory: "Garten & Außenanlagen",
-    metaTitle: "Kies & Splitt Rechner – Bedarf in Tonnen & m³ für Garten & Hof berechnen",
-    metaDescription: "Berechnen Sie das Gewicht in Tonnen und Volumen in m³ für Kies, Splitt, Schotter oder Rindenmulch nach Fläche in m² und Einbauhöhe.",
-    h1: "Kies & Splitt Rechner – Tonnen & Schüttvolumen berechnen",
-    shortDescription: "Ermittelt das Gewicht und Schüttvolumen von Kies, Splitt und Schotter.",
+    metaTitle: 'Kies & Splitt Rechner – Bedarf in Tonnen',
+    metaDescription: 'Berechnen Sie das Gewicht in Tonnen und Volumen in m³ für Kies, Splitt, Schotter oder Rindenmulch nach Fläche in m² und Einbauhöhe.',
+    h1: 'Kies & Splitt Rechner – Tonnen & Schüttvolumen berechnen',
+    shortDescription: 'Ermittelt das Gewicht und Schüttvolumen von Kies, Splitt und Schotter.',
     searchKeywords: ["kies rechner tonnen m3","splitt bedarf berechnen terrasse","schotter gewicht volumen dichte","zierkies menge quadratmeter"],
     inputs: [
           {
@@ -2594,17 +2558,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "2,56 Tonnen Splitt (3 Big Bags)"
     },
+    content: {
+      intro: 'Dieser Schüttgutrechner transformiert Flächenmaße und Schütthöhen in benötigte Kubikmeter und das Transportgewicht in Tonnen.',
+      details: 'Gewicht in Tonnen = Fläche in m² · Schütthöhe in Metern · Schüttdichte (ca. 1,5 bis 1,8 t/m³ je nach Körnung und Feuchte). Für Gartenwege und Zierbeete reicht eine Schütthöhe von 5 cm (ca. 80 kg/m²).',
+    },
     faqs: [
-          {
-                "question": "Wie dick sollte Zierkies im Garten aufgeschüttet werden?",
-                "answer": "Als Daumenregel gilt die doppelte Korngröße: Bei Kies 16/32 mm empfiehlt sich eine Schütthöhe von mindestens 5 bis 6 cm, damit das darunterliegende Unkrautvlies nicht durchscheint."
-          },
-          {
-                "question": "Braucht man ein Unkrautvlies unter Kiesflächen?",
-                "answer": "Ja, ein Geotextil-Unkrautvlies verhindert das Durchwachsen von Wurzeln und sorgt dafür, dass die Kieselsteine nicht im darunterliegenden Erdreich versinken."
-          }
+      { question: 'Welcher Unterschied besteht zwischen Kies und Splitt?', answer: 'Kies besteht aus rund gewaschenen Flusskiesen; Splitt besteht aus scharfkantig gebrochenem Naturstein, der sich unter Belastung verkeilt und kaum rollt.' },
+      { question: 'Warum sollte man unter Zierkies ein Unkrautvlies verlegen?', answer: 'Das Geotextil-Vlies verhindert, dass sich Steine mit dem feuchten Erdreich vermischen, und hemmt das Durchwachsen von Wurzelunkräutern.' },
     ],
-    relatedSlugs: ["pflastersteine-rechner","aushub-erdarbeiten-rechner","fundament-rechner"],
+    relatedSlugs: ['pflastersteine-rechner', 'aushub-erdarbeiten-rechner', 'fundament-rechner'],
   },
   {
     id: "drainage-gefaelle-rechner",
@@ -2613,10 +2575,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Gefälle-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Gefälle Rechner – Steigung in Prozent, Promille & cm pro Meter berechnen",
-    metaDescription: "Berechnen Sie das Gefälle von Terrassen (min. 2 %), Abwasserrohren nach DIN EN 12056 (1-2 cm/m) und Garagenauffahrten nach Länge und Höhenunterschied.",
-    h1: "Gefälle Rechner – Gefälle in %, cm/m & Höhenunterschied ermitteln",
-    shortDescription: "Berechnet Gefälle in Prozent, Grad und Höhenunterschied in Zentimetern.",
+    metaTitle: 'Gefälle Rechner – Steigung in Prozent, Promille',
+    metaDescription: 'Berechnen Sie das Gefälle von Terrassen (min. 2 %), Abwasserrohren nach DIN EN 12056 (1-2 cm/m) und Garagenauffahrten nach Länge und Höhenunterschied.',
+    h1: 'Gefälle Rechner – Gefälle in %, cm/m & Höhenunterschied ermitteln',
+    shortDescription: 'Berechnet Gefälle in Prozent, Grad und Höhenunterschied in Zentimetern mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["gefaelle rechner prozent cm m","terrasse gefaelle berechnen 2 prozent","abwasserrohr gefaelle din 12056","hoehenunterschied laenge gefaelle"],
     inputs: [
           {
@@ -2714,17 +2676,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "8 cm Höhenunterschied"
     },
+    content: {
+      intro: 'Dieser Neigungsrechner kalkuliert den Höhenunterschied und das Mindestgefälle für Drainagerohre und Abwasserleitungen nach DIN EN 12056 und DIN 4095.',
+      details: 'Gefälle in % = (Höhenunterschied / Rohrlänge) · 100. Für erdverlegte Abwasserleitungen gilt ein Mindestgefälle von 1,0 bis 2,0 Prozent (1 bis 2 cm pro Meter), um Ablagerungen und Verstopfungen zu vermeiden.',
+    },
     faqs: [
-          {
-                "question": "Warum benötigt eine Terrasse mindestens 2 % Gefälle?",
-                "answer": "Damit Regenwasser zügig vom Haus wegfließt, sich keine Pfützen bilden und im Winter kein gefrierendes Wasser Fliesen absprengt oder Terrassendielen vermosen lässt."
-          },
-          {
-                "question": "Wie viel Gefälle muss ein Abwasserrohr im Haus haben?",
-                "answer": "Nach DIN EN 12056 beträgt das empfohlene Gefälle für Schmutzwasserleitungen 1 bis 2 cm pro Meter (1 % bis 2 %). Zu viel Gefälle (> 5 %) führt dazu, dass Wasser abfließt, Feststoffe aber liegen bleiben."
-          }
+      { question: 'Kann ein Gefälle bei Abwasserrohren auch zu steil sein?', answer: 'Ja, bei über 5 Prozent Gefälle fließt das Abwasser zu schnell ab und lässt feste Bestandteile zurück; dies führt paradoxerweise zu Verstopfungen.' },
+      { question: 'Wie wird ein Ringdrainagerohr an der Fundamentsohle verlegt?', answer: 'Mit mindestens 0,5 Prozent Gefälle, umgeben von einem Filterkiesbett (Körnung 8/16 oder 16/32) und vollständig umhüllt von filterstabilem Geotextilvlies.' },
     ],
-    relatedSlugs: ["pflastersteine-rechner","regenwasser-zisterne-rechner","fundament-rechner"],
+    relatedSlugs: ['pflastersteine-rechner', 'regenwasser-zisterne-rechner', 'fundament-rechner'],
   },
   {
     id: "baugrund-tragfaehigkeit-rechner",
@@ -2733,10 +2693,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Bodenpressung-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Bodenpressung Rechner – Baugrund-Tragfähigkeit & Fundamentfläche DIN 1054",
-    metaDescription: "Berechnen Sie die vorhandene Bodenpressung (kN/m²) unter Fundamenten und vergleichen Sie diese mit der zulässigen Bodenpressung nach DIN 1054.",
-    h1: "Baugrund Rechner – Bodenpressung & Tragfähigkeit berechnen",
-    shortDescription: "Ermittelt die Bodenpressung unter Fundamenten und prüft die Tragfähigkeit.",
+    metaTitle: 'Bodenpressung Rechner – Baugrund-Tragfähigkeit',
+    metaDescription: 'Berechnen Sie die vorhandene Bodenpressung (kN/m²) unter Fundamenten und vergleichen Sie diese mit der zulässigen Bodenpressung nach DIN 1054.',
+    h1: 'Baugrund Rechner – Bodenpressung & Tragfähigkeit berechnen',
+    shortDescription: 'Ermittelt die Bodenpressung unter Fundamenten und prüft die Tragfähigkeit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["bodenpressung rechner din 1054","baugrund tragfaehigkeit kn m2","fundamentbelastung berechnen","zulaessige bodenpressung tabelle"],
     inputs: [
           {
@@ -2845,17 +2805,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "93,8 kN/m² (ausreichende Standsicherheit)"
     },
+    content: {
+      intro: 'Die zulässige Bodenpressung nach DIN 1054 bestimmt, welche Lasten das Fundament auf den anstehenden Baugrund übertragen darf, ohne dass Grundbruch oder schädliche Setzungen drohen.',
+      details: 'Vorhandene Bodenpressung = Bauwerkslast / Fundamentfläche. Feste Sande und Kiese tragen typischerweise 200 bis 300 kN/m²; weiche Tone oder organische Böden oft unter 100 kN/m².',
+    },
     faqs: [
-          {
-                "question": "Wie rechnet man Tonnen in Kilonewton (kN) um?",
-                "answer": "1 Tonne Masse entspricht auf der Erde einer Gewichtskraft von ca. 9,81 kN, in der Praxis rechnet man überschlägig mit: 1 Tonne ≈ 10 kN."
-          },
-          {
-                "question": "Wann ist ein geologisches Bodengutachten zwingend erforderlich?",
-                "answer": "Vor jedem Neubau oder größeren Anbau ist ein Baugrundgutachten dringend anzuraten, um teure Überraschungen wie Torflinsen, Schichtenwasser oder geringe Tragfähigkeit auszuschließen."
-          }
+      { question: 'Wann ist ein geotechnisches Baugrundgutachten Pflicht?', answer: 'Vor jedem Neubau: Das Gutachten ermittelt Bodenarten, Schichtenaufbau, Tragfähigkeit und den maßgeblichen Bemessungswasserstand (Grundwasser).' },
+      { question: 'Was sind ungleichmäßige Setzungen?', answer: 'Wenn sich verschiedene Gebäudeteile wegen inhomogenen Bodens unterschiedlich stark senken; dies führt zu schweren diagonalen Rissen im Tragwerk.' },
     ],
-    relatedSlugs: ["fundament-rechner","betonrechner","aushub-erdarbeiten-rechner"],
+    relatedSlugs: ['fundament-rechner', 'betonrechner', 'aushub-erdarbeiten-rechner'],
   },
   {
     id: "holz-balken-durchbiegung-rechner",
@@ -2864,10 +2822,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Holzbalken-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Holzbalken Durchbiegung Rechner – Balken dimensionieren nach Eurocode 5",
-    metaDescription: "Berechnen Sie die Durchbiegung von Holzdeckenbalken (C24 Nadelholz) nach Spannweite, Balkenbreite, Balkenhöhe und Last nach DIN EN 1995-1-1.",
-    h1: "Holzbalken Rechner – Balkenquerschnitt & Durchbiegung prüfen",
-    shortDescription: "Berechnet die Durchbiegung von Holzbalken und prüft Grenzwerte nach DIN.",
+    metaTitle: 'Holzbalken Durchbiegung Rechner – Balken dimensionieren nac...',
+    metaDescription: 'Berechnen Sie die Durchbiegung von Holzdeckenbalken (C24 Nadelholz) nach Spannweite, Balkenbreite, Balkenhöhe und Last nach DIN EN 1995-1-1.',
+    h1: 'Holzbalken Rechner – Balkenquerschnitt & Durchbiegung prüfen',
+    shortDescription: 'Berechnet die Durchbiegung von Holzbalken und prüft Grenzwerte nach DIN.',
     searchKeywords: ["holzbalken durchbiegung rechner","holzbalkendecke dimensionierung spanne","traegheitsmoment holzbalken b h3 12","eurocode 5 holz durchbiegung l 300"],
     inputs: [
           {
@@ -2977,17 +2935,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "7,4 mm Durchbiegung (weit unter dem Limit 13,3 mm)"
     },
+    content: {
+      intro: 'Die statische Vorbemessung nach Eurocode 5 (DIN EN 1995-1-1) prüft die Durchbiegung von Decken- und Dachbalken unter Gleichlast im Grenzzustand der Gebrauchstauglichkeit.',
+      details: 'Zulässige Durchbiegung: w_max ≤ Stützweite L / 300 für charakteristische Lasten (bzw. L / 200 für Enddurchbiegung). Die Steifigkeit hängt in der vierten Potenz von der Balkenhöhe h ab (Flächenträgheitsmoment I = (b · h³) / 12).',
+    },
     faqs: [
-          {
-                "question": "Was ist wichtiger für die Tragfähigkeit: Breite oder Höhe?",
-                "answer": "Eindeutig die Höhe! Die Höhe geht hoch 3 in die Steifigkeit ein. Ein 12×24 cm Balken ist fast doppelt so steif wie ein 16×20 cm Balken bei gleichem Holzverbrauch."
-          },
-          {
-                "question": "Was bedeutet Konstruktionsvollholz C24?",
-                "answer": "C24 ist die in Mitteleuropa gängigste Güteklasse für Nadelholz (Fichte/Tanne) im konstruktiven Holzbau mit einer Biegefestigkeit von 24 N/mm²."
-          }
+      { question: 'Warum ist die Balkenhöhe so viel wichtiger als die Balkenbreite?', answer: 'Weil die Höhe mit der dritten Potenz in die Biegesteifigkeit einfließt: Ein doppelt so hoher Balken biegt sich bei gleicher Belastung um den Faktor 8 weniger durch.' },
+      { question: 'Welche Holzart wird für Deckenbalken im Neubau verwendet?', answer: 'Konstruktionsvollholz (KVH, meist Fichte Nadelholz C24) oder Brettschichtholz (BSH/Leimholz) für verzugsarme, rissminimierte Bauteile.' },
     ],
-    relatedSlugs: ["dachflaeche-rechner","daemmung-u-wert-rechner","fundament-rechner"],
+    relatedSlugs: ['dachflaeche-rechner', 'daemmung-u-wert-rechner', 'fundament-rechner'],
   },
   {
     id: "beton-mischungsverhaeltnis-rechner",
@@ -2996,10 +2952,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Beton mischen",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: "Beton mischen Rechner – Mischungsverhältnis Zement & Kies nach Schaufeln",
-    metaDescription: "Berechnen Sie das optimale Mischungsverhältnis für Beton (1:4 Regel) in Schaufeln, Litern und kg Zement, Betonkies (0/16 oder 0/32) und Anmachwasser (w/z-Wert).",
-    h1: "Beton mischen Rechner – Mischverhältnis in Schaufeln & kg",
-    shortDescription: "Berechnet Schaufeln und Gewichte für das Selbstanmischen von Beton.",
+    metaTitle: 'Beton mischen Rechner – Mischungsverhältnis Zement',
+    metaDescription: 'Berechnen Sie das optimale Mischungsverhältnis für Beton (1:4 Regel) in Schaufeln, Litern und kg Zement, Betonkies (0/16 oder 0/32) und Anmachwasser.',
+    h1: 'Beton mischen Rechner – Mischverhältnis in Schaufeln & kg',
+    shortDescription: 'Berechnet Schaufeln und Gewichte für das Selbstanmischen von Beton mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["beton mischungsverhaeltnis schaufeln rechner","beton selber mischen verhaeltnis 1 zu 4","zement kies wasser rechner","w z wert beton anmachwasser"],
     inputs: [
           {
@@ -3089,17 +3045,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "6 Säcke Zement, 900 kg Kies, 83 l Wasser"
     },
+    content: {
+      intro: 'Dieser Mischungsrechner ermittelt die exakten Schaufel- und Gewichtsanteile von Zement, Betonkies (0/16 mm) und Wasser für selbst angemischten Baustellenbeton.',
+      details: 'Klassisches Volumen-Mischungsverhältnis für Normalbeton: 1 Teil Zement zu 4 Teilen Betonkies (z. B. 1 Schaufel Zement auf 4 Schaufeln Kies). Der Wasser-Zement-Wert (w/z) sollte für hohe Druckfestigkeit zwischen 0,50 und 0,60 liegen.',
+    },
     faqs: [
-          {
-                "question": "Welche Körnung hat Betonkies üblicherweise?",
-                "answer": "Für Standardbeton im Hoch- und Gartenbau wird Fertigbetonkies der Körnung 0/16 mm oder 0/32 mm verwendet, der bereits die ideale Sieblinie aus Sand und Steinen enthält."
-          },
-          {
-                "question": "Wie lange muss Beton feucht gehalten werden?",
-                "answer": "In den ersten Tagen nach dem Gießen muss Beton vor schnellem Austrocknen durch Sonne oder Wind geschützt werden (Nachbehandlung mit Folie oder Befeuchten), um Schwindrisse zu verhindern."
-          }
+      { question: 'Was passiert, wenn man beim Betonmischen zu viel Wasser zugibt?', answer: 'Ein zu hoher Wasser-Zement-Wert (> 0,65) schwächt das Zementkristallgitter drastisch: Die Druckfestigkeit sinkt massiv, und der Beton neigt zum "Bluten" und Reißen.' },
+      { question: 'Wie viele 25-kg-Säcke Zement benötigt man für 1 m³ selbst gemischten Beton?', answer: 'Für 1 Kubikmeter fertigen Beton der Festigkeitsklasse C20/25 werden rund 300 kg Zement benötigt (entspricht genau 12 Säcken zu je 25 kg).' },
     ],
-    relatedSlugs: ["betonrechner","fundament-rechner","estrich-rechner"],
+    relatedSlugs: ['betonrechner', 'fundament-rechner', 'estrich-rechner'],
   },
   {
     id: "dreieck-flaeche-rechner",
@@ -3108,10 +3062,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Dreieck-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Dreieck Rechner – Fläche berechnen nach Grundseite/Höhe & 3 Seiten",
-    metaDescription: "Berechnen Sie die Dreiecksfläche über Grundseite und Höhe (A = 1/2 g h) oder über alle 3 Seiten nach dem Satz des Heron inklusive Umfang.",
-    h1: "Dreieck Rechner – Flächeninhalt & Umfang für jedes Dreieck",
-    shortDescription: "Berechnet Flächeninhalt und Umfang für beliebige Dreiecke.",
+    metaTitle: 'Dreieck Rechner – Fläche berechnen nach Grundseite/Höhe',
+    metaDescription: 'Berechnen Sie die Dreiecksfläche über Grundseite und Höhe (A = 1/2 g h) oder über alle 3 Seiten nach dem Satz des Heron inklusive Umfang.',
+    h1: 'Dreieck Rechner – Flächeninhalt & Umfang für jedes Dreieck',
+    shortDescription: 'Berechnet Flächeninhalt und Umfang für beliebige Dreiecke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["dreieck flaeche rechner","heron formel rechner 3 seiten","dreiecksflaeche berechnen grundseite hoehe","dreieck umfang formel"],
     inputs: [
           {
@@ -3215,17 +3169,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "24 cm² Fläche"
     },
+    content: {
+      intro: 'Dieser Flächenrechner bestimmt den Flächeninhalt beliebiger Dreiecke wahlweise über Grundseite und Höhe, über zwei Seiten und Zwischenwinkel oder über die drei Seitenlängen.',
+      details: 'Standardformel: A = 1/2 · g · h. Satz von Heron bei drei bekannten Seiten: A = Wurzel[s · (s-a) · (s-b) · (s-c)] mit dem halben Umfang s = (a+b+c)/2.',
+    },
     faqs: [
-          {
-                "question": "Wann gilt die Dreiecksungleichung?",
-                "answer": "Drei Strecken bilden nur dann ein Dreieck, wenn die Summe zweier beliebiger Seiten stets strikt größer ist als die dritte Seite (a + b > c)."
-          },
-          {
-                "question": "Wie berechnet man die Höhe im gleichseitigen Dreieck?",
-                "answer": "Im gleichseitigen Dreieck mit Seitenlänge a gilt: h = (a / 2) × √3 ≈ 0,866 × a."
-          }
+      { question: 'Gilt die Formel A = 1/2 · g · h auch bei stumpfwinkligen Dreiecken?', answer: 'Ja, uneingeschränkt: Bei stumpfwinkligen Dreiecken liegt der Höhenfußpunkt außerhalb des Dreiecks auf der verlängerten Grundlinie.' },
+      { question: 'Wie lautet die Trigonometrie-Formel für die Dreiecksfläche?', answer: 'A = 1/2 · a · b · sin(gamma). Sie benötigt lediglich zwei Seitenlängen und den von ihnen eingeschlossenen Innenwinkel.' },
     ],
-    relatedSlugs: ["kreisrechner","rechteckrechner","satz-des-pythagoras-rechner"],
+    relatedSlugs: ['dreiecks-hoehen-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'rechteckrechner', 'satz-des-pythagoras-rechner', 'bogenmass-grad-rechner'],
   },
   {
     id: "kreis-umfang-rechner",
@@ -3234,11 +3186,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kreisumfang-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Kreisumfang Rechner – Umfang U = 2πr, Durchmesser d & Kreisfläche",
-    metaDescription: "Berechnen Sie Kreisumfang, Kreisfläche, Radius und Durchmesser mit der Kreiszahl Pi (π). Sofortige Umrechnung bei Eingabe einer beliebigen Größe.",
-    h1: "Kreisumfang Rechner – Umfang U = 2 · π · r & Durchmesser ermitteln",
-    shortDescription: "Berechnet Kreisumfang, Durchmesser und Fläche aus dem Radius.",
-    searchKeywords: ["kreisumfang rechner formel","umfang kreis durchmesser pi","kreisumfang u 2 pi r berechnen","kreis flaeche umfang umrechnen"],
+    metaTitle: 'Kreisumfang Rechner – Umfang berechnen mit U = 2·π·r',
+    metaDescription: 'Berechnen Sie den Kreisumfang direkt aus Radius oder Durchmesser nach der Formel U = 2·π·r mit präzisen Einheiten.',
+    h1: 'Kreisumfang Rechner – Exakten Umfang aus Radius berechnen',
+    shortDescription: 'Berechnet den genauen Umfang eines Kreises aus Radius oder Durchmesser nach der mathematischen Formel U = 2·π·r.',
+    searchKeywords: ['kreisumfang rechner', 'kreisumfang rechner formel', 'umfang kreis durchmesser pi', 'kreisumfang u 2 pi r berechnen', 'kreis flaeche umfang umrechnen'],
     inputs: [
           {
                 "id": "inputType",
@@ -3310,17 +3262,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "U = 31,42 cm, A = 78,54 cm²"
     },
+    content: {
+      intro: 'Dieser Rechner ermittelt den Umfang eines Kreises aus Radius oder Durchmesser und dient der Dimensionierung von Rundstrecken, Rohren und Baumstämmen.',
+      details: 'Umfang U = pi · d = 2 · pi · r. In der Forstwirtschaft wird der Stammumfang in Brusthöhe (1,30 m) gemessen und durch Pi geteilt, um den Stammdurchmesser (BHD) ohne Fällung zu bestimmen.',
+    },
     faqs: [
-          {
-                "question": "Wie berechnet man den Durchmesser aus dem Umfang?",
-                "answer": "Teilen Sie den Umfang einfach durch Pi: d = U / π. Bei einem Umfang von 31,4 cm ist der Durchmesser genau 10 cm."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen Radius und Durchmesser?",
-                "answer": "Der Radius reicht vom Mittelpunkt bis zum Kreisrand. Der Durchmesser ist die längste Sehne durch den Mittelpunkt und genau doppelt so lang wie der Radius (d = 2r)."
-          }
+      { question: 'Wie lang ist die Umlaufbahn der Erde um die Sonne näherungsweise?', answer: 'Bei einem mittleren Sonnenabstand von ca. 149,6 Mio. km beträgt der Erdumfang U ≈ 2 · pi · 149,6 Mio. km ≈ 940 Millionen Kilometer pro Jahr.' },
+      { question: 'Wie viel Zaun benötigt man für ein rundes Beet mit 4 m Durchmesser?', answer: 'U = pi · 4 m ≈ 12,57 Meter Zaunlänge.' },
     ],
-    relatedSlugs: ["kreisrechner","kugel-oberflaeche-rechner","kreissegment-rechner"],
+    relatedSlugs: ['ringgroesse-umrechner', 'ellipse-flaeche-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'kugel-oberflaeche-rechner', 'kreissegment-rechner'],
   },
   {
     id: "kegel-volumen-rechner",
@@ -3329,10 +3279,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kegel-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Kegel Rechner – Volumen V = 1/3πr²h, Mantelfläche & Oberfläche berechnen",
-    metaDescription: "Berechnen Sie das Volumen eines Kreiskegels (V = 1/3 · π · r² · h), die Mantellinie s, die Mantelfläche M und die Gesamtoberfläche O nach Radius und Höhe.",
-    h1: "Kegel Rechner – Volumen, Mantellinie & Oberfläche ermitteln",
-    shortDescription: "Berechnet Volumen, Mantelfläche und Gesamtoberfläche eines Kegels.",
+    metaTitle: 'Kegel Rechner – Volumen V = 1/3πr²h, Mantelfläche',
+    metaDescription: 'Berechnen Sie das Volumen eines Kreiskegels (V = 1/3 · π · r² · h), die Mantellinie s, die Mantelfläche M und die Gesamtoberfläche O nach Radius und Höhe.',
+    h1: 'Kegel Rechner – Volumen, Mantellinie & Oberfläche ermitteln',
+    shortDescription: 'Berechnet Volumen, Mantelfläche und Gesamtoberfläche eines Kegels mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kegel rechner volumen formel","kegel mantelflaeche oberflaeche berechnen","mantellinie s kegel pythagoras","kreiskegel volumen 1 drittel pi r2 h"],
     inputs: [
           {
@@ -3403,17 +3353,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "V = 301,59 cm³, O = 301,59 cm²"
     },
+    content: {
+      intro: 'Dieser Kegelrechner ermittelt Rauminhalt, Mantelfläche und Mantellinie s gerader Kreiskegel (Silotrichter, Schüttkegel, Hütchen).',
+      details: 'Volumen V = 1/3 · pi · r² · h. Ein Kegel hat exakt ein Drittel des Volumens eines Zylinders mit gleicher Grundfläche und Höhe. Mantellinie s = Wurzel(r² + h²).',
+    },
     faqs: [
-          {
-                "question": "Wie verhält sich das Kegelvolumen zum Zylindervolumen?",
-                "answer": "Das Kegelvolumen ist genau 1/3 des Zylindervolumens mit gleicher Grundfläche und Höhe. Drei gefüllte Kegel passen exakt in einen Zylinder."
-          },
-          {
-                "question": "Was ist ein schiefer Kegel?",
-                "answer": "Bei einem schiefen Kegel steht die Spitze nicht senkrecht über dem Mittelpunkt des Grundkreises. Die Volumenformel V = 1/3 · G · h (nach dem Prinzip von Cavalieri) gilt jedoch unverändert!"
-          }
+      { question: 'Wie berechnet man das Volumen eines aufgeschütteten Sandkegels?', answer: 'Messen Sie den Bodenumfang zur Bestimmung des Radius r und die Höhe h des Schüttkegels an der Spitze: V = 1/3 · pi · r² · h.' },
+      { question: 'Wie lautet die Formel für die gekrümmte Mantelfläche des Kegels?', answer: 'Mantelfläche M = pi · r · s, wobei s die schräge Mantellinie von der Grundkreiskante bis zur Spitze ist.' },
     ],
-    relatedSlugs: ["zylinderrechner","kugel-oberflaeche-rechner","pyramide-volumen-rechner"],
+    relatedSlugs: ['stumpf-kegel-rechner', 'zylinderrechner', 'kugel-oberflaeche-rechner', 'pyramide-volumen-rechner'],
   },
   {
     id: "hohlzylinder-rohr-rechner",
@@ -3422,10 +3370,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Rohr & Hohlzylinder",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Hohlzylinder Rechner – Rohr-Volumen, Wandstärke & Gewicht in kg",
-    metaDescription: "Berechnen Sie das Materialvolumen, Innen-/Außenvolumen und Gewicht eines Hohlzylinders oder Metallrohrs nach Außendurchmesser, Wandstärke, Länge und Materialdichte.",
-    h1: "Hohlzylinder Rechner – Rohrvolumen & Gewicht berechnen",
-    shortDescription: "Ermittelt Materialvolumen und Gewicht von Rohren und zylindrischen Hülsen.",
+    metaTitle: 'Hohlzylinder Rechner – Rohr-Volumen, Wandstärke',
+    metaDescription: 'Berechnen Sie das Materialvolumen, Innen-/Außenvolumen und Gewicht eines Hohlzylinders oder Metallrohrs nach Außendurchmesser, Wandstärke',
+    h1: 'Hohlzylinder Rechner – Rohrvolumen & Gewicht berechnen',
+    shortDescription: 'Ermittelt Materialvolumen und Gewicht von Rohren und zylindrischen Hülsen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["hohlzylinder rechner volumen formel","rohr gewicht berechnen stahl kupfer","wandstaerke hohlzylinder pi r2","rohrvolumen berechnen"],
     inputs: [
           {
@@ -3549,17 +3497,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "27,04 kg (4,51 kg pro Meter)"
     },
+    content: {
+      intro: 'Dieser Rohrrechner berechnet das Materialvolumen, Wandstärken und das Rohrgewicht von metallischen oder Kunststoff-Hohlzylindern.',
+      details: 'Materialvolumen V = pi · (r_aussen² - r_innen²) · h. Das Gewicht ergibt sich durch Multiplikation des Materialvolumens mit der Materialdichte (z. B. Stahl 7,85 g/cm³, Kupfer 8,96 g/cm³).',
+    },
     faqs: [
-          {
-                "question": "Wie berechnet man das Metergewicht eines Stahlrohrs?",
-                "answer": "Faustformel für Stahlrohre: Metergewicht (kg/m) ≈ (Außendurchmesser in mm - Wandstärke in mm) × Wandstärke in mm × 0,02466."
-          },
-          {
-                "question": "Wie viel Wasser passt in ein Heizungsrohr?",
-                "answer": "Das Füllvolumen pro Meter beträgt: V = π × (Innendurchmesser in dm / 2)² × 10 Liter. Ein 22-mm-Rohr mit 1 mm Wand (20 mm innen) fasst ca. 0,31 Liter Wasser pro Meter."
-          }
+      { question: 'Wie berechnet man die Wandstärke eines Rohres?', answer: 'Wandstärke s = (Außendurchmesser - Innendurchmesser) / 2.' },
+      { question: 'Wie berechnet man das Füllvolumen (Wasserinhalt) eines Rohres?', answer: 'Das Innenvolumen entspricht einem Vollzylinder mit dem Innenradius: V_innen = pi · r_innen² · Länge.' },
     ],
-    relatedSlugs: ["zylinderrechner","kegel-volumen-rechner","quader-volumen-rechner"],
+    relatedSlugs: ['zylinderrechner', 'kegel-volumen-rechner', 'quader-volumen-rechner'],
   },
   {
     id: "pyramide-volumen-rechner",
@@ -3568,10 +3514,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Pyramide-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Pyramide Rechner – Volumen V = 1/3a²h, Mantelfläche & Oberfläche berechnen",
-    metaDescription: "Berechnen Sie das Volumen einer regelmäßigen quadratischen Pyramide (V = 1/3 · a² · h), die Seitenhöhe h_a, die Kantenlänge s und die Mantelfläche M.",
-    h1: "Pyramide Rechner – Quadratische Pyramide berechnen",
-    shortDescription: "Berechnet Volumen, Seitenkante, Mantelfläche und Gesamtoberfläche.",
+    metaTitle: 'Pyramide Rechner – Volumen V = 1/3a²h, Mantelfläche',
+    metaDescription: 'Berechnen Sie das Volumen einer regelmäßigen quadratischen Pyramide (V = 1/3 · a² · h), die Seitenhöhe h_a, die Kantenlänge s und die Mantelfläche M.',
+    h1: 'Pyramide Rechner – Quadratische Pyramide berechnen',
+    shortDescription: 'Berechnet Volumen, Seitenkante, Mantelfläche und Gesamtoberfläche mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["pyramide rechner volumen formel","quadratische pyramide oberflaeche berechnen","seitenhoehe ha pyramide pythagoras","kantenlaenge s pyramide berechnen"],
     inputs: [
           {
@@ -3645,17 +3591,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "V = 400 cm³, O = 360 cm²"
     },
+    content: {
+      intro: 'Dieser Pyramidenrechner bestimmt Rauminhalt, Mantelfläche und Gesamtoberfläche gerader Pyramiden mit quadratischer oder rechteckiger Grundfläche.',
+      details: 'Volumen V = 1/3 · Grundfläche G · Körperhöhe h. Die Cheops-Pyramide in Ägypten hatte ursprünglich eine Grundseite von ca. 230 m und eine Höhe von 146,6 m (Volumen: ca. 2,58 Millionen m³).',
+    },
     faqs: [
-          {
-                "question": "Wie groß sind die Maße der Cheops-Pyramide?",
-                "answer": "Die Cheops-Pyramide in Gizeh hatte ursprünglich eine Basiskante von ca. 230,3 Metern und eine Höhe von ca. 146,6 Metern, was einem Volumen von fast 2,6 Millionen m³ entspricht."
-          },
-          {
-                "question": "Was ist ein regelmäßiges Tetraeder?",
-                "answer": "Ein Tetraeder ist eine dreiseitige Pyramide, deren vier Flächen aus identischen gleichseitigen Dreiecken bestehen. Alle Kanten sind gleich lang."
-          }
+      { question: 'Warum lautet der Vorfaktor bei Spitzkörpern immer 1/3?', answer: 'Weil sich jeder dreidimensionale Körper mit linear zur Spitze hin abnehmendem Querschnitt mathematisch über die Integralrechnung auf exakt ein Drittel des Prismas summiert.' },
+      { question: 'Wie berechnet man die Seitenhöhe einer quadratischen Pyramide?', answer: 'Über den Satz des Pythagoras: Seitenhöhe h_s = Wurzel[h² + (a/2)²].' },
     ],
-    relatedSlugs: ["kegel-volumen-rechner","quader-volumen-rechner","dreieck-flaeche-rechner"],
+    relatedSlugs: ['kegel-volumen-rechner', 'quader-volumen-rechner', 'dreieck-flaeche-rechner'],
   },
   {
     id: "trapez-flaeche-rechner",
@@ -3664,10 +3608,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Trapez-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Trapez Rechner – Fläche A = ((a+c)/2) · h & Mittellinie m berechnen",
-    metaDescription: "Berechnen Sie den Flächeninhalt eines Trapezes über die parallelen Grundseiten a und c, die Höhe h und die Mittellinie m = (a + c) / 2 inklusive Umfang.",
-    h1: "Trapez Rechner – Flächeninhalt & Mittellinie für jedes Trapez",
-    shortDescription: "Berechnet Flächeninhalt und Mittellinie für beliebige Trapeze.",
+    metaTitle: 'Trapez Rechner – Fläche A =/2) · h – RechenHafen',
+    metaDescription: 'Berechnen Sie den Flächeninhalt eines Trapezes über die parallelen Grundseiten a und c, die Höhe h und die Mittellinie m = (a + c) / 2 inklusive Umfang.',
+    h1: 'Trapez Rechner – Flächeninhalt & Mittellinie für jedes Trapez',
+    shortDescription: 'Berechnet Flächeninhalt und Mittellinie für beliebige Trapeze mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["trapez rechner flaeche formel","trapezflaeche berechnen a c 2 mal h","mittellinie m trapez formel","trapez umfang berechnen"],
     inputs: [
           {
@@ -3768,17 +3712,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "50 cm² Flächeninhalt"
     },
+    content: {
+      intro: 'Ein Trapez ist ein ebenes Viereck mit zwei zueinander parallelen Seiten a und c.',
+      details: 'Fläche A = [(a + c) / 2] · h = Mittellinie m · Höhe h. Die Höhe h ist der senkrechte Abstand zwischen den beiden parallelen Grundseiten.',
+    },
     faqs: [
-          {
-                "question": "Wann ist ein Trapez gleichschenklig?",
-                "answer": "Ein Trapez ist gleichschenklig, wenn die beiden nicht-parallelen Schenkel b und d gleich lang sind. Dann sind auch die Basiswinkel und die beiden Diagonalen exakt gleich groß."
-          },
-          {
-                "question": "Was ist ein rechtwinkliges Trapez?",
-                "answer": "In einem rechtwinkligen Trapez steht einer der beiden Schenkel senkrecht auf den Grundseiten a und c, sodass dieser Schenkel identisch mit der Höhe h ist."
-          }
+      { question: 'Was ist ein gleichschenkliges Trapez?', answer: 'Ein Trapez, bei dem die beiden nicht-parallelen Schenkel b und d exakt gleich lang sind; es ist spiegelsymmetrisch und besitzt gleich große Basiswinkel.' },
+      { question: 'Wie berechnet man den Flächeninhalt von Grundstücken mit Trapezform?', answer: 'Messen Sie die beiden parallelen Grundstücksgrenzen a und c, addieren Sie beide, teilen Sie durch 2 und multiplizieren Sie mit dem senkrechten Grenzabstand h.' },
     ],
-    relatedSlugs: ["parallelogramm-rechner","dreieck-flaeche-rechner","rechteckrechner"],
+    relatedSlugs: ['parallelogramm-rechner', 'dreieck-flaeche-rechner', 'rechteckrechner'],
   },
   {
     id: "parallelogramm-rechner",
@@ -3787,10 +3729,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Parallelogramm-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Parallelogramm Rechner – Fläche A = a · h_a, Umfang & Winkel berechnen",
-    metaDescription: "Berechnen Sie den Flächeninhalt eines Parallelogramms (A = a · h_a = a · b · sin(α)), den Umfang (U = 2a + 2b) und die Diagonalen e und f.",
-    h1: "Parallelogramm Rechner – Flächeninhalt, Umfang & Diagonalen",
-    shortDescription: "Berechnet Flächeninhalt, Umfang und Diagonalen eines Parallelogramms.",
+    metaTitle: 'Parallelogramm Rechner – Fläche A = a · h_a, Umfang',
+    metaDescription: 'Berechnen Sie den Flächeninhalt eines Parallelogramms (A = a · h_a = a · b · sin(α)), den Umfang (U = 2a + 2b) und die Diagonalen e und f.',
+    h1: 'Parallelogramm Rechner – Flächeninhalt, Umfang & Diagonalen',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonalen eines Parallelogramms mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["parallelogramm rechner flaeche formel","parallelogramm umfang 2a plus 2b","parallelogramm flaeche a mal ha","diagonalen parallelogramm kosinussatz"],
     inputs: [
           {
@@ -3884,17 +3826,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "A = 51,96 cm², U = 32 cm"
     },
+    content: {
+      intro: 'Ein Parallelogramm (Raute/Rhomboid) ist ein Viereck, bei dem die jeweils gegenüberliegenden Seiten parallel und gleich lang sind.',
+      details: 'Fläche A = Grundseite a · Höhe h_a = a · b · sin(alpha). Umfang U = 2 · (a + b). Gegenüberliegende Innenwinkel sind exakt gleich groß; benachbarte Winkel ergänzen sich zu 180°.',
+    },
     faqs: [
-          {
-                "question": "Was ist die Parallelogrammgleichung?",
-                "answer": "Die Parallelogrammgleichung besagt, dass die Summe der Quadrate über den vier Seiten gleich der Summe der Quadrate der beiden Diagonalen ist: 2(a² + b²) = e² + f²."
-          },
-          {
-                "question": "Ist jedes Rechteck ein Parallelogramm?",
-                "answer": "Ja, ein Rechteck ist ein spezielles Parallelogramm, bei dem alle vier Innenwinkel genau 90° betragen."
-          }
+      { question: 'Warum darf man für die Fläche nicht einfach Seite a mal Seite b rechnen?', answer: 'Weil a · b nur bei einem rechtwinkligen Rechteck die Fläche ergibt; bei schiefen Winkeln ist die senkrechte Höhe h_a stets kürzer als die Schenkelseite b (h_a = b · sin(alpha)).' },
+      { question: 'Halbieren sich die Diagonalen im Parallelogramm gegenseitig?', answer: 'Ja, in jedem Parallelogramm schneiden sich die beiden Diagonalen e und f exakt in ihren jeweiligen Mittelpunkten.' },
     ],
-    relatedSlugs: ["trapez-flaeche-rechner","rhombus-raute-rechner","rechteckrechner"],
+    relatedSlugs: ['trapez-flaeche-rechner', 'rhombus-raute-rechner', 'rechteckrechner'],
   },
   {
     id: "rhombus-raute-rechner",
@@ -3903,10 +3843,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Raute-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Raute Rechner – Rhombus Fläche A = (e · f) / 2, Umfang & Seite berechnen",
-    metaDescription: "Berechnen Sie Flächeninhalt einer Raute (A = (e · f) / 2), die Seitenlänge a, den Umfang (U = 4a) und den Inkreisradius aus den Diagonalen e und f.",
-    h1: "Raute Rechner – Flächeninhalt, Seitenlänge & Umfang eines Rhombus",
-    shortDescription: "Berechnet Fläche, Umfang und Seitenlänge einer Raute aus den Diagonalen.",
+    metaTitle: 'Raute Rechner – Rhombus Fläche A = / 2, Umfang',
+    metaDescription: 'Berechnen Sie Flächeninhalt einer Raute (A = (e · f) / 2), die Seitenlänge a, den Umfang (U = 4a) und den Inkreisradius aus den Diagonalen e und f.',
+    h1: 'Raute Rechner – Flächeninhalt, Seitenlänge & Umfang eines Rhombus',
+    shortDescription: 'Berechnet Fläche, Umfang und Seitenlänge einer Raute aus den Diagonalen.',
     searchKeywords: ["raute rechner flaeche diagonalen e f","rhombus flaeche formel 1 halbe e mal f","seitenlaenge raute berechnen pythagoras","umfang raute 4a"],
     inputs: [
           {
@@ -3977,17 +3917,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "A = 48 cm², a = 7,21 cm"
     },
+    content: {
+      intro: 'Ein Rhombus (Raute) ist ein Parallelogramm mit vier gleich langen Seiten, dessen Diagonalen sich senkrecht schneiden.',
+      details: 'Fläche A = a · h = (e · f) / 2, wobei e und f die Längen der beiden senkrecht aufeinander stehenden Diagonalen sind. Umfang U = 4 · a.',
+    },
     faqs: [
-          {
-                "question": "Stehen die Diagonalen in jeder Raute senkrecht aufeinander?",
-                "answer": "Ja, das ist das zentrale geometrische Kennzeichen jeder Raute: e und f schneiden sich stets im 90°-Winkel und halbieren zugleich die Innenwinkel."
-          },
-          {
-                "question": "Ist ein Quadrat auch eine Raute?",
-                "answer": "Ja, ein Quadrat ist eine spezielle Raute, bei der alle vier Innenwinkel 90° betragen (und somit beide Diagonalen exakt gleich lang sind)."
-          }
+      { question: 'Was ist der Unterschied zwischen Rhombus und Quadrat?', answer: 'Jedes Quadrat ist ein Rhombus mit rechten Winkeln (90°); ein allgemeiner Rhombus besitzt schiefe Innenwinkel ungleich 90°.' },
+      { question: 'Wie berechnet man die Seitenlänge a aus den Diagonalen?', answer: 'Über den Satz des Pythagoras im Teildreieck: a = Wurzel[(e/2)² + (f/2)²].' },
     ],
-    relatedSlugs: ["parallelogramm-rechner","trapez-flaeche-rechner","dreieck-flaeche-rechner"],
+    relatedSlugs: ['parallelogramm-rechner', 'trapez-flaeche-rechner', 'dreieck-flaeche-rechner'],
   },
   {
     id: "kugel-oberflaeche-rechner",
@@ -3996,10 +3934,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kugel-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Kugel Rechner – Kugelvolumen V = 4/3πr³ & Kugeloberfläche berechnen",
-    metaDescription: "Berechnen Sie Kugelvolumen (V = 4/3 · π · r³), Kugeloberfläche (O = 4 · π · r²), Durchmesser und Kreisumfang nach Radius oder Durchmesser.",
-    h1: "Kugel Rechner – Kugelvolumen & Kugeloberfläche berechnen",
-    shortDescription: "Berechnet Kugelvolumen, Oberfläche und Umfang aus dem Radius.",
+    metaTitle: 'Kugel Rechner – Kugelvolumen V = 4/3πr³',
+    metaDescription: 'Berechnen Sie Kugelvolumen (V = 4/3 · π · r³), Kugeloberfläche (O = 4 · π · r²), Durchmesser und Kreisumfang nach Radius oder Durchmesser.',
+    h1: 'Kugel Rechner – Kugelvolumen & Kugeloberfläche berechnen',
+    shortDescription: 'Berechnet Kugelvolumen, Oberfläche und Umfang aus dem Radius mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kugel rechner volumen formel 4 drittel pi r3","kugeloberflaeche berechnen 4 pi r2","kugel volumen radius durchmesser","kugelumfang grosskreis berechnen"],
     inputs: [
           {
@@ -4077,17 +4015,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "V = 4.188,79 cm³, O = 1.256,64 cm²"
     },
+    content: {
+      intro: 'Dieser Kugelrechner bestimmt Rauminhalt (Volumen) und Kugeloberfläche nach den klassischen Gesetzen des Archimedes.',
+      details: 'Volumen V = 4/3 · pi · r³. Oberfläche O = 4 · pi · r² = pi · d². Die Kugel besitzt von allen geometrischen Körpern das kleinste Oberflächen-zu-Volumen-Verhältnis (minimale Wärmeverluste).',
+    },
     faqs: [
-          {
-                "question": "Wie verhält sich das Kugelvolumen bei Verdopplung des Radius?",
-                "answer": "Da der Radius in der dritten Potenz (r³) steht, verachtfacht (2³ = 8) sich das Kugelvolumen bei einer Verdoppelung des Radius! Die Oberfläche vervierfacht (2² = 4) sich."
-          },
-          {
-                "question": "Wer entdeckte die Kugelformeln?",
-                "answer": "Archimedes von Syrakus bewies im 3. Jahrhundert v. Chr., dass das Volumen und die Oberfläche einer Kugel genau 2/3 des umbeschriebenen Zylinders betragen."
-          }
+      { question: 'Welches Volumen hat die Erdkugel näherungsweise?', answer: 'Bei einem mittleren Erdradius von r ≈ 6.371 km beträgt das Erdvolumen ca. 1,083 Billionen Kubikkilometer (1,083 · 10¹² km³).' },
+      { question: 'Wie verhält sich die Oberfläche einer Kugel zu ihrem Großkreis?', answer: 'Die Oberfläche einer Kugel entspricht exakt der vierfachen Fläche ihres größten Schnittkreises (4 · pi · r²).' },
     ],
-    relatedSlugs: ["kreisrechner","kegel-volumen-rechner","zylinderrechner"],
+    relatedSlugs: ['torus-volumen-rechner', 'kreisrechner', 'kegel-volumen-rechner', 'zylinderrechner'],
   },
   {
     id: "quader-volumen-rechner",
@@ -4096,10 +4032,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Quader-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Quader Rechner – Volumen V = a · b · c, Oberfläche & Raumdiagonale",
-    metaDescription: "Berechnen Sie das Quadervolumen (V = a · b · c), die Gesamtoberfläche (O = 2(ab + bc + ca)) und die 3D-Raumdiagonale d = √(a² + b² + c²) nach den Kantenlängen.",
-    h1: "Quader Rechner – Volumen, Oberfläche & Raumdiagonale berechnen",
-    shortDescription: "Berechnet Volumen, Oberfläche und Raumdiagonale eines Quaders.",
+    metaTitle: 'Quader Rechner – Volumen V = a · b · c, Oberfläche',
+    metaDescription: 'Berechnen Sie das Quadervolumen (V = a · b · c), die Gesamtoberfläche (O = 2(ab + bc + ca)) und die 3D-Raumdiagonale d = √(a² + b² + c²) nach den.',
+    h1: 'Quader Rechner – Volumen, Oberfläche & Raumdiagonale berechnen',
+    shortDescription: 'Berechnet Volumen, Oberfläche und Raumdiagonale eines Quaders mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["quader rechner volumen a b c","quader oberflaeche formel berechnen","raumdiagonale quader pythagoras 3d","quader kantenlaenge volumen"],
     inputs: [
           {
@@ -4182,17 +4118,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "V = 240 cm³, O = 248 cm², d = 12,33 cm"
     },
+    content: {
+      intro: 'Der Quaderrechner berechnet Rauminhalt, Gesamtoberfläche, Kantenlänge und Raumdiagonale rechtwinkliger Schachteln, Räume und Container.',
+      details: 'Volumen V = a · b · c. Oberfläche O = 2 · (ab + bc + ac). Raumdiagonale d = Wurzel(a² + b² + c²). 1 m³ entspricht genau 1.000 Litern Rauminhalt.',
+    },
     faqs: [
-          {
-                "question": "Wann ist ein Quader ein Würfel?",
-                "answer": "Ein Quader ist ein Würfel (Hexaeder), wenn alle drei Kantenlängen gleich lang sind (a = b = c). Dann gilt V = a³ und O = 6a²."
-          },
-          {
-                "question": "Wie viele Ecken, Kanten und Flächen hat ein Quader?",
-                "answer": "Ein Quader besitzt genau 8 rechtwinklige Ecken, 12 Kanten und 6 paarweise zueinander parallele und kongruente Rechteckflächen."
-          }
+      { question: 'Passt eine 2,50 m lange Latte in einen Karton mit 2 × 1 × 1 Meter?', answer: 'Raumdiagonale d = Wurzel(2² + 1² + 1²) = Wurzel(4 + 1 + 1) = Wurzel(6) ≈ 2,45 Meter. Nein, die Latte ist ca. 5 cm zu lang.' },
+      { question: 'Wie viele 20-Fuß-Seecontainer (ca. 33 m³ Innenvolumen) benötigt man für 100 m³ Frachtgut?', answer: '100 / 33 = 3,03; es werden mindestens 4 Container benötigt.' },
     ],
-    relatedSlugs: ["rechteckrechner","pyramide-volumen-rechner","zylinderrechner"],
+    relatedSlugs: ['prisma-volumen-rechner', 'rechteckrechner', 'pyramide-volumen-rechner', 'zylinderrechner'],
   },
   {
     id: "prisma-volumen-rechner",
@@ -4201,10 +4135,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Prisma-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Prisma Rechner – Prisma Volumen V = G · h & Gesamtoberfläche berechnen",
-    metaDescription: "Berechnen Sie das Volumen eines geraden Dreiecksprismas oder allgemeinen Prismas (V = Grundfläche · Höhe), die Mantelfläche und die Gesamtoberfläche O = 2G + M.",
-    h1: "Prisma Rechner – Volumen & Oberfläche für Dreiecksprismen",
-    shortDescription: "Berechnet Volumen, Mantelfläche und Oberfläche von geraden Prismen.",
+    metaTitle: 'Prisma Rechner – Prisma Volumen V = G · h',
+    metaDescription: 'Berechnen Sie das Volumen eines geraden Dreiecksprismas oder allgemeinen Prismas (V = Grundfläche · Höhe), die Mantelfläche und die Gesamtoberfläche O.',
+    h1: 'Prisma Rechner – Volumen & Oberfläche für Dreiecksprismen',
+    shortDescription: 'Berechnet Volumen, Mantelfläche und Oberfläche von geraden Prismen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["prisma rechner volumen formel grundflaeche hoehe","dreiecksprisma volumen berechnen","prisma oberflaeche 2g plus m","mantelflaeche prisma berechnen"],
     inputs: [
           {
@@ -4284,17 +4218,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "V = 375 cm³, O = 380 cm²"
     },
+    content: {
+      intro: 'Ein gerades Prisma ist ein geometrischer Körper mit zwei kongruenten Vielecken als Grund- und Deckfläche und rechteckigen Mantelflächen.',
+      details: 'Volumen V = Grundfläche G · Höhe h. Gesamtoberfläche O = 2 · G + Mantelfläche M (wobei M = Umfang der Grundfläche · Höhe).',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Zylinder und Prisma?",
-                "answer": "Ein Zylinder hat einen Kreis als Grundfläche, während ein Prisma ein beliebiges Vieleck (Dreieck, Viereck, Sechseck etc.) als Grundfläche besitzt. Die Volumenformel V = G · h ist für beide identisch!"
-          },
-          {
-                "question": "Gilt die Formel V = G · h auch für schiefe Prismen?",
-                "answer": "Ja, nach dem Prinzip von Cavalieri gilt V = G · h für alle Prismen, solange h der senkrechte Abstand zwischen Grund- und Deckfläche ist."
-          }
+      { question: 'Gilt die Formel V = G · h für jedes Prisma unabhängig von der Grundflächenform?', answer: 'Ja, völlig universell: Egal ob die Grundfläche ein Dreieck, Fünfeck oder unregelmäßiges Trapez ist, das Volumen ist immer Grundfläche mal Höhe.' },
+      { question: 'Was ist ein optisches Prisma in der Physik?', answer: 'Ein dreiseitiges Glasprisma, das weißes Sonnenlicht durch wellenlängenabhängige Lichtbrechung (Dispersion) in seine Spektralfarben auffächert.' },
     ],
-    relatedSlugs: ["zylinderrechner","quader-volumen-rechner","dreieck-flaeche-rechner"],
+    relatedSlugs: ['zylinderrechner', 'quader-volumen-rechner', 'dreieck-flaeche-rechner'],
   },
   {
     id: "sechseck-polygon-rechner",
@@ -4303,10 +4235,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Sechseck-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Sechseck Rechner – Regelmäßiges Hexagon Fläche A, Umfang & Inkreis",
-    metaDescription: "Berechnen Sie die Fläche eines regelmäßigen Sechsecks (A = (3√3 / 2) · a²), den Umfang (U = 6a), den Inkreisradius r_i und den Umkreisradius r_u = a.",
-    h1: "Sechseck Rechner – Hexagon Flächeninhalt & Inkreis berechnen",
-    shortDescription: "Berechnet Fläche, Umfang, Inkreis- und Umkreisradius eines Sechsecks.",
+    metaTitle: 'Sechseck Rechner – Regelmäßiges Hexagon Fläche A, Umfang',
+    metaDescription: 'Berechnen Sie die Fläche eines regelmäßigen Sechsecks (A = (3√3 / 2) · a²), den Umfang (U = 6a), den Inkreisradius r_i und den Umkreisradius r_u = a.',
+    h1: 'Sechseck Rechner – Hexagon Flächeninhalt & Inkreis berechnen',
+    shortDescription: 'Berechnet Fläche, Umfang, Inkreis- und Umkreisradius eines Sechsecks mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["sechseck rechner flaeche formel hexagon","regelmaessiges sechseck inkreisradius umkreisradius","flaecheninhalt sechseck 3 wurzel 3 halbe a2","hexagon umfang 6a"],
     inputs: [
           {
@@ -4362,17 +4294,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "A = 166,28 cm², U = 48 cm, r_i = 6,93 cm"
     },
+    content: {
+      intro: 'Das regelmäßige Sechseck (Hexagon) besteht aus sechs lückenlos aneinandergefügten, gleichseitigen Dreiecken und kommt häufig in der Natur (Bienenwaben, Schneeflocken) vor.',
+      details: 'Fläche A = (3 · Wurzel(3) / 2) · a² ≈ 2,598 · a². Umfang U = 6 · a. Der Inkreisradius entspricht r_i = (Wurzel(3) / 2) · a, der Umkreisradius r_u ist exakt gleich der Seitenlänge a.',
+    },
     faqs: [
-          {
-                "question": "Warum bauen Bienen sechseckige Waben?",
-                "answer": "Das Sechseck ist mathematisch die geometrische Figur, die eine Fläche mit dem geringstmöglichen Umfang lückenlos parkettiert. Dadurch sparen Bienen maximal Wachs und Energie."
-          },
-          {
-                "question": "Was ist die Schlüsselweite bei einer Sechskantschraube?",
-                "answer": "Die Schlüsselweite (SW) ist der parallele Abstand zweier gegenüberliegender Seiten des Sechskants und entspricht exakt dem doppelten Inkreisradius: SW = a · √3."
-          }
+      { question: 'Warum bauen Bienen ihre Waben sechseckig?', answer: 'Das Sechseck ist die mathematisch effizienteste Form für lückenlose Parkettierungen: Es maximiert das Speichervolumen bei minimalem Wachs-Umfang (Bienenwaben-Satz).' },
+      { question: 'Welche Schlüsselweite (SW) hat eine Sechskantschraube mit Seitenlänge 10 mm?', answer: 'Die Schlüsselweite entspricht dem doppelten Inkreisradius: SW = Wurzel(3) · a ≈ 1,732 · 10 mm ≈ 17,32 mm (Standard M10 nutzt typisch SW 16 oder 17).' },
     ],
-    relatedSlugs: ["dreieck-flaeche-rechner","kreis-umfang-rechner","rechteckrechner"],
+    relatedSlugs: ['dreieck-flaeche-rechner', 'kreis-umfang-rechner', 'rechteckrechner'],
   },
   {
     id: "ellipse-flaeche-rechner",
@@ -4381,10 +4311,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Ellipse-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Ellipse Rechner – Ellipsenfläche A = πab & Umfang nach Ramanujan",
-    metaDescription: "Berechnen Sie die Fläche einer Ellipse (A = π · a · b), den präzisen Umfang nach der Ramanujan-Formel und die lineare Exzentrizität aus den Halbachsen a und b.",
-    h1: "Ellipse Rechner – Ellipsenfläche, Umfang & Brennpunkte",
-    shortDescription: "Berechnet Flächeninhalt, Umfang und Brennpunkte einer Ellipse.",
+    metaTitle: 'Ellipse Rechner – Ellipsenfläche A = πab',
+    metaDescription: 'Berechnen Sie die Fläche einer Ellipse (A = π · a · b), den präzisen Umfang nach der Ramanujan-Formel und die lineare Exzentrizität aus den Halbachsen.',
+    h1: 'Ellipse Rechner – Ellipsenfläche, Umfang & Brennpunkte',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang und Brennpunkte einer Ellipse mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["ellipse rechner flaeche formel pi a b","ellipsenumfang ramanujan naeherung","halbachsen a b ellipse berechnen","lineare exzentrizitaet brennpunkt ellipse"],
     inputs: [
           {
@@ -4455,17 +4385,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "A = 188,50 cm², U = 51,05 cm"
     },
+    content: {
+      intro: 'Eine Ellipse ist eine gestreckte Kreisform mit einer großen Halbachse a und einer kleinen Halbachse b.',
+      details: 'Flächeninhalt A = pi · a · b. Sind beide Halbachsen gleich groß (a = b = r), geht die Ellipsenformel direkt in die Kreisflächenformel pi · r² über.',
+    },
     faqs: [
-          {
-                "question": "Wo liegen die Brennpunkte einer Ellipse?",
-                "answer": "Die beiden Brennpunkte F1 und F2 liegen symmetrisch auf der Hauptachse im Abstand e = √(a² - b²) vom Zentrum. Für jeden Punkt auf der Ellipse ist die Summe der Abstände zu den beiden Brennpunkten konstant 2a."
-          },
-          {
-                "question": "Was besagt das 1. Keplersche Gesetz?",
-                "answer": "Die Planeten unseres Sonnensystems bewegen sich auf elliptischen Bahnen um die Sonne, wobei die Sonne in einem der beiden Brennpunkte steht."
-          }
+      { question: 'Warum lässt sich der Umfang einer Ellipse nicht mit einer einfachen Formel exakt berechnen?', answer: 'Der Umfang einer Ellipse erfordert elliptische Integrale zweiter Art; in der Praxis nutzt man sehr genaue Näherungsformeln von Ramanujan: U ≈ pi · [3(a+b) - Wurzel((3a+b)(a+3b))].' },
+      { question: 'Was besagt das 1. Keplersche Gesetz über Planetenbahnen?', answer: 'Alle Planeten unseres Sonnensystems bewegen sich auf elliptischen Bahnen um die Sonne, wobei die Sonne in einem der beiden Brennpunkte der Ellipse steht.' },
     ],
-    relatedSlugs: ["kreis-umfang-rechner","kreisrechner","rechteckrechner"],
+    relatedSlugs: ['kreis-umfang-rechner', 'kreisrechner', 'rechteckrechner'],
   },
   {
     id: "kreissegment-rechner",
@@ -4474,10 +4402,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kreissektor & Segment",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Kreissektor & Segment Rechner – Bogenlänge, Sehnenlänge & Fläche",
-    metaDescription: "Berechnen Sie Kreissektor (Tortenstück), Bogenlänge b = (α/180)·π·r, Sehnenlänge s = 2r·sin(α/2) und die Kreissegment-Fläche aus Radius und Mittelpunktswinkel.",
-    h1: "Kreissektor & Kreissegment Rechner – Bogenlänge & Teilflächen",
-    shortDescription: "Berechnet Kreissektor, Kreissegment, Bogenlänge und Sehnenlänge.",
+    metaTitle: 'Kreissektor & Segment Rechner – Bogenlänge, Sehnenlänge',
+    metaDescription: 'Berechnen Sie Kreissektor (Tortenstück), Bogenlänge b = (α/180)·π·r, Sehnenlänge s = 2r·sin(α/2) und die Kreissegment-Fläche aus Radius und.',
+    h1: 'Kreissektor & Kreissegment Rechner – Bogenlänge & Teilflächen',
+    shortDescription: 'Berechnet Kreissektor, Kreissegment, Bogenlänge und Sehnenlänge mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kreissektor rechner flaeche bogenlaenge","kreissegment berechnen radius sehne","bogenlaenge b alpha 180 pi r","sehnenlaenge kreis berechnen formel"],
     inputs: [
           {
@@ -4549,17 +4477,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "b = 10,47 cm, Sektor = 52,36 cm², Segment = 9,06 cm²"
     },
+    content: {
+      intro: 'Ein Kreissegment (Kreisabschnitt) ist die Fläche zwischen einer Kreissehne und dem dazugehörigen Kreisbogen.',
+      details: 'Fläche A = 1/2 · r² · (alpha_rad - sin(alpha)). Segmenthöhe h = r · (1 - cos(alpha / 2)). Wichtig für die Füllstandsberechnung liegender zylindrischer Tanks.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Sektor und Segment?",
-                "answer": "Der Sektor wird vom Kreisbogen und zwei Radien begrenzt (wie ein Stück Pizza). Das Segment wird vom Kreisbogen und der geraden Sehne begrenzt (wie die abgeschnittene Kappe eines Kreises)."
-          },
-          {
-                "question": "Wie berechnet man den Bogen im Bogenmaß (Radiant)?",
-                "answer": "Im Bogenmaß gilt einfach b = r · φ (Winkel im Radiant). Es ist keine Umrechnung über 180° oder Pi nötig."
-          }
+      { question: 'Wie berechnet man den Füllstand in einem liegenden Öltank?', answer: 'Über die Kreissegmentfläche des Tankquerschnitts multipliziert mit der Tanklänge; das Segment ändert sein Volumen nicht-linear zur Füllhöhe.' },
+      { question: 'Was ist der Unterschied zwischen Kreissektor und Kreissegment?', answer: 'Ein Kreissektor (Tortenstück) reicht bis zum Kreismittelpunkt; ein Kreissegment ist nur der abgeschnittene Bogenbereich jenseits der Sehne.' },
     ],
-    relatedSlugs: ["kreis-umfang-rechner","kreisrechner","dreieck-flaeche-rechner"],
+    relatedSlugs: ['kreis-umfang-rechner', 'kreisrechner', 'dreieck-flaeche-rechner'],
   },
   {
     id: "bogenmass-grad-rechner",
@@ -4568,10 +4494,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Winkelumrechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Winkelumrechner – Grad [°], Bogenmaß [rad] & Neugrad [gon] umrechnen",
-    metaDescription: "Rechnen Sie Winkel sekundenschnell um zwischen Altgrad (0°-360°), Bogenmaß Radiant (0-2π rad) und Neugrad Gon (0-400 gon) inklusive Sinus- und Kosinus-Werten.",
-    h1: "Winkelumrechner – Grad, Radiant & Gon präzise umrechnen",
-    shortDescription: "Konvertiert Winkel zwischen Grad (°), Radiant (rad) und Neugrad (gon).",
+    metaTitle: 'Winkelumrechner – Grad [°], Bogenmaß [rad]',
+    metaDescription: 'Rechnen Sie Winkel sekundenschnell um zwischen Altgrad (0°-360°), Bogenmaß Radiant (0-2π rad) und Neugrad Gon (0-400 gon) inklusive Sinus- und.',
+    h1: 'Winkelumrechner – Grad, Radiant & Gon präzise umrechnen',
+    shortDescription: 'Konvertiert Winkel zwischen Grad (°), Radiant (rad) und Neugrad (gon).',
     searchKeywords: ["winkel umrechnen grad rad radiant","bogenmass in grad umrechnen pi","neugrad gon grad rechner","sinus kosinus winkel berechnen"],
     inputs: [
           {
@@ -4647,17 +4573,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "1,5708 rad = 100 gon"
     },
+    content: {
+      intro: 'Dieser Winkelumrechner transformiert ebene Winkel zwischen dem bürgerlichen Gradmaß (360° Vollkreis) und dem mathematischen Bogenmaß (Radiant, 2pi Vollkreis).',
+      details: 'Umrechnungsformeln: Radiant = Grad · (pi / 180°); Grad = Radiant · (180° / pi). 1 Radiant entspricht ca. 57,2958° (Winkel, bei dem die Bogenlänge exakt dem Radius entspricht).',
+    },
     faqs: [
-          {
-                "question": "Warum nutzt die höhere Mathematik das Bogenmaß?",
-                "answer": "Im Bogenmaß entsprechen Ableitungen trigonometrischer Funktionen einfachen Ausdrücken ohne Umrechnungsfaktoren: d/dx sin(x) = cos(x) gilt exakt nur, wenn x im Radiant gemessen wird."
-          },
-          {
-                "question": "Wo wird Neugrad (Gon) verwendet?",
-                "answer": "Neugrad wird vor allem im Vermessungswesen (Geodäsie) verwendet, da der rechte Winkel genau 100 Gon beträgt und Dezimalrechnungen stark vereinfacht."
-          }
+      { question: 'Warum rechnen Naturwissenschaften und Programmiersprachen bevorzugt in Radiant?', answer: 'Weil sich trigonometrische Ableitungen (z. B. d/dx sin(x) = cos(x)) und Taylor-Reihen nur im Bogenmaß ohne störende Korrekturfaktoren wie pi/180 formulieren lassen.' },
+      { question: 'Welchem Bogenmaß entsprechen 90° und 180°?', answer: '90° entsprechen exakt pi/2 Radiant (ca. 1,5708 rad); 180° entsprechen exakt pi Radiant (ca. 3,1416 rad).' },
     ],
-    relatedSlugs: ["kreissegment-rechner","dreieck-flaeche-rechner","kreis-umfang-rechner"],
+    relatedSlugs: ['kreissegment-rechner', 'dreieck-flaeche-rechner', 'kreis-umfang-rechner', 'sinussatz-kosinussatz-rechner'],
   },
   {
     id: "satz-des-pythagoras-rechner",
@@ -4666,10 +4590,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Pythagoras-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Satz des Pythagoras Rechner – a² + b² = c² Katheten & Hypotenuse",
-    metaDescription: "Berechnen Sie Hypotenuse c oder Kathete a/b im rechtwinkligen Dreieck nach dem Satz des Pythagoras a² + b² = c² inklusive Höhen- und Kathetensatz.",
-    h1: "Satz des Pythagoras Rechner – a² + b² = c² sofort berechnen",
-    shortDescription: "Berechnet Hypotenuse oder Kathete im rechtwinkligen Dreieck.",
+    metaTitle: 'Satz des Pythagoras Rechner – a² + b² = c² Katheten',
+    metaDescription: 'Berechnen Sie Hypotenuse c oder Kathete a/b im rechtwinkligen Dreieck nach dem Satz des Pythagoras a² + b² = c² inklusive Höhen- und Kathetensatz.',
+    h1: 'Satz des Pythagoras Rechner – a² + b² = c² sofort berechnen',
+    shortDescription: 'Berechnet Hypotenuse oder Kathete im rechtwinkligen Dreieck mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["satz des pythagoras rechner formel","a2 plus b2 gleich c2 rechner","hypotenuse berechnen rechtwinkliges dreieck","kathete a b pythagoras formel"],
     inputs: [
           {
@@ -4771,17 +4695,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "c = 5 cm Hypotenuse"
     },
+    content: {
+      intro: 'Dieser Geometrierechner berechnet Katheten und Hypotenuse rechtwinkliger Dreiecke und prüft Dreiecke auf Rechtwinkligkeit (Kehrsatz des Pythagoras).',
+      details: 'Hypotenuse c = Wurzel(a² + b²); Kathete a = Wurzel(c² - b²). Gilt a² + b² = c², ist der eingeschlossene Winkel gamma garantiert exakt 90 Grad.',
+    },
     faqs: [
-          {
-                "question": "Was sind pythagoreische Tripel?",
-                "answer": "Das sind ganzzahlige Lösungen der Gleichung a² + b² = c². Bekannte Tripel sind (3, 4, 5), (5, 12, 13), (8, 15, 17) und (7, 24, 25) sowie deren Vielfache."
-          },
-          {
-                "question": "Gilt der Satz des Pythagoras auch bei stumpfwinkligen Dreiecken?",
-                "answer": "Nein, der Satz des Pythagoras gilt streng nur bei Dreiecken mit genau einem 90°-Winkel. Für allgemeine Dreiecke gilt der verallgemeinerte Kosinussatz c² = a² + b² - 2ab·cos(γ)."
-          }
+      { question: 'Wie prüften schon die alten Ägypter rechte Winkel auf Feldern?', answer: 'Mit einer Zwölfknotenschnur mit den Knotenabständen 3, 4 und 5 Einheiten; aufgespannt bildet sie zwingend einen perfekten 90-Grad-Winkel.' },
+      { question: 'Welche Kathetenlänge hat ein gleichschenklig-rechtwinkliges Dreieck mit c = 10 cm?', answer: 'a = b = c / Wurzel(2) = 10 / 1,4142 ≈ 7,07 cm.' },
     ],
-    relatedSlugs: ["dreieck-flaeche-rechner","sinussatz-kosinussatz-rechner","rechteckrechner"],
+    relatedSlugs: ['dreiecks-hoehen-rechner', 'vektor-skalarprodukt-rechner', 'dreieck-flaeche-rechner', 'sinussatz-kosinussatz-rechner', 'rechteckrechner'],
   },
   {
     id: "sinussatz-kosinussatz-rechner",
@@ -4790,10 +4712,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Sinus- & Kosinussatz",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Sinussatz & Kosinussatz Rechner – Dreiecksberechnung Seiten & Winkel",
-    metaDescription: "Lösen Sie beliebige Dreiecke mit dem Sinussatz (a/sin(α) = b/sin(β)) und Kosinussatz (c² = a² + b² - 2ab·cos(γ)) nach SSS, SWS, WSW oder SSW.",
-    h1: "Sinussatz & Kosinussatz Rechner – Allgemeines Dreieck berechnen",
-    shortDescription: "Berechnet Seiten und Winkel in beliebigen Dreiecken.",
+    metaTitle: 'Sinussatz & Kosinussatz Rechner – Dreiecksberechnung Seiten',
+    metaDescription: 'Lösen Sie beliebige Dreiecke mit dem Sinussatz (a/sin(α) = b/sin(β)) und Kosinussatz (c² = a² + b² - 2ab·cos(γ)) nach SSS, SWS, WSW oder SSW.',
+    h1: 'Sinussatz & Kosinussatz Rechner – Allgemeines Dreieck berechnen',
+    shortDescription: 'Berechnet Seiten und Winkel in beliebigen Dreiecken mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["sinussatz rechner dreieck a sin alpha","kosinussatz rechner c2 a2 b2","dreieck aufloesen sws sss","innenwinkel dreieck trigonometrie"],
     inputs: [
           {
@@ -4882,17 +4804,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "c = 7,82 cm"
     },
+    content: {
+      intro: 'Sinussatz und Kosinussatz berechnen unbekannte Seiten und Winkel in beliebigen schiefwinkligen Dreiecken ohne rechten Winkel.',
+      details: 'Sinussatz: a / sin(alpha) = b / sin(beta) = c / sin(gamma) = 2R (Umkreisdurchmesser). Kosinussatz: c² = a² + b² - 2ab · cos(gamma) (Verallgemeinerung des Satzes des Pythagoras).',
+    },
     faqs: [
-          {
-                "question": "Wann verwendet man den Sinussatz und wann den Kosinussatz?",
-                "answer": "Den Kosinussatz verwendet man bei SSS (drei Seiten bekannt) und SWS (zwei Seiten und der eingeschlossene Winkel). Den Sinussatz verwendet man bei WSW (eine Seite und zwei Winkel) sowie SSW."
-          },
-          {
-                "question": "Was ist der mehrdeutige Fall beim Sinussatz?",
-                "answer": "Wenn zwei Seiten und ein der kleineren Seite gegenüberliegender Winkel gegeben sind (Ssw), kann es zwei verschiedene Dreiecke (spitzwinklig oder stumpfwinklig) geben."
-          }
+      { question: 'Wann wendet man den Sinussatz und wann den Kosinussatz an?', answer: 'Kosinussatz: Wenn alle drei Seiten (SSS) oder zwei Seiten und der eingeschlossene Winkel (SWS) gegeben sind. Sinussatz: Wenn eine Seite und zwei Winkel (WSW/SWW) oder zwei Seiten und der Gegenwinkel gegeben sind.' },
+      { question: 'Was ist der mehrdeutige Fall (SSW) beim Sinussatz?', answer: 'Wenn der gegebene Winkel der kleineren der beiden Seiten gegenüberliegt; in diesem Fall kann es zwei mathematisch gültige Dreiecke (spitz- und stumpfwinklig) geben.' },
     ],
-    relatedSlugs: ["satz-des-pythagoras-rechner","dreieck-flaeche-rechner","bogenmass-grad-rechner"],
+    relatedSlugs: ['vektor-skalarprodukt-rechner', 'satz-des-pythagoras-rechner', 'dreieck-flaeche-rechner', 'bogenmass-grad-rechner'],
   },
   {
     id: "vektor-skalarprodukt-rechner",
@@ -4901,10 +4821,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Skalarprodukt-Rechner",
     category: "geometrie",
     subcategory: "Vektorrechnung",
-    metaTitle: "Skalarprodukt Rechner – Vektoren 3D, Skalarprodukt & Winkel berechnen",
-    metaDescription: "Berechnen Sie das Skalarprodukt zweier 3D-Vektoren (a · b = ax·bx + ay·by + az·bz), deren Beträge (Längen) und den eingeschlossenen Schnittwinkel in Grad.",
-    h1: "Skalarprodukt Rechner – Skalarprodukt, Vektorbetrag & Schnittwinkel",
-    shortDescription: "Berechnet Skalarprodukt, Betrag und Schnittwinkel zweier 3D-Vektoren.",
+    metaTitle: 'Skalarprodukt Rechner – Vektoren 3D, Skalarprodukt',
+    metaDescription: 'Berechnen Sie das Skalarprodukt zweier 3D-Vektoren (a · b = ax·bx + ay·by + az·bz), deren Beträge (Längen) und den eingeschlossenen Schnittwinkel in Grad.',
+    h1: 'Skalarprodukt Rechner – Skalarprodukt, Vektorbetrag & Schnittwinkel',
+    shortDescription: 'Berechnet Skalarprodukt, Betrag und Schnittwinkel zweier 3D-Vektoren mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["skalarprodukt rechner 3d vektoren","vektor schnittwinkel berechnen cosinus","betrag vektor laenge sqrt ax2 ay2 az2","orthogonale vektoren skalarprodukt null"],
     inputs: [
           {
@@ -5022,17 +4942,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "Skalarprodukt = 0 (orthogonale Vektoren)"
     },
+    content: {
+      intro: 'Das Skalarprodukt zweier Vektoren multipliziert einander entsprechende Komponenten und verknüpft Vektorgeometrie mit Winkelmessungen.',
+      details: 'Skalarprodukt a · b = a1·b1 + a2·b2 + a3·b3 = |a| · |b| · cos(phi). Stehen zwei Vektoren senkrecht (orthogonal) aufeinander, ist ihr Skalarprodukt exakt null (da cos(90°) = 0).',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Skalarprodukt und Kreuzprodukt?",
-                "answer": "Das Skalarprodukt liefert eine einfache Zahl (einen Skalar). Das Kreuzprodukt (Vektorprodukt) liefert einen neuen Vektor, der senkrecht auf beiden Ausgangsvektoren steht."
-          },
-          {
-                "question": "Welche physikalische Bedeutung hat das Skalarprodukt?",
-                "answer": "In der Physik entspricht mechanische Arbeit dem Skalarprodukt aus Kraft- und Wegvektor: W = F · s = |F| · |s| · cos(α)."
-          }
+      { question: 'Wie berechnet man den Schnittwinkel zwischen zwei Vektoren?', answer: 'cos(phi) = (a · b) / (|a| · |b|). Man teilt das Skalarprodukt durch das Produkt der beiden Vektorlängen (Beträge) und wendet den Arkuskosinus (arccos) an.' },
+      { question: 'Was ist der Unterschied zwischen Skalarprodukt und Kreuzprodukt?', answer: 'Das Skalarprodukt liefert als Ergebnis eine reelle Zahl (Skalar); das Vektorprodukt (Kreuzprodukt) liefert einen neuen dreidimensionalen Vektor, der senkrecht auf beiden Ausgangsvektoren steht.' },
     ],
-    relatedSlugs: ["satz-des-pythagoras-rechner","sinussatz-kosinussatz-rechner","quader-volumen-rechner"],
+    relatedSlugs: ['satz-des-pythagoras-rechner', 'sinussatz-kosinussatz-rechner', 'quader-volumen-rechner'],
   },
   {
     id: "torus-volumen-rechner",
@@ -5041,10 +4959,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Torus-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Torus Rechner – Donut Volumen V = 2π²Rr² & Oberfläche berechnen",
-    metaDescription: "Berechnen Sie das Volumen eines Torus (V = 2 · π² · R · r²) und seine Oberfläche (O = 4 · π² · R · r) nach dem großen Ringradius R und dem kleinen Rohrradius r.",
-    h1: "Torus Rechner – Volumen & Oberfläche eines Rings ermitteln",
-    shortDescription: "Berechnet Volumen und Oberfläche eines Torus (Kreisrings/Donuts).",
+    metaTitle: 'Torus Rechner – Donut Volumen V = 2π²Rr²',
+    metaDescription: 'Berechnen Sie das Volumen eines Torus (V = 2 · π² · R · r²) und seine Oberfläche (O = 4 · π² · R · r) nach dem großen Ringradius R und dem kleinen.',
+    h1: 'Torus Rechner – Volumen & Oberfläche eines Rings ermitteln',
+    shortDescription: 'Berechnet Volumen und Oberfläche eines Torus (Kreisrings/Donuts) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["torus rechner volumen formel 2 pi2 r r2","donut oberflaeche berechnen 4 pi2 r r","torus grosser kleiner radius","guldinsche regel torus"],
     inputs: [
           {
@@ -5116,17 +5034,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "V = 1.776,53 cm³, O = 1.184,35 cm²"
     },
+    content: {
+      intro: 'Ein Torus ist ein dreidimensionaler Rotationskörper in Gestalt eines Schwimmreifens oder Donuts, der durch Rotation eines Kreises um eine externe Achse entsteht.',
+      details: 'Nach den Guldinschen Regeln: Volumen V = 2 · pi² · R · r². Oberfläche O = 4 · pi² · R · r, wobei R der Abstand vom Mittelpunkt zum Rohrzentrum und r der Radius des Rohres ist.',
+    },
     faqs: [
-          {
-                "question": "Was sind die Guldinschen Regeln?",
-                "answer": "Die Guldinschen Regeln (nach Paul Guldin) besagen, dass das Volumen eines Rotationskörpers gleich dem Produkt aus erzeugender Fläche und der Länge der Schwerpunktbahn ist: V = A · 2πR."
-          },
-          {
-                "question": "Was passiert, wenn r = R ist?",
-                "answer": "Wenn r = R ist, berührt sich der Innenrand im Zentrum im Nullpunkt (Horn-Torus). Ist r > R, schneidet sich die Geometrie selbst (Spindeltorus)."
-          }
+      { question: 'Welche Abmessungen müssen für einen Torus gelten?', answer: 'Der Torusmittelpunktsradius R muss größer oder gleich dem Rohrradius r sein (R ≥ r); ist R = r, berührt sich das Innenloch in einem einzigen Punkt (Horn-Torus).' },
+      { question: 'Wo werden Tori in der Hochtechnologie eingesetzt?', answer: 'In Fusionsreaktoren vom Typ Tokamak und Stellarator, um extrem heißes Plasma über kreisförmige Magnetfelder berührungslos einzuschließen.' },
     ],
-    relatedSlugs: ["kugel-oberflaeche-rechner","zylinderrechner","hohlzylinder-rohr-rechner"],
+    relatedSlugs: ['kugel-oberflaeche-rechner', 'zylinderrechner', 'hohlzylinder-rohr-rechner'],
   },
   {
     id: "stumpf-kegel-rechner",
@@ -5135,10 +5051,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kegelstumpf-Rechner",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: "Kegelstumpf Rechner – Volumen V = 1/3πh(R²+Rr+r²) & Mantelfläche",
-    metaDescription: "Berechnen Sie das Volumen eines Kegelstumpfs (V = 1/3 · π · h · (R² + Rr + r²)), die Mantellinie m und die Mantelfläche M für Eimer, Schalen und Trichter.",
-    h1: "Kegelstumpf Rechner – Volumen & Mantelfläche berechnen",
-    shortDescription: "Berechnet Volumen, Mantelfläche und Mantellinie eines Kegelstumpfs.",
+    metaTitle: 'Kegelstumpf Rechner – Volumen V = 1/3πh',
+    metaDescription: 'Berechnen Sie das Volumen eines Kegelstumpfs (V = 1/3 · π · h · (R² + Rr + r²)), die Mantellinie m und die Mantelfläche M für Eimer, Schalen und Trichter.',
+    h1: 'Kegelstumpf Rechner – Volumen & Mantelfläche berechnen',
+    shortDescription: 'Berechnet Volumen, Mantelfläche und Mantellinie eines Kegelstumpfs mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kegelstumpf rechner volumen formel","eimervolumen berechnen kegelstumpf","mantelflaeche kegelstumpf pi m r r","kegelstumpf hoehe radien"],
     inputs: [
           {
@@ -5221,17 +5137,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "10,05 Liter Eimerinhalt"
     },
+    content: {
+      intro: 'Ein Kegelstumpf entsteht, wenn die Spitze eines geraden Kreiskegels durch einen ebenen Schnitt parallel zur Grundfläche abgetrennt wird (Eimer, Lampenschirm, Blumentopf).',
+      details: 'Volumen V = 1/3 · pi · h · (R² + R·r + r²). Mantelfläche M = pi · (R + r) · s mit der Mantellinie s = Wurzel[(R - r)² + h²].',
+    },
     faqs: [
-          {
-                "question": "Wie misst man das Volumen eines Eimers am besten?",
-                "answer": "Da Eimer meist Kegelstümpfe sind, messen Sie den Durchmesser oben, den Durchmesser am Boden (jeweils durch 2 für den Radius) und die senkrechte Eimerhöhe."
-          },
-          {
-                "question": "Was passiert, wenn R = r ist?",
-                "answer": "Wenn oberer und unterer Radius identisch sind (R = r), wird der Kegelstumpf zu einem geraden Zylinder mit V = π · r² · h."
-          }
+      { question: 'Wie berechnet man das Fassungsvermögen eines Standard-Baueimers?', answer: 'Messen Sie oberen Innenradius R, unteren Innenradius r und Füllhöhe h in Dezimetern: Das berechnete Volumen entspricht direkt den Litern Inhalt.' },
+      { question: 'Wie verhält sich das Volumen, wenn der obere Radius r gegen 0 geht?', answer: 'Setzt man r = 0, geht die Kegelstumpfformel exakt in die normale Kegelvolumenformel V = 1/3 · pi · h · R² über.' },
     ],
-    relatedSlugs: ["kegel-volumen-rechner","zylinderrechner","kugel-oberflaeche-rechner"],
+    relatedSlugs: ['kegel-volumen-rechner', 'zylinderrechner', 'kugel-oberflaeche-rechner'],
   },
   {
     id: "dreiecks-hoehen-rechner",
@@ -5240,10 +5154,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Dreiecks-Höhen-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Dreiecks Höhen Rechner – Höhen h_a, h_b, h_c & Inkreis berechnen",
-    metaDescription: "Berechnen Sie alle 3 Höhen eines Dreiecks (h_a, h_b, h_c), den Inkreisradius r und den Umkreisradius R aus den drei Seitenlängen a, b und c.",
-    h1: "Dreiecks Höhen Rechner – Alle 3 Höhen, Inkreis & Umkreis ermitteln",
-    shortDescription: "Berechnet alle 3 Höhen sowie Inkreis und Umkreis aus 3 Seiten.",
+    metaTitle: 'Dreiecks Höhen Rechner – Höhen h_a, h_b, h_c',
+    metaDescription: 'Berechnen Sie alle 3 Höhen eines Dreiecks (h_a, h_b, h_c), den Inkreisradius r und den Umkreisradius R aus den drei Seitenlängen a, b und c.',
+    h1: 'Dreiecks Höhen Rechner – Alle 3 Höhen, Inkreis & Umkreis ermitteln',
+    shortDescription: 'Berechnet alle 3 Höhen sowie Inkreis und Umkreis aus 3 Seiten.',
     searchKeywords: ["hoehen dreieck rechner ha hb hc","inkreisradius dreieck berechnen formel","umkreisradius dreieck 3 seiten","dreieckshoehen berechnen heron"],
     inputs: [
           {
@@ -5334,17 +5248,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "h_a = 8 cm, h_b = 6 cm, h_c = 4,80 cm"
     },
+    content: {
+      intro: 'Dieser Höhenrechner ermittelt die drei senkrechten Höhen h_a, h_b und h_c eines Dreiecks aus den Seitenlängen über den Flächeninhalt.',
+      details: 'Formeln: h_a = (2 · A) / a; h_b = (2 · A) / b; h_c = (2 · A) / c. Die drei Höhenlinien eines Dreiecks schneiden sich stets in einem gemeinsamen Punkt, dem Höhenschnittpunkt H.',
+    },
     faqs: [
-          {
-                "question": "Schneiden sich die drei Höhenlinien in einem Punkt?",
-                "answer": "Ja, die drei Höhen (bzw. deren Verlängerungen) schneiden sich immer in genau einem Punkt, dem Höhenschnittpunkt H des Dreiecks."
-          },
-          {
-                "question": "Wo liegt der Höhenschnittpunkt bei einem stumpfwinkligen Dreieck?",
-                "answer": "Bei einem stumpfwinkligen Dreieck liegt der Höhenschnittpunkt außerhalb des Dreiecks, da zwei Höhen außerhalb der Dreiecksfläche auf die verlängerten Seiten treffen."
-          }
+      { question: 'Wann liegt der Höhenschnittpunkt außerhalb des Dreiecks?', answer: 'Bei jedem stumpfwinkligen Dreieck liegt der Höhenschnittpunkt H im Außenbereich jenseits der stumpfen Ecke.' },
+      { question: 'Wo liegt der Höhenschnittpunkt bei einem rechtwinkligen Dreieck?', answer: 'Exakt im Scheitelpunkt des rechten 90-Grad-Winkels, da die beiden Katheten gleichzeitig als Höhen aufeinander fungieren.' },
     ],
-    relatedSlugs: ["dreieck-flaeche-rechner","satz-des-pythagoras-rechner","sinussatz-kosinussatz-rechner"],
+    relatedSlugs: ['dreieck-flaeche-rechner', 'satz-des-pythagoras-rechner', 'sinussatz-kosinussatz-rechner'],
   },
   {
     id: "goldener-schnitt-rechner",
@@ -5353,10 +5265,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Goldener Schnitt",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: "Goldener Schnitt Rechner – Major, Minor & Phi (Φ = 1,618) berechnen",
-    metaDescription: "Berechnen Sie die Streckenteilung nach dem Goldenen Schnitt: Gesamtlänge, Major (a = ca. 61,8 %) und Minor (b = ca. 38,2 %) mit der Zahl Phi Φ ≈ 1,6180339.",
-    h1: "Goldener Schnitt Rechner – Harmonische Proportionen & Teilung",
-    shortDescription: "Berechnet Major, Minor und Gesamtstrecke nach dem Goldenen Schnitt.",
+    metaTitle: 'Goldener Schnitt Rechner – Major, Minor',
+    metaDescription: 'Berechnen Sie die Streckenteilung nach dem Goldenen Schnitt: Gesamtlänge, Major (a = ca. 61,8 %) und Minor (b = ca. 38,2 %) mit der Zahl Phi Φ ≈ 1,6180339.',
+    h1: 'Goldener Schnitt Rechner – Harmonische Proportionen & Teilung',
+    shortDescription: 'Berechnet Major, Minor und Gesamtstrecke nach dem Goldenen Schnitt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["goldener schnitt rechner formel phi","major minor berechnen 61 8 prozent","goldene proportion architektur kunst","goldener schnitt zahl phi 1 618"],
     inputs: [
           {
@@ -5439,16 +5351,14 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "result": "Major = 618 px, Minor = 382 px"
     },
+    content: {
+      intro: 'Der Goldene Schnitt (Phi ≈ 1,6180339887) beschreibt das harmonische Teilungsverhältnis (a+b)/a = a/b, das seit der Antike Architektur, Kunst und Fotografie prägt.',
+      details: 'Teilt man eine Gesamtstrecke im Goldenen Schnitt (Major a und Minor b), macht der größere Teil rund 61,8 % und der kleinere Teil ca. 38,2 % der Gesamtstrecke aus. Phi lässt sich exakt ausdrücken als (1 + Wurzel(5)) / 2.',
+    },
     faqs: [
-          {
-                "question": "Wie hängen der Goldene Schnitt und die Fibonacci-Folge zusammen?",
-                "answer": "Teilt man aufeinanderfolgende Fibonacci-Zahlen (1, 1, 2, 3, 5, 8, 13, 21, 34...), konvergiert das Verhältnis gegen Phi: 34/21 ≈ 1,619, 55/34 ≈ 1,6176, 89/55 ≈ 1,61818."
-          },
-          {
-                "question": "Wo begegnet uns der Goldene Schnitt in der Praxis?",
-                "answer": "In der Fotografie (goldene Spirale / Drittelregel), in Webdesigns (Rasteraufteilung), im Kreditkartenformat (Verhältnis 85,6 mm zu 53,98 mm ≈ 1,586) und in der Natur (Sonnenblumenkerne)."
-          }
+      { question: 'Welcher Zusammenhang besteht zwischen dem Goldenen Schnitt und der Fibonacci-Folge?', answer: 'Der Quotient zweier aufeinanderfolgender Fibonacci-Zahlen (1, 1, 2, 3, 5, 8, 13, 21, 34...) nähert sich mit wachsenden Zahlen immer präziser der Zahl Phi des Goldenen Schnitts an.' },
+      { question: 'Was ist die Drittel-Regel in der Fotografie?', answer: 'Eine praktische Vereinfachung des Goldenen Schnitts: Das Bild wird durch je zwei horizontale und vertikale Linien in 9 gleiche Felder geteilt; Hauptmotive platziert man auf den Schnittpunkten.' },
     ],
-    relatedSlugs: ["rechteckrechner","kreisrechner","dreieck-flaeche-rechner"],
+    relatedSlugs: ['rechteckrechner', 'kreisrechner', 'dreieck-flaeche-rechner'],
   },
 ];

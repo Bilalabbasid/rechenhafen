@@ -16,7 +16,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Stundenlohn berechnen',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Stundenlohn',
-    metaTitle: 'Stundenlohnrechner – Monatsgehalt exakt in Stundenlohn umrechnen',
+    metaTitle: 'Stundenlohnrechner – Monatsgehalt exakt in Stundenlohn umre...',
     metaDescription: 'Berechnen Sie Ihren Brutto-Stundenlohn aus dem Monatsgehalt nach der offiziellen deutschen 13-Wochen-Formel (§ 11 BUrlG / ArbZG).',
     h1: 'Stundenlohnrechner – Monatsgehalt in Stundenlohn umrechnen',
     shortDescription: 'Ermittelt Ihren Bruttostundenlohn aus Monatsgehalt und Wochenarbeitszeit nach gesetzlichem Standard.',
@@ -36,13 +36,13 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Kennen Sie Ihren wahren Stundenlohn? Dieser Rechner ermittelt nach der in Deutschland arbeitsrechtlich maßgeblichen Quartalsformel Ihren genauen Stundenverdienst.',
-      details: 'Da Monate unterschiedlich viele Tage haben, darf man das Monatsgehalt nicht einfach durch 4 Wochen teilen (ein Monat hat im Schnitt 4,33 Wochen).',
+      details: 'Da Monate unterschiedlich viele Tage haben, darf man das Monatsgehalt nicht einfach durch 4 Wochen teilen (ein Monat hat im Schnitt 4,33 Wochen). Gesetzliche Formel: Stundenlohn = (Monatsgehalt · 3 Monate) / (13 Wochen · Wochenstunden).',
     },
     faqs: [
       { question: 'Wie viele Arbeitsstunden hat ein Monat im Durchschnitt bei 40 Stunden?', answer: 'Bei einer 40-Stunden-Woche hat ein Monat im Jahresdurchschnitt genau 173,33 Arbeitsstunden (40 × 13 / 3).' },
-      { question: 'Wie hoch ist der gesetzliche Mindestlohn 2026?', answer: `In Deutschland beträgt der gesetzliche Mindestlohn ${formatCurrency(GERMAN_DATA_2026.mindestlohn_stunde.value)} brutto je Zeitstunde.` },
+      { question: 'Wie hoch ist der gesetzliche Mindestlohn in Deutschland?', answer: 'In Deutschland gilt das Mindestlohngesetz (MiLoG); der gesetzliche Mindestlohn wird regelmäßig durch die Mindestlohnkommission überprüft und angepasst.' },
     ],
-    relatedSlugs: ['teilzeit-gehaltsrechner', 'gehaltserhoehung-rechner', 'arbeitstage-rechner'],
+    relatedSlugs: ['brutto-stundensatz-freiberufler-rechner', 'nachtzuschlag-sonntagszuschlag-rechner', 'teilzeit-gehaltsrechner', 'gehaltserhoehung-rechner', 'arbeitstage-rechner', 'jahresgehalt-in-monatsgehalt-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: GERMAN_DATA_2026.mindestlohn_stunde.year,
@@ -79,12 +79,13 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Planen Sie den Umstieg auf eine 4-Tage-Woche oder eine Reduzierung Ihrer Wochenarbeitszeit? Mit diesem Rechner sehen Sie sofort Ihr neues Bruttoeinkommen.',
-      details: 'Durch die Steuerprogression fällt das Nettogehalt bei einer Reduzierung oft prozentual deutlich weniger stark ab als das Bruttogehalt.',
+      details: 'Durch die Steuerprogression fällt das Nettogehalt bei einer Reduzierung oft prozentual deutlich weniger stark ab als das Bruttogehalt. Neues Brutto = Vollzeitgehalt · (Teilzeitstunden / Vollzeitstunden).',
     },
     faqs: [
       { question: 'Habe ich einen gesetzlichen Anspruch auf Teilzeit?', answer: 'Ja, nach § 8 TzBfG haben Arbeitnehmer in Betrieben mit mehr als 15 Beschäftigten nach sechsmonatiger Betriebszugehörigkeit einen Anspruch auf Reduzierung der Arbeitszeit, sofern keine dringenden betrieblichen Gründe entgegenstehen.' },
+      { question: 'Was ist die Brückenteilzeit nach § 9a TzBfG?', answer: 'Das Recht, die Arbeitszeit für einen im Voraus bestimmten Zeitraum von einem bis fünf Jahren zu verringern und danach automatisch zur ursprünglichen Vollzeit zurückzukehren.' },
     ],
-    relatedSlugs: ['stundenlohnrechner', 'urlaubstage-rechner', 'gehaltserhoehung-rechner'],
+    relatedSlugs: ['stundenlohnrechner', 'gehaltserhoehung-rechner', 'vermoegenswirksame-leistungen-rechner', 'arbeitstage-rechner', 'firmenwagen-geldwerter-vorteil-rechner', 'kirchensteuer-rechner'],
   },
   {
     id: 'gehaltserhoehung-rechner',
@@ -93,10 +94,10 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Gehaltserhöhung',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Stundenlohn',
-    metaTitle: 'Gehaltserhöhung Rechner – Neues Monats- & Jahresgehalt berechnen',
+    metaTitle: 'Gehaltserhöhung Rechner – Neues Monats-',
     metaDescription: 'Berechnen Sie das Plus auf Ihrem Gehaltszettel: Gehaltserhöhung in Prozent oder Euro monatlich und jährlich kalkulieren.',
     h1: 'Gehaltserhöhung Rechner – Mehr Gehalt verhandeln',
-    shortDescription: 'Berechnet die finanziellen Auswirkungen einer prozentualen oder absoluten Gehaltsanpassung.',
+    shortDescription: 'Berechnet die finanziellen Auswirkungen einer prozentualen oder absoluten Gehaltsanpassung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['gehaltserhöhung rechner', 'gehaltserhöhung prozent berechnen', 'wieviel mehr gehalt', 'lohnerhöhung rechner'],
     inputs: [
       { id: 'currentSalary', label: 'Aktuelles Brutto-Monatsgehalt', type: 'number', defaultValue: 3800, unit: '€' },
@@ -114,12 +115,13 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Gehen Sie optimal vorbereitet in Ihre nächste Gehaltsverhandlung. Sehen Sie genau, wie viel eine Steigerung um 3 %, 5 % oder 8 % in Euro ausmacht.',
-      details: 'Geben Sie auch Sonderzahlungen wie Urlaubs- oder Weihnachtsgeld ein, um das Jahresplus zu ermitteln.',
+      details: 'Geben Sie auch Sonderzahlungen wie Urlaubs- oder Weihnachtsgeld ein, um das Jahresplus zu ermitteln. Bei Gehaltserhöhungen greift der persönliche Grenzsteuersatz, weshalb vom Bruttozuwachs netto meist 50 bis 60 % ankommen.',
     },
     faqs: [
-      { question: 'Wie viel Prozent Gehaltserhöhung sind üblich?', answer: 'Bei normalen Leistungsbeurteilungen sind in Deutschland 3 % bis 5 % üblich. Bei einem Wechsel der Position, Beförderung oder erweiterten Aufgaben sind 8 % bis 15 % verhandelbar.' },
+      { question: 'Wie viel Prozent Gehaltserhöhung sind in Verhandlungen üblich?', answer: 'Bei normalen Leistungsbeurteilungen sind in Deutschland 3 % bis 5 % üblich. Bei einem Wechsel der Position, Beförderung oder erweiterten Aufgaben sind 8 % bis 15 % verhandelbar.' },
+      { question: 'Was bedeutet die kalte Progression?', answer: 'Steigt das Bruttogehalt nur um die Inflationsrate, rutscht man durch den progressiven Steuertarif in einen höheren Steuersatz, sodass die reale Kaufkraft trotz Lohnerhöhung sinken kann.' },
     ],
-    relatedSlugs: ['stundenlohnrechner', 'teilzeit-gehaltsrechner', 'prozentuale-veraenderung'],
+    relatedSlugs: ['stundenlohnrechner', 'teilzeit-gehaltsrechner', 'prozentuale-veraenderung', 'jahresgehalt-in-monatsgehalt-rechner'],
   },
   {
     id: 'urlaubstage-rechner',
@@ -131,7 +133,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Urlaubstage Rechner – Urlaubsanspruch bei Teilzeit (§ 3 BUrlG)',
     metaDescription: 'Berechnen Sie Ihren Urlaubsanspruch bei Wechsel in Teilzeit nach dem Bundesurlaubsgesetz. Exakte Tage & Wochen Freizeit.',
     h1: 'Urlaubsanspruch Rechner bei Teilzeit nach § 3 BUrlG',
-    shortDescription: 'Berechnet den genauen Urlaubsanspruch anhand der wöchentlichen Arbeitstage.',
+    shortDescription: 'Berechnet den genauen Urlaubsanspruch anhand der wöchentlichen Arbeitstage mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['urlaubstage rechner', 'urlaubsanspruch teilzeit berechnen', 'urlaubstage bei 3 tage woche', 'burlg urlaub umrechnen'],
     inputs: [
       { id: 'standardDays', label: 'Betrieblicher Urlaubsanspruch bei Vollzeit (in Tagen)', type: 'number', defaultValue: 30, unit: 'Tage' },
@@ -149,10 +151,11 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Wie viele Urlaubstage stehen Ihnen zu, wenn Sie nicht an allen 5 Tagen der Woche arbeiten? Entscheidend ist allein die Anzahl der Tage, an denen Sie arbeiten – nicht die Stundenzahl.',
-      details: 'Der Rechner ermittelt Ihren Anspruch nach der offiziellen Formel des Bundesurlaubsgesetzes.',
+      details: 'Der Rechner ermittelt Ihren Anspruch nach der offiziellen Formel des Bundesurlaubsgesetzes (§ 3 BUrlG): Urlaubstage = Vereinbarte Jahresurlaubstage · (Tatsächliche Arbeitstage pro Woche / Reguläre Wochenarbeitstage).',
     },
     faqs: [
       { question: 'Habe ich bei Teilzeit weniger Wochen Urlaub?', answer: 'Nein! Wer z.B. 3 Tage pro Woche arbeitet und 18 Urlaubstage hat, kann genauso 6 ganze Wochen Urlaub nehmen wie ein Vollzeitmitarbeiter mit 30 Urlaubstagen bei einer 5-Tage-Woche (30/5 = 6 Wochen; 18/3 = 6 Wochen).' },
+      { question: 'Wie hoch ist der gesetzliche Mindesturlaub in Deutschland?', answer: 'Nach § 3 BUrlG beträgt der Mindesturlaub 24 Werktage bei einer 6-Tage-Woche bzw. 20 Arbeitstage bei einer 5-Tage-Woche (entspricht jeweils 4 vollen Kalenderwochen).' },
     ],
     relatedSlugs: ['teilzeit-gehaltsrechner', 'arbeitstage-rechner', 'stundenlohnrechner'],
   },

@@ -4,6 +4,7 @@ import {
   calculateAgeInDays,
   calculateDateDifference,
   calculateWorkdays,
+  calculateWorkdaysAndHolidays,
   calculateDateAdd,
   calculateLeapYear,
   calculateTimeDifference,
@@ -13,6 +14,33 @@ import {
 } from '@/lib/calculators/datumZeit';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
 
+const FEDERAL_STATE_OPTIONS = [
+  { value: 'bundesweit', label: 'Bundesweit (nur 9 einheitliche Feiertage)' },
+  { value: 'BW', label: 'Baden-Württemberg' },
+  { value: 'BY', label: 'Bayern' },
+  { value: 'BE', label: 'Berlin' },
+  { value: 'BB', label: 'Brandenburg' },
+  { value: 'HB', label: 'Bremen' },
+  { value: 'HH', label: 'Hamburg' },
+  { value: 'HE', label: 'Hessen' },
+  { value: 'MV', label: 'Mecklenburg-Vorpommern' },
+  { value: 'NI', label: 'Niedersachsen' },
+  { value: 'NW', label: 'Nordrhein-Westfalen' },
+  { value: 'RP', label: 'Rheinland-Pfalz' },
+  { value: 'SL', label: 'Saarland' },
+  { value: 'SN', label: 'Sachsen' },
+  { value: 'ST', label: 'Sachsen-Anhalt' },
+  { value: 'SH', label: 'Schleswig-Holstein' },
+  { value: 'TH', label: 'Thüringen' },
+];
+
+const BOUNDARY_OPTIONS = [
+  { value: 'both', label: 'Start- und Enddatum mitzählen (Beidseitig inklusive)' },
+  { value: 'startOnly', label: 'Nur Startdatum mitzählen' },
+  { value: 'endOnly', label: 'Nur Enddatum mitzählen' },
+  { value: 'neither', label: 'Start- und Enddatum ausschließen (Exklusiv)' },
+];
+
 export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'altersrechner',
@@ -21,7 +49,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Alter berechnen',
     category: 'datum-zeit',
     subcategory: 'Alter & Geburtstag',
-    metaTitle: 'Altersrechner – Alter genau in Jahren, Monaten & Tagen berechnen',
+    metaTitle: 'Altersrechner – Alter genau in Jahren, Monaten',
     metaDescription: 'Berechnen Sie Ihr exaktes Alter auf den Tag genau in Jahren, Monaten, Tagen, Stunden und Minuten. Inklusive Countdown zum nächsten Geburtstag.',
     h1: 'Altersrechner – Exaktes Alter berechnen',
     shortDescription: 'Ermittelt Ihr genaues Alter in Jahren, Monaten, Tagen, gelebten Wochen und Stunden inklusive nächstem Geburtstag.',
@@ -40,18 +68,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '36 Jahre (13.149 Tage)',
     },
     content: {
-      intro: 'Mit unserem präzisen Altersrechner bestimmen Sie Ihr Alter oder das Alter beliebiger Personen auf den Tag genau. Der Rechner berücksichtigt automatisch alle Schaltjahre.',
-      details: 'Neben den vollendeten Lebensjahren zeigt Ihnen das Tool auch die bisher gelebten Gesamttage, Wochen, Monate und Stunden an. Ebenso erfahren Sie, wie viele Tage bis zu Ihrem nächsten Geburtstag verbleiben.',
-      tips: [
-        'Nutzen Sie den Stichtag, um Ihr Alter zu einem bestimmten historischen oder zukünftigen Ereignis zu ermitteln.',
-        'Schaltjahre wie 2024 oder 2028 werden exakt mit 366 Tagen einberechnet.',
-      ],
+      intro: 'Die exakte Altersbestimmung erfordert die präzise Subtraktion von Geburtsjahr, -monat und -tag vom Stichtag unter Berücksichtigung der unterschiedlichen Monatslängen und Schaltjahre.',
+      details: 'Im deutschen Recht (§ 187 Abs. 2 Satz 2 BGB) beginnt das Lebensjahr mit dem Beginn des Geburtstages. Wer am 29. Februar geboren wurde, vollendet in Gemeinjahren sein Lebensjahr gemäß § 188 BGB mit Ablauf des 28. Februars bzw. mit Beginn des 1. März.',
     },
     faqs: [
-      { question: 'Wie werden Schaltjahre beim Altersrechner berücksichtigt?', answer: 'Der Rechner nutzt echte Kalenderarithmetik. Alle vier Jahre (mit den gregorianischen Ausnahmen für Säkularjahre) wird der 29. Februar als vollwertiger Tag in die Tageszählung einbezogen.' },
-      { question: 'Wann hat jemand Geburtstag, der am 29. Februar geboren wurde?', answer: 'In Nicht-Schaltjahren wird nach deutschem Recht (§ 187 Abs. 2 BGB) der Geburtstag rechtlich am 1. März vollendet.' },
+      { question: 'Wann vollenden am 29. Februar Geborene in Nicht-Schaltjahren ihr Lebensjahr?', answer: 'Nach deutschem Zivilrecht (§ 188 Abs. 3 BGB) gilt das Lebensjahr mit Ablauf des 28. Februars (24:00 Uhr) als vollendet, sodass der Geburtstag am 1. März gefeiert wird.' },
+      { question: 'Wie berechnet man das Alter auf den Tag genau im Kopf?', answer: 'Man zieht zunächst das Geburtsjahr vom aktuellen Jahr ab. Liegt der Geburtstag im laufenden Jahr noch in der Zukunft, zieht man ein ganzes Jahr ab und berechnet die verbleibenden Monate und Resttage zum Vormonat.' },
     ],
-    relatedSlugs: ['alter-in-tagen', 'alter-in-wochen', 'altersunterschied', 'geburtstagsrechner', 'datumsdifferenz'],
+    relatedSlugs: ['alter-in-tagen', 'geburtstagsrechner', 'datumsdifferenz', 'arbeitstage-rechner', 'altersunterschied'],
   },
   {
     id: 'alter-in-tagen',
@@ -79,13 +103,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '11.189 Lebenstage',
     },
     content: {
-      intro: 'Haben Sie sich schon einmal gefragt, wie viele Tage Sie bereits auf der Welt sind? Dieser Rechner ermittelt die exakte Tagesanzahl seit Ihrer Geburt.',
-      details: 'Viele Menschen feiern besondere Tage-Jubiläen, wie etwa den 10.000. Tag (ca. mit 27,4 Jahren) oder den 20.000. Tag (ca. mit 54,7 Jahren).',
+      intro: 'Die Zählung des Lebensalters in Tagen ermittelt die absolute Anzahl an Kalendertagen zwischen der Geburt und einem Zielzeitpunkt.',
+      details: 'Jedes Normaljahr steuert exakt 365 Tage bei, während Schaltjahre 366 Tage umfassen. Ein Mensch erreicht seinen 10.000sten Lebenstag typischerweise im Alter von 27 Jahren und etwa vier Monaten.',
     },
     faqs: [
-      { question: 'Wann feiert man seinen 10.000sten Lebenstag?', answer: 'Im Durchschnitt erreicht ein Mensch seinen 10.000. Lebenstag im Alter von 27 Jahren und etwa 137 Tagen (abhängig von der Anzahl der durchlebten Schaltjahre).' },
+      { question: 'Werden Schalttage bei der Tageszählung vollständig berücksichtigt?', answer: 'Ja, alle 29. Februare, die zwischen dem Geburtsdatum und dem Stichtag liegen, werden voll als Einzeltage mitgezählt.' },
+      { question: 'Wird der Geburtstag selbst als ganzer Tag mitgezählt?', answer: 'In der Zeitrechnung zählt der Geburtstag als Tag 0; nach Vollendung von 24 Stunden ist der erste Lebenstag abgeschlossen.' },
     ],
-    relatedSlugs: ['altersrechner', 'alter-in-wochen', 'alter-in-monaten', 'lebenszeit-in-stunden'],
+    relatedSlugs: ['altersrechner', 'geburtstagsrechner', 'datumsdifferenz', 'alter-in-wochen', 'alter-in-monaten'],
   },
   {
     id: 'lebenszeit-in-stunden',
@@ -129,13 +154,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'ca. 262.800 Stunden',
     },
     content: {
-      intro: 'Betrachten Sie Ihre Lebensspanne aus einer neuen Perspektive: In Stunden gemessen wird Zeit greifbar und faszinierend.',
-      details: 'Das Tool berechnet auch physiologische Schätzwerte wie die Anzahl der getätigten Atemzüge.',
+      intro: 'Die Umrechnung des Lebensalters in Stunden verdeutlicht die tatsächlich erlebte Zeitspanne und bietet eine greifbare Grundlage für biologische Vergleiche.',
+      details: 'Ein durchschnittliches Menschenleben von 80 Jahren umfasst rund 700.000 Stunden. Rund ein Drittel davon (etwa 230.000 Stunden) verbringt der Mensch im Schlaf, während das menschliche Herz dabei über 2,8 Milliarden Schläge ausführt.',
     },
     faqs: [
-      { question: 'Wie oft schlägt ein menschliches Herz im Leben?', answer: 'Im Laufe eines durchschnittlichen Lebens von 80 Jahren schlägt das Herz etwa 2,5 bis 3 Milliarden Mal ununterbrochen.' },
+      { question: 'Werden Sommer- und Winterzeit bei der Gesamtstundenzahl berücksichtigt?', answer: 'Für astronomische Lebenszeitberechnungen wird der standardmäßige 24-Stunden-Schnitt pro Kalendertag verwendet, da sich Sommer- und Winterzeit im Jahresverlauf gegenseitig aufheben.' },
+      { question: 'Wie rechnet man Lebenstage manuell in Stunden um?', answer: 'Multiplizieren Sie die Gesamtanzahl der absoluten Lebenstage einfach mit dem Faktor 24.' },
     ],
-    relatedSlugs: ['alter-in-tagen', 'altersrechner'],
+    relatedSlugs: ['alter-in-tagen', 'altersrechner', 'alter-in-wochen'],
   },
   {
     id: 'alter-in-wochen',
@@ -178,11 +204,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '30 Wochen, 4 Tage',
     },
     content: {
-      intro: 'Vor allem bei Neugeborenen und Kleinkindern wird das Alter häufig in Lebenswochen angegeben, da sich die motorische und geistige Entwicklung rasant vollzieht.',
-      details: 'Dieser Rechner wandelt jedes Geburtsdatum zuverlässig in volle Lebenswochen um.',
+      intro: 'Vor allem in der Säuglingsentwicklung, bei kinderärztlichen U-Untersuchungen und in der Schwangerschaftsmedizin ist die Angabe des Alters in vollendeten Wochen der maßgebliche Standard.',
+      details: 'Die Berechnung dividiert die Gesamtzahl der Lebenstage ganzzahlig durch 7. Der verbleibende Divisionsrest stellt die zusätzlichen Einzeltage dar (z. B. 12 Wochen und 4 Tage).',
     },
     faqs: [
-      { question: 'Ab wann gibt man das Alter eher in Monaten an?', answer: 'In der Kinderheilkunde wird das Alter meist bis zur 12. Woche in Lebenswochen und danach bis zum 2. Geburtstag in Lebensmonaten angegeben.' },
+      { question: 'Warum wird das Alter von Babys meist in Wochen statt Monaten angegeben?', answer: 'In den ersten Lebensmonaten verläuft die motorische und neuronale Entwicklung in rasanten Schüben, die sich in Wochenschritten wesentlich genauer beurteilen lassen als in ungleich langen Monaten.' },
+      { question: 'Wie viele Wochen hat ein durchschnittliches Kalenderjahr?', answer: 'Ein Gemeinjahr hat 52 Wochen plus einen Tag (365 / 7 = 52,14), ein Schaltjahr 52 Wochen plus zwei Tage.' },
     ],
     relatedSlugs: ['altersrechner', 'alter-in-tagen', 'alter-in-monaten', 'geburtstermin-rechner'],
   },
@@ -196,7 +223,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Alter in Monaten Rechner – Lebensmonate exakt berechnen',
     metaDescription: 'Wie viele Monate alt sind Sie oder Ihr Kind? Berechnen Sie volle Monate und verbleibende Tage schnell und unkompliziert.',
     h1: 'Alter in Monaten berechnen',
-    shortDescription: 'Berechnet die vollendeten Lebensmonate zwischen Geburtsdatum und Stichtag.',
+    shortDescription: 'Berechnet die vollendeten Lebensmonate zwischen Geburtsdatum und Stichtag mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['alter in monaten', 'lebensmonate berechnen', 'wie viele monate alt'],
     inputs: [
       { id: 'birthDate', label: 'Geburtsdatum', type: 'date', defaultValue: '2024-03-10' },
@@ -236,11 +263,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '22 Monate',
     },
     content: {
-      intro: 'Berechnen Sie das Alter in Lebensmonaten – besonders hilfreich für Eltern bei der U-Untersuchung von Babys oder für die Feststellung von Altersgrenzen.',
-      details: 'Der Rechner beachtet unterschiedliche Monatslängen (28, 29, 30 oder 31 Tage) taggenau.',
+      intro: 'Für Verträge, Kündigungsfristen, Garantielaufzeiten sowie entwicklungspsychologische Stufen ist das Alter in vollen Monaten plus Resttagen eine wichtige Zeiteinheit.',
+      details: 'Da Kalendermonate zwischen 28 und 31 Tagen schwanken, basiert die Monatszählung auf dem kalendarischen Monatssprung vom Ausgangstag zum gleichen Tag des Folgemonats.',
     },
     faqs: [
-      { question: 'Wie viele Tage hat ein durchschnittlicher Monat?', answer: 'Im gregorianischen Kalender hat ein durchschnittlicher Monat 30,4375 Tage (365,2425 Tage geteilt durch 12).' },
+      { question: 'Wie wird gerechnet, wenn der Ausgangstag im Zielmonat nicht existiert (z. B. 31. Januar auf Februar)?', answer: 'Nach § 188 Abs. 3 BGB endet die Monatsfrist in solchen Fällen mit dem Ablauf des letzten Tages des Monats (also am 28. bzw. 29. Februar).' },
+      { question: 'Wie viele Monate hat ein Kleinkind mit 2,5 Jahren?', answer: 'Zweieinhalb Lebensjahre entsprechen exakt 30 Kalendermonaten (2 × 12 + 6).' },
     ],
     relatedSlugs: ['altersrechner', 'alter-in-wochen', 'alter-in-tagen'],
   },
@@ -254,7 +282,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Altersunterschied Rechner – Abstand zweier Geburtsdaten',
     metaDescription: 'Ermitteln Sie den genauen Altersunterschied zwischen zwei Personen in Jahren, Monaten, Tagen und Wochen.',
     h1: 'Altersunterschied zwischen zwei Personen berechnen',
-    shortDescription: 'Vergleicht zwei Geburtsdaten und berechnet die exakte zeitliche Differenz.',
+    shortDescription: 'Vergleicht zwei Geburtsdaten und berechnet die exakte zeitliche Differenz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['altersunterschied rechner', 'altersabstand berechnen', 'wer ist älter', 'differenz geburtsdatum'],
     inputs: [
       { id: 'datePerson1', label: 'Geburtsdatum Person 1', type: 'date', defaultValue: '1988-04-12' },
@@ -270,13 +298,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '4 Jahre, 5 Monate, 13 Tage',
     },
     content: {
-      intro: 'Ob zwischen Geschwistern, Partnern oder Freunden: Mit diesem Rechner erfahren Sie auf den Tag genau, wie groß der Altersabstand ist.',
-      details: 'Neben der Angabe in Jahren und Monaten liefert der Rechner auch die absolute Tagesdifferenz.',
+      intro: 'Der chronologische Altersabstand zweier Personen drückt die zeitliche Distanz zwischen ihren Geburtstagen in Jahren, Monaten und Tagen sowie als absolute Tagesdifferenz aus.',
+      details: 'Bei der Differenzbildung wird der zeitliche Abstand zwischen beiden Geburtszeitpunkten ermittelt. In Partnerschaften, Erbfolgen oder im Sport (Altersklassen) bildet dieser Wert die objektive Vergleichsbasis.',
     },
     faqs: [
-      { question: 'Gibt es eine Faustformel für den Altersunterschied in Partnerschaften?', answer: 'In der Popkultur existiert die sogenannte Halb-dein-Alter-plus-7-Regel, sie besitzt jedoch keinerlei wissenschaftliche oder rechtliche Relevanz.' },
+      { question: 'Verändert sich der Altersabstand in Tagen jemals?', answer: 'Nein, die Anzahl der Kalendertage zwischen zwei Geburtszeitpunkten bleibt das gesamte Leben über unveränderlich konstant.' },
+      { question: 'Wie wird der relative Altersunterschied mit zunehmendem Alter wahrgenommen?', answer: 'Psychologisch und prozentual schrumpft der Abstand: Ein Unterschied von 5 Jahren macht bei 15-Jährigen 33 % der Lebensspanne aus, bei 50-Jährigen nur noch 10 %.' },
     ],
-    relatedSlugs: ['altersrechner', 'datumsdifferenz', 'geburtstagsrechner'],
+    relatedSlugs: ['altersrechner', 'datumsdifferenz', 'geburtstagsrechner', 'alter-in-tagen', 'arbeitstage-rechner'],
   },
   {
     id: 'geburtstagsrechner',
@@ -285,10 +314,10 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Geburtstagsrechner',
     category: 'datum-zeit',
     subcategory: 'Alter & Geburtstag',
-    metaTitle: 'Geburtstagsrechner – Wochentag der Geburt & nächster Geburtstag',
-    metaDescription: 'An welchem Wochentag wurden Sie geboren? Wann ist Ihr nächster Geburtstag und wie viele Tage verbleiben noch? Jetzt online berechnen.',
-    h1: 'Geburtstagsrechner – Wochentag & Countdown',
-    shortDescription: 'Berechnet den Wochentag der Geburt, den Wochentag des nächsten Geburtstags sowie die verbleibenden Tage.',
+    metaTitle: 'Geburtstagsrechner – Exaktes Alter & Wochentag der Geburt',
+    metaDescription: 'Erfahren Sie Ihr genaues Alter in Tagen, den Wochentag Ihrer Geburt und spannende Meilensteine mit dem Geburtstagsrechner.',
+    h1: 'Geburtstagsrechner – Alter & Geburtswochentag ermitteln',
+    shortDescription: 'Ermittelt Ihr exaktes Alter in Tagen und Stunden sowie den Wochentag Ihrer Geburt und kommende runde Jubiläen.',
     searchKeywords: ['geburtstagsrechner', 'an welchem wochentag geboren', 'wochentag geburtstag', 'tage bis geburtstag'],
     inputs: [
       { id: 'birthDate', label: 'Ihr Geburtsdatum', type: 'date', defaultValue: '1992-08-14' },
@@ -303,13 +332,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Freitag',
     },
     content: {
-      intro: 'Wussten Sie, an welchem Wochentag Sie das Licht der Welt erblickt haben? Finden Sie es heraus und sehen Sie zugleich, auf welchen Wochentag Ihr nächster Geburtstag fällt.',
-      details: 'Das Tool zeigt Ihnen auch die exakte Tagesanzahl, die Sie noch bis zur nächsten Geburtstagsfeier warten müssen.',
+      intro: 'Dieser Geburtstagsplaner ermittelt den Wochentag der Geburt, das genaue Alter und den Wochentag künftiger runder Jubiläen.',
+      details: 'Da ein Gemeinjahr 365 Tage hat (52 Wochen plus 1 Tag), verschiebt sich der Geburtstag in jedem Folgejahr um genau einen Wochentag nach vorne; nach einem Schaltjahr springt er um zwei Wochentage weiter.',
     },
     faqs: [
-      { question: 'Wiederholt sich der Wochentag des Geburtstags in einem festen Rhythmus?', answer: 'Aufgrund der Schaltjahre verschiebt sich der Wochentag in Normaljahren um 1 Tag und nach einem Schaltjahr um 2 Tage nach vorn. Im Schnitt wiederholt sich der exakte Rhythmus alle 5, 6 oder 11 Jahre (nach 28 Jahren wiederholt sich der Sonnenzyklus exakt).' },
+      { question: 'Warum wandert der Geburtstag jedes Jahr auf einen anderen Wochentag?', answer: 'Weil 365 geteilt durch 7 den Rest 1 ergibt; jeder Geburtstag rückt daher im Folgejahr um einen Wochentag weiter (Schaltjahre überspringen zwei Tage).' },
+      { question: 'Wie viele Geburtstage fallen statistisch auf das Wochenende?', answer: 'Über einen Lebenszyklus von mehreren Jahrzehnten fallen im Schnitt ca. 28,5 Prozent (2/7) aller Geburtstage auf einen Samstag oder Sonntag.' },
     ],
-    relatedSlugs: ['altersrechner', 'tage-bis-geburtstag', 'schaltjahr-rechner'],
+    relatedSlugs: ['altersrechner', 'alter-in-tagen', 'datumsdifferenz', 'tage-bis-geburtstag', 'arbeitstage-rechner'],
   },
   {
     id: 'tage-bis-geburtstag',
@@ -318,11 +348,11 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Tage bis Geburtstag',
     category: 'datum-zeit',
     subcategory: 'Alter & Geburtstag',
-    metaTitle: 'Tage bis zum Geburtstag Rechner – Exakter Countdown',
-    metaDescription: 'Wie viele Tage sind es noch bis zu Ihrem Geburtstag? Berechnen Sie die verbleibenden Tage, Wochen und Stunden bis zum Ehrentag.',
-    h1: 'Tage bis zum nächsten Geburtstag berechnen',
-    shortDescription: 'Countdown zum nächsten Geburtstag in Tagen, Stunden und Wochen.',
-    searchKeywords: ['tage bis geburtstag', 'geburtstag countdown', 'wann habe ich wieder geburtstag'],
+    metaTitle: 'Tage bis zum Geburtstag – Countdown & Schlafeinheiten',
+    metaDescription: 'Wie viele Tage sind es noch bis zum Geburtstag? Berechnen Sie verbleibende Tage, Wochen und Stunden mit dem Countdown-Rechner.',
+    h1: 'Geburtstags-Countdown – Tage bis zum nächsten Geburtstag',
+    shortDescription: 'Zählt die verbleibenden Tage, Wochen und Schlafeinheiten bis zum nächsten Geburtstag für Vorfreude und Eventplanung.',
+    searchKeywords: ['tage bis zum geburtstag', 'tage bis geburtstag', 'geburtstag countdown', 'wann habe ich wieder geburtstag'],
     inputs: [
       { id: 'birthDate', label: 'Geburtstag (Tag & Monat)', type: 'date', defaultValue: '1996-10-24' },
     ],
@@ -357,11 +387,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '45 Tage',
     },
     content: {
-      intro: 'Starten Sie den Countdown: Dieser Rechner verrät Ihnen, wie oft Sie noch schlafen müssen, bis Ihr nächstes Wiegenfest ansteht.',
-      details: 'Ideal für die Planung von Geburtstagsfeiern, Einladungen und Geschenken.',
+      intro: 'Dieser Countdown berechnet die exakt verbleibenden Kalendertage und Stunden bis zu Ihrem nächsten Geburtstag.',
+      details: 'Er berücksichtigt automatisch, ob der Geburtstag im laufenden Kalenderjahr bereits verstrichen ist (in diesem Fall wird auf das Folgejahr berechnet) und bezieht eventuelle Schalttage nahtlos ein.',
     },
     faqs: [
-      { question: 'Wie viele Geburtstage feiert ein Mensch im Durchschnitt?', answer: 'In Deutschland liegt die durchschnittliche Lebenserwartung bei ca. 81 Jahren, sodass Menschen im Mittel 80 bis 82 Geburtstage erleben.' },
+      { question: 'Wann schaltet der Rechner auf das nächste Lebensjahr um?', answer: 'Exakt um 00:00 Uhr des Geburtstages; an Ihrem Ehrentag selbst zeigt der Countdown "Heute ist Ihr Geburtstag!" an.' },
+      { question: 'Wie viele Tage hat das persönliche Lebensjahr?', answer: '365 Tage, es sei denn, in den 12 Monaten bis zum nächsten Geburtstag liegt ein 29. Februar (dann sind es 366 Tage).' },
     ],
     relatedSlugs: ['geburtstagsrechner', 'altersrechner', 'countdown-rechner'],
   },
@@ -372,11 +403,11 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Datumsdifferenz',
     category: 'datum-zeit',
     subcategory: 'Datumsdifferenz',
-    metaTitle: 'Datumsdifferenz Rechner – Abstand zweier Daten genau berechnen',
-    metaDescription: 'Berechnen Sie die exakte Zeitspanne zwischen zwei beliebigen Daten in Tagen, Wochen, Monaten und Jahren. Kostenlos & sekundenschnell.',
-    h1: 'Datumsdifferenz berechnen',
-    shortDescription: 'Ermittelt die genaue Distanz zwischen einem Start- und Enddatum in allen Zeiteinheiten.',
-    searchKeywords: ['datumsdifferenz rechner', 'zeitspanne zwischen zwei daten', 'tage zwischen zwei daten', 'abstand zwischen daten'],
+    metaTitle: 'Datumsdifferenz Rechner – Tage, Wochen & Monate berechnen',
+    metaDescription: 'Berechnen Sie die genaue Differenz zwischen zwei Kalenderdaten in Tagen, Wochen, Monaten und Jahren schnell und exakt.',
+    h1: 'Datumsdifferenz Rechner – Abstand zweier Daten ermitteln',
+    shortDescription: 'Ermittelt die exakte Zeitspanne zwischen zwei Kalenderdaten in Tagen, Wochen, vollen Monaten und Jahren.',
+    searchKeywords: ['datumsdifferenz', 'datumsdifferenz rechner', 'zeitspanne zwischen zwei daten', 'tage zwischen zwei daten', 'abstand zwischen daten'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-01-01' },
       { id: 'endDate', label: 'Enddatum', type: 'date', defaultValue: '2026-12-31' },
@@ -391,13 +422,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '364 Tage (exklusive Endtag) bzw. 365 Tage',
     },
     content: {
-      intro: 'Mit dem Datumsdifferenz-Rechner ermitteln Sie in Sekundenschnelle die Zeitdauer zwischen zwei beliebigen Kalenderdaten.',
-      details: 'Perfekt für Fristenberechnungen, Verträge, Kündigungsfristen, Projektlaufzeiten oder Urlaubsreisen.',
+      intro: 'Die Kalendertagsberechnung zwischen zwei Fixdaten ermittelt die genaue Tageszahl wahlweise inklusive oder exklusive des Endtages.',
+      details: 'Im deutschen Rechtsverkehr schließt die Fristberechnung nach § 187 Abs. 1 BGB den Tag des Ereignisses nicht mit ein; die Frist beginnt am Folgetag und endet mit Ablauf des letzten Tages.',
     },
     faqs: [
-      { question: 'Zählt der Anfangstag bei Fristen mit?', answer: 'Nach deutschem Zivilrecht (§ 187 Abs. 1 BGB) wird bei Ereignisfristen der Tag des auslösenden Ereignisses bei der Fristberechnung nicht mitgerechnet.' },
+      { question: 'Was ist der Unterschied zwischen inklusiver und exklusiver Tageszählung?', answer: 'Bei exklusiver Zählung ergibt der Zeitraum 01. Mai bis 02. Mai genau 1 Tag. Bei inklusiver Zählung (beide Tage voll mitgerechnet) sind es 2 Tage.' },
+      { question: 'Welche Methode wenden deutsche Banken bei Zinstagen an?', answer: 'Die deutsche Zinsmethode (30/360) rechnet jeden vollen Monat mit 30 Tagen und das Jahr mit 360 Tagen, während die Eurozinsmethode (act/360) kalendergenaue Tage nutzt.' },
     ],
-    relatedSlugs: ['tage-zwischen-zwei-daten', 'arbeitstage-rechner', 'kalendertage-rechner'],
+    relatedSlugs: ['altersrechner', 'arbeitstage-rechner', 'geburtstagsrechner', 'alter-in-tagen', 'werktage-rechner'],
   },
   {
     id: 'wochen-zwischen-daten',
@@ -433,11 +465,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '25 Wochen, 5 Tage',
     },
     content: {
-      intro: 'Ermitteln Sie die Spanne zwischen zwei Terminen in Wochen – ideal für Projektplanungen, Schwangerschaften oder Semesterzeiten.',
-      details: 'Der Rechner gibt sowohl die vollen Wochen als auch die verbleibenden Resttage aus.',
+      intro: 'Die Wochenzählung zwischen zwei Stichtagen vereinfacht die Planung von Bauvorhaben, Probezeiten, Elternzeiten oder Semestern.',
+      details: 'Die absolute Tagesdifferenz wird durch 7 geteilt. So lässt sich unmittelbar ablesen, wie viele volle Arbeits- und Ruhewochen für das Vorhaben zur Verfügung stehen.',
     },
     faqs: [
-      { question: 'Wie viele Wochen hat ein Halbjahr?', answer: 'Ein Halbjahr umfasst ca. 26 Wochen (ein volles Jahr hat 52 Wochen und 1 bis 2 Tage).' },
+      { question: 'Wie viele Wochen liegen zwischen Jahresanfang und Jahresmitte?', answer: 'Zwischen dem 1. Januar und dem 1. Juli liegen in einem Gemeinjahr exakt 181 Tage bzw. 25 Wochen und 6 Tage.' },
+      { question: 'Wie rechnet man Wochen schnell in Monate um?', answer: 'Multiplizieren Sie die Wochenzahl mit 7 und teilen Sie durch 30,4 (mittlere Monatslänge), oder rechnen Sie mit der Faustformel: 4,33 Wochen ergeben einen vollen Monat.' },
     ],
     relatedSlugs: ['datumsdifferenz', 'monate-zwischen-daten', 'kalendertage-rechner'],
   },
@@ -451,7 +484,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Monate zwischen zwei Daten Rechner – Kalendermonate ermitteln',
     metaDescription: 'Berechnen Sie die vollendeten Monate und Tage zwischen zwei Terminen. Perfekt für Kündigungsfristen und Mietverträge.',
     h1: 'Monate zwischen zwei Daten berechnen',
-    shortDescription: 'Berechnet die Anzahl ganzer Kalendermonate und verbleibender Tage.',
+    shortDescription: 'Berechnet die Anzahl ganzer Kalendermonate und verbleibender Tage mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['monate zwischen zwei daten', 'anzahl monate berechnen', 'monatsdifferenz rechner'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-01-15' },
@@ -490,11 +523,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '9 Monate',
     },
     content: {
-      intro: 'Für Verträge, Kündigungen oder Probezeiten ist oft die Monatsanzahl maßgeblich.',
-      details: 'Berechnen Sie hier die genaue Monatsdistanz zwischen zwei Kalenderdaten.',
+      intro: 'Die genaue Monatsdistanz zwischen zwei Kalenderdaten ist entscheidend für Kündigungsfristen von Mietverträgen, Kreditzinsbindungen und Beschäftigungszeiten.',
+      details: 'Die Berechnung ermittelt volle abgelaufene Monate unter Würdigung der Monatsenden (§ 188 BGB) und weist verbleibende Resttage separat aus.',
     },
     faqs: [
-      { question: 'Gilt bei Mietverträgen der Monatsanfang?', answer: 'Kündigungen von Wohnraummietverträgen müssen bis zum dritten Werktag eines Monats beim Vermieter eingehen, damit der Monat noch zur 3-monatigen Kündigungsfrist zählt.' },
+      { question: 'Wie wirkt sich ein Monatsende auf die Berechnung aus (z. B. 28. Februar bis 31. März)?', answer: 'Geht ein Zeitraum vom letzten Tag eines kurzen Monats bis zum letzten Tag eines längeren Monats, gilt der Monat rechtlich als vollendet.' },
+      { question: 'Wie viele Monate Kündigungsfrist hat ein Wohnungsmietvertrag?', answer: 'Für Mieter beträgt die Frist gesetzlich stets 3 Monate (§ 573c BGB). Für Vermieter verlängert sie sich nach 5 und 8 Jahren Mietdauer auf 6 bzw. 9 Monate.' },
     ],
     relatedSlugs: ['wochen-zwischen-daten', 'datumsdifferenz', 'kalendertage-rechner'],
   },
@@ -508,7 +542,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Kalendertage Rechner – Anzahl aller Kalendertage ermitteln',
     metaDescription: 'Berechnen Sie alle Kalendertage eines Zeitraums inklusive Sonn- und Feiertage. Einfach & zuverlässig.',
     h1: 'Kalendertage berechnen',
-    shortDescription: 'Zählt alle Kalendertage zwischen Start- und Enddatum ohne Ausnahme.',
+    shortDescription: 'Zählt alle Kalendertage zwischen Start- und Enddatum ohne Ausnahme mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['kalendertage rechner', 'anzahl kalendertage', 'tage zählen kalender'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-01-01' },
@@ -524,11 +558,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '89 bzw. 90 Kalendertage',
     },
     content: {
-      intro: 'Zählen Sie die absolute Anzahl der Tage in einem beliebigen Zeitraum.',
-      details: 'Wichtig für Hotelübernachtungen, Reisedauern oder tägliche Pauschalen.',
+      intro: 'Dieser Zähler ermittelt die reine Anzahl an Kalendertagen eines Monats, Quartals oder frei wählbaren Zeitintervalls.',
+      details: 'Kalendertage umfassen ausnahmslos alle 24-Stunden-Tage (Montag bis Sonntag inklusive aller gesetzlichen Feiertage). Dies ist die gesetzliche Basis für Verzugszinsen und Mietzinsberechnungen.',
     },
     faqs: [
-      { question: 'Wie viele Tage hat das Jahr 2026?', answer: 'Genau 365 Kalendertage.' },
+      { question: 'Wie viele Kalendertage hat ein Quartal?', answer: 'Q1 hat 90 Tage (Schaltjahr: 91); Q2 hat 91 Tage; Q3 hat 92 Tage; Q4 hat 92 Tage.' },
+      { question: 'Wann rechnen Gerichte nach Kalendertagen statt Werktagen?', answer: 'Fristen, die nach Wochen, Monaten oder Jahren bestimmt sind (§ 188 BGB), laufen nach Kalendertagen; nur der letzte Fristtag verlängert sich bei Samstagen/Sonntagen auf den Werktag (§ 193 BGB).' },
     ],
     relatedSlugs: ['arbeitstage-rechner', 'werktage-rechner', 'datumsdifferenz'],
   },
@@ -539,10 +574,10 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Arbeitszeit erfassen',
     category: 'datum-zeit',
     subcategory: 'Arbeitstage & Werktage',
-    metaTitle: 'Arbeitszeitrechner – Tägliche Arbeitszeit & Pausen online berechnen',
+    metaTitle: 'Arbeitszeitrechner – Tägliche Arbeitszeit & Pausen',
     metaDescription: 'Erfassen Sie Ihre tägliche Arbeitszeit: Beginn, Ende und Pause eingeben und sofort Netto-Arbeitszeit und Industriestunden berechnen.',
     h1: 'Arbeitszeitrechner – Zeiterfassung & Pausen',
-    shortDescription: 'Berechnet die tägliche Netto-Arbeitszeit nach Abzug der gesetzlichen Pausen.',
+    shortDescription: 'Berechnet die tägliche Netto-Arbeitszeit nach Abzug der gesetzlichen Pausen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['arbeitszeitrechner', 'zeiterfassung rechner', 'arbeitszeit berechnen pause', 'stempeluhr rechner'],
     inputs: [
       { id: 'startTime', label: 'Kommen (Arbeitsbeginn)', type: 'select', defaultValue: '08:00', options: generateTimeOptions() },
@@ -559,13 +594,14 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '8 Std. 0 Min.',
     },
     content: {
-      intro: 'Nach dem ArbZG müssen bei einer Arbeitszeit von mehr als 6 Stunden mindestens 30 Minuten und bei mehr als 9 Stunden mindestens 45 Minuten Pause eingelegt werden.',
-      details: 'Dieser Rechner ermittelt sofort, ob Sie Ihre Soll-Arbeitszeit erreicht haben.',
+      intro: 'Dieser Arbeitszeitrechner erfasst tägliche Arbeitsbeginn- und Endzeiten, zieht gesetzliche Pausenzeiten nach § 4 ArbZG ab und ermittelt Über- oder Minusstunden.',
+      details: 'Nach § 4 Arbeitszeitgesetz ist bei einer Arbeitszeit von 6 bis 9 Stunden eine Ruhepause von mindestens 30 Minuten, bei mehr als 9 Stunden von mindestens 45 Minuten zwingend vorgeschrieben.',
     },
     faqs: [
-      { question: 'Wann ist eine Pause gesetzlich Pflicht?', answer: 'Nach § 4 ArbZG ist die Arbeit bei mehr als 6 bis zu 9 Stunden durch mindestens 30 Minuten Pause zu unterbrechen. Bei mehr als 9 Stunden Gesamtarbeitszeit sind mindestens 45 Minuten Pause vorgeschrieben.' },
+      { question: 'Darf die gesetzliche Ruhepause aufgespalten werden?', answer: 'Ja, die Ruhepause kann in Zeitabschnitte von jeweils mindestens 15 Minuten aufgeteilt werden; kürzere Unterbrechungen gelten rechtlich nicht als Pause.' },
+      { question: 'Zählt der Weg zur Arbeit als Arbeitszeit?', answer: 'Die normale Fahrt zur ersten Tätigkeitsstätte gilt als private Lebensführung; Dienstreisen oder Fahrten zwischen Kunden gelten hingegen in vollem Umfang als vergütungspflichtige Arbeitszeit.' },
     ],
-    relatedSlugs: ['stundenrechner', 'arbeitstage-rechner', 'stundenlohnrechner'],
+    relatedSlugs: ['brutto-stundensatz-freiberufler-rechner', 'stundenrechner', 'arbeitstage-rechner', 'stundenlohnrechner'],
   },
   {
     id: 'tage-zwischen-zwei-daten',
@@ -574,11 +610,11 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Tage zwischen Daten',
     category: 'datum-zeit',
     subcategory: 'Datumsdifferenz',
-    metaTitle: 'Tage zwischen zwei Daten Rechner – Kalendertage ermitteln',
-    metaDescription: 'Wie viele Tage liegen zwischen zwei Terminen? Schnelle Berechnung von Kalendertagen inklusive oder exklusive Enddatum.',
-    h1: 'Tage zwischen zwei Daten berechnen',
-    shortDescription: 'Berechnet die absolute Anzahl der Tage zwischen zwei Zeitpunkten.',
-    searchKeywords: ['tage zwischen zwei daten', 'anzahl tage berechnen', 'wieviele tage zwischen', 'kalendertage rechner'],
+    metaTitle: 'Tage zwischen zwei Daten – Werktage & Kalendertage Rechner',
+    metaDescription: 'Berechnen Sie Kalendertage und Werktage zwischen zwei Stichtagen mit Wochenendabzug für Projektplanung und Fristen.',
+    h1: 'Tage zwischen zwei Daten – Zeitspannen exakt berechnen',
+    shortDescription: 'Berechnet Werktage und Kalendertage zwischen zwei Datumsangaben für die präzise Fristen- und Projektplanung.',
+    searchKeywords: ['tage zwischen zwei daten rechner', 'arbeitstage rechner', 'tage zwischen zwei daten', 'anzahl tage berechnen', 'wieviele tage zwischen', 'kalendertage rechner'],
     inputs: [
       { id: 'startDate', label: 'Erstes Datum', type: 'date', defaultValue: '2026-06-01' },
       { id: 'endDate', label: 'Zweites Datum', type: 'date', defaultValue: '2026-08-31' },
@@ -593,11 +629,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '91 Tage',
     },
     content: {
-      intro: 'Ermitteln Sie die exakte Anzahl der Tage zwischen zwei Terminen.',
-      details: 'Hilfreich bei Mietverträgen, Zinsberechnungen nach deutscher oder internationaler Zinsmethode und Reiseplanungen.',
+      intro: 'Ermittelt die astronomisch exakte Anzahl von Kalendertagen zwischen Start- und Zieldatum unter Berücksichtigung aller zwischenliegenden Schaltjahre.',
+      details: 'Die Berechnung basiert auf der Differenz der julianischen Tageszahlen oder Unix-Millisekunden, geteilt durch 86.400.000 Millisekunden pro Tag.',
     },
     faqs: [
-      { question: 'Gibt es einen Unterschied zwischen Kalendertagen und Werktagen?', answer: 'Ja. Kalendertage umfassen jeden Tag der Woche (Montag bis Sonntag). Werktage schließen Sonn- und Feiertage aus (Samstag ist rechtlich ein Werktag, sofern nicht anders vereinbart).' },
+      { question: 'Wie viele Tage liegen exakt zwischen Weihnachten (25.12.) und Silvester (31.12.)?', answer: 'Exklusiv des Starttages liegen exakt 6 Kalendertage dazwischen; zählt man beide Grenztage mit, sind es 7 Tage.' },
+      { question: 'Wie wird ein Schalttag zwischen zwei Terminen gewertet?', answer: 'Liegt der 29. Februar innerhalb des gewählten Intervalls, erhöht sich die berechnete Tagesanzahl automatisch um genau 1.' },
     ],
     relatedSlugs: ['datumsdifferenz', 'arbeitstage-rechner', 'kalendertage-rechner'],
   },
@@ -608,33 +645,66 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Arbeitstage berechnen',
     category: 'datum-zeit',
     subcategory: 'Arbeitstage & Werktage',
-    metaTitle: 'Arbeitstage Rechner – Arbeitstage Mo–Fr genau berechnen',
-    metaDescription: 'Berechnen Sie die Anzahl der Arbeitstage (Montag bis Freitag) in einem beliebigen Zeitraum. Ideal für Urlaubsplanung und Lohnabrechnung.',
-    h1: 'Arbeitstage berechnen (Mo–Fr)',
-    shortDescription: 'Zählt alle regulären Arbeitstage (Montag bis Freitag) unter Ausschluss von Samstagen und Sonntagen.',
-    searchKeywords: ['arbeitstage rechner', 'arbeitstage berechnen', 'werktage mo fr rechner', 'arbeitstage monat'],
+    metaTitle: 'Arbeitstage Rechner – Arbeitstage pro Jahr nach Bundesland',
+    metaDescription: 'Berechnen Sie die gesetzlichen Arbeitstage pro Jahr und Monat für alle 16 Bundesländer inklusive gesetzlicher Feiertage.',
+    h1: 'Arbeitstage Rechner – Arbeitstage im Kalenderjahr ermitteln',
+    shortDescription: 'Ermittelt die exakte Anzahl der Arbeitstage im Jahr oder Monat für alle deutschen Bundesländer mit Feiertagsberechnung.',
+    searchKeywords: ['arbeitstage rechner bundesland', 'arbeitstage rechner', 'arbeitstage berechnen', 'werktage mo fr rechner', 'arbeitstage monat'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-01-01' },
       { id: 'endDate', label: 'Enddatum', type: 'date', defaultValue: '2026-01-31' },
+      {
+        id: 'workweek',
+        label: 'Arbeitswoche',
+        type: 'select',
+        defaultValue: 'mo-fr',
+        options: [
+          { value: 'mo-fr', label: 'Montag bis Freitag (Reguläre 5-Tage-Woche)' },
+          { value: 'mo-sa', label: 'Montag bis Samstag (6-Tage-Woche / Werktage)' },
+          { value: 'custom', label: 'Benutzerdefiniert' },
+        ],
+      },
+      {
+        id: 'excludeHolidays',
+        label: 'Gesetzliche Feiertage abziehen',
+        type: 'boolean',
+        defaultValue: true,
+        helpText: 'Berücksichtigt die gesetzlichen Feiertage des ausgewählten Bundeslandes',
+      },
+      {
+        id: 'federalState',
+        label: 'Bundesland für Feiertagsregelung',
+        type: 'select',
+        defaultValue: 'bundesweit',
+        options: FEDERAL_STATE_OPTIONS,
+      },
       { id: 'hoursPerDay', label: 'Arbeitsstunden pro Tag', type: 'number', defaultValue: 8, unit: 'Std.' },
+      {
+        id: 'includeBoundary',
+        label: 'Zählung der Grenztage',
+        type: 'select',
+        defaultValue: 'both',
+        options: BOUNDARY_OPTIONS,
+      },
     ],
     calculate: calculateWorkdays,
-    formula: 'Arbeitstage = Summe aller Tage mit Wochentag 1 bis 5 (Mo bis Fr)',
-    formulaExplanation: 'Jeder Tag der Periode wird geprüft. Samstage (Wochentag 6) und Sonntage (Wochentag 0) werden abgezogen.',
+    formula: 'Arbeitstage = Kalendertage – Wochenendtage – Feiertage (an Arbeitstagen)',
+    formulaExplanation: 'Jeder Tag der Periode wird auf den gewählten Wochentagsmodus und Feiertagsstatus geprüft. Feiertage am Wochenende werden nicht doppelt abgezogen.',
     workedExample: {
-      title: 'Beispiel: Januar 2026 (31 Kalendertage)',
-      description: 'Enthält 22 Arbeitstage und 9 Wochenendtage.',
-      inputs: { startDate: '2026-01-01', endDate: '2026-01-31', hoursPerDay: 8 },
-      resultSummary: '22 Arbeitstage (176 Arbeitsstunden)',
+      title: 'Beispiel: Januar 2026 (31 Kalendertage, Bundesweit)',
+      description: 'Enthält 21 Arbeitstage (nach Abzug von 1 Feiertag an Neujahr und 9 Wochenendtagen) sowie 168 Arbeitsstunden.',
+      inputs: { startDate: '2026-01-01', endDate: '2026-01-31', workweek: 'mo-fr', excludeHolidays: true, hoursPerDay: 8 },
+      resultSummary: '21 Arbeitstage (168 Arbeitsstunden)',
     },
     content: {
-      intro: 'Wie viele Arbeitstage hat ein Monat oder ein Quartal? Unser Arbeitstage-Rechner filtert alle Wochenenden heraus.',
-      details: 'Dies ist die unverzichtbare Grundlage für die Berechnung von Soll-Arbeitsstunden, Monatsgehältern und Urlaubsanträgen.',
+      intro: 'Die Ermittlung der tatsächlichen Arbeitstage bildet das Fundament für die Pendlerpauschale in der Einkommensteuererklärung sowie für Urlaubs- und Arbeitszeitplanungen.',
+      details: 'Ein typisches Kalenderjahr hat bei einer 5-Tage-Woche (Montag bis Freitag) zwischen 250 und 252 potenzielle Arbeitstage. Nach Abzug von Feiertagen und Urlaub verbleiben meist 200 bis 220 tatsächliche Arbeitstage.',
     },
     faqs: [
-      { question: 'Wie viele Arbeitstage hat ein Jahr in Deutschland im Durchschnitt?', answer: 'In einer 5-Tage-Woche (Mo–Fr) hat ein Jahr durchschnittlich ca. 250 bis 252 Arbeitstage (nach Abzug von Wochenenden und bundesweiten Feiertagen).' },
+      { question: 'Wie viele Arbeitstage erkennt das Finanzamt bei einer 5-Tage-Woche pauschal an?', answer: 'Die meisten Finanzämter akzeptieren ohne gesonderte Einzelnachweise 220 bis 230 Arbeitstage pro Jahr für die Entfernungspauschale.' },
+      { question: 'Müssen Feiertage am Wochenende abgezogen werden?', answer: 'Nein, Feiertage, die ohnehin auf einen Samstag oder Sonntag fallen, mindern die reguläre Arbeitszeit nicht zusätzlich.' },
     ],
-    relatedSlugs: ['werktage-rechner', 'stundenrechner', 'arbeitszeitrechner', 'datumsdifferenz'],
+    relatedSlugs: ['datumsdifferenz', 'werktage-rechner', 'altersrechner', 'arbeitszeitrechner', 'urlaubstage-rechner'],
   },
   {
     id: 'werktage-rechner',
@@ -646,52 +716,61 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Werktage Rechner – Werktage (Mo–Sa) nach BGB berechnen',
     metaDescription: 'Ermitteln Sie die Anzahl der gesetzlichen Werktage (Montag bis Samstag) für Mietzahlungen, Kündigungsfristen und BGB-Fristen.',
     h1: 'Werktage berechnen (Montag bis Samstag)',
-    shortDescription: 'Zählt alle gesetzlichen Werktage inklusive Samstage gemäß deutschem Recht.',
+    shortDescription: 'Zählt alle gesetzlichen Werktage inklusive Samstage gemäß deutschem Recht mit präziser Feiertagsprüfung und anpassbarer Arbeitswoche.',
     searchKeywords: ['werktage rechner', 'werktage bgb', 'werktage berechnen samstag', 'miete 3 werktage'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-02-01' },
       { id: 'endDate', label: 'Enddatum', type: 'date', defaultValue: '2026-02-28' },
-    ],
-    calculate: (inputs) => {
-      const s = new Date(inputs.startDate || '2026-02-01');
-      const e = new Date(inputs.endDate || '2026-02-28');
-      let werktage = 0;
-      let sonntage = 0;
-      let total = 0;
-      const cur = new Date(s);
-      while (cur <= e) {
-        const day = cur.getDay();
-        if (day === 0) {
-          sonntage++;
-        } else {
-          werktage++;
-        }
-        total++;
-        cur.setDate(cur.getDate() + 1);
-      }
-      return {
-        primary: { id: 'werktage', label: 'Gesetzliche Werktage (Mo–Sa)', value: werktage, formattedValue: `${werktage} Werktage`, highlight: true },
-        secondary: [
-          { id: 'totalDays', label: 'Kalendertage', value: total, formattedValue: `${total} Tage` },
-          { id: 'sundays', label: 'Sonntage', value: sonntage, formattedValue: `${sonntage} Tage` },
+      {
+        id: 'workweek',
+        label: 'Wochenarbeitszeit / Werktagsdefinition',
+        type: 'select',
+        defaultValue: 'mo-sa',
+        options: [
+          { value: 'mo-sa', label: 'Montag bis Samstag (Gesetzliche Werktage nach BGB / § 3 BUrlG)' },
+          { value: 'mo-fr', label: 'Montag bis Freitag (Reguläre 5-Tage-Arbeitswoche)' },
+          { value: 'custom', label: 'Benutzerdefiniert' },
         ],
-        summaryText: `Im Zeitraum von ${total} Kalendertagen gibt es ${werktage} gesetzliche Werktage (inklusive Samstagen) und ${sonntage} Sonntage.`,
-      };
-    },
-    formula: 'Werktage = Alle Tage außer Sonntagen (und Feiertagen)',
-    formulaExplanation: 'Nach ständiger Rechtsprechung und § 3 BUrlG gilt der Samstag gesetzlich als Werktag.',
+      },
+      {
+        id: 'excludeHolidays',
+        label: 'Gesetzliche Feiertage ausschließen',
+        type: 'boolean',
+        defaultValue: true,
+        helpText: 'Zieht Feiertage ab (Feiertage an ohnehin freien Tagen werden nicht doppelt abgezogen)',
+      },
+      {
+        id: 'federalState',
+        label: 'Bundesland für Feiertage',
+        type: 'select',
+        defaultValue: 'bundesweit',
+        options: FEDERAL_STATE_OPTIONS,
+      },
+      {
+        id: 'includeBoundary',
+        label: 'Zählung der Grenztage',
+        type: 'select',
+        defaultValue: 'both',
+        options: BOUNDARY_OPTIONS,
+      },
+    ],
+    calculate: calculateWorkdaysAndHolidays,
+    formula: 'Werktage = Kalendertage – Sonntage – Feiertage (an Werktagen)',
+    formulaExplanation: 'Nach ständiger Rechtsprechung und § 3 BUrlG gilt der Samstag gesetzlich als Werktag. Bei Umstellung auf Mo–Fr werden Samstage ebenfalls abgezogen.',
     workedExample: {
       title: 'Beispiel: Februar 2026 (28 Tage)',
-      description: '24 Werktage und 4 Sonntage.',
-      inputs: { startDate: '2026-02-01', endDate: '2026-02-28' },
+      description: '24 Werktage (Mo–Sa) und 4 Sonntage.',
+      inputs: { startDate: '2026-02-01', endDate: '2026-02-28', workweek: 'mo-sa', excludeHolidays: true },
       resultSummary: '24 Werktage',
     },
     content: {
-      intro: 'Nach deutschem Recht (§ 3 Bundesurlaubsgesetz, BGB) sind Werktage alle Kalendertage, die nicht Sonn- oder gesetzliche Feiertage sind. Das schließt den Samstag ein!',
-      details: 'Besonders wichtig bei der Mietzahlung: Gemäß § 556b Abs. 1 BGB ist die Miete spätestens am 3. Werktag des Monats fällig.',
+      intro: 'Werktage sind alle Kalendertage, die nicht auf einen Sonntag oder gesetzlichen Feiertag fallen. Nach deutschem Recht (§ 3 Bundesurlaubsgesetz) zählt auch der Samstag regulär als Werktag.',
+      details: 'Zur Bestimmung der Werktage werden von den Kalendertagen alle Sonntage sowie die im jeweiligen Bundesland geltenden gesetzlichen Feiertage subtrahiert. Bei reinen Fünftage-Bürowochen spricht man präziser von Arbeitstagen.',
     },
     faqs: [
-      { question: 'Ist der Samstag ein Werktag?', answer: 'Ja, nach § 3 Abs. 2 BUrlG sind Werktage alle Kalendertage, die nicht Sonn- oder gesetzliche Feiertage sind. Somit ist der Samstag gesetzlich ein Werktag.' },
+      { question: 'Ist der Samstag rechtlich immer ein Werktag?', answer: 'Ja, nach dem BGB und dem BUrlG gilt der Samstag ausdrücklich als Werktag, es sei denn, ein Vertrag oder Tarifvertrag definiert abweichend reine Arbeitstage (Mo–Fr).' },
+      { question: 'Zählen regionale Feiertage wie Fronleichnam oder Allerheiligen als Werktage?', answer: 'In den Bundesländern, in denen diese Tage gesetzliche Feiertage sind (z. B. Bayern, NRW, Baden-Württemberg), gelten sie arbeitsrechtlich nicht als Werktage.' },
+      { question: 'Was passiert, wenn ein Feiertag auf einen Samstag fällt?', answer: 'Bei einer 5-Tage-Woche (Mo–Fr) mindert ein Samstagsfeiertag das Ergebnis nicht doppelt, da der Samstag ohnehin arbeitsfrei ist.' },
     ],
     relatedSlugs: ['arbeitstage-rechner', 'datumsdifferenz', 'kalendertage-rechner'],
   },
@@ -705,7 +784,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Datum plus Tage Rechner – Welches Datum ist in X Tagen?',
     metaDescription: 'Addieren Sie Tage zu einem Datum und erfahren Sie sofort das Zieldatum, den Wochentag und die Kalenderwoche.',
     h1: 'Datum plus Tage berechnen',
-    shortDescription: 'Addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum.',
+    shortDescription: 'Addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['datum plus tage', 'datum addieren', 'welches datum ist in 30 tagen', 'tage dazurechnen'],
     inputs: [
       { id: 'startDate', label: 'Ausgangsdatum', type: 'date', defaultValue: '2026-03-01' },
@@ -721,11 +800,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '15.03.2026',
     },
     content: {
-      intro: 'Müssen Sie eine Frist berechnen (z.B. Zahlungsziel in 14 Tagen oder Widerspruchsfrist in 30 Tagen)? Dieser Rechner gibt Ihnen das genaue Zieldatum.',
-      details: 'Gleichzeitig wird der Wochentag ermittelt, sodass Sie sofort sehen, ob die Frist auf ein Wochenende fällt.',
+      intro: 'Dieser Zukunftsrechner addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum und ermittelt das exakte Zieldatum samt Wochentag.',
+      details: 'Berücksichtigt präzise Monatsgrenzen (28, 29, 30 oder 31 Tage) und Schaltjahre. Ideal zur Bestimmung von Zahlungszielen (z. B. "zahlbar innerhalb von 14 Tagen") oder Lieferfristen.',
     },
     faqs: [
-      { question: 'Was passiert, wenn eine Frist am Sonntag endet?', answer: 'Nach § 193 BGB tritt an die Stelle eines Sonntags, Feiertags oder Samstags der nächste Werktag als Fristende.' },
+      { question: 'Wie berechnet man eine 14-tägige Frist nach BGB?', answer: 'Nach § 187 Abs. 1 BGB zählt der Tag des Zugangs nicht mit; die Frist beginnt am darauffolgenden Tag und endet mit Ablauf des 14. Tages.' },
+      { question: 'Fällt das Ergebnis bei Addition von Vielfachen von 7 immer auf denselben Wochentag?', answer: 'Ja, jede Addition von 7, 14, 21, 28 etc. Tagen landet exakt auf demselben Wochentag wie das Startdatum.' },
     ],
     relatedSlugs: ['datum-minus-tage', 'datumsdifferenz', 'arbeitstage-rechner'],
   },
@@ -739,7 +819,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Datum minus Tage Rechner – Welches Datum war vor X Tagen?',
     metaDescription: 'Ziehen Sie Tage von einem Datum ab. Finden Sie schnell heraus, welches Datum vor 14, 30 oder 90 Tagen war.',
     h1: 'Datum minus Tage berechnen',
-    shortDescription: 'Subtrahiert Tage von einem Datum in die Vergangenheit.',
+    shortDescription: 'Subtrahiert Tage von einem Datum in die Vergangenheit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['datum minus tage', 'datum subtrahieren', 'welches datum war vor 30 tagen'],
     inputs: [
       { id: 'startDate', label: 'Ausgangsdatum', type: 'date', defaultValue: '2026-05-01' },
@@ -755,11 +835,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '01.04.2026',
     },
     content: {
-      intro: 'Ermitteln Sie ganz einfach ein Datum in der Vergangenheit, indem Sie eine beliebige Anzahl von Tagen subtrahieren.',
-      details: 'Nützlich bei rückwirkenden Fristen, Quarantänezeiten oder Verjährungsfristen.',
+      intro: 'Dieser Rückrechner subtrahiert eine vorgegebene Anzahl von Kalendertagen von einem Stichtag zur Feststellung von Vorlauffristen oder Kündigungsterminen.',
+      details: 'Die Subtraktion erfolgt taggenau rückwärts über Monats- und Jahresgrenzen hinweg. Unverzichtbar für Vorbereitungszeiten bei Veranstaltungen, Hochzeiten oder Bauprojekten.',
     },
     faqs: [
-      { question: 'Berücksichtigt der Rechner Schaltjahre?', answer: 'Ja, auch bei der Rückwärtsrechnung wird der Februar im Schaltjahr mit 29 Tagen einbezogen.' },
+      { question: 'Wie ermittelt man den spätesten Absendetermin bei einer 4-wöchigen Kündigungsfrist?', answer: 'Subtrahieren Sie 28 Kalendertage vom Monatsende und rechnen Sie 2 bis 3 Tage Postlaufzeit als Puffer ein.' },
+      { question: 'Was geschieht bei Subtraktion über einen Schalttag hinweg?', answer: 'Fällt der 29. Februar in das Rückwärts-Intervall, zieht der Rechner diesen Tag vollautomatisch als vollwertigen Tag ab.' },
     ],
     relatedSlugs: ['datum-plus-tage', 'datumsdifferenz', 'kalendertage-rechner'],
   },
@@ -770,7 +851,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Schaltjahr prüfen',
     category: 'datum-zeit',
     subcategory: 'Uhrzeit & Zeiteinheiten',
-    metaTitle: 'Schaltjahr Rechner – Ist ein Jahr ein Schaltjahr? (Regeln & Prüfung)',
+    metaTitle: 'Schaltjahr Rechner – Ist ein Jahr ein Schaltjahr?',
     metaDescription: 'Prüfen Sie jedes beliebige Jahr auf die Schaltjahr-Eigenschaft nach gregorianischem Kalender. Inklusive einfacher Erklärung der 400-Jahre-Regel.',
     h1: 'Schaltjahr Rechner – Ist das Jahr ein Schaltjahr?',
     shortDescription: 'Prüft, ob ein Kalenderjahr 365 oder 366 Tage hat und begründet die gregorianische Schaltregel.',
@@ -788,12 +869,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Nein (365 Tage)',
     },
     content: {
-      intro: 'Ein Sonnenjahr dauert ca. 365 Tage, 5 Stunden, 48 Minuten und 46 Sekunden. Um die Differenz zum 365-Tage-Kalender auszugleichen, schuf Papst Gregor XIII. 1582 die moderne Schaltjahrregel.',
-      details: 'Unser Rechner prüft jedes Jahr zwischen 1 und 9999 nach den offiziellen astronomischen Kalenderregeln.',
+      intro: 'Schaltjahre gleichen die Differenz zwischen dem bürgerlichen Kalenderjahr (365 Tage) und dem astronomischen Sonnenjahr (ca. 365,2422 Tage) durch das Einfügen eines 366. Tages aus.',
+      details: 'Die gregorianische Schaltregel lautet: Ein Jahr ist ein Schaltjahr, wenn die Jahreszahl durch 4 teilbar ist – es sei denn, sie ist durch 100 teilbar. Ist sie jedoch auch durch 400 teilbar, handelt es sich dennoch um ein Schaltjahr (daher war 2000 ein Schaltjahr, 1900 keines).',
     },
     faqs: [
-      { question: 'War das Jahr 2000 ein Schaltjahr?', answer: 'Ja, denn 2000 ist durch 400 teilbar. Das Jahr 1900 war dagegen kein Schaltjahr, da es zwar durch 100, aber nicht durch 400 teilbar ist.' },
-      { question: 'Wann ist das nächste Schaltjahr nach 2026?', answer: 'Das nächste Schaltjahr nach 2026 ist das Jahr 2028.' },
+      { question: 'Warum reicht es nicht aus, einfach alle 4 Jahre einen Schalttag einzufügen?', answer: 'Ein Sonnenjahr dauert 365 Tage, 5 Stunden, 48 Minuten und 45 Sekunden. Ein Schalttag alle 4 Jahre würde den Kalender um etwa 11 Minuten pro Jahr überkompensieren; die 100- und 400-Jahre-Regeln korrigieren diesen Fehler.' },
+      { question: 'Wann ist das nächste Jahrhundert-Schaltjahr?', answer: 'Das nächste glatte Jahrhundert, das ein Schaltjahr sein wird, ist das Jahr 2400. Die Jahre 2100, 2200 und 2300 werden reguläre Gemeinjahre sein.' },
     ],
     relatedSlugs: ['altersrechner', 'wochenrechner', 'kalendertage-rechner'],
   },
@@ -822,11 +903,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'KW 38',
     },
     content: {
-      intro: 'In der deutschen Wirtschaft, Logistik und Projektplanung ist die Kalenderwoche (KW) die zentrale Zeiteinheit. Dieser Rechner ermittelt die offizielle KW nach DIN ISO 8601.',
-      details: 'Zusätzlich sehen Sie das Quartal (Q1 bis Q4) sowie den Tag des Jahres.',
+      intro: 'Dieser Rechner führt Additionen und Subtraktionen von Kalenderwochen und Tagen zu einem vorgegebenen Ausgangsdatum durch.',
+      details: 'Wichtig für Bauzeitenpläne, Schwangerschaftswochen (SSW) und Lieferfristen im Handel, bei denen Fristen üblicherweise in vollen Arbeits- oder Kalenderwochen formuliert sind.',
     },
     faqs: [
-      { question: 'Kann ein Datum im Januar zur KW 52 oder 53 des Vorjahres gehören?', answer: 'Ja. Wenn der 1. Januar auf einen Freitag, Samstag oder Sonntag fällt, gehört er zur letzten Kalenderwoche des vorherigen Jahres.' },
+      { question: 'Wie addiert man 6 Wochen zu einem Datum im Kopf?', answer: '6 Wochen entsprechen genau 42 Kalendertagen. Addieren Sie einen vollen Monat (ca. 30 Tage) plus 12 weitere Tage.' },
+      { question: 'Fällt das Ergebnis nach Addition ganzer Wochen immer auf denselben Wochentag?', answer: 'Ja, da eine Woche genau 7 Tage hat, fällt das Zieldatum bei der Addition voller Wochen ausnahmslos auf denselben Wochentag wie das Ausgangsdatum.' },
     ],
     relatedSlugs: ['arbeitstage-rechner', 'datumsdifferenz', 'schaltjahr-rechner'],
   },
@@ -837,7 +919,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Zeitdifferenz',
     category: 'datum-zeit',
     subcategory: 'Uhrzeit & Zeiteinheiten',
-    metaTitle: 'Zeitdifferenz Rechner – Stunden & Minuten zwischen zwei Uhrzeiten',
+    metaTitle: 'Zeitdifferenz Rechner – Stunden – RechenHafen',
     metaDescription: 'Berechnen Sie die Zeitspanne zwischen zwei Uhrzeiten abzüglich Pausen. Perfekt für Arbeitszeiterfassung und Industriestunden.',
     h1: 'Zeitdifferenz zwischen zwei Uhrzeiten berechnen',
     shortDescription: 'Berechnet die genaue Dauer zwischen Start- und Endzeitpunkt inklusive Pausenabzug und Dezimalstunden.',
@@ -857,11 +939,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '8 Std. 0 Min. (8,00 Industriestunden)',
     },
     content: {
-      intro: 'Ob für den Arbeitszeitnachweis, Handwerkerrechnungen oder Sport: Dieser Rechner ermittelt exakt die verflossene Zeit zwischen zwei Uhrzeiten.',
-      details: 'Das Ergebnis wird sowohl im Format Stunden:Minuten als auch in Dezimalstunden (z.B. 7,75 Std.) angezeigt, wie es in der Lohnabrechnung Standard ist.',
+      intro: 'Die Ermittlung der Zeitdifferenz zwischen zwei Uhrzeiten ist unverzichtbar für Stundenzettel, Gleitzeitkonten, Schichtpläne und Reisezeiten.',
+      details: 'Liegt die Endzeit numerisch vor der Anfangszeit, hat ein Tageswechsel stattgefunden: In diesem Fall werden zur Endzeit 24 Stunden hinzuaddiert, bevor die Startzeit abgezogen wird.',
     },
     faqs: [
-      { question: 'Funktioniert der Rechner auch über Mitternacht?', answer: 'Ja. Wenn die Endzeit vor der Startzeit liegt (z.B. Nachtschicht von 22:00 bis 06:00 Uhr), wird der Tageswechsel automatisch berücksichtigt.' },
+      { question: 'Wie wird ein Schichtdienst über Mitternacht berechnet?', answer: 'Beginnt eine Schicht um 22:00 Uhr und endet um 06:00 Uhr morgens, rechnet man (06:00 + 24:00) - 22:00 = 30:00 - 22:00 = 8 Stunden Arbeitsdauer.' },
+      { question: 'Wie wandelt man Minuten in Dezimalstunden für die Lohnabrechnung um?', answer: 'Teilen Sie die Minutenzahl durch 60: 15 Minuten entsprechen 0,25 Stunden, 30 Minuten 0,5 Stunden und 45 Minuten 0,75 Stunden.' },
     ],
     relatedSlugs: ['arbeitstage-rechner', 'stundenrechner', 'arbeitszeitrechner'],
   },
@@ -873,7 +956,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     category: 'datum-zeit',
     subcategory: 'Uhrzeit & Zeiteinheiten',
     metaTitle: 'Stundenrechner – Arbeitsstunden & Zeiten zusammenrechnen',
-    metaDescription: 'Rechnen Sie Arbeitszeiten und Stunden schnell zusammen. Wandeln Sie Minuten in Dezimalstunden um.',
+    metaDescription: 'Rechnen Sie Arbeitszeiten und Stunden schnell zusammen. Wandeln Sie Minuten in Dezimalstunden um. Mit praxisnaher Formelerklärung und schnellem Ergebnis.',
     h1: 'Stundenrechner – Arbeitszeit & Dauer',
     shortDescription: 'Addiert Stunden und Minuten und wandelt sie in Industriestunden um.',
     searchKeywords: ['stundenrechner', 'arbeitsstunden zusammenrechnen', 'minuten in stunden umrechnen'],
@@ -892,11 +975,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '8 Std. 0 Min.',
     },
     content: {
-      intro: 'Erfassen Sie Ihre täglichen Arbeitsstunden schnell und fehlerfrei.',
-      details: 'Ideal zur Überprüfung der eigenen Stempeluhr oder Zeiterfassung.',
+      intro: 'Dieser Zeiterfassungsrechner addiert und subtrahiert Arbeitsstunden und Minuten über mehrere Tage für die Erstellung lückenloser Stundennachweise.',
+      details: 'Summiert Bruttozeiten, zieht Pausenblöcke ab und weist das Endergebnis in Stunden und Minuten (hh:mm) sowie als Dezimalstunde (Industrieminute) aus.',
     },
     faqs: [
-      { question: 'Wie rechnet man Minuten in Industrieminuten (Dezimal) um?', answer: 'Teilen Sie die Minutenanzahl durch 60. Beispiel: 15 Minuten / 60 = 0,25 Stunden; 30 Minuten / 60 = 0,5 Stunden; 45 Minuten / 60 = 0,75 Stunden.' },
+      { question: 'Wie rechnet man 7 Stunden und 45 Minuten in Dezimalstunden um?', answer: '7 + (45 / 60) = 7 + 0,75 = 7,75 Dezimalstunden.' },
+      { question: 'Ist die Erfassung der Arbeitszeit in Deutschland gesetzlich verpflichtend?', answer: 'Ja, nach dem BAG-Urteil von 2022 (Az. 1 ABR 22/21) und dem EuGH-Urteil sind Arbeitgeber in Deutschland verpflichtet, ein verlässliches System zur Erfassung der täglichen Arbeitszeit einzurichten.' },
     ],
     relatedSlugs: ['zeitdifferenz-rechner', 'arbeitstage-rechner', 'arbeitszeitrechner'],
   },
@@ -947,11 +1031,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Exakte Tages- und Stundenzahl',
     },
     content: {
-      intro: 'Ob Vorfreude auf den Sommerurlaub, die eigene Hochzeit, den Rentenbeginn oder den Jahreswechsel: Unser Countdown-Rechner zählt die Zeit für Sie herunter.',
-      details: 'Geben Sie einfach Ihr Wunschdatum ein und sehen Sie auf einen Blick die verbleibende Spanne.',
+      intro: 'Dieser Countdown-Timer misst die verbleibende Restzeit bis zu einem festen Stichtag sekundengenau herunter.',
+      details: 'Rechnet die Zeitdifferenz in Tage, Stunden, Minuten und Sekunden um. Nützlich für Produkt-Launches, Neujahr, Jubiläen oder Projekt-Deadlines.',
     },
     faqs: [
-      { question: 'Wie viele Tage hat das Jahr 2026?', answer: 'Das Jahr 2026 ist ein Gemeinjahr und hat genau 365 Tage (52 Wochen und 1 Tag).' },
+      { question: 'Wie viele Sekunden hat ein Tag?', answer: 'Ein regulärer Kalendertag hat exakt 24 × 60 × 60 = 86.400 Sekunden.' },
+      { question: 'Was passiert mit dem Countdown bei Zeitumstellung?', answer: 'Bei Zeitstempeln mit lokaler Zeitzone verschiebt sich die Stundendifferenz am Tag der Zeitumstellung um genau 1 Stunde.' },
     ],
     relatedSlugs: ['tage-bis-geburtstag', 'datumsdifferenz', 'wochenrechner'],
   },

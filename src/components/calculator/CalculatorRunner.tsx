@@ -1,97 +1,211 @@
 'use client';
 
-import React, { useState, useEffect, useId } from 'react';
-import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
+import React, { useState, useEffect, useRef, useId } from 'react';
+import { CalculatorInput, CalculationResult } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
-import { AlertCircle } from 'lucide-react';
-
-import { getCalculatorBySlug } from '@/data/calculators';
+import { AlertCircle, Copy, Check, RotateCcw, ShieldCheck } from 'lucide-react';
+import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 
 interface Props {
   slug: string;
+  name: string;
+  inputs: CalculatorInput[];
+  initialResult: CalculationResult;
+  isTimeSensitive?: boolean;
+  timeSensitiveMeta?: {
+    year: number;
+    source: string;
+    sourceUrl?: string;
+    lastVerified: string;
+  };
 }
 
-export default function CalculatorRunner({ slug }: Props) {
-  const calculator = getCalculatorBySlug(slug);
+export default function CalculatorRunner({
+  slug,
+  name,
+  inputs: inputDefs,
+  initialResult,
+  isTimeSensitive,
+  timeSensitiveMeta,
+}: Props) {
   const formId = useId();
 
-  // Initialisiere State mit den Defaultwerten der Inputs
+  // Initialize inputs with default values
   const [inputs, setInputs] = useState<Record<string, any>>(() => {
-    if (!calculator) return {};
     const init: Record<string, any> = {};
-    for (const inp of calculator.inputs) {
+    for (const inp of inputDefs) {
       init[inp.id] = inp.defaultValue;
     }
     return init;
   });
 
-  // URL Query-Parameter beim Laden optional einlesen
-  useEffect(() => {
-    if (!calculator || typeof window === 'undefined') return;
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const updated: Record<string, any> = {};
-      let changed = false;
+  // Result state initialized with prerendered server result (Zero Layout Shift)
+  const [result, setResult] = useState<CalculationResult>(initialResult);
+  const [copied, setCopied] = useState(false);
 
-      for (const inp of calculator.inputs) {
-        if (params.has(inp.id)) {
-          const raw = params.get(inp.id);
-          if (raw !== null) {
-            if (inp.type === 'number') {
-              const parsed = parseFloat(raw.replace(',', '.'));
-              if (Number.isFinite(parsed)) {
-                updated[inp.id] = parsed;
-                changed = true;
+  // Reference to loaded engine function
+  const engineRef = useRef<((inp: Record<string, any>) => CalculationResult) | null>(null);
+
+  // Preload calculator engine in background after mount
+  useEffect(() => {
+    let isMounted = true;
+    loadCalculatorEngine(slug).then((fn) => {
+      if (isMounted && fn) {
+        engineRef.current = fn;
+
+        // Parse query params safely on client
+        try {
+          const params = new URLSearchParams(window.location.search);
+          const updated: Record<string, any> = {};
+          let changed = false;
+
+          for (const inp of inputDefs) {
+            if (params.has(inp.id)) {
+              const raw = params.get(inp.id);
+              if (raw !== null && typeof raw === 'string') {
+                if (inp.type === 'number') {
+                  const sanitized = raw.slice(0, 32).trim().replace(',', '.');
+                  const parsed = parseFloat(sanitized);
+                  if (Number.isFinite(parsed)) {
+                    let val = parsed;
+                    if (inp.min !== undefined && val < inp.min) val = inp.min;
+                    if (inp.max !== undefined && val > inp.max) val = inp.max;
+                    updated[inp.id] = val;
+                    changed = true;
+                  }
+                } else if (inp.type === 'boolean') {
+                  updated[inp.id] = raw.toLowerCase() === 'true' || raw === '1';
+                  changed = true;
+                } else if (inp.type === 'select') {
+                  const isValidOption = inp.options?.some((opt) => opt.value === raw);
+                  if (isValidOption) {
+                    updated[inp.id] = raw;
+                    changed = true;
+                  }
+                } else if (inp.type === 'date') {
+                  if (/^\d{4}-\d{2}-\d{2}$/.test(raw.trim())) {
+                    updated[inp.id] = raw.trim();
+                    changed = true;
+                  }
+                } else {
+                  updated[inp.id] = raw.slice(0, 100);
+                  changed = true;
+                }
               }
-            } else if (inp.type === 'boolean') {
-              updated[inp.id] = raw === 'true';
-              changed = true;
-            } else {
-              updated[inp.id] = raw;
-              changed = true;
             }
           }
+
+          if (changed) {
+            setInputs((prev) => {
+              const merged = { ...prev, ...updated };
+              try {
+                const newRes = fn(merged);
+                setResult(newRes);
+              } catch {}
+              return merged;
+            });
+          }
+        } catch {
+          // Ignore parsing errors
         }
       }
+    });
 
-      if (changed) {
-        setInputs((prev) => ({ ...prev, ...updated }));
+    return () => {
+      isMounted = false;
+    };
+  }, [slug, inputDefs]);
+
+  const handleInputChange = async (id: string, value: any) => {
+    const updatedInputs = { ...inputs, [id]: value };
+    setInputs(updatedInputs);
+
+    let fn = engineRef.current;
+    if (!fn) {
+      fn = await loadCalculatorEngine(slug);
+      if (fn) {
+        engineRef.current = fn;
       }
-    } catch {
-      // Ignoriere Parsing-Fehler
     }
-  }, [calculator]);
 
-  const handleInputChange = (id: string, value: any) => {
-    setInputs((prev) => ({ ...prev, [id]: value }));
+    if (fn) {
+      try {
+        const nextResult = fn(updatedInputs);
+        setResult(nextResult);
+      } catch {
+        setResult({
+          primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
+          error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
+        });
+      }
+    }
   };
 
-  if (!calculator) return null;
+  const handleReset = () => {
+    const defaultVals: Record<string, any> = {};
+    for (const inp of inputDefs) {
+      defaultVals[inp.id] = inp.defaultValue;
+    }
+    setInputs(defaultVals);
+    if (engineRef.current) {
+      try {
+        const resetRes = engineRef.current(defaultVals);
+        setResult(resetRes);
+      } catch {}
+    } else {
+      setResult(initialResult);
+    }
+  };
 
-  // Berechnung ausführen
-  let result: CalculationResult;
-  try {
-    result = calculator.calculate(inputs);
-  } catch (err) {
-    result = {
-      primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
-      error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
-    };
-  }
+  const handleCopyResult = async () => {
+    if (result.error) return;
+    const primaryStr = `${result.primary.label}: ${result.primary.formattedValue ?? result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}`;
+    let textToCopy = `${name}\n${primaryStr}`;
+
+    const secondaries = result.secondary && result.secondary.length > 0 ? result.secondary : result.details;
+    if (secondaries && secondaries.length > 0) {
+      const secLines = secondaries.map(
+        (s) => `${s.label}: ${s.formattedValue ?? s.value}${s.unit ? ' ' + s.unit : ''}`
+      );
+      textToCopy += `\n\nDetails:\n${secLines.join('\n')}`;
+    }
+    textToCopy += `\n\nBerechnet auf RechenHafen.de`;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+    }
+  };
 
   return (
     <div className={styles.calculatorCard} id="rechner-app">
       <div className={styles.calculatorHeader}>
-        <h2 className={styles.calculatorTitle}>{calculator.name}</h2>
+        <h2 className={styles.calculatorTitle}>{name}</h2>
         <span className={styles.clientTag}>Lokale Echtzeit-Berechnung</span>
       </div>
 
       <div className={styles.calculatorLayout}>
         {/* Eingabebereich */}
         <div className={styles.inputSection}>
-          <h3 className={styles.sectionHeading}>Eingabewerte</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+            <h3 className={styles.sectionHeading} style={{ margin: 0 }}>Eingabewerte</h3>
+            <button
+              type="button"
+              onClick={handleReset}
+              className={styles.actionBtn}
+              title="Auf Standardwerte zurücksetzen"
+              aria-label="Eingaben auf Standardwerte zurücksetzen"
+            >
+              <RotateCcw size={13} />
+              <span>Zurücksetzen</span>
+            </button>
+          </div>
+
           <div className={styles.inputGrid}>
-            {calculator.inputs.map((field) => {
+            {inputDefs.map((field) => {
               const inputId = `${formId}-${field.id}`;
               return (
                 <div key={field.id} className={styles.inputGroup}>
@@ -182,17 +296,27 @@ export default function CalculatorRunner({ slug }: Props) {
               <div className={styles.primaryResult}>
                 <span className={styles.primaryLabel}>{result.primary.label}</span>
                 <span className={styles.primaryValue}>
-                  {result.primary.formattedValue ?? (result.primary.value !== undefined && result.primary.value !== null ? `${result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}` : '-')}
+                  {result.primary.formattedValue ??
+                    (result.primary.value !== undefined && result.primary.value !== null
+                      ? `${result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}`
+                      : '-')}
                 </span>
               </div>
 
-              {((result.secondary && result.secondary.length > 0) || (result.details && result.details.length > 0)) && (
+              {((result.secondary && result.secondary.length > 0) ||
+                (result.details && result.details.length > 0)) && (
                 <div className={styles.secondaryGrid}>
-                  {((result.secondary && result.secondary.length > 0) ? result.secondary : result.details!).map((sec, idx) => (
+                  {(result.secondary && result.secondary.length > 0
+                    ? result.secondary
+                    : result.details!
+                  ).map((sec, idx) => (
                     <div key={sec.id || sec.label || idx} className={styles.secondaryItem}>
                       <span className={styles.secondaryLabel}>{sec.label}</span>
                       <span className={styles.secondaryValue}>
-                        {sec.formattedValue ?? (sec.value !== undefined && sec.value !== null ? `${sec.value}${sec.unit ? ' ' + sec.unit : ''}` : '-')}
+                        {sec.formattedValue ??
+                          (sec.value !== undefined && sec.value !== null
+                            ? `${sec.value}${sec.unit ? ' ' + sec.unit : ''}`
+                            : '-')}
                       </span>
                     </div>
                   ))}
@@ -204,24 +328,47 @@ export default function CalculatorRunner({ slug }: Props) {
                   <p>{result.summaryText}</p>
                 </div>
               )}
+
+              {/* Actions Bar */}
+              <div className={styles.resultActionsBar}>
+                <button
+                  type="button"
+                  onClick={handleCopyResult}
+                  className={`${styles.actionBtn} ${copied ? styles.actionBtnCopied : ''}`}
+                  title="Ergebnis in die Zwischenablage kopieren"
+                >
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  <span>{copied ? 'Ergebnis kopiert!' : 'Ergebnis kopieren'}</span>
+                </button>
+
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                  Echtzeit-Berechnung
+                </span>
+              </div>
             </div>
           )}
 
-          {/* Zeitabhängige / Regulierte Dateninfo Stand 2026 */}
-          {calculator.isTimeSensitive && calculator.timeSensitiveMeta && (
+          {/* Privacy Signal */}
+          <div className={styles.privacyNotice}>
+            <ShieldCheck size={15} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+            <span>Die Berechnung erfolgt lokal in Ihrem Browser. Keine Datenübertragung.</span>
+          </div>
+
+          {/* Regulated Year Notice */}
+          {isTimeSensitive && timeSensitiveMeta && (
             <div className={styles.regulatedNotice}>
               <span className={styles.regulatedBadge}>
-                Stand: {calculator.timeSensitiveMeta.year}
+                Stand: {timeSensitiveMeta.year}
               </span>
               <span>
-                Quelle: {calculator.timeSensitiveMeta.source} (geprüft am {calculator.timeSensitiveMeta.lastVerified})
+                Quelle: {timeSensitiveMeta.source} (geprüft am {timeSensitiveMeta.lastVerified})
               </span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Aufschlüsselungs-Tabelle */}
+      {/* Breakdown Table */}
       {!result.error && result.breakdown && result.breakdown.rows.length > 0 && (
         <div className={styles.breakdownContainer}>
           <h4 className={styles.breakdownTitle}>Detaillierter Verlauf</h4>
@@ -238,7 +385,9 @@ export default function CalculatorRunner({ slug }: Props) {
               <tbody>
                 {result.breakdown.rows.map((row, idx) => (
                   <tr key={idx}>
-                    <td><strong>{row.period}</strong></td>
+                    <td>
+                      <strong>{row.period}</strong>
+                    </td>
                     {result.breakdown!.columns.map((col) => (
                       <td key={col.key}>{row.values[col.key]}</td>
                     ))}

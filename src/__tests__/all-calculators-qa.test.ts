@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
 
-describe('RechenHafen 405 Calculators Comprehensive QA Verification', () => {
-  it('contains exactly 405 calculators across 16 categories', () => {
-    expect(ALL_CALCULATORS.length).toBe(405);
-    expect(CATEGORIES.length).toBe(16);
+describe('RechenHafen Calculators Comprehensive QA Verification', () => {
+  it('contains exactly 418 calculators across 17 categories', () => {
+    expect(ALL_CALCULATORS.length).toBe(418);
+    expect(CATEGORIES.length).toBe(17);
   });
 
   it('has unique valid slugs matching ^[a-z0-9-]+$', () => {

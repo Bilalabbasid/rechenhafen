@@ -22,8 +22,20 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die Stromkosten beliebiger Geräte aus Watt-Leistung, Betriebsdauer und Strompreis.',
     searchKeywords: ['stromkostenrechner', 'stromverbrauch berechnen', 'watt in stromkosten umrechnen', 'kwh kosten rechner'],
     inputs: [
-      { id: 'watts', label: 'Leistungsaufnahme des Geräts in Watt (W)', type: 'number', defaultValue: 150, min: 1, step: 5, unit: 'Watt' },
-      { id: 'hoursPerDay', label: 'Tägliche Nutzungsdauer', type: 'number', defaultValue: 4, min: 0.1, max: 24, step: 0.5, unit: 'Std./Tag' },
+      { id: 'watts', label: 'Leistungsaufnahme des Geräts', type: 'number', defaultValue: 150, min: 1, step: 5, unit: 'Watt' },
+      { id: 'usageTime', label: 'Nutzungsdauer', type: 'number', defaultValue: 4, min: 0.1, step: 0.5 },
+      {
+        id: 'usageTimeUnit',
+        label: 'Zeiteinheit der Nutzung',
+        type: 'select',
+        defaultValue: 'hoursPerDay',
+        options: [
+          { value: 'hoursPerDay', label: 'Stunden pro Tag' },
+          { value: 'minutesPerDay', label: 'Minuten pro Tag' },
+          { value: 'hoursPerWeek', label: 'Stunden pro Woche' },
+          { value: 'hoursPerYear', label: 'Stunden pro Jahr' },
+        ],
+      },
       { id: 'pricePerKwh', label: 'Strompreis pro Kilowattstunde (kWh)', type: 'number', defaultValue: GERMAN_DATA_2026.strompreis_durchschnitt.value, min: 0.05, step: 0.01, unit: '€/kWh' },
     ],
     calculate: calculateElectricityCost,
@@ -36,17 +48,14 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '145,64 € pro Jahr',
     },
     content: {
-      intro: 'Welche Elektrogeräte treiben Ihre Stromrechnung in die Höhe? Unser Stromkostenrechner deckt heimliche Stromfresser im Haushalt auf.',
-      details: 'Die Leistungsangabe in Watt finden Sie auf dem Typenschild jedes Geräts oder in der Bedienungsanleitung.',
-      tips: [
-        'Besonders Heizlüfter, alte Kühlschränke, Gaming-PCs und Wäschetrockner verbrauchen spürbar viel Energie.',
-        'Vergleichen Sie regelmäßig Stromtarife, um Ihren Arbeitspreis pro kWh zu senken.',
-      ],
+      intro: 'Dieser Stromkostenrechner kalkuliert die jährlichen Gesamtstromkosten eines Haushalts aus Grundpreis, Arbeitspreis und Jahresverbrauch in Kilowattstunden (kWh).',
+      details: 'Gesamtkosten = (Verbrauch in kWh · Arbeitspreis/kWh) + (12 · monatlicher Grundpreis). Ein 2-Personen-Haushalt in Deutschland verbraucht im Schnitt ca. 2.500 bis 3.000 kWh Strom pro Jahr.',
     },
     faqs: [
-      { question: 'Wie viel kostet 1 kWh Strom in Deutschland aktuell?', answer: 'Der durchschnittliche Haushaltsstrompreis in Deutschland liegt im Jahr 2026 bei rund 38 Cent pro Kilowattstunde (0,38 €/kWh) inklusive aller Steuern, Umlagen und Netzentgelte.' },
+      { question: 'Was ist der Unterschied zwischen Arbeitspreis und Grundpreis?', answer: 'Der Arbeitspreis bezahlt jede tatsächlich verbrauchte Kilowattstunde (ct/kWh); der Grundpreis ist eine verbrauchsunabhängige monatliche Fixgebühr für Netzanschluss, Zähler und Messstellenbetrieb.' },
+      { question: 'Wie viel Strom verbraucht ein 1-Personen-Haushalt durchschnittlich?', answer: 'Ein Single-Haushalt verbraucht im Mehrfamilienhaus ca. 1.300 bis 1.500 kWh pro Jahr; erfolgt die Warmwasserbereitung elektrisch (Durchlauferhitzer), steigt der Bedarf auf ca. 1.800 bis 2.000 kWh.' },
     ],
-    relatedSlugs: ['standby-kosten-rechner', 'led-ersparnis-rechner', 'gaskostenrechner'],
+    relatedSlugs: ['ohmsches-gesetz-rechner', 'standby-kosten-rechner', 'led-ersparnis-rechner', 'gaskostenrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: GERMAN_DATA_2026.strompreis_durchschnitt.year,
@@ -62,10 +71,10 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Standby-Kosten',
     category: 'haushalt-energie',
     subcategory: 'Strom & Geräte',
-    metaTitle: 'Standby-Kosten Rechner – Heimliche Stromkosten online ermitteln',
+    metaTitle: 'Standby-Kosten Rechner – Heimliche Stromkosten',
     metaDescription: 'Wie viel Geld kostet Sie der Standby-Modus von Fernseher, Kaffeemaschine & Co. im Jahr? Berechnen Sie Einsparpotenziale.',
     h1: 'Standby-Kosten Rechner – Stromverschwendung stoppen',
-    shortDescription: 'Berechnet die unnötigen jährlichen Stromkosten durch Geräte im Bereitschaftsmodus.',
+    shortDescription: 'Berechnet die unnötigen jährlichen Stromkosten durch Geräte im Bereitschaftsmodus mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['standby kosten rechner', 'standby stromverbrauch kosten', 'strom sparen standby', 'heimliche stromfresser'],
     inputs: [
       { id: 'standbyWatts', label: 'Geschätzte Standby-Leistung aller Haushaltsgeräte zusammen', type: 'number', defaultValue: 35, min: 1, step: 5, unit: 'Watt', helpText: 'Ein typischer Haushalt hat 20–50 Watt Dauer-Standby' },
@@ -82,13 +91,14 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'ca. 97 € unnötige Kosten pro Jahr',
     },
     content: {
-      intro: 'Kaffeemaschinen mit Uhr, Fernseher im Bereitschaftsmodus, WLAN-Verstärker und Netzteile: Im deutschen Durchschnittshaushalt fallen jedes Jahr bis zu 100 Euro reine Standby-Kosten an.',
-      details: 'Mit einfachen schaltbaren Steckdosenleisten lassen sich diese Ausgaben fast auf null reduzieren.',
+      intro: 'Elektrische Geräte im Bereitschaftsmodus (Standby) verbrauchen rund um die Uhr heimlich Strom, was sich auf 80 bis 150 Euro unnötige Kosten pro Jahr summieren kann.',
+      details: 'Jahreskosten = (Leistung in Watt · 8.760 Jahresstunden / 1.000) · Strompreis. Ein einziges Gerät mit permanent 5 Watt Standby-Aufnahme kostet bei 35 Cent/kWh bereits über 15 Euro pro Jahr.',
     },
     faqs: [
-      { question: 'Dürfen Neugeräte viel Strom im Standby verbrauchen?', answer: 'Nein, nach der Ökodesign-Richtlinie der EU dürfen einfache Haushaltsgeräte im Standby maximal 0,5 Watt verbrauchen (bei vernetzten Geräten bis zu 2 Watt).' },
+      { question: 'Welche Geräte haben die höchsten heimlichen Standby-Verbräuche?', answer: 'Ältere Fernseher, Spielekonsolen im Schnellstart-Modus, AV-Receiver, WLAN-Verstärker, Espressomaschinen und ältere PC-Netzteile.' },
+      { question: 'Wie lassen sich Standby-Verluste am einfachsten abstellen?', answer: 'Durch abschaltbare Steckdosenleisten, smarte Zwischenstecker mit Zeitschaltuhr oder Master-Slave-Steckdosen, die Peripheriegeräte automatisch vom Netz trennen.' },
     ],
-    relatedSlugs: ['stromkostenrechner', 'led-ersparnis-rechner'],
+    relatedSlugs: ['stromkostenrechner', 'led-ersparnis-rechner', 'gaskostenrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: GERMAN_DATA_2026.strompreis_durchschnitt.year,
@@ -136,13 +146,14 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '1.684,00 € pro Jahr',
     },
     content: {
-      intro: 'Die Gasabrechnung ist für viele Haushalte schwer verständlich, da der Zähler Kubikmeter (m³) anzeigt, die Rechnung jedoch in Kilowattstunden (kWh) abgerechnet wird.',
-      details: 'Unser Rechner nimmt Ihnen die Umrechnung ab und kalkuliert den exakten monatlichen Abschlagsbetrag.',
+      intro: 'Der Gaskostenrechner ermittelt die Heiz- und Warmwasserkosten bei Erdgasheizungen unter Berücksichtigung von Arbeitspreis, Grundpreis und CO₂-Abgabe.',
+      details: 'Gesamtkosten = (Verbrauch in kWh · Arbeitspreis) + Grundpreis + CO₂-Kosten. Ein typisches Einfamilienhaus (140 m²) benötigt pro Jahr etwa 16.000 bis 22.000 kWh Erdgas.',
     },
     faqs: [
-      { question: 'Wo finde ich Brennwert und Zustandszahl?', answer: 'Diese Werte stehen auf Ihrer letzten Jahres-Gasabrechnung Ihres Gasversorgers oder Netzbetreibers.' },
+      { question: 'Wie liest man den Gaszähler ab (m³ in kWh)?', answer: 'Der Gaszähler zählt Kubikmeter (m³); die Rechnung erfolgt in Kilowattstunden (kWh). Multiplizieren Sie die Kubikmeter mit dem Brennwert (ca. 10,2 bis 11,5) und der Zustandszahl (ca. 0,95) Ihres Netzbetreibers.' },
+      { question: 'Wie hoch ist die gesetzliche CO₂-Abgabe auf Erdgas?', answer: 'Auf Erdgas fällt nach dem Brennstoffemissionshandelsgesetz (BEHG) eine CO₂-Abgabe an, die den Kilowattstundenpreis um etwa 0,6 bis 1,0 Cent verteuert.' },
     ],
-    relatedSlugs: ['stromkostenrechner', 'led-ersparnis-rechner'],
+    relatedSlugs: ['brennholz-raummeter-rechner', 'stromkostenrechner', 'led-ersparnis-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: GERMAN_DATA_2026.gaspreis_durchschnitt.year,
@@ -180,12 +191,13 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'ca. 288 € Ersparnis pro Jahr',
     },
     content: {
-      intro: 'Der Wechsel auf moderne LED-Beleuchtung ist eine der rentabelsten Energiesparmaßnahmen überhaupt: LEDs verbrauchen bis zu 85 % weniger Strom als herkömmliche Glühbirnen.',
-      details: 'Die Anschaffungskosten einer LED amortisieren sich oft bereits nach wenigen Monaten.',
+      intro: 'Der Austausch herkömmlicher Glüh- und Halogenlampen gegen moderne LED-Leuchtmittel senkt den Strombedarf für Beleuchtung um bis zu 85 bis 90 Prozent.',
+      details: 'Eine klassische 60-Watt-Glühbirne erzeugt denselben Lichtstrom (ca. 800 Lumen) wie eine moderne LED mit nur 8 Watt Leistungsaufnahme. Die Amortisationszeit neuer LED-Lampen liegt oft bei weniger als 6 Monaten.',
     },
     faqs: [
-      { question: 'Wie viel Watt hat eine LED im Vergleich zur 60-Watt-Glühbirne?', answer: 'Eine moderne LED mit ca. 800 Lumen Helligkeit benötigt nur etwa 7 bis 9 Watt, um das Licht einer 60-Watt-Glühlampe zu erzeugen.' },
+      { question: 'Wie vergleicht man die Helligkeit alter Glühbirnen mit LEDs?', answer: 'Über den Lichtstrom in Lumen (lm): 25 W Glühbirne ≈ 250 lm; 40 W ≈ 470 lm; 60 W ≈ 806 lm; 100 W ≈ 1.521 lm.' },
+      { question: 'Wie lange hält eine LED-Lampe im Vergleich zur Glühbirne?', answer: 'Glühlampen hielten ca. 1.000 Stunden; hochwertige LEDs erreichen 15.000 bis 25.000 Betriebsstunden (bei 3 Stunden täglicher Nutzung entspricht das über 15 bis 20 Jahren Lebensdauer).' },
     ],
-    relatedSlugs: ['stromkostenrechner', 'standby-kosten-rechner'],
+    relatedSlugs: ['stromkostenrechner', 'standby-kosten-rechner', 'gaskostenrechner'],
   },
 ];

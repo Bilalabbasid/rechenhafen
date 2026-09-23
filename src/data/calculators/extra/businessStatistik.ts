@@ -9,10 +9,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Deckungsbeitrag-Rechner",
     category: "business",
     subcategory: "Kostenrechnung & Controlling",
-    metaTitle: "Deckungsbeitrag Rechner – Stück-DB, DB I & Deckungsbeitragsquote berechnen",
-    metaDescription: "Berechnen Sie den Deckungsbeitrag pro Stück (db = Preis - variable Kosten), den Gesamt-Deckungsbeitrag (DB I), die DB-Quote in % und das Betriebsergebnis.",
-    h1: "Deckungsbeitrag Rechner – DB I, Stück-DB & DB-Quote kalkulieren",
-    shortDescription: "Ermittelt Stückdeckungsbeitrag, Gesamtdeckungsbeitrag und Betriebsergebnis.",
+    metaTitle: 'Deckungsbeitrag Rechner – Stück-DB, DB I',
+    metaDescription: 'Berechnen Sie den Deckungsbeitrag pro Stück (db = Preis - variable Kosten), den Gesamt-Deckungsbeitrag (DB I), die DB-Quote in % und das Betriebsergebnis.',
+    h1: 'Deckungsbeitrag Rechner – DB I, Stück-DB & DB-Quote kalkulieren',
+    shortDescription: 'Ermittelt Stückdeckungsbeitrag, Gesamtdeckungsbeitrag und Betriebsergebnis mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["deckungsbeitrag rechner dbi stueckdeckungsbeitrag","deckungsbeitragsquote berechnen formel","umsatz variable kosten fixkosten betriebsergebnis","deckungsbeitrag 1 berechnen bwl"],
     inputs: [
           {
@@ -116,17 +116,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "DB = 30.000 €, Gewinn = 10.000 €"
     },
+    content: {
+      intro: 'Der Deckungsbeitrag (DB) ist der Geldbetrag, der nach Abzug der variablen Kosten vom Umsatzerlös zur Deckung der fixen Unternehmenskosten verbleibt.',
+      details: 'Deckungsbeitrag I = Umsatzerlöse - variable Kosten. Deckungsbeitrag in % (Deckungsbeitragsquote) = (DB / Umsatz) · 100. Produkte mit negativem Deckungsbeitrag verursachen bei jedem Verkauf Verluste und müssen eliminiert werden.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Deckungsbeitrag I und II?",
-                "answer": "Der DB I zieht nur die variablen Kosten vom Umsatz ab. Der mehrstufige DB II zieht zusätzlich die erzeugnisfixenen Kosten ab, um die Rentabilität einzelner Produktlinien präziser zu beurteilen."
-          },
-          {
-                "question": "Was bedeutet eine negative Deckungsbeitragsquote?",
-                "answer": "Ein negativer Deckungsbeitrag bedeutet, dass der Verkaufspreis nicht einmal die unmittelbaren Herstellungskosten deckt. Mit jedem verkauften Stück vergrößert sich der Verlust – das Produkt sollte sofort ausgelistet oder im Preis erhöht werden."
-          }
+      { question: 'Was ist die mehrstufige Deckungsbeitragsrechnung?', answer: 'Sie spaltet die Fixkosten hierarchisch auf: Zuerst Erzeugnisfixkosten, dann Produktgruppenfixkosten, Bereichsfixkosten und schließlich Unternehmensfixkosten, um echte Verlustbringer aufzudecken.' },
+      { question: 'Was bedeutet die absolute Preisuntergrenze?', answer: 'Die kurzfristige Preisuntergrenze entspricht genau den variablen Stückkosten (DB = 0); zu diesem Preis darf ein Zusatzauftrag bei freien Kapazitäten kurzfristig angenommen werden.' },
     ],
-    relatedSlugs: ["break-even-rechner","marge-rechner","roi-rechner"],
+    relatedSlugs: ['stundensatz-kalkulation-freiberufler-rechner', 'break-even-rechner', 'marge-rechner', 'roi-rechner'],
   },
   {
     id: "roas-rechner",
@@ -135,10 +133,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "ROAS-Rechner",
     category: "business",
     subcategory: "Marketing & Vertrieb",
-    metaTitle: "ROAS Rechner – Return on Ad Spend & Break-Even-ROAS für Werbekampagnen",
-    metaDescription: "Berechnen Sie den ROAS in % und als Faktor (z. B. 4x = 400 %) für Google Ads, Meta Ads und TikTok sowie den erforderlichen Break-Even-ROAS nach Produktmarge.",
-    h1: "ROAS Rechner – Return on Ad Spend für Online-Marketing berechnen",
-    shortDescription: "Ermittelt Werberentabilität (ROAS) und Mindest-ROAS für Profitabilität.",
+    metaTitle: 'ROAS Rechner – Return on Ad Spend – RechenHafen',
+    metaDescription: 'Berechnen Sie den ROAS in % und als Faktor (z. B. 4x = 400 %) für Google Ads, Meta Ads und TikTok sowie den erforderlichen Break-Even-ROAS nach.',
+    h1: 'ROAS Rechner – Return on Ad Spend für Online-Marketing berechnen',
+    shortDescription: 'Ermittelt Werberentabilität (ROAS) und Mindest-ROAS für Profitabilität mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["roas rechner return on ad spend formel","break even roas berechnen marge ecommerce","google ads roas faktor prozent","werberendite berechnen umsatz ad spend"],
     inputs: [
           {
@@ -226,17 +224,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "ROAS 4,0x (2.500 € Nettogewinn)"
     },
+    content: {
+      intro: 'Der Return on Advertising Spend (ROAS) misst die Rentabilität bezahlter Werbekampagnen (Google Ads, Meta Ads) im E-Commerce und Online-Marketing.',
+      details: 'ROAS = (Durch Werbung generierter Bruttoumsatz / Werbekosten) · 100. Ein ROAS von 400 % bedeutet, dass jeder investierte Werbeeuro 4,00 Euro Umsatz generiert.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen ROAS und ROI?",
-                "answer": "Der ROAS berücksichtigt ausschließlich die Werbeausgaben (Umsatz / Werbekosten). Der ROI (Return on Investment) berücksichtigt alle Kosten (Wareneinsatz, Personal, Versand, Retouren und Werbung)."
-          },
-          {
-                "question": "Welcher ROAS gilt im E-Commerce als gut?",
-                "answer": "Das hängt von der Marge ab: Bei 30 % Marge braucht man mindestens 3,33x ROAS für den Break-Even. Bei 70 % Marge reicht bereits 1,43x ROAS für die Gewinnzone."
-          }
+      { question: 'Was ist der Break-Even-ROAS?', answer: 'Der Mindest-ROAS, ab dem die Kampagne nach Abzug der Wareneinsatzkosten profitabel ist: Break-Even-ROAS = 1 / Bruttomarge (bei 25 % Marge liegt der Break-Even-ROAS bei 400 %).' },
+      { question: 'Was unterscheidet ROAS von ROI?', answer: 'Der ROAS betrachtet isoliert den generierten Umsatz im Verhältnis zum reinen Ad-Spend; der ROI bezieht alle Kosten (Wareneinsatz, Personal, Software) ein und misst den tatsächlichen Nettogewinn.' },
     ],
-    relatedSlugs: ["roi-rechner","marge-rechner","deckungsbeitrag-rechner"],
+    relatedSlugs: ['roi-rechner', 'marge-rechner', 'deckungsbeitrag-rechner'],
   },
   {
     id: "roi-rechner",
@@ -245,10 +241,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "ROI-Rechner",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "ROI Rechner – Return on Investment (%) & Amortisationszeit berechnen",
-    metaDescription: "Berechnen Sie den Return on Investment (ROI in %) und die Amortisationsdauer in Monaten nach Investitionskosten und erzieltem Netto-Gewinnzuwachs.",
-    h1: "ROI Rechner – Return on Investment & Kapitalrendite ermitteln",
-    shortDescription: "Berechnet Kapitalrendite (ROI) und Amortisationsdauer von Investitionen.",
+    metaTitle: 'ROI Rechner – Return on Investment – RechenHafen',
+    metaDescription: 'Berechnen Sie den Return on Investment (ROI in %) und die Amortisationsdauer in Monaten nach Investitionskosten und erzieltem Netto-Gewinnzuwachs.',
+    h1: 'ROI Rechner – Return on Investment & Kapitalrendite ermitteln',
+    shortDescription: 'Berechnet Kapitalrendite (ROI) und Amortisationsdauer von Investitionen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["roi rechner return on investment formel","kapitalrendite investition berechnen","amortisationszeit monate rechner","roi prozent berechnen gewinn kosten"],
     inputs: [
           {
@@ -337,17 +333,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "50,0 % ROI (Amortisation nach 3,3 Jahren)"
     },
+    content: {
+      intro: 'Der Return on Investment (ROI nach dem DuPont-Kennzahlensystem) misst die Gesamtkapitalrentabilität einer Investition oder unternehmerischen Maßnahme.',
+      details: 'ROI = (Nettogewinn der Investition / Gesamte Investitionskosten) · 100 = Umsatzrentabilität · Kapitalumschlag. Ein positiver ROI signalisiert echten Kapitalzuwachs.',
+    },
     faqs: [
-          {
-                "question": "Was ist ein guter ROI?",
-                "answer": "Als allgemeiner Richtwert gilt: Ein ROI über 10 % p.a. ist solide, ab 15 % bis 20 % gilt eine Investition als hochattraktiv. Im Marketing und E-Commerce werden oft noch deutlich höhere kurzfristige ROIs erzielt."
-          },
-          {
-                "question": "Berücksichtigt die einfache ROI-Methode Zinsen oder Inflation?",
-                "answer": "Nein, die einfache ROI-Berechnung ignoriert den Zeitwert des Geldes. Für exakte mehrjährige Großprojekte nutzt man stattdessen die Kapitalwertmethode (NPV) oder den internen Zinsfuß (IRR)."
-          }
+      { question: 'Welcher ROI gilt in der Industrie als benchmarkfähig?', answer: 'In der produzierenden Industrie wird häufig ein ROI von mindestens 12 bis 15 Prozent angestrebt, um Kapitalkosten (WACC) zu übertreffen und Risiken abzudecken.' },
+      { question: 'Welche Schwachstelle hat die statische ROI-Betrachtung?', answer: 'Sie ignoriert den zeitlichen Anfall der Zahlungsströme (Zeitwert des Geldes); für mehrjährige Großprojekte ist die dynamische Kapitalwertmethode (NPV) vorzuziehen.' },
     ],
-    relatedSlugs: ["roas-rechner","deckungsbeitrag-rechner","ebit-ebitda-rechner"],
+    relatedSlugs: ['roas-rechner', 'deckungsbeitrag-rechner', 'ebit-ebitda-rechner'],
   },
   {
     id: "ebit-ebitda-rechner",
@@ -356,10 +350,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "EBIT & EBITDA",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "EBIT & EBITDA Rechner – Operatives Ergebnis & EBITDA-Marge berechnen",
-    metaDescription: "Berechnen Sie EBIT (operatives Ergebnis vor Zinsen und Steuern), EBITDA (vor Abschreibungen) und die EBITDA-Marge in % aus Umsatzerlösen und Kosten.",
-    h1: "EBIT & EBITDA Rechner – Operatives Unternehmensergebnis ermitteln",
-    shortDescription: "Berechnet EBIT, EBITDA und operative Margen nach GuV.",
+    metaTitle: 'EBIT & EBITDA Rechner – Operatives Ergebnis',
+    metaDescription: 'Berechnen Sie EBIT (operatives Ergebnis vor Zinsen und Steuern), EBITDA (vor Abschreibungen) und die EBITDA-Marge in % aus Umsatzerlösen und Kosten.',
+    h1: 'EBIT & EBITDA Rechner – Operatives Unternehmensergebnis ermitteln',
+    shortDescription: 'Berechnet EBIT, EBITDA und operative Margen nach GuV mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["ebit rechner ebitda marge formel","earnings before interest taxes bwl rechner","operativer gewinn vor zinsen steuern abschreibungen","ebitda berechnen guv umsatz"],
     inputs: [
           {
@@ -464,17 +458,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "EBITDA: 100.000 €, EBIT: 75.000 €"
     },
+    content: {
+      intro: 'EBIT (operatives Betriebsergebnis) und EBITDA (Ergebnis vor Zinsen, Steuern und Abschreibungen) messen die reine Ertragskraft des operativen Kerngeschäfts.',
+      details: 'EBIT = Jahresüberschuss + Ertragsteuern + Finanzergebnis. EBITDA = EBIT + Abschreibungen auf Sachanlagen (Depreciation) + Abschreibungen auf immaterielle Vermögensgegenstände (Amortization).',
+    },
     faqs: [
-          {
-                "question": "Was bedeutet das Akronym EBITDA?",
-                "answer": "EBITDA steht für \"Earnings Before Interest, Taxes, Depreciation and Amortization\" – also Jahresergebnis vor Zinsen, Steuern, Abschreibungen auf Sachanlagen und immaterielle Vermögenswerte."
-          },
-          {
-                "question": "Warum nutzen Banken und Investoren EBITDA für Unternehmensbewertungen?",
-                "answer": "Weil das EBITDA den reinen operativen Mittelzufluss widerspiegelt, der zur Bedienung von Krediten und für Reinvestitionen zur Verfügung steht, unabhängig davon, wie das Unternehmen bilanziert oder finanziert ist."
-          }
+      { question: 'Warum schätzen internationale Investoren das EBITDA so sehr?', answer: 'Weil es die operative Ertragskraft unabhängig von nationalen Steuersystemen, Finanzierungsstrukturen (Fremdkapitalanteil) und willkürlichen Abschreibungsmethoden vergleichbar macht.' },
+      { question: 'Was ist das Problem beim EBITDA?', answer: 'Es ignoriert reale Reinvestitionskosten: Maschinen und Software veralten und müssen zwingend ersetzt werden (Warren Buffett bezeichnet EBITDA daher oft als geschönte Größe).' },
     ],
-    relatedSlugs: ["cashflow-rechner","roi-rechner","umsatzrentabilitaet-rechner"],
+    relatedSlugs: ['abschreibung-linear-degressiv-rechner', 'cashflow-rechner', 'roi-rechner', 'umsatzrentabilitaet-rechner'],
   },
   {
     id: "cashflow-rechner",
@@ -483,10 +475,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Cashflow-Rechner",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "Cashflow Rechner – Operativen Cashflow berechnen (Praktiker-Formel)",
-    metaDescription: "Berechnen Sie den operativen Cashflow nach der Praktiker-Formel: Jahresüberschuss + Abschreibungen (AfA) + Veränderung der langfristigen Rückstellungen.",
-    h1: "Cashflow Rechner – Operative Finanzkraft & Liquiditätszufluss",
-    shortDescription: "Ermittelt den operativen Cashflow und die Cashflow-Umsatzrate.",
+    metaTitle: 'Cashflow Rechner – Operativen Cashflow berechnen',
+    metaDescription: 'Berechnen Sie den operativen Cashflow nach der Praktiker-Formel: Jahresüberschuss + Abschreibungen (AfA) + Veränderung der langfristigen Rückstellungen.',
+    h1: 'Cashflow Rechner – Operative Finanzkraft & Liquiditätszufluss',
+    shortDescription: 'Ermittelt den operativen Cashflow und die Cashflow-Umsatzrate mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["cashflow rechner praktiker formel bwl","operativer cashflow berechnen jahresueberschuss abschreibungen","cashflow marge quote umsatz","innenfinanzierungskraft unternehmen"],
     inputs: [
           {
@@ -575,17 +567,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "105.000 € operativer Cashflow (21 % Marge)"
     },
+    content: {
+      intro: 'Der operative Cashflow (Mittelzufluss aus laufender Geschäftstätigkeit) beziffert die tatsächliche Innenfinanzierungskraft und Liquiditätsgenerierung eines Unternehmens.',
+      details: 'Praktikerkennzahl (indirekte Methode): Jahresüberschuss + Abschreibungen + Zuführung zu Rückstellungen = Cashflow. Der Cashflow kann durch buchhalterische Gestaltungstricks kaum manipuliert werden ("Profit is an opinion, cash is a fact").',
+    },
     faqs: [
-          {
-                "question": "Kann ein Unternehmen trotz hohem Gewinn insolvent werden?",
-                "answer": "Ja! Wenn Kunden Rechnungen spät bezahlen oder viel Kapital im Warenlager gebunden ist, kann der Cashflow negativ werden. Viele insolvente Firmen waren auf dem Papier profitabel, hatten aber keine Liquidität."
-          },
-          {
-                "question": "Was ist der Free Cashflow?",
-                "answer": "Der Free Cashflow ist der operative Cashflow abzüglich der getätigten Investitionsausgaben (Capex). Er beziffert das Geld, das den Eigentümern frei zur Entnahme oder für Dividendenausschüttungen verbleibt."
-          }
+      { question: 'Was ist der Free Cashflow (FCF)?', answer: 'Der freie Cashflow ist der operative Cashflow abzüglich der notwendigen Investitionen in Sachanlagen (CapEx); dieses Geld steht frei für Dividendenzahlungen oder Schuldentilgung bereit.' },
+      { question: 'Kann ein hochprofitables Unternehmen mit positivem Gewinn insolvent werden?', answer: 'Ja, wenn die Gewinne nur auf dem Papier in offenen Kundenforderungen (Forderungen aus L.u.L.) gebunden sind, aber kein reales Geld auf dem Bankkonto zur Begleichung fälliger Gehälter vorhanden ist.' },
     ],
-    relatedSlugs: ["ebit-ebitda-rechner","liquiditaetsgrad-rechner","working-capital-rechner"],
+    relatedSlugs: ['abschreibung-linear-degressiv-rechner', 'ebit-ebitda-rechner', 'liquiditaetsgrad-rechner', 'working-capital-rechner'],
   },
   {
     id: "liquiditaetsgrad-rechner",
@@ -594,10 +584,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Liquiditätsgrade",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "Liquiditätsgrad Rechner – Barliquidität (1.), Quick Ratio (2.) & Current Ratio (3.)",
-    metaDescription: "Berechnen Sie die Liquidität 1. Grades (Cash Ratio, Ziel 20-30 %), 2. Grades (Quick Ratio, Ziel 100 %) und 3. Grades (Current Ratio, Ziel 150-200 %) nach Bilanzwerten.",
-    h1: "Liquiditätsgrade Rechner – Zahlungsfähigkeit 1., 2. & 3. Grades prüfen",
-    shortDescription: "Berechnet Cash Ratio, Quick Ratio und Current Ratio nach Bilanz.",
+    metaTitle: 'Liquiditätsgrad Rechner – Barliquidität, Quick Ratio',
+    metaDescription: 'Berechnen Sie die Liquidität 1. Grades (Cash Ratio, Ziel 20-30 %), 2. Grades (Quick Ratio, Ziel 100 %) und 3.',
+    h1: 'Liquiditätsgrade Rechner – Zahlungsfähigkeit 1., 2. & 3. Grades prüfen',
+    shortDescription: 'Berechnet Cash Ratio, Quick Ratio und Current Ratio nach Bilanz.',
     searchKeywords: ["liquiditaetsgrade rechner 1 2 3 grad formel","barliquiditaet cash ratio quick ratio current ratio","zahlungsfaehigkeit unternehmen bilanzpruefung","liquiditaet 2 grades 100 prozent zielwert"],
     inputs: [
           {
@@ -689,17 +679,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "L1: 37,5 %, L2: 125 %, L3: 200 %"
     },
+    content: {
+      intro: 'Die Liquiditätsgrade (1., 2. und 3. Grades) analysieren die Fähigkeit eines Unternehmens, seinen kurzfristigen Zahlungsverpflichtungen jederzeit pünktlich nachzukommen.',
+      details: 'Barliquidität (1. Grad, Cash Ratio) = Flüssige Mittel / kurzfristige Verbindlichkeiten (Ziel: 20–30 %). Einzugsbedingte Liquidität (2. Grad, Quick Ratio) = (Flüssige Mittel + Forderungen) / Verbindlichkeiten (Ziel: 100–120 %).',
+    },
     faqs: [
-          {
-                "question": "Warum ist die Liquidität 2. Grades (Quick Ratio) die wichtigste Kennzahl?",
-                "answer": "Weil Waren im Lager (3. Grad) oft nicht sofort zu Geld gemacht werden können, ohne hohe Preisnachlässe zu gewähren. Bei L2 müssen allein Kasse und offene Rechnungen alle fälligen Schulden abdecken."
-          },
-          {
-                "question": "Ist eine zu hohe Liquidität (z. B. 80 % Barliquidität) schädlich?",
-                "answer": "Ja, übermäßige Barliquidität bringt kaum Zinsen und bedeutet, dass Kapital unproduktiv auf dem Girokonto liegt, anstatt gewinnbringend investiert zu werden."
-          }
+      { question: 'Was misst die Current Ratio (Liquidität 3. Grades)?', answer: 'Current Ratio = Gesamtes Umlaufvermögen (inkl. Vorräte) / kurzfristige Verbindlichkeiten; sie sollte mindestens 150 bis 200 Prozent betragen.' },
+      { question: 'Warum zählt man das Warenlager beim Quick Ratio (2. Grad) nicht mit?', answer: 'Weil Vorräte und Rohstoffe nicht sofort zu Geld gemacht werden können und bei Notverkäufen erhebliche Wertabschläge drohen.' },
     ],
-    relatedSlugs: ["working-capital-rechner","cashflow-rechner","skontorechner"],
+    relatedSlugs: ['skonto-jahreszins-rechner', 'working-capital-rechner', 'cashflow-rechner', 'skontorechner'],
   },
   {
     id: "working-capital-rechner",
@@ -708,10 +696,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Working Capital",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "Working Capital Rechner – Nettoumlaufvermögen (NUV) & Ratio berechnen",
-    metaDescription: "Berechnen Sie das Working Capital (Umlaufvermögen abzüglich kurzfristiger Verbindlichkeiten) und die Working Capital Ratio zur Beurteilung der finanziellen Pufferzone.",
-    h1: "Working Capital Rechner – Nettoumlaufvermögen & Liquiditätspuffer",
-    shortDescription: "Ermittelt Working Capital und die Working Capital Ratio aus der Bilanz.",
+    metaTitle: 'Working Capital Rechner – Nettoumlaufvermögen',
+    metaDescription: 'Berechnen Sie das Working Capital (Umlaufvermögen abzüglich kurzfristiger Verbindlichkeiten) und die Working Capital Ratio zur Beurteilung der.',
+    h1: 'Working Capital Rechner – Nettoumlaufvermögen & Liquiditätspuffer',
+    shortDescription: 'Ermittelt Working Capital und die Working Capital Ratio aus der Bilanz.',
     searchKeywords: ["working capital rechner nettoumlaufvermoegen formel","working capital ratio umlaufvermoegen verbindlichkeiten","working capital management optimieren","finanzielle stabilitaet bilanzkennzahl"],
     inputs: [
           {
@@ -774,17 +762,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "+70.000 € Working Capital (Ratio 164 %)"
     },
+    content: {
+      intro: 'Das Net Working Capital (Nettoumlaufvermögen) ist das zinslos gebundene Betriebskapital, das die laufende Produktion und Lieferfähigkeit finanziert.',
+      details: 'Formel: Working Capital = Umlaufvermögen - kurzfristige unverzinsliche Verbindlichkeiten. Ein positives Working Capital signalisiert, dass das Umlaufvermögen die kurzfristigen Schulden übersteigt und Liquiditätssicherheit besteht.',
+    },
     faqs: [
-          {
-                "question": "Was tun bei zu hohem Working Capital?",
-                "answer": "Ein zu hohes Working Capital bindet unnötig viel Kapital (z. B. durch riesige Lagerbestände oder zögerliches Mahnwesen bei Kunden). Ziel des Working-Capital-Managements ist es, Vorräte und Forderungslaufzeiten zu minimieren."
-          },
-          {
-                "question": "Gibt es Branchen mit bewusst negativem Working Capital?",
-                "answer": "Ja! Große Lebensmitteleinzelhändler (z. B. Aldi, Edeka) haben oft ein negatives Working Capital: Kunden zahlen bar oder mit Karte sofort, während Lieferanten erst nach 60-90 Tagen bezahlt werden. Das Unternehmen finanziert sich zinslos über Lieferantenkredite!"
-          }
+      { question: 'Kann ein negatives Working Capital auch vorteilhaft sein?', answer: 'Ja, bei Geschäftsmodellen wie Discountern oder E-Commerce (z. B. Amazon): Kunden zahlen sofort bar oder per Kreditkarte, während Lieferanten erst nach 60 bis 90 Tagen bezahlt werden (Lieferantenkredit finanziert das Wachstum).' },
+      { question: 'Wie optimiert man das Working Capital (Working Capital Management)?', answer: 'Durch stringentes Mahnwesen (kürzere Zahlungsziele für Kunden), Just-in-Time-Lagerhaltung (geringere Vorräte) und Verhandlung längerer Zahlungsziele bei Lieferanten.' },
     ],
-    relatedSlugs: ["liquiditaetsgrad-rechner","cashflow-rechner","lagerumschlagshaeufigkeit-rechner"],
+    relatedSlugs: ['liquiditaetsgrad-rechner', 'cashflow-rechner', 'lagerumschlagshaeufigkeit-rechner'],
   },
   {
     id: "umsatzrentabilitaet-rechner",
@@ -793,10 +779,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Umsatzrendite-Rechner",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "Umsatzrentabilität Rechner – Umsatzrendite (Return on Sales ROS in %)",
-    metaDescription: "Berechnen Sie die Umsatzrendite / Umsatzrentabilität (ROS in %): Wie viel Cent Reingewinn verbleiben dem Unternehmen von jedem Euro Umsatz?",
-    h1: "Umsatzrentabilität Rechner – Umsatzrendite (ROS) ermitteln",
-    shortDescription: "Berechnet die Umsatzrendite in Prozent aus Gewinn und Gesamtumsatz.",
+    metaTitle: 'Umsatzrentabilität Rechner – Umsatzrendite',
+    metaDescription: 'Berechnen Sie die Umsatzrendite / Umsatzrentabilität (ROS in %): Wie viel Cent Reingewinn verbleiben dem Unternehmen von jedem Euro Umsatz?',
+    h1: 'Umsatzrentabilität Rechner – Umsatzrendite (ROS) ermitteln',
+    shortDescription: 'Berechnet die Umsatzrendite in Prozent aus Gewinn und Gesamtumsatz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["umsatzrentabilitaet rechner formel gewinn umsatz","umsatzrendite return on sales ros prozent","wieviel cent gewinn pro euro umsatz","bruttoumsatzrendite nettoumsatzrendite berechnen"],
     inputs: [
           {
@@ -863,17 +849,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "8,0 % Umsatzrendite"
     },
+    content: {
+      intro: 'Die Umsatzrentabilität (Umsatzrendite / Return on Sales, ROS) beziffert den Gewinnanteil, den ein Unternehmen mit jedem umgesetzten Euro erwirtschaftet.',
+      details: 'ROS = (Jahresüberschuss / Umsatzerlöse) · 100. Eine Umsatzrendite von 8 % bedeutet, dass nach Begleichung aller Material-, Personal-, Verwaltungs- und Steuerkosten von 100 € Umsatz genau 8 € Reingewinn verbleiben.',
+    },
     faqs: [
-          {
-                "question": "Welche Umsatzrendite ist normal in Deutschland?",
-                "answer": "Im deutschen Schnitt liegt die Nettoumsatzrendite im Mittelstand bei ca. 4 % bis 7 %. Im Lebensmitteleinzelhandel oft bei nur 1,5 % bis 2 %, in der Softwarebranche dagegen häufig bei 20 % bis 35 %."
-          },
-          {
-                "question": "Was ist der Unterschied zwischen EBIT-Marge und Umsatzrendite?",
-                "answer": "Die operative EBIT-Marge setzt das Betriebsergebnis vor Zinsen und Steuern ins Verhältnis zum Umsatz. Die klassische Umsatzrendite (ROS) basiert meist auf dem Jahresüberschuss nach Steuern."
-          }
+      { question: 'Welche Branchen haben traditionell niedrige, welche hohe Umsatzrenditen?', answer: 'Der Lebensmitteleinzelhandel operiert oft mit extrem niedrigen Margen von 1,5 bis 3 Prozent (hohe Umschlagshäufigkeit); Software- und Pharmaunternehmen erzielen oft 20 bis 35 Prozent Umsatzrendite.' },
+      { question: 'Was ist die operative Umsatzrendite (EBIT-Marge)?', answer: 'EBIT / Umsatz · 100; sie misst die reine operative Leistung vor Zinsaufwendungen und Steuern.' },
     ],
-    relatedSlugs: ["marge-rechner","ebit-ebitda-rechner","eigenkapitalrentabilitaet-rechner"],
+    relatedSlugs: ['marge-rechner', 'ebit-ebitda-rechner', 'eigenkapitalrentabilitaet-rechner', 'gesamtkapitalrentabilitaet-rechner'],
   },
   {
     id: "eigenkapitalrentabilitaet-rechner",
@@ -882,10 +866,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "ROE-Rechner",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "Eigenkapitalrentabilität Rechner – Return on Equity (ROE) & Leverage-Effekt",
-    metaDescription: "Berechnen Sie die Eigenkapitalrendite (ROE in % = Gewinn / Eigenkapital) und analysieren Sie den positiven oder negativen Leverage-Effekt von Fremdkapital.",
-    h1: "Eigenkapitalrentabilität Rechner – Return on Equity (ROE) berechnen",
-    shortDescription: "Berechnet die Eigenkapitalrendite (ROE) und den Leverage-Effekt.",
+    metaTitle: 'Eigenkapitalrentabilität Rechner – Return on Equity',
+    metaDescription: 'Berechnen Sie die Eigenkapitalrendite (ROE in % = Gewinn / Eigenkapital) und analysieren Sie den positiven oder negativen Leverage-Effekt von Fremdkapital.',
+    h1: 'Eigenkapitalrentabilität Rechner – Return on Equity (ROE) berechnen',
+    shortDescription: 'Berechnet die Eigenkapitalrendite (ROE) und den Leverage-Effekt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["eigenkapitalrentabilitaet rechner roe formel","return on equity berechnen eigenkapital gewinn","leverage effekt fremdkapitalzinsen hebel","eigenkapitalverzinsung bwl aktie"],
     inputs: [
           {
@@ -951,17 +935,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "16,0 % Eigenkapitalrendite"
     },
+    content: {
+      intro: 'Die Eigenkapitalrentabilität (Return on Equity, ROE) misst die Verzinsung des von den Unternehmensinhabern bzw. Aktionären eingesetzten Eigenkapitals.',
+      details: 'ROE = (Jahresüberschuss / Eigenkapital) · 100. Liegt der ROE dauerhaft unter dem Zinssatz für sichere Bundesanleihen, lohnt sich das unternehmerische Risiko für die Anteilseigner betriebswirtschaftlich nicht.',
+    },
     faqs: [
-          {
-                "question": "Was ist der Leverage-Effekt beim Eigenkapital?",
-                "answer": "Liegt die Gesamtkapitalrendite über dem Fremdkapitalzins, steigt die Eigenkapitalrendite durch die Aufnahme von günstigem Fremdkapital an. Umgekehrt drohen bei sinkenden Erträgen massive Verluste (negativer Hebel)."
-          },
-          {
-                "question": "Warum ist ein extrem hoher ROE nicht immer ein Qualitätsmerkmal?",
-                "answer": "Ein künstlich hoher ROE kann entstehen, wenn ein Unternehmen kaum Eigenkapital besitzt und hochgradig mit Schulden überladen ist, was die Insolvenzgefahr bei Krisen drastisch erhöht."
-          }
+      { question: 'Wie kann ein Unternehmen seine Eigenkapitalrendite künstlich aufblähen?', answer: 'Über den Leverage-Effekt: Durch Aufnahme von billigem Fremdkapital wird die Eigenkapitalbasis verkleinert; dies steigert den ROE, erhöht aber gleichzeitig das Insolvenzrisiko massiv.' },
+      { question: 'Welcher ROE gilt für gesunde Mittelständler als solide?', answer: 'Werte zwischen 10 und 18 Prozent gelten im deutschen Mittelstand als solide und krisenfest.' },
     ],
-    relatedSlugs: ["gesamtkapitalrentabilitaet-rechner","umsatzrentabilitaet-rechner","roi-rechner"],
+    relatedSlugs: ['gesamtkapitalrentabilitaet-rechner', 'umsatzrentabilitaet-rechner', 'roi-rechner'],
   },
   {
     id: "gesamtkapitalrentabilitaet-rechner",
@@ -970,10 +952,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "ROA-Rechner",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: "Gesamtkapitalrentabilität Rechner – Return on Assets (ROA in %) berechnen",
-    metaDescription: "Berechnen Sie die Gesamtkapitalrendite (ROA in % = (Gewinn + Fremdkapitalzinsen) / Gesamtkapital) zur unabhängigen Bewertung der Leistungsfähigkeit des Gesamtunternehmens.",
-    h1: "Gesamtkapitalrentabilität Rechner – Kapitalverzinsung (ROA) ermitteln",
-    shortDescription: "Berechnet die Gesamtkapitalrendite unabhängig von der Finanzierung.",
+    metaTitle: 'Gesamtkapitalrentabilität Rechner – Return on Assets berechnen',
+    metaDescription: 'Berechnen Sie die Gesamtkapitalrendite (ROA in % = (Gewinn + Fremdkapitalzinsen) / Gesamtkapital) zur unabhängigen Bewertung der Leistungsfähigkeit des.',
+    h1: 'Gesamtkapitalrentabilität Rechner – Kapitalverzinsung (ROA) ermitteln',
+    shortDescription: 'Berechnet die Gesamtkapitalrendite unabhängig von der Finanzierung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["gesamtkapitalrentabilitaet rechner roa formel","return on assets berechnen bwl fremdkapitalzinsen","gesamtkapitalverzinsung bilanz aktiva","rentabilitaet des gesamtkapitals"],
     inputs: [
           {
@@ -1050,17 +1032,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "8,0 % Gesamtkapitalrentabilität"
     },
+    content: {
+      intro: 'Die Gesamtkapitalrentabilität (Return on Assets, ROA) misst die Effizienz, mit der das gesamte im Unternehmen arbeitende Kapital (Eigen- und Fremdkapital) eingesetzt wird.',
+      details: 'ROA = [(Jahresüberschuss + Fremdkapitalzinsen) / Gesamtkapital (Bilanzsumme)] · 100. Die Fremdkapitalzinsen werden hinzuaddiert, da sie die Ertragsleistung des Fremdkapitals darstellen.',
+    },
     faqs: [
-          {
-                "question": "Warum addiert man die Zinsen bei der Gesamtkapitalrendite wieder hinzu?",
-                "answer": "Weil die Zinsen der Ertrag des Fremdkapitals sind. Durch die Hinzurechnung wird die Kennzahl unabhängig davon, ob das Unternehmen mit Eigen- oder Fremdkapital finanziert ist."
-          },
-          {
-                "question": "Welcher ROA gilt in der Industrie als gut?",
-                "answer": "Eine Gesamtkapitalrendite über dem marktüblichen Kreditzins (z. B. > 6 % bis 8 %) ist das Mindestziel, um den Hebel des Fremdkapitals positiv nutzen zu können."
-          }
+      { question: 'Warum werden die Fremdkapitalzinsen zum Gewinn hinzuaddiert?', answer: 'Weil die Gesamtkapitalrentabilität messen soll, wie produktiv das gesamte Vermögen gewirtschaftet hat, unabhängig davon, ob es von Banken oder Aktionären finanziert wurde.' },
+      { question: 'Welche Bedingung muss für einen positiven Hebeleffekt (Leverage) gelten?', answer: 'Die Gesamtkapitalrentabilität muss zwingend höher sein als der Fremdkapitalzinssatz; liegt sie darunter, vernichtet jede Kreditaufnahme Eigenkapital (negativer Leverage).' },
     ],
-    relatedSlugs: ["eigenkapitalrentabilitaet-rechner","umsatzrentabilitaet-rechner","ebit-ebitda-rechner"],
+    relatedSlugs: ['eigenkapitalrentabilitaet-rechner', 'umsatzrentabilitaet-rechner', 'ebit-ebitda-rechner'],
   },
   {
     id: "kundengewinnungskosten-cac-rechner",
@@ -1069,10 +1049,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "CAC-Rechner",
     category: "business",
     subcategory: "Marketing & Vertrieb",
-    metaTitle: "CAC Rechner – Customer Acquisition Cost (Kundengewinnungskosten berechnen)",
-    metaDescription: "Berechnen Sie die Customer Acquisition Costs (CAC in €) aus Marketing- und Vertriebsaufwand geteilt durch die Anzahl gewonnener Neukunden.",
-    h1: "CAC Rechner – Kundengewinnungskosten im Vertrieb berechnen",
-    shortDescription: "Ermittelt die durchschnittlichen Kosten für die Gewinnung eines Neukunden.",
+    metaTitle: 'CAC Rechner – Customer Acquisition Cost',
+    metaDescription: 'Berechnen Sie die Customer Acquisition Costs (CAC in €) aus Marketing- und Vertriebsaufwand geteilt durch die Anzahl gewonnener Neukunden.',
+    h1: 'CAC Rechner – Kundengewinnungskosten im Vertrieb berechnen',
+    shortDescription: 'Ermittelt die durchschnittlichen Kosten für die Gewinnung eines Neukunden mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["cac rechner customer acquisition cost formel","kundengewinnungskosten berechnen marketing vertrieb","cac payback period monate","kosten pro neukunde ecommerce saas"],
     inputs: [
           {
@@ -1158,17 +1138,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "100 € CAC (2 Monate Payback)"
     },
+    content: {
+      intro: 'Die Customer Acquisition Cost (CAC) beziffern die durchschnittlichen Gesamtvertriebs- und Marketingkosten zur Gewinnung eines einzigen neuen zahlenden Kunden.',
+      details: 'CAC = (Gesamte Marketing- und Vertriebsausgaben inklusive Gehälter) / Anzahl der Neukunden. Wichtig: Die Kosten müssen alle Werbebudgets, Gehälter der Sales-Mitarbeiter und CRM-Softwarelizenzen einschließen.',
+    },
     faqs: [
-          {
-                "question": "Welches Verhältnis von CLV zu CAC gilt als gesund?",
-                "answer": "Im SaaS- und Digitalbereich gilt ein CLV:CAC-Verhältnis von mindestens 3:1 als goldener Standard (der Kunde bringt dreimal so viel Bruttoertrag ein, wie seine Gewinnung gekostet hat)."
-          },
-          {
-                "question": "Welche Kosten gehören alles in die CAC-Berechnung?",
-                "answer": "Alle Kosten: Werbeausgaben (Google/Meta), Gehälter von Marketing- und Vertriebsmitarbeitern, Softwarekosten für CRM- und E-Mail-Tools sowie externe Agenturhonorare."
-          }
+      { question: 'In welchem Verhältnis sollten CAC und Customer Lifetime Value (CLV) stehen?', answer: 'Die goldene Faustregel im SaaS- und Digitalbusiness lautet: CLV zu CAC sollte mindestens 3:1 betragen; liegt das Verhältnis unter 1:1, verbrennt das Unternehmen mit jedem Neukunden Geld.' },
+      { question: 'Was ist die CAC Payback Period?', answer: 'Die Zeitspanne in Monaten, die ein Kunde benötigt, um über seine Bruttomargenbeiträge die für ihn aufgewendeten Akquisitionskosten vollständig zu refinanzieren (ideal: < 12 Monate).' },
     ],
-    relatedSlugs: ["customer-lifetime-value-clv-rechner","roas-rechner","lead-conversion-rate-rechner"],
+    relatedSlugs: ['customer-lifetime-value-clv-rechner', 'roas-rechner', 'lead-conversion-rate-rechner'],
   },
   {
     id: "customer-lifetime-value-clv-rechner",
@@ -1177,10 +1155,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "CLV-Rechner",
     category: "business",
     subcategory: "Marketing & Vertrieb",
-    metaTitle: "CLV Rechner – Customer Lifetime Value & Kundenwertformel berechnen",
-    metaDescription: "Berechnen Sie den Customer Lifetime Value (CLV in €) nach durchschnittlichem Bestellwert, Kauffrequenz, Kundenlebensdauer und Bruttomarge.",
-    h1: "CLV Rechner – Customer Lifetime Value & Kundenwert ermitteln",
-    shortDescription: "Berechnet den Kundenwert (CLV) über die gesamte Kundenbeziehung.",
+    metaTitle: 'CLV Rechner – Customer Lifetime Value',
+    metaDescription: 'Berechnen Sie den Customer Lifetime Value (CLV in €) nach durchschnittlichem Bestellwert, Kauffrequenz, Kundenlebensdauer und Bruttomarge.',
+    h1: 'CLV Rechner – Customer Lifetime Value & Kundenwert ermitteln',
+    shortDescription: 'Berechnet den Kundenwert (CLV) über die gesamte Kundenbeziehung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["clv rechner customer lifetime value formel","kundenwert berechnen marketing ecommerce saas","clv cac ratio verhaeltnis 3 zu 1","lebenszeitwert eines kunden berechnen"],
     inputs: [
           {
@@ -1276,17 +1254,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "480 € Customer Lifetime Value"
     },
+    content: {
+      intro: 'Der Customer Lifetime Value (CLV) prognostiziert den kumulierten Deckungsbeitrag, den ein Kunde über die gesamte Dauer seiner Kundenbeziehung für das Unternehmen generiert.',
+      details: 'CLV = Durchschnittlicher Bestellwert · Kauffrequenz pro Jahr · Kundenlebensdauer in Jahren · Bruttomarge in %. Bei Abomodellen: (Monatlicher Deckungsbeitrag pro Kunde) / Churn-Rate.',
+    },
     faqs: [
-          {
-                "question": "Warum ist der CLV wichtiger als der Erstbestellwert?",
-                "answer": "Im modernen E-Commerce deckt die Erstbestellung durch hohe Werbekosten oft nicht einmal die Akquisekosten (CAC). Profitabel wird das Unternehmen erst durch Wiederkäufe über die gesamte Lebensdauer."
-          },
-          {
-                "question": "Wie kann man den CLV aktiv steigern?",
-                "answer": "Durch gezieltes E-Mail-Marketing zur Steigerung der Kauffrequenz, Cross-Selling zur Erhöhung des Warenkorbs und exzellenten Kundenservice zur Senkung der Abwanderungsquote (Churn)."
-          }
+      { question: 'Warum ist Kundenbindung fast immer günstiger als Neukundengewinnung?', answer: 'Bestehende Kunden haben bereits Vertrauen gefasst, verursachen keine erneuten Akquisekosten, kaufen oft häufiger und reagieren weniger preissensibel auf Upgrades.' },
+      { question: 'Wie beeinflusst die Kündigungsquote (Churn) den CLV?', answer: 'Eine Halbierung der Churn-Rate verdoppelt die durchschnittliche Kundenlebensdauer und verdoppelt damit direkt den gesamten Customer Lifetime Value.' },
     ],
-    relatedSlugs: ["kundengewinnungskosten-cac-rechner","churn-rate-rechner","roas-rechner"],
+    relatedSlugs: ['kundengewinnungskosten-cac-rechner', 'churn-rate-rechner', 'roas-rechner'],
   },
   {
     id: "churn-rate-rechner",
@@ -1295,10 +1271,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Churn-Rate-Rechner",
     category: "business",
     subcategory: "Marketing & Vertrieb",
-    metaTitle: "Churn Rate Rechner – Kundenabwanderungsquote (%) & MRR Churn",
-    metaDescription: "Berechnen Sie die monatliche und jährliche Churn Rate (Kundenabwanderung in %) sowie den Revenue Churn für SaaS-, Abo- und Dienstleistungsunternehmen.",
-    h1: "Churn Rate Rechner – Abwanderungsquote & Kundenverlust ermitteln",
-    shortDescription: "Berechnet Kunden- und Umsatzabwanderung im Abonnementgeschäft.",
+    metaTitle: 'Churn Rate Rechner – Kundenabwanderungsquote (%) & MRR Churn',
+    metaDescription: 'Berechnen Sie die monatliche und jährliche Churn Rate (Kundenabwanderung in %) sowie den Revenue Churn für SaaS-, Abo- und Dienstleistungsunternehmen.',
+    h1: 'Churn Rate Rechner – Abwanderungsquote & Kundenverlust ermitteln',
+    shortDescription: 'Berechnet Kunden- und Umsatzabwanderung im Abonnementgeschäft mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["churn rate rechner kundenabwanderungsquote formel","mrr churn berechnen saas abonnement","kundenabwanderung prozent pro monat jahr","durchschnittliche kundenlebensdauer 1 durch churn"],
     inputs: [
           {
@@ -1378,17 +1354,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "3,0 % Monats-Churn (33 Monate Lebensdauer)"
     },
+    content: {
+      intro: 'Die Churn-Rate (Kundenabwanderungsquote) beziffert den prozentualen Verlust von Abonnenten oder Kunden innerhalb eines festgelegten Abrechnungszeitraums.',
+      details: 'Churn-Rate = (Verlorene Kunden während der Periode / Kundenbestand zu Periodenbeginn) · 100. Eine monatliche Churn-Rate von 5 % bedeutet, dass über das Jahr gerechnet fast die Hälfte des Kundenstamms ersetzt werden muss.',
+    },
     faqs: [
-          {
-                "question": "Was ist Net Revenue Churn?",
-                "answer": "Der Net Revenue Churn berücksichtigt neben Abwanderungen auch Upgrades und Expansionen bestehender Kunden. Ist der Net Churn negativ, wächst der Umsatz des Unternehmens selbst dann, wenn kein einziger Neukunde gewonnen wird!"
-          },
-          {
-                "question": "Welche Churn Rate gilt im B2B- und B2C-Bereich als gut?",
-                "answer": "Im B2B-Enterprise-Bereich gilt eine Jahres-Churn-Rate unter 5 % bis 8 % als exzellent. Im B2C-Abo-Bereich (z. B. Streaming, Fitnessstudio) sind monatliche Quoten von 3 % bis 5 % üblich."
-          }
+      { question: 'Was ist der Unterschied zwischen Customer Churn und Revenue Churn?', answer: 'Customer Churn misst die Anzahl der abgesprungenen Kunden; Revenue Churn misst den verlorenen monatlich wiederkehrenden Umsatz (MRR); durch Upgrades bestehender Kunden kann Net Revenue Churn sogar negativ sein (starkes Wachstum!).' },
+      { question: 'Was ist eine gesunde Churn-Rate im B2B-SaaS-Bereich?', answer: 'Im Enterprise-B2B-Sektor gilt eine jährliche Churn-Rate von unter 5 bis 7 Prozent als hervorragend; im B2C-Geschäft liegen Monats-Churn-Raten oft bei 3 bis 7 Prozent.' },
     ],
-    relatedSlugs: ["customer-lifetime-value-clv-rechner","kundengewinnungskosten-cac-rechner","lead-conversion-rate-rechner"],
+    relatedSlugs: ['customer-lifetime-value-clv-rechner', 'kundengewinnungskosten-cac-rechner', 'lead-conversion-rate-rechner'],
   },
   {
     id: "lead-conversion-rate-rechner",
@@ -1397,10 +1371,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Conversion-Rate-Rechner",
     category: "business",
     subcategory: "Marketing & Vertrieb",
-    metaTitle: "Conversion Rate Rechner – Konversionsrate (%) für E-Commerce & Leads",
-    metaDescription: "Berechnen Sie die Conversion Rate in Prozent für Webshops und Landingpages: Besucher zu Leads, Warenkörbe zu Käufen und Lead-to-Customer Rate.",
-    h1: "Conversion Rate Rechner – Konversionsrate für Shop & Leads ermitteln",
-    shortDescription: "Berechnet die Conversion Rate aus Besucherzahlen und Abschlüssen.",
+    metaTitle: 'Conversion Rate Rechner – Konversionsrate für E-Commerce',
+    metaDescription: 'Berechnen Sie die Conversion Rate in Prozent für Webshops und Landingpages: Besucher zu Leads, Warenkörbe zu Käufen und Lead-to-Customer Rate.',
+    h1: 'Conversion Rate Rechner – Konversionsrate für Shop & Leads ermitteln',
+    shortDescription: 'Berechnet die Conversion Rate aus Besucherzahlen und Abschlüssen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["conversion rate rechner formel prozent shop","konversionsrate berechnen besucher kunden","lead to customer conversion rate rechner","durchschnittliche ecommerce conversion rate 2 bis 3 prozent"],
     inputs: [
           {
@@ -1482,17 +1456,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "2,50 % Conversion Rate (1,63 € RPV)"
     },
+    content: {
+      intro: 'Die Lead Conversion Rate misst den prozentualen Anteil von Interessenten (Leads), die zu aktiven Käufern oder Vertragsabschlüssen konvertiert werden.',
+      details: 'Conversion Rate = (Erfolgreiche Abschlüsse / Gesamtzahl der generierten Leads) · 100. Die Conversion Rate analysiert Schwachstellen in den einzelnen Stufen des Marketing- und Vertriebs-Funnels.',
+    },
     faqs: [
-          {
-                "question": "Wie hoch ist die durchschnittliche Conversion Rate im E-Commerce?",
-                "answer": "Im deutschen Online-Handel liegt der Branchendurchschnitt typischerweise zwischen 1,8 % und 2,8 %. Auf Mobilgeräten ist die CR meist etwa 30 % niedriger als auf dem Desktop."
-          },
-          {
-                "question": "Wie kann man die Conversion Rate am schnellsten steigern?",
-                "answer": "Durch Verkürzen der Ladezeiten, Anbieten beliebter Zahlungsarten (PayPal, Klarna, Apple Pay), Vertrauenselemente (Käuferschutz-Siegel, echte Kundenbewertungen) und One-Page-Checkouts."
-          }
+      { question: 'Welche Conversion Rates sind im deutschen E-Commerce typisch?', answer: 'Die durchschnittliche E-Commerce-Conversion-Rate im Online-Handel liegt in Deutschland bei ca. 1,5 bis 3,0 Prozent aller Website-Besucher.' },
+      { question: 'Wie lässt sich die Conversion Rate im Checkout optimieren?', answer: 'Durch Anbieten beliebter lokaler Bezahlmethoden (PayPal, Klarna, Kauf auf Rechnung), Verzicht auf erzwungene Kundenkonto-Registrierung (Gast-Checkout) und transparente Versandkosten.' },
     ],
-    relatedSlugs: ["roas-rechner","kundengewinnungskosten-cac-rechner","churn-rate-rechner"],
+    relatedSlugs: ['roas-rechner', 'kundengewinnungskosten-cac-rechner', 'churn-rate-rechner'],
   },
   {
     id: "abschreibung-linear-degressiv-rechner",
@@ -1501,10 +1473,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "AfA-Rechner",
     category: "business",
     subcategory: "Steuern & Buchhaltung",
-    metaTitle: "AfA Rechner – Lineare & Degressive Abschreibung (Wachstumschancengesetz 2024)",
-    metaDescription: "Berechnen Sie die jährliche steuerliche Abschreibung (AfA) linear nach offizieller BMF-Nutzungsdauer oder degressiv (bis zu 20 % nach Wachstumschancengesetz) inklusive Restbuchwert.",
-    h1: "AfA Rechner – Lineare & Degressive Abschreibung ermitteln",
-    shortDescription: "Berechnet jährliche Abschreibungsbeträge und Restbuchwerte.",
+    metaTitle: 'AfA Rechner – Lineare – RechenHafen',
+    metaDescription: 'Berechnen Sie die jährliche steuerliche Abschreibung (AfA) linear nach offizieller BMF-Nutzungsdauer oder degressiv (bis zu 20 % nach.',
+    h1: 'AfA Rechner – Lineare & Degressive Abschreibung ermitteln',
+    shortDescription: 'Berechnet jährliche Abschreibungsbeträge und Restbuchwerte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["afa rechner lineare degressive abschreibung formel","abschreibungstabelle bmf nutzungsdauer jahre","degressive afa 2024 wachstumschancengesetz 20 prozent","restbuchwert abschreibungsplan berechnen"],
     inputs: [
           {
@@ -1602,17 +1574,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "6.666,67 € jährliche Abschreibung"
     },
+    content: {
+      intro: 'Dieser AfA-Rechner kalkuliert die steuerliche Abschreibung betrieblicher Wirtschaftsgüter nach den amtlichen AfA-Tabellen des Bundesfinanzministeriums.',
+      details: 'Lineare AfA = Anschaffungskosten / Nutzungsdauer in Jahren. Degressive AfA (nach § 7 Abs. 2 EStG bei befristeter Zulassung) wendet einen festen Prozentsatz auf den jeweiligen Restbuchwert an; der Wechsel zur linearen AfA erfolgt, sobald die lineare Rest-AfA höher ausfällt.',
+    },
     faqs: [
-          {
-                "question": "Was gilt für geringwertige Wirtschaftsgüter (GWG)?",
-                "answer": "Selbstständig nutzbare Gegenstände bis 800 Euro netto (GWG-Grenze § 6 Abs. 2 EStG) können im Jahr der Anschaffung sofort zu 100 % voll als Betriebsausgabe abgesetzt werden."
-          },
-          {
-                "question": "Darf man von der degressiven zur linearen AfA wechseln?",
-                "answer": "Ja! Sobald der lineare Betrag (Restbuchwert geteilt durch Restnutzungsdauer) höher ist als der degressive Betrag, wechselt man steueroptimal zur linearen Methode."
-          }
+      { question: 'Was sind geringwertige Wirtschaftsgüter (GWG nach § 6 Abs. 2 EStG)?', answer: 'Bewegliche, selbstständig nutzbare Wirtschaftsgüter bis zu 800 Euro Netto-Anschaffungskosten können im Jahr der Anschaffung sofort zu 100 % als Betriebsausgabe voll abgeschrieben werden.' },
+      { question: 'Wie lang ist die offizielle Nutzungsdauer eines Laptops für die Steuer?', answer: 'Nach dem BMF-Schreiben von 2021 können Computer, Laptops und Software steuerlich über eine betriebsgewöhnliche Nutzungsdauer von nur 1 Jahr voll abgeschrieben werden.' },
     ],
-    relatedSlugs: ["ebit-ebitda-rechner","cashflow-rechner","mwst-rechner"],
+    relatedSlugs: ['ebit-ebitda-rechner', 'cashflow-rechner', 'mwst-rechner'],
   },
   {
     id: "skonto-jahreszins-rechner",
@@ -1621,10 +1591,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Skonto Jahreszins",
     category: "business",
     subcategory: "Kostenrechnung & Controlling",
-    metaTitle: "Skonto Jahreszins Rechner – Effektiven Skontozins p.a. berechnen",
-    metaDescription: "Berechnen Sie den effektiven Jahreszinssatz bei Skontonutzung (z. B. 2 % oder 3 % Skonto bei Zahlung binnen 10 Tagen statt 30 Tagen Nettoziel) im Vergleich zum Kontokorrentkredit.",
-    h1: "Skonto Jahreszins Rechner – Lohnt sich Skonto auch auf Pump?",
-    shortDescription: "Berechnet den enormen effektiven Jahreszins von Skontoangeboten.",
+    metaTitle: 'Skonto Jahreszins Rechner – Effektiven Skontozins p.a. bere...',
+    metaDescription: 'Berechnen Sie den effektiven Jahreszinssatz bei Skontonutzung (z. B. 2 % oder 3 % Skonto bei Zahlung binnen 10 Tagen statt 30 Tagen Nettoziel) im.',
+    h1: 'Skonto Jahreszins Rechner – Lohnt sich Skonto auch auf Pump?',
+    shortDescription: 'Berechnet den enormen effektiven Jahreszins von Skontoangeboten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["skonto effektiver jahreszins rechner formel","skonto ausnutzen dispo kredit zinsvergleich","skontosatz tage zahlungsziel kaufmaennisch","skonto vorteil berechnen bwl"],
     inputs: [
           {
@@ -1733,17 +1703,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "55,7 % effektiver Jahreszins"
     },
+    content: {
+      intro: 'Dieser Zinsrechner ermittelt den effektiven Jahreszinssatz, der sich hinter einer Skontovereinbarung (z. B. 2 % Skonto bei Zahlung binnen 10 Tagen statt 30 Tagen netto) verbirgt.',
+      details: 'Effektiver Jahreszins ≈ [Skontosatz / (100 - Skontosatz)] · [360 / (Nettozahlungsziel - Skontofrist)]. Ein Skonto von 2 % bei 20 Tagen Fristvorteil entspricht einem atemberaubenden Jahreszins von über 36,7 Prozent!',
+    },
     faqs: [
-          {
-                "question": "Lohnt es sich, für Skonto das Bankkonto zu überziehen?",
-                "answer": "Ja, fast immer! Selbst bei teuren 10-12 % Dispozins spart man bares Geld, weil Skonto einem Jahreszins von über 40 % bis 60 % entspricht. Skonto immer mitnehmen!"
-          },
-          {
-                "question": "Darf man Skonto auch vom Bruttobetrag abziehen?",
-                "answer": "Ja, Skonto wird kaufmännisch vom Bruttorechnungsbetrag abgezogen. Die im Vorsteuerabzug geltend gemachte Mehrwertsteuer muss in der Buchhaltung entsprechend um den Skontosatz korrigiert werden."
-          }
+      { question: 'Warum gewähren Lieferanten so teures Skonto?', answer: 'Weil Lieferanten dadurch sofortige Liquidität erhalten, Mahnverfahren und Ausfallrisiken (Delkredere) drastisch reduzieren und Buchhaltungskosten sparen.' },
+      { question: 'Was sollte man tun, wenn die Bank keine Kreditlinie für Skonto gewährt?', answer: 'Verhandeln Sie mit der Hausbank: Banken finanzieren Skontolinien gerne, da sie die wirtschaftliche Rentabilität für das Unternehmen unmittelbar einsehen.' },
     ],
-    relatedSlugs: ["skontorechner","liquiditaetsgrad-rechner","rabattrechner"],
+    relatedSlugs: ['skontorechner', 'liquiditaetsgrad-rechner', 'rabattrechner'],
   },
   {
     id: "wareneinsatzquote-rechner",
@@ -1752,10 +1720,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Wareneinsatzquote",
     category: "business",
     subcategory: "Kostenrechnung & Controlling",
-    metaTitle: "Wareneinsatzquote Rechner – Food Cost & Wareneinsatz (%) in Gastronomie & Handel",
-    metaDescription: "Berechnen Sie die Wareneinsatzquote / Food Cost in % aus Wareneinsatz und Netto-Umsatz für Restaurants, Bäckereien, Cafés und Einzelhandel.",
-    h1: "Wareneinsatzquote Rechner – Food Cost & Wareneinsatz in % ermitteln",
-    shortDescription: "Berechnet die Wareneinsatzquote und Food Cost für Gastronomie und Handel.",
+    metaTitle: 'Wareneinsatzquote Rechner – Food Cost',
+    metaDescription: 'Berechnen Sie die Wareneinsatzquote / Food Cost in % aus Wareneinsatz und Netto-Umsatz für Restaurants, Bäckereien, Cafés und Einzelhandel.',
+    h1: 'Wareneinsatzquote Rechner – Food Cost & Wareneinsatz in % ermitteln',
+    shortDescription: 'Berechnet die Wareneinsatzquote und Food Cost für Gastronomie und Handel.',
     searchKeywords: ["wareneinsatzquote rechner formel gastronomie food cost","wieviel prozent wareneinsatz restaurant baeckerei","wareneinsatzquote berechnen netto umsatz","wareneinsatz kalkulieren speisekarte"],
     inputs: [
           {
@@ -1849,17 +1817,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "28,0 % Food Cost (perfekt im Zielkorridor)"
     },
+    content: {
+      intro: 'Die Wareneinsatzquote (Cost of Goods Sold Ratio, COGS-Quote) beziffert das prozentuale Verhältnis der eingekauften Rohstoffe und Handelswaren zum Umsatzerlös.',
+      details: 'Wareneinsatzquote = (Wareneinsatz / Umsatzerlöse) · 100. In der Gastronomie gilt traditionell die Faustformel: Wareneinsatz ca. 25 bis 30 %, Personalkosten ca. 30 bis 35 %, Gemeinkosten ca. 20 bis 25 %, Gewinnmarge ca. 10 %.',
+    },
     faqs: [
-          {
-                "question": "Wie berechnet man den Wareneinsatz am Monatsende exakt?",
-                "answer": "Formel: Anfangsbestand des Lagers + Einkäufe im Monat - Endbestand laut Inventur = tatsächlicher Wareneinsatz."
-          },
-          {
-                "question": "Warum haben Getränke eine viel niedrigere Wareneinsatzquote als Speisen?",
-                "answer": "Getränke (Kaffee, Softdrinks, Bier) haben Wareneinsatzquoten von nur 10 % bis 18 %, da sie kaum Vorbereitungszeit benötigen und extrem hohe Aufschlagfaktoren erlauben."
-          }
+      { question: 'Wie berechnet man den Wareneinsatz der Periode?', answer: 'Anfangsbestand an Vorräten + Wareneinkäufe der Periode - Endbestand laut Inventur = tatsächlicher Wareneinsatz.' },
+      { question: 'Was signalisiert ein plötzlicher Anstieg der Wareneinsatzquote?', answer: 'Steigende Einkaufspreise der Lieferanten, erhöhten Verderb/Bruch, Diebstahl im Lager oder verdeckte Rabatte beim Verkauf.' },
     ],
-    relatedSlugs: ["marge-rechner","deckungsbeitrag-rechner","lagerumschlagshaeufigkeit-rechner"],
+    relatedSlugs: ['marge-rechner', 'deckungsbeitrag-rechner', 'lagerumschlagshaeufigkeit-rechner'],
   },
   {
     id: "lagerumschlagshaeufigkeit-rechner",
@@ -1868,10 +1834,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Lagerumschlag-Rechner",
     category: "business",
     subcategory: "Kostenrechnung & Controlling",
-    metaTitle: "Lagerumschlag Rechner – Umschlagshäufigkeit & Lagerdauer (Tage) berechnen",
-    metaDescription: "Berechnen Sie die Lagerumschlagshäufigkeit (Wareneinsatz / Ø Lagerbestand) und die durchschnittliche Lagerdauer in Tagen zur Optimierung des gebundenen Kapitals.",
-    h1: "Lagerumschlag Rechner – Umschlagshäufigkeit & Verweildauer berechnen",
-    shortDescription: "Ermittelt wie oft sich das Lager pro Jahr dreht und die Lagerdauer.",
+    metaTitle: 'Lagerumschlag Rechner – Umschlagshäufigkeit',
+    metaDescription: 'Berechnen Sie die Lagerumschlagshäufigkeit (Wareneinsatz / Ø Lagerbestand) und die durchschnittliche Lagerdauer in Tagen zur Optimierung des gebundenen.',
+    h1: 'Lagerumschlag Rechner – Umschlagshäufigkeit & Verweildauer berechnen',
+    shortDescription: 'Ermittelt wie oft sich das Lager pro Jahr dreht und die Lagerdauer.',
     searchKeywords: ["lagerumschlagshaeufigkeit rechner formel wareneinsatz lagerbestand","durchschnittliche lagerdauer tage 360 durch umschlag","lagerbestand optimieren bwl kennzahl","kapitalbindung lager reduzieren"],
     inputs: [
           {
@@ -1933,17 +1899,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "6 Umschläge / Jahr (60 Tage Lagerdauer)"
     },
+    content: {
+      intro: 'Die Lagerumschlagshäufigkeit misst, wie oft der durchschnittliche Lagerbestand innerhalb eines Geschäftsjahres vollständig verkauft und ersetzt wird.',
+      details: 'Umschlagshäufigkeit = Wareneinsatz / durchschnittlicher Lagerbestand zu Einstandspreisen. Durchschnittliche Lagerdauer in Tagen = 360 / Lagerumschlagshäufigkeit.',
+    },
     faqs: [
-          {
-                "question": "Wie berechnet man den durchschnittlichen Lagerbestand?",
-                "answer": "Einfache Formel: (Anfangsbestand + Endbestand) / 2. Für genauere Werte bei saisonalen Schwankungen: (Anfangsbestand + 12 Monatsendbestände) / 13."
-          },
-          {
-                "question": "Welche Nachteile hat eine zu hohe Lagerumschlagshäufigkeit?",
-                "answer": "Ein zu straff geführtes Lager kann bei Lieferkettenproblemen zu Lieferunfähigkeit (\"Out of Stock\") und entgangenen Umsätzen führen. Ein Sicherheitsbestand bleibt unverzichtbar."
-          }
+      { question: 'Welche Vorteile hat eine hohe Lagerumschlagshäufigkeit?', answer: 'Geringere Kapitalbindung im Lager, niedrigere Lagerhaltungs- und Versicherungskosten, geringeres Risiko von Veralterung, Verderb und Abschreibungen auf Ladenhüter.' },
+      { question: 'Welche Gefahr birgt ein zu schneller Lagerumschlag?', answer: 'Die Gefahr von Lieferengpässen (Stockouts): Wenn Sicherheitsbestände zu knapp bemessen sind, führen minimale Lieferverzögerungen sofort zu Umsatzausfällen.' },
     ],
-    relatedSlugs: ["wareneinsatzquote-rechner","working-capital-rechner","liquiditaetsgrad-rechner"],
+    relatedSlugs: ['wareneinsatzquote-rechner', 'working-capital-rechner', 'liquiditaetsgrad-rechner'],
   },
   {
     id: "stundensatz-kalkulation-freiberufler-rechner",
@@ -1952,10 +1916,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Stundensatz-Rechner",
     category: "business",
     subcategory: "Kostenrechnung & Controlling",
-    metaTitle: "Stundensatz Rechner – Honorar für Freiberufler & Selbstständige kalkulieren",
-    metaDescription: "Berechnen Sie Ihren Mindest-Stundensatz netto nach Wunsch-Nettoeinkommen, Betriebsausgaben, Krankenversicherung, Steuern, Urlaub, Krankheit und bezahlbaren Stunden.",
-    h1: "Stundensatz Rechner – Honorar für Selbstständige & Freelancer",
-    shortDescription: "Kalkuliert den benötigten Stundensatz nach Lebenshaltungskosten und Auslastung.",
+    metaTitle: 'Stundensatz Rechner – Honorar für Freiberufler',
+    metaDescription: 'Berechnen Sie Ihren Mindest-Stundensatz netto nach Wunsch-Nettoeinkommen, Betriebsausgaben, Krankenversicherung, Steuern, Urlaub',
+    h1: 'Stundensatz Rechner – Honorar für Selbstständige & Freelancer',
+    shortDescription: 'Kalkuliert den benötigten Stundensatz nach Lebenshaltungskosten und Auslastung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["stundensatz kalkulation freiberufler rechner","freelancer stundensatz berechnen formel urlaub krankheit","wieviel stundensatz als selbststaendiger verlangen","honorar berechnen netto zielgehalt"],
     inputs: [
           {
@@ -2054,17 +2018,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           ],
           "result": "84,00 € / Stunde (Tagessatz ca. 670 €)"
     },
+    content: {
+      intro: 'Dieser betriebswirtschaftliche Stundensatzkalkulator ermittelt den erforderlichen Netto-Verrechnungssatz pro Stunde für Freiberufler, Berater und Agenturen.',
+      details: 'Kalkulation: (Privater Lebensunterhalt + Vorsorgeaufwand + betriebliche Fixkosten + Risikogewinnaufschlag) / (Verfügbare Jahresarbeitstage · fakturierbare Stunden pro Tag).',
+    },
     faqs: [
-          {
-                "question": "Warum reicht ein Stundensatz von 40 oder 50 Euro meist nicht aus?",
-                "answer": "Weil ein Selbstständiger alle Sozialabgaben (ca. 19 % Kranken-/Pflegeversicherung, Altersvorsorge), Urlaubstage, Krankheitsausfälle und unbezahlte Akquisezeiten allein aus seinem Stundensatz finanzieren muss. Unter 70-80 € droht im Alter Altersarmut."
-          },
-          {
-                "question": "Sollte man nach Festpreis oder Stundensatz abrechnen?",
-                "answer": "Für erfahrene Dienstleister ist die wertbasierte Pauschalabrechnung (Value-Based Pricing) oft lukrativer: Je schneller und effizienter gearbeitet wird, desto höher steigt der effektive Stundenlohn."
-          }
+      { question: 'Wie viele Stunden pro Tag kann ein Dienstleister durchschnittlich fakturieren?', answer: 'In der Realität selten mehr als 5 bis 6 Stunden pro Tag; die restliche Zeit entfällt zwingend auf Akquise, Kundenberatung, Buchhaltung, Weiterbildung und Büroorganisation.' },
+      { question: 'Warum führt die Formel "Gehalt durch 160 Stunden" bei Selbstständigen in den Ruin?', answer: 'Weil sie ignoriert, dass Selbstständige keinen Arbeitgeberzuschuss zur Kranken- und Rentenversicherung erhalten, Urlaub und Feiertage unbezahlt sind und administrative Zeiten nicht abgerechnet werden können.' },
     ],
-    relatedSlugs: ["teilzeit-gehaltsrechner","deckungsbeitrag-rechner","umsatzrentabilitaet-rechner"],
+    relatedSlugs: ['brutto-stundensatz-freiberufler-rechner', 'teilzeit-gehaltsrechner', 'deckungsbeitrag-rechner', 'umsatzrentabilitaet-rechner'],
   },
   {
     id: "mittelwert-median-modus-rechner",
@@ -2073,10 +2035,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Lageparameter-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Deskriptive Statistik",
-    metaTitle: "Mittelwert, Median & Modus Rechner – Lageparameter online berechnen",
-    metaDescription: "Berechnen Sie arithmetisches Mittel, Median (Zentralwert), Modus (Modalwert) und Spannweite für Ihre Messreihe schnell und unkompliziert.",
-    h1: "Mittelwert, Median & Modus Rechner",
-    shortDescription: "Ermittelt die zentralen statistischen Lagemaße und Spannweite einer beliebigen Datenreihe.",
+    metaTitle: 'Mittelwert, Median & Modus Rechner – Lageparameter',
+    metaDescription: 'Berechnen Sie arithmetisches Mittel, Median (Zentralwert), Modus (Modalwert) und Spannweite für Ihre Messreihe schnell und unkompliziert.',
+    h1: 'Mittelwert, Median & Modus Rechner',
+    shortDescription: 'Ermittelt die zentralen statistischen Lagemaße und Spannweite einer beliebigen Datenreihe.',
     searchKeywords: ["mittelwert rechner","median berechnen","modus statistik","lageparameter rechner","zentralwert online"],
     inputs: [
           {
@@ -2164,16 +2126,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "Mittelwert: 20,00 | Median: 20,00"
     },
     content: {
-          "intro": "Lageparameter sind die grundlegendsten Kennzahlen der deskriptiven Statistik, um eine Datenmenge prägnant zusammenzufassen.",
-          "details": "Während der Mittelwert empfindlich auf Extremwerte reagiert, bleibt der Median robust."
+      intro: 'Dieser Lagemaß-Rechner ermittelt die drei klassischen Kennzahlen einer Verteilung: arithmetisches Mittel, Median (Zentralwert) und Modus (häufigster Wert).',
+      details: 'Der Median halbiert die sortierte Datenreihe exakt: 50 % der Werte liegen darunter, 50 % darüber. Bei schiefen Verteilungen (z. B. Gehälter oder Vermögen) ist der Median extrem robust gegenüber Milliardärs-Ausreißern.',
     },
     faqs: [
-          {
-                "question": "Wann sollte man den Median statt des Mittelwerts nutzen?",
-                "answer": "Bei schiefen Verteilungen mit extremen Ausreißern (z.B. Einkommen oder Vermögen) spiegelt der Median den typischen Wert viel realistischer wider als der Mittelwert."
-          }
+      { question: 'Wann sind Mittelwert und Median exakt identisch?', answer: 'Bei perfekt symmetrischen Verteilungen, wie beispielsweise der Gaußschen Glockenkurve (Normalverteilung).' },
+      { question: 'Was ist ein multimodaler Datensatz?', answer: 'Ein Datensatz, bei dem zwei oder mehr verschiedene Werte gleich oft mit der höchsten Häufigkeit auftreten (z. B. bimodal mit zwei Peaks).' },
     ],
-    relatedSlugs: ["standardabweichung-rechner","notendurchschnitt-rechner","variationskoeffizient-rechner"],
+    relatedSlugs: ['standardabweichung-rechner', 'notendurchschnitt-rechner', 'variationskoeffizient-rechner', 'geometrisches-mittel-rechner', 'harmonisches-mittel-rechner'],
   },
   {
     id: "varianz-standardabweichung-stichprobe-rechner",
@@ -2182,11 +2142,11 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Varianz & Streuung",
     category: "statistik-wissenschaft",
     subcategory: "Deskriptive Statistik",
-    metaTitle: "Varianz & Standardabweichung Rechner – Stichprobe & Grundgesamtheit",
-    metaDescription: "Berechnen Sie Stichprobenvarianz (n-1), Populationsvarianz (n) und Standardabweichung für Ihre Messwerte online.",
-    h1: "Stichprobenvarianz & Populationsstreuung Rechner",
-    shortDescription: "Vergleicht empirische Stichproben-Streumaße (Bessel-Korrektur n-1) mit Parametern der Grundgesamtheit (n).",
-    searchKeywords: ["varianz rechner","stichprobenvarianz","populationsvarianz berechnen","streuungsmaße formel","standardabweichung stichprobe"],
+    metaTitle: 'Stichprobenvarianz Rechner – Standardabweichung s (n-1)',
+    metaDescription: 'Ermitteln Sie die erwartungstreue Stichprobenvarianz s² und Standardabweichung s mit Bessel-Korrektur (n-1) für empirische Studien.',
+    h1: 'Stichprobenvarianz Rechner – Bessel-Korrektur (n-1) nutzen',
+    shortDescription: 'Ermittelt die empirische Stichprobenvarianz und Standardabweichung mit Bessel-Korrektur (n-1) für wissenschaftliche Datensätze.',
+    searchKeywords: ['stichprobenvarianz rechner', 'varianz rechner', 'stichprobenvarianz', 'populationsvarianz berechnen', 'streuungsmaße formel', 'standardabweichung stichprobe'],
     inputs: [
           {
                 "id": "v1",
@@ -2267,16 +2227,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "s = 4,743 | s² = 22,500"
     },
     content: {
-          "intro": "In empirischen Studien wird fast immer eine Stichprobe untersucht. Die Korrektur mit n-1 gleicht die Unterschätzung der Streuung aus.",
-          "details": "Wenn Sie sämtliche Daten der gesamten Population kennen (z.B. alle Einwohner einer Stadt), verwenden Sie n."
+      intro: 'Dieser Streumaßrechner berechnet die Varianz (mittlere quadratische Abweichung) und Standardabweichung für Grundgesamtheiten (Teilung durch N) und Stichproben (Teilung durch n-1).',
+      details: 'Varianz s² = (1 / (n-1)) · Summe(x_i - Mittelwert)². Die Varianz hat die quadrierte Einheit der Messgröße (z. B. Euro²); erst das Ziehen der Quadratwurzel liefert die Standardabweichung in der ursprünglichen Maßeinheit (z. B. Euro).',
     },
     faqs: [
-          {
-                "question": "Warum teilt man durch n - 1 statt n?",
-                "answer": "Weil die Abweichungen vom Stichprobenmittelwert x̄ berechnet werden, der selbst aus den Daten geschätzt wurde. Dies kostet einen Freiheitsgrad (df = n - 1)."
-          }
+      { question: 'Warum quadriert man die Differenzen bei der Varianz?', answer: 'Damit sich positive und negative Abweichungen vom Mittelwert nicht gegenseitig zu null aufheben und größere Ausreißer mathematisch stärker gewichtet werden.' },
+      { question: 'Was misst die empirische Varianz im Portfolio-Management?', answer: 'Die Volatilität (Schwankungsintensität) der Kursrenditen und bildet das fundamentale Risikomaß in der modernen Portfoliotheorie nach Markowitz.' },
     ],
-    relatedSlugs: ["standardabweichung-rechner","mittelwert-median-modus-rechner","konfidenzintervall-rechner"],
+    relatedSlugs: ['standardabweichung-rechner', 'mittelwert-median-modus-rechner', 'konfidenzintervall-rechner'],
   },
   {
     id: "korrelationskoeffizient-rechner",
@@ -2285,10 +2243,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Korrelation r",
     category: "statistik-wissenschaft",
     subcategory: "Zusammenhangsmaße",
-    metaTitle: "Korrelationskoeffizient Rechner – Pearson r linearer Zusammenhang",
-    metaDescription: "Ermitteln Sie den Korrelationskoeffizienten nach Pearson (r) sowie das Bestimmtheitsmaß (R²) für bivariate Datenpaare online.",
-    h1: "Korrelationskoeffizient Rechner (Pearson r)",
-    shortDescription: "Berechnet die lineare Korrelation zwischen zwei Merkmalen X und Y.",
+    metaTitle: 'Korrelationskoeffizient Rechner – Pearson r linearer Zusamm...',
+    metaDescription: 'Ermitteln Sie den Korrelationskoeffizienten nach Pearson (r) sowie das Bestimmtheitsmaß (R²) für bivariate Datenpaare online.',
+    h1: 'Korrelationskoeffizient Rechner (Pearson r)',
+    shortDescription: 'Berechnet die lineare Korrelation zwischen zwei Merkmalen X und Y.',
     searchKeywords: ["korrelationskoeffizient rechner","pearson r berechnen","korrelation online","bestimmtheitsmaß r2","bivariate statistik"],
     inputs: [
           {
@@ -2417,16 +2375,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "r = 0,9932 | R² = 98,64 %"
     },
     content: {
-          "intro": "Der Bravais-Pearson-Korrelationskoeffizient quantifiziert die Stärke und Richtung des linearen Zusammenhangs zweier metrischer Variablen.",
-          "details": "Korrelation impliziert keine Kausalität: Ein hoher r-Wert beweist nicht, dass X die Ursache von Y ist."
+      intro: 'Der Pearson-Korrelationskoeffizient (r) quantifiziert die Stärke und Richtung eines linearen Zusammenhangs zwischen zwei metrischen Merkmalen X und Y.',
+      details: 'Wertebereich: -1,0 ≤ r ≤ +1,0. Ein Wert von +1 bedeutet perfekten positiven linearen Zusammenhang; 0 bedeutet keinen linearen Zusammenhang; -1 bedeutet perfekten gegenläufigen Zusammenhang. Korrelation impliziert niemals automatisch Kausalität!',
     },
     faqs: [
-          {
-                "question": "Was bedeutet das Bestimmtheitsmaß R²?",
-                "answer": "R² gibt den Anteil der Varianz in Y an, der durch die lineare Beziehung zu X erklärt werden kann."
-          }
+      { question: 'Was ist Scheinkorrelation (Spurious Correlation)?', answer: 'Wenn zwei Variablen statistisch hoch korrelieren, ohne inhaltlich ursächlich verknüpft zu sein (z. B. Storchenpopulation und Geburtenrate korrelieren scheinbar, weil beide von ländlicher Struktur abhängen).' },
+      { question: 'Ab welchem r-Wert spricht man von starker Korrelation?', answer: 'Nach Cohen gilt: |r| ab 0,10 als schwacher, ab 0,30 als mittlerer und ab 0,50 als starker linearer Zusammenhang.' },
     ],
-    relatedSlugs: ["lineare-regression-rechner","kovarianz-rechner","standardabweichung-rechner"],
+    relatedSlugs: ['lineare-regression-rechner', 'kovarianz-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "z-score-normalverteilung-rechner",
@@ -2435,10 +2391,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Z-Score-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Wahrscheinlichkeitsverteilung",
-    metaTitle: "Z-Score Rechner – Standardnormalverteilung & Perzentil online",
-    metaDescription: "Berechnen Sie den Z-Wert, die Standardabweichungsdistanz und die kumulierte Wahrscheinlichkeit P(Z <= z) online.",
-    h1: "Z-Score Rechner (Normalverteilung)",
-    shortDescription: "Standardisiert Rohdatenwerte anhand von Mittelwert und Standardabweichung.",
+    metaTitle: 'Z-Score Rechner – Standardnormalverteilung & Perzentil online',
+    metaDescription: 'Berechnen Sie den Z-Wert, die Standardabweichungsdistanz und die kumulierte Wahrscheinlichkeit P(Z <= z) online.',
+    h1: 'Z-Score Rechner (Normalverteilung)',
+    shortDescription: 'Standardisiert Rohdatenwerte anhand von Mittelwert und Standardabweichung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["z score rechner","z wert berechnen","standardnormalverteilung","z transformation","standardisierung statistik"],
     inputs: [
           {
@@ -2501,16 +2457,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "z = 1,000 | 84,13 %"
     },
     content: {
-          "intro": "Die Z-Transformation erlaubt den fairen Vergleich von Messwerten aus unterschiedlichen Verteilungen.",
-          "details": "Ein z-Score von 0 entspricht exakt dem Mittelwert. Rund 68,3 % aller Werte liegen zwischen z = -1 und z = +1."
+      intro: 'Der Z-Score (Standardwert) normiert Messwerte auf eine Standardnormalverteilung mit Mittelwert mu = 0 und Standardabweichung sigma = 1.',
+      details: 'Formel: z = (x - mu) / sigma. Ein Z-Score von +2,0 besagt, dass der individuelle Messwert genau zwei Standardabweichungen über dem Mittelwert der Gesamtstichprobe liegt (Perzentil ca. 97,7 %).',
     },
     faqs: [
-          {
-                "question": "Was bedeutet ein negativer Z-Score?",
-                "answer": "Ein negativer Z-Wert bedeutet, dass der Beobachtungswert unterhalb des Mittelwerts liegt."
-          }
+      { question: 'Wie liest man Wahrscheinlichkeiten aus der Z-Tabelle ab?', answer: 'Die Standardnormalverteilungstabelle (Phi(z)) gibt die Wahrscheinlichkeit an, dass eine Standardnormalvariable einen Wert kleiner oder gleich z annimmt.' },
+      { question: 'Welchem IQ-Wert entspricht ein Z-Score von +1,0?', answer: 'Bei Standard-IQ-Tests (Mittelwert 100, Standardabweichung 15) entspricht z = +1,0 einem IQ von genau 115 (überdurchschnittlich).' },
     ],
-    relatedSlugs: ["standardabweichung-rechner","konfidenzintervall-rechner","p-wert-hypothesentest-rechner"],
+    relatedSlugs: ['standardabweichung-rechner', 'konfidenzintervall-rechner', 'p-wert-hypothesentest-rechner'],
   },
   {
     id: "p-wert-hypothesentest-rechner",
@@ -2519,10 +2473,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "p-Wert-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Inferenzstatistik",
-    metaTitle: "p-Wert Rechner – Z-Statistik & Signifikanzniveau online",
-    metaDescription: "Berechnen Sie den einseitigen und zweiseitigen p-Wert aus einer Z-Prüfgröße und prüfen Sie statistische Signifikanz (α = 0,05).",
-    h1: "p-Wert Rechner (Hypothesenprüfung)",
-    shortDescription: "Ermittelt den p-Wert für ein- und zweiseitige Tests und prüft die Nullhypothese.",
+    metaTitle: 'p-Wert Rechner – Z-Statistik & Signifikanzniveau online',
+    metaDescription: 'Berechnen Sie den einseitigen und zweiseitigen p-Wert aus einer Z-Prüfgröße und prüfen Sie statistische Signifikanz (α = 0,05).',
+    h1: 'p-Wert Rechner (Hypothesenprüfung)',
+    shortDescription: 'Ermittelt den p-Wert für ein- und zweiseitige Tests und prüft die Nullhypothese.',
     searchKeywords: ["p wert rechner","p value berechnen","hypothesentest signifikant","z test p wert","alpha fehler"],
     inputs: [
           {
@@ -2575,16 +2529,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "p = 0,0500"
     },
     content: {
-          "intro": "Der p-Wert ist das zentrale Kriterium wissenschaftlicher Hypothesentests zur Entscheidung über Annahme oder Ablehnung der Nullhypothese.",
-          "details": "Ein p-Wert unter dem gewählten Signifikanzniveau α (meist 5 % oder 1 %) führt zur Ablehnung von H0."
+      intro: 'Der p-Wert beziffert die Wahrscheinlichkeit, die beobachteten Daten (oder noch extremere) zu erhalten, wenn die Nullhypothese H0 in Wahrheit zutrifft.',
+      details: 'Liegt der p-Wert unter dem vorab festgelegten Signifikanzniveau alpha (typisch alpha = 0,05 oder 0,01), wird die Nullhypothese verworfen und das Ergebnis gilt als statistisch signifikant.',
     },
     faqs: [
-          {
-                "question": "Beweist ein niedriger p-Wert, dass die Forschungshypothese wahr ist?",
-                "answer": "Nein, er zeigt lediglich, dass die beobachteten Daten unter der Annahme des Zufalls (H0) sehr unwahrscheinlich sind."
-          }
+      { question: 'Bedeutet ein p-Wert von 0,03, dass die Hypothese zu 97 % wahr ist?', answer: 'Nein, das ist der häufigste Fehlschluss: Der p-Wert ist nicht die Wahrscheinlichkeit der Hypothese, sondern P(Daten | H0), also die Wahrscheinlichkeit der Daten unter der Annahme, H0 stimme.' },
+      { question: 'Was ist ein Fehler 1. Art (Alpha-Fehler)?', answer: 'Die irrtümliche Ablehnung einer in Wahrheit richtigen Nullhypothese (falsch-positiver Befund); die Wahrscheinlichkeit dafür wird durch das Signifikanzniveau alpha gedeckelt.' },
     ],
-    relatedSlugs: ["z-score-normalverteilung-rechner","t-test-rechner","konfidenzintervall-rechner"],
+    relatedSlugs: ['chi-quadrat-unabhaengigkeitstest-rechner', 'z-score-normalverteilung-rechner', 't-test-rechner', 'konfidenzintervall-rechner', 'stichprobengroesse-rechner'],
   },
   {
     id: "t-test-rechner",
@@ -2593,10 +2545,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "t-Test-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Inferenzstatistik",
-    metaTitle: "t-Test Rechner – Einstichproben-t-Test & Prüfgröße berechnen",
-    metaDescription: "Ermitteln Sie die empirische t-Prüfgröße, Standardfehler und Freiheitsgrade für einen Einstichproben-Mittelwertsvergleich.",
-    h1: "Einstichproben-t-Test Rechner",
-    shortDescription: "Prüft, ob der Stichprobenmittelwert signifikant von einem theoretischen Erwartungswert abweicht.",
+    metaTitle: 't-Test Rechner – Einstichproben-t-Test & Prüfgröße berechnen',
+    metaDescription: 'Ermitteln Sie die empirische t-Prüfgröße, Standardfehler und Freiheitsgrade für einen Einstichproben-Mittelwertsvergleich.',
+    h1: 'Einstichproben-t-Test Rechner',
+    shortDescription: 'Prüft, ob der Stichprobenmittelwert signifikant von einem theoretischen Erwartungswert abweicht.',
     searchKeywords: ["t test rechner","einstichproben t test","students t test","t prüfgröße berechnen","freiheitsgrade statistik"],
     inputs: [
           {
@@ -2664,16 +2616,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "t = 2,500 | df = 24"
     },
     content: {
-          "intro": "Der Student-t-Test wird eingesetzt, wenn die wahre Varianz der Grundgesamtheit unbekannt ist und aus einer kleinen bis mittleren Stichprobe geschätzt werden muss.",
-          "details": "Ab etwa n = 30 nähert sich die Student-t-Verteilung sehr stark der Standardnormalverteilung an."
+      intro: 'Der Student-t-Test prüft, ob sich die Mittelwerte zweier Stichproben statistisch signifikant voneinander unterscheiden.',
+      details: 'Man unterscheidet den unverbundenen (zweistichproben-) t-Test für unabhängige Gruppen (z. B. Kontrollgruppe vs. Medikamentengruppe) und den gepaarten t-Test für Messwiederholungen an denselben Probanden (Vorher-Nachher-Vergleich).',
     },
     faqs: [
-          {
-                "question": "Was ist der Standardfehler (Standard Error)?",
-                "answer": "Der Standardfehler misst die Streuung des Stichprobenmittelwerts um den wahren Populationsmittelwert."
-          }
+      { question: 'Wann nutzt man den t-Test statt des Z-Tests?', answer: 'Immer dann, wenn die wahre Varianz der Grundgesamtheit unbekannt ist und aus den Daten der Stichprobe geschätzt werden muss (insbesondere bei kleineren Stichprobengrößen n < 30).' },
+      { question: 'Was ist der Welch-t-Test?', answer: 'Eine robuste Variante des unverbundenen t-Tests, die angewendet wird, wenn die Varianzen beider Gruppen ungleich sind (Varianzheterogenität).' },
     ],
-    relatedSlugs: ["p-wert-hypothesentest-rechner","konfidenzintervall-rechner","effektstaerke-cohens-d-rechner"],
+    relatedSlugs: ['p-wert-hypothesentest-rechner', 'konfidenzintervall-rechner', 'effektstaerke-cohens-d-rechner'],
   },
   {
     id: "konfidenzintervall-rechner",
@@ -2682,10 +2632,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Konfidenzintervall",
     category: "statistik-wissenschaft",
     subcategory: "Inferenzstatistik",
-    metaTitle: "Konfidenzintervall Rechner – 90 %, 95 % & 99 % Vertrauensbereich",
-    metaDescription: "Ermitteln Sie die untere und obere Grenze des Konfidenzintervalls für Ihren Mittelwert und die Fehlerspanne (Margin of Error).",
-    h1: "Konfidenzintervall Rechner (Vertrauensintervall)",
-    shortDescription: "Berechnet den Vertrauensbereich für den wahren Populationsmittelwert.",
+    metaTitle: 'Konfidenzintervall Rechner – 90 %, 95 %',
+    metaDescription: 'Ermitteln Sie die untere und obere Grenze des Konfidenzintervalls für Ihren Mittelwert und die Fehlerspanne (Margin of Error).',
+    h1: 'Konfidenzintervall Rechner (Vertrauensintervall)',
+    shortDescription: 'Berechnet den Vertrauensbereich für den wahren Populationsmittelwert mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["konfidenzintervall rechner","vertrauensbereich berechnen","margin of error rechner","95 prozent konfidenz","fehlerspanne"],
     inputs: [
           {
@@ -2771,16 +2721,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "[48,04 ; 51,96]"
     },
     content: {
-          "intro": "Ein Konfidenzintervall beziffert die Schätzpräzision einer Stichprobenuntersuchung.",
-          "details": "Eine Vervierfachung des Stichprobenumfangs n halbiert die Fehlerspanne des Intervalls."
+      intro: 'Ein Konfidenzintervall (Vertrauensbereich, meist 95 % CI) grenzt den Bereich ein, der den wahren, unbekannten Parameter der Grundgesamtheit mit hoher Wahrscheinlichkeit überdeckt.',
+      details: '95 % Konfidenzintervall = Stichprobenmittelwert ± z_(1 - alpha/2) · (s / Wurzel(n)). Bei Verzehnfachung der Stichprobengröße n halbiert sich die Breite des Fehlerbereichs (Wurzel-n-Gesetz).',
     },
     faqs: [
-          {
-                "question": "Bedeutet 95 % Konfidenz, dass der wahre Wert mit 95 % im berechneten Intervall liegt?",
-                "answer": "Klassisch-frequentistisch bedeutet es: Würde man 100 Stichproben ziehen und je ein Intervall berechnen, würden im Schnitt 95 dieser Intervalle den wahren festen Wert enthalten."
-          }
+      { question: 'Was bedeutet ein 95-%-Konfidenzintervall wissenschaftlich korrekt?', answer: 'Würde man das Experiment unendlich oft wiederholen und jedes Mal ein Intervall berechnen, würden 95 Prozent aller berechneten Intervalle den wahren Populationsmittelwert enthalten.' },
+      { question: 'Wie beeinflusst die Streuung s das Intervall?', answer: 'Je größer die Streuung in den Daten, desto ungenauer ist die Schätzung und desto breiter muss das Konfidenzintervall sein.' },
     ],
-    relatedSlugs: ["stichprobengroesse-rechner","p-wert-hypothesentest-rechner","standardabweichung-rechner"],
+    relatedSlugs: ['stichprobengroesse-rechner', 'p-wert-hypothesentest-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "stichprobengroesse-rechner",
@@ -2789,10 +2737,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Stichprobengröße",
     category: "statistik-wissenschaft",
     subcategory: "Stichprobenplanung",
-    metaTitle: "Stichprobengröße Rechner – Stichprobenumfang für Umfragen berechnen",
-    metaDescription: "Ermitteln Sie die nötige Stichprobengröße n nach Cochran für Umfragen, Marktforschung und wissenschaftliche Erhebungen.",
-    h1: "Stichprobengröße Rechner (Cochran-Formel)",
-    shortDescription: "Berechnet den erforderlichen Stichprobenumfang bei gewünschter Fehlerspanne und Konfidenz.",
+    metaTitle: 'Stichprobengröße Rechner – Stichprobenumfang für Umfragen b...',
+    metaDescription: 'Ermitteln Sie die nötige Stichprobengröße n nach Cochran für Umfragen, Marktforschung und wissenschaftliche Erhebungen.',
+    h1: 'Stichprobengröße Rechner (Cochran-Formel)',
+    shortDescription: 'Berechnet den erforderlichen Stichprobenumfang bei gewünschter Fehlerspanne und Konfidenz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["stichprobengröße rechner","stichprobenumfang berechnen","cochran formel online","fehlertoleranz umfrage","repräsentative stichprobe"],
     inputs: [
           {
@@ -2872,16 +2820,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "n = 965 Teilnehmer"
     },
     content: {
-          "intro": "Die richtige Stichprobengröße entscheidet über Repräsentativität und Kostenbudget von Umfragen.",
-          "details": "Selbst für Millionen-Populationen genügen bei ±3 % Fehlerspanne rund 1.067 Teilnehmer für ein 95 %-Konfidenzintervall."
+      intro: 'Dieser Stichprobenplaner kalkuliert den mathematisch notwendigen Stichprobenumfang n für empirische Studien, Umfragen und A/B-Tests bei vorgegebener Fehlertoleranz.',
+      details: 'Formel nach Cochran: n = [z² · p · (1-p)] / e², wobei z das Konfidenzniveau (1,96 für 95 %), e die maximale Fehlermarge (z. B. 3 %) und p der erwartete Anteil (0,5 für konservatives Maximum) ist.',
     },
     faqs: [
-          {
-                "question": "Muss die Stichprobe bei größeren Populationen proportional größer sein?",
-                "answer": "Nein! Ab einer Populationsgröße von etwa 20.000 Personen bleibt die benötigte Stichprobengröße nahezu konstant."
-          }
+      { question: 'Wie viele Teilnehmer benötigt eine repräsentative Wahlumfrage in Deutschland?', answer: 'Für eine Fehlermarge von ca. ±2,5 bis 3 Prozent bei 95 % Konfidenz genügen ca. 1.000 bis 1.500 repräsentativ ausgewählte Personen – unabhängig davon, ob die Gesamtbevölkerung 1 Million oder 84 Millionen beträgt!' },
+      { question: 'Was ist die Endlichkeitskorrektur?', answer: 'Macht die Stichprobe mehr als 5 Prozent der gesamten Grundgesamtheit aus (z. B. bei Befragung aller Mitarbeiter einer Firma), verringert die Endlichkeitskorrektur die benötigte Probandenzahl.' },
     ],
-    relatedSlugs: ["konfidenzintervall-rechner","p-wert-hypothesentest-rechner","prozentrechner"],
+    relatedSlugs: ['konfidenzintervall-rechner', 'p-wert-hypothesentest-rechner', 'prozentrechner'],
   },
   {
     id: "quartile-box-plot-rechner",
@@ -2890,10 +2836,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Quartile-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Deskriptive Statistik",
-    metaTitle: "Quartile & Box-Plot Rechner – Q1, Median, Q3 & IQR berechnen",
-    metaDescription: "Ermitteln Sie das 1. Quartil, Median (Q2), 3. Quartil und den Interquartilsabstand (IQR) für Ihre Datenreihe online.",
-    h1: "Quartile & Interquartilsabstand Rechner",
-    shortDescription: "Berechnet die Quartile Q1, Q2, Q3 sowie den IQR für Boxplot-Analysen.",
+    metaTitle: 'Quartile & Box-Plot Rechner – Q1, Median, Q3 & IQR berechnen',
+    metaDescription: 'Ermitteln Sie das 1. Quartil, Median (Q2), 3. Quartil und den Interquartilsabstand (IQR) für Ihre Datenreihe online.',
+    h1: 'Quartile & Interquartilsabstand Rechner',
+    shortDescription: 'Berechnet die Quartile Q1, Q2, Q3 sowie den IQR für Boxplot-Analysen.',
     searchKeywords: ["quartile rechner","interquartilsabstand iqr","q1 q2 q3 berechnen","boxplot rechner online","spannweite statistik"],
     inputs: [
           {
@@ -2996,16 +2942,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "IQR = 20,00 | Median = 24,00"
     },
     content: {
-          "intro": "Quartile und der Interquartilsabstand bilden das mathematische Rückgrat des Box-Plots (Kastengrafik).",
-          "details": "Werte außerhalb von Q1 - 1,5·IQR bzw. Q3 + 1,5·IQR gelten in der deskriptiven Statistik als potenzielle Ausreißer."
+      intro: 'Dieser Rechner ermittelt Minimum, 1. Quartil (Q1), Median (Q2), 3. Quartil (Q3) und Maximum (Fünf-Punkte-Zusammenfassung) für Box-Plot-Diagramme.',
+      details: 'Der Interquartilsabstand (IQR = Q3 - Q1) umfasst die mittleren 50 Prozent aller Messwerte. Nach der Tukey-Regel gelten Werte außerhalb von [Q1 - 1,5·IQR; Q3 + 1,5·IQR] als statistische Ausreißer.',
     },
     faqs: [
-          {
-                "question": "Warum ist der IQR oft aussagekräftiger als die Standardabweichung?",
-                "answer": "Weil der IQR unempfindlich gegenüber extremen Ausreißern ist, da er nur die mittleren 50 % der Daten betrachtet."
-          }
+      { question: 'Was zeigt die "Box" in einem Box-Plot?', answer: 'Die Box visualisiert den Interquartilsabstand (IQR): Der untere Rand ist das 25-%-Quartil, der Strich in der Mitte der Median und der obere Rand das 75-%-Quartil.' },
+      { question: 'Was sind die Whiskers (Antennen) am Box-Plot?', answer: 'Die Linien reichen bis zum kleinsten bzw. größten Datenwert, der noch kein extremer Ausreißer ist (maximal 1,5-facher IQR).' },
     ],
-    relatedSlugs: ["mittelwert-median-modus-rechner","perzentil-rechner","standardabweichung-rechner"],
+    relatedSlugs: ['mittelwert-median-modus-rechner', 'perzentil-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "binomialverteilung-rechner",
@@ -3014,10 +2958,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Binomialverteilung",
     category: "statistik-wissenschaft",
     subcategory: "Wahrscheinlichkeitsverteilung",
-    metaTitle: "Binomialverteilung Rechner – P(X = k) & kumulierte Wahrscheinlichkeit",
-    metaDescription: "Berechnen Sie Einzelwahrscheinlichkeit P(X=k), P(X<=k), Erwartungswert und Varianz einer Bernoulli-Kette online.",
-    h1: "Binomialverteilung Rechner (B(n, p))",
-    shortDescription: "Berechnet Wahrscheinlichkeiten für Bernoulli-Versuchsreihen mit Trefferquote p.",
+    metaTitle: 'Binomialverteilung Rechner – P – RechenHafen',
+    metaDescription: 'Berechnen Sie Einzelwahrscheinlichkeit P(X=k), P(X<=k), Erwartungswert und Varianz einer Bernoulli-Kette online.',
+    h1: 'Binomialverteilung Rechner (B(n, p))',
+    shortDescription: 'Berechnet Wahrscheinlichkeiten für Bernoulli-Versuchsreihen mit Trefferquote p mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["binomialverteilung rechner","bernoulli kette berechnen","n über k wahrscheinlichkeit","p x gleich k","kumulierte binomialverteilung"],
     inputs: [
           {
@@ -3098,16 +3042,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "P(X = 2) = 30,20 %"
     },
     content: {
-          "intro": "Die Binomialverteilung ist die grundlegendste diskrete Wahrscheinlichkeitsverteilung in Industrie, Qualitätskontrolle und Spieltheorie.",
-          "details": "Bedingung ist die Unabhängigkeit der Einzelversuche mit gleichbleibender Trefferwahrscheinlichkeit (Ziehen mit Zurücklegen)."
+      intro: 'Die Binomialverteilung B(n, p) modelliert die Wahrscheinlichkeit für exakt k Erfolge in n unabhängigen Bernoulli-Versuchen mit konstanter Erfolgswahrscheinlichkeit p.',
+      details: 'Formel nach Bernoulli: P(X = k) = (n über k) · p^k · (1 - p)^(n - k). Erwartungswert E(X) = n · p; Varianz Var(X) = n · p · (1 - p). Typisch für Qualitätskontrollen und Münzwürfe.',
     },
     faqs: [
-          {
-                "question": "Wann kann die Binomialverteilung durch die Normalverteilung angenähert werden?",
-                "answer": "Wenn die Laplace-Bedingung σ = √(n · p · (1 - p)) > 3 erfüllt ist."
-          }
+      { question: 'Wie hoch ist die Wahrscheinlichkeit für genau 3 Sechsen bei 5 Würfelwürfen?', answer: 'n = 5, k = 3, p = 1/6: (5 über 3) · (1/6)³ · (5/6)² = 10 · (1/216) · (25/36) ≈ 3,22 Prozent.' },
+      { question: 'Wann lässt sich die Binomialverteilung durch die Normalverteilung approximieren?', answer: 'Wenn die Laplace-Bedingung erfüllt ist: Varianz sigma² = n · p · (1 - p) > 9 (Satz von Moivre-Laplace mit Stetigkeitskorrektur ±0,5).' },
     ],
-    relatedSlugs: ["poisson-verteilung-rechner","kombinatorik-n-ueber-k-rechner","wahrscheinlichkeit-wuerfel-muenze-rechner"],
+    relatedSlugs: ['poisson-verteilung-rechner', 'kombinatorik-n-ueber-k-rechner', 'wahrscheinlichkeit-wuerfel-muenze-rechner'],
   },
   {
     id: "poisson-verteilung-rechner",
@@ -3116,10 +3058,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Poisson-Verteilung",
     category: "statistik-wissenschaft",
     subcategory: "Wahrscheinlichkeitsverteilung",
-    metaTitle: "Poisson-Verteilung Rechner – P(X = k) für seltene Ereignisse",
-    metaDescription: "Berechnen Sie Poisson-Wahrscheinlichkeiten für Callcenter-Anrufe, Kundenankünfte, Serveranfragen oder Fehlerraten online.",
-    h1: "Poisson-Verteilung Rechner (Ereignishäufigkeit)",
-    shortDescription: "Berechnet die Wahrscheinlichkeit für das Eintreffen von k Ereignissen bei gegebener Rate λ.",
+    metaTitle: 'Poisson-Verteilung Rechner – P(X = k) für seltene Ereignisse',
+    metaDescription: 'Berechnen Sie Poisson-Wahrscheinlichkeiten für Callcenter-Anrufe, Kundenankünfte, Serveranfragen oder Fehlerraten online.',
+    h1: 'Poisson-Verteilung Rechner (Ereignishäufigkeit)',
+    shortDescription: 'Berechnet die Wahrscheinlichkeit für das Eintreffen von k Ereignissen bei gegebener Rate λ.',
     searchKeywords: ["poisson verteilung rechner","ereignisrate lambda","warteschlangentheorie rechner","poisson wahrscheinlichkeit formel","seltene ereignisse statistik"],
     inputs: [
           {
@@ -3180,16 +3122,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "P(X = 4) = 19,54 %"
     },
     content: {
-          "intro": "Die Poisson-Verteilung wird weltweit für die Dimensionierung von Servern, Telefon-Hotlines, Notaufnahmen und Ampelschaltungen genutzt.",
-          "details": "Besondere Eigenschaft der Poisson-Verteilung ist, dass Erwartungswert und Varianz exakt identisch sind: E(X) = Var(X) = λ."
+      intro: 'Die Poisson-Verteilung modelliert seltene, unabhängig voneinander auftretende Ereignisse in einem festen Zeit- oder Raumintervall mit bekannter Durchschnittsrate Lambda.',
+      details: 'Formel: P(X = k) = (Lambda^k · e^(-Lambda)) / k!. Erwartungswert und Varianz sind bei der Poisson-Verteilung identisch: E(X) = Var(X) = Lambda. Typisch für Server-Anfragen pro Sekunde oder Notrufeinteilungen.',
     },
     faqs: [
-          {
-                "question": "Wann wird die Poisson-Verteilung statt der Binomialverteilung verwendet?",
-                "answer": "Wenn n sehr groß und p sehr klein ist (Faustregel: n ≥ 50 und p ≤ 0,05), nähert die Poisson-Verteilung die Binomialverteilung hervorragend an."
-          }
+      { question: 'Welche Voraussetzungen müssen für einen Poisson-Prozess gelten?', answer: 'Die Ereignisse müssen unabhängig voneinander auftreten, die durchschnittliche Rate Lambda muss konstant sein und zwei Ereignisse dürfen nicht exakt im selben winzigen Moment stattfinden.' },
+      { question: 'Wie hängen Poisson-Verteilung und Exponentialverteilung zusammen?', answer: 'Die Poisson-Verteilung zählt die Anzahl der Ereignisse in fester Zeit; die Exponentialverteilung modelliert die kontinuierliche Wartezeit zwischen zwei aufeinanderfolgenden Ereignissen.' },
     ],
-    relatedSlugs: ["binomialverteilung-rechner","kombinatorik-n-ueber-k-rechner","wahrscheinlichkeit-wuerfel-muenze-rechner"],
+    relatedSlugs: ['binomialverteilung-rechner', 'kombinatorik-n-ueber-k-rechner', 'wahrscheinlichkeit-wuerfel-muenze-rechner'],
   },
   {
     id: "kombinatorik-n-ueber-k-rechner",
@@ -3198,10 +3138,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Kombinatorik-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Diskrete Mathematik",
-    metaTitle: "Kombinatorik Rechner – Binomialkoeffizient (n über k) & Fakultät",
-    metaDescription: "Berechnen Sie Kombinationen (Lotto), Permutationen und Variationen mit oder ohne Zurücklegen / Reihenfolge online.",
-    h1: "Kombinatorik Rechner (n über k)",
-    shortDescription: "Ermittelt Möglichkeiten für Kombinationen, Variationen und Permutationen.",
+    metaTitle: 'Kombinatorik Rechner – Binomialkoeffizient',
+    metaDescription: 'Berechnen Sie Kombinationen (Lotto), Permutationen und Variationen mit oder ohne Zurücklegen / Reihenfolge online.',
+    h1: 'Kombinatorik Rechner (n über k)',
+    shortDescription: 'Ermittelt Möglichkeiten für Kombinationen, Variationen und Permutationen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kombinatorik rechner","n über k berechnen","binomialkoeffizient rechner","lotto kombinationen","fakultät rechner"],
     inputs: [
           {
@@ -3263,16 +3203,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "13.983.816 Kombinationen"
     },
     content: {
-          "intro": "Die Kombinatorik liefert die mathematischen Grundlagen zur Zählung möglicher Ereignisse in Statistik und Kryptografie.",
-          "details": "Ob die Reihenfolge eine Rolle spielt und ob Elemente mehrfach gewählt werden dürfen, bestimmt die Berechnungsformel."
+      intro: 'Der Binomialkoeffizient "n über k" ermittelt die Anzahl der Möglichkeiten, k Elemente aus einer Menge von n Elementen ohne Zurücklegen und ohne Beachtung der Reihenfolge auszuwählen.',
+      details: 'Formel: (n über k) = n! / [k! · (n - k)!]. Im Lotto "6 aus 49" gibt es exakt (49 über 6) = 13.983.816 mögliche Zahlenkombinationen.',
     },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Permutation und Kombination?",
-                "answer": "Bei einer Permutation kommt es auf die genaue Reihenfolge an (wie bei einem Zahlenschloss). Bei einer Kombination ist die Reihenfolge egal (wie bei den gezogenen Lottozahlen)."
-          }
+      { question: 'Was ist der Unterschied zwischen Permutation und Kombination?', answer: 'Bei Permutationen spielt die Reihenfolge eine Rolle (z. B. PIN-Codes oder Zieleinlauf); bei Kombinationen ist die Reihenfolge der gezogenen Elemente irrelevant (z. B. Handkarten beim Poker).' },
+      { question: 'Warum gilt immer (n über k) = (n über n-k)?', answer: 'Wegen der Symmetrie: Die Auswahl von k Elementen, die man mitnimmt, ist mathematisch vollkommen identisch mit der Auswahl der (n - k) Elemente, die man zurücklässt.' },
     ],
-    relatedSlugs: ["binomialverteilung-rechner","wahrscheinlichkeit-wuerfel-muenze-rechner","poisson-verteilung-rechner"],
+    relatedSlugs: ['binomialverteilung-rechner', 'wahrscheinlichkeit-wuerfel-muenze-rechner', 'poisson-verteilung-rechner'],
   },
   {
     id: "lineare-regression-rechner",
@@ -3281,10 +3219,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Lineare Regression",
     category: "statistik-wissenschaft",
     subcategory: "Regressionsanalyse",
-    metaTitle: "Lineare Regression Rechner – Regressionsgerade & Steigung berechnen",
-    metaDescription: "Ermitteln Sie Regressionsgerade (y = ax + b), Achsenabschnitt, Steigung und Bestimmtheitsmaß R² für Wertepaare online.",
-    h1: "Lineare Regression Rechner (Methode der kleinsten Quadrate)",
-    shortDescription: "Berechnet die optimale Trendlinie nach der Methode der kleinsten Quadrate (OLS).",
+    metaTitle: 'Lineare Regression Rechner – Regressionsgerade',
+    metaDescription: 'Ermitteln Sie Regressionsgerade (y = ax + b), Achsenabschnitt, Steigung und Bestimmtheitsmaß R² für Wertepaare online.',
+    h1: 'Lineare Regression Rechner (Methode der kleinsten Quadrate)',
+    shortDescription: 'Berechnet die optimale Trendlinie nach der Methode der kleinsten Quadrate (OLS).',
     searchKeywords: ["lineare regression rechner","regressionsgerade berechnen","methode kleinste quadrate","steigung achsenabschnitt r2","trendlinie formel"],
     inputs: [
           {
@@ -3397,16 +3335,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "y = 2,200 · x + 0,320"
     },
     content: {
-          "intro": "Die lineare Regression ist das Standardwerkzeug zur Modellierung von Kausal- und Trendbeziehungen zwischen kontinuierlichen Variablen.",
-          "details": "Das Bestimmtheitsmaß R² beziffert die Güte der Anpassung der Geraden an die empirischen Daten."
+      intro: 'Die lineare Einfachregression (Methode der kleinsten Quadrate, OLS) legt die bestmögliche Trendgerade y = a · x + b durch eine Punktewolke von Messwerten.',
+      details: 'Steigung a = Kovarianz(X,Y) / Varianz(X); Achsenabschnitt b = Mittelwert(Y) - a · Mittelwert(X). Das Bestimmtheitsmaß R² (0 ≤ R² ≤ 1) beziffert den Anteil der durch das Modell erklärten Varianz.',
     },
     faqs: [
-          {
-                "question": "Darf man die Gerade zur Vorhersage beliebiger Werte nutzen?",
-                "answer": "Nur innerhalb des gemessenen Wertebereichs (Interpolation). Eine Extrapolation weit außerhalb birgt hohe Risiken von Fehlprognosen."
-          }
+      { question: 'Was bedeutet ein Bestimmtheitsmaß von R² = 0,85?', answer: 'Es bedeutet, dass 85 Prozent der beobachteten Streuung der Zielgröße Y durch den linearen Zusammenhang mit der Variablen X statistisch erklärt werden.' },
+      { question: 'Was sind Residuen in der Regression?', answer: 'Die vertikalen Differenzen zwischen den real gemessenen Y-Werten und den durch die Regressionsgerade prognostizierten Werten (Residuum = y_i - y_dach).' },
     ],
-    relatedSlugs: ["korrelationskoeffizient-rechner","kovarianz-rechner","standardabweichung-rechner"],
+    relatedSlugs: ['korrelationskoeffizient-rechner', 'kovarianz-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "kovarianz-rechner",
@@ -3415,10 +3351,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Kovarianz-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Zusammenhangsmaße",
-    metaTitle: "Kovarianz Rechner – Stichprobenkovarianz & Populationskovarianz",
-    metaDescription: "Berechnen Sie die Kovarianz Cov(X, Y) zwischen zwei Datensätzen zur Messung der gemeinsamen Streuung online.",
-    h1: "Kovarianz Rechner (Cov(X, Y))",
-    shortDescription: "Misst den unstandardisierten linearen Zusammenhang zweier Merkmale.",
+    metaTitle: 'Kovarianz Rechner – Stichprobenkovarianz',
+    metaDescription: 'Berechnen Sie die Kovarianz Cov(X, Y) zwischen zwei Datensätzen zur Messung der gemeinsamen Streuung online.',
+    h1: 'Kovarianz Rechner (Cov(X, Y))',
+    shortDescription: 'Misst den unstandardisierten linearen Zusammenhang zweier Merkmale mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["kovarianz rechner","cov x y berechnen","stichprobenkovarianz","kovarianz formel","gemeinsame streuung"],
     inputs: [
           {
@@ -3521,16 +3457,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "Cov = 163,33"
     },
     content: {
-          "intro": "Die Kovarianz ist das grundlegende Maß für die gemeinsame Varianz zweier Zufallsvariablen in der Portfoliotheorie und Statistik.",
-          "details": "Da die Kovarianz vom Maßstab abhängt, wird sie durch Division durch die Standardabweichungen zum Korrelationskoeffizienten r normiert."
+      intro: 'Die Kovarianz misst den gemeinsamen monotonen Trend zweier metrischer Zufallsvariablen X und Y.',
+      details: 'Formel: Cov(X,Y) = (1 / (n-1)) · Summe[ (x_i - x_quer) · (y_i - y_quer) ]. Eine positive Kovarianz zeigt an, dass überdurchschnittliche Werte von X tendenziell mit überdurchschnittlichen Werten von Y einhergehen.',
     },
     faqs: [
-          {
-                "question": "Worin unterscheidet sich Kovarianz von Korrelation?",
-                "answer": "Die Kovarianz ist maßstabsabhängig (hat die Einheit X mal Y). Der Korrelationskoeffizient ist dimensionslos und liegt stets zwischen -1 und +1."
-          }
+      { question: 'Warum lässt sich die Stärke des Zusammenhangs an der Kovarianz allein schwer ablesen?', answer: 'Weil die Kovarianz nicht normiert ist und von den Einheiten der Messdaten abhängt; teilt man die Kovarianz durch das Produkt der Standardabweichungen, erhält man den normierten Pearson-Korrelationskoeffizienten r.' },
+      { question: 'Was ist eine Kovarianzmatrix?', answer: 'Eine quadratische Matrix im multivariaten Datenraum, die alle paarweisen Kovarianzen zwischen mehreren Variablen systematisch anordnet (Hauptdiagonale = Varianzen).' },
     ],
-    relatedSlugs: ["korrelationskoeffizient-rechner","lineare-regression-rechner","standardabweichung-rechner"],
+    relatedSlugs: ['korrelationskoeffizient-rechner', 'lineare-regression-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "variationskoeffizient-rechner",
@@ -3539,10 +3473,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Variationskoeffizient",
     category: "statistik-wissenschaft",
     subcategory: "Deskriptive Statistik",
-    metaTitle: "Variationskoeffizient Rechner – Relative Streuung (CV) online berechnen",
-    metaDescription: "Ermitteln Sie den Variationskoeffizienten (CV = s / x̄) zur Beurteilung der relativen Streuung unabhängig von der Maßeinheit.",
-    h1: "Variationskoeffizient Rechner (Relative Standardabweichung)",
-    shortDescription: "Vergleicht die relative Streuung verschiedener Datensätze maßstabsunabhängig.",
+    metaTitle: 'Variationskoeffizient Rechner – Relative Streuung (CV)',
+    metaDescription: 'Ermitteln Sie den Variationskoeffizienten (CV = s / x̄) zur Beurteilung der relativen Streuung unabhängig von der Maßeinheit.',
+    h1: 'Variationskoeffizient Rechner (Relative Standardabweichung)',
+    shortDescription: 'Vergleicht die relative Streuung verschiedener Datensätze maßstabsunabhängig mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["variationskoeffizient rechner","relative standardabweichung","coefficient of variation","cv statistik formel","streuung vergleich"],
     inputs: [
           {
@@ -3591,16 +3525,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "CV = 15,00 %"
     },
     content: {
-          "intro": "Der Variationskoeffizient erlaubt den objektiven Vergleich von Streuungen zwischen Merkmalen mit völlig unterschiedlichen Mittelwerten oder Einheiten.",
-          "details": "Besonders nützlich im Qualitätsmanagement und in der Finanzanalyse (Risiko pro Renditeeinheit)."
+      intro: 'Der Variationskoeffizient (CV, relative Standardabweichung) setzt die Standardabweichung ins Verhältnis zum arithmetischen Mittelwert.',
+      details: 'Formel: CV = (s / Mittelwert) · 100 %. Als dimensionslose Prozentzahl ermöglicht der Variationskoeffizient den direkten Vergleich von Streuungen zwischen Datensätzen mit völlig unterschiedlichen Größenordnungen oder Einheiten.',
     },
     faqs: [
-          {
-                "question": "Darf der Variationskoeffizient bei negativen Werten berechnet werden?",
-                "answer": "Nein, der CV ist nur für verhältnisskalierte Größen mit echtem Nullpunkt sinnvoll definiert (z.B. Körpergröße, Preise, Messzeiten, aber nicht Celsius-Temperatur)."
-          }
+      { question: 'Kann man die Streuung von Elefanten- und Mäusegewichten fair vergleichen?', answer: 'Ja, über den Variationskoeffizienten: Während die absolute Standardabweichung bei Elefanten in hunderten Kilogramm und bei Mäusen in Gramm gemessen wird, zeigt der CV das relative Risiko unabhängig vom Maßstab.' },
+      { question: 'Wann darf der Variationskoeffizient nicht angewendet werden?', answer: 'Er ist nur für verhältnisskalierte Daten mit absolutem Nullpunkt sinnvoll; bei Intervallskalen (wie Celsius-Temperaturen, wo der Nullpunkt willkürlich ist) verliert der CV seine mathematische Gültigkeit.' },
     ],
-    relatedSlugs: ["standardabweichung-rechner","mittelwert-median-modus-rechner","varianz-standardabweichung-stichprobe-rechner"],
+    relatedSlugs: ['standardabweichung-rechner', 'mittelwert-median-modus-rechner', 'varianz-standardabweichung-stichprobe-rechner'],
   },
   {
     id: "geometrisches-mittel-rechner",
@@ -3609,10 +3541,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Geometrisches Mittel",
     category: "statistik-wissenschaft",
     subcategory: "Mittelwerte",
-    metaTitle: "Geometrisches Mittel Rechner – Durchschnittliche Wachstumsrate berechnen",
-    metaDescription: "Berechnen Sie das geometrische Mittel für Renditen, Zuwachsraten, Zinseszinsen und Multiplikatoren online.",
-    h1: "Geometrisches Mittel Rechner",
-    shortDescription: "Ermittelt das geometrische Mittel zur korrekten Durchschnittsberechnung prozentualer Wachstumsraten.",
+    metaTitle: 'Geometrisches Mittel Rechner – Durchschnittliche Wachstumsr...',
+    metaDescription: 'Berechnen Sie das geometrische Mittel für Renditen, Zuwachsraten, Zinseszinsen und Multiplikatoren online.',
+    h1: 'Geometrisches Mittel Rechner',
+    shortDescription: 'Ermittelt das geometrische Mittel zur korrekten Durchschnittsberechnung prozentualer Wachstumsraten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["geometrisches mittel rechner","durchschnittliches wachstum berechnen","geometrischer durchschnitt","zinseszins durchschnitt","wachstumsfaktor rechner"],
     inputs: [
           {
@@ -3684,16 +3616,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "+9,22 % p.a."
     },
     content: {
-          "intro": "Das arithmetische Mittel überschätzt Renditen und Wachstumsraten systematisch. Für Kapitalanlagen ist das geometrische Mittel unverzichtbar.",
-          "details": "Wenn eine Aktie im Jahr 1 um 100 % steigt und im Jahr 2 um 50 % fällt, ist der Kapitalgewinn 0 %. Das geometrische Mittel zeigt korrekte 0 % p.a. (arithmetisch wären es scheinbare +25 %)."
+      intro: 'Das geometrische Mittel ist der einzig mathematisch exakte Mittelwert für proportionale Wachstumsraten, Zinseszinsen, Inflationsreihen und Indexziffern.',
+      details: 'Formel: Geometrisches Mittel = n-te Wurzel aus dem Produkt aller Werte (x1 · x2 · ... · xn). Liegen Wachstumsfaktoren vor (z. B. +10 % und +30 %), rechnet man mit den Faktoren 1,10 und 1,30.',
     },
     faqs: [
-          {
-                "question": "Warum darf das geometrische Mittel nicht für negative Faktoren berechnet werden?",
-                "answer": "Weil aus negativen Produkten keine reelle gerade Wurzel gezogen werden kann. Verwenden Sie daher immer Faktoren (1 + Rendite) statt reiner Prozentzahlen."
-          }
+      { question: 'Warum ist das geometrische Mittel immer kleiner oder gleich dem arithmetischen Mittel?', answer: 'Dies besagt die fundamentale Ungleichung vom arithmetischen und geometrischen Mittel (AM-GM-Ungleichung); beide sind nur dann exakt gleich, wenn alle Einzelwerte identisch sind.' },
+      { question: 'Wie berechnet man die durchschnittliche jährliche Aktienrendite bei +50 % im 1. Jahr und -50 % im 2. Jahr?', answer: 'Wachstumsfaktoren: 1,50 und 0,50. Produkt = 0,75. Quadratwurzel(0,75) ≈ 0,866. Reale jährliche Durchschnittsrendite: -13,4 % p.a. (das arithmetische Mittel von 0 % wäre trügerisch!).' },
     ],
-    relatedSlugs: ["harmonisches-mittel-rechner","mittelwert-median-modus-rechner","prozentrechner"],
+    relatedSlugs: ['harmonisches-mittel-rechner', 'mittelwert-median-modus-rechner', 'prozentrechner', 'durchschnittsrechner'],
   },
   {
     id: "harmonisches-mittel-rechner",
@@ -3702,10 +3632,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Harmonisches Mittel",
     category: "statistik-wissenschaft",
     subcategory: "Mittelwerte",
-    metaTitle: "Harmonisches Mittel Rechner – Durchschnittsgeschwindigkeit online",
-    metaDescription: "Berechnen Sie das harmonische Mittel für Geschwindigkeiten (km/h), Dichten und Wechselkurse nach der exakten Formel.",
-    h1: "Harmonisches Mittel Rechner",
-    shortDescription: "Berechnet den physikalisch korrekten Durchschnitt für Verhältnisgrößen wie Geschwindigkeit (km/h).",
+    metaTitle: 'Harmonisches Mittel Rechner – Durchschnittsgeschwindigkeit...',
+    metaDescription: 'Berechnen Sie das harmonische Mittel für Geschwindigkeiten (km/h), Dichten und Wechselkurse nach der exakten Formel.',
+    h1: 'Harmonisches Mittel Rechner',
+    shortDescription: 'Berechnet den physikalisch korrekten Durchschnitt für Verhältnisgrößen wie Geschwindigkeit (km/h).',
     searchKeywords: ["harmonisches mittel rechner","durchschnittsgeschwindigkeit berechnen","harmonischer durchschnitt","hin und rückfahrt geschwindigkeit","verhältnisgrößen mittel"],
     inputs: [
           {
@@ -3755,16 +3685,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "80,00 km/h"
     },
     content: {
-          "intro": "Klassische Denkfalle der Physik: Wer eine Strecke mit 60 km/h hin und 120 km/h zurückfährt, fährt im Schnitt 80 km/h, keineswegs 90 km/h.",
-          "details": "Das liegt daran, dass man für die langsamere Hinfahrt doppelt so viel Zeit aufwendet wie für die schnelle Rückfahrt."
+      intro: 'Das harmonische Mittel ist der zwingend vorgeschriebene Mittelwert für Verhältnisgrößen und Quotienten wie Geschwindigkeiten (km/h) oder Preise pro Einheit.',
+      details: 'Formel: H = n / Summe(1 / x_i). Fährt man eine feste Strecke mit 100 km/h hin und dieselbe Strecke mit 50 km/h zurück, beträgt die Durchschnittsgeschwindigkeit exakt 2 / (1/100 + 1/50) = 66,67 km/h (nicht 75 km/h!).',
     },
     faqs: [
-          {
-                "question": "Wann muss das harmonische Mittel verwendet werden?",
-                "answer": "Immer dann, wenn ein Durchschnitt aus Quotienten gebildet wird, deren Bezugsgröße im Nenner fixiert ist (z.B. Kilometer pro Stunde bei fester Wegstrecke)."
-          }
+      { question: 'Warum versagt das arithmetische Mittel bei Durchschnittsgeschwindigkeiten auf fester Distanz?', answer: 'Weil man bei niedriger Geschwindigkeit mehr Zeit auf der Strecke verbringt und die langsame Phase daher zeitlich überproportional stark ins Gewicht fällt.' },
+      { question: 'Wann verwendet man das harmonische Mittel in der Finanzwelt?', answer: 'Beim Berechnen des durchschnittlichen Kurs-Gewinn-Verhältnisses (KGV) eines Aktienindex (P/E-Ratio), um Verzerrungen durch extrem hohe Einzelwerte zu eliminieren.' },
     ],
-    relatedSlugs: ["geometrisches-mittel-rechner","mittelwert-median-modus-rechner","notendurchschnitt-rechner"],
+    relatedSlugs: ['geometrisches-mittel-rechner', 'mittelwert-median-modus-rechner', 'notendurchschnitt-rechner', 'durchschnittsrechner'],
   },
   {
     id: "bayes-theorem-rechner",
@@ -3773,10 +3701,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Bayes-Theorem-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Wahrscheinlichkeitsrechnung",
-    metaTitle: "Bayes-Theorem Rechner – Bedingte Wahrscheinlichkeit P(A|B) berechnen",
-    metaDescription: "Berechnen Sie A-posteriori-Wahrscheinlichkeiten für medizinische Tests, Schnelltests, Diagnose-Sensitivität und Spezifität.",
-    h1: "Satz von Bayes Rechner (Bedingte Wahrscheinlichkeit)",
-    shortDescription: "Berechnet die A-posteriori-Wahrscheinlichkeit P(A|B) nach dem Satz von Bayes.",
+    metaTitle: 'Bayes-Theorem Rechner – Bedingte Wahrscheinlichkeit P berec...',
+    metaDescription: 'Berechnen Sie A-posteriori-Wahrscheinlichkeiten für medizinische Tests, Schnelltests, Diagnose-Sensitivität und Spezifität.',
+    h1: 'Satz von Bayes Rechner (Bedingte Wahrscheinlichkeit)',
+    shortDescription: 'Berechnet die A-posteriori-Wahrscheinlichkeit P(A|B) nach dem Satz von Bayes mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["bayes theorem rechner","satz von bayes berechnen","bedingte wahrscheinlichkeit","sensitivität spezifität rechner","positiver vorhersagewert"],
     inputs: [
           {
@@ -3842,16 +3770,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "P(A|B) = 16,10 %"
     },
     content: {
-          "intro": "Das Bayes-Theorem verdeutlicht das Phänomen der \"Base Rate Fallacy\" bei Massentests und Diagnosen.",
-          "details": "Bei seltenen Erkrankungen überwiegen selbst bei hochpräzisen Tests die falsch-positiven Befunde die echten Treffer."
+      intro: 'Der Satz von Bayes berechnet die bedingte Wahrscheinlichkeit eines Ereignisses unter Berücksichtigung von neuem Vorwissen oder Testergebnissen (A-posteriori-Wahrscheinlichkeit).',
+      details: 'Formel: P(A|B) = [P(B|A) · P(A)] / P(B). Fundamental in der Medizin: Selbst bei einem zu 99 % zuverlässigen Test ist ein positives Testergebnis bei seltenen Krankheiten (niedrige Prävalenz P(A)) oft zu über 80 % ein Fehlalarm!',
     },
     faqs: [
-          {
-                "question": "Was ist der Unterschied zwischen Sensitivität und Spezifität?",
-                "answer": "Sensitivität ist die Fähigkeit des Tests, Kranke zuverlässig als positiv zu erkennen. Spezifität ist die Fähigkeit, Gesunde zuverlässig als negativ zu klassifizieren."
-          }
+      { question: 'Was ist der Base-Rate-Fallacy (Prävalenzfehler)?', answer: 'Die menschliche Neigung, die extrem niedrige Grundwahrscheinlichkeit (Basisrate) einer seltenen Erkrankung in der Bevölkerung zu ignorieren und die Aussagekraft eines positiven Tests drastisch zu überschätzen.' },
+      { question: 'Wo wird Bayes-Theorem in der Informatik eingesetzt?', answer: 'In selbstlernenden Spam-Filtern (Bayes-Filter), künstlicher Intelligenz (Bayessche Netze) und prädiktiver Text- und Spracherkennung.' },
     ],
-    relatedSlugs: ["wahrscheinlichkeit-wuerfel-muenze-rechner","binomialverteilung-rechner","prozentrechner"],
+    relatedSlugs: ['chi-quadrat-unabhaengigkeitstest-rechner', 'wahrscheinlichkeit-wuerfel-muenze-rechner', 'binomialverteilung-rechner', 'prozentrechner'],
   },
   {
     id: "wahrscheinlichkeit-wuerfel-muenze-rechner",
@@ -3860,10 +3786,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Würfel & Münze",
     category: "statistik-wissenschaft",
     subcategory: "Wahrscheinlichkeitsrechnung",
-    metaTitle: "Würfel & Münze Wahrscheinlichkeitsrechner – Würfe online berechnen",
-    metaDescription: "Berechnen Sie Trefferchancen für Mehrfach-Würfe mit 6-seitigen Würfeln und Münzwürfe (mindestens eine 6, Pasch, Augensumme).",
-    h1: "Würfel & Münzwurf Wahrscheinlichkeitsrechner",
-    shortDescription: "Ermittelt Chancen und Gegenwahrscheinlichkeiten für mehrfache Würfel- und Münzwürfe.",
+    metaTitle: 'Würfel & Münze Wahrscheinlichkeitsrechner – Würfe',
+    metaDescription: 'Berechnen Sie Trefferchancen für Mehrfach-Würfe mit 6-seitigen Würfeln und Münzwürfe (mindestens eine 6, Pasch, Augensumme).',
+    h1: 'Würfel & Münzwurf Wahrscheinlichkeitsrechner',
+    shortDescription: 'Ermittelt Chancen und Gegenwahrscheinlichkeiten für mehrfache Würfel- und Münzwürfe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ["würfel wahrscheinlichkeit rechner","münzwurf wahrscheinlichkeit","mindestens eine sechs rechner","pasch chance berechnen","laplace wahrscheinlichkeit"],
     inputs: [
           {
@@ -3916,16 +3842,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "42,13 %"
     },
     content: {
-          "intro": "Das Rechnen mit Gegenwahrscheinlichkeiten ist das wichtigste Werkzeug bei der Analyse von Glücksspielen und Risikoentscheidungen.",
-          "details": "Bei 4 Würfeln übersteigt die Chance auf mindestens eine Sechs erstmals die 50 %-Marke (51,77 %)."
+      intro: 'Dieser Stochastik-Rechner ermittelt Eintrittswahrscheinlichkeiten, Augensummen und Trefferfolgen bei fairen Münzen und mehrfachen Würfelwürfen.',
+      details: 'Klassische Laplace-Wahrscheinlichkeit: P(E) = Günstige Ergebnisse / Mögliche Ergebnisse. Bei zwei 6-seitigen Würfeln gibt es 6² = 36 mögliche Würfelpaare; die Augensumme 7 ist mit 6 günstigen Paaren (Wahrscheinlichkeit 6/36 = 16,67 %) am wahrscheinlichsten.',
     },
     faqs: [
-          {
-                "question": "Verdoppelt sich die Chance auf eine 6, wenn man zwei Würfel wirft?",
-                "answer": "Nein! Bei zwei Würfeln beträgt die Chance 1 - (5/6)² = 30,56 % (nicht 2 × 16,67 % = 33,33 %), da beide Würfel gleichzeitig eine 6 zeigen können."
-          }
+      { question: 'Wie hoch ist die Wahrscheinlichkeit, bei 10 Münzwürfen mindestens einmal "Kopf" zu werfen?', answer: 'Über das Gegenereignis: 1 - P(zehnmal Zahl) = 1 - (0,5)¹⁰ = 1 - (1/1024) ≈ 99,90 Prozent.' },
+      { question: 'Was ist der Spielerfehlschluss (Gambler\'s Fallacy)?', answer: 'Der Irrglaube, dass nach einer langen Serie von "Rot" beim Roulette die Chance auf "Schwarz" gestiegen sei; die Kugel hat kein Gedächtnis, jede Runde bleibt stochastisch unabhängig.' },
     ],
-    relatedSlugs: ["binomialverteilung-rechner","kombinatorik-n-ueber-k-rechner","bayes-theorem-rechner"],
+    relatedSlugs: ['binomialverteilung-rechner', 'kombinatorik-n-ueber-k-rechner', 'bayes-theorem-rechner'],
   },
   {
     id: "perzentil-rechner",
@@ -3934,10 +3858,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Perzentil-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Deskriptive Statistik",
-    metaTitle: "Perzentil Rechner – Quantile & Perzentil-Rang online ermitteln",
-    metaDescription: "Berechnen Sie das p-te Perzentil für eine Zahlenreihe oder den relativen Perzentil-Rang eines Werts.",
-    h1: "Perzentil & Quantil Rechner",
-    shortDescription: "Ermittelt Quantile und Perzentile zur relativen Einordnung von Testergebnissen und Kennzahlen.",
+    metaTitle: 'Perzentil Rechner – Quantile & Perzentil-Rang online ermitteln',
+    metaDescription: 'Berechnen Sie das p-te Perzentil für eine Zahlenreihe oder den relativen Perzentil-Rang eines Werts.',
+    h1: 'Perzentil & Quantil Rechner',
+    shortDescription: 'Ermittelt Quantile und Perzentile zur relativen Einordnung von Testergebnissen und Kennzahlen.',
     searchKeywords: ["perzentil rechner","quantil berechnen","perzentilrang formel","90 perzentil berechnen","dezile statistik"],
     inputs: [
           {
@@ -4040,16 +3964,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "P90 = 77,50"
     },
     content: {
-          "intro": "Perzentile werden standardmäßig bei medizinischen Wachstumskurven von Kindern sowie bei standardisierten Tests verwendet.",
-          "details": "Bekannte Perzentile sind der Median (50. Perzentil) und die Quartile Q1 (25.) und Q3 (75.)."
+      intro: 'Das p-te Perzentil teilt eine sortierte Stichprobe so, dass mindestens p Prozent der Messwerte kleiner oder gleich diesem Schwellenwert sind.',
+      details: 'Das 50. Perzentil ist der Median. Das 90. Perzentil markiert den Wert, den 90 % der Probanden unterschreiten und nur 10 % übertreffen (Standardmaß bei Gehaltstabellen, Server-Antwortzeiten und Kinderperzentilen).',
     },
     faqs: [
-          {
-                "question": "Was bedeutet es, beim Gehalt im 90. Perzentil zu liegen?",
-                "answer": "Es bedeutet, dass 90 % der Vergleichsgruppe weniger verdienen als man selbst und nur 10 % mehr."
-          }
+      { question: 'Was bedeuten Perzentilkurven im gelben Kinderuntersuchungsheft (U-Heft)?', answer: 'Liegt das Körpergewicht eines Babys auf der 75. Perzentilkurve, wiegen genau 75 Prozent aller gesunden gleichaltrigen Kinder weniger und 25 Prozent wiegen mehr.' },
+      { question: 'Was ist die 95th-Percentile-Regel bei Internet-Providern?', answer: 'Provider schneiden die obersten 5 Prozent der monatlichen Datenverkehrsspitzen ab und rechnen die verbleibende maximale Bandbreite ab, um kurzzeitige Lastspitzen fair zu behandeln.' },
     ],
-    relatedSlugs: ["quartile-box-plot-rechner","mittelwert-median-modus-rechner","z-score-normalverteilung-rechner"],
+    relatedSlugs: ['quartile-box-plot-rechner', 'mittelwert-median-modus-rechner', 'z-score-normalverteilung-rechner'],
   },
   {
     id: "effektstaerke-cohens-d-rechner",
@@ -4058,10 +3980,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Cohen's d-Rechner",
     category: "statistik-wissenschaft",
     subcategory: "Inferenzstatistik",
-    metaTitle: "Effektstärke Rechner – Cohen's d für Mittelwertunterschiede",
-    metaDescription: "Berechnen Sie die standardisierte Effektstärke Cohen's d für zwei Gruppen und interpretieren Sie praktische Relevanz (klein/mittel/groß).",
-    h1: "Effektstärke Rechner (Cohen's d)",
-    shortDescription: "Quantifiziert die praktische Bedeutsamkeit eines Mittelwertunterschieds unabhängig von der Stichprobengröße.",
+    metaTitle: 'Effektstärke Rechner – Cohen\'s d für Mittelwertunterschiede',
+    metaDescription: 'Berechnen Sie die standardisierte Effektstärke Cohen\'s d für zwei Gruppen und interpretieren Sie praktische Relevanz (klein/mittel/groß).',
+    h1: 'Effektstärke Rechner (Cohen\'s d)',
+    shortDescription: 'Quantifiziert die praktische Bedeutsamkeit eines Mittelwertunterschieds unabhängig von der Stichprobengröße.',
     searchKeywords: ["cohens d rechner","effektstärke berechnen","effektmaß statistik","praktische signifikanz","pooled standard deviation"],
     inputs: [
           {
@@ -4133,16 +4055,14 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "d = 0,667"
     },
     content: {
-          "intro": "Ein statistisch signifikantes Testergebnis (p < 0,05) kann bei riesigen Stichproben völlig unbedeutend sein. Die Effektstärke misst die echte Relevanz.",
-          "details": "Besonders in Medizin, Psychologie und Bildungsforschung verlangen moderne Fachjournale die Angabe von Effektstärken."
+      intro: 'Cohens d misst die praktische Relevanz und relative Effektstärke eines Unterschieds zwischen zwei Gruppen unabhängig von der reinen Stichprobengröße.',
+      details: 'Formel: d = (Mittelwert1 - Mittelwert2) / gepoolte Standardabweichung. Da bei riesigen Stichproben selbst minimale, irrelevante Unterschiede statistisch signifikant werden (p < 0,05), ist Cohens d unverzichtbar zur Beurteilung echter wissenschaftlicher Wirksamkeit.',
     },
     faqs: [
-          {
-                "question": "Was besagt die Faustregel von Cohen?",
-                "answer": "d = 0,2 gilt als kleiner Effekt, d = 0,5 als mittlerer Effekt und d ab 0,8 als großer Effekt."
-          }
+      { question: 'Wie interpretiert man Cohens d nach Standardkonventionen?', answer: 'd = 0,20 gilt als kleiner Effekt; d = 0,50 als mittlerer Effekt; ab d = 0,80 spricht man von einem starken Effekt.' },
+      { question: 'Was bedeutet Cohens d = 1,0 ganz anschaulich?', answer: 'Dass sich die beiden Verteilungen um eine volle Standardabweichung unterscheiden; rund 84 Prozent der Behandlungsgruppe liegen über dem Mittelwert der Kontrollgruppe.' },
     ],
-    relatedSlugs: ["t-test-rechner","p-wert-hypothesentest-rechner","standardabweichung-rechner"],
+    relatedSlugs: ['t-test-rechner', 'p-wert-hypothesentest-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "chi-quadrat-unabhaengigkeitstest-rechner",
@@ -4151,10 +4071,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     shortName: "Chi-Quadrat Test",
     category: "statistik-wissenschaft",
     subcategory: "Inferenzstatistik",
-    metaTitle: "Chi-Quadrat Rechner – 2x2 Vierfeldertafel Test auf Unabhängigkeit",
-    metaDescription: "Berechnen Sie die Chi-Quadrat-Prüfgröße (χ²), Freiheitsgrade und Scheinkorrelation für 2x2 Vierfeldertafeln online.",
-    h1: "Chi-Quadrat Test Rechner (Vierfeldertafel)",
-    shortDescription: "Prüft nominalskalierte Merkmale in einer 2x2 Kontingenztafel auf stochastische Unabhängigkeit.",
+    metaTitle: 'Chi-Quadrat Rechner – 2x2 Vierfeldertafel Test auf Unabhäng...',
+    metaDescription: 'Berechnen Sie die Chi-Quadrat-Prüfgröße (χ²), Freiheitsgrade und Scheinkorrelation für 2x2 Vierfeldertafeln online.',
+    h1: 'Chi-Quadrat Test Rechner (Vierfeldertafel)',
+    shortDescription: 'Prüft nominalskalierte Merkmale in einer 2x2 Kontingenztafel auf stochastische Unabhängigkeit.',
     searchKeywords: ["chi quadrat rechner","vierfeldertafel rechner","unabhängigkeitstest statistik","chi square test online","kontingenzkoeffizient"],
     inputs: [
           {
@@ -4232,15 +4152,13 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "resultSummary": "χ² = 9,000 (signifikant)"
     },
     content: {
-          "intro": "Der Chi-Quadrat-Unabhängigkeitstest eignet sich optimal zur Analyse von Fragebögen mit Ja/Nein-Antworten oder Kategoriemerkmalen.",
-          "details": "Faustregel: Die erwartete Zellhäufigkeit sollte in allen Feldern mindestens 5 betragen."
+      intro: 'Der Chi-Quadrat-Unabhängigkeitstest (Chi²-Test) prüft in einer Kontingenztafel, ob zwei kategoriale Merkmale (z. B. Geschlecht und Wahlpräferenz) stochastisch unabhängig sind.',
+      details: 'Teststatistik: Chi² = Summe[ (Beobachtete Häufigkeit f_o - Erwartete Häufigkeit f_e)² / f_e ]. Erwartete Häufigkeit f_e = (Zeilensumme · Spaltensumme) / Gesamtstichprobe. Freiheitsgrade df = (Zeilen - 1) · (Spalten - 1).',
     },
     faqs: [
-          {
-                "question": "Was besagt der kritische Wert von 3,841?",
-                "answer": "Bei einem Freiheitsgrad (df = 1) und einem Signifikanzniveau von α = 0,05 führt jeder χ²-Wert über 3,841 zur Ablehnung der Unabhängigkeitshypothese."
-          }
+      { question: 'Welche Mindesthäufigkeit verlangt der Chi-Quadrat-Test?', answer: 'In jeder Zelle der Kontingenztafel sollte die erwartete Häufigkeit f_e mindestens 5 betragen; bei kleineren Zahlen greift der exakte Fisher-Test.' },
+      { question: 'Was ist der Unterschied zwischen Chi²-Unabhängigkeitstest und Chi²-Anpassungstest?', answer: 'Der Anpassungstest prüft, ob eine beobachtete Häufigkeitsverteilung einer theoretischen Verteilung (z. B. den Mendelschen Vererbungsregeln) folgt; der Unabhängigkeitstest prüft den Zusammenhang zweier Merkmale.' },
     ],
-    relatedSlugs: ["p-wert-hypothesentest-rechner","bayes-theorem-rechner","korrelationskoeffizient-rechner"],
+    relatedSlugs: ['p-wert-hypothesentest-rechner', 'bayes-theorem-rechner', 'korrelationskoeffizient-rechner'],
   },
 ];

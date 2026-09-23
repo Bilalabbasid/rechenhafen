@@ -4,7 +4,10 @@ import { formatCurrency, formatPercent } from '@/lib/formatters';
 export function calculateInstallmentLoan(inputs: Record<string, any>): CalculationResult {
   const loanAmount = parseFloat(inputs.loanAmount) || 10000;
   const annualInterest = (parseFloat(inputs.annualInterest) || 4.5) / 100;
-  const termMonths = parseInt(inputs.termMonths || '48', 10);
+  const rawTerm = parseInt(inputs.term || inputs.termMonths || '48', 10);
+  const termUnit = inputs.termUnit || 'months'; // 'months' vs 'years'
+  const termMonths = termUnit === 'years' ? rawTerm * 12 : rawTerm;
+  const annualSpecialRepayment = Math.max(0, parseFloat(inputs.sondertilgung || '0'));
 
   if (loanAmount <= 0 || termMonths <= 0) {
     return {
@@ -25,29 +28,35 @@ export function calculateInstallmentLoan(inputs: Record<string, any>): Calculati
     monthlyPayment = loanAmount * ((qPow * (q - 1)) / (qPow - 1));
   }
 
-  const totalPayment = monthlyPayment * termMonths;
-  const totalInterest = Math.max(0, totalPayment - loanAmount);
-
-  // Tilgungsplan (Jahresbasis)
+  // Tilgungsplan (Jahresbasis) unter Berücksichtigung von Sondertilgungen
   const rows: CalculationBreakdownRow[] = [];
   let remainingDebt = loanAmount;
   let accumulatedInterest = 0;
   let accumulatedRepayment = 0;
+  let actualMonths = 0;
 
   const totalYears = Math.ceil(termMonths / 12);
   let currentMonth = 1;
 
-  for (let year = 1; year <= totalYears; year++) {
+  for (let year = 1; year <= totalYears && remainingDebt > 0.01; year++) {
     let yearInterest = 0;
     let yearRepayment = 0;
 
-    for (let m = 0; m < 12 && currentMonth <= termMonths; m++, currentMonth++) {
+    for (let m = 0; m < 12 && currentMonth <= termMonths && remainingDebt > 0.01; m++, currentMonth++) {
+      actualMonths++;
       const interestForMonth = remainingDebt * monthlyRateInterest;
       const repaymentForMonth = Math.min(remainingDebt, monthlyPayment - interestForMonth);
 
       yearInterest += interestForMonth;
       yearRepayment += repaymentForMonth;
       remainingDebt = Math.max(0, remainingDebt - repaymentForMonth);
+
+      // Sondertilgung am Jahresende (Monat 12, 24, ...)
+      if (m === 11 && annualSpecialRepayment > 0 && remainingDebt > 0.01) {
+        const actualSpecial = Math.min(remainingDebt, annualSpecialRepayment);
+        yearRepayment += actualSpecial;
+        remainingDebt = Math.max(0, remainingDebt - actualSpecial);
+      }
     }
 
     accumulatedInterest += yearInterest;
@@ -63,6 +72,31 @@ export function calculateInstallmentLoan(inputs: Record<string, any>): Calculati
     });
   }
 
+  const totalPayment = accumulatedRepayment + accumulatedInterest;
+  const secondary: Array<{ id: string; label: string; value: any; formattedValue: string }> = [
+    { id: 'totalInterest', label: 'Gesamtzinskosten', value: accumulatedInterest, formattedValue: formatCurrency(accumulatedInterest) },
+    { id: 'totalPayment', label: 'Gesamtbetrag Rückzahlung', value: totalPayment, formattedValue: formatCurrency(totalPayment) },
+    { id: 'loanAmount', label: 'Nettodarlehensbetrag', value: loanAmount, formattedValue: formatCurrency(loanAmount) },
+    { id: 'actualTerm', label: 'Tatsächliche Laufzeit', value: actualMonths, formattedValue: `${actualMonths} Monate (${(actualMonths / 12).toFixed(1)} Jahre)` },
+  ];
+
+  if (annualSpecialRepayment > 0) {
+    const monthsSaved = termMonths - actualMonths;
+    if (monthsSaved > 0) {
+      secondary.unshift({
+        id: 'timeSaved',
+        label: 'Ersparte Laufzeit durch Sondertilgung',
+        value: monthsSaved,
+        formattedValue: `${monthsSaved} Monate schneller schuldenfrei`,
+      });
+    }
+  }
+
+  let summary = `Für einen Nettokredit von ${formatCurrency(loanAmount)} mit ${formatPercent(annualInterest * 100)} Zinsen zahlen Sie bei regulär ${termMonths} Monaten Laufzeit eine monatliche Rate von ${formatCurrency(monthlyPayment)}. Die Gesamtzinsen belaufen sich auf ${formatCurrency(accumulatedInterest)}.`;
+  if (annualSpecialRepayment > 0 && actualMonths < termMonths) {
+    summary += ` Durch die jährliche Sondertilgung von ${formatCurrency(annualSpecialRepayment)} sind Sie bereits nach ${actualMonths} Monaten (${termMonths - actualMonths} Monate früher) schuldenfrei.`;
+  }
+
   return {
     primary: {
       id: 'monthlyRate',
@@ -71,11 +105,7 @@ export function calculateInstallmentLoan(inputs: Record<string, any>): Calculati
       formattedValue: formatCurrency(monthlyPayment),
       highlight: true,
     },
-    secondary: [
-      { id: 'totalInterest', label: 'Gesamtzinskosten', value: totalInterest, formattedValue: formatCurrency(totalInterest) },
-      { id: 'totalPayment', label: 'Gesamtbetrag Rückzahlung', value: totalPayment, formattedValue: formatCurrency(totalPayment) },
-      { id: 'loanAmount', label: 'Nettodarlehensbetrag', value: loanAmount, formattedValue: formatCurrency(loanAmount) },
-    ],
+    secondary,
     breakdown: {
       columns: [
         { key: 'repaymentYear', label: 'Getilgter Betrag' },
@@ -84,7 +114,7 @@ export function calculateInstallmentLoan(inputs: Record<string, any>): Calculati
       ],
       rows,
     },
-    summaryText: `Für einen Nettokredit von ${formatCurrency(loanAmount)} mit ${formatPercent(annualInterest * 100)} Zinsen zahlen Sie bei ${termMonths} Monaten Laufzeit eine feste Rate von ${formatCurrency(monthlyPayment)} pro Monat. Die Gesamtzinsen belaufen sich auf ${formatCurrency(totalInterest)}.`,
+    summaryText: summary,
   };
 }
 

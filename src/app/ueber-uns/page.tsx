@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function UeberUnsPage() {
   return (
     <div className={styles.container}>
-      <Breadcrumbs items={[{ label: 'Über uns' }]} />
+      <Breadcrumbs items={[{ label: 'Über uns', href: '/ueber-uns/' }]} />
 
       <article style={{ maxWidth: '800px', margin: '0 auto var(--space-12)', lineHeight: 1.7, color: 'var(--color-text-secondary)' }}>
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>

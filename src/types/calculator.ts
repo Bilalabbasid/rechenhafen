@@ -65,6 +65,16 @@ export interface WorkedExample {
 
 export type CalculationFunction = (inputs: Record<string, any>) => CalculationResult;
 
+export interface TrustMetadata {
+  methodology?: string;
+  assumptions?: string[];
+  limitations?: string[];
+  legalBasis?: string;
+  sourceName?: string;
+  sourceUrl?: string;
+  lastReviewed?: string;
+}
+
 export interface CalculatorDefinition {
   id: string;
   slug: string;
@@ -96,6 +106,7 @@ export interface CalculatorDefinition {
     sourceUrl?: string;
     lastVerified: string;
   };
+  trustMeta?: TrustMetadata;
 }
 
 export interface CategoryDefinition {

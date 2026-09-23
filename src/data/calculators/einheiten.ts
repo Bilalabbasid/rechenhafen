@@ -12,10 +12,10 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Längenumrechner',
     category: 'einheiten',
     subcategory: 'Länge & Distanz',
-    metaTitle: 'Längenumrechner – Meter, Zentimeter, Zoll, Fuß & Meilen umrechnen',
+    metaTitle: 'Längenumrechner – Meter, Zentimeter, Zoll, Fuß',
     metaDescription: 'Rechnen Sie metrische und angloamerikanische Längeneinheiten schnell um: Zoll (Inch) in cm, Fuß in Meter, Meilen in km.',
     h1: 'Längenumrechner – Alle Maßeinheiten umrechnen',
-    shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um.',
+    shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['längenumrechner', 'zoll in cm umrechnen', 'inch in cm rechner', 'fuß in meter', 'meilen in km'],
     inputs: [
       { id: 'value', label: 'Eingabewert', type: 'number', defaultValue: 1, step: 0.1 },
@@ -62,13 +62,14 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '139,70 cm',
     },
     content: {
-      intro: 'Ob Bildschirmgrößen in Zoll, Flughöhen in Fuß oder US-Rezeptmaße: Unser Längenumrechner rechnet alle weltweiten Längeneinheiten präzise um.',
-      details: 'Alle Umrechnungsfaktoren basieren auf den internationalen Standarddefinitionen des SI-Systems.',
+      intro: 'Dieser Längenkonverter rechnet Längenmaße zwischen dem metrischen SI-System (Millimeter, Zentimeter, Meter, Kilometer) und dem angloamerikanischen Maßsystem (Inch, Fuß, Yard, Meile) um.',
+      details: 'Die offizielle völkerrechtliche Definition lautet seit 1959: 1 Inch (Zoll) = exakt 25,4 Millimeter. 1 Fuß (Foot) = 12 Zoll = 30,48 cm. 1 Yard = 3 Fuß = 91,44 cm. 1 Landmeile = 1.609,344 Meter.',
     },
     faqs: [
-      { question: 'Wie viel cm sind 1 Zoll?', answer: '1 Zoll (im Englischen Inch) ist international exakt als 25,4 Millimeter bzw. 2,54 Zentimeter definiert.' },
+      { question: 'Wie lang ist eine Seemeile (Nautische Meile nm)?', answer: 'Eine Seemeile ist völkerrechtlich auf exakt 1.852 Meter definiert; sie entsprach ursprünglich einer Bogenminute (1/60 Grad) auf einem Meridian der Erdkugel.' },
+      { question: 'Was ist ein Lichtjahr in Kilometern?', answer: 'Die Distanz, die das Licht im Vakuum in einem tropischen Jahr zurücklegt: ca. 9,461 Billionen Kilometer (9,461 · 10¹² km).' },
     ],
-    relatedSlugs: ['temperatur-umrechner'],
+    relatedSlugs: ['ringgroesse-umrechner', 'schuhe-kleidergroessen-umrechner', 'temperatur-umrechner'],
   },
   {
     id: 'temperatur-umrechner',
@@ -77,10 +78,10 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Temperatur-Umrechner',
     category: 'einheiten',
     subcategory: 'Temperatur',
-    metaTitle: 'Temperatur-Umrechner – Celsius (°C), Fahrenheit (°F) & Kelvin (K)',
+    metaTitle: 'Temperatur-Umrechner – Celsius, Fahrenheit',
     metaDescription: 'Rechnen Sie Temperaturen zwischen Grad Celsius, Fahrenheit und Kelvin um. Inklusive Umrechnungsformeln und Siedepunkten.',
     h1: 'Temperatur-Umrechner (°C, °F & Kelvin)',
-    shortDescription: 'Wandelt Temperaturwerte zwischen Celsius, Fahrenheit und Kelvin um.',
+    shortDescription: 'Wandelt Temperaturwerte zwischen Celsius, Fahrenheit und Kelvin um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['temperatur umrechner', 'celsius in fahrenheit rechner', 'fahrenheit in celsius formel', 'kelvin umrechnen'],
     inputs: [
       { id: 'value', label: 'Temperaturwert', type: 'number', defaultValue: 25, step: 0.5 },
@@ -117,12 +118,13 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '77,00 °F',
     },
     content: {
-      intro: 'Reisen Sie in die USA oder lesen Sie amerikanische Backrezepte? Mit diesem Rechner wandeln Sie Grad Fahrenheit im Nu in vertraute Grad Celsius um.',
-      details: 'Kelvin ist die offizielle Basiseinheit des internationalen Einheitensystems (SI) mit dem absoluten Nullpunkt bei 0 Kelvin (-273,15 °C).',
+      intro: 'Dieser Temperaturrechner transformiert Werte exakt zwischen Grad Celsius (°C), Fahrenheit (°F) und der thermodynamischen Basiseinheit Kelvin (K).',
+      details: 'Formeln: Fahrenheit = (Celsius · 1,8) + 32; Celsius = (Fahrenheit - 32) / 1,8; Kelvin = Celsius + 273,15. Am absoluten Nullpunkt bei 0 Kelvin (-273,15 °C) stoppt jede thermische Teilchenbewegung.',
     },
     faqs: [
-      { question: 'Bei welcher Temperatur sind Celsius und Fahrenheit gleich?', answer: 'Bei genau -40 Grad stimmen beide Skalen überein: -40 °C ist identisch mit -40 °F.' },
+      { question: 'Bei welcher Temperatur sind Celsius und Fahrenheit zahlenmäßig identisch?', answer: 'Bei exakt -40 Grad: -40 °C entspricht genau -40 °F, da (-40 × 1,8) + 32 = -72 + 32 = -40.' },
+      { question: 'Warum nutzt die Wissenschaft die Kelvin-Skala ohne Gradzeichen?', answer: 'Weil Kelvin eine absolute thermodynamische Einheit ist (keine relative Skala wie Celsius mit willkürlichem Gefrierpunkt von Wasser); negative Kelvin-Temperaturen existieren im Reellen nicht.' },
     ],
-    relatedSlugs: ['laengen-umrechner'],
+    relatedSlugs: ['schokolade-temperieren-rechner', 'laengen-umrechner', 'gewicht-masse-umrechner'],
   },
 ];

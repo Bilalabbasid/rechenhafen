@@ -15,6 +15,7 @@ import { EINHEITEN_CALCULATORS } from './einheiten';
 import { KOCHEN_CALCULATORS } from './kochen';
 import { BUSINESS_CALCULATORS } from './business';
 import { STATISTIK_CALCULATORS } from './statistik';
+import { STEUERN_GEHALT_CALCULATORS } from './steuernGehalt';
 import { EXTRA_CALCULATORS } from './extra';
 
 export const ALL_CALCULATORS: CalculatorDefinition[] = [
@@ -26,6 +27,7 @@ export const ALL_CALCULATORS: CalculatorDefinition[] = [
   ...WOHNEN_CALCULATORS,
   ...HAUSHALT_CALCULATORS,
   ...ARBEIT_CALCULATORS,
+  ...STEUERN_GEHALT_CALCULATORS,
   ...GESUNDHEIT_CALCULATORS,
   ...FAMILIE_CALCULATORS,
   ...BAUEN_CALCULATORS,

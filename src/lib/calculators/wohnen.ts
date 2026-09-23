@@ -39,12 +39,64 @@ export function calculateRentBurden(inputs: Record<string, any>): CalculationRes
   };
 }
 
+const STATE_TRANSFER_TAX: Record<string, number> = {
+  BY: 3.5,
+  BW: 5.0,
+  HB: 5.0,
+  NI: 5.0,
+  RP: 5.0,
+  TH: 5.0,
+  HH: 5.5,
+  SN: 5.5,
+  BE: 6.0,
+  HE: 6.0,
+  MV: 6.0,
+  ST: 6.0,
+  BB: 6.5,
+  NW: 6.5,
+  SL: 6.5,
+  SH: 6.5,
+};
+
+const STATE_NAMES: Record<string, string> = {
+  BY: 'Bayern (3,5 %)',
+  BW: 'Baden-Württemberg (5,0 %)',
+  BE: 'Berlin (6,0 %)',
+  BB: 'Brandenburg (6,5 %)',
+  HB: 'Bremen (5,0 %)',
+  HH: 'Hamburg (5,5 %)',
+  HE: 'Hessen (6,0 %)',
+  MV: 'Mecklenburg-Vorpommern (6,0 %)',
+  NI: 'Niedersachsen (5,0 %)',
+  NW: 'Nordrhein-Westfalen (6,5 %)',
+  RP: 'Rheinland-Pfalz (5,0 %)',
+  SL: 'Saarland (6,5 %)',
+  SN: 'Sachsen (5,5 %)',
+  ST: 'Sachsen-Anhalt (6,0 %)',
+  SH: 'Schleswig-Holstein (6,5 %)',
+  TH: 'Thüringen (5,0 %)',
+};
+
 export function calculatePropertyPurchaseFees(inputs: Record<string, any>): CalculationResult {
   const purchasePrice = parseFloat(inputs.purchasePrice) || 350000;
-  const stateRate = parseFloat(inputs.transferTaxRate) || 5.0; // Grunderwerbsteuer Bundesland 3.5% bis 6.5%
+  const stateCode = inputs.federalState as string;
+  let stateRate = 5.0;
+  if (stateCode && STATE_TRANSFER_TAX[stateCode] !== undefined) {
+    stateRate = STATE_TRANSFER_TAX[stateCode];
+  } else if (inputs.transferTaxRate !== undefined) {
+    stateRate = parseFloat(inputs.transferTaxRate) || 5.0;
+  }
+
   const notaryRate = parseFloat(inputs.notaryRate) || 1.5; // Notar ca. 1.5%
   const landRegistryRate = parseFloat(inputs.landRegistryRate) || 0.5; // Grundbuchamt ca. 0.5%
-  const realtorRate = parseFloat(inputs.realtorRate) || 3.57; // Maklerkäuferprovision inkl. MwSt.
+  
+  let realtorRate = 3.57;
+  if (inputs.realtorOption === 'none') {
+    realtorRate = 0;
+  } else if (inputs.realtorRate !== undefined) {
+    realtorRate = parseFloat(inputs.realtorRate);
+    if (isNaN(realtorRate)) realtorRate = 3.57;
+  }
 
   if (purchasePrice <= 0) {
     return {
@@ -62,6 +114,8 @@ export function calculatePropertyPurchaseFees(inputs: Record<string, any>): Calc
   const totalCost = purchasePrice + totalFees;
   const feesPercent = (totalFees / purchasePrice) * 100;
 
+  const stateName = stateCode && STATE_NAMES[stateCode] ? STATE_NAMES[stateCode] : `${formatPercent(stateRate)}`;
+
   return {
     primary: {
       id: 'totalFees',
@@ -72,13 +126,13 @@ export function calculatePropertyPurchaseFees(inputs: Record<string, any>): Calc
     },
     secondary: [
       { id: 'totalCost', label: 'Gesamtkosten (Kaufpreis + Nebenkosten)', value: totalCost, formattedValue: formatCurrency(totalCost) },
-      { id: 'transferTax', label: `Grunderwerbsteuer (${formatPercent(stateRate)})`, value: transferTax, formattedValue: formatCurrency(transferTax) },
+      { id: 'transferTax', label: `Grunderwerbsteuer (${stateName})`, value: transferTax, formattedValue: formatCurrency(transferTax) },
       { id: 'notary', label: `Notarkosten (${formatPercent(notaryRate)})`, value: notaryFees, formattedValue: formatCurrency(notaryFees) },
       { id: 'landRegistry', label: `Grundbucheintrag (${formatPercent(landRegistryRate)})`, value: landRegistryFees, formattedValue: formatCurrency(landRegistryFees) },
       { id: 'realtor', label: `Maklerprovision (${formatPercent(realtorRate)})`, value: realtorFees, formattedValue: formatCurrency(realtorFees) },
       { id: 'feesPercent', label: 'Nebenkostenanteil am Kaufpreis', value: feesPercent, formattedValue: formatPercent(feesPercent, 2) },
     ],
-    summaryText: `Bei einem Immobilienkaufpreis von ${formatCurrency(purchasePrice)} fallen ca. ${formatCurrency(totalFees)} (${formatPercent(feesPercent, 1)}) an Kaufnebenkosten an. Die Gesamtinvestition beläuft sich auf ${formatCurrency(totalCost)}.`,
+    summaryText: `Bei einem Immobilienkaufpreis von ${formatCurrency(purchasePrice)} fallen in ${stateCode ? STATE_NAMES[stateCode]?.split(' ')[0] : 'diesem Bundesland'} ca. ${formatCurrency(totalFees)} (${formatPercent(feesPercent, 1)}) an Kaufnebenkosten an. Die Gesamtinvestition beläuft sich auf ${formatCurrency(totalCost)}.`,
   };
 }
 

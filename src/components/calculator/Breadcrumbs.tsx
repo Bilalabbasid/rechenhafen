@@ -25,7 +25,11 @@ export default function Breadcrumbs({ items }: Props) {
       '@type': 'ListItem',
       position: index + 1,
       name: item.label,
-      item: item.href ? `https://rechenhafen.de${item.href}` : undefined,
+      item: item.href
+        ? item.href.startsWith('http')
+          ? item.href
+          : `https://rechenhafen.de${item.href.startsWith('/') ? item.href : `/${item.href}`}`
+        : undefined,
     })),
   };
 
@@ -52,7 +56,7 @@ export default function Breadcrumbs({ items }: Props) {
       </ol>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
       />
     </nav>
   );

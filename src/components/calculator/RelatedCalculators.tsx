@@ -1,8 +1,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { CalculatorDefinition } from '@/types/calculator';
-import styles from '@/styles/components.module.css';
-import { Calculator, ArrowRight } from 'lucide-react';
+import CalculatorCard from '@/components/common/CalculatorCard';
+import cardsStyles from '@/styles/cards.module.css';
+import { ArrowRight } from 'lucide-react';
 
 interface Props {
   calculators: CalculatorDefinition[];
@@ -14,34 +15,61 @@ export default function RelatedCalculators({ calculators, categoryName, category
   if (!calculators || calculators.length === 0) return null;
 
   return (
-    <section className={styles.relatedSection} aria-labelledby="related-heading">
-      <div className={styles.relatedHeader}>
-        <h2 id="related-heading" className={styles.sectionTitle}>
-          Verwandte Online-Rechner
+    <section
+      style={{
+        marginTop: 'var(--space-10)',
+        marginBottom: 'var(--space-10)',
+        borderTop: '1px solid var(--color-border)',
+        paddingTop: 'var(--space-8)',
+        width: '100%',
+      }}
+      aria-labelledby="related-heading"
+    >
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        flexWrap: 'wrap',
+        gap: 'var(--space-2)',
+        marginBottom: 'var(--space-6)',
+      }}>
+        <h2 id="related-heading" style={{
+          fontSize: 'clamp(1.2rem, 3vw, 1.45rem)',
+          fontWeight: 700,
+          margin: 0,
+          color: 'var(--color-text-primary)'
+        }}>
+          Passende Rechner
         </h2>
         {categorySlug && (
-          <Link href={`/${categorySlug}/`} className={styles.categoryBackLink}>
+          <Link
+            href={`/${categorySlug}/`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              color: 'var(--color-primary)',
+              textDecoration: 'none'
+            }}
+          >
             Alle Rechner in {categoryName || 'dieser Kategorie'} <ArrowRight size={14} />
           </Link>
         )}
       </div>
 
-      <div className={styles.relatedGrid}>
+      <div className={cardsStyles.calculatorGrid}>
         {calculators.map((calc) => (
-          <Link
+          <CalculatorCard
             key={calc.id}
-            href={`/rechner/${calc.slug}/`}
-            className={styles.relatedCard}
-          >
-            <div className={styles.relatedCardHeader}>
-              <Calculator size={18} className={styles.relatedIcon} />
-              <h3 className={styles.relatedCardTitle}>{calc.name}</h3>
-            </div>
-            <p className={styles.relatedCardDesc}>{calc.shortDescription}</p>
-            <span className={styles.relatedCardAction}>
-              Rechner öffnen <ArrowRight size={14} />
-            </span>
-          </Link>
+            slug={calc.slug}
+            name={calc.name}
+            shortName={calc.shortName}
+            shortDescription={calc.shortDescription}
+            category={calc.category}
+            categoryName={categoryName}
+          />
         ))}
       </div>
     </section>

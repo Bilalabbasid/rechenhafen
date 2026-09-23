@@ -4,24 +4,40 @@ import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
 export function calculateElectricityCost(inputs: Record<string, any>): CalculationResult {
   const watts = parseFloat(inputs.watts) || 100;
-  const hoursPerDay = parseFloat(inputs.hoursPerDay) || 4;
+  const rawTime = parseFloat(inputs.usageTime || inputs.hoursPerDay) || 4;
+  const timeUnit = inputs.usageTimeUnit || 'hoursPerDay'; // 'hoursPerDay', 'minutesPerDay', 'hoursPerWeek', 'hoursPerYear'
   const pricePerKwh = parseFloat(inputs.pricePerKwh) || GERMAN_DATA_2026.strompreis_durchschnitt.value;
 
-  if (watts <= 0 || hoursPerDay <= 0 || pricePerKwh <= 0) {
+  if (watts <= 0 || rawTime <= 0 || pricePerKwh <= 0) {
     return {
       primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '0,00 €' },
       error: 'Bitte positive Werte für Leistung, Nutzungsdauer und Strompreis angeben.',
     };
   }
 
+  // Effektive Stunden pro Tag berechnen
+  let effectiveHoursPerDay = rawTime;
+  if (timeUnit === 'minutesPerDay') {
+    effectiveHoursPerDay = rawTime / 60;
+  } else if (timeUnit === 'hoursPerWeek') {
+    effectiveHoursPerDay = rawTime / 7;
+  } else if (timeUnit === 'hoursPerYear') {
+    effectiveHoursPerDay = rawTime / 365;
+  }
+
   // Täglicher Verbrauch in kWh
-  const kwhPerDay = (watts * hoursPerDay) / 1000;
+  const kwhPerDay = (watts * effectiveHoursPerDay) / 1000;
   const kwhPerYear = kwhPerDay * 365;
   const kwhPerMonth = kwhPerYear / 12;
 
   const costPerDay = kwhPerDay * pricePerKwh;
   const costPerMonth = kwhPerMonth * pricePerKwh;
   const costPerYear = kwhPerYear * pricePerKwh;
+
+  let unitText = `${formatNumber(rawTime, 1)} Stunden pro Tag`;
+  if (timeUnit === 'minutesPerDay') unitText = `${formatNumber(rawTime, 0)} Minuten pro Tag`;
+  else if (timeUnit === 'hoursPerWeek') unitText = `${formatNumber(rawTime, 1)} Stunden pro Woche`;
+  else if (timeUnit === 'hoursPerYear') unitText = `${formatNumber(rawTime, 0)} Stunden pro Jahr`;
 
   return {
     primary: {
@@ -34,10 +50,11 @@ export function calculateElectricityCost(inputs: Record<string, any>): Calculati
     secondary: [
       { id: 'costPerMonth', label: 'Stromkosten pro Monat', value: costPerMonth, formattedValue: formatCurrency(costPerMonth) },
       { id: 'costPerDay', label: 'Stromkosten pro Tag', value: costPerDay, formattedValue: formatCurrency(costPerDay) },
-      { id: 'kwhPerYear', label: 'Jahresverbrauch', value: kwhPerYear, formattedValue: `${formatNumber(kwhPerYear, 1)} kWh` },
-      { id: 'kwhPerDay', label: 'Tagesverbrauch', value: kwhPerDay, formattedValue: `${formatNumber(kwhPerDay, 2)} kWh` },
+      { id: 'kwhPerYear', label: 'Jahresverbrauch', value: kwhPerYear, formattedValue: `${formatNumber(kwhPerYear, 1)} kWh / Jahr` },
+      { id: 'kwhPerMonth', label: 'Monatsverbrauch', value: kwhPerMonth, formattedValue: `${formatNumber(kwhPerMonth, 2)} kWh / Monat` },
+      { id: 'kwhPerDay', label: 'Tagesverbrauch', value: kwhPerDay, formattedValue: `${formatNumber(kwhPerDay, 3)} kWh / Tag` },
     ],
-    summaryText: `Ein Gerät mit ${formatNumber(watts)} Watt Leistung verursacht bei ${formatNumber(hoursPerDay)} Stunden täglichem Betrieb und einem Strompreis von ${formatCurrency(pricePerKwh)}/kWh jährliche Kosten von ${formatCurrency(costPerYear)} (${formatNumber(kwhPerYear, 1)} kWh).`,
+    summaryText: `Ein Elektrogerät mit ${formatNumber(watts)} Watt Leistung verursacht bei ${unitText} und einem Strompreis von ${formatCurrency(pricePerKwh)}/kWh jährliche Kosten von ${formatCurrency(costPerYear)} (${formatNumber(kwhPerYear, 1)} kWh).`,
   };
 }
 

@@ -1,7 +1,14 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import '@/styles/globals.css';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#0284c7',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://rechenhafen.de'),
@@ -79,9 +86,10 @@ export default function RootLayout({
   return (
     <html lang="de">
       <head>
+        <meta name="google" content="notranslate" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema).replace(/</g, '\\u003c') }}
         />
       </head>
       <body>

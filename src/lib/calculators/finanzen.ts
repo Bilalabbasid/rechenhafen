@@ -3,10 +3,13 @@ import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
 export function calculateCompoundInterest(inputs: Record<string, any>): CalculationResult {
   const initial = parseFloat(inputs.initialAmount) || 0;
-  const monthly = parseFloat(inputs.monthlyContribution) || 0;
+  const initialMonthly = parseFloat(inputs.monthlyContribution) || 0;
   const rateAnnual = (parseFloat(inputs.annualRate) || 0) / 100;
   const years = parseInt(inputs.years || '10', 10);
-  const compoundFreq = parseInt(inputs.compoundFrequency || '12', 10); // 1 = jährlich, 12 = monatlich
+  const compoundFreq = Math.max(1, parseInt(inputs.compoundFrequency || '12', 10)); // 1, 2, 4, 12
+  const depositTiming = inputs.depositTiming || 'end'; // 'end' = nachschüssig, 'start' = vorschüssig
+  const dynamicRatePercent = parseFloat(inputs.dynamicIncrease || '0') / 100; // jährliche Sparratendynamik
+  const inflationRatePercent = parseFloat(inputs.inflationRate || '0') / 100; // optionale Inflationsbereinigung
 
   if (years <= 0) {
     return {
@@ -17,6 +20,7 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
 
   let balance = initial;
   let totalDeposits = initial;
+  let currentMonthly = initialMonthly;
   const rows: CalculationBreakdownRow[] = [];
 
   const ratePerPeriod = rateAnnual / compoundFreq;
@@ -27,14 +31,21 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
     let yearDeposits = 0;
 
     for (let p = 0; p < periodsPerYear; p++) {
-      // Monate pro Periode
       const monthsInPeriod = 12 / periodsPerYear;
-      const periodContribution = monthly * monthsInPeriod;
-      balance += periodContribution;
+      const periodContribution = currentMonthly * monthsInPeriod;
+
+      if (depositTiming === 'start') {
+        // Vorschüssig: Einzahlung zu Beginn der Periode, verzinst sich in der Periode mit
+        balance += periodContribution;
+        balance *= (1 + ratePerPeriod);
+      } else {
+        // Nachschüssig: Zinsen fallen auf bestehendes Guthaben an, Einzahlung am Periodenende
+        balance *= (1 + ratePerPeriod);
+        balance += periodContribution;
+      }
+
       totalDeposits += periodContribution;
       yearDeposits += periodContribution;
-
-      balance *= (1 + ratePerPeriod);
     }
 
     const yearInterest = balance - startYearBalance - yearDeposits;
@@ -47,10 +58,43 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
         balance: formatCurrency(balance),
       },
     });
+
+    // Jährliche Dynamisierung der Sparrate
+    if (dynamicRatePercent > 0) {
+      currentMonthly *= (1 + dynamicRatePercent);
+    }
   }
 
   const totalInterest = Math.max(0, balance - totalDeposits);
   const totalReturnPercent = totalDeposits > 0 ? (totalInterest / totalDeposits) * 100 : 0;
+
+  const secondary: Array<{ id: string; label: string; value: any; formattedValue: string }> = [
+    { id: 'totalDeposits', label: 'Eigene Einzahlungen', value: totalDeposits, formattedValue: formatCurrency(totalDeposits) },
+    { id: 'totalInterest', label: 'Erwirtschaftete Zinsen', value: totalInterest, formattedValue: formatCurrency(totalInterest) },
+    { id: 'returnPercent', label: 'Gesamtrendite auf Einzahlungen', value: totalReturnPercent, formattedValue: formatPercent(totalReturnPercent, 1) },
+  ];
+
+  if (inflationRatePercent > 0) {
+    const realPurchasingPower = balance / Math.pow(1 + inflationRatePercent, years);
+    secondary.push({
+      id: 'realPower',
+      label: `Kaufkraft inflationsbereinigt (${formatPercent(inflationRatePercent * 100)} Inflation)`,
+      value: realPurchasingPower,
+      formattedValue: formatCurrency(realPurchasingPower),
+    });
+  }
+
+  if (dynamicRatePercent > 0) {
+    secondary.push({
+      id: 'endMonthlyRate',
+      label: `Monatliche Sparrate im letzten Jahr (${formatPercent(dynamicRatePercent * 100)} Dynamik)`,
+      value: currentMonthly,
+      formattedValue: formatCurrency(currentMonthly),
+    });
+  }
+
+  const freqLabel = compoundFreq === 12 ? 'monatlicher' : compoundFreq === 4 ? 'vierteljährlicher' : compoundFreq === 2 ? 'halbjährlicher' : 'jährlicher';
+  const timingLabel = depositTiming === 'start' ? 'vorschüssig (Monatsanfang)' : 'nachschüssig (Monatsende)';
 
   return {
     primary: {
@@ -60,20 +104,16 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
       formattedValue: formatCurrency(balance),
       highlight: true,
     },
-    secondary: [
-      { id: 'totalDeposits', label: 'Eigene Einzahlungen', value: totalDeposits, formattedValue: formatCurrency(totalDeposits) },
-      { id: 'totalInterest', label: 'Erwirtschaftete Zinsen', value: totalInterest, formattedValue: formatCurrency(totalInterest) },
-      { id: 'returnPercent', label: 'Gesamtrendite auf Einzahlungen', value: totalReturnPercent, formattedValue: formatPercent(totalReturnPercent, 1) },
-    ],
+    secondary,
     breakdown: {
       columns: [
         { key: 'deposits', label: 'Eingezahltes Kapital' },
         { key: 'interestTotal', label: 'Zinsertrag kumuliert' },
         { key: 'balance', label: 'Guthaben am Jahresende' },
       ],
-      rows: rows.slice(-15), // Show up to 15 years for readability
+      rows: rows.slice(-15),
     },
-    summaryText: `Nach ${years} Jahren wächst Ihr Startkapital von ${formatCurrency(initial)} mit monatlich ${formatCurrency(monthly)} bei ${formatPercent(rateAnnual * 100)} Zinsen auf ein Endvermögen von ${formatCurrency(balance)} an. Davon sind ${formatCurrency(totalInterest)} reiner Zinsgewinn.`,
+    summaryText: `Nach ${years} Jahren wächst Ihr Startkapital von ${formatCurrency(initial)} mit ${timingLabel} Sparrate von anfangs ${formatCurrency(initialMonthly)} bei ${formatPercent(rateAnnual * 100)} Zinsen und ${freqLabel} Zinsgutschrift auf ein Endvermögen von ${formatCurrency(balance)} an. Davon sind ${formatCurrency(totalInterest)} reiner Zinsgewinn.`,
   };
 }
 

@@ -90,6 +90,17 @@ export const CATEGORIES: CategoryDefinition[] = [
     metaDescription: 'Kalkulationen rund um Beruf und Einkommen: Stundenlohn aus Monatsgehalt, Teilzeitgehalt berechnen, Überstunden und Urlaubsanspruch.',
   },
   {
+    id: 'steuern-gehalt',
+    slug: 'steuern-gehalt',
+    name: 'Steuern & Gehalt',
+    shortName: 'Steuern & Gehalt',
+    description: 'Offizielle deutsche Steuer- und Gehaltsrechner: Brutto-Netto, Einkommensteuer nach § 32a EStG, Lohnsteuer, Solidaritätszuschlag, Kirchensteuer, Sozialabgaben, Arbeitgeberkosten, Minijob und Abfindung.',
+    iconName: 'Receipt',
+    subcategories: ['Gehalt & Lohn', 'Einkommensteuer & Tarif', 'Sozialabgaben & Vorsorge', 'Sonderzahlungen & Minijob'],
+    metaTitle: 'Steuer- & Gehaltsrechner – Brutto-Netto, Einkommensteuer & Abgaben',
+    metaDescription: 'Präzise deutsche Steuer- und Gehaltsrechner für 2025 und 2026: Brutto-Netto berechnen, Einkommensteuertarif (§ 32a EStG), Sozialversicherungsbeiträge und Lohnnebenkosten.',
+  },
+  {
     id: 'gesundheit-fitness',
     slug: 'gesundheit-fitness',
     name: 'Gesundheit & Fitness',
