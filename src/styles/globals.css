@@ -24,7 +24,6 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
   overflow-wrap: break-word;
   word-wrap: break-word;
   -webkit-hyphens: auto;
@@ -122,11 +121,8 @@ p {
   overflow-wrap: break-word;
 }
 
-/* Clean Form Elements with 46-48px touch target compliance */
-input[type="number"],
-input[type="text"],
-input[type="date"],
-select {
+/* Base Form Elements with 46-48px touch target compliance */
+:where(input[type="number"], input[type="text"], input[type="date"], input[type="search"], select) {
   width: 100%;
   min-height: 46px;
   height: 46px;
@@ -141,10 +137,7 @@ select {
 }
 
 @media (max-width: 639px) {
-  input[type="number"],
-  input[type="text"],
-  input[type="date"],
-  select {
+  :where(input[type="number"], input[type="text"], input[type="date"], input[type="search"], select) {
     min-height: 48px;
     height: 48px;
   }

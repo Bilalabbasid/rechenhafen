@@ -13,10 +13,16 @@
 .searchIcon {
   position: absolute;
   left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--color-text-muted);
   pointer-events: none;
   flex-shrink: 0;
   transition: color 0.15s ease;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .inputWrapper:focus-within .searchIcon {
@@ -27,22 +33,21 @@
   width: 100%;
   height: 44px;
   min-height: 44px;
-  padding-left: 42px;
+  padding-left: 44px;
   padding-right: 76px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   font-size: 0.925rem;
-  transition: all 0.15s ease;
+  line-height: 1.5;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
   box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
-  .searchInput {
-    font-size: 1rem; /* Prevents auto-zoom on iOS Safari */
-    padding-right: 44px;
-  }
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.9;
 }
 
 .searchInput:focus {
@@ -52,43 +57,91 @@
   box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
+/* Header Variant */
+.headerSearch .searchInput {
+  height: 40px;
+  min-height: 40px;
+  font-size: 0.875rem;
+  padding-left: 36px;
+  padding-right: 72px;
+}
+
+.headerSearch .searchIcon {
+  left: 12px;
+}
+
+.headerSearch .kbdBadge {
+  display: none;
+}
+
+@media (min-width: 1240px) {
+  .headerSearch .kbdBadge {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 1239px) {
+  .headerSearch .searchInput {
+    padding-right: 32px;
+    font-size: 0.825rem;
+  }
+}
+
 /* Large Hero Search Variant */
 .heroSearch .searchInput {
   height: 52px;
   min-height: 52px;
-  font-size: 1.05rem;
-  padding-left: 48px;
-  padding-right: 90px;
+  font-size: 1.025rem;
+  padding-left: 52px;
+  padding-right: 84px;
   border-radius: var(--radius-lg);
   border-color: var(--color-border-strong);
   box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.08);
 }
 
 .heroSearch .searchIcon {
-  left: 16px;
+  left: 18px;
+}
+
+.heroSearch .inputActions {
+  right: 12px;
+}
+
+@media (max-width: 600px) {
+  .searchInput {
+    font-size: 1rem; /* Prevents auto-zoom on iOS Safari */
+    padding-right: 40px;
+  }
 }
 
 .inputActions {
   position: absolute;
   right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 4px;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .kbdBadge {
   display: none;
   align-items: center;
-  padding: 2px 6px;
+  justify-content: center;
+  padding: 3px 7px;
   font-size: 0.725rem;
   font-family: var(--font-mono);
   font-weight: 600;
+  line-height: 1;
   color: var(--color-text-muted);
   background-color: var(--color-surface-subtle);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   pointer-events: none;
   user-select: none;
+  white-space: nowrap;
 }
 
 @media (min-width: 768px) {
@@ -97,7 +150,14 @@
   }
 }
 
+@media (max-width: 600px) {
+  .kbdBadge {
+    display: none !important;
+  }
+}
+
 .clearBtn {
+  pointer-events: auto;
   background: none;
   border: none;
   color: var(--color-text-muted);
@@ -105,8 +165,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   transition: color 0.15s ease, background-color 0.15s ease;
 }

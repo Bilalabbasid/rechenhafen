@@ -20,7 +20,7 @@ interface Props {
   onSelect?: () => void;
   className?: string;
   autoFocus?: boolean;
-  variant?: 'default' | 'hero';
+  variant?: 'default' | 'hero' | 'header';
 }
 
 const POPULAR_SUGGESTIONS = [
@@ -241,10 +241,16 @@ export default function SearchBar({
   return (
     <div
       ref={containerRef}
-      className={`${styles.searchContainer} ${variant === 'hero' ? styles.heroSearch : ''} ${className || ''}`}
+      className={`${styles.searchContainer} ${
+        variant === 'hero' ? styles.heroSearch : variant === 'header' ? styles.headerSearch : ''
+      } ${className || ''}`}
     >
       <div className={styles.inputWrapper}>
-        <Search size={variant === 'hero' ? 20 : 18} className={styles.searchIcon} aria-hidden="true" />
+        <Search
+          size={variant === 'hero' ? 20 : variant === 'header' ? 16 : 18}
+          className={styles.searchIcon}
+          aria-hidden="true"
+        />
         <input
           ref={inputRef}
           type="text"
@@ -252,6 +258,7 @@ export default function SearchBar({
           autoFocus={autoFocus}
           maxLength={100}
           onChange={(e) => setQuery(e.target.value.slice(0, 100))}
+          onInput={(e) => setQuery((e.target as HTMLInputElement).value.slice(0, 100))}
           onFocus={() => {
             if (query.trim() && results.length > 0) setIsOpen(true);
           }}
@@ -276,7 +283,7 @@ export default function SearchBar({
               className={styles.clearBtn}
               aria-label="Eingabe löschen"
             >
-              <X size={16} />
+              <X size={variant === 'header' ? 14 : 16} />
             </button>
           ) : (
             <kbd className={styles.kbdBadge} aria-hidden="true">

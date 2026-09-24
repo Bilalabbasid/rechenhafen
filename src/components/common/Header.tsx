@@ -151,7 +151,7 @@ export default function Header() {
         {/* Right Header Actions */}
         <div className={styles.headerActions}>
           <div className={styles.headerSearchWrapper}>
-            <SearchBar placeholder="Rechner suchen..." />
+            <SearchBar variant="header" placeholder="Rechner suchen..." />
           </div>
 
           <button

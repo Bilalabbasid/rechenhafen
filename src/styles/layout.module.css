@@ -198,13 +198,42 @@
   gap: var(--space-2);
 }
 
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .headerContainer {
+    gap: var(--space-2);
+  }
+  .brandName {
+    font-size: 1.15rem;
+  }
+  .navLink,
+  .moreButton {
+    font-size: 0.825rem;
+    padding: 6px 8px;
+  }
+  .desktopNav {
+    gap: 2px;
+  }
+}
+
 .headerSearchWrapper {
-  width: 240px;
+  width: 190px;
+}
+
+@media (min-width: 1140px) {
+  .headerSearchWrapper {
+    width: 230px;
+  }
 }
 
 @media (min-width: 1240px) {
   .headerSearchWrapper {
     width: 270px;
+  }
+}
+
+@media (min-width: 1366px) {
+  .headerSearchWrapper {
+    width: 300px;
   }
 }
 
