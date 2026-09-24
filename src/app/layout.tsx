@@ -76,11 +76,7 @@ export default function RootLayout({
     name: 'RechenHafen',
     url: 'https://rechenhafen.de',
     description: 'Alle Rechner an einem Ort. Hunderte präzise deutsche Online-Rechner.',
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: 'https://rechenhafen.de/?q={search_term_string}',
-      'query-input': 'required name=search_term_string',
-    },
+    inLanguage: 'de-DE',
   };
 
   return (

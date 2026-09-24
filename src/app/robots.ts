@@ -5,10 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: [
-        '/*?*',
-        '/*?',
-      ],
+      disallow: ['/api/'],
     },
     sitemap: 'https://rechenhafen.de/sitemap.xml',
     host: 'https://rechenhafen.de',

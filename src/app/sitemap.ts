@@ -5,49 +5,50 @@ import { getAllArticles } from '@/data/ratgeber/articles';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://rechenhafen.de';
-  const now = new Date();
+  // Stable release date of the current platform redesign (ensures Googlebot trusts lastmod)
+  const platformUpdateDate = new Date('2026-09-24T00:00:00.000Z');
 
   // Statische Kernseiten
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/rechner/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/ratgeber/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/ueber-uns/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${baseUrl}/methodik/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
       url: `${baseUrl}/impressum/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${baseUrl}/datenschutz/`,
-      lastModified: now,
+      lastModified: platformUpdateDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
@@ -56,7 +57,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // 16 Kategorieseiten
   const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
     url: `${baseUrl}/${cat.slug}/`,
-    lastModified: now,
+    lastModified: platformUpdateDate,
     changeFrequency: 'weekly',
     priority: 0.8,
   }));
@@ -64,7 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Rechnerseiten
   const calculatorPages: MetadataRoute.Sitemap = ALL_CALCULATORS.map((calc) => ({
     url: `${baseUrl}/rechner/${calc.slug}/`,
-    lastModified: now,
+    lastModified: platformUpdateDate,
     changeFrequency: 'monthly',
     priority: 0.7,
   }));

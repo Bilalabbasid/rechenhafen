@@ -96,7 +96,7 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
       url: 'https://rechenhafen.de',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://rechenhafen.de/favicon.ico',
+        url: 'https://rechenhafen.de/icon.svg',
       },
     },
   };
