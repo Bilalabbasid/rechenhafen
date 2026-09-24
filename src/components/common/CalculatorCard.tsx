@@ -11,7 +11,6 @@ import {
   Activity,
   Home,
   Briefcase,
-  ArrowRight,
   LucideIcon,
 } from 'lucide-react';
 import styles from '@/styles/cards.module.css';
@@ -59,14 +58,11 @@ export default function CalculatorCard({
       className={styles.calcCard}
       title={`${displayName} öffnen`}
     >
-      <div className={styles.cardHeader}>
-        <div className={styles.iconWrapper} aria-hidden="true">
-          <Icon size={18} />
-        </div>
-        <div className={styles.titleArea}>
-          <h3 className={styles.calcTitle}>{displayName}</h3>
-        </div>
+      <div className={styles.iconWrapper} aria-hidden="true">
+        <Icon size={20} />
       </div>
+
+      <h3 className={styles.calcTitle}>{displayName}</h3>
 
       <p className={styles.calcDesc}>{shortDescription}</p>
 
@@ -75,7 +71,7 @@ export default function CalculatorCard({
           {categoryName || category || 'Rechner'}
         </span>
         <span className={styles.actionIndicator} aria-hidden="true">
-          Öffnen <ArrowRight size={13} />
+          <span className={styles.actionArrow}>→</span>
         </span>
       </div>
     </Link>

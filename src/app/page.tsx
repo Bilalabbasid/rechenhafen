@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { CATEGORIES } from '@/data/categories';
 import { ALL_CALCULATORS, getCalculatorsByCategory } from '@/data/calculators';
+import { getAllArticles } from '@/data/ratgeber/articles';
 import SearchBar from '@/components/common/SearchBar';
 import CalculatorCard from '@/components/common/CalculatorCard';
 import CategoryCard from '@/components/common/CategoryCard';
-import { ShieldCheck, CheckCircle2, Zap, ArrowRight } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Zap, ArrowRight, Clock, BookOpen } from 'lucide-react';
 import styles from '@/styles/layout.module.css';
 import cardsStyles from '@/styles/cards.module.css';
+import ratgeberStyles from '@/styles/ratgeber.module.css';
 
 export const metadata: Metadata = {
   title: 'RechenHafen – Alle Rechner an einem Ort | Kostenlose Online-Rechner',
@@ -35,20 +37,23 @@ const POPULAR_SLUGS = [
   'kreditrechner',
   'zinseszinsrechner',
   'stundenlohnrechner',
+  'inflationsrechner',
 ];
 
 const POPULAR_CHIPS = [
   { label: 'Brutto-Netto', slug: 'brutto-netto-rechner' },
-  { label: 'Prozentrechner', slug: 'prozentrechner' },
-  { label: 'Altersrechner', slug: 'altersrechner' },
-  { label: 'BMI-Rechner', slug: 'bmi-rechner' },
+  { label: 'Prozent', slug: 'prozentrechner' },
+  { label: 'Alter', slug: 'altersrechner' },
+  { label: 'BMI', slug: 'bmi-rechner' },
   { label: 'Spritkosten', slug: 'spritkostenrechner' },
-  { label: 'Kreditrechner', slug: 'kreditrechner' },
+  { label: 'Kredit', slug: 'kreditrechner' },
   { label: 'Zinseszins', slug: 'zinseszinsrechner' },
   { label: 'Stundenlohn', slug: 'stundenlohnrechner' },
 ];
 
 export default function HomePage() {
+  const totalCalculators = ALL_CALCULATORS.length;
+
   const popularCalculators = POPULAR_SLUGS.map((slug) =>
     ALL_CALCULATORS.find((c) => c.slug === slug)
   ).filter(Boolean);
@@ -59,68 +64,43 @@ export default function HomePage() {
   const autoCalcs = getCalculatorsByCategory('auto-verkehr').slice(0, 4);
   const timeCalcs = getCalculatorsByCategory('datum-zeit').slice(0, 4);
 
+  // Curated Ratgeber articles
+  const featuredArticles = getAllArticles().slice(0, 3);
+
   return (
     <div className={styles.container}>
-      {/* 1. Hero Section - Discovery Focused */}
-      <section style={{ textAlign: 'center', padding: 'var(--space-8) 0 var(--space-6)' }}>
-        <h1 style={{
-          fontSize: 'clamp(1.75rem, 4.5vw, 2.75rem)',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          lineHeight: 1.15,
-          color: 'var(--color-text-primary)',
-          margin: '0 auto var(--space-3)',
-          maxWidth: '750px',
-        }}>
+      {/* 1. Hero Section - Focused, 300–400px Desktop */}
+      <section className={styles.heroSection}>
+        <div className={styles.heroEyebrow}>
+          Über {totalCalculators} praktische Online-Rechner
+        </div>
+
+        <h1 className={styles.heroTitle}>
           Alle Rechner an einem Ort.
         </h1>
 
-        <p style={{
-          fontSize: '1.1rem',
-          lineHeight: 1.55,
-          color: 'var(--color-text-secondary)',
-          maxWidth: '640px',
-          margin: '0 auto var(--space-6)'
-        }}>
-          Kostenlose Online-Rechner für Alltag, Finanzen, Gesundheit, Arbeit, Auto und mehr.
+        <p className={styles.heroText}>
+          Kostenlose Rechner für Finanzen, Steuern, Alltag, Gesundheit, Auto, Wohnen und mehr.
         </p>
 
-        {/* Large Central Search Bar */}
-        <div style={{ maxWidth: '640px', margin: '0 auto var(--space-4)' }}>
+        {/* Large Central Search Input */}
+        <div className={styles.heroSearchBox}>
           <SearchBar
             variant="hero"
-            placeholder="Rechner suchen, z. B. Brutto Netto, Prozent, BMI ..."
+            placeholder="Rechner suchen, z. B. Brutto-Netto, Prozent, BMI ..."
           />
         </div>
 
-        {/* Quick Chips */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '6px',
-          maxWidth: '720px',
-          margin: '0 auto'
-        }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginRight: '4px' }}>
+        {/* Quick Search Chips */}
+        <div className={styles.quickChipsRow}>
+          <span className={styles.quickChipsLabel}>
             Häufig gesucht:
           </span>
           {POPULAR_CHIPS.map((chip) => (
             <Link
               key={chip.slug}
               href={`/rechner/${chip.slug}/`}
-              style={{
-                fontSize: '0.8rem',
-                fontWeight: 500,
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-full)',
-                background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                color: 'var(--color-text-secondary)',
-                textDecoration: 'none',
-                transition: 'all 0.12s ease'
-              }}
+              className={styles.quickChip}
             >
               {chip.label}
             </Link>
@@ -129,36 +109,19 @@ export default function HomePage() {
       </section>
 
       {/* 2. Beliebte Rechner Section */}
-      <section style={{ marginBottom: 'var(--space-10)' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          marginBottom: 'var(--space-4)',
-          borderBottom: '1px solid var(--color-border)',
-          paddingBottom: 'var(--space-3)'
-        }}>
-          <div>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
+      <section className={styles.sectionBlock}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeaderLeft}>
+            <h2 className={styles.sectionTitle}>
               Beliebte Rechner
             </h2>
-            <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-              Schnellzugriff auf die am häufigsten benötigten Werkzeuge
+            <p className={styles.sectionSubtitle}>
+              Schnell zu den wichtigsten und am häufigsten genutzten Rechnern.
             </p>
           </div>
-          <Link
-            href="/rechner/"
-            style={{
-              fontSize: '0.85rem',
-              fontWeight: 600,
-              color: 'var(--color-primary)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              textDecoration: 'none'
-            }}
-          >
-            Alle 418 Rechner <ArrowRight size={14} />
+          <Link href="/rechner/" className={styles.sectionCta}>
+            <span>Alle {totalCalculators} Rechner entdecken</span>
+            <ArrowRight size={14} />
           </Link>
         </div>
 
@@ -181,27 +144,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. Kategorien Section */}
-      <section style={{ marginBottom: 'var(--space-10)' }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'baseline',
-          marginBottom: 'var(--space-4)',
-          borderBottom: '1px solid var(--color-border)',
-          paddingBottom: 'var(--space-3)'
-        }}>
-          <div>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-              Kategorien entdecken
+      {/* 3. Rechner nach Kategorie Section (Visually Distinct Collection Tiles) */}
+      <section className={styles.sectionBlock}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeaderLeft}>
+            <h2 className={styles.sectionTitle}>
+              Rechner nach Kategorie
             </h2>
-            <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-              Strukturierte Fachbereiche mit dynamisch gepflegten Rechenwerkzeugen
+            <p className={styles.sectionSubtitle}>
+              Entdecken Sie spezialisierte Werkzeuge nach Fachbereichen und Lebenslagen.
             </p>
           </div>
-          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>
-            17 Kategorien
-          </span>
+          <Link href="/rechner/" className={styles.sectionCta}>
+            <span>{CATEGORIES.length} Kategorien</span>
+            <ArrowRight size={14} />
+          </Link>
         </div>
 
         <div className={cardsStyles.categoryGrid}>
@@ -222,48 +179,58 @@ export default function HomePage() {
       </section>
 
       {/* 4. Wichtige Themenschwerpunkte */}
-      <section style={{ marginBottom: 'var(--space-10)' }}>
-        <h2 style={{ fontSize: '1.35rem', fontWeight: 700, marginBottom: 'var(--space-4)', color: 'var(--color-text-primary)' }}>
-          Häufig genutzte Themenschwerpunkte
-        </h2>
+      <section className={styles.sectionBlock}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeaderLeft}>
+            <h2 className={styles.sectionTitle}>
+              Themenschwerpunkte im Fokus
+            </h2>
+            <p className={styles.sectionSubtitle}>
+              Die beliebtesten Themenbereiche mit verlässlichen BMF- und Rechtsstandards 2026.
+            </p>
+          </div>
+        </div>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 'var(--space-4)'
+          gap: 'var(--space-5)'
         }}>
           {/* Steuern & Gehalt */}
           <div style={{
             background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-4)'
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-5)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Steuern & Gehalt</h3>
-              <Link href="/steuern-gehalt/" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Alle ansehen →</Link>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Steuern & Gehalt</h3>
+              <Link href="/steuern-gehalt/" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>Alle ansehen →</Link>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-3)' }}>
+            <p style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)', lineHeight: 1.45 }}>
               BMF-konforme Berechnungen nach deutschem Steuer- und Sozialversicherungsrecht (2025/2026).
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
               {taxCalcs.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/rechner/${c.slug}/`}
                   style={{
-                    fontSize: '0.85rem',
+                    fontSize: '0.875rem',
                     color: 'var(--color-text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '4px 6px',
+                    padding: '6px 8px',
                     borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--color-surface-subtle)',
                     textDecoration: 'none'
                   }}
                 >
-                  <span>{c.shortName || c.name}</span>
-                  <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Öffnen</span>
+                  <span style={{ fontWeight: 500 }}>{c.shortName || c.name}</span>
+                  <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>Öffnen →</span>
                 </Link>
               ))}
             </div>
@@ -273,34 +240,37 @@ export default function HomePage() {
           <div style={{
             background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-4)'
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-5)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Finanzen & Vorsorge</h3>
-              <Link href="/finanzen/" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Alle ansehen →</Link>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Finanzen & Vorsorge</h3>
+              <Link href="/finanzen/" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>Alle ansehen →</Link>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-3)' }}>
-              Zinsen, Kredite, Tilgungspläne, Sparraten und Vermögensaufbau.
+            <p style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)', lineHeight: 1.45 }}>
+              Zinsen, Kredite, Tilgungspläne, Sparraten und langfristiger Vermögensaufbau.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
               {financeCalcs.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/rechner/${c.slug}/`}
                   style={{
-                    fontSize: '0.85rem',
+                    fontSize: '0.875rem',
                     color: 'var(--color-text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '4px 6px',
+                    padding: '6px 8px',
                     borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--color-surface-subtle)',
                     textDecoration: 'none'
                   }}
                 >
-                  <span>{c.shortName || c.name}</span>
-                  <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Öffnen</span>
+                  <span style={{ fontWeight: 500 }}>{c.shortName || c.name}</span>
+                  <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>Öffnen →</span>
                 </Link>
               ))}
             </div>
@@ -310,34 +280,37 @@ export default function HomePage() {
           <div style={{
             background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-4)'
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-5)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Auto & Mobilität</h3>
-              <Link href="/auto-verkehr/" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Alle ansehen →</Link>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Auto & Mobilität</h3>
+              <Link href="/auto-verkehr/" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>Alle ansehen →</Link>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-3)' }}>
-              Spritkosten, Pendlerpauschale, Kraftstoffverbrauch und Fahrtzeit.
+            <p style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)', lineHeight: 1.45 }}>
+              Spritkosten, Pendlerpauschale, Kraftstoffverbrauch und realistische Fahrtzeit.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
               {autoCalcs.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/rechner/${c.slug}/`}
                   style={{
-                    fontSize: '0.85rem',
+                    fontSize: '0.875rem',
                     color: 'var(--color-text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '4px 6px',
+                    padding: '6px 8px',
                     borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--color-surface-subtle)',
                     textDecoration: 'none'
                   }}
                 >
-                  <span>{c.shortName || c.name}</span>
-                  <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Öffnen</span>
+                  <span style={{ fontWeight: 500 }}>{c.shortName || c.name}</span>
+                  <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>Öffnen →</span>
                 </Link>
               ))}
             </div>
@@ -347,34 +320,37 @@ export default function HomePage() {
           <div style={{
             background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-4)'
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-5)',
+            display: 'flex',
+            flexDirection: 'column'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-2)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700 }}>Datum & Zeit</h3>
-              <Link href="/datum-zeit/" style={{ fontSize: '0.8rem', fontWeight: 600 }}>Alle ansehen →</Link>
+              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>Datum & Zeit</h3>
+              <Link href="/datum-zeit/" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>Alle ansehen →</Link>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '0 0 var(--space-3)' }}>
+            <p style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)', lineHeight: 1.45 }}>
               Arbeitstage, Fristen, Altersberechnung und Zeitspannen im deutschen Kalender.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
               {timeCalcs.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/rechner/${c.slug}/`}
                   style={{
-                    fontSize: '0.85rem',
+                    fontSize: '0.875rem',
                     color: 'var(--color-text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '4px 6px',
+                    padding: '6px 8px',
                     borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--color-surface-subtle)',
                     textDecoration: 'none'
                   }}
                 >
-                  <span>{c.shortName || c.name}</span>
-                  <span style={{ color: 'var(--color-primary)', fontSize: '0.75rem' }}>Öffnen</span>
+                  <span style={{ fontWeight: 500 }}>{c.shortName || c.name}</span>
+                  <span style={{ color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 600 }}>Öffnen →</span>
                 </Link>
               ))}
             </div>
@@ -382,48 +358,117 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Trust & Quality Assurance Section */}
+      {/* 5. Ratgeber & Magazin (Distinct Article Cards) */}
+      {featuredArticles.length > 0 && (
+        <section className={styles.sectionBlock}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderLeft}>
+              <h2 className={styles.sectionTitle}>
+                Ratgeber & Fachwissen
+              </h2>
+              <p className={styles.sectionSubtitle}>
+                Verständliche Erklärungen zu rechtlichen Grundlagen, Berechnungen und Fallstricken.
+              </p>
+            </div>
+            <Link href="/ratgeber/" className={styles.sectionCta}>
+              <span>Alle Ratgeber lesen</span>
+              <ArrowRight size={14} />
+            </Link>
+          </div>
+
+          <div className={ratgeberStyles.hubGrid} style={{ marginBottom: 0 }}>
+            {featuredArticles.map((article) => (
+              <Link
+                key={article.slug}
+                href={`/ratgeber/${article.slug}/`}
+                className={ratgeberStyles.articleCard}
+              >
+                <div>
+                  <div className={ratgeberStyles.cardCategory}>{article.categoryName}</div>
+                  <h3 className={ratgeberStyles.cardTitle}>{article.title}</h3>
+                  <p className={ratgeberStyles.cardExcerpt}>{article.summary}</p>
+                </div>
+
+                <div className={ratgeberStyles.cardFooter}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Clock size={13} /> {article.readingTimeMin} Min. Lesezeit
+                  </span>
+                  <span className={ratgeberStyles.cardReadMore}>
+                    Beitrag lesen <ArrowRight size={14} />
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 6. Trust & Quality Assurance Section */}
       <section style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: 'var(--space-4)',
-        padding: 'var(--space-6) 0',
-        marginBottom: 'var(--space-8)',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: 'var(--space-6)',
+        padding: 'var(--space-8) 0',
+        marginBottom: 'var(--space-12)',
         borderTop: '1px solid var(--color-border)',
         borderBottom: '1px solid var(--color-border)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-          <div style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--color-surface-subtle)', color: 'var(--color-primary)', flexShrink: 0 }}>
-            <ShieldCheck size={20} />
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{
+            padding: '10px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--color-primary-light)',
+            color: 'var(--color-primary)',
+            flexShrink: 0
+          }}>
+            <ShieldCheck size={22} />
           </div>
           <div>
-            <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>100 % Lokale Berechnung</strong>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: 1.4, display: 'block', marginTop: '2px' }}>
-              Keine Eingaben verlassen Ihren Browser. Höchster Datenschutz für sensible Daten.
+            <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+              100 % Lokale Berechnung
+            </strong>
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, display: 'block' }}>
+              Keine Eingaben verlassen Ihren Webbrowser. Maximale Datensicherheit für private Finanzen und Gehaltsdaten.
             </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-          <div style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--color-surface-subtle)', color: 'var(--color-primary)', flexShrink: 0 }}>
-            <CheckCircle2 size={20} />
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{
+            padding: '10px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--color-primary-light)',
+            color: 'var(--color-primary)',
+            flexShrink: 0
+          }}>
+            <CheckCircle2 size={22} />
           </div>
           <div>
-            <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>Deutsche Gesetzeslage 2026</strong>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: 1.4, display: 'block', marginTop: '2px' }}>
-              Fundiert nach § 32a EStG, SGB und amtlichen Bekanntmachungen gepflegt.
+            <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+              Deutsche Gesetzeslage 2026
+            </strong>
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, display: 'block' }}>
+              Geprüft nach § 32a EStG, SGB IV/XI, BUrlG und offiziellen BMF-Steuertabellen für das laufende Steuerjahr.
             </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-          <div style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--color-surface-subtle)', color: 'var(--color-primary)', flexShrink: 0 }}>
-            <Zap size={20} />
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+          <div style={{
+            padding: '10px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--color-primary-light)',
+            color: 'var(--color-primary)',
+            flexShrink: 0
+          }}>
+            <Zap size={22} />
           </div>
           <div>
-            <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>Sofortige Ergebnisse</strong>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', lineHeight: 1.4, display: 'block', marginTop: '2px' }}>
-              Echtzeit-Berechnungen ohne Ladezeiten oder Werbeunterbrechungen vor dem Resultat.
+            <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+              Sofortige Echtzeit-Ergebnisse
+            </strong>
+            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, display: 'block' }}>
+              Berechnung erfolgt unmittelbar beim Tippen ohne Ladezeiten, Registrierung oder Paywalls.
             </span>
           </div>
         </div>

@@ -1,10 +1,15 @@
+/* ==========================================================================
+   Calculator Runner & Result Panel Styles
+   Clean, premium German consumer utility interface
+   ========================================================================== */
+
 .calculatorCard {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-6);
-  margin-bottom: var(--space-8);
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+  padding: clamp(var(--space-5), 4vw, var(--space-8));
+  margin-bottom: var(--space-10);
   width: 100%;
   box-sizing: border-box;
 }
@@ -16,66 +21,67 @@
   }
 }
 
-@media (max-width: 360px) {
-  .calculatorCard {
-    padding: var(--space-3);
-  }
-}
-
 .calculatorHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  gap: var(--space-3);
   border-bottom: 1px solid var(--color-border);
   padding-bottom: var(--space-4);
   margin-bottom: var(--space-6);
 }
 
 .calculatorTitle {
-  font-size: clamp(1.15rem, 3.5vw, 1.35rem);
+  font-size: clamp(1.2rem, 3.5vw, 1.45rem);
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
   overflow-wrap: break-word;
   word-break: break-word;
+  hyphens: auto;
 }
 
 .clientTag {
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   font-weight: 600;
-  padding: 4px 8px;
-  background-color: var(--color-surface-subtle);
-  color: var(--color-text-muted);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  padding: 4px 10px;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-hover);
+  border-radius: var(--radius-full);
   white-space: nowrap;
 }
 
+/* Two-column layout on desktop, stacked on mobile */
 .calculatorLayout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-6);
+  gap: var(--space-8);
 }
 
-@media (min-width: 840px) {
+@media (min-width: 860px) {
   .calculatorLayout {
-    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-columns: 1.15fr 0.85fr;
     gap: var(--space-8);
   }
 }
 
 .sectionHeading {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-top: 0;
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Input Section */
+.inputSection {
+  min-width: 0;
+  width: 100%;
 }
 
 .inputGrid {
@@ -97,27 +103,29 @@
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-1);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-1);
+  margin-bottom: 6px;
   overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .unitBadge {
   color: var(--color-text-muted);
-  font-weight: 400;
-  font-size: 0.8rem;
+  font-weight: 500;
+  font-size: 0.825rem;
   white-space: nowrap;
 }
 
 .input,
 .select {
   width: 100%;
-  min-height: 44px;
-  height: 44px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-border-subtle);
+  min-height: 48px;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background-color: var(--color-surface);
   color: var(--color-text-primary);
@@ -138,7 +146,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 44px;
+  min-height: 48px;
   padding: var(--space-1) 0;
   cursor: pointer;
 }
@@ -152,14 +160,15 @@
 }
 
 .helpText {
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   color: var(--color-text-muted);
-  margin-top: var(--space-1);
-  line-height: 1.4;
+  margin-top: 4px;
+  line-height: 1.45;
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 
-/* Result Box */
+/* Result Section */
 .resultSection {
   display: flex;
   flex-direction: column;
@@ -171,7 +180,7 @@
   background-color: var(--color-surface-subtle);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  padding: clamp(var(--space-4), 3vw, var(--space-5));
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -179,43 +188,41 @@
   box-sizing: border-box;
 }
 
-@media (min-width: 480px) {
-  .resultBox {
-    padding: var(--space-5);
-  }
-}
-
+/* Dominant Primary Result */
 .primaryResult {
   display: flex;
   flex-direction: column;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-4);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.05);
   min-width: 0;
   overflow: hidden;
 }
 
 .primaryLabel {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.8125rem;
+  font-weight: 700;
   color: var(--color-text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: var(--space-1);
-}
-
-.primaryValue {
-  font-size: clamp(1.35rem, 5.5vw, 1.85rem);
-  font-weight: 800;
-  color: var(--color-primary);
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
+.primaryValue {
+  font-size: clamp(1.75rem, 5.5vw, 2.35rem);
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Secondary Items Grid */
 .secondaryGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -233,7 +240,7 @@
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -241,14 +248,16 @@
 }
 
 .secondaryLabel {
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   color: var(--color-text-muted);
   margin-bottom: 2px;
   overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .secondaryValue {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--color-text-primary);
   overflow-wrap: break-word;
@@ -257,11 +266,12 @@
 
 .summaryText {
   font-size: 0.875rem;
-  line-height: 1.55;
+  line-height: 1.6;
   color: var(--color-text-secondary);
   border-top: 1px solid var(--color-border);
   padding-top: var(--space-3);
   overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .summaryText p {
@@ -298,27 +308,27 @@
 }
 
 .regulatedNotice {
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.75rem;
+  font-size: 0.775rem;
   color: var(--color-text-muted);
   line-height: 1.4;
 }
 
 .regulatedBadge {
   background-color: var(--color-surface-subtle);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--color-border);
   font-weight: 600;
-  padding: 2px 6px;
+  padding: 2px 8px;
   border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
-/* Breakdown Table with Mobile Momentum Scrolling */
+/* Breakdown Table */
 .breakdownContainer {
   margin-top: var(--space-8);
   border-top: 1px solid var(--color-border);
@@ -327,7 +337,9 @@
 }
 
 .breakdownTitle {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
   margin-bottom: var(--space-4);
 }
 
@@ -344,13 +356,13 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   min-width: 360px;
 }
 
 .table th {
   background-color: var(--color-surface-subtle);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   font-weight: 600;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
@@ -358,7 +370,7 @@
 }
 
 .table td {
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -387,15 +399,15 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
+  padding: 8px 14px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--color-text-secondary);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.12s ease;
+  transition: all 0.15s ease;
 }
 
 .actionBtn:hover {
@@ -413,12 +425,12 @@
 .privacyNotice {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
+  gap: 8px;
+  font-size: 0.775rem;
   color: var(--color-text-muted);
   margin-top: var(--space-3);
-  padding: 6px 10px;
+  padding: 8px 12px;
   background-color: var(--color-surface-subtle);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 }

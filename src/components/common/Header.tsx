@@ -3,21 +3,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Menu, X, ChevronDown, Calculator, ArrowRight } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 import styles from '@/styles/layout.module.css';
 import SearchBar from './SearchBar';
 
 const PRIMARY_NAV_ITEMS = [
   { label: 'Alle Rechner', href: '/rechner/' },
-  { label: 'Ratgeber', href: '/ratgeber/' },
   { label: 'Finanzen', href: '/finanzen/' },
   { label: 'Steuern & Gehalt', href: '/steuern-gehalt/' },
   { label: 'Auto & Verkehr', href: '/auto-verkehr/' },
-  { label: 'Wohnen & Immobilien', href: '/wohnen-immobilien/' },
-  { label: 'Kredite & Zinsen', href: '/kredit-schulden/' },
+  { label: 'Wohnen', href: '/wohnen-immobilien/' },
+  { label: 'Ratgeber', href: '/ratgeber/' },
 ];
 
 const MORE_NAV_ITEMS = [
+  { label: 'Kredite & Zinsen', href: '/kredit-schulden/' },
+  { label: 'Gesundheit & Fitness', href: '/gesundheit/' },
   { label: 'Datum & Zeit', href: '/datum-zeit/' },
   { label: 'Mathematik & Prozent', href: '/mathematik/' },
   { label: 'Arbeit & Gehalt', href: '/arbeit-gehalt/' },
@@ -84,14 +85,13 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={`container ${styles.headerContainer}`}>
-        {/* Brand Logo & Tagline */}
+        {/* Brand Logo & Wordmark (Clutter-free) */}
         <Link href="/" className={styles.brand} aria-label="RechenHafen Startseite">
           <div className={styles.brandLogo} aria-hidden="true">
             RH
           </div>
           <div className={styles.brandText}>
             <span className={styles.brandName}>RechenHafen</span>
-            <span className={styles.brandTagline}>Alle Rechner an einem Ort</span>
           </div>
         </Link>
 
@@ -159,6 +159,7 @@ export default function Header() {
             className={styles.mobileSearchBtn}
             onClick={() => setIsMobileSearchOpen((prev) => !prev)}
             aria-label="Rechner-Suche öffnen"
+            aria-expanded={isMobileSearchOpen}
           >
             <Search size={18} />
           </button>
@@ -166,11 +167,11 @@ export default function Header() {
           <button
             type="button"
             className={styles.mobileMenuBtn}
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Menü öffnen"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isMobileMenuOpen ? "Menü schließen" : "Menü öffnen"}
             aria-expanded={isMobileMenuOpen}
           >
-            <Menu size={20} />
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
@@ -199,7 +200,7 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.drawerHeader}>
-              <div className={styles.drawerTitle}>Kategorien & Rechner</div>
+              <div className={styles.drawerTitle}>Kategorien & Navigation</div>
               <button
                 type="button"
                 className={styles.drawerCloseBtn}
@@ -258,7 +259,7 @@ export default function Header() {
                 <Link href="/datenschutz/" onClick={() => setIsMobileMenuOpen(false)}>Datenschutz</Link>
                 <Link href="/impressum/" onClick={() => setIsMobileMenuOpen(false)}>Impressum</Link>
               </div>
-              <div>© 2026 RechenHafen. Alle Rechner an einem Ort.</div>
+              <div>© {new Date().getFullYear()} RechenHafen.de</div>
             </div>
           </div>
         </div>
