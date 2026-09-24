@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, X, Calculator, ArrowRight, CornerDownLeft } from 'lucide-react';
+import type { SearchItem } from '@/data/searchIndex';
 import styles from '@/styles/search.module.css';
 
 interface SearchResult {
@@ -31,6 +32,16 @@ const POPULAR_SUGGESTIONS = [
   { name: 'BMI-Rechner', slug: 'bmi-rechner' },
 ];
 
+let searchIndexPromise: Promise<SearchItem[]> | undefined;
+
+function loadSearchIndex() {
+  if (!searchIndexPromise) {
+    searchIndexPromise = import('@/data/searchIndex').then(({ SEARCH_INDEX }) => SEARCH_INDEX);
+  }
+
+  return searchIndexPromise;
+}
+
 export default function SearchBar({
   placeholder = 'Rechner suchen, z. B. Brutto Netto, Prozent, BMI ...',
   onSelect,
@@ -46,6 +57,11 @@ export default function SearchBar({
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsListRef = useRef<HTMLUListElement>(null);
   const router = useRouter();
+
+  // Begin loading before the visitor types so the first search feels instant.
+  useEffect(() => {
+    void loadSearchIndex();
+  }, []);
 
   // Global Shortcut Ctrl+K / Cmd+K
   useEffect(() => {
@@ -64,11 +80,15 @@ export default function SearchBar({
 
   // Search logic using lightweight searchIndex
   useEffect(() => {
+    let cancelled = false;
+
     if (!query.trim()) {
       setResults([]);
       setIsOpen(false);
       setSelectedIndex(-1);
-      return;
+      return () => {
+        cancelled = true;
+      };
     }
 
     const q = query.toLowerCase().trim();
@@ -92,7 +112,9 @@ export default function SearchBar({
       searchTerms.push('zinseszins', 'kreditrechner', 'tilgungsrechner', 'sparrechner');
     }
 
-    import('@/data/searchIndex').then(({ SEARCH_INDEX }) => {
+    void loadSearchIndex().then((SEARCH_INDEX) => {
+      if (cancelled) return;
+
       // Score and rank matches
       const matched = SEARCH_INDEX.map((item) => {
         const nameLower = item.name.toLowerCase();
@@ -132,6 +154,10 @@ export default function SearchBar({
       setIsOpen(true);
       setSelectedIndex(-1);
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [query]);
 
   // Click outside listener
