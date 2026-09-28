@@ -55,6 +55,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+function renderFormattedText(text: string) {
+  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  if (!regex.test(text)) return text;
+
+  const elements: (string | React.ReactNode)[] = [];
+  let lastIndex = 0;
+  regex.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      elements.push(text.substring(lastIndex, match.index));
+    }
+    const [, label, href] = match;
+    elements.push(
+      <Link key={match.index} href={href} style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
+        {label}
+      </Link>
+    );
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    elements.push(text.substring(lastIndex));
+  }
+  return elements;
+}
+
 export default async function CalculatorPage({ params }: PageProps) {
   const { slug } = await params;
   const calc = getCalculatorBySlug(slug);
@@ -256,10 +282,10 @@ export default async function CalculatorPage({ params }: PageProps) {
       {(calc.content?.intro || calc.content?.details) && (
         <section style={{ maxWidth: 'var(--max-content-width)', margin: 'var(--space-8) 0', lineHeight: 1.7, color: 'var(--color-text-secondary)', fontSize: '0.975rem' }}>
           {calc.content.intro && (
-            <p style={{ marginBottom: 'var(--space-4)' }}>{calc.content.intro}</p>
+            <p style={{ marginBottom: 'var(--space-4)' }}>{renderFormattedText(calc.content.intro)}</p>
           )}
           {calc.content.details && (
-            <p style={{ marginBottom: 'var(--space-4)' }}>{calc.content.details}</p>
+            <p style={{ marginBottom: 'var(--space-4)' }}>{renderFormattedText(calc.content.details)}</p>
           )}
         </section>
       )}

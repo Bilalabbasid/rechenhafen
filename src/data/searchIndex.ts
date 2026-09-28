@@ -1053,6 +1053,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       "arbeit-gehalt",
       "teilzeit & arbeitszeit",
       "teilzeitrechner",
+      "teilzeit rechner",
       "teilzeit gehalt berechnen",
       "stunden reduzieren gehalt",
       "30 stunden woche gehalt"
@@ -1354,6 +1355,9 @@ export const SEARCH_INDEX: SearchItem[] = [
       "gesundheit-fitness",
       "kalorien & stoffwechsel",
       "kalorienbedarf rechner",
+      "täglicher kalorienbedarf",
+      "kalorienbedarf mann",
+      "kalorienbedarf frau",
       "grundumsatz rechner",
       "tdee rechner deutsch",
       "kalorien abnehmen rechner",
@@ -1654,7 +1658,9 @@ export const SEARCH_INDEX: SearchItem[] = [
       "break-even berechnen",
       "business",
       "unternehmenskennzahlen",
+      "gewinnschwelle berechnen",
       "break even rechner",
+      "break-even rechner",
       "gewinnschwelle berechnen formel",
       "deckungsbeitrag break even",
       "mindestabsatz rechner"
@@ -2364,8 +2370,9 @@ export const SEARCH_INDEX: SearchItem[] = [
       "maximaler kredit",
       "kredit-schulden",
       "ratenkredit",
-      "maximaler kredit rechner",
       "wie viel kredit bekomme ich",
+      "maximaler kredit rechner",
+      "wie viel kredit kann ich mir leisten",
       "leistbare kredithoehe berechnen",
       "kreditrahmen gehalt rechner"
     ]
@@ -2996,6 +3003,7 @@ export const SEARCH_INDEX: SearchItem[] = [
       "gasverbrauch m³ in kwh",
       "haushalt-energie",
       "heizung & gas",
+      "gasverbrauch berechnen",
       "gasverbrauch m3 in kwh rechner",
       "gaszaehler umrechnen formel",
       "brennwert zustandszahl gas",

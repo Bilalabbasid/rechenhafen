@@ -76,6 +76,16 @@ const nextConfig: NextConfig = {
         destination: '/rechner/ballonfinanzierung-rechner/',
         permanent: true,
       },
+      {
+        source: '/rechner/kalorienbedarfrechner',
+        destination: '/rechner/kalorienbedarf-rechner/',
+        statusCode: 301,
+      },
+      {
+        source: '/rechner/kalorienbedarfrechner/',
+        destination: '/rechner/kalorienbedarf-rechner/',
+        statusCode: 301,
+      },
     ];
   },
 };

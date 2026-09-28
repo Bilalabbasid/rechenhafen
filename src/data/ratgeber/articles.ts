@@ -1070,10 +1070,10 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     ],
     primaryCalculator: {
       slug: 'teilzeit-gehaltsrechner',
-      title: 'Teilzeitgehalt online berechnen',
-      ctaText: 'Neues Teilzeit-Gehalt ermitteln',
-      description: 'Geben Sie Ihr bisheriges Vollzeitgehalt sowie die alten und neuen Wochenstunden ein, um Ihr neues Brutto- und Nettogehalt sofort zu sehen.',
-      badge: 'Teilzeit-Rechner',
+      title: 'Teilzeitrechner',
+      ctaText: 'Zum Teilzeitrechner',
+      description: 'Geben Sie Ihr bisheriges Vollzeitgehalt sowie die alten und neuen Wochenstunden ein, um Ihr anteiliges Gehalt sofort im Teilzeitrechner zu berechnen.',
+      badge: 'Kostenloser Rechner',
     },
     secondaryCalculators: [
       {
@@ -1096,6 +1096,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         paragraphs: [
           'Viele Beschäftigte zögern, ihre Arbeitszeit zu reduzieren, weil sie befürchten, bei 20 % weniger Arbeit auch 20 % weniger Geld zum Leben zu haben. Das ist ein Trugschluss.',
           'Aufgrund der Steuerprogression im deutschen Einkommensteuertarif (§ 32a EStG) wird Einkommen nicht mit einem festen Pauschalsatz besteuert. Die obersten verdienten Euro unterliegen dem höchsten Grenzsteuersatz (oft 30 % bis 42 %). Wenn Sie Ihre Arbeitszeit reduzieren, verzichten Sie auf eben jene am stärksten besteuerten Spitzenstunden.',
+          'Möchten Sie Ihr neues Bruttoeinkommen direkt kalkulieren? Mit unserem kostenlosen [Teilzeitrechner](/rechner/teilzeit-gehaltsrechner/) ermitteln Sie in Sekundenschnelle Ihr anteiliges Monatsgehalt für jedes beliebige Arbeitszeitmodell.',
         ],
         table: {
           headers: ['Arbeitszeit-Modell', 'Wochenstunden', 'Bruttogehalt', 'Nettogehalt (StKl. I)', 'Netto-Verlust'],
@@ -1460,6 +1461,195 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       },
     ],
     relatedArticleSlugs: ['grenzsteuersatz-durchschnittssteuersatz-unterschied', 'pendelkosten-monat-berechnen'],
+  },
+  {
+    slug: 'zahnspachtel-groessen-tabelle-fliesen',
+    title: 'Zahnspachtel Größen Tabelle: Welche Zahnung für welche Fliese?',
+    metaTitle: 'Zahnspachtel Größen Tabelle: Richtige Zahnung für Fliesen | RechenHafen',
+    metaDescription: 'Zahnspachtel Größen Tabelle für Fliesen: Welche Zahnung (3, 6, 8, 10, 12 mm oder Mittelbett) für Wand & Boden? Praxiswissen zu Untergrund, Kleberbett & Buttering-Floating.',
+    h1: 'Zahnspachtel Größen Tabelle: Welche Zahnung für welche Fliese?',
+    category: 'bauen-renovieren',
+    categoryName: 'Bauen & Renovieren',
+    publishedAt: '2026-04-10',
+    updatedAt: '2026-09-26',
+    readingTimeMin: 7,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Bauen & Handwerk',
+    },
+    reviewer: {
+      name: 'Fliesenlegermeister RechenHafen',
+      role: 'Geprüfter Fliesen-, Platten- und Mosaiklegermeister',
+    },
+    summary:
+      'Die Wahl der passenden Zahnspachtel-Größe entscheidet maßgeblich über die Haltbarkeit und Hohlraumfreiheit jedes Fliesenbelags. Unsere übersichtliche Tabelle zeigt Ihnen genau, welche Zahnung (3 bis 12 mm oder Mittelbett) für welches Fliesenformat, Wand, Boden und Fußbodenheizung erforderlich ist – inklusive Kleberbett-Dicke, Buttering-Floating-Verfahren und praktischer Benetzungskontrolle.',
+    keyTakeaways: [
+      'Je größer die Fliese und je unebener der Untergrund, desto größer muss die Zahnung gewählt werden: z. B. 6 mm für Standard-Wandfliesen, 8–10 mm für Bodenfliesen und 10–12 mm für Großformate ab 60×60 cm.',
+      'Die tatsächliche Kleberbettdicke nach dem Einschieben der Fliese beträgt ca. ein Drittel bis die Hälfte der Zahnhöhe der Kelle (eine 8-mm-Zahnung erzeugt ca. 2,5 bis 3 mm Kleberbett).',
+      'Bei großformatigen Fliesen, auf Fußbodenheizungen und im Außenbereich schreibt der ZDB das Buttering-Floating-Verfahren (kombinierter Kleberauftrag auf Untergrund und Fliesenrückseite) für 100 % Hohlraumfreiheit vor.',
+      'Der Kellen-Anstellwinkel (ideal 45° bis 60°) und ein geradliniger Stegverlauf sind entscheidend, damit Luft beim Andrücken der Fliese ungehindert entweichen kann.',
+    ],
+    primaryCalculator: {
+      slug: 'fliesenkleber-rechner',
+      title: 'Fliesenkleber & Fugenmörtel Rechner',
+      ctaText: 'Fliesenkleber-Bedarf berechnen',
+      description: 'Berechnen Sie den exakten Bedarf an Fliesenkleber (Säcke à 25 kg und kg) und Fugenmörtel für Ihre Quadratmeter und gewählte Zahnung.',
+      badge: 'Material-Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'estrich-rechner',
+        title: 'Estrich-Rechner',
+        ctaText: 'Estrichbedarf kalkulieren',
+        description: 'Ermittelt benötigten Estrich, Sand und Zement für den tragfähigen und ebenen Untergrund.',
+      },
+      {
+        slug: 'farbmengen-rechner',
+        title: 'Farbmengen-Rechner',
+        ctaText: 'Wandfarben-Bedarf ermitteln',
+        description: 'Berechnet Liter und Gebinde Wandfarbe für angrenzende Wände und Decken.',
+      },
+    ],
+    sections: [
+      {
+        id: 'tabelle-zahnspachtel-groessen',
+        title: 'Zahnspachtel Größen Tabelle: Empfohlene Zahnung nach Fliesenformat',
+        paragraphs: [
+          'Beim Verlegen von Fliesen im Dünnbettverfahren ist die Zahnspachtel-Größe (angegeben in Millimetern) das wichtigste Werkzeugmaß. Die Zahnung bestimmt, wie viel Klebermörtel pro Quadratmeter aufgekämmt wird und wie dick das tragende Kleberbett nach dem Einschieben der Fliese ausfällt.',
+          'Die folgende Referenztabelle basiert auf den anerkannten Fachregeln des Zentralverbandes Deutsches Baugewerbe (ZDB) und gilt für Standard-Quadratzahnungen (C-Zahnung nach TKB-Spezifikation) auf planebenem Untergrund:',
+        ],
+        table: {
+          headers: ['Fliesenformat & Kantenlänge', 'Typischer Einsatzbereich', 'Empfohlene Zahnung', 'Kleberbett-Dicke (ca.)', 'Kleberverbrauch (ca.)'],
+          rows: [
+            ['Mosaik (< 10 × 10 cm)', 'Wand / Duschbereich / Bordüren', '3 bis 4 mm Quadratzahnung', '1,0 – 1,5 mm', '1,5 – 2,0 kg/m²'],
+            ['Kleinformat (10 × 10 bis 15 × 15 cm)', 'Küche, Fliesenspiegel Wand', '4 bis 6 mm Quadratzahnung', '1,5 – 2,0 mm', '2,0 – 2,5 kg/m²'],
+            ['Standard-Wandfliese (bis 20 × 25 cm)', 'Badezimmer Wände', '6 mm Quadratzahnung', '2,0 – 2,5 mm', '2,5 – 3,0 kg/m²'],
+            ['Mittleres Format (bis 30 × 30 cm)', 'Boden & Wand normal belastet', '8 mm Quadratzahnung', '2,5 – 3,0 mm', '3,0 – 3,5 kg/m²'],
+            ['Bodenfliesen (30 × 60 cm)', 'Badezimmer, Wohnräume Boden', '8 bis 10 mm Quadratzahnung', '3,0 – 3,5 mm', '3,5 – 4,5 kg/m²'],
+            ['Großformat (60 × 60 cm)', 'Moderne Boden- & Wandflächen', '10 mm (+ Buttering-Floating)', '3,5 – 4,0 mm', '4,5 – 5,5 kg/m²'],
+            ['XXL-Großformat (60 × 120 cm & größer)', 'Großflächen, Feinsteinzeug', '12 mm oder Rundzahnung (R15)', '4,0 – 5,0 mm', '5,5 – 7,0 kg/m²'],
+            ['Spaltplatten / Naturstein (uneben)', 'Terrassen, Treppen, Naturstein', 'Mittelbettspachtel (15–20 mm)', '5,0 – 15,0 mm', '7,0 – 12,0 kg/m²'],
+          ],
+        },
+      },
+      {
+        id: 'einflussfaktoren-zahnung',
+        title: 'Die 5 entscheidenden Einflussfaktoren für die Zahnspachtel-Größe',
+        paragraphs: [
+          'Das bloße Fliesenformat ist der wichtigste, aber keineswegs der einzige Parameter bei der Auswahl der richtigen Zahnkelle. Erfahrene Fliesenleger berücksichtigen stets fünf bauliche Faktoren:',
+          '1. Fliesenformat und Kantenlänge: Großformatige Fliesen weisen durch den Brennvorgang herstellungsbedingte Durchbiegungen auf. Je größer die Diagonale der Fliese, desto mehr Kleberausgleich ist nötig, damit die Fliese vollflächig aufsitzt.',
+          '2. Profilierung der Fliesenrückseite: Glatte Fliesenrückseiten benötigen weniger Klebervolumen. Stark geriffelte oder profilierte Rückseiten (wie bei vielen Spaltklinkern oder rustikalen Steinzeugfliesen) schlucken Kleber und verlangen eine um 2 mm größere Zahnung.',
+          '3. Untergrundebenheit nach DIN 18202: Dünnbettkleber gleicht maximal 3 bis 5 mm Höhendifferenzen aus. Weist der Estrich oder Wandputz stärkere Toleranzen auf, muss vorab mit Nivelliermasse ausgeglichen oder auf Mittelbettmörtel ausgewichen werden.',
+          '4. Art des Fliesenklebers: Hochflexible kunststoffvergütete Flexkleber (Klassifizierung C2 TE S1 nach DIN EN 12004) sind für Großformate Standard. Fließbettmörtel hingegen zerfließen unter dem Eigengewicht der Bodenfliese und ermöglichen auch mit runden Zähnen eine hohlraumfreie Bettung.',
+          '5. Beanspruchungsbereich: Im Außenbereich (Frostgefahr durch Wasseransammlungen in Hohlräumen) und bei Fußbodenheizung (Wärmedämmung durch Lufteinschlüsse) ist eine vollflächige 100-Prozent-Benetzung bauphysikalisch zwingend vorgeschrieben.',
+        ],
+        callout: {
+          type: 'tip',
+          title: 'Faustformel für das fertige Kleberbett',
+          text: 'Eine 8-mm-Zahnkelle ergibt keine 8 mm Kleberschicht! Beim Einschieben und Andrücken der Fliese werden die trapezförmigen Mörtelstege breitgedrückt. Als Faustregel gilt: Fertige Kleberbettdicke = ca. 1/3 bis 1/2 der Zahnhöhe des Spachtels.',
+        },
+      },
+      {
+        id: 'buttering-floating-verfahren',
+        title: 'Floating-Buttering-Verfahren: Wann ist es unverzichtbar?',
+        paragraphs: [
+          'Im modernen Fliesenlegerhandwerk unterscheidet man zwischen drei Verlegearten: Floating (Auftrag nur auf den Untergrund), Buttering (Auftrag nur auf die Fliesenrückseite) und dem kombinierten Buttering-Floating-Verfahren.',
+          'Beim Buttering-Floating-Verfahren wird der Fliesenkleber mit der Zahnkelle auf Wand oder Estrich aufgekämmt und zusätzlich mit der glatten Seite der Kelle eine dünne Kontaktschicht (ca. 1 mm) vollflächig auf den Fliesenrücken aufgezogen.',
+          'Nach den Richtlinien des Zentralverbandes Deutsches Baugewerbe (ZDB) ist das Buttering-Floating-Verfahren zwingend vorgeschrieben für: Fliesen ab 30 × 60 cm, alle Fliesen über einer Fußbodenheizung, bodengleiche Duschen und Wellnessbereiche sowie alle Außenbeläge auf Balkonen und Terrassen.',
+        ],
+        callout: {
+          type: 'warning',
+          title: 'Gefahr von Hohlräumen bei Fußbodenheizung',
+          text: 'Lufteinschlüsse unter Fliesen wirken wie eine Isolierschicht: Die Wärme der Fußbodenheizung gelangt nur verzögert in den Raum. Zudem können punktuelle Lasten (z. B. Möbelfüße oder Stuhlrollen) über Hohlräumen zu Spannungsrissen und Brüchen der Fliese führen.',
+        },
+      },
+      {
+        id: 'anwendungstipps-zahnpraxis',
+        title: 'Praxistipps: Kellenführung, Benetzungsprüfung & typische Verlegefehler',
+        paragraphs: [
+          'Für ein gleichmäßiges Ergebnis kommt es auf die richtige Haltung an: Halten Sie die Zahnkelle stets in einem konstanten Winkel von 45° bis 60° zum Untergrund. Wird die Kelle zu flach geführt (z. B. unter 30°), verringert sich die Steghöhe drastisch und es gelangt bis zu 40 Prozent zu wenig Kleber unter die Fliese.',
+          'Kämmen Sie das Kleberbett immer geradlinig und parallel zur kurzen Kante der Fliese auf. Vermeiden Sie bogenförmiges oder kreuzweises Kämmen, da hierbei Lufteinschlüsse entstehen, die beim Andrücken nicht mehr seitlich entweichen können.',
+          'Benetzungskontrolle: Heben Sie während der Arbeit stichprobenartig eine frisch eingelegte Fliese wieder an. Nach ZDB-Kriterien müssen im Innenbereich mindestens 80 Prozent der Fliesenrückseite gleichmäßig mit Kleber benetzt sein – im Nassbereich und auf Fußbodenheizungen mindestens 95 bis 100 Prozent.',
+          'Um vorab den genauen Materialbedarf an Fliesenkleber in Kilogramm und 25-kg-Säcken für Ihre Raumfläche zu kalkulieren, nutzen Sie unseren präzisen [Fliesenkleber-Rechner](/rechner/fliesenkleber-rechner/).',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Praxisbeispiel: Zahnungswahl & Benetzungsprüfung für 60×60 cm Feinsteinzeug im Bad mit Fußbodenheizung',
+      scenario: 'Ein Heimwerker saniert ein Badezimmer mit 18 m² Fläche. Verlegt werden rektifizierte Feinsteinzeug-Fliesen im Großformat 60 × 60 cm auf neuem Heizestrich mit Warmwasser-Fußbodenheizung. Welche Zahnspachtelgröße wird benötigt und wie viel Kleber ist erforderlich?',
+      formula: 'Zahnung = 10 mm Quadratzahnung + Kontaktschicht (Buttering-Floating) mit C2 TE S1 Flexkleber',
+      steps: [
+        {
+          label: 'Schritt 1: Format und Randbedingungen analysieren',
+          calculation: 'Fliesenformat 60 × 60 cm gilt als Großformat; Heizestrich verlangt zwingend 100 % hohlraumfreie Bettung zur optimalen Wärmeübertragung.',
+        },
+        {
+          label: 'Schritt 2: Zahnspachtel nach Tabelle auswählen',
+          calculation: 'Tabelle empfiehlt 10-mm-Quadratzahnung auf dem Untergrund plus 1–2 mm Kontaktschicht auf der Fliesenrückseite (Buttering-Floating).',
+          note: 'Anstellwinkel der Kelle beim Durchkämmen: konstant 50° bis 60°.',
+        },
+        {
+          label: 'Schritt 3: Kleberbettdicke und Materialverbrauch berechnen',
+          calculation: 'Aus 10 mm Zahnung resultiert ein tragendes Kleberbett von ca. 3,5 bis 4,0 mm. Kleberverbrauch: ca. 4,5 kg/m² Pulver.',
+          note: '18 m² × 4,5 kg/m² × 1,10 (10 % Reserve) = ca. 89 kg Fliesenkleber (4 Säcke à 25 kg).',
+        },
+        {
+          label: 'Schritt 4: Benetzungskontrolle durchführen',
+          calculation: 'Erste Fliese ins frische Kleberbett einschieben, anklopfen und anheben: Die Rückseite weist 100 % geschlossene Benetzung ohne Luftblasen auf.',
+        },
+      ],
+      resultSummary: '10-mm-Zahnspachtel im Buttering-Floating-Verfahren sorgt für hohlraumfreie Verlegung und exzellente Wärmeübertragung der Fußbodenheizung.',
+    },
+    commonMistakes: [
+      {
+        mistake: '6-mm-Zahnkelle für 60×60 cm Großformat-Fliesen verwenden.',
+        correction: 'Die Mörtelmenge reicht nicht aus, um Kantenüberzähne und minimale Biegungen auszugleichen. Die Fliesen klingen nach dem Aushärten hohl und können bei Belastung brechen.',
+      },
+      {
+        mistake: 'Fliesenkleber kreisförmig oder bogenförmig auf den Boden kämmen.',
+        correction: 'Kleber stets geradlinig und parallel zur kurzen Fliesenseite kämmen. Nur so kann die Luft beim Einschieben der Fliese ungehindert zu den Fugen hin entweichen.',
+      },
+      {
+        mistake: 'Buttering-Floating bei Fußbodenheizung aus Zeitgründen weglassen.',
+        correction: 'Ohne Kontaktschicht auf der Fliese sinkt der Benetzungsgrad oft unter 70 %, was zu spürbaren Wärmeverlusten der Heizung und Hohlstellen führt.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Welche Zahnung eignet sich für Standard-Wandfliesen im Badezimmer?',
+        answer: 'Für klassische Steingut-Wandfliesen bis zu einem Format von 20 × 25 cm oder 20 × 30 cm ist eine 6-mm-Quadratzahnung optimal. Für großformatigere Wandfliesen ab 30 × 60 cm sollte eine 8-mm- oder 10-mm-Zahnkelle verwendet werden.',
+      },
+      {
+        question: 'Was ist der Unterschied zwischen Quadratzahnung und Rundzahnung?',
+        answer: 'Die Quadratzahnung (C-Zahnung) ist der Standard für standfeste Dünnbettkleber auf ebenen Flächen. Rundzahnungen (R-Zahnung bzw. Halbrundkellen) werden vor allem bei Fließbettklebern und Großformaten eingesetzt, da sich die runden Stege unter dem Plattengewicht noch leichter und hohlraumfreier zusammenschieben.',
+      },
+      {
+        question: 'Warum klingen frisch verlegte Fliesen hohl?',
+        answer: 'Hohlstellen entstehen durch eine zu kleine Zahnspachtelgröße, einen zu flachen Anstellwinkel beim Kämmen, das Überschreiten der kleberoffenen Zeit (Hautbildung auf dem Mörtel) oder das Fehlen des Buttering-Floating-Verfahrens bei Großformaten.',
+      },
+      {
+        question: 'Wie viel Fliesenkleber benötigt man bei einer 8-mm-Zahnung?',
+        answer: 'Bei einer 8-mm-Quadratzahnung liegt der durchschnittliche Verbrauch bei etwa 3,0 bis 3,5 kg trockenem Pulverkleber pro Quadratmeter. Den genauen Bedarf in Säcken und Kilogramm können Sie mit unserem Fliesenkleber-Rechner berechnen.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Zentralverband Deutsches Baugewerbe (ZDB)',
+        citation: 'Fachinformation und Merkblatt „Hinweise für die Ausführung von Verbundabdichtungen und Verlegungen von Fliesen und Platten“',
+        url: 'https://www.zdb.de',
+      },
+      {
+        title: 'DIN EN 12004',
+        citation: 'Mörtel und Klebstoffe für Fliesen und Platten – Anforderungen und Prüfverfahren',
+        url: 'https://www.beuth.de',
+      },
+      {
+        title: 'DIN 18202',
+        citation: 'Toleranzen im Hochbau – Bauwerke (Grenzwerte für Ebenheitstoleranzen bei Wand- und Bodenflächen)',
+        url: 'https://www.beuth.de',
+      },
+    ],
+    relatedArticleSlugs: ['werktage-arbeitstage-unterschied', 'teilzeit-gehalt-berechnen'],
   },
 ];
 

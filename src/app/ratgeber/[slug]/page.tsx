@@ -63,6 +63,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+function renderParagraphWithLinks(text: string) {
+  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  if (!regex.test(text)) return text;
+
+  const elements: (string | React.ReactNode)[] = [];
+  let lastIndex = 0;
+  regex.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      elements.push(text.substring(lastIndex, match.index));
+    }
+    const [, label, href] = match;
+    elements.push(
+      <Link key={match.index} href={href} style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
+        {label}
+      </Link>
+    );
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) {
+    elements.push(text.substring(lastIndex));
+  }
+  return elements;
+}
+
 export default async function RatgeberArticlePage({ params }: PageProps) {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
@@ -182,7 +208,7 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
                   <section key={section.id} id={section.id}>
                     <h2>{section.title}</h2>
                     {section.paragraphs?.map((p, pIdx) => (
-                      <p key={pIdx}>{p}</p>
+                      <p key={pIdx}>{renderParagraphWithLinks(p)}</p>
                     ))}
 
                     {/* Section Callout */}

@@ -672,10 +672,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "4 Säcke Fliesenkleber (100 kg)"
     },
     content: {
-      intro: 'Dieser Verbrauchsrechner ermittelt die benötigte Menge an Fliesenkleber in Kilogramm basierend auf Fliesenformat, Zahnspachtelgröße und Untergrund.',
-      details: 'Formel: Verbrauch = Fläche in m² · Kleberverbrauch (kg/m²). Richtwerte: 6-mm-Zahnung ca. 2,0–2,5 kg/m²; 8-mm-Zahnung ca. 3,0–3,5 kg/m²; 10- bis 12-mm-Zahnung für Großformate ca. 4,5–6,0 kg/m².',
+      intro: 'Dieser Verbrauchsrechner ermittelt die benötigte Menge an Fliesenkleber in Kilogramm und 25-kg-Säcken basierend auf Raumfläche, Zahnspachtelgröße und Untergrund. Eine vollständige Übersicht zur passenden Kelle für jedes Format finden Sie in unserer [Zahnspachtel Größen Tabelle](/ratgeber/zahnspachtel-groessen-tabelle-fliesen/).',
+      details: 'Formel: Verbrauch = Fläche in m² · Kleberverbrauch (kg/m²) · Sicherheitsreserve. Richtwerte für den Kleberverbrauch: 6-mm-Zahnung ca. 2,4 kg/m²; 8-mm-Zahnung ca. 3,2 kg/m²; 10-mm-Zahnung ca. 4,0 kg/m²; 12-mm-Zahnung bzw. Mittelbett ca. 5,0 kg/m². Bei Großformaten ab 30 × 60 cm sowie bei Fußbodenheizung empfiehlt der ZDB zwingend das kombinierte Buttering-Floating-Verfahren.',
     },
     faqs: [
+      { question: 'Woher weiß ich, welche Zahnspachtel-Größe ich für meine Fliesen brauche?', answer: 'Die Wahl der Zahnung richtet sich nach Kantenlänge der Fliese und Untergrund. Ausführliche Richtwerte, Tabellen und Praxistipps finden Sie in unserem Ratgeber: [Zahnspachtel Größen Tabelle: Welche Zahnung für welche Fliese?](/ratgeber/zahnspachtel-groessen-tabelle-fliesen/).' },
       { question: 'Welche Zahnung benötigt man für Fliesen ab 60 × 60 cm?', answer: 'Für großformatige Fliesen empfiehlt sich mindestens eine 10-mm- oder 12-mm-Zahnung sowie das Floating-Buttering-Verfahren (Kleber auf Untergrund und Fliesenrückseite).' },
       { question: 'Welcher Fliesenkleber eignet sich für Fußbodenheizungen?', answer: 'Zwingend ein flexibler Kleber (Klassifizierung C2 TE S1 nach DIN EN 12004), der thermische Spannungen und Dehnungen des Estrichs rissfrei ausgleicht.' },
     ],
