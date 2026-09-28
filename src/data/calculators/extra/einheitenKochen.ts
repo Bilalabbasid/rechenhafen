@@ -228,11 +228,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Geschwindigkeit Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: 'Geschwindigkeit Umrechner – km/h, m/s, mph',
-    metaDescription: 'Rechnen Sie Geschwindigkeiten sekundenschnell um zwischen km/h, Meter pro Sekunde (m/s), Meilen pro Stunde (mph), Seemeilen/Knoten (kn) und Mach.',
-    h1: 'Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten ermitteln',
+    metaTitle: 'Geschwindigkeit Umrechner: km/h in m/s, mph & Knoten umrechnen | RechenHafen',
+    metaDescription: 'Rechnen Sie Geschwindigkeiten präzise um zwischen km/h, Meter pro Sekunde (m/s), Meilen pro Stunde (mph), Seemeilen/Knoten (kn) und Mach mit Formel.',
+    h1: 'Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten präzise umrechnen',
     shortDescription: 'Konvertiert km/h in m/s, Meilen pro Stunde und Seemeilen-Knoten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["geschwindigkeit umrechnen kmh ms formel","mph in kmh umrechnen meilen pro stunde","knoten in kmh seemeilen umrechner","meter pro sekunde in kmh teilen 3 6"],
+    searchKeywords: ["geschwindigkeit umrechnen kmh ms formel", "mph in kmh umrechnen meilen pro stunde", "knoten in kmh seemeilen umrechner", "meter pro sekunde in kmh teilen 3 6", "geschwindigkeit umrechner knoten"],
     inputs: [
           {
                 "id": "inputValue",
@@ -304,6 +304,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     formulaExplanation: "Der Umrechnungsfaktor 3,6 ergibt sich mathematisch exakt aus dem Verhältnis von 3.600 Sekunden pro Stunde und 1.000 Metern pro Kilometer.",
     workedExample: {
           "title": "Beispiel: 60 mph Tempolimit in den USA in km/h",
+          "description": "Ein Tempolimit von 60 mph auf US-Highways entspricht multipliziert mit dem Faktor 1,609344 genau 96,56 km/h (bzw. ca. 26,82 m/s).",
           "inputValues": [
                 {
                       "label": "Tempo",
@@ -316,14 +317,16 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "96,56 km/h"
     },
     content: {
-      intro: 'Dieser Geschwindigkeitsrechner transformiert Werte zwischen km/h, Metern pro Sekunde (m/s), Meilen pro Stunde (mph) und Knoten (Knoten kn, Seemeilen pro Stunde).',
-      details: 'Zentrale Faustregel: km/h geteilt durch 3,6 ergibt m/s (z. B. 36 km/h = 10 m/s; 100 km/h ≈ 27,78 m/s). 1 Knoten = 1 Seemeile pro Stunde = 1,852 km/h. 1 mph ≈ 1,609 km/h.',
+      intro: 'Unser Geschwindigkeitsumrechner konvertiert Tempo-Angaben zwischen den weltweit gängigen Maßeinheiten: Kilometer pro Stunde (km/h), Meter pro Sekunde (m/s), Meilen pro Stunde (mph) sowie nautischen Knoten (kn) und Schallgeschwindigkeit (Mach).',
+      details: 'Die wichtigste Umrechnungsregel in der Physik und im Alltag lautet: km/h geteilt durch 3,6 ergibt m/s (z. B. 100 km/h ≈ 27,78 m/s). Der Faktor 3,6 entsteht exakt aus 3.600 Sekunden pro Stunde geteilt durch 1.000 Meter pro Kilometer. Für die Seefahrt und Luftfahrt gilt: 1 Knoten = 1 Seemeile pro Stunde = 1,852 km/h. Für den angloamerikanischen Raum gilt: 1 mph = 1,609344 km/h. Berechnen Sie passende Distanzen mit unserem [Längen-Umrechner](/rechner/laengen-umrechner/) oder Reisezeiten mit unserem [Spritkostenrechner](/rechner/spritkostenrechner/).',
     },
     faqs: [
-      { question: 'Wie schnell ist Mach 1 (Schallgeschwindigkeit)?', answer: 'In trockener Luft bei 20 °C auf Meereshöhe beträgt die Schallgeschwindigkeit ca. 343 m/s bzw. 1.235 km/h.' },
-      { question: 'Was bedeutet die Geschwindigkeitsangabe 55 mph auf US-Highways in km/h?', answer: '55 Meilen pro Stunde entsprechen ca. 88,5 km/h.' },
+      { question: 'Wie rechnet man km/h im Kopf schnell in m/s um?', answer: 'Teilen Sie die km/h durch 3,6. Als praktische Faustregel für den Kopf: Teilen Sie den km/h-Wert durch 10 und multiplizieren Sie das Ergebnis mit knapp 3 (z. B. 50 km/h / 10 = 5; 5 × 2,8 ≈ 13,9 m/s).' },
+      { question: 'Was entspricht 1 Knoten in km/h?', answer: '1 Knoten (kn) ist definiert als eine Seemeile (1.852 Meter) pro Stunde. Somit entspricht 1 Knoten exakt 1,852 km/h bzw. ca. 0,514 m/s.' },
+      { question: 'Wie schnell ist Mach 1 bei normalen Temperaturen?', answer: 'Mach 1 bezeichnet die Schallgeschwindigkeit. In trockener Luft bei 20 °C auf Meereshöhe beträgt die Schallgeschwindigkeit ca. 343 m/s bzw. 1.234,8 km/h.' },
+      { question: 'Wie viel km/h sind 70 mph im Großbritannien- oder USA-Urlaub?', answer: '70 mph (das typische Autobahn-Tempolimit in den USA und Großbritannien) entsprechen ca. 112,65 km/h.' },
     ],
-    relatedSlugs: ['drehzahl-umfangsgeschwindigkeit-rechner', 'laengen-umrechner', 'kraftstoffverbrauch-umrechner', 'zeit-umrechner'],
+    relatedSlugs: ['drehzahl-umfangsgeschwindigkeit-rechner', 'laengen-umrechner', 'zeit-umrechner', 'spritkostenrechner', 'kraftstoffverbrauch-umrechner'],
   },
   {
     id: "volumen-umrechner",

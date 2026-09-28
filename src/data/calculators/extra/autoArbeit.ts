@@ -10,11 +10,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'KFZ-Steuer berechnen',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'KFZ-Steuer Rechner – Kraftfahrzeugsteuer für Benzin, Diesel',
-    metaDescription: 'Berechnen Sie die jährliche KFZ-Steuer für Ihr Auto nach Hubraum und CO2-Ausstoß (g/km) gemäß aktuellem Kraftfahrzeugsteuergesetz (KraftStG).',
-    h1: 'KFZ-Steuer Rechner – Jährliche Autosteuer online berechnen',
-    shortDescription: 'Ermittelt die exakte Kraftfahrzeugsteuer für Pkw mit Benzin-, Diesel- oder Hybridantrieb.',
-    searchKeywords: ['kfz steuer rechner', 'autosteuer berechnen co2 hubraum', 'diesel kfz steuer tabelle', 'kraftfahrzeugsteuer pkw'],
+    metaTitle: 'KFZ-Steuer-Rechner 2026: Autosteuer nach Hubraum & CO2 berechnen | RechenHafen',
+    metaDescription: 'Berechnen Sie die jährliche KFZ-Steuer für Benziner, Diesel und Elektroautos nach Hubraum und CO2-Ausstoß (g/km) gemäß aktuellem KraftStG 2026.',
+    h1: 'KFZ-Steuer-Rechner 2026 – Autosteuer für Benziner, Diesel & Elektro berechnen',
+    shortDescription: 'Ermittelt die exakte Kraftfahrzeugsteuer für Pkw mit Benzin-, Diesel- oder Elektroantrieb nach aktuellen gesetzlichen Vorgaben.',
+    searchKeywords: ['kfz steuer rechner', 'kraftfahrzeugsteuer berechnen', 'autosteuer rechner', 'kfz steuer rechner 2026', 'diesel kfz steuer tabelle', 'kfz steuer elektroauto berechnen', 'kfz steuer nach hubraum berechnen', 'wie hoch ist meine kfz steuer', 'autosteuer berechnen co2 hubraum'],
     inputs: [
       {
         id: 'engineType',
@@ -27,8 +27,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { value: 'electric', label: 'Elektrofahrzeug (Bis 2030 steuerbefreit, danach 50 % ermäßigt)' },
         ],
       },
-      { id: 'displacementCc', label: 'Hubraum in cm³ (z. B. 1998 cm³)', type: 'number', defaultValue: 1998, min: 0, max: 8000, step: 100, unit: 'cm³' },
-      { id: 'co2EmissionsGkm', label: 'CO2-Ausstoß in g/km (nach WLTP)', type: 'number', defaultValue: 135, min: 0, max: 400, step: 1, unit: 'g/km' },
+      { id: 'displacementCc', label: 'Hubraum in cm³ (Feld P.1 im Fahrzeugschein)', type: 'number', defaultValue: 1998, min: 0, max: 8000, step: 100, unit: 'cm³' },
+      { id: 'co2EmissionsGkm', label: 'CO2-Ausstoß in g/km (Feld V.7 nach WLTP)', type: 'number', defaultValue: 135, min: 0, max: 400, step: 1, unit: 'g/km' },
     ],
     calculate: (inputs) => {
       const type = inputs.engineType || 'petrol';
@@ -77,25 +77,35 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     formulaExplanation: 'Rechtsgrundlage ist § 9 KraftStG mit progressiver CO2-Staffel für Zulassungen ab 2021.',
     workedExample: {
       title: 'Beispiel: 1.998 cm³ Benziner mit 135 g/km CO2',
+      description: 'Berechnung für einen 1.998 cm³ Benziner mit 135 g/km CO2-Ausstoß: Hubraum-Sockelbetrag (20 × 2,00 € = 40,00 €) plus progressiver CO2-Aufschlag (40 g über Freigrenze 95 g/km = 84,00 €) ergibt 124,00 € KFZ-Steuer pro Jahr.',
       inputValues: [{ label: 'Hubraum', value: '1.998 cm³' }, { label: 'CO2', value: '135 g/km' }],
       steps: ['Hubraum: 20 × 2,00 € = 40,00 €', 'CO2-Zuschlag (40 g über 95): 20 × 2,00 € + 20 × 2,20 € = 84,00 €', 'Gesamt = 40 € + 84 € = 124,00 €/Jahr'],
       result: '124,00 € jährliche Steuer',
     },
     content: {
-      intro: 'Die deutsche Kraftfahrzeugsteuer nach § 8 KraftStG bemisst sich bei Erstzulassungen ab 2021 nach Hubraum und dem linearen CO₂-Ausstoß.',
-      details: 'Benziner zahlen 2,00 € je angefangene 100 cm³ Hubraum, Diesel 9,50 €. Hinzu kommt ein progressiver CO₂-Zuschlag ab 95 g/km von 2,00 € bis zu 4,00 € pro Gramm über 195 g/km. Reine Elektroautos sind bis Ende 2030 steuerbefreit.',
+      intro: 'Die deutsche Kraftfahrzeugsteuer nach dem KraftStG bemisst sich bei Pkw mit Erstzulassung ab 2021 zweigeteilt: aus einem festen Hubraumbetrag je angefangene 100 cm³ und einem progressiv gestaffelten CO₂-Zuschlag für jede Emission über der Freigrenze von 95 g/km.',
+      details: 'Die relevanten Messwerte finden Sie in Ihrer Zulassungsbescheinigung Teil I (Fahrzeugschein): Der Hubraum steht in Feld P.1, der kombinierte CO₂-Wert nach WLTP in Feld V.7 und die Antriebsart in Feld 14. Benziner zahlen 2,00 € je 100 cm³, Dieselfahrzeuge 9,50 € je 100 cm³. Reine Elektrofahrzeuge sind bei Erstzulassung bis Ende 2025 für bis zu 10 Jahre, längstens bis zum 31.12.2030, komplett von der Steuer befreit. Planen Sie auch Ihre laufenden Betriebskosten mit unserem [Spritkostenrechner](/rechner/spritkostenrechner/) und dem [Auto-Wertverlust-Rechner](/rechner/auto-wertverlust-rechner/).',
     },
     faqs: [
-      { question: 'Warum zahlen Diesel-Fahrzeuge deutlich höhere Hubraumsteuern als Benziner?', answer: 'Weil die Mineralölsteuer auf Dieselkraftstoff an der Tankstelle steuerlich subventioniert wird; der Gesetzgeber gleicht diesen Steuervorteil über die höhere Kfz-Steuer aus.' },
-      { question: 'Bis wann sind Elektrofahrzeuge von der Kfz-Steuer befreit?', answer: 'Reine E-Autos mit Erstzulassung bis 31.12.2025 sind für bis zu 10 Jahre, längstens jedoch bis zum 31.12.2030, vollständig von der Kraftfahrzeugsteuer befreit.' },
+      { question: 'Wo finde ich Hubraum und CO₂-Ausstoß im Fahrzeugschein (Zulassungsbescheinigung Teil I)?', answer: 'Der Hubraum in Kubikzentimetern (cm³) ist in Feld P.1 vermerkt. Der für die Steuer maßgebliche CO₂-Ausstoß in g/km (nach dem realistischeren WLTP-Messverfahren) ist in Feld V.7 eingetragen. Die Antriebsart (z. B. Benzin, Diesel, Elektro) steht in Feld 14.' },
+      { question: 'Warum ist die KFZ-Steuer für Diesel so viel höher als für Benziner?', answer: 'Diesel-Pkw werden mit 9,50 € pro angefangene 100 cm³ besteuert (Benziner: 2,00 €). Der Gesetzgeber gleicht damit die niedrigere Mineralölsteuer bzw. Energiesteuer auf Dieselkraftstoff an den Tankstellen steuerlich aus.' },
+      { question: 'Wie funktioniert die progressive CO₂-Staffel ab Erstzulassung 2021?', answer: 'Emissionen bis 95 g/km sind zuschlagfrei. Darüber greift ein Stufentarif: 96–115 g/km kosten 2,00 € je Gramm; 116–135 g/km kosten 2,20 €; 136–155 g/km kosten 2,50 €; 156–175 g/km kosten 2,90 €; 176–195 g/km kosten 3,40 €; ab 196 g/km fallen 4,00 € je Gramm an.' },
+      { question: 'Gilt die Steuerbefreiung für Elektroautos auch bei Halterwechsel?', answer: 'Ja. Die bis zu zehnjährige Steuerbefreiung nach § 3d KraftStG (maximal bis zum 31.12.2030) ist fahrzeuggebunden und geht bei Verkauf oder Umschreibung eines gebrauchten E-Autos auf den neuen Halter über.' },
+      { question: 'Wie werden Plug-in-Hybride (PHEV) bei der KFZ-Steuer behandelt?', answer: 'Plug-in-Hybride gelten steuerlich nicht als reine Elektroautos. Sie werden wie herkömmliche Verbrenner nach Hubraum (Benzin oder Diesel) plus CO₂-Ausstoß besteuert, profitieren aber durch den Elektromotor meist von einem sehr geringen offiziellen CO₂-Wert.' },
     ],
-    relatedSlugs: ['motorrad-unterhaltskosten-rechner', 'co2-auto-rechner', 'dienstwagen-1-prozent-rechner', 'spritkostenrechner'],
+    relatedSlugs: ['motorrad-unterhaltskosten-rechner', 'co2-auto-rechner', 'dienstwagen-1-prozent-rechner', 'spritkostenrechner', 'auto-wertverlust-rechner', 'autokreditrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
       source: 'Kraftfahrzeugsteuergesetz (§ 8, § 9 KraftStG)',
       sourceUrl: 'https://www.bundesfinanzministerium.de',
       lastVerified: '2026-01-15',
+    },
+    trustMeta: {
+      legalBasis: 'Kraftfahrzeugsteuergesetz (§ 8, § 9, § 3d KraftStG)',
+      sourceName: 'Bundesfinanzministerium (BMF)',
+      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      lastReviewed: '2026-01-15',
     },
   },
 
@@ -2585,11 +2595,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Bürgergeld-Rechner',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Netto',
-    metaTitle: 'Bürgergeld Rechner 2026 – Regelsatz, Miete',
-    metaDescription: 'Berechnen Sie Ihren Bürgergeld-Bedarf nach SGB II: Gesetzliche Regelbedarfe (563 € für Alleinstehende) plus Kosten für Warmmiete und Heizung.',
-    h1: 'Bürgergeld Rechner – Gesetzlichen Bürgergeld-Anspruch ermitteln',
-    shortDescription: 'Kalkuliert den monatlichen Gesamtbedarf nach SGB II aus Regelsatz und Wohnkosten.',
-    searchKeywords: ['buergergeld rechner 2026', 'regelsatz buergergeld alleinerziehend', 'kosten der unterkunft kdu buergergeld', 'sgb ii anspruch berechnen'],
+    metaTitle: 'Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen | RechenHafen',
+    metaDescription: 'Berechnen Sie Ihren Bürgergeld-Anspruch 2026 nach SGB II: Gesetzliche Regelbedarfe (563 € für Alleinstehende), Warmmiete (KdU) und Freibeträge bei Erwerbseinkommen.',
+    h1: 'Bürgergeld-Rechner 2026 – Gesetzlichen Anspruch nach SGB II ermitteln',
+    shortDescription: 'Kalkuliert den monatlichen Gesamtbedarf nach SGB II aus gesetzlichem Regelsatz, Miete, Heizung und anrechenbarem Einkommen.',
+    searchKeywords: ['buergergeld rechner 2026', 'buergergeld anspruch berechnen', 'regelsatz buergergeld alleinerziehend', 'kosten der unterkunft kdu buergergeld', 'sgb ii anspruch berechnen', 'schonvermoegen buergergeld', 'buergergeld miete heizung'],
     inputs: [
       {
         id: 'householdType',
@@ -2631,26 +2641,36 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     formulaExplanation: 'Im ersten Jahr des Bürgergeldbezugs gilt eine Karenzzeit für Wohnen und Vermögen: Die tatsächlichen Wohnkosten werden in voller Höhe übernommen.',
     workedExample: {
       title: 'Beispiel: Alleinstehend mit 1 Kind und 720 € Warmmiete',
+      description: 'Berechnung für eine alleinstehende Person mit einem Kind und 720 € tatsächlicher Warmmiete: Der Regelbedarf für Alleinstehende (563 €) und Kind (ca. 390 €) ergibt 953 € Regelbedarf. Zusammen mit den Wohnkosten (720 €) beläuft sich der monatliche Auszahlungsanspruch auf 1.673,00 €.',
       inputValues: [{ label: 'Typ', value: 'Alleinstehend' }, { label: 'Kinder', value: '1 Kind' }, { label: 'Warmmiete', value: '720 €' }],
       steps: ['Regelsatz Erwachsene = 563 €', 'Regelsatz Kind ca. = 390 €', 'Wohnkosten = 720 €', 'Gesamtanspruch = 1.673 € monatlich'],
       result: '1.673,00 € monatlicher Anspruch',
     },
     content: {
-      intro: 'Das Bürgergeld (Grundsicherung für Arbeitsuchende nach dem SGB II) sichert das soziokulturelle Existenzminimum für erwerbsfähige Hilfebedürftige und ihre Familien.',
-      details: 'Der Gesamtanspruch setzt sich aus dem monatlichen Regelbedarf (für Alleinstehende, Partner und Kinder) sowie den tatsächlichen, angemessenen Kosten der Unterkunft und Heizung (KdU) abzüglich anrechenbaren Einkommens und Vermögens zusammen.',
+      intro: 'Das Bürgergeld (Grundsicherung für Arbeitsuchende nach dem Zweiten Buch Sozialgesetzbuch – SGB II) sichert das verfassungsrechtlich garantierte Existenzminimum für erwerbsfähige Hilfebedürftige und deren Familienmitglieder.',
+      details: 'Der monatliche Bürgergeld-Gesamtbedarf setzt sich aus den gesetzlichen Regelbedarfen (563 € für Alleinstehende, 506 € je volljährigem Partner in einer Bedarfsgemeinschaft) und den tatsächlichen Kosten der Unterkunft und Heizung (KdU) zusammen. Im ersten Bezugsjahr (Karenzzeit) übernimmt das Jobcenter die tatsächlichen Warmmietkosten in voller Höhe. Erwerbseinkommen wird nicht voll abgezogen: Über den Grundabsetzbetrag (100 €) und prozentuale Erwerbstätigenfreibeträge lohnt sich eigenes Arbeiten immer. Vergleichen Sie Ihr Einkommen auch mit unserem [Teilzeit-Gehaltsrechner](/rechner/teilzeit-gehaltsrechner/) oder prüfen Sie die Nebenkosten mit dem [Warmmiete zu Kaltmiete Rechner](/rechner/warmmiete-zu-kaltmiete-rechner/). Ausführliche rechtliche Grundlagen finden Sie im [Ratgeber Teilzeitgehalt berechnen](/ratgeber/teilzeit-gehalt-berechnen/).',
     },
     faqs: [
-      { question: 'Wie viel Schonvermögen ist beim Bürgergeld geschützt?', answer: 'In der einjährigen Karenzzeit gilt ein Schonvermögen von 40.000 € für die erste Person und 15.000 € für jede weitere Person; danach gilt ein Vermögensfreibetrag von 15.000 € pro Person.' },
-      { question: 'Wie werden Einkommen aus Erwerbstätigkeit auf das Bürgergeld angerechnet?', answer: 'Die ersten 100 € sind voll anrechnungsfrei (Grundabsetzbetrag); darüber hinausgehende Erwerbseinkommen bleiben gestaffelt zu 20 bis 30 Prozent anrechnungsfrei (Erwerbstätigenfreibetrag).' },
+      { question: 'Wie hoch ist der Bürgergeld-Regelsatz 2026?', answer: 'Für Alleinstehende und Alleinerziehende beträgt der Regelsatz 563 € monatlich. Volljährige Partner in einer Bedarfsgemeinschaft erhalten jeweils 506 €. Für Kinder und Jugendliche gelten gestaffelte Sätze: 357 € (0–5 Jahre), 390 € (6–13 Jahre) und 471 € (14–17 Jahre).' },
+      { question: 'Welches Schonvermögen ist in der Karenzzeit geschützt?', answer: 'In den ersten 12 Monaten des Bürgergeldbezugs (Karenzzeit) bleibt ein Vermögen von bis zu 40.000 € für die erste Person und jeweils 15.000 € für jede weitere Person im Haushalt unberücksichtigt. Nach der Karenzzeit gilt ein einheitlicher Freibetrag von 15.000 € pro Person.' },
+      { question: 'Wie viel darf ich zum Bürgergeld anrechnungsfrei hinzuverdienen?', answer: 'Die ersten 100 € Bruttoeinkommen aus Erwerbstätigkeit sind als Grundabsetzbetrag komplett anrechnungsfrei. Im Bereich von 100 € bis 520 € bleiben 20 % anrechnungsfrei, von 520 € bis 1.000 € bleiben 30 % frei (bei Kindern bis 1.200 € bzw. 1.500 €).' },
+      { question: 'Welche Wohnkosten werden vom Jobcenter übernommen?', answer: 'Das Jobcenter übernimmt die angemessene Kaltmiete sowie die Betriebskosten und tatsächlichen Heizkosten. Im ersten Jahr gilt eine Angemessenheitsvermutung (Karenzzeit) für die Miethöhe; Heizkosten müssen jedoch auch während der Karenzzeit in angemessenem Rahmen bleiben.' },
+      { question: 'Wann lohnt sich Wohngeld und Kinderzuschlag mehr als Bürgergeld?', answer: 'Wenn Ihr eigenes Einkommen knapp ausreicht, um den Lebensunterhalt ohne SGB II zu decken, haben Wohngeld und der Kinderzuschlag (KiZ) Vorrang. Dies schützt vor dem Gang zum Jobcenter und vermeidet die Offenlegung der Vermögensverhältnisse im Rahmen des Bürgergelds.' },
     ],
-    relatedSlugs: ['arbeitslosengeld-1-rechner', 'warmmiete-zu-kaltmiete-rechner', 'teilzeit-gehaltsrechner'],
+    relatedSlugs: ['arbeitslosengeld-1-rechner', 'warmmiete-zu-kaltmiete-rechner', 'teilzeit-gehaltsrechner', 'brutto-netto-rechner', 'midijob-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundesministerium für Arbeit und Soziales (§ 20 SGB II)',
       sourceUrl: 'https://www.bmas.de',
       lastVerified: '2026-01-15',
-    }
+    },
+    trustMeta: {
+      legalBasis: 'Zweites Buch Sozialgesetzbuch (§ 20, § 22 SGB II)',
+      sourceName: 'Bundesministerium für Arbeit und Soziales (BMAS)',
+      sourceUrl: 'https://www.bmas.de',
+      lastReviewed: '2026-01-15',
+    },
   },
 
   {

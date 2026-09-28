@@ -1250,11 +1250,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Schalungsstein-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: 'Schalungssteine Rechner – Steine, Füllbeton',
-    metaDescription: 'Berechnen Sie die Anzahl Schalungssteine (17,5er, 24er, 30er), das Verfüllbetonvolumen in m³ und den Bedarf an Baustahl nach Wandmaßen.',
-    h1: 'Schalungssteine Rechner – Steine, Füllbeton & Baustahl ermitteln',
+    metaTitle: 'Schalungssteine Rechner: Steine & Füllbeton (m³) für Stützmauer berechnen | RechenHafen',
+    metaDescription: 'Berechnen Sie die benötigte Anzahl an Schalungssteinen (17,5er, 24er, 30er) sowie das Füllbeton-Volumen in m³ und Bewehrungsstahl für Stützmauern und Fundamente.',
+    h1: 'Schalungssteine Rechner – Steinbedarf, Füllbeton (m³) & Bewehrungsstahl berechnen',
     shortDescription: 'Berechnet Schalungssteine und Verfüllbeton für Stützmauern und Poolwände mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["schalungssteine rechner fuellbeton","betonschalungssteine menge stuetzmauer","fuellbeton m3 schalungsstein 24er","bewehrungsstahl schalungsstein"],
+    searchKeywords: ["schalungssteine rechner fuellbeton", "betonschalungssteine menge stuetzmauer", "fuellbeton m3 schalungsstein 24er", "bewehrungsstahl schalungsstein", "schalungsstein bedarf pro m2"],
     inputs: [
           {
                 "id": "wallLength",
@@ -1346,6 +1346,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     formulaExplanation: "Schalungssteine werden trocken im Verband aufgesetzt, mit Baustahl bewehrt und anschließend kammerweise mit flüssigem Beton verfüllt.",
     workedExample: {
           "title": "Beispiel: 8 m × 1,5 m Stützmauer mit 24er Schalungssteinen",
+          "description": "Für eine Stützmauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen und 5 % Verschnitt werden 101 Schalungssteine (Standardmaß 50×25 cm) sowie ca. 1,83 m³ Verfüllbeton (ca. 4,2 Tonnen) und rund 115 Meter Bewehrungsstahl benötigt.",
           "inputValues": [
                 {
                       "label": "Wandmaß",
@@ -1363,14 +1364,23 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "101 Schalungssteine und 1,83 m³ Verfüllbeton"
     },
     content: {
-      intro: 'Schalungssteine (Hohlblocksteine aus Beton) werden trocken im Verband aufgestellt, bewehrt und anschließend mit flüssigem Beton verfüllt.',
-      details: 'Steinbedarf = Wandfläche in m² · Steine pro m² (typisch 8 Stück bei Standardmaßen 50 × 25 cm). Der Betonfüllbedarf beträgt je nach Steinbreite (17,5 bis 30 cm) ca. 100 bis 180 Liter Beton pro Quadratmeter Wand.',
+      intro: 'Schalungssteine (auch Beton-Schalungssteine oder Hohlwandsteine genannt) sind das ideale Bauelement für massive Gartenstützmauern, Poolwände, Zaunsockel und Kellerwände.',
+      details: 'Die Steine werden trocken und fugenlos im Halbsteinverband aufgesetzt, mit horizontalem und vertikalem Bewehrungsstahl armiert und anschließend mit flüssigem Verfüllbeton (mindestens Festigkeitsklasse C20/25) ausgegossen. Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden exakt 8 Steine pro Quadratmeter Mauerfläche benötigt. Der Betonfüllbedarf variiert stark nach der Steinbreite: Ein 17,5er Stein benötigt ca. 100 Liter Beton/m², ein 24er Stein ca. 145 l/m² und ein 30er Stein ca. 195 l/m². Berechnen Sie das genaue Mischverhältnis und Material für den Beton mit unserem [Betonrechner](/rechner/betonrechner/) und dem [Beton-Mischungsverhältnis Rechner](/rechner/beton-mischungsverhaeltnis-rechner/).',
     },
     faqs: [
-      { question: 'Wie viel Armierungsstahl gehört in Schalungssteine?', answer: 'In der Regel werden horizontal 2 Stäbe Betonstahl (z. B. 10 mm) pro Steinreihe in die Aussparungen gelegt und vertikal alle 25 bis 50 cm Stäbe ins Fundament eingesteckt.' },
-      { question: 'Wie hoch darf man Schalungssteine vor dem Betonieren aufstellen?', answer: 'Um ein Platzen der Steine durch den hydrostatischen Betondruck zu verhindern, sollten maximal 3 bis 4 Steinreihen (ca. 75 bis 100 cm) in einem Guss verfüllt werden.' },
+      { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Handelsübliche Schalungssteine haben die Maße 50 cm Länge und 25 cm Höhe. Für einen Quadratmeter Maueransichtsfläche werden daher genau 8 Steine benötigt (1 m² / (0,5 m × 0,25 m) = 8 Stück). Planen Sie ca. 5 % Verschnitt für Passstücke und Ecksteine ein.' },
+      { question: 'Wie viel Füllbeton benötigt man für 24er Schalungssteine?', answer: 'Für Schalungssteine mit 24 cm Wandstärke rechnet man im Schnitt mit 140 bis 150 Litern (ca. 0,145 m³) Verfüllbeton pro Quadratmeter Wandfläche. Für 10 m² Mauer werden demnach rund 1,45 m³ Beton benötigt.' },
+      { question: 'Welcher Beton eignet sich zum Verfüllen von Schalungssteinen?', answer: 'Empfohlen wird Normalbeton der Festigkeitsklasse C20/25 oder C25/30 mit einer Fließkonsistenz (F3/F4) und einer maximalen Gesteinskörnung von 8 bis 16 mm, damit sich der Beton ohne Hohlräume um die Armierungseisen verteilt.' },
+      { question: 'Wie viel Bewehrungsstahl gehört in eine Schalungssteinwand?', answer: 'In der Regel werden horizontal 2 Stäbe Baustahl (z. B. Ø 10 mm) in jede Steinlage in die Aussparungen gelegt sowie vertikal alle 25 bis 50 cm Stäbe eingesetzt, die kraftschlüssig mit dem Fundament verbunden sind.' },
+      { question: 'Wie viele Steinreihen darf man auf einmal mit Beton füllen?', answer: 'Wegen des hohen hydrostatischen Betondrucks sollten Sie maximal 3 bis 4 Steinreihen (ca. 75 bis 100 cm Höhe) in einem Betoniervorgang verfüllen und mit einem Rüttler oder Stab sorgfältig verdichten.' },
     ],
-    relatedSlugs: ['betonrechner', 'fundament-rechner', 'bausteine-mauerwerk-rechner'],
+    relatedSlugs: ['betonrechner', 'fundament-rechner', 'beton-mischungsverhaeltnis-rechner', 'bausteine-mauerwerk-rechner'],
+    trustMeta: {
+      legalBasis: 'DIN 1045 (Tragwerke aus Beton, Stahlbeton und Spannbeton) & DIN EN 771-3',
+      sourceName: 'Bundesverband der Deutschen Transportbetonindustrie / DIN-Normen',
+      sourceUrl: 'https://www.transportbeton.de',
+      lastReviewed: '2026-01-15',
+    },
   },
   {
     id: "fassadenfarbe-rechner",
@@ -3187,11 +3197,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kreisumfang-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: 'Kreisumfang Rechner – Umfang berechnen mit U = 2·π·r',
-    metaDescription: 'Berechnen Sie den Kreisumfang direkt aus Radius oder Durchmesser nach der Formel U = 2·π·r mit präzisen Einheiten.',
-    h1: 'Kreisumfang Rechner – Exakten Umfang aus Radius berechnen',
+    metaTitle: 'Kreisumfang berechnen: Rechner & Formel (U = 2·π·r = π·d) | RechenHafen',
+    metaDescription: 'Berechnen Sie den Kreisumfang direkt aus Radius oder Durchmesser nach der Formel U = 2·π·r = π·d. Inklusive Rechenweg, Kreisfläche und Umkehrformeln.',
+    h1: 'Kreisumfang Rechner – Exakten Umfang aus Radius oder Durchmesser berechnen',
     shortDescription: 'Berechnet den genauen Umfang eines Kreises aus Radius oder Durchmesser nach der mathematischen Formel U = 2·π·r.',
-    searchKeywords: ['kreisumfang rechner', 'kreisumfang rechner formel', 'umfang kreis durchmesser pi', 'kreisumfang u 2 pi r berechnen', 'kreis flaeche umfang umrechnen'],
+    searchKeywords: ['kreisumfang rechner', 'kreisumfang berechnen', 'umfang kreis durchmesser pi', 'formel kreisumfang', 'kreisumfang u 2 pi r berechnen', 'durchmesser aus umfang berechnen', 'kreis flaeche umfang umrechnen'],
     inputs: [
           {
                 "id": "inputType",
@@ -3250,6 +3260,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     formulaExplanation: "Die Kreiszahl Pi (π ≈ 3,14159) beschreibt das feste Verhältnis zwischen dem Umfang eines jeden Kreises und seinem Durchmesser.",
     workedExample: {
           "title": "Beispiel: Kreis mit Durchmesser d = 10 cm",
+          "description": "Für einen Kreis mit einem Durchmesser von 10 cm (Radius r = 5 cm) beträgt der Umfang U = π × 10 cm ≈ 31,42 cm. Die zugehörige Kreisfläche beläuft sich auf A = π × 5² ≈ 78,54 cm².",
           "inputValues": [
                 {
                       "label": "Durchmesser",
@@ -3264,14 +3275,16 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "U = 31,42 cm, A = 78,54 cm²"
     },
     content: {
-      intro: 'Dieser Rechner ermittelt den Umfang eines Kreises aus Radius oder Durchmesser und dient der Dimensionierung von Rundstrecken, Rohren und Baumstämmen.',
-      details: 'Umfang U = pi · d = 2 · pi · r. In der Forstwirtschaft wird der Stammumfang in Brusthöhe (1,30 m) gemessen und durch Pi geteilt, um den Stammdurchmesser (BHD) ohne Fällung zu bestimmen.',
+      intro: 'Mit unserem Kreisumfang-Rechner ermitteln Sie in Sekundenschnelle den Umfang eines Kreises wahlweise aus dem Radius (r), dem Durchmesser (d) oder direkt aus der Umkehrung des Umfangs.',
+      details: 'Die klassische Kreisumfangsformel lautet U = 2 · π · r bzw. U = π · d mit der Kreiszahl Pi (π ≈ 3,14159265). Benötigen Sie stattdessen die Umkehrformel, um den Durchmesser aus einem gemessenen Umfang zu berechnen (z. B. beim Vermessen von runden Baumstämmen, Säulen oder runden Pools), gilt d = U / π. Für die vollständige Geometrie inklusive Kreissektoren und Kreisbogen nutzen Sie unseren [Kreisrechner (Flächeninhalt & Radius)](/rechner/kreisrechner/), den [Zylinder-Rechner](/rechner/zylinderrechner/) oder den [Kreissegment-Rechner](/rechner/kreissegment-rechner/).',
     },
     faqs: [
-      { question: 'Wie lang ist die Umlaufbahn der Erde um die Sonne näherungsweise?', answer: 'Bei einem mittleren Sonnenabstand von ca. 149,6 Mio. km beträgt der Erdumfang U ≈ 2 · pi · 149,6 Mio. km ≈ 940 Millionen Kilometer pro Jahr.' },
-      { question: 'Wie viel Zaun benötigt man für ein rundes Beet mit 4 m Durchmesser?', answer: 'U = pi · 4 m ≈ 12,57 Meter Zaunlänge.' },
+      { question: 'Wie lautet die Formel zur Berechnung des Kreisumfangs?', answer: 'Der Kreisumfang U berechnet sich aus dem doppelten Radius multipliziert mit Pi: U = 2 · π · r. Da der Durchmesser d dem doppelten Radius entspricht (d = 2r), lässt sich der Umfang ebenso einfach über U = π · d ermitteln.' },
+      { question: 'Wie berechnet man den Durchmesser, wenn nur der Umfang bekannt ist?', answer: 'Teilen Sie den gemessenen Umfang einfach durch die Kreiszahl Pi: d = U / π. Bei einem gemessenen Stammumfang von 94,2 cm beträgt der Durchmesser beispielsweise 94,2 / 3,14159 ≈ 30 cm.' },
+      { question: 'Wie viel Umzäunung braucht ein rundes Gartenbeet?', answer: 'Messen Sie den Durchmesser des Beets quer durch die Mitte und multiplizieren Sie das Maß mit 3,1416. Bei einem Beet-Durchmesser von 4 Metern benötigen Sie ca. 12,57 Meter Beeteinfassung oder Zaun.' },
+      { question: 'Was ist der Unterschied zwischen Kreisumfang und Kreisfläche?', answer: 'Der Umfang (U) beschreibt die eindimensionale Länge der Begrenzungslinie (Einheit: cm, m), während die Fläche (A = π · r²) das zweidimensionale Areal im Inneren des Kreises beziffert (Einheit: cm², m²).' },
     ],
-    relatedSlugs: ['ringgroesse-umrechner', 'ellipse-flaeche-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'kugel-oberflaeche-rechner', 'kreissegment-rechner'],
+    relatedSlugs: ['kreisrechner', 'zylinderrechner', 'kreissegment-rechner', 'ringgroesse-umrechner', 'ellipse-flaeche-rechner'],
   },
   {
     id: "kegel-volumen-rechner",
