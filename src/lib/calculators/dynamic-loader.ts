@@ -62,6 +62,7 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "kalendertage-rechner": "datumZeit",
   "arbeitszeitrechner": "datumZeit",
   "tage-zwischen-zwei-daten": "datumZeit",
+  "tage-bis-weihnachten": "datumZeit",
   "arbeitstage-rechner": "datumZeit",
   "werktage-rechner": "datumZeit",
   "datum-plus-tage": "datumZeit",

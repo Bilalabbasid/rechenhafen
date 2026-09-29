@@ -1,5 +1,6 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+import { parseDateParts } from '@/lib/calculators/dateMath';
 
 export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
   // ==================== DATUM & ZEIT (2) ====================
@@ -74,23 +75,24 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'entryDate', label: 'Eintrittsdatum in das Unternehmen', type: 'date', defaultValue: '2016-01-01' },
     ],
     calculate: (inputs) => {
-      const entry = new Date(inputs.entryDate || '2016-01-01');
-      if (isNaN(entry.getTime())) {
-        return { primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: 'Ungültig' }, error: 'Bitte gültiges Datum eingeben' };
+      const parts = parseDateParts(inputs.entryDate || '2016-01-01');
+      if (!parts) {
+        return { primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: 'Ungültig' }, error: 'Bitte geben Sie ein gültiges Datum im Format TT.MM.JJJJ oder JJJJ-MM-TT ein.' };
       }
-      const y = entry.getFullYear();
-      const m = entry.getMonth() + 1;
-      const d = entry.getDate();
-      const pad = (n: number) => (n < 10 ? '0' + n : n);
+      const y = parts.year;
+      const m = parts.month;
+      const d = parts.day;
+      const pad = (n: number) => (n < 10 ? '0' + n : String(n));
       const j10 = `${pad(d)}.${pad(m)}.${y + 10}`;
       const j25 = `${pad(d)}.${pad(m)}.${y + 25}`;
       const j40 = `${pad(d)}.${pad(m)}.${y + 40}`;
+      const j50 = `${pad(d)}.${pad(m)}.${y + 50}`;
       return {
         primary: { id: 'j25', label: '25-jähriges Dienstjubiläum', value: y + 25, formattedValue: j25, highlight: true },
         secondary: [
           { id: 'j10', label: '10-jähriges Jubiläum', value: y + 10, formattedValue: j10 },
           { id: 'j40', label: '40-jähriges Jubiläum', value: y + 40, formattedValue: j40 },
-          { id: 'j50', label: '50-jähriges Jubiläum', value: y + 50, formattedValue: `${pad(d)}.${pad(m)}.${y + 50}` },
+          { id: 'j50', label: '50-jähriges Jubiläum', value: y + 50, formattedValue: j50 },
         ],
         summaryText: `Bei einem Diensteintritt am ${pad(d)}.${pad(m)}.${y} vollenden Sie Ihr 10-jähriges Jubiläum am ${j10}, Ihr 25-jähriges Jubiläum am ${j25} und Ihr 40-jähriges Jubiläum am ${j40}.`,
       };

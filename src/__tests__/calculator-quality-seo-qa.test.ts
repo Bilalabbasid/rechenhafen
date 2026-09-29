@@ -82,7 +82,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
       }
     });
 
-    it('verifies generateMetadata for all 420 calculator routes renders brand suffix exactly once', async () => {
+    it('verifies generateMetadata for all 421 calculator routes renders brand suffix exactly once', async () => {
       const template = '%s | RechenHafen';
       for (const calc of ALL_CALCULATORS) {
         const meta = await generateCalcMetadata({ params: Promise.resolve({ slug: calc.slug }) });
@@ -107,7 +107,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   // =========================================================================
   describe('Calculator Registry & Route Smoke Tests', () => {
     it('discovers all registered calculators from real registry with self-referencing canonicals and exactly one H1', async () => {
-      expect(ALL_CALCULATORS.length).toBe(420);
+      expect(ALL_CALCULATORS.length).toBe(421);
 
       for (const calc of ALL_CALCULATORS) {
         // Self-referencing canonical

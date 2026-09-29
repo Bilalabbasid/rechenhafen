@@ -1,3 +1,5 @@
+import { formatDateGerman } from '@/lib/calculators/dateMath';
+
 /**
  * RechenHafen Formatierungs-Helfer
  * Einheitliche deutsche Zahlen-, Währungs-, Prozent- und Datumsformatierung.
@@ -44,13 +46,7 @@ export function formatPercent(
 
 export function formatDateDe(dateInput: Date | string | undefined | null): string {
   if (!dateInput) return '';
-  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-  if (isNaN(date.getTime())) return '';
-  return new Intl.DateTimeFormat('de-DE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date);
+  return formatDateGerman(dateInput);
 }
 
 export function parseGermanNumber(val: string | number): number {

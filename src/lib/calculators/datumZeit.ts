@@ -1,6 +1,15 @@
 import { CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
 import { getGermanHolidays, FederalState, FEDERAL_STATES } from '@/lib/holidays';
+import {
+  calculateCalendarDiff,
+  calculateTagerechner,
+  calculateTageBisWeihnachten,
+  formatDateGerman,
+  parseDateParts,
+} from '@/lib/calculators/dateMath';
+
+export { calculateTagerechner, calculateTageBisWeihnachten };
 
 export function calculateAge(inputs: Record<string, any>): CalculationResult {
   const birthDateStr = inputs.birthDate || '1990-01-01';
@@ -102,51 +111,33 @@ export function calculateAgeInDays(inputs: Record<string, any>): CalculationResu
 }
 
 export function calculateDateDifference(inputs: Record<string, any>): CalculationResult {
-  const start = new Date(inputs.startDate || '2026-01-01');
-  const end = new Date(inputs.endDate || '2026-12-31');
+  const includeEndDay = inputs.includeEndDay === true || inputs.includeEndDay === 'true';
+  const outputUnit = inputs.outputUnit || 'days';
 
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+  const diff = calculateCalendarDiff(
+    inputs.startDate || '2026-01-01',
+    inputs.endDate || '2026-12-31',
+    includeEndDay
+  );
+
+  if (!diff) {
     return {
       primary: { id: 'diff', label: 'Differenz', value: 0, formattedValue: '0 Tage' },
       error: 'Ungültige Datumsangaben.',
     };
   }
 
-  const isReversed = end < start;
-  const tStart = isReversed ? end : start;
-  const tEnd = isReversed ? start : end;
-
-  const includeEndDay = inputs.includeEndDay === true || inputs.includeEndDay === 'true';
-  const outputUnit = inputs.outputUnit || 'days';
-
-  const diffMs = tEnd.getTime() - tStart.getTime();
-  let totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (includeEndDay) {
-    totalDays += 1;
-  }
-
-  const totalWeeks = Math.floor(totalDays / 7);
-  const remDays = totalDays % 7;
-
-  let years = tEnd.getFullYear() - tStart.getFullYear();
-  let months = tEnd.getMonth() - tStart.getMonth();
-  let days = tEnd.getDate() - tStart.getDate();
-
-  if (days < 0) {
-    months--;
-    const prevMonthDays = new Date(tEnd.getFullYear(), tEnd.getMonth(), 0).getDate();
-    days += prevMonthDays;
-  }
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
-  if (includeEndDay) {
-    days += 1;
-  }
-
+  const totalDays = diff.totalDays;
+  const totalWeeks = diff.totalWeeks;
+  const remDays = diff.remDays;
+  const years = diff.years;
+  const months = diff.months;
+  const days = diff.days;
   const totalMonths = years * 12 + months;
   const totalHours = totalDays * 24;
+
+  const startFormatted = formatDateGerman(diff.rawStart);
+  const endFormatted = formatDateGerman(diff.rawEnd);
 
   let primaryVal = totalDays;
   let primaryLabel = 'Tage';
@@ -184,7 +175,7 @@ export function calculateDateDifference(inputs: Record<string, any>): Calculatio
       { id: 'weeks', label: 'Wochen & Tage', value: totalWeeks, formattedValue: `${totalWeeks} Wochen und ${remDays} Tage` },
       { id: 'hours', label: 'Stunden gesamt', value: totalHours, formattedValue: `${formatNumber(totalHours, 0)} Std.` },
     ],
-    summaryText: `Zwischen dem ${formatDateDe(start)} und dem ${formatDateDe(end)} liegen ${formatNumber(totalDays, 0)} Tage (${years} Jahre, ${months} Monate und ${days} Tage).${includeEndDay ? ' (inklusive Endtag)' : ''}`,
+    summaryText: `Zwischen dem ${startFormatted} und dem ${endFormatted} liegen ${formatNumber(totalDays, 0)} Tage (${years} Jahre, ${months} Monate und ${days} Tage).${includeEndDay ? ' (inklusive Endtag)' : ''}`,
   };
 }
 

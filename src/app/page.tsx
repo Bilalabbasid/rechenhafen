@@ -33,6 +33,7 @@ export const metadata: Metadata = {
 const POPULAR_SLUGS = [
   'brutto-netto-rechner',
   'prozentrechner',
+  'tage-zwischen-zwei-daten',
   'altersrechner',
   'bmi-rechner',
   'spritkostenrechner',
@@ -44,6 +45,7 @@ const POPULAR_SLUGS = [
 
 const POPULAR_CHIPS = [
   { label: 'Brutto-Netto', slug: 'brutto-netto-rechner' },
+  { label: 'Tagerechner', slug: 'tage-zwischen-zwei-daten' },
   { label: 'Prozent', slug: 'prozentrechner' },
   { label: 'Alter', slug: 'altersrechner' },
   { label: 'BMI', slug: 'bmi-rechner' },

@@ -86,6 +86,46 @@ const nextConfig: NextConfig = {
         destination: '/rechner/kalorienbedarf-rechner/',
         statusCode: 301,
       },
+      {
+        source: '/rechner/tagerechner',
+        destination: '/rechner/tage-zwischen-zwei-daten/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tagerechner/',
+        destination: '/rechner/tage-zwischen-zwei-daten/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-datum',
+        destination: '/rechner/tage-zwischen-zwei-daten/?mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-datum/',
+        destination: '/rechner/tage-zwischen-zwei-daten/?mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-seit-datum',
+        destination: '/rechner/tage-zwischen-zwei-daten/?mode=since',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-seit-datum/',
+        destination: '/rechner/tage-zwischen-zwei-daten/?mode=since',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-silvester',
+        destination: '/rechner/tage-zwischen-zwei-daten/?preset=silvester&mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-silvester/',
+        destination: '/rechner/tage-zwischen-zwei-daten/?preset=silvester&mode=until',
+        permanent: true,
+      },
     ];
   },
 };

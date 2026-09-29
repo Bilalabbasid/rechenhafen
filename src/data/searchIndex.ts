@@ -211,20 +211,40 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "tage-zwischen-zwei-daten",
     "slug": "tage-zwischen-zwei-daten",
-    "name": "Tage-zwischen-zwei-Daten-Rechner",
+    "name": "Tagerechner: Tage zwischen zwei Daten berechnen",
     "category": "datum-zeit",
     "keywords": [
       "tage-zwischen-zwei-daten",
-      "tage-zwischen-zwei-daten-rechner",
+      "tagerechner",
+      "tagerechner online",
+      "tage zwischen zwei daten",
+      "tage zwischen zwei daten berechnen",
+      "tage bis datum",
+      "tage seit datum",
+      "tage bis silvester",
       "tage zwischen daten",
       "datum-zeit",
       "datumsdifferenz",
       "tage zwischen zwei daten rechner",
-      "arbeitstage rechner",
-      "tage zwischen zwei daten",
       "anzahl tage berechnen",
       "wieviele tage zwischen",
       "kalendertage rechner"
+    ]
+  },
+  {
+    "id": "tage-bis-weihnachten",
+    "slug": "tage-bis-weihnachten",
+    "name": "Tage bis Weihnachten: Countdown bis Heiligabend",
+    "category": "datum-zeit",
+    "keywords": [
+      "tage-bis-weihnachten",
+      "tage bis weihnachten",
+      "wie viele tage bis weihnachten",
+      "countdown heiligabend",
+      "tage bis heiligabend",
+      "weihnachts countdown",
+      "weihnachten rechner",
+      "datum-zeit"
     ]
   },
   {

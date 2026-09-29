@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useId } from 'react';
+import Link from 'next/link';
 import { CalculatorInput, CalculationResult } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
-import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
+import { formatDateDe } from '@/lib/formatters';
 
 interface Props {
   slug: string;
@@ -42,6 +44,7 @@ export default function CalculatorRunner({
   // Result state initialized with prerendered server result (Zero Layout Shift)
   const [result, setResult] = useState<CalculationResult>(initialResult);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   // Reference to loaded engine function
   const engineRef = useRef<((inp: Record<string, any>) => CalculationResult) | null>(null);
@@ -95,6 +98,34 @@ export default function CalculatorRunner({
             }
           }
 
+          if (slug === 'tage-zwischen-zwei-daten' && params.has('preset')) {
+            const p = params.get('preset')?.toLowerCase();
+            const berlinParts = new Intl.DateTimeFormat('en-CA', {
+              timeZone: 'Europe/Berlin',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(new Date()).split('-');
+            const currentYear = parseInt(berlinParts[0], 10);
+            if (p === 'silvester') {
+              updated.mode = 'until';
+              updated.endDate = `${currentYear}-12-31`;
+              changed = true;
+            } else if (p === 'heiligabend') {
+              updated.mode = 'until';
+              updated.endDate = `${currentYear}-12-24`;
+              changed = true;
+            } else if (p === 'weihnachten') {
+              updated.mode = 'until';
+              updated.endDate = `${currentYear}-12-25`;
+              changed = true;
+            } else if (p === 'neujahr') {
+              updated.mode = 'until';
+              updated.endDate = `${currentYear + 1}-01-01`;
+              changed = true;
+            }
+          }
+
           if (changed) {
             setInputs((prev) => {
               const merged = { ...prev, ...updated };
@@ -120,6 +151,25 @@ export default function CalculatorRunner({
     const updatedInputs = { ...inputs, [id]: value };
     setInputs(updatedInputs);
 
+    // Non-personal analytics tracking according to German privacy & consent rules
+    if (typeof window !== 'undefined') {
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      if (slug === 'tage-zwischen-zwei-daten' && id === 'mode') {
+        w.dataLayer.push({
+          event: 'calculator_date_mode_selected',
+          calculator_slug: slug,
+          mode: value,
+        });
+      } else if (slug === 'tage-bis-weihnachten' && id === 'christmasTarget') {
+        w.dataLayer.push({
+          event: 'calculator_christmas_target_selected',
+          calculator_slug: slug,
+          target: value,
+        });
+      }
+    }
+
     let fn = engineRef.current;
     if (!fn) {
       fn = await loadCalculatorEngine(slug);
@@ -132,12 +182,102 @@ export default function CalculatorRunner({
       try {
         const nextResult = fn(updatedInputs);
         setResult(nextResult);
+
+        if (slug === 'tage-zwischen-zwei-daten' && typeof window !== 'undefined') {
+          const w = window as any;
+          w.dataLayer = w.dataLayer || [];
+          w.dataLayer.push({
+            event: 'calculator_date_calculated',
+            calculator_slug: slug,
+            mode: updatedInputs.mode || 'between',
+            include_start_day: Boolean(updatedInputs.includeStartDay),
+          });
+        }
       } catch {
         setResult({
           primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
           error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
         });
       }
+    }
+  };
+
+  const handlePresetSelect = async (presetKey: string) => {
+    const berlinParts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Berlin',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date()).split('-');
+    const currentYear = parseInt(berlinParts[0], 10);
+    const todayStr = berlinParts.join('-');
+
+    let updatedInputs = { ...inputs };
+    if (presetKey === 'heute') {
+      if (inputs.mode === 'since') {
+        updatedInputs.startDate = todayStr;
+      } else {
+        updatedInputs.endDate = todayStr;
+      }
+    } else if (presetKey === 'heiligabend') {
+      updatedInputs.mode = 'until';
+      updatedInputs.endDate = `${currentYear}-12-24`;
+    } else if (presetKey === 'weihnachten') {
+      updatedInputs.mode = 'until';
+      updatedInputs.endDate = `${currentYear}-12-25`;
+    } else if (presetKey === 'silvester') {
+      updatedInputs.mode = 'until';
+      updatedInputs.endDate = `${currentYear}-12-31`;
+    } else if (presetKey === 'neujahr') {
+      updatedInputs.mode = 'until';
+      updatedInputs.endDate = `${currentYear + 1}-01-01`;
+    }
+
+    setInputs(updatedInputs);
+
+    let fn = engineRef.current;
+    if (!fn) {
+      fn = await loadCalculatorEngine(slug);
+      if (fn) engineRef.current = fn;
+    }
+    if (fn) {
+      try {
+        setResult(fn(updatedInputs));
+      } catch {}
+    }
+
+    if (typeof window !== 'undefined') {
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        event: 'calculator_date_preset_selected',
+        calculator_slug: slug,
+        preset: presetKey,
+      });
+    }
+  };
+
+  const handleCopyShareLink = async () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const url = new URL(window.location.href);
+      for (const [key, val] of Object.entries(inputs)) {
+        if (val !== undefined && val !== null && val !== '') {
+          url.searchParams.set(key, String(val));
+        }
+      }
+      await navigator.clipboard.writeText(url.toString());
+      setLinkCopied(true);
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        event: 'calculator_date_copy_link',
+        calculator_slug: slug,
+        mode: inputs.mode || 'default',
+      });
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // Fallback
     }
   };
 
@@ -286,11 +426,105 @@ export default function CalculatorRunner({
             </button>
           </div>
 
+          {/* Dedicated Mode Selector and Presets for Tagerechner */}
+          {slug === 'tage-zwischen-zwei-daten' && (
+            <div className={styles.dateClusterSection}>
+              <label className={styles.label}>Berechnungsmodus wählen</label>
+              <div className={styles.modeSelector} role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={inputs.mode === 'between' || !inputs.mode}
+                  className={`${styles.modeTab} ${inputs.mode === 'between' || !inputs.mode ? styles.modeTabActive : ''}`}
+                  onClick={() => handleInputChange('mode', 'between')}
+                >
+                  Tage zwischen zwei Daten
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={inputs.mode === 'until'}
+                  className={`${styles.modeTab} ${inputs.mode === 'until' ? styles.modeTabActive : ''}`}
+                  onClick={() => handleInputChange('mode', 'until')}
+                >
+                  Tage bis zu einem Datum
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={inputs.mode === 'since'}
+                  className={`${styles.modeTab} ${inputs.mode === 'since' ? styles.modeTabActive : ''}`}
+                  onClick={() => handleInputChange('mode', 'since')}
+                >
+                  Tage seit einem Datum
+                </button>
+              </div>
+
+              <div className={styles.presetsRow}>
+                <span className={styles.presetsLabel}>Presets:</span>
+                <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('heute')}>Heute</button>
+                <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('heiligabend')}>Heiligabend</button>
+                <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('weihnachten')}>Weihnachten</button>
+                <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('silvester')}>Silvester</button>
+                <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('neujahr')}>Neujahr</button>
+              </div>
+            </div>
+          )}
+
           <div className={styles.inputGrid}>
             {inputDefs.map((field) => {
               // Special case: for arbeitszeitrechner, pauseMinutes is handled dynamically below
               if (slug === 'arbeitszeitrechner' && field.id === 'pauseMinutes') {
                 return null;
+              }
+
+              // Mode selector for Tagerechner is already rendered above
+              if (slug === 'tage-zwischen-zwei-daten' && field.id === 'mode') {
+                return null;
+              }
+
+              const inputId = `${formId}-${field.id}`;
+
+              // Automatic readonly date handling for until / since modes in Tagerechner
+              if (slug === 'tage-zwischen-zwei-daten') {
+                if (inputs.mode === 'until' && field.id === 'startDate') {
+                  return (
+                    <div key={field.id} className={styles.inputGroup}>
+                      <label htmlFor={inputId} className={styles.label}>
+                        Startdatum (Automatisch)
+                      </label>
+                      <input
+                        id={inputId}
+                        type="text"
+                        readOnly
+                        disabled
+                        className={styles.input}
+                        value={`Heute (${formatDateDe(new Date())})`}
+                        style={{ backgroundColor: 'var(--color-background)', cursor: 'default' }}
+                      />
+                      <span className={styles.helpText}>Im Modus „Tage bis“ wird automatisch ab dem heutigen Tag gerechnet.</span>
+                    </div>
+                  );
+                }
+                if (inputs.mode === 'since' && field.id === 'endDate') {
+                  return (
+                    <div key={field.id} className={styles.inputGroup}>
+                      <label htmlFor={inputId} className={styles.label}>
+                        Enddatum (Automatisch)
+                      </label>
+                      <input
+                        id={inputId}
+                        type="text"
+                        readOnly
+                        disabled
+                        className={styles.input}
+                        value={`Heute (${formatDateDe(new Date())})`}
+                        style={{ backgroundColor: 'var(--color-background)', cursor: 'default' }}
+                      />
+                      <span className={styles.helpText}>Im Modus „Tage seit“ wird automatisch bis zum heutigen Tag gerechnet.</span>
+                    </div>
+                  );
+                }
               }
 
               // Check conditional visibility via dependsOn
@@ -304,7 +538,6 @@ export default function CalculatorRunner({
                 }
               }
 
-              const inputId = `${formId}-${field.id}`;
               return (
                 <div key={field.id} className={styles.inputGroup}>
                   <label htmlFor={inputId} className={styles.label}>
@@ -326,13 +559,22 @@ export default function CalculatorRunner({
                       ))}
                     </select>
                   ) : field.type === 'date' ? (
-                    <input
-                      id={inputId}
-                      type="date"
-                      className={styles.input}
-                      value={inputs[field.id] ?? ''}
-                      onChange={(e) => handleInputChange(field.id, e.target.value)}
-                    />
+                    <div className={styles.dateInputContainer}>
+                      <input
+                        id={inputId}
+                        type="date"
+                        lang="de"
+                        className={styles.input}
+                        value={inputs[field.id] ?? ''}
+                        onChange={(e) => handleInputChange(field.id, e.target.value)}
+                      />
+                      {inputs[field.id] && (
+                        <div className={styles.dateFormattedHint}>
+                          <Calendar size={13} />
+                          <span>Datum: {formatDateDe(inputs[field.id])}</span>
+                        </div>
+                      )}
+                    </div>
                   ) : field.type === 'boolean' ? (
                     <div className={styles.checkboxWrapper}>
                       <input
@@ -521,11 +763,41 @@ export default function CalculatorRunner({
                   <span>{copied ? 'Ergebnis kopiert!' : 'Ergebnis kopieren'}</span>
                 </button>
 
+                {slug === 'tage-zwischen-zwei-daten' && (
+                  <button
+                    type="button"
+                    onClick={handleCopyShareLink}
+                    className={`${styles.actionBtn} ${linkCopied ? styles.actionBtnCopied : ''}`}
+                    title="Link mit aktuellen Einstellungen kopieren"
+                    aria-label="Link mit Parametern kopieren"
+                  >
+                    {linkCopied ? <Check size={14} /> : <Share2 size={14} />}
+                    <span>{linkCopied ? 'Link kopiert!' : 'Link teilen'}</span>
+                  </button>
+                )}
+
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
                   Echtzeit-Berechnung
                 </span>
               </div>
             </div>
+
+            {/* Quick Navigation for Christmas countdown */}
+            {slug === 'tage-bis-weihnachten' && (
+              <div className={styles.quickNavBlock}>
+                <h4 className={styles.quickNavTitle}>Weitere Zähler & Rechner</h4>
+                <div className={styles.quickNavButtons}>
+                  <Link href="/rechner/tage-zwischen-zwei-daten/?preset=silvester&mode=until" className={styles.quickNavBtn}>
+                    <Sparkles size={14} />
+                    <span>Countdown bis Silvester</span>
+                  </Link>
+                  <Link href="/rechner/tage-zwischen-zwei-daten/" className={styles.quickNavBtn}>
+                    <Calendar size={14} />
+                    <span>Allgemeiner Tagerechner</span>
+                  </Link>
+                </div>
+              </div>
+            )}
             </>
           )}
 
