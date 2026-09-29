@@ -11,6 +11,7 @@ import FormulaBox from '@/components/calculator/FormulaBox';
 import MethodologyBox from '@/components/calculator/MethodologyBox';
 import FaqAccordion from '@/components/calculator/FaqAccordion';
 import RelatedCalculators from '@/components/calculator/RelatedCalculators';
+import PopularDateCalculators from '@/components/calculator/PopularDateCalculators';
 import TaxBracketVisualizer from '@/components/calculator/TaxBracketVisualizer';
 import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
@@ -450,6 +451,11 @@ export default async function CalculatorPage({ params }: PageProps) {
 
       {/* Bottom Leaderboard Werbefläche mit fest reserviertem Platz (Zero CLS) */}
       <AdSlot format="top-banner" slotId="calc-bottom" />
+
+      {/* Beliebte Datumsrechner (Fokus-Navigation im Datumsrechner-Cluster) */}
+      {(calc.slug === 'tage-zwischen-zwei-daten' || calc.slug === 'tage-bis-weihnachten') && (
+        <PopularDateCalculators currentSlug={calc.slug} />
+      )}
 
       {/* Related Calculators */}
       <RelatedCalculators

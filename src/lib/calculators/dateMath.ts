@@ -172,6 +172,41 @@ export function getGermanWeekday(year: number, month: number, day: number): stri
   return GERMAN_WEEKDAYS[d.getUTCDay()];
 }
 
+/**
+ * Computes Easter Sunday (Ostersonntag) for any Gregorian calendar year (Meeus/Jones/Butcher algorithm).
+ */
+export function getEasterSunday(year: number): DateParts {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return { year, month, day };
+}
+
+/**
+ * Returns the ISO date string (YYYY-MM-DD) for the next upcoming Easter Sunday relative to Berlin today.
+ */
+export function getUpcomingEasterDateString(refDate?: DateParts): string {
+  const ref = refDate || getBerlinTodayParts();
+  const easterThisYear = getEasterSunday(ref.year);
+  const refDayNum = dateToDayNumber(ref.year, ref.month, ref.day);
+  const easterDayNum = dateToDayNumber(easterThisYear.year, easterThisYear.month, easterThisYear.day);
+
+  const target = easterDayNum >= refDayNum ? easterThisYear : getEasterSunday(ref.year + 1);
+  const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+  return `${target.year}-${pad(target.month)}-${pad(target.day)}`;
+}
+
 export interface CalendarDiffResult {
   totalDays: number;
   totalWeeks: number;

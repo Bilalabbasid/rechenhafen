@@ -126,6 +126,26 @@ const nextConfig: NextConfig = {
         destination: '/rechner/tage-zwischen-zwei-daten/?preset=silvester&mode=until',
         permanent: true,
       },
+      {
+        source: '/rechner/tage-bis-neujahr',
+        destination: '/rechner/tage-zwischen-zwei-daten/?preset=neujahr&mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-neujahr/',
+        destination: '/rechner/tage-zwischen-zwei-daten/?preset=neujahr&mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-ostern',
+        destination: '/rechner/tage-zwischen-zwei-daten/?preset=ostern&mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/tage-bis-ostern/',
+        destination: '/rechner/tage-zwischen-zwei-daten/?preset=ostern&mode=until',
+        permanent: true,
+      },
     ];
   },
 };

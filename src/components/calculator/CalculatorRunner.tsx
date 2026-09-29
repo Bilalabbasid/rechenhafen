@@ -7,6 +7,7 @@ import styles from '@/styles/calculator.module.css';
 import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe } from '@/lib/formatters';
+import { getUpcomingEasterDateString } from '@/lib/calculators/dateMath';
 
 interface Props {
   slug: string;
@@ -123,6 +124,10 @@ export default function CalculatorRunner({
               updated.mode = 'until';
               updated.endDate = `${currentYear + 1}-01-01`;
               changed = true;
+            } else if (p === 'ostern') {
+              updated.mode = 'until';
+              updated.endDate = getUpcomingEasterDateString();
+              changed = true;
             }
           }
 
@@ -231,6 +236,9 @@ export default function CalculatorRunner({
     } else if (presetKey === 'neujahr') {
       updatedInputs.mode = 'until';
       updatedInputs.endDate = `${currentYear + 1}-01-01`;
+    } else if (presetKey === 'ostern') {
+      updatedInputs.mode = 'until';
+      updatedInputs.endDate = getUpcomingEasterDateString();
     }
 
     setInputs(updatedInputs);
@@ -467,6 +475,7 @@ export default function CalculatorRunner({
                 <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('weihnachten')}>Weihnachten</button>
                 <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('silvester')}>Silvester</button>
                 <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('neujahr')}>Neujahr</button>
+                <button type="button" className={styles.presetBtn} onClick={() => handlePresetSelect('ostern')}>Ostern</button>
               </div>
             </div>
           )}

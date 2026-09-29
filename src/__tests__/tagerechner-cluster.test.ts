@@ -13,6 +13,7 @@ import {
   getBerlinTodayParts,
   getBerlinTodayString,
   dateToDayNumber,
+  getEasterSunday,
 } from '@/lib/calculators/dateMath';
 import { generateMetadata as generateCalcMetadata } from '@/app/rechner/[slug]/page';
 
@@ -302,6 +303,35 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
       expect(silvesterRedir).toBeDefined();
       expect(silvesterRedir?.destination).toBe('/rechner/tage-zwischen-zwei-daten/?preset=silvester&mode=until');
       expect(silvesterRedir?.permanent).toBe(true);
+
+      // tage-bis-neujahr -> tage-zwischen-zwei-daten/?preset=neujahr&mode=until
+      const neujahrRedir = redirects.find((r) => r.source === '/rechner/tage-bis-neujahr/');
+      expect(neujahrRedir).toBeDefined();
+      expect(neujahrRedir?.destination).toBe('/rechner/tage-zwischen-zwei-daten/?preset=neujahr&mode=until');
+      expect(neujahrRedir?.permanent).toBe(true);
+
+      // tage-bis-ostern -> tage-zwischen-zwei-daten/?preset=ostern&mode=until
+      const osternRedir = redirects.find((r) => r.source === '/rechner/tage-bis-ostern/');
+      expect(osternRedir).toBeDefined();
+      expect(osternRedir?.destination).toBe('/rechner/tage-zwischen-zwei-daten/?preset=ostern&mode=until');
+      expect(osternRedir?.permanent).toBe(true);
+    });
+
+    it('verifies Easter calculation adheres strictly to astronomical/Gregorian rules', () => {
+      // 2024: 31. März
+      const e2024 = getEasterSunday(2024);
+      expect(e2024.month).toBe(3);
+      expect(e2024.day).toBe(31);
+
+      // 2025: 20. April
+      const e2025 = getEasterSunday(2025);
+      expect(e2025.month).toBe(4);
+      expect(e2025.day).toBe(20);
+
+      // 2026: 5. April
+      const e2026 = getEasterSunday(2026);
+      expect(e2026.month).toBe(4);
+      expect(e2026.day).toBe(5);
     });
 
     it('verifies sitemap contains new Christmas page and primary Tagerechner, but NO redirect URLs', () => {
@@ -317,7 +347,20 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
         expect(url.includes('/rechner/tage-bis-datum/')).toBe(false);
         expect(url.includes('/rechner/tage-seit-datum/')).toBe(false);
         expect(url.includes('/rechner/tage-bis-silvester/')).toBe(false);
+        expect(url.includes('/rechner/tage-bis-neujahr/')).toBe(false);
+        expect(url.includes('/rechner/tage-bis-ostern/')).toBe(false);
       }
+    });
+
+    it('verifies visible worked examples on Tagerechner including same-day calculation', () => {
+      const tagerechner = getCalculatorBySlug('tage-zwischen-zwei-daten');
+      expect(tagerechner?.workedExamples).toBeDefined();
+      expect(tagerechner?.workedExamples?.length).toBeGreaterThanOrEqual(3);
+
+      const titles = tagerechner?.workedExamples?.map((e) => e.title) || [];
+      expect(titles.some((t) => t?.includes('01.03.1960 bis heute'))).toBe(true);
+      expect(titles.some((t) => t?.includes('05.10.2050'))).toBe(true);
+      expect(titles.some((t) => t?.includes('Same-Day') || t?.includes('Gleicher Tag'))).toBe(true);
     });
 
     it('verifies internal linking between date cluster calculators', () => {
@@ -339,6 +382,16 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
       expect(xmas?.content?.details).toContain('/rechner/countdown-rechner/');
       expect(xmas?.content?.details).toContain('/rechner/tage-bis-geburtstag/');
       expect(xmas?.content?.details).toContain('/rechner/tage-zwischen-zwei-daten/');
+
+      const arbeitstage = getCalculatorBySlug('arbeitstage-rechner');
+      expect(arbeitstage?.relatedSlugs).toContain('tage-zwischen-zwei-daten');
+      expect(arbeitstage?.relatedSlugs).toContain('werktage-rechner');
+      expect(arbeitstage?.content?.details).toContain('Unterschied zwischen Arbeitstagen und Werktagen');
+
+      const werktage = getCalculatorBySlug('werktage-rechner');
+      expect(werktage?.relatedSlugs).toContain('tage-zwischen-zwei-daten');
+      expect(werktage?.relatedSlugs).toContain('arbeitstage-rechner');
+      expect(werktage?.content?.details).toContain('Werktage vs. Arbeitstage nach deutschem Recht');
     });
   });
 });
