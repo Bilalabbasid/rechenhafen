@@ -7,13 +7,13 @@ import AllCalculatorsDirectory from '@/components/calculator/AllCalculatorsDirec
 import styles from '@/styles/layout.module.css';
 
 export const metadata: Metadata = {
-  title: 'Alle Rechner – Gesamtverzeichnis | RechenHafen',
+  title: 'Alle Rechner – Gesamtverzeichnis',
   description: 'Übersicht über alle 418 kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.',
   alternates: {
     canonical: 'https://rechenhafen.de/rechner/',
   },
   openGraph: {
-    title: 'Alle Rechner – Gesamtverzeichnis | RechenHafen',
+    title: 'Alle Rechner – Gesamtverzeichnis',
     description: 'Das vollständige Verzeichnis aller Online-Rechner für Deutschland: Steuern, Finanzen, Gesundheit, Alltag und mehr.',
     url: 'https://rechenhafen.de/rechner/',
     siteName: 'RechenHafen',

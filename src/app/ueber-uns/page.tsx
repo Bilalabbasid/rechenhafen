@@ -6,7 +6,7 @@ import styles from '@/styles/layout.module.css';
 import { Anchor, ShieldCheck, Cpu, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Über uns | RechenHafen – Alle Rechner an einem Ort',
+  title: 'Über uns – Mission & Team',
   description: 'Erfahren Sie mehr über RechenHafen: Unsere Mission für präzise, werbefreie und datenschutzfreundliche Online-Rechner für Deutschland.',
   alternates: {
     canonical: 'https://rechenhafen.de/ueber-uns/',

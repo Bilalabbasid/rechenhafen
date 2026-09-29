@@ -58,7 +58,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Teilzeitrechner',
     category: 'arbeit-gehalt',
     subcategory: 'Teilzeit & Arbeitszeit',
-    metaTitle: 'Teilzeitrechner: Gehalt bei Stundenreduzierung berechnen | RechenHafen',
+    metaTitle: 'Teilzeitrechner: Gehalt bei Stundenreduzierung berechnen',
     metaDescription: 'Kostenloser Teilzeitrechner: Berechnen Sie Ihr Gehalt bei Stundenreduzierung (z. B. 20, 25, 30 oder 32 Stunden). Gesetzliche Grundlagen & Formel.',
     h1: 'Teilzeitrechner – Gehalt bei reduzierter Arbeitszeit',
     shortDescription: 'Berechnet das anteilige Bruttogehalt bei einem Wechsel von Vollzeit in Teilzeit schnell und präzise.',

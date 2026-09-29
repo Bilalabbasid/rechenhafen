@@ -7,7 +7,7 @@ import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 import { ShieldCheck, CheckCircle2, AlertTriangle, BookOpen, ExternalLink, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Berechnungsmethodik, Datenquellen & Transparenz | RechenHafen',
+  title: 'Berechnungsmethodik, Datenquellen & Transparenz',
   description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
   alternates: {
     canonical: 'https://rechenhafen.de/methodik/',

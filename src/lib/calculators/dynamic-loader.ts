@@ -46,6 +46,8 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "abfindungsrechner": "steuernGehalt",
   "renten-brutto-netto-rechner": "steuernGehalt",
   "umsatzsteuerrechner": "steuernGehalt",
+  "gewerbesteuer-rechner": "steuernGehalt",
+  "mieterhoehung-rechner": "wohnen",
   "altersrechner": "datumZeit",
   "alter-in-tagen": "datumZeit",
   "lebenszeit-in-stunden": "datumZeit",

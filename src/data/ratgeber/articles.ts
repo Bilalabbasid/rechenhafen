@@ -1465,7 +1465,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
   {
     slug: 'zahnspachtel-groessen-tabelle-fliesen',
     title: 'Zahnspachtel Größen Tabelle: Welche Zahnung für welche Fliese?',
-    metaTitle: 'Zahnspachtel Größen Tabelle: Richtige Zahnung für Fliesen | RechenHafen',
+    metaTitle: 'Zahnspachtel Größen Tabelle: Richtige Zahnung für Fliesen',
     metaDescription: 'Zahnspachtel Größen Tabelle für Fliesen: Welche Zahnung (3, 6, 8, 10, 12 mm oder Mittelbett) für Wand & Boden? Praxiswissen zu Untergrund, Kleberbett & Buttering-Floating.',
     h1: 'Zahnspachtel Größen Tabelle: Welche Zahnung für welche Fliese?',
     category: 'bauen-renovieren',

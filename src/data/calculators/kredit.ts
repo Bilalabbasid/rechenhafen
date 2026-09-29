@@ -97,7 +97,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Autokredit berechnen',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Autokreditrechner: Kfz-Monatsrate & Autofinanzierung berechnen | RechenHafen',
+    metaTitle: 'Autokreditrechner: Kfz-Monatsrate & Autofinanzierung berechnen',
     metaDescription: 'Berechnen Sie die Monatsrate für Ihren klassischen Kfz-Ratenkredit mit Kaufpreis, Anzahlung, Laufzeit und Effektivzins. Voll tilgend ohne teure Schlussrate.',
     h1: 'Autokreditrechner – Monatliche Rate für Ihren Autokauf berechnen',
     shortDescription: 'Berechnet die monatliche Kreditrate für Ihren Autokauf unter Berücksichtigung von Anzahlung und Zinsen nach deutschem Standard.',

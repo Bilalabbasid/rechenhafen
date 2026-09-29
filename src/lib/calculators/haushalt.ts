@@ -1,4 +1,4 @@
-import { CalculationResult } from '@/types/calculator';
+import { CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
@@ -93,22 +93,102 @@ export function calculateStandbyCost(inputs: Record<string, any>): CalculationRe
 
 export function calculateGasCost(inputs: Record<string, any>): CalculationResult {
   const inputType = inputs.inputType || 'kwh'; // 'kwh' or 'm3'
-  const amount = parseFloat(inputs.amount) || 12000;
-  const calorificValue = parseFloat(inputs.calorificValue) || 10.3; // Brennwert kWh/m³
-  const stateFactor = parseFloat(inputs.stateFactor) || 0.95; // Zustandszahl z
-  const pricePerKwh = parseFloat(inputs.pricePerKwh) || GERMAN_DATA_2026.gaspreis_durchschnitt.value;
-  const basePricePerMonth = parseFloat(inputs.basePricePerMonth) || 12.0;
+  const rawAmount = parseFloat(inputs.amount);
+  const amount = !isNaN(rawAmount) && rawAmount >= 0 ? rawAmount : 12000;
+  const calorificValue = parseFloat(inputs.calorificValue) > 0 ? parseFloat(inputs.calorificValue) : 10.3; // Brennwert kWh/m³
+  const stateFactor = parseFloat(inputs.stateFactor) > 0 ? parseFloat(inputs.stateFactor) : 0.95; // Zustandszahl z
+  const rawPrice = parseFloat(inputs.pricePerKwh);
+  const pricePerKwh = !isNaN(rawPrice) && rawPrice >= 0 ? rawPrice : GERMAN_DATA_2026.gaspreis_durchschnitt.value;
+  const rawBase = parseFloat(inputs.basePricePerMonth);
+  const basePricePerMonth = !isNaN(rawBase) && rawBase >= 0 ? rawBase : 12.0;
+
+  if (amount < 0 || pricePerKwh < 0 || basePricePerMonth < 0) {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '0,00 €' },
+      error: 'Bitte geben Sie positive Zahlenwerte für Verbrauch, Arbeitspreis und Grundpreis ein.',
+    };
+  }
 
   let totalKwh = amount;
+  let conversionFactor = 1;
   if (inputType === 'm3') {
     // kWh = m³ * Brennwert * Zustandszahl
-    totalKwh = amount * calorificValue * stateFactor;
+    conversionFactor = calorificValue * stateFactor;
+    totalKwh = amount * conversionFactor;
   }
 
   const workCost = totalKwh * pricePerKwh;
   const annualBaseCost = basePricePerMonth * 12;
   const totalAnnualCost = workCost + annualBaseCost;
   const monthlyAdvancePayment = totalAnnualCost / 12;
+
+  const secondary: ResultItem[] = [
+    {
+      id: 'monthlyPayment',
+      label: 'Durchschnittliche monatliche Kosten (Abschlag)',
+      value: monthlyAdvancePayment,
+      formattedValue: formatCurrency(monthlyAdvancePayment),
+      highlight: true,
+    },
+    {
+      id: 'totalKwh',
+      label: 'Gasverbrauch',
+      value: totalKwh,
+      formattedValue: inputType === 'm3' ? `${formatNumber(totalKwh, 0)} kWh (${formatNumber(amount, 0)} m³)` : `${formatNumber(totalKwh, 0)} kWh`,
+    },
+    {
+      id: 'pricePerKwh',
+      label: 'Arbeitspreis',
+      value: pricePerKwh,
+      formattedValue: `${formatNumber(pricePerKwh * 100, 2)} ct/kWh (${formatCurrency(pricePerKwh, 3)}/kWh)`,
+    },
+    {
+      id: 'baseCost',
+      label: 'Jährlicher Grundpreis',
+      value: annualBaseCost,
+      formattedValue: `${formatCurrency(annualBaseCost)} (${formatCurrency(basePricePerMonth)}/Monat)`,
+    },
+    {
+      id: 'workCost',
+      label: 'Reine Verbrauchskosten (Arbeitspreis)',
+      value: workCost,
+      formattedValue: formatCurrency(workCost),
+    },
+  ];
+
+  if (inputType === 'm3') {
+    secondary.push({
+      id: 'conversionFactor',
+      label: 'Umrechnungsfaktor (Brennwert × z-Zahl)',
+      value: conversionFactor,
+      formattedValue: `${formatNumber(conversionFactor, 3)} kWh pro m³`,
+      helpText: 'Individueller Multiplikator laut Gasabrechnung (variiert regional)',
+    });
+  }
+
+  const breakdownRows = [
+    {
+      period: 'Verbrauchskosten',
+      values: {
+        beschreibung: `${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwh, 3)}/kWh`,
+        betrag: formatCurrency(workCost),
+      },
+    },
+    {
+      period: 'Grundpreis',
+      values: {
+        beschreibung: `12 Monate × ${formatCurrency(basePricePerMonth)}/Monat`,
+        betrag: formatCurrency(annualBaseCost),
+      },
+    },
+    {
+      period: 'Gesamtkosten',
+      values: {
+        beschreibung: 'Summe aus Arbeitspreis und Grundpreis',
+        betrag: formatCurrency(totalAnnualCost),
+      },
+    },
+  ];
 
   return {
     primary: {
@@ -118,13 +198,15 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       formattedValue: formatCurrency(totalAnnualCost),
       highlight: true,
     },
-    secondary: [
-      { id: 'monthlyPayment', label: 'Empfohlener monatlicher Abschlag', value: monthlyAdvancePayment, formattedValue: formatCurrency(monthlyAdvancePayment) },
-      { id: 'totalKwh', label: 'Verbrauch in kWh', value: totalKwh, formattedValue: `${formatNumber(totalKwh, 0)} kWh` },
-      { id: 'workCost', label: 'Reine Arbeitspreiskosten', value: workCost, formattedValue: formatCurrency(workCost) },
-      { id: 'baseCost', label: 'Grundpreis pro Jahr', value: annualBaseCost, formattedValue: formatCurrency(annualBaseCost) },
-    ],
-    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und ${formatCurrency(pricePerKwh)}/kWh Arbeitspreis betragen die jährlichen Gesamtkosten inkl. Grundgebühr ${formatCurrency(totalAnnualCost)}. Der monatliche Abschlag liegt bei ${formatCurrency(monthlyAdvancePayment)}.`,
+    secondary,
+    breakdown: {
+      columns: [
+        { key: 'beschreibung', label: 'Berechnungsschritt' },
+        { key: 'betrag', label: 'Kosten' },
+      ],
+      rows: breakdownRows,
+    },
+    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem jährlichen Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich jährliche Gesamtkosten von ${formatCurrency(totalAnnualCost)} (monatlicher Abschlag: ${formatCurrency(monthlyAdvancePayment)}).`,
   };
 }
 

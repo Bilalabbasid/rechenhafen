@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useId } from 'react';
 import { CalculatorInput, CalculationResult } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
-import { AlertCircle, Copy, Check, RotateCcw, ShieldCheck } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 
 interface Props {
@@ -141,11 +141,69 @@ export default function CalculatorRunner({
     }
   };
 
+  // Dynamic breaks state for arbeitszeitrechner (1 to 4 breaks)
+  const [dynamicBreaks, setDynamicBreaks] = useState<number[]>([30]);
+
+  const handleBreakChange = (index: number, val: number) => {
+    const next = [...dynamicBreaks];
+    next[index] = Math.max(0, val || 0);
+    setDynamicBreaks(next);
+    const total = next.reduce((a, b) => a + b, 0);
+    const updated = { ...inputs, pauses: next, pauseMinutes: total };
+    setInputs(updated);
+    if (engineRef.current) {
+      try {
+        const newRes = engineRef.current(updated);
+        setResult(newRes);
+      } catch {}
+    }
+  };
+
+  const handleAddBreak = () => {
+    if (dynamicBreaks.length >= 4) return;
+    const next = [...dynamicBreaks, 15];
+    setDynamicBreaks(next);
+    const total = next.reduce((a, b) => a + b, 0);
+    const updated = { ...inputs, pauses: next, pauseMinutes: total };
+    setInputs(updated);
+    if (engineRef.current) {
+      try {
+        const newRes = engineRef.current(updated);
+        setResult(newRes);
+      } catch {}
+    }
+  };
+
+  const handleRemoveBreak = (index: number) => {
+    if (dynamicBreaks.length <= 1) return;
+    const next = dynamicBreaks.filter((_, i) => i !== index);
+    setDynamicBreaks(next);
+    const total = next.reduce((a, b) => a + b, 0);
+    const updated = { ...inputs, pauses: next, pauseMinutes: total };
+    setInputs(updated);
+    if (engineRef.current) {
+      try {
+        const newRes = engineRef.current(updated);
+        setResult(newRes);
+      } catch {}
+    }
+  };
+
+  const isOvernight = (() => {
+    if (slug !== 'arbeitszeitrechner') return false;
+    const s = inputs.startTime || '08:00';
+    const e = inputs.endTime || '16:30';
+    const [h1, m1] = String(s).split(':').map((v: string) => parseInt(v, 10) || 0);
+    const [h2, m2] = String(e).split(':').map((v: string) => parseInt(v, 10) || 0);
+    return (h2 * 60 + m2) <= (h1 * 60 + m1);
+  })();
+
   const handleReset = () => {
     const defaultVals: Record<string, any> = {};
     for (const inp of inputDefs) {
       defaultVals[inp.id] = inp.defaultValue;
     }
+    setDynamicBreaks([30]);
     setInputs(defaultVals);
     if (engineRef.current) {
       try {
@@ -156,6 +214,21 @@ export default function CalculatorRunner({
       setResult(initialResult);
     }
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && result && !result.error && result.primary?.value !== undefined) {
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        event: 'calculator_completion',
+        calculator_slug: slug,
+        calculator_name: name,
+        result_primary_label: result.primary.label,
+        result_primary_value: result.primary.value,
+        result_primary_formatted: result.primary.formattedValue,
+      });
+    }
+  }, [result, slug, name]);
 
   const handleCopyResult = async () => {
     if (result.error) return;
@@ -174,6 +247,15 @@ export default function CalculatorRunner({
     try {
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
+      if (typeof window !== 'undefined') {
+        const w = window as any;
+        w.dataLayer = w.dataLayer || [];
+        w.dataLayer.push({
+          event: 'calculator_result_copy',
+          calculator_slug: slug,
+          calculator_name: name,
+        });
+      }
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback
@@ -206,6 +288,22 @@ export default function CalculatorRunner({
 
           <div className={styles.inputGrid}>
             {inputDefs.map((field) => {
+              // Special case: for arbeitszeitrechner, pauseMinutes is handled dynamically below
+              if (slug === 'arbeitszeitrechner' && field.id === 'pauseMinutes') {
+                return null;
+              }
+
+              // Check conditional visibility via dependsOn
+              if (field.dependsOn) {
+                const currentVal = inputs[field.dependsOn.field];
+                const targetVal = field.dependsOn.value;
+                if (Array.isArray(targetVal)) {
+                  if (!targetVal.includes(currentVal)) return null;
+                } else if (currentVal !== targetVal) {
+                  return null;
+                }
+              }
+
               const inputId = `${formId}-${field.id}`;
               return (
                 <div key={field.id} className={styles.inputGroup}>
@@ -270,12 +368,84 @@ export default function CalculatorRunner({
                     />
                   )}
 
+                  {slug === 'arbeitszeitrechner' && field.id === 'endTime' && isOvernight && (
+                    <div className={styles.overnightBadge}>
+                      <Moon size={13} />
+                      <span>Nachtschicht: Schichtende am Folgetag (+1 Tag)</span>
+                    </div>
+                  )}
+
                   {field.helpText && field.type !== 'boolean' && (
                     <span className={styles.helpText}>{field.helpText}</span>
                   )}
                 </div>
               );
             })}
+
+            {/* Dynamic breaks section for arbeitszeitrechner */}
+            {slug === 'arbeitszeitrechner' && (
+              <div className={styles.breakManager}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+                  <label className={styles.label} style={{ margin: 0, fontWeight: 700 }}>
+                    Pausenzeiten (§ 4 ArbZG)
+                  </label>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+                    Gesamt: {dynamicBreaks.reduce((a, b) => a + b, 0)} Min.
+                  </span>
+                </div>
+
+                {dynamicBreaks.map((bVal, bIdx) => (
+                  <div key={bIdx} className={styles.breakRow}>
+                    <div style={{ flex: 1 }}>
+                      <label htmlFor={`${formId}-pause-${bIdx}`} style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', display: 'block', marginBottom: '2px' }}>
+                        Pause {bIdx + 1}
+                      </label>
+                      <input
+                        id={`${formId}-pause-${bIdx}`}
+                        type="number"
+                        min="0"
+                        max="360"
+                        step="5"
+                        className={styles.input}
+                        value={bVal}
+                        onChange={(e) => handleBreakChange(bIdx, parseFloat(e.target.value) || 0)}
+                      />
+                    </div>
+                    {dynamicBreaks.length > 1 && (
+                      <button
+                        type="button"
+                        className={styles.removeBreakBtn}
+                        onClick={() => handleRemoveBreak(bIdx)}
+                        title={`Pause ${bIdx + 1} entfernen`}
+                        aria-label={`Pause ${bIdx + 1} entfernen`}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-2)' }}>
+                  {dynamicBreaks.length < 4 ? (
+                    <button
+                      type="button"
+                      className={styles.addBreakBtn}
+                      onClick={handleAddBreak}
+                    >
+                      <Plus size={14} />
+                      <span>Pause hinzufügen ({dynamicBreaks.length}/4)</span>
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                      Maximal 4 Pausenblöcke erreicht
+                    </span>
+                  )}
+                </div>
+                <span className={styles.helpText} style={{ display: 'block', marginTop: '6px' }}>
+                  Ruhepausen können in Abschnitte von mindestens 15 Minuten aufgeteilt werden (§ 4 ArbZG).
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -292,7 +462,17 @@ export default function CalculatorRunner({
               </div>
             </div>
           ) : (
-            <div className={styles.resultBox}>
+            <>
+              {result.warning && (
+                <div className={styles.warningAlert} role="status">
+                  <AlertTriangle size={18} className={styles.warningIcon} />
+                  <div>
+                    <strong>Gesetzlicher Hinweis (§ 4 ArbZG)</strong>
+                    <p>{result.warning}</p>
+                  </div>
+                </div>
+              )}
+              <div className={styles.resultBox}>
               <div className={styles.primaryResult}>
                 <span className={styles.primaryLabel}>{result.primary.label}</span>
                 <span className={styles.primaryValue}>
@@ -346,6 +526,7 @@ export default function CalculatorRunner({
                 </span>
               </div>
             </div>
+            </>
           )}
 
           {/* Privacy Signal */}

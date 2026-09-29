@@ -17,6 +17,7 @@ export interface CalculatorInput {
   placeholder?: string;
   helpText?: string;
   options?: SelectOption[];
+  dependsOn?: { field: string; value: any | any[] };
 }
 
 export interface ResultItem {
@@ -44,6 +45,7 @@ export interface CalculationResult {
   };
   summaryText?: string;
   error?: string;
+  warning?: string;
   [key: string]: any;
 }
 
@@ -75,6 +77,11 @@ export interface TrustMetadata {
   lastReviewed?: string;
 }
 
+export interface ContentSection {
+  title: string;
+  content: string;
+}
+
 export interface CalculatorDefinition {
   id: string;
   slug: string;
@@ -92,10 +99,12 @@ export interface CalculatorDefinition {
   formula: string;
   formulaExplanation: string;
   workedExample: WorkedExample;
+  workedExamples?: WorkedExample[];
   content?: {
     intro?: string;
     details?: string;
     tips?: string[];
+    sections?: ContentSection[];
   };
   faqs: FAQItem[];
   relatedSlugs: string[];

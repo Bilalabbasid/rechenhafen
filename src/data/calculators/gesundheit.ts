@@ -60,7 +60,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Kalorienbedarf Rechner',
     category: 'gesundheit-fitness',
     subcategory: 'Kalorien & Stoffwechsel',
-    metaTitle: 'Kalorienbedarf Rechner: Täglicher Bedarf für Mann & Frau | RechenHafen',
+    metaTitle: 'Kalorienbedarf Rechner: Täglicher Bedarf für Mann & Frau',
     metaDescription: 'Kostenloser Kalorienbedarf Rechner: Berechnen Sie den täglichen Kalorienbedarf (TDEE) & Grundumsatz für Mann und Frau exakt nach wissenschaftlicher Formel.',
     h1: 'Kalorienbedarf Rechner – Täglicher Bedarf für Mann & Frau',
     shortDescription: 'Berechnen Sie Ihren täglichen Kalorienbedarf (TDEE) und Grundumsatz für Mann und Frau präzise nach wissenschaftlicher Formel zum Abnehmen, Halten oder Zunehmen.',

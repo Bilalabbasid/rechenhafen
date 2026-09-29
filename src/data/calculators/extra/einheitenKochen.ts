@@ -228,7 +228,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Geschwindigkeit Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: 'Geschwindigkeit Umrechner: km/h in m/s, mph & Knoten umrechnen | RechenHafen',
+    metaTitle: 'Geschwindigkeit Umrechner: km/h in m/s, mph & Knoten umrechnen',
     metaDescription: 'Rechnen Sie Geschwindigkeiten präzise um zwischen km/h, Meter pro Sekunde (m/s), Meilen pro Stunde (mph), Seemeilen/Knoten (kn) und Mach mit Formel.',
     h1: 'Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten präzise umrechnen',
     shortDescription: 'Konvertiert km/h in m/s, Meilen pro Stunde und Seemeilen-Knoten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
@@ -1747,7 +1747,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Drehzahl & Schnitt",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: 'Drehzahl Rechner – RPM, Umfangs- – RechenHafen',
+    metaTitle: 'Drehzahl Rechner – RPM & Umfangsgeschwindigkeit berechnen',
     metaDescription: 'Berechnen Sie die Schnittgeschwindigkeit und Umfangsgeschwindigkeit v in m/min und m/s aus Werkzeugdurchmesser d (mm) und Drehzahl n (U/min / RPM) für.',
     h1: 'Drehzahl Rechner – Schnittgeschwindigkeit & RPM berechnen',
     shortDescription: 'Ermittelt Schnittgeschwindigkeit und Umfangsgeschwindigkeit aus Drehzahl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
@@ -2538,7 +2538,6 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const usSize = (dInch - 0.458) / 0.032;
       
       // UK Ringgröße (Buchstaben A bis Z):
-      // A entspricht ca. US 0.5 (ca. 37.8 mm), jeder Buchstabe ca. 0.5 US-Größen
       const ukCharCode = Math.round(65 + (usSize * 2) - 1);
       let ukLetter = 'M';
       if (ukCharCode >= 65 && ukCharCode <= 90) {
@@ -2576,9 +2575,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Schmuckrechner konvertiert Ringmaße zwischen dem deutschen Innenumfang in Millimetern, dem Innendurchmesser sowie US- und UK-Ringgrößen.',
-      details: 'Die deutsche Ringgröße entspricht exakt dem inneren Fingerumfang in Millimetern (Ringgröße 54 = 54 mm Innenumfang). Der Innendurchmesser beträgt d = Umfang / pi (bei Größe 54 entspricht das ca. 17,2 mm).',
+      details: 'Die deutsche Ringgröße entspricht exakt dem inneren Fingerumfang in Millimetern (Ringgröße 54 = 54 mm Innenumfang). Der Innendurchmesser beträgt d = Umfang / pi (bei Größe 54 entspricht das ca. 17,2 mm, bei Größe 70 genau 22,3 mm).',
     },
     faqs: [
+      { question: 'Welche Ringgröße entspricht einem Fingerumfang von 70 mm?', answer: 'Ein Fingerinnenumfang von 70 mm entspricht genau der deutschen EU-Ringgröße 70. Nach der Berechnungsformel entspricht dies einem Innendurchmesser von 22,3 mm (70 mm / π), der US-Ringgröße US 13,1 (im Handel oft gerundet als US 13 geführt) sowie der britischen Ringgröße UK Z.' },
       { question: 'Zu welcher Tageszeit sollte man die Ringgröße am besten messen?', answer: 'Am späten Nachmittag oder Abend bei normaler Zimmertemperatur; morgens oder bei Kälte sind die Finger meist etwas dünner, bei Sommerhitze geschwollen.' },
       { question: 'Wie misst man die Ringgröße heimlich für einen Heiratsantrag?', answer: 'Nehmen Sie einen gut sitzenden Ring der Partnerin und messen Sie mit einem präzisen Messschieber den inneren Durchmesser auf den Zehntelmillimeter genau ab.' },
     ],
@@ -4890,7 +4890,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Raclette & Fondue",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: 'Raclette & Fondue Rechner – Käse- – RechenHafen',
+    metaTitle: 'Raclette & Fondue Rechner – Käse- und Fleischmengen berechnen',
     metaDescription: 'Berechnen Sie die perfekten Mengen für Silvester & Feiern: Raclettekäse (200 bis 250 g p.P.), Fleisch (200 bis 250 g p.P.',
     h1: 'Raclette & Fondue Rechner – Einkaufsmenge für Party & Silvester',
     shortDescription: 'Ermittelt Käse-, Fleisch- und Beilagenmengen pro Person mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
@@ -5288,7 +5288,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Rezept-Kalorien-Rechner",
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
-    metaTitle: 'Rezept Kalorien Rechner – kcal – RechenHafen',
+    metaTitle: 'Rezept Kalorien Rechner – kcal & Makros pro Portion',
     metaDescription: 'Berechnen Sie die Gesamtkalorien (kcal) und Makronährstoffe (Kohlenhydrate, Eiweiß, Fett) eines Rezepts nach Hauptzutaten und Portionen.',
     h1: 'Rezept Kalorien Rechner – Nährwerte & Makros pro Portion ermitteln',
     shortDescription: 'Berechnet Kalorien und Makros pro Portion für eigene Rezepte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',

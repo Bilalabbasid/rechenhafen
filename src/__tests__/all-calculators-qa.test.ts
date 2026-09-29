@@ -3,8 +3,8 @@ import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
 
 describe('RechenHafen Calculators Comprehensive QA Verification', () => {
-  it('contains exactly 418 calculators across 17 categories', () => {
-    expect(ALL_CALCULATORS.length).toBe(418);
+  it('contains exactly 420 calculators across 17 categories', () => {
+    expect(ALL_CALCULATORS.length).toBe(420);
     expect(CATEGORIES.length).toBe(17);
   });
 

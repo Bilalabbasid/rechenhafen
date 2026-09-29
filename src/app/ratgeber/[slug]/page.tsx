@@ -21,6 +21,8 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
+import { formatMetaTitle } from '@/lib/seo/title';
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -37,20 +39,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!article) {
     return {
-      title: 'Artikel nicht gefunden | RechenHafen',
+      title: 'Artikel nicht gefunden',
     };
   }
 
   const canonicalUrl = `https://rechenhafen.de/ratgeber/${article.slug}/`;
+  const cleanTitle = formatMetaTitle(article.metaTitle);
 
   return {
-    title: article.metaTitle,
+    title: cleanTitle,
     description: article.metaDescription,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: article.metaTitle,
+      title: cleanTitle,
       description: article.metaDescription,
       url: canonicalUrl,
       siteName: 'RechenHafen',

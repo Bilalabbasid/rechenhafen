@@ -112,7 +112,7 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Gewinnschwelle berechnen',
     category: 'business',
     subcategory: 'Unternehmenskennzahlen',
-    metaTitle: 'Gewinnschwelle berechnen: Break-Even-Rechner & Formel | RechenHafen',
+    metaTitle: 'Gewinnschwelle berechnen: Break-Even-Rechner & Formel',
     metaDescription: 'Gewinnschwelle berechnen: Kostenloser Break-Even-Rechner für Mindestabsatz & Mindestumsatz. Inklusive Deckungsbeitragsformel, Rechenbeispiel und Praxis-Tipps.',
     h1: 'Gewinnschwelle berechnen – Break-Even-Rechner',
     shortDescription: 'Berechnen Sie die Gewinnschwelle (Break-Even-Point) kostenlos online: Ermitteln Sie die erforderliche Absatzmenge und den Mindestumsatz aus Fixkosten und Stückdeckungsbeitrag.',

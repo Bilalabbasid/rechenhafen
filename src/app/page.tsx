@@ -13,7 +13,9 @@ import cardsStyles from '@/styles/cards.module.css';
 import ratgeberStyles from '@/styles/ratgeber.module.css';
 
 export const metadata: Metadata = {
-  title: 'RechenHafen – Alle Rechner an einem Ort | Kostenlose Online-Rechner',
+  title: {
+    absolute: 'RechenHafen – Alle Rechner an einem Ort | Kostenlose Online-Rechner',
+  },
   description: 'Über 400 präzise Online-Rechner für Deutschland: Steuern, Gehalt, Finanzen, Zinsen, Brutto-Netto, Gesundheit, Datum, Geometrie und Alltag. Schnell, verlässlich & kostenlos.',
   alternates: {
     canonical: 'https://rechenhafen.de/',

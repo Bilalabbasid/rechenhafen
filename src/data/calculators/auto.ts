@@ -17,7 +17,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Spritkosten berechnen',
     category: 'auto-verkehr',
     subcategory: 'Sprit & Verbrauch',
-    metaTitle: 'Spritkostenrechner: Fahrtkosten, Spritverbrauch & Kosten pro km berechnen | RechenHafen',
+    metaTitle: 'Spritkostenrechner: Fahrtkosten, Spritverbrauch & Kosten pro km berechnen',
     metaDescription: 'Berechnen Sie die Spritkosten für Einzelfahrten, Pendelstrecken und Fahrgemeinschaften. Inklusive Literbedarf, Kosten pro Kilometer und fairem Anteil je Mitfahrer.',
     h1: 'Spritkostenrechner – Benzin- & Dieselkosten pro Fahrt, km & Mitfahrer berechnen',
     shortDescription: 'Berechnet Kraftstoffkosten, Literbedarf und Kosten pro Kilometer für Einzelfahrten, Fahrgemeinschaften und Pendelstrecken.',

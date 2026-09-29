@@ -16,6 +16,8 @@ import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
 import { ShieldCheck, Info } from 'lucide-react';
 
+import { formatMetaTitle } from '@/lib/seo/title';
+
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -32,20 +34,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!calc) {
     return {
-      title: 'Rechner nicht gefunden | RechenHafen',
+      title: 'Rechner nicht gefunden',
     };
   }
 
   const canonicalUrl = `https://rechenhafen.de/rechner/${calc.slug}/`;
+  const cleanTitle = formatMetaTitle(calc.metaTitle);
 
   return {
-    title: calc.metaTitle,
+    title: cleanTitle,
     description: calc.metaDescription,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: calc.metaTitle,
+      title: cleanTitle,
       description: calc.metaDescription,
       url: canonicalUrl,
       siteName: 'RechenHafen',
@@ -242,16 +245,55 @@ export default async function CalculatorPage({ params }: PageProps) {
         trustMeta={calc.trustMeta}
       />
 
-      {/* Worked Example */}
-      {calc.workedExample && (
-        <section style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 'clamp(var(--space-4), 4vw, var(--space-6))',
-          margin: 'var(--space-8) 0',
-          overflowWrap: 'break-word',
-        }}>
+      {/* Worked Example(s) */}
+      {calc.workedExamples && calc.workedExamples.length > 0 ? (
+        calc.workedExamples.map((ex, idx) => (
+          <section
+            key={idx}
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'clamp(var(--space-4), 4vw, var(--space-6))',
+              margin: 'var(--space-6) 0',
+              overflowWrap: 'break-word',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-2)' }}>
+              <Info size={18} style={{ color: 'var(--color-primary)' }} />
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
+                {ex.title}
+              </h2>
+            </div>
+            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
+              {ex.description}
+            </p>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--color-primary-light)',
+                color: 'var(--color-primary)',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+              }}
+            >
+              Ergebnis: {ex.resultSummary || ex.result}
+            </div>
+          </section>
+        ))
+      ) : calc.workedExample ? (
+        <section
+          style={{
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'clamp(var(--space-4), 4vw, var(--space-6))',
+            margin: 'var(--space-8) 0',
+            overflowWrap: 'break-word',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-2)' }}>
             <Info size={18} style={{ color: 'var(--color-primary)' }} />
             <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
@@ -261,29 +303,138 @@ export default async function CalculatorPage({ params }: PageProps) {
           <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
             {calc.workedExample.description}
           </p>
-          <div style={{
-            display: 'inline-block',
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--color-primary-light)',
-            color: 'var(--color-primary)',
-            fontWeight: 600,
-            fontSize: '0.9rem'
-          }}>
+          <div
+            style={{
+              display: 'inline-block',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-primary-light)',
+              color: 'var(--color-primary)',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+            }}
+          >
             Ergebnis: {calc.workedExample.resultSummary || calc.workedExample.result}
           </div>
         </section>
-      )}
+      ) : null}
 
       {/* In-Content Werbefläche mit fest reserviertem Platz (Zero CLS) */}
       <AdSlot format="in-content" slotId="calc-incontent" />
 
-      {/* Editorial Content: Intro & Details */}
-      {(calc.content?.intro || calc.content?.details) && (
-        <section style={{ maxWidth: 'var(--max-content-width)', margin: 'var(--space-8) 0', lineHeight: 1.7, color: 'var(--color-text-secondary)', fontSize: '0.975rem' }}>
+      {/* Editorial Content: Intro, Sections & Details */}
+      {(calc.content?.intro || calc.content?.details || (calc.content?.sections && calc.content.sections.length > 0)) && (
+        <section
+          style={{
+            maxWidth: 'var(--max-content-width)',
+            margin: 'var(--space-8) 0',
+            lineHeight: 1.7,
+            color: 'var(--color-text-secondary)',
+            fontSize: '0.975rem',
+          }}
+        >
           {calc.content.intro && (
             <p style={{ marginBottom: 'var(--space-4)' }}>{renderFormattedText(calc.content.intro)}</p>
           )}
+
+          {calc.content.sections?.map((sec, sIdx) => (
+            <div key={sIdx} style={{ margin: 'var(--space-6) 0' }}>
+              <h2
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  margin: '0 0 var(--space-2)',
+                  color: 'var(--color-text-primary)',
+                }}
+              >
+                {sec.title}
+              </h2>
+              {sec.content.split('\n\n').map((paragraph, pIdx) => {
+                const trimmed = paragraph.trim();
+                // Check if paragraph is markdown list
+                if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+                  const items = trimmed.split('\n').filter((l) => l.trim().length > 0);
+                  return (
+                    <ul key={pIdx} style={{ paddingLeft: '1.25rem', margin: '0 0 var(--space-3)' }}>
+                      {items.map((it, itIdx) => (
+                        <li key={itIdx} style={{ marginBottom: '4px' }}>
+                          {renderFormattedText(it.replace(/^[-•]\s*/, ''))}
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                }
+                // Check if paragraph is markdown table
+                if (trimmed.includes('|') && trimmed.includes('---')) {
+                  const rows = trimmed
+                    .split('\n')
+                    .map((r) => r.trim())
+                    .filter((r) => r.startsWith('|') && r.endsWith('|'));
+                  if (rows.length >= 2) {
+                    const headerCols = rows[0]
+                      .slice(1, -1)
+                      .split('|')
+                      .map((c) => c.trim());
+                    const dataRows = rows.slice(2).map((r) =>
+                      r
+                        .slice(1, -1)
+                        .split('|')
+                        .map((c) => c.trim())
+                    );
+                    return (
+                      <div key={pIdx} style={{ overflowX: 'auto', margin: 'var(--space-4) 0' }}>
+                        <table
+                          style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            fontSize: '0.9rem',
+                            background: 'var(--color-surface)',
+                            border: '1px solid var(--color-border)',
+                            borderRadius: 'var(--radius-md)',
+                          }}
+                        >
+                          <thead>
+                            <tr style={{ background: 'var(--color-surface-hover)', textAlign: 'left' }}>
+                              {headerCols.map((col, cIdx) => (
+                                <th
+                                  key={cIdx}
+                                  style={{
+                                    padding: '8px 12px',
+                                    borderBottom: '2px solid var(--color-border)',
+                                    fontWeight: 700,
+                                    color: 'var(--color-text-primary)',
+                                  }}
+                                >
+                                  {col}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {dataRows.map((dRow, rIdx) => (
+                              <tr key={rIdx} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                                {dRow.map((cell, cIdx) => (
+                                  <td key={cIdx} style={{ padding: '8px 12px' }}>
+                                    {renderFormattedText(cell)}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    );
+                  }
+                }
+                return (
+                  <p key={pIdx} style={{ marginBottom: 'var(--space-3)' }}>
+                    {renderFormattedText(paragraph)}
+                  </p>
+                );
+              })}
+            </div>
+          ))}
+
           {calc.content.details && (
             <p style={{ marginBottom: 'var(--space-4)' }}>{renderFormattedText(calc.content.details)}</p>
           )}

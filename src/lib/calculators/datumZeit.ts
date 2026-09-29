@@ -1,4 +1,4 @@
-import { CalculationResult } from '@/types/calculator';
+import { CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
 import { getGermanHolidays, FederalState, FEDERAL_STATES } from '@/lib/holidays';
 
@@ -477,6 +477,182 @@ export function calculateTimeDifference(inputs: Record<string, any>): Calculatio
       { id: 'pause', label: 'Abgezogene Pause', value: pauseMin, formattedValue: `${pauseMin} Min.` },
     ],
     summaryText: `Zwischen ${time1} Uhr und ${time2} Uhr (abzüglich ${pauseMin} Min. Pause) verbleiben ${effHours} Stunden und ${effRemainingMin} Minuten (${formatNumber(decimalHours, 2)} Industriestunden).`,
+  };
+}
+
+export function calculateArbeitszeit(inputs: Record<string, any>): CalculationResult {
+  const time1 = (inputs.startTime || '08:00').toString().trim();
+  const time2 = (inputs.endTime || '16:30').toString().trim();
+
+  // Validate time format (HH:MM or H:MM)
+  const timeRegex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/;
+  if (!timeRegex.test(time1) || !timeRegex.test(time2)) {
+    return {
+      primary: { id: 'duration', label: 'Netto-Arbeitszeit', value: 0, formattedValue: '0 Std. 0 Min.' },
+      error: 'Bitte geben Sie gültige Uhrzeiten für Arbeitsbeginn und Arbeitsende im Format HH:MM ein.',
+    };
+  }
+
+  // Parse pause minutes: support array 'pauses', individual 'pause1..4', or 'pauseMinutes'
+  let pauseList: number[] = [];
+  if (Array.isArray(inputs.pauses)) {
+    pauseList = inputs.pauses.map((p: any) => typeof p === 'number' ? p : parseFloat(p));
+  } else if (inputs.pause1 !== undefined || inputs.pause2 !== undefined || inputs.pause3 !== undefined || inputs.pause4 !== undefined) {
+    if (inputs.pause1 !== undefined && inputs.pause1 !== '') pauseList.push(parseFloat(inputs.pause1));
+    if (inputs.pause2 !== undefined && inputs.pause2 !== '') pauseList.push(parseFloat(inputs.pause2));
+    if (inputs.pause3 !== undefined && inputs.pause3 !== '') pauseList.push(parseFloat(inputs.pause3));
+    if (inputs.pause4 !== undefined && inputs.pause4 !== '') pauseList.push(parseFloat(inputs.pause4));
+  } else if (inputs.pauseMinutes !== undefined && inputs.pauseMinutes !== '') {
+    pauseList = [parseFloat(inputs.pauseMinutes)];
+  } else {
+    pauseList = [0];
+  }
+
+  // Check for NaN or negative breaks
+  for (const p of pauseList) {
+    if (isNaN(p) || p < 0) {
+      return {
+        primary: { id: 'duration', label: 'Netto-Arbeitszeit', value: 0, formattedValue: '0 Std. 0 Min.' },
+        error: 'Pausenzeiten dürfen nicht negativ oder ungültig sein.',
+      };
+    }
+  }
+
+  const totalPause = pauseList.reduce((acc, curr) => acc + curr, 0);
+
+  // Parse target hours (default 8 if not specified, or explicit null)
+  let targetHours: number | null = null;
+  if (inputs.targetHours !== undefined && inputs.targetHours !== null && inputs.targetHours !== '') {
+    const parsedTarget = parseFloat(inputs.targetHours);
+    if (isNaN(parsedTarget) || parsedTarget < 0 || parsedTarget > 24) {
+      return {
+        primary: { id: 'duration', label: 'Netto-Arbeitszeit', value: 0, formattedValue: '0 Std. 0 Min.' },
+        error: 'Bitte geben Sie eine gültige Sollarbeitszeit zwischen 0 und 24 Stunden an.',
+      };
+    }
+    targetHours = parsedTarget;
+  }
+
+  const [h1, m1] = time1.split(':').map((v: string) => parseInt(v, 10));
+  const [h2, m2] = time2.split(':').map((v: string) => parseInt(v, 10));
+
+  let totalMinutes = (h2 * 60 + m2) - (h1 * 60 + m1);
+  const isOvernight = totalMinutes <= 0;
+  if (isOvernight) {
+    totalMinutes += 24 * 60; // Automatic overnight handling (ends on next day)
+  }
+
+  if (totalPause > totalMinutes) {
+    return {
+      primary: { id: 'duration', label: 'Netto-Arbeitszeit', value: 0, formattedValue: '0 Std. 0 Min.' },
+      error: `Die gesamte Pausenzeit (${totalPause} Min.) darf nicht länger als die Bruttoarbeitszeit (${Math.floor(totalMinutes / 60)} Std. ${totalMinutes % 60} Min.) sein.`,
+    };
+  }
+
+  const effectiveMinutes = Math.max(0, totalMinutes - totalPause);
+  const effHours = Math.floor(effectiveMinutes / 60);
+  const effRemainingMin = effectiveMinutes % 60;
+  const decimalHours = effectiveMinutes / 60;
+  const grossHours = totalMinutes / 60;
+
+  // Legal break guidance (§ 4 ArbZG):
+  // - More than 6 to 9 hours: at least 30 minutes break
+  // - More than 9 hours: at least 45 minutes break
+  let warningMessage: string | undefined;
+  if (grossHours > 9 && totalPause < 45) {
+    warningMessage = `Hinweis zur Orientierung, keine Rechtsberatung: Gemäß § 4 ArbZG ist bei mehr als 9 Stunden Arbeitszeit eine Ruhepause von mindestens 45 Minuten gesetzlich vorgeschrieben (aktuelle Pause: ${totalPause} Min.).`;
+  } else if (grossHours > 6 && grossHours <= 9 && totalPause < 30) {
+    warningMessage = `Hinweis zur Orientierung, keine Rechtsberatung: Gemäß § 4 ArbZG ist bei mehr als 6 bis 9 Stunden Arbeitszeit eine Ruhepause von mindestens 30 Minuten gesetzlich vorgeschrieben (aktuelle Pause: ${totalPause} Min.).`;
+  }
+
+  if (decimalHours > 10) {
+    const maxHourNote = `Hinweis zur Orientierung (§ 3 ArbZG): Die werktägliche Arbeitszeit darf 10 Stunden grundsätzlich nicht überschreiten (aktuelle Nettozeit: ${formatNumber(decimalHours, 2)} Std.).`;
+    warningMessage = warningMessage ? `${warningMessage} ${maxHourNote}` : maxHourNote;
+  }
+
+  const secondary: ResultItem[] = [
+    {
+      id: 'grossMinutes',
+      label: 'Bruttoarbeitszeit',
+      value: grossHours,
+      formattedValue: `${Math.floor(totalMinutes / 60)} Std. ${totalMinutes % 60} Min. (${formatNumber(grossHours, 2)} Std.)`,
+    },
+    {
+      id: 'pause',
+      label: 'Gesamte Pausenzeit',
+      value: totalPause,
+      formattedValue: `${totalPause} Min. (${formatNumber(totalPause / 60, 2)} Std.)`,
+    },
+    {
+      id: 'decimal',
+      label: 'Nettoarbeitszeit (Dezimal)',
+      value: decimalHours,
+      formattedValue: `${formatNumber(decimalHours, 2, 2)} Std.`,
+      highlight: true,
+    },
+  ];
+
+  if (targetHours !== null) {
+    secondary.push({
+      id: 'targetHours',
+      label: 'Sollarbeitszeit',
+      value: targetHours,
+      formattedValue: `${formatNumber(targetHours, 2)} Std.`,
+    });
+
+    const overtimeHours = decimalHours - targetHours;
+    let formattedDiff = '';
+    if (overtimeHours > 0.001) {
+      formattedDiff = `+${formatNumber(overtimeHours, 2, 2)} Std. (Überstunden)`;
+    } else if (overtimeHours < -0.001) {
+      formattedDiff = `${formatNumber(overtimeHours, 2, 2)} Std. (Minusstunden)`;
+    } else {
+      formattedDiff = '0,00 Std. (Ausgeglichen)';
+    }
+    secondary.push({
+      id: 'overtime',
+      label: 'Überstunden / Minusstunden',
+      value: overtimeHours,
+      formattedValue: formattedDiff,
+    });
+  }
+
+  if (isOvernight) {
+    secondary.push({
+      id: 'shiftType',
+      label: 'Schichtart',
+      value: 'overnight',
+      formattedValue: 'Nachtschicht / Folgetag (+1 Tag)',
+      helpText: 'Arbeitsende liegt am Folgetag nach Mitternacht.',
+    });
+  }
+
+  secondary.push({
+    id: 'disclaimer',
+    label: 'Rechtlicher Hinweis',
+    value: 0,
+    formattedValue: 'Orientierungshilfe nach ArbZG; Tarifverträge & Betriebsvereinbarungen können abweichen.',
+  });
+
+  let summary = `Zwischen ${time1} Uhr und ${time2} Uhr${isOvernight ? ' (Folgetag)' : ''} beträgt Ihre Bruttoanwesenheit ${Math.floor(totalMinutes / 60)} Std. ${totalMinutes % 60} Min. Nach Abzug von ${totalPause} Min. Pause verbleiben genau ${effHours} Std. ${effRemainingMin} Min. Nettoarbeitszeit (${formatNumber(decimalHours, 2)} Industriestunden).`;
+  if (targetHours !== null) {
+    const diff = decimalHours - targetHours;
+    summary += diff >= 0
+      ? ` Gegenüber der vereinbarten Sollarbeitszeit (${formatNumber(targetHours, 2)} Std.) haben Sie ${formatNumber(diff, 2)} Überstunden geleistet.`
+      : ` Gegenüber der vereinbarten Sollarbeitszeit (${formatNumber(targetHours, 2)} Std.) verbleiben ${formatNumber(Math.abs(diff), 2)} Minusstunden.`;
+  }
+
+  return {
+    primary: {
+      id: 'duration',
+      label: 'Netto-Arbeitszeit',
+      value: decimalHours,
+      formattedValue: `${effHours} Std. ${effRemainingMin} Min.`,
+      highlight: true,
+    },
+    secondary,
+    summaryText: summary,
+    warning: warningMessage,
   };
 }
 

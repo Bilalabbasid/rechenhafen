@@ -4,7 +4,7 @@ import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import styles from '@/styles/layout.module.css';
 
 export const metadata: Metadata = {
-  title: 'Impressum | RechenHafen',
+  title: 'Impressum',
   description: 'Impressum und gesetzliche Anbieterkennzeichnung nach § 5 DDG für die Website RechenHafen.',
   alternates: {
     canonical: 'https://rechenhafen.de/impressum/',

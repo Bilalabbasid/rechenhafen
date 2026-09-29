@@ -65,7 +65,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
     shortName: 'Dienstjubiläum',
     category: 'datum-zeit',
     subcategory: 'Arbeitstage & Werktage',
-    metaTitle: 'Dienstjubiläum Rechner – 10, 25 – RechenHafen',
+    metaTitle: 'Dienstjubiläum Rechner – Betriebszugehörigkeit berechnen',
     metaDescription: 'Berechnen Sie das genaue Datum für Ihr 10-, 25- oder 40-jähriges Firmenjubiläum nach Eintrittsdatum. Inklusive verbleibender Tage.',
     h1: 'Dienstjubiläum Rechner (Betriebszugehörigkeit)',
     shortDescription: 'Ermittelt das exakte Datum für 10, 25, 40 und 50 Jahre Betriebszugehörigkeit anhand des Eintrittsdatums.',

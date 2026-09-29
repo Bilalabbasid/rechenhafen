@@ -8,7 +8,7 @@ import compStyles from '@/styles/components.module.css';
 import { Compass, ArrowRight, Home } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Seite nicht gefunden (404) | RechenHafen',
+  title: 'Seite nicht gefunden (404)',
   description: 'Die aufgerufene Seite konnte leider nicht gefunden werden. Finden Sie den passenden Online-Rechner über unsere Suche oder nach Kategorie.',
   robots: {
     index: false,

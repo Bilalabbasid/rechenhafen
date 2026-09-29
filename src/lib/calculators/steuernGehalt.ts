@@ -1,4 +1,4 @@
-import { CalculationResult } from '@/types/calculator';
+import { CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig, TaxYearConfig } from '@/data/regulated/tax';
 
@@ -827,5 +827,146 @@ export function calculateMwSt(inputs: Record<string, any>): CalculationResult {
       { id: 'netAmount', label: 'Nettobetrag', value: net, formattedValue: formatCurrency(net) },
       { id: 'grossAmount', label: 'Bruttobetrag', value: gross, formattedValue: formatCurrency(gross) },
     ],
+  };
+}
+
+// ==========================================
+// 15. GEWERBESTEUERRECHNER
+// ==========================================
+export function calculateGewerbesteuer(inputs: Record<string, any>): CalculationResult {
+  const legalForm = inputs.legalForm || 'einzelunternehmen';
+  const rawErtrag = parseFloat(inputs.gewerbeertrag);
+  const rawHebesatz = parseFloat(inputs.hebesatz);
+
+  if (isNaN(rawErtrag)) {
+    return {
+      primary: { id: 'gewerbesteuer', label: 'Voraussichtliche Gewerbesteuer', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen gültigen Gewerbeertrag ein.',
+    };
+  }
+
+  const ertrag = Math.max(0, rawErtrag);
+  const hebesatz = !isNaN(rawHebesatz) && rawHebesatz > 0 ? rawHebesatz : 400;
+
+  // 1. Abrundung auf volle 100 Euro (§ 11 Abs. 1 Satz 3 GewStG)
+  const roundedErtrag = Math.floor(ertrag / 100) * 100;
+
+  // 2. Gesetzlicher Freibetrag (§ 11 Abs. 1 GewStG)
+  let freibetrag = 0;
+  let legalFormLabel = 'Einzelunternehmen / natürliche Person';
+  if (legalForm === 'einzelunternehmen') {
+    freibetrag = 24500;
+    legalFormLabel = 'Einzelunternehmen / natürliche Person';
+  } else if (legalForm === 'personengesellschaft') {
+    freibetrag = 24500;
+    legalFormLabel = 'Personengesellschaft (GbR, OHG, KG, GmbH & Co. KG)';
+  } else if (legalForm === 'kapitalgesellschaft') {
+    freibetrag = 0;
+    legalFormLabel = 'Kapitalgesellschaft (GmbH, UG haftungsbeschränkt, AG)';
+  } else if (legalForm === 'sonstige') {
+    freibetrag = 5000;
+    legalFormLabel = 'Verein / sonstige juristische Person (§ 11 Abs. 1 Nr. 2 GewStG)';
+  }
+
+  // 3. Gekürzter Gewerbeertrag (mindestens 0)
+  const taxableErtrag = Math.max(0, roundedErtrag - freibetrag);
+
+  // 4. Steuermesszahl 3,5 % (§ 11 Abs. 2 GewStG)
+  const steuermesszahl = 0.035;
+
+  // 5. Steuermessbetrag (§ 14 GewStG)
+  const steuermessbetrag = Math.round((taxableErtrag * steuermesszahl) * 100) / 100;
+
+  // 6. Gewerbesteuer = Steuermessbetrag × Hebesatz / 100 (§ 16 GewStG)
+  const gewerbesteuer = Math.round((steuermessbetrag * (hebesatz / 100)) * 100) / 100;
+
+  // 7. Effektiver Gewerbesteuersatz auf den Gewerbeertrag
+  const effectiveRate = ertrag > 0 ? (gewerbesteuer / ertrag) * 100 : 0;
+
+  // 8. § 35 EStG Anrechnungspotenzial (nur für Personenunternehmen)
+  const isPersonenUnternehmen = legalForm === 'einzelunternehmen' || legalForm === 'personengesellschaft';
+  const maxEstCredit = isPersonenUnternehmen ? Math.min(gewerbesteuer, steuermessbetrag * 4.0) : 0;
+
+  // Warnings
+  let warningMessage: string | undefined;
+  if (hebesatz < 200) {
+    warningMessage = `Gesetzlicher Mindesthebesatz unterschritten: Nach § 16 Abs. 4 Satz 2 GewStG muss der Hebesatz mindestens 200 % betragen (eingegeben: ${hebesatz} %).`;
+  }
+
+  const secondary: ResultItem[] = [
+    {
+      id: 'gewerbeertragRaw',
+      label: 'Eingegebener Gewerbeertrag',
+      value: ertrag,
+      formattedValue: formatCurrency(ertrag),
+    },
+    {
+      id: 'gewerbeertragRounded',
+      label: 'Abgerundeter Gewerbeertrag (§ 11 GewStG)',
+      value: roundedErtrag,
+      formattedValue: `${formatCurrency(roundedErtrag)} (auf volle 100 €)`,
+    },
+    {
+      id: 'freibetrag',
+      label: `Freibetrag (${legalForm === 'kapitalgesellschaft' ? 'Kein Freibetrag für Kapitalgesellschaften' : '§ 11 Abs. 1 GewStG'})`,
+      value: freibetrag,
+      formattedValue: formatCurrency(freibetrag),
+    },
+    {
+      id: 'taxableErtrag',
+      label: 'Steuerpflichtiger Gewerbeertrag',
+      value: taxableErtrag,
+      formattedValue: formatCurrency(taxableErtrag),
+    },
+    {
+      id: 'steuermessbetrag',
+      label: 'Steuermessbetrag (3,5 % Steuermesszahl)',
+      value: steuermessbetrag,
+      formattedValue: formatCurrency(steuermessbetrag),
+    },
+    {
+      id: 'hebesatz',
+      label: 'Kommunaler Hebesatz',
+      value: hebesatz,
+      formattedValue: `${formatNumber(hebesatz, 1)} %`,
+    },
+    {
+      id: 'effectiveRate',
+      label: 'Effektive Gewerbesteuer-Belastung',
+      value: effectiveRate,
+      formattedValue: formatPercent(effectiveRate, 2),
+    },
+  ];
+
+  if (isPersonenUnternehmen) {
+    secondary.push({
+      id: 'estCreditPotential',
+      label: 'Max. Ermäßigungspotenzial Einkommensteuer (§ 35 EStG)',
+      value: maxEstCredit,
+      formattedValue: `${formatCurrency(maxEstCredit)} (max. 4,0 × Messbetrag)`,
+      helpText: 'Gilt nur für die persönliche Einkommensteuer der Gesellschafter/Inhaber. Mindert nicht die Zahllast gegenüber der Gemeinde.',
+    });
+  }
+
+  let summaryText = `Für ${legalFormLabel} mit einem Gewerbeertrag von ${formatCurrency(ertrag)} (abgerundet: ${formatCurrency(roundedErtrag)}) beträgt die Gewerbesteuer beim Hebesatz von ${formatNumber(hebesatz, 1)} % voraussichtlich ${formatCurrency(gewerbesteuer)}.`;
+  if (freibetrag > 0 && roundedErtrag <= freibetrag) {
+    summaryText += ` Durch den Freibetrag von ${formatCurrency(freibetrag)} fällt keine Gewerbesteuer an (Steuermessbetrag: 0,00 €).`;
+  } else if (isPersonenUnternehmen) {
+    summaryText += ` Nach Abzug des Freibetrags von ${formatCurrency(freibetrag)} verbleiben ${formatCurrency(taxableErtrag)} als Bemessungsgrundlage (Steuermessbetrag: ${formatCurrency(steuermessbetrag)}).`;
+  } else {
+    summaryText += ` Für Kapitalgesellschaften gewährt das GewStG keinen Freibetrag; der volle abgerundete Gewerbeertrag (${formatCurrency(roundedErtrag)}) wird mit 3,5 % besteuert (Steuermessbetrag: ${formatCurrency(steuermessbetrag)}).`;
+  }
+
+  return {
+    primary: {
+      id: 'gewerbesteuer',
+      label: 'Voraussichtliche Gewerbesteuer',
+      value: gewerbesteuer,
+      formattedValue: formatCurrency(gewerbesteuer),
+      highlight: true,
+    },
+    secondary,
+    summaryText,
+    warning: warningMessage,
   };
 }

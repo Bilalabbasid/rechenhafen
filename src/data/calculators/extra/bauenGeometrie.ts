@@ -9,7 +9,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Estrich-Bedarfsrechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: 'Estrich Rechner – Zementestrich – RechenHafen',
+    metaTitle: 'Estrich Rechner – Zementestrich & Fließestrich Bedarf',
     metaDescription: 'Berechnen Sie den Estrichbedarf in m³, Tonnen und 25-kg-/40-kg-Säcken nach Fläche und Einbaudicke (z. B. 45 mm, 60 mm) inklusive Trocknungszeit-Richtwert.',
     h1: 'Estrich Rechner – Materialmenge & Sackanzahl für Zementestrich',
     shortDescription: 'Ermittelt den Estrichbedarf nach Raumfläche und Schichtdicke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
@@ -418,7 +418,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Mauerstein-Bedarfsrechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: 'Mauersteine Rechner – Ziegel- – RechenHafen',
+    metaTitle: 'Mauersteine Rechner – Ziegel- & Mörtelbedarf berechnen',
     metaDescription: 'Berechnen Sie den Bedarf an Mauersteinen (NF, DF, 2DF, Planstein 24er/36er) und Mörtel nach Wandfläche in m² abzüglich Fenster- und Türöffnungen.',
     h1: 'Mauersteine Rechner – Steinanzahl & Mörtelbedarf ermitteln',
     shortDescription: 'Ermittelt die Stückzahl an Mauerziegeln und Mörtel für eine Wand.',
@@ -1250,7 +1250,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Schalungsstein-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: 'Schalungssteine Rechner: Steine & Füllbeton (m³) für Stützmauer berechnen | RechenHafen',
+    metaTitle: 'Schalungssteine Rechner: Steine & Füllbeton (m³) für Stützmauer berechnen',
     metaDescription: 'Berechnen Sie die benötigte Anzahl an Schalungssteinen (17,5er, 24er, 30er) sowie das Füllbeton-Volumen in m³ und Bewehrungsstahl für Stützmauern und Fundamente.',
     h1: 'Schalungssteine Rechner – Steinbedarf, Füllbeton (m³) & Bewehrungsstahl berechnen',
     shortDescription: 'Berechnet Schalungssteine und Verfüllbeton für Stützmauern und Poolwände mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
@@ -1326,27 +1326,28 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       else if (inputs.stoneWidth === '36.5') concretePerM2 = 240;
       
       const concreteM3 = (wallArea * (concretePerM2 / 1000)) * waste;
+      const concreteTonnes = concreteM3 * 2.3; // Normalbeton Dichte ~2,3 t/m³
       // Bewehrungsstahl: 2 horizontale Stäbe je Schicht (alle 25 cm) + Vertikalstäbe alle 25 cm
       const layers = Math.ceil(h / 0.25);
       const horizontalRebarM = layers * 2 * l;
       const verticalRebarM = Math.ceil(l / 0.25) * h;
-      const totalRebarMeters = Math.ceil((horizontalRebarM + verticalRebarM) * 1.1);
+      const totalRebarMeters = Math.ceil((horizontalRebarM + verticalRebarM) * 1.1); // 10 % Überdeckung/Verschnitt
       
       return {
         primary: { id: 'stones', label: 'Benötigte Schalungssteine (50×25 cm)', value: stonesCount, formattedValue: stonesCount + ' Stück', highlight: true },
         secondary: [
-          { id: 'concreteM3', label: 'Verfüllbeton Gesamtvolumen', value: concreteM3, formattedValue: formatNumber(concreteM3, 2) + ' m³ (' + Math.ceil(concreteM3 * 2.3) + ' t)' },
-          { id: 'rebar', label: 'Bewehrungsstahl (z. B. Torstahl Ø 10 mm)', value: totalRebarMeters, formattedValue: 'ca. ' + totalRebarMeters + ' lfd. Meter' },
+          { id: 'concreteM3', label: 'Verfüllbeton Gesamtvolumen', value: concreteM3, formattedValue: formatNumber(concreteM3, 2) + ' m³ (ca. ' + formatNumber(concreteTonnes, 1) + ' t Normalbeton)' },
+          { id: 'rebar', label: 'Bewehrungsstahl (Ø 10 mm inkl. 10 % Überdeckung)', value: totalRebarMeters, formattedValue: 'ca. ' + totalRebarMeters + ' lfd. Meter' },
           { id: 'wallArea', label: 'Ansichtsfläche der Mauer', value: wallArea, formattedValue: formatNumber(wallArea, 2) + ' m²' },
         ],
-        summaryText: 'Für ' + formatNumber(wallArea, 2) + ' m² Wand benötigen Sie ' + stonesCount + ' Schalungssteine, ca. ' + formatNumber(concreteM3, 2) + ' m³ Verfüllbeton und rund ' + totalRebarMeters + ' m Bewehrungsstahl.',
+        summaryText: 'Für ' + formatNumber(wallArea, 2) + ' m² Wandfläche benötigen Sie ' + stonesCount + ' Schalungssteine (50×25 cm), ca. ' + formatNumber(concreteM3, 2) + ' m³ Verfüllbeton (ca. ' + formatNumber(concreteTonnes, 1) + ' t bei 2,3 t/m³) und rund ' + totalRebarMeters + ' m Bewehrungsstahl.',
       };
     },
-    formula: "Steine = Wandfläche × 8 Stk./m²; Füllbeton = Wandfläche × Betonbedarf/m² nach Steinbreite",
-    formulaExplanation: "Schalungssteine werden trocken im Verband aufgesetzt, mit Baustahl bewehrt und anschließend kammerweise mit flüssigem Beton verfüllt.",
+    formula: "Steine = Wandfläche × 8 Stk./m² × Verschnitt; Füllbeton = Wandfläche × Liter/m² × Verschnitt; Stahl = (2 × Lagen × Länge + Vertikalstäbe × Höhe) × 1,1",
+    formulaExplanation: "Schalungssteine werden trocken im Verband aufgesetzt (8 Stk./m² bei 50×25 cm Format), mit Baustahl horizontal (2 Stäbe je 25-cm-Lage) und vertikal bewehrt und anschließend mit flüssigem Normalbeton (Dichte ~2,3 t/m³) verfüllt.",
     workedExample: {
           "title": "Beispiel: 8 m × 1,5 m Stützmauer mit 24er Schalungssteinen",
-          "description": "Für eine Stützmauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen und 5 % Verschnitt werden 101 Schalungssteine (Standardmaß 50×25 cm) sowie ca. 1,83 m³ Verfüllbeton (ca. 4,2 Tonnen) und rund 115 Meter Bewehrungsstahl benötigt.",
+          "description": "Für eine Stützmauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen (145 l/m² Beton) und 5 % Verschnitt werden 101 Schalungssteine (Standardmaß 50×25 cm) sowie ca. 1,83 m³ Verfüllbeton (ca. 4,2 Tonnen bei 2,3 t/m³) und rund 159 Meter Bewehrungsstahl benötigt.",
           "inputValues": [
                 {
                       "label": "Wandmaß",
@@ -1355,13 +1356,19 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
                 {
                       "label": "Steinbreite",
                       "value": "24 cm (145 l/m²)"
+                },
+                {
+                      "label": "Verschnitt",
+                      "value": "5 %"
                 }
           ],
           "steps": [
-                "Steine: 12 m² × 8 × 1,05 = 101 Steine",
-                "Füllbeton: 12 m² × 0,145 m³ × 1,05 = 1,83 m³"
+                "Wandfläche: 8 m × 1,5 m = 12 m²",
+                "Steine: 12 m² × 8 Stk./m² × 1,05 = 100,8 → 101 Schalungssteine (50×25 cm)",
+                "Füllbeton: 12 m² × 0,145 m³/m² × 1,05 = 1,827 m³ ≈ 1,83 m³ (bei 2,3 t/m³ ≈ 4,2 Tonnen)",
+                "Bewehrung: 6 Lagen × 2 Stäbe × 8 m = 96 m horizontal; 32 Stäbe × 1,5 m = 48 m vertikal; (96 m + 48 m) × 1,10 = 158,4 m → 159 lfd. Meter"
           ],
-          "result": "101 Schalungssteine und 1,83 m³ Verfüllbeton"
+          "result": "101 Schalungssteine, 1,83 m³ Verfüllbeton (ca. 4,2 t) und 159 m Bewehrungsstahl"
     },
     content: {
       intro: 'Schalungssteine (auch Beton-Schalungssteine oder Hohlwandsteine genannt) sind das ideale Bauelement für massive Gartenstützmauern, Poolwände, Zaunsockel und Kellerwände.',
@@ -1369,9 +1376,9 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Handelsübliche Schalungssteine haben die Maße 50 cm Länge und 25 cm Höhe. Für einen Quadratmeter Maueransichtsfläche werden daher genau 8 Steine benötigt (1 m² / (0,5 m × 0,25 m) = 8 Stück). Planen Sie ca. 5 % Verschnitt für Passstücke und Ecksteine ein.' },
-      { question: 'Wie viel Füllbeton benötigt man für 24er Schalungssteine?', answer: 'Für Schalungssteine mit 24 cm Wandstärke rechnet man im Schnitt mit 140 bis 150 Litern (ca. 0,145 m³) Verfüllbeton pro Quadratmeter Wandfläche. Für 10 m² Mauer werden demnach rund 1,45 m³ Beton benötigt.' },
+      { question: 'Wie viel Füllbeton benötigt man für 24er Schalungssteine?', answer: 'Für Schalungssteine mit 24 cm Wandstärke rechnet man im Schnitt mit 140 bis 150 Litern (ca. 0,145 m³) Verfüllbeton pro Quadratmeter Wandfläche. Für 10 m² Mauer werden demnach rund 1,45 m³ Beton benötigt (Gewicht: ca. 3,34 Tonnen bei 2,3 t/m³ Normalbetondichte).' },
       { question: 'Welcher Beton eignet sich zum Verfüllen von Schalungssteinen?', answer: 'Empfohlen wird Normalbeton der Festigkeitsklasse C20/25 oder C25/30 mit einer Fließkonsistenz (F3/F4) und einer maximalen Gesteinskörnung von 8 bis 16 mm, damit sich der Beton ohne Hohlräume um die Armierungseisen verteilt.' },
-      { question: 'Wie viel Bewehrungsstahl gehört in eine Schalungssteinwand?', answer: 'In der Regel werden horizontal 2 Stäbe Baustahl (z. B. Ø 10 mm) in jede Steinlage in die Aussparungen gelegt sowie vertikal alle 25 bis 50 cm Stäbe eingesetzt, die kraftschlüssig mit dem Fundament verbunden sind.' },
+      { question: 'Wie viel Bewehrungsstahl gehört in eine Schalungssteinwand?', answer: 'In der Regel werden horizontal 2 Stäbe Baustahl (z. B. Ø 10 mm) in jede Steinlage in die Aussparungen gelegt sowie vertikal alle 25 bis 50 cm Stäbe eingesetzt, die kraftschlüssig mit dem Fundament verbunden sind. Bei einer 8 m langen und 1,5 m hohen Stützmauer mit Stäben alle 25 cm und 10 % Überdeckung/Verschnitt sind dies rund 159 laufende Meter Baustahl.' },
       { question: 'Wie viele Steinreihen darf man auf einmal mit Beton füllen?', answer: 'Wegen des hohen hydrostatischen Betondrucks sollten Sie maximal 3 bis 4 Steinreihen (ca. 75 bis 100 cm Höhe) in einem Betoniervorgang verfüllen und mit einem Rüttler oder Stab sorgfältig verdichten.' },
     ],
     relatedSlugs: ['betonrechner', 'fundament-rechner', 'beton-mischungsverhaeltnis-rechner', 'bausteine-mauerwerk-rechner'],
@@ -2353,7 +2360,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Treppen-Rechner",
     category: "bauen-renovieren",
     subcategory: "Ausbau & Wand",
-    metaTitle: 'Treppenstufen Rechner – Steigung – RechenHafen',
+    metaTitle: 'Treppenstufen Rechner – Steigung & Auftritt nach DIN 18065',
     metaDescription: 'Berechnen Sie die Stufenanzahl, Steigungshöhe (s), Auftrittstiefe (a) und Treppenlänge nach der Schrittmaßregel (2s + a = 63 cm) und.',
     h1: 'Treppen Rechner – Stufenanzahl, Steigung & Auftritt nach Schrittmaß',
     shortDescription: 'Berechnet Stufenanzahl, Steigung und Auftritt nach der DIN 18065 mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
@@ -3197,7 +3204,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kreisumfang-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: 'Kreisumfang berechnen: Rechner & Formel (U = 2·π·r = π·d) | RechenHafen',
+    metaTitle: 'Kreisumfang berechnen: Rechner & Formel (U = 2·π·r = π·d)',
     metaDescription: 'Berechnen Sie den Kreisumfang direkt aus Radius oder Durchmesser nach der Formel U = 2·π·r = π·d. Inklusive Rechenweg, Kreisfläche und Umkehrformeln.',
     h1: 'Kreisumfang Rechner – Exakten Umfang aus Radius oder Durchmesser berechnen',
     shortDescription: 'Berechnet den genauen Umfang eines Kreises aus Radius oder Durchmesser nach der mathematischen Formel U = 2·π·r.',
@@ -3622,7 +3629,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Trapez-Rechner",
     category: "geometrie",
     subcategory: "Ebene Figuren",
-    metaTitle: 'Trapez Rechner – Fläche A =/2) · h – RechenHafen',
+    metaTitle: 'Trapez Rechner – Fläche, Mittellinie & Umfang berechnen',
     metaDescription: 'Berechnen Sie den Flächeninhalt eines Trapezes über die parallelen Grundseiten a und c, die Höhe h und die Mittellinie m = (a + c) / 2 inklusive Umfang.',
     h1: 'Trapez Rechner – Flächeninhalt & Mittellinie für jedes Trapez',
     shortDescription: 'Berechnet Flächeninhalt und Mittellinie für beliebige Trapeze mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',

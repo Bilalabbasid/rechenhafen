@@ -79,7 +79,7 @@ describe('SEO & 301 Redirects Verification', () => {
   it('verifies Gasverbrauch Rechner updated title and H1', () => {
     const calc = getCalculatorBySlug('gasverbrauch-kwh-m3-rechner');
     expect(calc).toBeDefined();
-    expect(calc?.metaTitle).toBe('Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner | RechenHafen');
+    expect(calc?.metaTitle).toBe('Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner');
     expect(calc?.h1).toBe('Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner');
     expect(calc?.formula).toContain('kWh');
     expect(calc?.workedExample.description).toBeDefined();
@@ -88,7 +88,7 @@ describe('SEO & 301 Redirects Verification', () => {
   it('verifies Maximaler Kredit Rechner intent and caveats', () => {
     const calc = getCalculatorBySlug('maximaler-kredit-rechner');
     expect(calc).toBeDefined();
-    expect(calc?.metaTitle).toBe('Wie viel Kredit bekomme ich? Maximaler Kredit Rechner | RechenHafen');
+    expect(calc?.metaTitle).toBe('Wie viel Kredit bekomme ich? Maximaler Kredit Rechner');
     expect(calc?.h1).toBe('Wie viel Kredit bekomme ich? – Maximaler Kredit Rechner');
     expect(calc?.content?.details).toContain('verbindliche Kreditzusage');
     expect(calc?.content?.details).toContain('Bonitätsentscheidung');
@@ -98,7 +98,7 @@ describe('SEO & 301 Redirects Verification', () => {
     const calc = getCalculatorBySlug('break-even-rechner');
     expect(calc).toBeDefined();
     expect(calc?.slug).toBe('break-even-rechner');
-    expect(calc?.metaTitle).toBe('Gewinnschwelle berechnen: Break-Even-Rechner & Formel | RechenHafen');
+    expect(calc?.metaTitle).toBe('Gewinnschwelle berechnen: Break-Even-Rechner & Formel');
     expect(calc?.h1).toBe('Gewinnschwelle berechnen – Break-Even-Rechner');
     expect(calc?.content?.intro).toContain('Gewinnschwelle berechnen');
 
@@ -139,7 +139,7 @@ describe('SEO & 301 Redirects Verification', () => {
   it('verifies top prioritized calculators (KFZ-Steuer, Bürgergeld, Spritkosten, Kreisumfang, etc.) have rich SEO metadata, workedExample descriptions, and visible FAQs', () => {
     // 1. KFZ-Steuer
     const kfz = getCalculatorBySlug('kfz-steuer-rechner');
-    expect(kfz?.metaTitle).toBe('KFZ-Steuer-Rechner 2026: Autosteuer nach Hubraum & CO2 berechnen | RechenHafen');
+    expect(kfz?.metaTitle).toBe('KFZ-Steuer-Rechner 2026: Autosteuer nach Hubraum & CO2 berechnen');
     expect(kfz?.h1).toBe('KFZ-Steuer-Rechner 2026 – Autosteuer für Benziner, Diesel & Elektro berechnen');
     expect(kfz?.workedExample.description).toBeDefined();
     expect(kfz?.faqs.length).toBeGreaterThanOrEqual(4);
@@ -147,7 +147,7 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 2. Bürgergeld
     const bg = getCalculatorBySlug('buergergeld-anspruch-rechner');
-    expect(bg?.metaTitle).toBe('Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen | RechenHafen');
+    expect(bg?.metaTitle).toBe('Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen');
     expect(bg?.h1).toBe('Bürgergeld-Rechner 2026 – Gesetzlichen Anspruch nach SGB II ermitteln');
     expect(bg?.workedExample.description).toBeDefined();
     expect(bg?.faqs.length).toBeGreaterThanOrEqual(4);
@@ -155,28 +155,28 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 3. Spritkosten
     const sprit = getCalculatorBySlug('spritkostenrechner');
-    expect(sprit?.metaTitle).toBe('Spritkostenrechner: Fahrtkosten, Spritverbrauch & Kosten pro km berechnen | RechenHafen');
+    expect(sprit?.metaTitle).toBe('Spritkostenrechner: Fahrtkosten, Spritverbrauch & Kosten pro km berechnen');
     expect(sprit?.h1).toBe('Spritkostenrechner – Benzin- & Dieselkosten pro Fahrt, km & Mitfahrer berechnen');
     expect(sprit?.workedExample.description).toBeDefined();
     expect(sprit?.faqs.length).toBeGreaterThanOrEqual(4);
 
     // 4. Kreisumfang
     const kreis = getCalculatorBySlug('kreis-umfang-rechner');
-    expect(kreis?.metaTitle).toBe('Kreisumfang berechnen: Rechner & Formel (U = 2·π·r = π·d) | RechenHafen');
+    expect(kreis?.metaTitle).toBe('Kreisumfang berechnen: Rechner & Formel (U = 2·π·r = π·d)');
     expect(kreis?.h1).toBe('Kreisumfang Rechner – Exakten Umfang aus Radius oder Durchmesser berechnen');
     expect(kreis?.workedExample.description).toBeDefined();
     expect(kreis?.faqs.length).toBeGreaterThanOrEqual(4);
 
     // 5. Renten-Brutto-Netto
     const rente = getCalculatorBySlug('renten-brutto-netto-rechner');
-    expect(rente?.metaTitle).toBe('Renten-Brutto-Netto-Rechner 2026: Wie viel Netto-Rente bleibt übrig? | RechenHafen');
+    expect(rente?.metaTitle).toBe('Renten-Brutto-Netto-Rechner 2026: Wie viel Netto-Rente bleibt übrig?');
     expect(rente?.h1).toBe('Renten-Brutto-Netto-Rechner 2026 – Gesetzliche Altersrente nach Abzügen berechnen');
     expect(rente?.workedExample.description).toBeDefined();
     expect(rente?.faqs.length).toBeGreaterThanOrEqual(4);
 
     // 6. Autokredit
     const auto = getCalculatorBySlug('autokreditrechner');
-    expect(auto?.metaTitle).toBe('Autokreditrechner: Kfz-Monatsrate & Autofinanzierung berechnen | RechenHafen');
+    expect(auto?.metaTitle).toBe('Autokreditrechner: Kfz-Monatsrate & Autofinanzierung berechnen');
     expect(auto?.h1).toBe('Autokreditrechner – Monatliche Rate für Ihren Autokauf berechnen');
     expect(auto?.content?.details).toContain('Ballonfinanzierung');
     expect(auto?.workedExample.description).toBeDefined();
@@ -184,14 +184,14 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 7. Geschwindigkeit
     const speed = getCalculatorBySlug('geschwindigkeit-umrechner');
-    expect(speed?.metaTitle).toBe('Geschwindigkeit Umrechner: km/h in m/s, mph & Knoten umrechnen | RechenHafen');
+    expect(speed?.metaTitle).toBe('Geschwindigkeit Umrechner: km/h in m/s, mph & Knoten umrechnen');
     expect(speed?.h1).toBe('Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten präzise umrechnen');
     expect(speed?.workedExample.description).toBeDefined();
     expect(speed?.faqs.length).toBeGreaterThanOrEqual(4);
 
     // 8. Schalungssteine
     const stein = getCalculatorBySlug('schalungssteine-rechner');
-    expect(stein?.metaTitle).toBe('Schalungssteine Rechner: Steine & Füllbeton (m³) für Stützmauer berechnen | RechenHafen');
+    expect(stein?.metaTitle).toBe('Schalungssteine Rechner: Steine & Füllbeton (m³) für Stützmauer berechnen');
     expect(stein?.h1).toBe('Schalungssteine Rechner – Steinbedarf, Füllbeton (m³) & Bewehrungsstahl berechnen');
     expect(stein?.workedExample.description).toBeDefined();
     expect(stein?.faqs.length).toBeGreaterThanOrEqual(4);

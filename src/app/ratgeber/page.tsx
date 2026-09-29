@@ -7,14 +7,14 @@ import styles from '@/styles/ratgeber.module.css';
 import { BookOpen, Clock, Calendar, ArrowRight, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt | RechenHafen',
+  title: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt',
   description:
     'Fundierte Ratgeber, gesetzliche Hintergründe und nachvollziehbare Rechenbeispiele zu Finanzen, Steuern, Gehalt, Wohnen, Energie und Arbeitstagen.',
   alternates: {
     canonical: 'https://rechenhafen.de/ratgeber/',
   },
   openGraph: {
-    title: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt | RechenHafen',
+    title: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt',
     description:
       'Fundierte Ratgeber, gesetzliche Hintergründe und nachvollziehbare Rechenbeispiele zu Finanzen, Steuern, Gehalt, Wohnen, Energie und Arbeitstagen.',
     url: 'https://rechenhafen.de/ratgeber/',

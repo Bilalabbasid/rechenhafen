@@ -1216,7 +1216,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Maximaler Kredit Rechner',
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
-    metaTitle: 'Wie viel Kredit bekomme ich? Maximaler Kredit Rechner | RechenHafen',
+    metaTitle: 'Wie viel Kredit bekomme ich? Maximaler Kredit Rechner',
     metaDescription: 'Wie viel Kredit bekomme ich? Berechnen Sie Ihre maximale Kreditsumme anhand von monatlicher Wunschrate, Zins und Laufzeit. Kostenlose Haushaltsbudget-Schätzung.',
     h1: 'Wie viel Kredit bekomme ich? – Maximaler Kredit Rechner',
     shortDescription: 'Berechnet die maximal finanzierbare Kreditsumme aus Ihrer leistbaren Monatsrate und Laufzeit – als unverbindliche Orientierungshilfe für Ihren Kreditrahmen.',

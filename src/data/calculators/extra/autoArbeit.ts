@@ -10,7 +10,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'KFZ-Steuer berechnen',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'KFZ-Steuer-Rechner 2026: Autosteuer nach Hubraum & CO2 berechnen | RechenHafen',
+    metaTitle: 'KFZ-Steuer-Rechner 2026: Autosteuer nach Hubraum & CO2 berechnen',
     metaDescription: 'Berechnen Sie die jährliche KFZ-Steuer für Benziner, Diesel und Elektroautos nach Hubraum und CO2-Ausstoß (g/km) gemäß aktuellem KraftStG 2026.',
     h1: 'KFZ-Steuer-Rechner 2026 – Autosteuer für Benziner, Diesel & Elektro berechnen',
     shortDescription: 'Ermittelt die exakte Kraftfahrzeugsteuer für Pkw mit Benzin-, Diesel- oder Elektroantrieb nach aktuellen gesetzlichen Vorgaben.',
@@ -116,7 +116,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Dienstwagen 1%-Regelung',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'Dienstwagen Rechner – 1 % Regelung – RechenHafen',
+    metaTitle: 'Dienstwagen Rechner – 1 % Regelung & geldwerter Vorteil',
     metaDescription: 'Berechnen Sie den geldwerten Vorteil und die tatsächliche Netto-Belastung für Ihren Firmenwagen nach der 1-%-Regel (Verbrenner 1 %, Hybrid 0,5 %',
     h1: 'Dienstwagen Rechner – 1 % Pauschalversteuerung berechnen',
     shortDescription: 'Ermittelt den steuerpflichtigen geldwerten Vorteil für die Privatnutzung eines Dienstwagens (§ 8 Abs. 2 EStG).',
@@ -750,7 +750,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Reifenrechner Abrollumfang',
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
-    metaTitle: 'Reifenrechner – Abrollumfang – RechenHafen',
+    metaTitle: 'Reifenrechner – Abrollumfang & Tachoabweichung berechnen',
     metaDescription: 'Berechnen Sie Abrollumfang, Durchmesser und die Tachoabweichung beim Wechsel auf neue Reifengrößen und Felgen gemäß ECE-Norm.',
     h1: 'Reifenrechner – Abrollumfang & Tachoabweichung berechnen',
     shortDescription: 'Vergleicht zwei Reifengrößen und prüft die gesetzliche Zulässigkeit der Tachoanzeige.',
@@ -880,72 +880,122 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'dienstfahrrad-jobrad-rechner',
     slug: 'dienstfahrrad-jobrad-rechner',
-    name: 'Dienstfahrrad & JobRad-Rechner (0,25 % Gehaltsumwandlung)',
-    shortName: 'JobRad-Rechner',
+    name: 'Dienstfahrrad-Rechner (Leasing & 0,25 % Gehaltsumwandlung)',
+    shortName: 'Dienstrad-Rechner',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'Dienstfahrrad Rechner – JobRad Ersparnis & 0,25 % Besteuerung',
-    metaDescription: 'Berechnen Sie Ihre Ersparnis beim Dienstrad-Leasing (JobRad, Bikeleasing) per Gehaltsumwandlung: Bis zu 40 % Ersparnis gegenüber dem Privatkauf.',
-    h1: 'Dienstfahrrad Rechner – JobRad & E-Bike Leasing berechnen',
-    shortDescription: 'Kalkuliert die Netto-Kosten eines Dienst-E-Bikes nach 0,25 % Versteuerung und Gehaltsumwandlung.',
-    searchKeywords: ['jobrad rechner ersparnis', 'dienstfahrrad gehaltsumwandlung rechner', '0 25 prozent regelung e bike', 'bikeleasing netto abzug'],
+    metaTitle: 'Dienstfahrrad-Rechner: Leasingkosten & Netto-Belastung berechnen',
+    metaDescription: 'Berechnen Sie die monatlichen Leasingkosten und Ihre Netto-Ersparnis beim Dienstrad-Leasing per Gehaltsumwandlung nach der offiziellen 0,25-%-Regelung.',
+    h1: 'Dienstfahrrad-Rechner: Deine monatlichen Leasingkosten berechnen',
+    shortDescription: 'Berechnet die tatsächliche monatliche Netto-Belastung und Gesamtersparnis beim Dienstrad-Leasing über den Arbeitgeber.',
+    searchKeywords: ['dienstfahrrad rechner', 'dienstrad leasing rechner', 'jobrad rechner ersparnis', 'jobrad netto rechner', '0 25 prozent regelung e bike', 'gehaltsumwandlung fahrrad rechner'],
     inputs: [
-      { id: 'bikePriceGross', label: 'Fahrrad- / E-Bike-Kaufpreis inkl. Schloss & Zubehör (UVP)', type: 'number', defaultValue: 3500, min: 750, max: 15000, step: 100, unit: '€' },
+      { id: 'bikePriceGross', label: 'Fahrrad- / E-Bike-Kaufpreis inkl. Zubehör (UVP)', type: 'number', defaultValue: 3500, min: 750, max: 15000, step: 100, unit: '€' },
       { id: 'grossSalary', label: 'Ihr monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 1000, step: 100, unit: '€' },
+      { id: 'employerSubsidy', label: 'Monatlicher Arbeitgeberzuschuss (optional)', type: 'number', defaultValue: 0, min: 0, max: 200, step: 5, unit: '€/Monat', helpText: 'Freiwilliger monatlicher Zuschuss Ihres Arbeitgebers zur Leasingrate' },
+      { id: 'serviceCost', label: 'Monatliche Inspektions- / Versicherungskosten', type: 'number', defaultValue: 10, min: 0, max: 50, step: 1, unit: '€/Monat', helpText: 'Vollkaskoversicherung und jährliche Inspektion' },
       { id: 'taxClass', label: 'Steuerklasse', type: 'select', defaultValue: '1', options: [
-        { value: '1', label: 'Steuerklasse 1 (Ledig / keine Kinder)' },
-        { value: '3', label: 'Steuerklasse 3 (Verheiratet Alleinverdiener)' },
-        { value: '4', label: 'Steuerklasse 4 (Verheiratet)' },
+        { value: '1', label: 'Steuerklasse 1 (Ledig / getrennt lebend)' },
+        { value: '3', label: 'Steuerklasse 3 (Verheiratet, Alleinverdiener)' },
+        { value: '4', label: 'Steuerklasse 4 (Verheiratet, Doppelverdiener)' },
       ]},
     ],
     calculate: (inputs) => {
       const price = parseFloat(inputs.bikePriceGross) || 3500;
-      // Monatliche Leasingrate ca. 2,9 % des Kaufpreises (36 Monate)
+      const salary = parseFloat(inputs.grossSalary) || 3800;
+      const subsidy = Math.max(0, parseFloat(inputs.employerSubsidy) || 0);
+      const service = Math.max(0, parseFloat(inputs.serviceCost) || 0);
+
+      // Leasingrate ca. 2,9 % des UVP (typischer Marktwert bei 36 Monaten Laufzeit)
       const leasingRate = price * 0.029;
-      // Geldwerter Vorteil: 0,25 % auf gerundete volle 100 € des UVP
-      const roundedPrice = Math.floor(price / 100) * 100;
-      const benefit = roundedPrice * 0.0025;
-      // Durch Steuer- und SV-Ersparnis sinkt die Netto-Belastung auf ca. 55 % bis 60 % der Leasingrate
-      const actualNetDeduction = (leasingRate * 0.58) + (benefit * 0.40);
-      const totalPaid36Months = actualNetDeduction * 36;
-      // Typischer Übernahmepreis nach 36 Monaten ca. 17-18 %
+      // Brutto-Umwandlungsbetrag
+      const grossDeduction = Math.max(0, leasingRate + service - subsidy);
+
+      // Geldwerter Vorteil nach § 6 Abs. 1 Nr. 4 Satz 6 EStG (0,25 % Regelung):
+      // 0,25 % auf das auf volle 100 € abgerundete Viertel des UVP
+      const quarterUvpRounded = Math.floor((price * 0.25) / 100) * 100;
+      // Monatlicher geldwerter Vorteil: 1 % von 25 % = 0,25 % von 100 %
+      const taxableBenefit = Math.max(1, quarterUvpRounded * 0.01);
+
+      // Reale Steuer- & SV-Entlastung schätzen (ca. 42-48 % Grenzbelastung je nach Gehalt):
+      const marginalRate = salary > 4500 ? 0.46 : salary > 2800 ? 0.42 : 0.36;
+      const taxSvSavings = grossDeduction * marginalRate;
+      const benefitTaxCost = taxableBenefit * marginalRate;
+
+      // Tatsächliche monatliche Netto-Belastung
+      const actualNetDeduction = Math.max(5, grossDeduction - taxSvSavings + benefitTaxCost);
+      const totalNetPaid36 = actualNetDeduction * 36;
+
+      // Typischer Übernahmepreis nach 36 Monaten (17-18 % der UVP)
       const takeoverPrice = price * 0.18;
-      const totalCost = totalPaid36Months + takeoverPrice;
+      const totalCost = totalNetPaid36 + takeoverPrice;
       const savingsVsDirectPurchase = price - totalCost;
+      const savingsPct = price > 0 ? (savingsVsDirectPurchase / price) * 100 : 0;
 
       return {
-        primary: { id: 'actualNetDeduction', label: 'Tatsächliche monatliche Netto-Belastung', value: actualNetDeduction, formattedValue: formatCurrency(actualNetDeduction), highlight: true },
+        primary: {
+          id: 'actualNetDeduction',
+          label: 'Geschätzte monatliche Netto-Belastung',
+          value: actualNetDeduction,
+          formattedValue: formatCurrency(actualNetDeduction),
+          highlight: true,
+        },
         secondary: [
-          { id: 'savingsVsDirectPurchase', label: 'Gesamtersparnis gegenüber Direktkauf', value: savingsVsDirectPurchase, formattedValue: formatCurrency(savingsVsDirectPurchase) },
-          { id: 'pctSaved', label: 'Ersparnis in Prozent', value: (savingsVsDirectPurchase / price) * 100, formattedValue: formatPercent((savingsVsDirectPurchase / price) * 100, 1) },
+          { id: 'savingsVsDirectPurchase', label: 'Geschätzte Gesamtersparnis ggü. Direktkauf', value: savingsVsDirectPurchase, formattedValue: formatCurrency(savingsVsDirectPurchase) },
+          { id: 'pctSaved', label: 'Ersparnis in Prozent', value: savingsPct, formattedValue: formatPercent(savingsPct, 1) },
+          { id: 'leasingRate', label: 'Monatliche Leasingrate (brutto)', value: leasingRate, formattedValue: formatCurrency(leasingRate) },
+          { id: 'grossDeduction', label: 'Monatlicher Bruttoabzug vom Gehalt', value: grossDeduction, formattedValue: formatCurrency(grossDeduction) },
+          { id: 'benefit', label: 'Geldwerter Vorteil (0,25 % Regelung)', value: taxableBenefit, formattedValue: formatCurrency(taxableBenefit) },
           { id: 'takeoverPrice', label: 'Voraussichtlicher Übernahmepreis nach 36 Monaten', value: takeoverPrice, formattedValue: formatCurrency(takeoverPrice) },
         ],
-        summaryText: `Statt ${formatCurrency(price)} bar zahlen Sie über Gehaltsumwandlung effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Sie sparen insgesamt ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent((savingsVsDirectPurchase / price) * 100, 1)}).`,
+        details: [
+          { id: 'leaseTerm', label: 'Vertragslaufzeit', value: 36, formattedValue: '36 Monate' },
+          { id: 'total36', label: 'Summe der 36 Netto-Monatsraten', value: totalNetPaid36, formattedValue: formatCurrency(totalNetPaid36) },
+          { id: 'totalCostOverall', label: 'Gesamtaufwand inkl. Übernahme', value: totalCost, formattedValue: formatCurrency(totalCost) },
+        ],
+        summaryText: `Bei einem Fahrradpreis von ${formatCurrency(price)} zahlen Sie bei 36 Monaten Laufzeit effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Zusammen mit dem voraussichtlichen Übernahmepreis von ca. ${formatCurrency(takeoverPrice)} sparen Sie gegenüber dem privaten Sofortkauf voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}).`,
       };
     },
-    formula: 'Ersparnis = UVP - (36 × Netto-Leasingabzug + Übernahmepreis)',
-    formulaExplanation: 'Seit 2020 muss für die private Nutzung eines Dienstrads nur noch 0,25 % des geviertelten Bruttolistenpreises als geldwerter Vorteil versteuert werden (§ 6 Abs. 1 Nr. 4 EStG).',
+    formula: 'Netto-Belastung ≈ Bruttoabzug - (Bruttoabzug × Grenzsteuersatz) + (0,25 % UVP × Grenzsteuersatz)',
+    formulaExplanation: 'Die Leasingrate wird vor Steuern und Sozialabgaben vom Bruttogehalt abgezogen (Gehaltsumwandlung). Versteuert werden muss monatlich lediglich der geldwerte Vorteil für die Privatnutzung nach der 0,25-%-Regel (§ 6 Abs. 1 Nr. 4 Satz 6 EStG).',
     workedExample: {
-      title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Gehalt',
-      inputValues: [{ label: 'E-Bike Preis', value: '3.500 €' }, { label: 'Gehalt', value: '3.800 €' }],
-      steps: ['Leasingrate brutto ≈ 101,50 €', 'Tatsächlicher Nettoabzug ≈ 62,40 €/Monat', 'Kauf nach 36 Monaten ≈ 630 €', 'Gesamtkosten ≈ 2.876 € statt 3.500 €'],
-      result: 'ca. 624 € Ersparnis gegenüber Direktkauf',
+      title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Bruttogehalt',
+      description: 'Leasingrate brutto: ca. 101,50 €/Monat zzgl. 10,00 € Versicherung. Nach Abzug von Lohnsteuer und Sozialabgaben sowie Hinzurechnung des geldwerten Vorteils (8,00 €) beträgt die tatsächliche monatliche Netto-Belastung rund 68,00 €. Nach 36 Monaten und Übernahme für ca. 630 € beträgt die Gesamtersparnis gegenüber dem privaten Direktkauf rund 420 €.',
+      inputs: { bikePriceGross: 3500, grossSalary: 3800, employerSubsidy: 0, serviceCost: 10, taxClass: '1' },
+      resultSummary: 'ca. 68,00 € monatlich netto (ca. 420 € Gesamtersparnis)',
     },
     content: {
-      intro: 'Das Dienstrad-Leasing (JobRad-Modell) nutzt die steuerliche Gehaltsumwandlung für Fahrräder und E-Bikes nach der 0,25-Prozent-Regel.',
-      details: 'Die Leasingrate wird vom Bruttogehalt abgezogen, was Lohnsteuer und Sozialabgaben mindert. Der geldwerte Vorteil für die private Nutzung wird monatlich mit nur 0,25 % eines auf volle 100 € abgerundeten Viertels der UVP versteuert.',
+      intro: 'Mit unserem kostenlosen Dienstfahrrad-Rechner ermitteln Sie Ihre monatliche Netto-Belastung und Ihre finanzielle Gesamtersparnis beim Dienstrad-Leasing per Gehaltsumwandlung. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad.',
+      sections: [
+        {
+          title: 'So funktioniert das Dienstrad-Leasing per Gehaltsumwandlung',
+          content: 'Beim Dienstrad-Leasing least der Arbeitgeber das Fahrrad oder E-Bike bei einer Leasinggesellschaft (wie JobRad, Deutsche Dienstrad, Bikeleasing oder BusinessBike) und überlässt es Ihnen auch zur uneingeschränkten privaten Nutzung.\n\nDie monatliche Leasingrate wird direkt von Ihrem Bruttogehalt einbehalten (**Gehaltsumwandlung**). Dadurch sinkt Ihr steuer- und sozialversicherungspflichtiges Bruttoeinkommen, sodass Sie spürbar weniger Lohnsteuer und Sozialabgaben abführen.\n\nAls Ausgleich müssen Sie lediglich die private Nutzung als sogenannten **geldwerten Vorteil** pauschal versteuern. Seit 2020 gilt hierfür die äußerst günstige **0,25-%-Regel**.',
+        },
+        {
+          title: 'Die 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 EStG',
+          content: 'Im Gegensatz zum Dienstwagen (bei dem 1 % des Bruttolistenpreises versteuert werden muss) gilt für Dienstfahrräder und Pedelecs ein reduzierter Satz:\n- Der Bruttolistenpreis (UVP) wird auf volle 100 Euro abgerundet und geviertelt (25 %).\n- Von diesem geviertelten Betrag wird 1 % monatlich dem steuerpflichtigen Gehalt hinzugerechnet.\n- Dies entspricht rechnerisch exakt **0,25 % des ursprünglichen UVP** pro Monat.\n\nBei einem E-Bike für 3.500 Euro müssen Sie somit lediglich 8,00 Euro monatlich als geldwerten Vorteil versteuern – das kostet Sie netto meist weniger als 4 Euro im Monat!',
+        },
+        {
+          title: 'Leasing versus Direktkauf: Wann lohnt sich das Dienstrad?',
+          content: 'Das Dienstrad-Leasing lohnt sich besonders durch:\n- **Steuer- und SV-Vorteil**: Die Netto-Belastung liegt meist 25 bis 40 Prozent unter der regulären Brutto-Rate.\n- **Integrierte Versicherung**: Diebstahl, Vandalismus und Verschleiß sind in den Leasingpaketen meist günstig mitversichert.\n- **Günstige Übernahme**: Am Ende der 36 Monate können Sie das Rad meist für ca. 15 bis 18 Prozent des Ursprungspreises privat übernehmen.\n\n*Wichtiger Hinweis zu den Berechnungsannahmen*: Bei den ausgewiesenen Beträgen handelt es sich um eine verlässliche Musterschätzung. Die exakte Netto-Entlastung auf Ihrer Gehaltsabrechnung hängt von Ihrer persönlichen Steuerprogression, Krankenversicherungszusatzbeiträgen, Kirchensteuerpflicht sowie den Beitragsbemessungsgrenzen ab.',
+        },
+      ],
+      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie gleich lautende Erlasse der obersten Finanzbehörden der Länder zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Kennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung).',
     },
     faqs: [
-      { question: 'Wie hoch ist die typische Ersparnis gegenüber dem Direktkauf?', answer: 'Durch die Ersparnis bei Einkommensteuer und Sozialversicherungsbeiträgen liegt die Gesamtersparnis meist bei 25 bis 40 Prozent gegenüber dem privaten Barkauf.' },
-      { question: 'Was geschieht mit dem Dienstrad bei Ablauf des 36-Monats-Leasings?', answer: 'Die Leasinggesellschaft bietet dem Mitarbeiter meist die Übernahme des Rads zum günstigen Restwert an (typischerweise ca. 15 bis 18 Prozent des ursprünglichen Kaufpreises).' },
+      { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 6 Abs. 1 Nr. 4 Satz 6 EStG wird für die private Nutzung eines Dienstfahrrads monatlich 1 Prozent eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung (UVP) als geldwerter Vorteil angesetzt. Das entspricht effektiv 0,25 Prozent des Bruttolistenpreises.' },
+      { question: 'Welche Auswirkung hat ein Arbeitgeberzuschuss?', answer: 'Wenn Ihr Arbeitgeber die Leasingrate oder die Inspektionskosten ganz oder teilweise bezuschusst, sinkt Ihr Bruttoabzug entsprechend. Manche Arbeitgeber übernehmen die Kosten vollständig – in diesem Fall ist das Dienstfahrrad für Sie sogar komplett steuer- und beitragsfrei (§ 3 Nr. 37 EStG).' },
+      { question: 'Dienstrad-Leasing vs. Privatkauf: Was ist günstiger?', answer: 'Aufgrund der Ersparnis bei Lohnsteuer und Sozialabgaben sowie des günstigen Übernahmepreises nach 36 Monaten (typischerweise ca. 17 bis 18 Prozent des UVP) ist das Dienstrad-Leasing in den allermeisten Fällen 20 bis 35 Prozent günstiger als der private Barkauf mit Ratenkredit.' },
+      { question: 'Wer kann ein Dienstfahrrad über die Gehaltsumwandlung nutzen?', answer: 'Jeder festangestellte Arbeitnehmer, dessen Arbeitgeber einen Rahmenvertrag mit einem Leasinganbieter geschlossen hat. Auch Beamte in Bund und den meisten Bundesländern sowie Selbstständige können Dienstrad-Leasingmodelle steuerlich nutzen.' },
+      { question: 'Warum wird dieser Rechner auch als JobRad-Rechner bezeichnet?', answer: 'JobRad ist eine geschützte Marke der JobRad GmbH und einer der bekanntesten Pioniere des Dienstrad-Leasings in Deutschland. Der Rechner berechnet herstellerunabhängig die gesetzliche Gehaltsumwandlung, die gleichermaßen für JobRad, Deutsche Dienstrad, Bikeleasing, BusinessBike, Lease a Bike und weitere Anbieter gilt. RechenHafen steht in keiner geschäftlichen Verbindung zu JobRad.' },
     ],
     relatedSlugs: ['pendlerpauschale-rechner', 'dienstwagen-1-prozent-rechner', 'teilzeit-gehaltsrechner', 'stundenlohnrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 Satz 6 EStG / Erlass der obersten Finanzbehörden)',
+      source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 Satz 6 EStG / BMF-Erlass)',
       sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-02-01',
     },
   },
 
@@ -2061,54 +2111,80 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Sabbatical-Rechner',
     category: 'arbeit-gehalt',
     subcategory: 'Urlaub & Arbeitszeit',
-    metaTitle: 'Sabbatical Rechner – Gehaltsreduktion',
-    metaDescription: 'Berechnen Sie Ihr reduziertes Gehalt im Sabbatical-Blockmodell: Vorarbeitsphase mit Gehaltsverzicht und voll bezahlte Freistellungsphase.',
+    metaTitle: 'Sabbatical Rechner: Gehalt im Blockmodell, Ansparphase & Auszeit berechnen',
+    metaDescription: 'Berechnen Sie Ihr Gehalt im Sabbatical-Blockmodell: Vorarbeitsphase mit Gehaltsverzicht, monatliche Auszahlungsquote und Freistellungsphase mit Sozialversicherungsschutz.',
     h1: 'Sabbatical Rechner – Auszeit planen & Gehalt berechnen',
-    shortDescription: 'Kalkuliert die monatliche Gehaltsreduktion im Blockmodell für eine bezahlte berufliche Auszeit.',
-    searchKeywords: ['sabbatical rechner gehaltsverzicht', 'auszeit nehmen gehalt berechnen blockmodell', 'sabbatjahr finanzierung rechner', 'sabbatical sozialversicherung'],
+    shortDescription: 'Kalkuliert die monatliche Gehaltsglättung im Blockmodell für eine bezahlte berufliche Auszeit.',
+    searchKeywords: ['sabbatical rechner gehaltsverzicht', 'auszeit nehmen gehalt berechnen blockmodell', 'sabbatjahr finanzierung rechner', 'sabbatical sozialversicherung', 'ansparphase freistellungsphase'],
     inputs: [
       { id: 'regularNet', label: 'Bisheriges monatliches Nettogehalt', type: 'number', defaultValue: 2800, min: 800, step: 100, unit: '€' },
-      { id: 'workMonths', label: 'Dauer der Arbeitsphase / Ansparphase in Monaten', type: 'number', defaultValue: 24, min: 6, max: 60, step: 6, unit: 'Monate' },
-      { id: 'leaveMonths', label: 'Dauer der Freistellungsphase (Sabbatical) in Monaten', type: 'number', defaultValue: 6, min: 1, max: 24, step: 1, unit: 'Monate' },
+      { id: 'workMonths', label: 'Dauer der Arbeitsphase / Ansparphase in Monaten', type: 'number', defaultValue: 12, min: 3, max: 60, step: 1, unit: 'Monate' },
+      { id: 'leaveMonths', label: 'Dauer der Freistellungsphase (Sabbatical) in Monaten', type: 'number', defaultValue: 12, min: 1, max: 24, step: 1, unit: 'Monate' },
     ],
     calculate: (inputs) => {
       const net = parseFloat(inputs.regularNet) || 2800;
-      const workM = parseInt(inputs.workMonths, 10) || 24;
-      const leaveM = parseInt(inputs.leaveMonths, 10) || 6;
+      const workM = parseInt(inputs.workMonths, 10) || 12;
+      const leaveM = parseInt(inputs.leaveMonths, 10) || 12;
       const totalMonths = workM + leaveM;
 
       // Gehaltsquote über den gesamten Zeitraum
-      const salaryRatio = workM / totalMonths;
+      const salaryRatio = totalMonths > 0 ? workM / totalMonths : 0;
       const continuousNetSalary = net * salaryRatio;
       const monthlySacrifice = net - continuousNetSalary;
 
       return {
         primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: continuousNetSalary, formattedValue: formatCurrency(continuousNetSalary), highlight: true },
         secondary: [
-          { id: 'monthlySacrifice', label: 'Monatlicher Gehaltsverzicht', value: monthlySacrifice, formattedValue: formatCurrency(monthlySacrifice) },
-          { id: 'salaryRatio', label: 'Auszahlungsquote', value: salaryRatio * 100, formattedValue: formatPercent(salaryRatio * 100, 1) },
-          { id: 'totalModelMonths', label: 'Gesamtlaufzeit des Modells', value: totalMonths, formattedValue: `${totalMonths} Monate (${workM} Arb. + ${leaveM} Freistellung)` },
+          { id: 'monthlySacrifice', label: 'Monatlicher Gehaltsverzicht in der Ansparphase', value: monthlySacrifice, formattedValue: formatCurrency(monthlySacrifice) },
+          { id: 'salaryRatio', label: 'Monatliche Auszahlungsquote', value: salaryRatio * 100, formattedValue: formatPercent(salaryRatio * 100, 1) },
+          { id: 'totalModelMonths', label: 'Gesamtlaufzeit des Modells', value: totalMonths, formattedValue: `${totalMonths} Monate (${workM} Ansparung + ${leaveM} Auszeit)` },
         ],
-        summaryText: `Sie arbeiten ${workM} Monate voll und erhalten über die gesamten ${totalMonths} Monate durchgehend ${formatCurrency(continuousNetSalary)} netto (Verzicht von ${formatCurrency(monthlySacrifice)}/Monat). Während der ${leaveM} Monate Auszeit bleibt der volle Sozialversicherungsschutz bestehen!`,
+        details: [
+          { id: 'totalAccumulated', label: 'Insgesamt angespartes Guthaben', value: monthlySacrifice * workM, formattedValue: formatCurrency(monthlySacrifice * workM) },
+          { id: 'payoutDuringLeave', label: 'Auszahlung in der Freistellung', value: continuousNetSalary * leaveM, formattedValue: formatCurrency(continuousNetSalary * leaveM) },
+        ],
+        summaryText: `Sie arbeiten ${workM} Monate voll und erhalten über die gesamten ${totalMonths} Monate durchgehend rechnerisch ${formatCurrency(continuousNetSalary)} netto (Verzicht von ${formatCurrency(monthlySacrifice)}/Monat). Wichtiger Hinweis: Der lückenlose Fortbestand des Sozialversicherungsschutzes während der Freistellung setzt eine ordnungsgemäße vertragliche Vereinbarung (z. B. Wertguthaben nach § 7b SGB IV oder Teilzeit-Blockmodell) mit dem Arbeitgeber voraus.`,
       };
     },
     formula: 'Fortlaufendes Gehalt = Bisheriges Gehalt × [Arbeitsmonate / (Arbeitsmonate + Freistellungsmonate)]',
-    formulaExplanation: 'Im Blockmodell wird das Gehalt über die gesamte Laufzeit gleichmäßig gekürzt. Dadurch bleibt der Arbeitnehmer auch während der Freistellung voll versichert und erhält monatlich Gehalt.',
+    formulaExplanation: 'Im Blockmodell wird das Gehalt über die gesamte Laufzeit gleichmäßig gekürzt. Bei einer wirksamen arbeitsrechtlichen Vereinbarung (z. B. Wertguthaben nach § 7b SGB IV) bleibt das Beschäftigungsverhältnis rechtlich bestehen und die Sozialversicherungsbeiträge werden auch während der Freistellung fortlaufend abgeführt.',
     workedExample: {
-      title: 'Beispiel: 2.800 € Netto, 24 Monate Ansparphase für 6 Monate Sabbatical',
-      inputValues: [{ label: 'Gehalt', value: '2.800 €' }, { label: 'Ansparzeit', value: '24 Monate' }, { label: 'Freistellung', value: '6 Monate' }],
-      steps: ['Gesamtdauer = 30 Monate', 'Gehaltsquote = 24 / 30 = 80 %', 'Monatliches Gehalt durchgehend: 2.800 € × 0,80 = 2.240 €'],
-      result: '2.240,00 € durchgehendes Nettogehalt',
+      title: 'Beispiel: 2.800 € Nettogehalt, 12 Monate Ansparphase für 12 Monate Sabbatical',
+      description: 'Bei einem regulären Nettogehalt von 2.800 €, 12 Monaten Arbeitsphase und 12 Monaten Freistellung (Gesamtdauer 24 Monate) beträgt die Gehaltsquote genau 50 % (12 / 24). Sie verzichten während der 12 Monate Ansparphase auf 1.400 € monatlich und erhalten über die gesamten 2 Jahre durchgehend 1.400,00 € netto ausgezahlt.',
+      inputs: { regularNet: 2800, workMonths: 12, leaveMonths: 12 },
+      resultSummary: '1.400,00 € monatlich über alle 24 Monate (50 % Quote)',
     },
     content: {
-      intro: 'Ein Sabbatical (berufliche Auszeit) lässt sich über ein Langzeitarbeitszeitkonto oder ein Teilzeitmodell mit Gehaltsverzicht sozialversichert finanzieren.',
-      details: 'Modell: Sie arbeiten z. B. 2 Jahre lang Vollzeit (100 %), erhalten aber nur 75 % des Gehalts ausgezahlt; im 3. Jahr werden Sie für 8 Monate bezahlt freigestellt, während die Sozialversicherung lückenlos weiterläuft.',
+      intro: 'Mit unserem kostenlosen Sabbatical-Rechner planen Sie Ihre berufliche Auszeit finanzmathematisch vorausschauend: Ermitteln Sie die monatliche Gehaltsglättung, die notwendige Ansparphase und die Auszahlungsquote für ein voll bezahltes Sabbatjahr im Blockmodell oder über ein Langzeit-Wertguthabenkonto.',
+      sections: [
+        {
+          title: 'Ansparphase und Freistellungsphase im Überblick',
+          content: 'Ein Sabbatical im Blockmodell gliedert sich in zwei aufeinander folgende Phasen:\n- **1. Ansparphase (Arbeitsphase)**: Sie arbeiten weiterhin mit voller vertraglicher Stundenzahl (z. B. 40 Stunden/Woche). Sie lassen sich jedoch nur einen reduzierten Prozentsatz Ihres Gehalts auszahlen. Der einbehaltene Gehaltsteil fließt auf ein insolvenzgeschütztes Wertguthabenkonto beim Arbeitgeber.\n- **2. Freistellungsphase (Auszeit)**: Sie sind von der Arbeitsleistung komplett freigestellt, erhalten aber weiterhin Monat für Monat denselben reduzierten Gehaltsbetrag aus Ihrem zuvor angesparten Zeit- oder Wertguthaben ausgezahlt.',
+        },
+        {
+          title: 'Zeitlicher Ablauf im Blockmodell (Beispiel 12 + 12 Monate)',
+          content: '| Phase | Zeitraum | Arbeitsleistung | Ausgezahltes Gehalt | Sozialversicherung |\n| --- | --- | --- | --- | --- |\n| Ansparphase | Monat 1 bis 12 | 100 % (Vollzeit) | 50 % (1.400 € netto) | Voll geschützt (§ 7b SGB IV) |\n| Freistellungsphase | Monat 13 bis 24 | 0 % (Sabbatical) | 50 % (1.400 € netto) | Lückenlos weiterversichert |\n\nDurch diese kontinuierliche Gehaltsauszahlung bleibt das sozialversicherungspflichtige Beschäftigungsverhältnis formal ununterbrochen bestehen.',
+        },
+        {
+          title: 'Sozialversicherungsschutz: Worauf Sie zwingend achten müssen',
+          content: 'Der Fortbestand des Sozialversicherungsschutzes ist **nicht** automatisch garantiert, sondern hängt streng von der vertraglichen Ausgestaltung ab:\n- **Geschützt über Wertguthaben nach § 7b SGB IV**: Wenn Sie mit Ihrem Arbeitgeber ein schriftliches Wertguthaben oder Blockmodell vereinbaren und monatlich Arbeitsentgelt über der Minijob-Grenze ausgezahlt wird, bleiben Kranken-, Pflege-, Renten- und Arbeitslosenversicherung während der gesamten Freistellung lückenlos bestehen.\n- **Gefahr bei unbezahltem Sonderurlaub (§ 7 Abs. 3 SGB IV)**: Bei einer unbezahlten Freistellung ohne Gehaltsfortzahlung besteht die gesetzliche Pflichtversicherung nach § 7 Abs. 3 Satz 1 SGB IV nur für **längstens einen Monat** fort. Ab dem zweiten Monat müssen Sie sich selbst freiwillig in der gesetzlichen Kranken- und Pflegeversicherung versichern und den vollen Beitrag aus eigener Tasche tragen!\n\n*Wichtiger Hinweis zur Orientierung*: Stimmen Sie Ihr Sabbatical-Modell vorab verbindlich mit Ihrer Personalabteilung und Ihrer Krankenkasse bzw. der Deutschen Rentenversicherung (DRV) ab.',
+        },
+      ],
+      details: 'Rechtliche Grundlagen: § 7 Abs. 1a und § 7b SGB IV (Wertguthabenvereinbarung) sowie § 7 Abs. 3 SGB IV (Fortbestand der Beschäftigung bei Freistellung). Tarifverträge (z. B. TVöD, TV-L) enthalten oft spezifische Sabbatical-Regelungen mit Laufzeiten von 2 bis 7 Jahren.',
     },
     faqs: [
-      { question: 'Bleibt man während eines Sabbaticals krankenversichert?', answer: 'Bei Nutzung eines Wertguthaben- oder Teilzeitmodells bleibt das Beschäftigungsverhältnis rechtlich bestehen; Kranken-, Pflege- und Rentenversicherung laufen uneingeschränkt weiter.' },
-      { question: 'Was passiert bei einer unbezahlten Freistellung?', answer: 'Bei unbezahltem Urlaub endet der Sozialversicherungsschutz nach genau einem Monat (§ 7 Abs. 3 SGB IV); danach müssen Sie sich freiwillig gesetzlich oder privat krankenversichern.' },
+      { question: 'Was genau berechnet der Sabbatical-Rechner?', answer: 'Der Rechner ermittelt die monatliche Auszahlungsquote und das geglättete Nettogehalt: Sie arbeiten in der Ansparphase in Vollzeit, erhalten aber nur den vereinbarten Teilbetrag ausgezahlt. Das angesparte Guthaben finanziert anschließend die monatlichen Bezüge während Ihrer Freistellung.' },
+      { question: 'Bleibt man während des Sabbaticals automatisch kranken- und sozialversichert?', answer: 'Das hängt vom gewählten Modell ab: Nur bei einem ordnungsgemäß vereinbarten Blockmodell oder Wertguthaben nach § 7b SGB IV bleibt das sozialversicherungspflichtige Arbeitsverhältnis formal bestehen, sodass Kranken-, Renten- und Pflegeversicherung lückenlos weiterlaufen. Bei unbezahltem Urlaub endet die Pflichtversicherung nach einem Monat (§ 7 Abs. 3 SGB IV) und Sie müssen sich selbst freiwillig weiterversichern.' },
+      { question: 'Gibt es einen gesetzlichen Anspruch auf ein Sabbatical in Deutschland?', answer: 'In der Privatwirtschaft gibt es keinen generellen gesetzlichen Anspruch auf ein Sabbatical. Ein Rechtsanspruch kann sich jedoch aus Tarifverträgen, Betriebsvereinbarungen oder dem Recht auf Brückenteilzeit (§ 9a TzBfG) ergeben. Klären Sie Freistellung und Rückkehrkonditionen stets rechtzeitig mit Ihrem Arbeitgeber.' },
+      { question: 'Was ist der Unterschied zwischen Wertguthaben und unbezahltem Sonderurlaub?', answer: 'Beim Wertguthaben (§ 7b SGB IV) wird Gehalt vorab angespart und während der Auszeit fortlaufend ausgezahlt; der Sozialversicherungsschutz bleibt voll erhalten. Bei unbezahltem Urlaub entfällt das Gehalt komplett und nach einem Monat erlischt der gesetzliche Pflichtversicherungsschutz.' },
     ],
-    relatedSlugs: ['grosselternzeit-rechner', 'urlaubstage-rechner', 'teilzeit-gehaltsrechner'],
+    relatedSlugs: ['urlaubstage-rechner', 'teilzeit-gehaltsrechner', 'arbeitstage-rechner', 'grosselternzeit-rechner'],
+    trustMeta: {
+      legalBasis: '§ 7 Abs. 1a & § 7b SGB IV (Wertguthaben) sowie § 7 Abs. 3 SGB IV',
+      sourceName: 'Deutsche Rentenversicherung (DRV) / Bundesministerium für Arbeit und Soziales (BMAS)',
+      sourceUrl: 'https://www.deutsche-rentenversicherung.de',
+      lastReviewed: '2026-02-01',
+    },
   },
 
   {
@@ -2595,7 +2671,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Bürgergeld-Rechner',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Netto',
-    metaTitle: 'Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen | RechenHafen',
+    metaTitle: 'Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen',
     metaDescription: 'Berechnen Sie Ihren Bürgergeld-Anspruch 2026 nach SGB II: Gesetzliche Regelbedarfe (563 € für Alleinstehende), Warmmiete (KdU) und Freibeträge bei Erwerbseinkommen.',
     h1: 'Bürgergeld-Rechner 2026 – Gesetzlichen Anspruch nach SGB II ermitteln',
     shortDescription: 'Kalkuliert den monatlichen Gesamtbedarf nach SGB II aus gesetzlichem Regelsatz, Miete, Heizung und anrechenbarem Einkommen.',

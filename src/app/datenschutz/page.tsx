@@ -4,7 +4,7 @@ import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import styles from '@/styles/layout.module.css';
 
 export const metadata: Metadata = {
-  title: 'Datenschutzerklärung | RechenHafen',
+  title: 'Datenschutzerklärung',
   description: 'Datenschutzerklärung von RechenHafen: Alle Berechnungen erfolgen 100 % lokal in Ihrem Webbrowser. Keine Speicherung persönlicher Finanz- oder Gesundheitsdaten.',
   alternates: {
     canonical: 'https://rechenhafen.de/datenschutz/',

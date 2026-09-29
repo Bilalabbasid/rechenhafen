@@ -12,6 +12,8 @@ import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
 import cardsStyles from '@/styles/cards.module.css';
 
+import { formatMetaTitle } from '@/lib/seo/title';
+
 interface PageProps {
   params: Promise<{ kategorie: string }>;
 }
@@ -28,20 +30,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!cat) {
     return {
-      title: 'Kategorie nicht gefunden | RechenHafen',
+      title: 'Kategorie nicht gefunden',
     };
   }
 
   const canonicalUrl = `https://rechenhafen.de/${cat.slug}/`;
+  const cleanTitle = formatMetaTitle(cat.metaTitle);
 
   return {
-    title: cat.metaTitle,
+    title: cleanTitle,
     description: cat.metaDescription,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: cat.metaTitle,
+      title: cleanTitle,
       description: cat.metaDescription,
       url: canonicalUrl,
       siteName: 'RechenHafen',
