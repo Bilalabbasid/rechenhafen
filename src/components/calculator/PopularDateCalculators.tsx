@@ -1,6 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import { trackRelatedCalculatorClicked } from '@/lib/analytics/ga4';
 
 interface Props {
   currentSlug?: string;
@@ -135,6 +138,11 @@ export default function PopularDateCalculators({ currentSlug }: Props) {
             <Link
               key={calc.slug}
               href={`/rechner/${calc.slug}/`}
+              onClick={() => {
+                if (currentSlug && currentSlug !== calc.slug) {
+                  trackRelatedCalculatorClicked(currentSlug, calc.slug);
+                }
+              }}
               style={{
                 display: 'flex',
                 flexDirection: 'column',

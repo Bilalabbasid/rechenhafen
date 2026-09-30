@@ -8,10 +8,17 @@ import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, 
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe } from '@/lib/formatters';
 import { getUpcomingEasterDateString } from '@/lib/calculators/dateMath';
+import {
+  trackCalculatorView,
+  trackCalculationCompleted,
+  trackResultCopied,
+  trackValidationError,
+} from '@/lib/analytics/ga4';
 
 interface Props {
   slug: string;
   name: string;
+  category?: string;
   inputs: CalculatorInput[];
   initialResult: CalculationResult;
   isTimeSensitive?: boolean;
@@ -26,6 +33,7 @@ interface Props {
 export default function CalculatorRunner({
   slug,
   name,
+  category,
   inputs: inputDefs,
   initialResult,
   isTimeSensitive,
@@ -49,6 +57,11 @@ export default function CalculatorRunner({
 
   // Reference to loaded engine function
   const engineRef = useRef<((inp: Record<string, any>) => CalculationResult) | null>(null);
+
+  // Track privacy-safe calculator view event
+  useEffect(() => {
+    trackCalculatorView(slug, category || 'allgemein');
+  }, [slug, category]);
 
   // Preload calculator engine in background after mount
   useEffect(() => {
@@ -156,22 +169,16 @@ export default function CalculatorRunner({
     const updatedInputs = { ...inputs, [id]: value };
     setInputs(updatedInputs);
 
-    // Non-personal analytics tracking according to German privacy & consent rules
-    if (typeof window !== 'undefined') {
-      const w = window as any;
-      w.dataLayer = w.dataLayer || [];
-      if (slug === 'tage-zwischen-zwei-daten' && id === 'mode') {
-        w.dataLayer.push({
-          event: 'calculator_date_mode_selected',
-          calculator_slug: slug,
-          mode: value,
-        });
-      } else if (slug === 'tage-bis-weihnachten' && id === 'christmasTarget') {
-        w.dataLayer.push({
-          event: 'calculator_christmas_target_selected',
-          calculator_slug: slug,
-          target: value,
-        });
+    // Track input validation errors safely without exposing user values
+    const fieldDef = inputDefs.find((inp) => inp.id === id);
+    if (fieldDef && fieldDef.type === 'number') {
+      const numVal = Number(value);
+      if (isNaN(numVal)) {
+        trackValidationError(slug, 'invalid_number');
+      } else if (fieldDef.min !== undefined && numVal < fieldDef.min) {
+        trackValidationError(slug, 'range_underflow');
+      } else if (fieldDef.max !== undefined && numVal > fieldDef.max) {
+        trackValidationError(slug, 'range_overflow');
       }
     }
 
@@ -188,17 +195,13 @@ export default function CalculatorRunner({
         const nextResult = fn(updatedInputs);
         setResult(nextResult);
 
-        if (slug === 'tage-zwischen-zwei-daten' && typeof window !== 'undefined') {
-          const w = window as any;
-          w.dataLayer = w.dataLayer || [];
-          w.dataLayer.push({
-            event: 'calculator_date_calculated',
-            calculator_slug: slug,
-            mode: updatedInputs.mode || 'between',
-            include_start_day: Boolean(updatedInputs.includeStartDay),
-          });
+        if (nextResult.error) {
+          trackValidationError(slug, 'calculation_error');
+        } else {
+          trackCalculationCompleted(slug, category || 'allgemein');
         }
       } catch {
+        trackValidationError(slug, 'calculation_exception');
         setResult({
           primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
           error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
@@ -250,18 +253,16 @@ export default function CalculatorRunner({
     }
     if (fn) {
       try {
-        setResult(fn(updatedInputs));
-      } catch {}
-    }
-
-    if (typeof window !== 'undefined') {
-      const w = window as any;
-      w.dataLayer = w.dataLayer || [];
-      w.dataLayer.push({
-        event: 'calculator_date_preset_selected',
-        calculator_slug: slug,
-        preset: presetKey,
-      });
+        const res = fn(updatedInputs);
+        setResult(res);
+        if (res.error) {
+          trackValidationError(slug, 'calculation_error');
+        } else {
+          trackCalculationCompleted(slug, category || 'allgemein');
+        }
+      } catch {
+        trackValidationError(slug, 'calculation_exception');
+      }
     }
   };
 
@@ -276,13 +277,6 @@ export default function CalculatorRunner({
       }
       await navigator.clipboard.writeText(url.toString());
       setLinkCopied(true);
-      const w = window as any;
-      w.dataLayer = w.dataLayer || [];
-      w.dataLayer.push({
-        event: 'calculator_date_copy_link',
-        calculator_slug: slug,
-        mode: inputs.mode || 'default',
-      });
       setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       // Fallback
@@ -303,6 +297,11 @@ export default function CalculatorRunner({
       try {
         const newRes = engineRef.current(updated);
         setResult(newRes);
+        if (newRes.error) {
+          trackValidationError(slug, 'calculation_error');
+        } else {
+          trackCalculationCompleted(slug, category || 'allgemein');
+        }
       } catch {}
     }
   };
@@ -318,6 +317,11 @@ export default function CalculatorRunner({
       try {
         const newRes = engineRef.current(updated);
         setResult(newRes);
+        if (newRes.error) {
+          trackValidationError(slug, 'calculation_error');
+        } else {
+          trackCalculationCompleted(slug, category || 'allgemein');
+        }
       } catch {}
     }
   };
@@ -333,6 +337,11 @@ export default function CalculatorRunner({
       try {
         const newRes = engineRef.current(updated);
         setResult(newRes);
+        if (newRes.error) {
+          trackValidationError(slug, 'calculation_error');
+        } else {
+          trackCalculationCompleted(slug, category || 'allgemein');
+        }
       } catch {}
     }
   };
@@ -357,26 +366,16 @@ export default function CalculatorRunner({
       try {
         const resetRes = engineRef.current(defaultVals);
         setResult(resetRes);
+        if (resetRes.error) {
+          trackValidationError(slug, 'calculation_error');
+        } else {
+          trackCalculationCompleted(slug, category || 'allgemein');
+        }
       } catch {}
     } else {
       setResult(initialResult);
     }
   };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && result && !result.error && result.primary?.value !== undefined) {
-      const w = window as any;
-      w.dataLayer = w.dataLayer || [];
-      w.dataLayer.push({
-        event: 'calculator_completion',
-        calculator_slug: slug,
-        calculator_name: name,
-        result_primary_label: result.primary.label,
-        result_primary_value: result.primary.value,
-        result_primary_formatted: result.primary.formattedValue,
-      });
-    }
-  }, [result, slug, name]);
 
   const handleCopyResult = async () => {
     if (result.error) return;
@@ -395,15 +394,7 @@ export default function CalculatorRunner({
     try {
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
-      if (typeof window !== 'undefined') {
-        const w = window as any;
-        w.dataLayer = w.dataLayer || [];
-        w.dataLayer.push({
-          event: 'calculator_result_copy',
-          calculator_slug: slug,
-          calculator_name: name,
-        });
-      }
+      trackResultCopied(slug);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback

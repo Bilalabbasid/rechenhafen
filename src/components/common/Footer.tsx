@@ -3,6 +3,7 @@ import Link from 'next/link';
 import styles from '@/styles/layout.module.css';
 import { CATEGORIES } from '@/data/categories';
 import { ShieldCheck } from 'lucide-react';
+import CookieSettingsButton from '@/components/common/CookieSettingsButton';
 
 export default function Footer() {
   const popularCategories = CATEGORIES.slice(0, 8);
@@ -62,6 +63,7 @@ export default function Footer() {
             <li><Link href="/methodik/" className={styles.footerLink}>Methodik & Quellen</Link></li>
             <li><Link href="/impressum/" className={styles.footerLink}>Impressum</Link></li>
             <li><Link href="/datenschutz/" className={styles.footerLink}>Datenschutz</Link></li>
+            <li><CookieSettingsButton /></li>
           </ul>
         </div>
       </div>

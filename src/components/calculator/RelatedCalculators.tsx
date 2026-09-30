@@ -9,9 +9,10 @@ interface Props {
   calculators: CalculatorDefinition[];
   categoryName?: string;
   categorySlug?: string;
+  fromSlug?: string;
 }
 
-export default function RelatedCalculators({ calculators, categoryName, categorySlug }: Props) {
+export default function RelatedCalculators({ calculators, categoryName, categorySlug, fromSlug }: Props) {
   if (!calculators || calculators.length === 0) return null;
 
   return (
@@ -69,6 +70,7 @@ export default function RelatedCalculators({ calculators, categoryName, category
             shortDescription={calc.shortDescription}
             category={calc.category}
             categoryName={categoryName}
+            fromSlug={fromSlug}
           />
         ))}
       </div>

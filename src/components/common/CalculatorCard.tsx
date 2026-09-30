@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -14,6 +16,7 @@ import {
   LucideIcon,
 } from 'lucide-react';
 import styles from '@/styles/cards.module.css';
+import { trackRelatedCalculatorClicked } from '@/lib/analytics/ga4';
 
 interface CalculatorCardProps {
   slug: string;
@@ -22,6 +25,7 @@ interface CalculatorCardProps {
   shortDescription: string;
   category?: string;
   categoryName?: string;
+  fromSlug?: string;
 }
 
 function resolveIcon(slug: string, category?: string): LucideIcon {
@@ -48,15 +52,23 @@ export default function CalculatorCard({
   shortDescription,
   category,
   categoryName,
+  fromSlug,
 }: CalculatorCardProps) {
   const Icon = resolveIcon(slug, category);
   const displayName = shortName || name;
+
+  const handleClick = () => {
+    if (fromSlug) {
+      trackRelatedCalculatorClicked(fromSlug, slug);
+    }
+  };
 
   return (
     <Link
       href={`/rechner/${slug}/`}
       className={styles.calcCard}
       title={`${displayName} öffnen`}
+      onClick={handleClick}
     >
       <div className={styles.iconWrapper} aria-hidden="true">
         <Icon size={20} />

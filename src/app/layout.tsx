@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import '@/styles/globals.css';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
+import CookieConsentBanner from '@/components/common/CookieConsentBanner';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -89,9 +91,11 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <GoogleAnalytics />
         <Header />
         <main style={{ flex: 1 }}>{children}</main>
         <Footer />
+        <CookieConsentBanner />
       </body>
     </html>
   );

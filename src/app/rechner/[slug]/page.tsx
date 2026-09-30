@@ -221,6 +221,7 @@ export default async function CalculatorPage({ params }: PageProps) {
       <CalculatorRunner
         slug={calc.slug}
         name={calc.name}
+        category={calc.category}
         inputs={calc.inputs}
         initialResult={initialResult}
         isTimeSensitive={calc.isTimeSensitive}
@@ -462,6 +463,7 @@ export default async function CalculatorPage({ params }: PageProps) {
         calculators={relatedCalculators}
         categoryName={category?.name}
         categorySlug={category?.slug}
+        fromSlug={calc.slug}
       />
     </div>
   );
