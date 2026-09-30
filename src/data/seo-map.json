@@ -2755,7 +2755,7 @@
     },
     {
       "slug": "gaskostenrechner",
-      "name": "Gaskostenrechner (m³ in kWh & Kosten)",
+      "name": "Gaskostenrechner (Gasverbrauch & Kosten berechnen)",
       "url": "/rechner/gaskostenrechner/",
       "category": "haushalt-energie",
       "categoryName": "Haushalt & Energie",
@@ -2765,16 +2765,28 @@
       "ymyl": false,
       "primaryKeyword": "gaskostenrechner",
       "secondaryKeywords": [
-        "gas m3 in kwh umrechnen",
+        "gasverbrauch rechner",
+        "gaskosten berechnen",
         "gasverbrauch berechnen",
+        "gas verbrauch berechnen",
+        "gas kosten rechner",
+        "gasverbrauch umrechnen",
+        "kwh gas preis rechner",
+        "gas m3 in kwh umrechnen",
         "abschlag gas berechnen"
       ],
       "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
         "gaskostenrechner",
-        "gas m3 in kwh umrechnen",
+        "gasverbrauch rechner",
+        "gaskosten berechnen",
         "gasverbrauch berechnen",
+        "gas verbrauch berechnen",
+        "gas kosten rechner",
+        "gasverbrauch umrechnen",
+        "kwh gas preis rechner",
+        "gas m3 in kwh umrechnen",
         "abschlag gas berechnen"
       ],
       "serpCompetitors": [],
@@ -7623,7 +7635,7 @@
     },
     {
       "slug": "dienstfahrrad-jobrad-rechner",
-      "name": "Dienstfahrrad & JobRad-Rechner (0,25 % Gehaltsumwandlung)",
+      "name": "JobRad Rechner (Dienstfahrrad-Leasing & Gehaltsumwandlung)",
       "url": "/rechner/dienstfahrrad-jobrad-rechner/",
       "category": "auto-verkehr",
       "categoryName": "Auto & Verkehr",
@@ -7631,8 +7643,12 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "jobrad rechner ersparnis",
+      "primaryKeyword": "jobrad rechner",
       "secondaryKeywords": [
+        "dienstfahrrad rechner",
+        "jobrad netto rechner",
+        "dienstrad leasing rechner",
+        "jobrad rechner ersparnis",
         "dienstfahrrad gehaltsumwandlung rechner",
         "0 25 prozent regelung e bike",
         "bikeleasing netto abzug"
@@ -7640,6 +7656,10 @@
       "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
+        "jobrad rechner",
+        "dienstfahrrad rechner",
+        "jobrad netto rechner",
+        "dienstrad leasing rechner",
         "jobrad rechner ersparnis",
         "dienstfahrrad gehaltsumwandlung rechner",
         "0 25 prozent regelung e bike",
@@ -10300,7 +10320,7 @@
     },
     {
       "slug": "schalungssteine-rechner",
-      "name": "Schalungsstein-Rechner (Steinanzahl, Füllbeton & Bewehrungsstahl)",
+      "name": "Schalungssteine Rechner (Menge für Ihre Mauer)",
       "url": "/rechner/schalungssteine-rechner/",
       "category": "bauen-renovieren",
       "categoryName": "Bauen & Renovieren",
@@ -10308,19 +10328,27 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "schalungssteine rechner fuellbeton",
+      "primaryKeyword": "schalungssteine rechner",
       "secondaryKeywords": [
+        "schalungssteine berechnen",
+        "schalungsstein rechner",
+        "schalungssteine menge mauer",
+        "fuellbeton m3 schalungsstein",
         "betonschalungssteine menge stuetzmauer",
-        "fuellbeton m3 schalungsstein 24er",
-        "bewehrungsstahl schalungsstein"
+        "bewehrungsstahl schalungsstein",
+        "schalungsstein bedarf pro m2"
       ],
       "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
-        "schalungssteine rechner fuellbeton",
+        "schalungssteine rechner",
+        "schalungssteine berechnen",
+        "schalungsstein rechner",
+        "schalungssteine menge mauer",
+        "fuellbeton m3 schalungsstein",
         "betonschalungssteine menge stuetzmauer",
-        "fuellbeton m3 schalungsstein 24er",
-        "bewehrungsstahl schalungsstein"
+        "bewehrungsstahl schalungsstein",
+        "schalungsstein bedarf pro m2"
       ],
       "serpCompetitors": [],
       "volumeDeMonthlyEstimate": "NOT VERIFIED",

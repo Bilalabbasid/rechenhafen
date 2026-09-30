@@ -1016,16 +1016,20 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "gaskostenrechner",
     "slug": "gaskostenrechner",
-    "name": "Gaskostenrechner (m³ in kWh & Kosten)",
+    "name": "Gaskostenrechner (Gasverbrauch & Kosten berechnen)",
     "category": "haushalt-energie",
     "keywords": [
       "gaskostenrechner",
-      "gaskostenrechner (m³ in kwh & kosten)",
+      "gasverbrauch rechner",
       "gaskosten berechnen",
+      "gasverbrauch berechnen",
+      "gas verbrauch berechnen",
+      "gas kosten rechner",
+      "gasverbrauch umrechnen",
+      "kwh gas preis rechner",
       "haushalt-energie",
       "gas & heizung",
       "gas m3 in kwh umrechnen",
-      "gasverbrauch berechnen",
       "abschlag gas berechnen"
     ]
   },
@@ -3559,17 +3563,20 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "dienstfahrrad-jobrad-rechner",
     "slug": "dienstfahrrad-jobrad-rechner",
-    "name": "Dienstfahrrad & JobRad-Rechner (0,25 % Gehaltsumwandlung)",
+    "name": "JobRad Rechner (Dienstfahrrad-Leasing & Gehaltsumwandlung)",
     "category": "auto-verkehr",
     "keywords": [
+      "jobrad rechner",
+      "dienstfahrrad rechner",
+      "jobrad netto rechner",
+      "jobrad ersparnis rechner",
+      "dienstrad leasing rechner",
       "dienstfahrrad-jobrad-rechner",
-      "dienstfahrrad & jobrad-rechner (0,25 % gehaltsumwandlung)",
-      "jobrad-rechner",
+      "jobrad leasing berechnen",
       "auto-verkehr",
       "kosten & steuern",
-      "jobrad rechner ersparnis",
-      "dienstfahrrad gehaltsumwandlung rechner",
       "0 25 prozent regelung e bike",
+      "gehaltsumwandlung fahrrad rechner",
       "bikeleasing netto abzug"
     ]
   },
@@ -4914,18 +4921,20 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "schalungssteine-rechner",
     "slug": "schalungssteine-rechner",
-    "name": "Schalungsstein-Rechner (Steinanzahl, Füllbeton & Bewehrungsstahl)",
+    "name": "Schalungssteine Rechner (Menge für Ihre Mauer)",
     "category": "bauen-renovieren",
     "keywords": [
+      "schalungssteine rechner",
+      "schalungssteine berechnen",
+      "schalungsstein rechner",
+      "schalungssteine menge mauer",
       "schalungssteine-rechner",
-      "schalungsstein-rechner (steinanzahl, füllbeton & bewehrungsstahl)",
-      "schalungsstein-rechner",
       "bauen-renovieren",
       "rohbau & boden",
-      "schalungssteine rechner fuellbeton",
+      "fuellbeton m3 schalungsstein",
       "betonschalungssteine menge stuetzmauer",
-      "fuellbeton m3 schalungsstein 24er",
-      "bewehrungsstahl schalungsstein"
+      "bewehrungsstahl schalungsstein",
+      "schalungsstein bedarf pro m2"
     ]
   },
   {

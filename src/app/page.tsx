@@ -46,6 +46,9 @@ const POPULAR_SLUGS = [
 const POPULAR_CHIPS = [
   { label: 'Brutto-Netto', slug: 'brutto-netto-rechner' },
   { label: 'Tagerechner', slug: 'tage-zwischen-zwei-daten' },
+  { label: 'Gaskosten', slug: 'gaskostenrechner' },
+  { label: 'JobRad', slug: 'dienstfahrrad-jobrad-rechner' },
+  { label: 'Schalungssteine', slug: 'schalungssteine-rechner' },
   { label: 'Prozent', slug: 'prozentrechner' },
   { label: 'Alter', slug: 'altersrechner' },
   { label: 'BMI', slug: 'bmi-rechner' },

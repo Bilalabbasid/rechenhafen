@@ -121,6 +121,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
   const annualBaseCost = basePricePerMonth * 12;
   const totalAnnualCost = workCost + annualBaseCost;
   const monthlyAdvancePayment = totalAnnualCost / 12;
+  const dailyCost = totalAnnualCost / 365;
 
   const secondary: ResultItem[] = [
     {
@@ -129,6 +130,12 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       value: monthlyAdvancePayment,
       formattedValue: formatCurrency(monthlyAdvancePayment),
       highlight: true,
+    },
+    {
+      id: 'dailyCost',
+      label: 'Geschätzte tägliche Gaskosten',
+      value: dailyCost,
+      formattedValue: formatCurrency(dailyCost),
     },
     {
       id: 'totalKwh',
@@ -182,7 +189,21 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       },
     },
     {
-      period: 'Gesamtkosten',
+      period: 'Monatlicher Abschlag (Ø)',
+      values: {
+        beschreibung: 'Gesamtkosten auf 12 Monate aufgeteilt',
+        betrag: formatCurrency(monthlyAdvancePayment),
+      },
+    },
+    {
+      period: 'Tägliche Kosten (Ø)',
+      values: {
+        beschreibung: 'Gesamtkosten auf 365 Tage aufgeteilt',
+        betrag: formatCurrency(dailyCost),
+      },
+    },
+    {
+      period: 'Gesamtkosten pro Jahr',
       values: {
         beschreibung: 'Summe aus Arbeitspreis und Grundpreis',
         betrag: formatCurrency(totalAnnualCost),
@@ -206,7 +227,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       ],
       rows: breakdownRows,
     },
-    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem jährlichen Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich jährliche Gesamtkosten von ${formatCurrency(totalAnnualCost)} (monatlicher Abschlag: ${formatCurrency(monthlyAdvancePayment)}).`,
+    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem jährlichen Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich jährliche Gesamtkosten von ${formatCurrency(totalAnnualCost)} (monatlicher Abschlag: ${formatCurrency(monthlyAdvancePayment)}, ca. ${formatCurrency(dailyCost)} pro Tag). Hinweis: Es handelt sich um eine Modellrechnung; Abrechnungsdetails Ihres Versorgers können abweichen.`,
   };
 }
 

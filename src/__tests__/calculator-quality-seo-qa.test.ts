@@ -789,8 +789,8 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
     it('verifies Dienstfahrrad Rechner has natural non-brand positioning and neutral explanatory JobRad note', () => {
       const calc = getCalculatorBySlug('dienstfahrrad-jobrad-rechner');
       expect(calc).toBeDefined();
-      expect(calc!.metaTitle).toBe('Dienstfahrrad-Rechner: Leasingkosten & Netto-Belastung berechnen');
-      expect(calc!.h1).toBe('Dienstfahrrad-Rechner: Deine monatlichen Leasingkosten berechnen');
+      expect(calc!.metaTitle).toBe('JobRad Rechner: Dienstfahrrad-Leasing berechnen');
+      expect(calc!.h1).toBe('JobRad Rechner: Dienstfahrrad-Leasing berechnen');
       expect(calc!.content?.intro).toContain('Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad.');
       
       // Explanatory reference in FAQs

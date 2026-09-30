@@ -9,6 +9,7 @@ import CategoryIcon from '@/components/common/CategoryIcon';
 import CategoryCard from '@/components/common/CategoryCard';
 import CategoryCalculatorsView from '@/components/calculator/CategoryCalculatorsView';
 import PopularDateCalculators from '@/components/calculator/PopularDateCalculators';
+import CategoryFocusCalculators from '@/components/calculator/CategoryFocusCalculators';
 import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
 import cardsStyles from '@/styles/cards.module.css';
@@ -135,6 +136,9 @@ export default async function CategoryPage({ params }: PageProps) {
       {cat.slug === 'datum-zeit' && (
         <PopularDateCalculators />
       )}
+
+      {/* Fokus-Rechner für priorisierte Themenbereiche (Haushalt, Mobilität, Bauen) */}
+      <CategoryFocusCalculators categorySlug={cat.slug} />
 
       {/* Interactive Category Search & Calculators Grid */}
       <CategoryCalculatorsView

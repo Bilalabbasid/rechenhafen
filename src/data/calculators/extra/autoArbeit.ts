@@ -880,18 +880,36 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'dienstfahrrad-jobrad-rechner',
     slug: 'dienstfahrrad-jobrad-rechner',
-    name: 'Dienstfahrrad-Rechner (Leasing & 0,25 % Gehaltsumwandlung)',
-    shortName: 'Dienstrad-Rechner',
+    name: 'JobRad Rechner (Dienstfahrrad-Leasing & Gehaltsumwandlung)',
+    shortName: 'JobRad Rechner',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'Dienstfahrrad-Rechner: Leasingkosten & Netto-Belastung berechnen',
-    metaDescription: 'Berechnen Sie die monatlichen Leasingkosten und Ihre Netto-Ersparnis beim Dienstrad-Leasing per Gehaltsumwandlung nach der offiziellen 0,25-%-Regelung.',
-    h1: 'Dienstfahrrad-Rechner: Deine monatlichen Leasingkosten berechnen',
-    shortDescription: 'Berechnet die tatsächliche monatliche Netto-Belastung und Gesamtersparnis beim Dienstrad-Leasing über den Arbeitgeber.',
-    searchKeywords: ['dienstfahrrad rechner', 'dienstrad leasing rechner', 'jobrad rechner ersparnis', 'jobrad netto rechner', '0 25 prozent regelung e bike', 'gehaltsumwandlung fahrrad rechner'],
+    metaTitle: 'JobRad Rechner: Dienstfahrrad-Leasing berechnen',
+    metaDescription: 'JobRad & Dienstfahrrad Rechner: Monatliche Netto-Belastung, Steuerersparnis und Übernahmepreis bei der 0,25-%-Gehaltsumwandlung präzise berechnen.',
+    h1: 'JobRad Rechner: Dienstfahrrad-Leasing berechnen',
+    shortDescription: 'Berechnet die tatsächliche monatliche Netto-Belastung, die Steuerersparnis und die Gesamtersparnis gegenüber dem Neukauf beim Dienstrad-Leasing.',
+    searchKeywords: [
+      'jobrad rechner',
+      'dienstfahrrad rechner',
+      'jobrad netto rechner',
+      'jobrad ersparnis rechner',
+      'dienstrad leasing rechner',
+      '0 25 prozent regelung e bike',
+      'gehaltsumwandlung fahrrad rechner',
+      'e-bike leasing rechner',
+    ],
     inputs: [
       { id: 'bikePriceGross', label: 'Fahrrad- / E-Bike-Kaufpreis inkl. Zubehör (UVP)', type: 'number', defaultValue: 3500, min: 750, max: 15000, step: 100, unit: '€' },
       { id: 'grossSalary', label: 'Ihr monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 1000, step: 100, unit: '€' },
+      {
+        id: 'leaseTerm',
+        label: 'Leasinglaufzeit',
+        type: 'select',
+        defaultValue: '36',
+        options: [
+          { value: '36', label: '36 Monate (Regellaufzeit)' },
+        ],
+      },
       { id: 'employerSubsidy', label: 'Monatlicher Arbeitgeberzuschuss (optional)', type: 'number', defaultValue: 0, min: 0, max: 200, step: 5, unit: '€/Monat', helpText: 'Freiwilliger monatlicher Zuschuss Ihres Arbeitgebers zur Leasingrate' },
       { id: 'serviceCost', label: 'Monatliche Inspektions- / Versicherungskosten', type: 'number', defaultValue: 10, min: 0, max: 50, step: 1, unit: '€/Monat', helpText: 'Vollkaskoversicherung und jährliche Inspektion' },
       { id: 'taxClass', label: 'Steuerklasse', type: 'select', defaultValue: '1', options: [
@@ -905,6 +923,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const salary = parseFloat(inputs.grossSalary) || 3800;
       const subsidy = Math.max(0, parseFloat(inputs.employerSubsidy) || 0);
       const service = Math.max(0, parseFloat(inputs.serviceCost) || 0);
+      const taxClass = inputs.taxClass || '1';
 
       // Leasingrate ca. 2,9 % des UVP (typischer Marktwert bei 36 Monaten Laufzeit)
       const leasingRate = price * 0.029;
@@ -917,8 +936,13 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       // Monatlicher geldwerter Vorteil: 1 % von 25 % = 0,25 % von 100 %
       const taxableBenefit = Math.max(1, quarterUvpRounded * 0.01);
 
-      // Reale Steuer- & SV-Entlastung schätzen (ca. 42-48 % Grenzbelastung je nach Gehalt):
-      const marginalRate = salary > 4500 ? 0.46 : salary > 2800 ? 0.42 : 0.36;
+      // Reale Steuer- & SV-Entlastung schätzen je nach Steuerklasse und Gehalt:
+      let marginalRate = 0.42;
+      if (taxClass === '3') {
+        marginalRate = salary > 4500 ? 0.38 : salary > 2800 ? 0.32 : 0.28;
+      } else {
+        marginalRate = salary > 4500 ? 0.46 : salary > 2800 ? 0.42 : 0.36;
+      }
       const taxSvSavings = grossDeduction * marginalRate;
       const benefitTaxCost = taxableBenefit * marginalRate;
 
@@ -953,13 +977,13 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { id: 'total36', label: 'Summe der 36 Netto-Monatsraten', value: totalNetPaid36, formattedValue: formatCurrency(totalNetPaid36) },
           { id: 'totalCostOverall', label: 'Gesamtaufwand inkl. Übernahme', value: totalCost, formattedValue: formatCurrency(totalCost) },
         ],
-        summaryText: `Bei einem Fahrradpreis von ${formatCurrency(price)} zahlen Sie bei 36 Monaten Laufzeit effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Zusammen mit dem voraussichtlichen Übernahmepreis von ca. ${formatCurrency(takeoverPrice)} sparen Sie gegenüber dem privaten Sofortkauf voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}).`,
+        summaryText: `Bei einem Fahrradpreis von ${formatCurrency(price)} zahlen Sie bei 36 Monaten Laufzeit effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Zusammen mit dem voraussichtlichen Übernahmepreis von ca. ${formatCurrency(takeoverPrice)} sparen Sie gegenüber dem privaten Sofortkauf voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}). Hinweis: Unverbindliche Modellrechnung; keine Steuerberatung.`,
       };
     },
-    formula: 'Netto-Belastung ≈ Bruttoabzug - (Bruttoabzug × Grenzsteuersatz) + (0,25 % UVP × Grenzsteuersatz)',
-    formulaExplanation: 'Die Leasingrate wird vor Steuern und Sozialabgaben vom Bruttogehalt abgezogen (Gehaltsumwandlung). Versteuert werden muss monatlich lediglich der geldwerte Vorteil für die Privatnutzung nach der 0,25-%-Regel (§ 6 Abs. 1 Nr. 4 Satz 6 EStG).',
+    formula: 'Netto-Belastung ≈ Bruttoabzug - (Bruttoabzug × Grenzbelastung) + (0,25 % UVP × Grenzbelastung)',
+    formulaExplanation: 'Die Leasingrate wird vor Steuern und Sozialabgaben vom Bruttogehalt abgezogen (Gehaltsumwandlung). Versteuert werden muss monatlich lediglich der geldwerte Vorteil für die Privatnutzung nach der 0,25-%-Regel (§ 6 Abs. 1 Nr. 4 Satz 6 EStG). Dieser Rechner dient der Orientierung und ersetzt keine Steuerberatung.',
     workedExample: {
-      title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Bruttogehalt',
+      title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Bruttogehalt (Steuerklasse 1)',
       description: 'Leasingrate brutto: ca. 101,50 €/Monat zzgl. 10,00 € Versicherung. Nach Abzug von Lohnsteuer und Sozialabgaben sowie Hinzurechnung des geldwerten Vorteils (8,00 €) beträgt die tatsächliche monatliche Netto-Belastung rund 68,00 €. Nach 36 Monaten und Übernahme für ca. 630 € beträgt die Gesamtersparnis gegenüber dem privaten Direktkauf rund 420 €.',
       inputs: { bikePriceGross: 3500, grossSalary: 3800, employerSubsidy: 0, serviceCost: 10, taxClass: '1' },
       resultSummary: 'ca. 68,00 € monatlich netto (ca. 420 € Gesamtersparnis)',
@@ -969,7 +993,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       sections: [
         {
           title: 'So funktioniert das Dienstrad-Leasing per Gehaltsumwandlung',
-          content: 'Beim Dienstrad-Leasing least der Arbeitgeber das Fahrrad oder E-Bike bei einer Leasinggesellschaft (wie JobRad, Deutsche Dienstrad, Bikeleasing oder BusinessBike) und überlässt es Ihnen auch zur uneingeschränkten privaten Nutzung.\n\nDie monatliche Leasingrate wird direkt von Ihrem Bruttogehalt einbehalten (**Gehaltsumwandlung**). Dadurch sinkt Ihr steuer- und sozialversicherungspflichtiges Bruttoeinkommen, sodass Sie spürbar weniger Lohnsteuer und Sozialabgaben abführen.\n\nAls Ausgleich müssen Sie lediglich die private Nutzung als sogenannten **geldwerten Vorteil** pauschal versteuern. Seit 2020 gilt hierfür die äußerst günstige **0,25-%-Regel**.',
+          content: 'Beim Dienstrad-Leasing least der Arbeitgeber das Fahrrad oder E-Bike bei einer Leasinggesellschaft (wie JobRad, Deutsche Dienstrad, Bikeleasing oder BusinessBike) und überlässt es Ihnen auch zur uneingeschränkten privaten Nutzung.\n\nDie monatliche Leasingrate wird direkt von Ihrem Bruttogehalt einbehalten (**Gehaltsumwandlung**). Dadurch sinkt Ihr steuer- und sozialversicherungspflichtiges Bruttoeinkommen, sodass Sie spürbar weniger Lohnsteuer und Sozialabgaben abführen.\n\nAls Ausgleich müssen Sie lediglich die private Nutzung als sogenannten **geldwerten Vorteil** pauschal versteuern. Seit 2020 gilt hierfür die gesetzlich verankerte, äußerst günstige **0,25-%-Regel**.',
         },
         {
           title: 'Die 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 EStG',
@@ -977,10 +1001,18 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         },
         {
           title: 'Leasing versus Direktkauf: Wann lohnt sich das Dienstrad?',
-          content: 'Das Dienstrad-Leasing lohnt sich besonders durch:\n- **Steuer- und SV-Vorteil**: Die Netto-Belastung liegt meist 25 bis 40 Prozent unter der regulären Brutto-Rate.\n- **Integrierte Versicherung**: Diebstahl, Vandalismus und Verschleiß sind in den Leasingpaketen meist günstig mitversichert.\n- **Günstige Übernahme**: Am Ende der 36 Monate können Sie das Rad meist für ca. 15 bis 18 Prozent des Ursprungspreises privat übernehmen.\n\n*Wichtiger Hinweis zu den Berechnungsannahmen*: Bei den ausgewiesenen Beträgen handelt es sich um eine verlässliche Musterschätzung. Die exakte Netto-Entlastung auf Ihrer Gehaltsabrechnung hängt von Ihrer persönlichen Steuerprogression, Krankenversicherungszusatzbeiträgen, Kirchensteuerpflicht sowie den Beitragsbemessungsgrenzen ab.',
+          content: 'Das Dienstrad-Leasing lohnt sich besonders durch drei Effekte:\n- **Steuer- und SV-Vorteil**: Die monatliche Netto-Belastung liegt meist 25 bis 40 Prozent unter der regulären Brutto-Rate.\n- **Integrierte Versicherung**: Diebstahl, Vandalismus und Verschleiß sind in den Leasingpaketen meist günstig mitversichert.\n- **Günstige Übernahme**: Am Ende der 36 Monate können Sie das Rad meist für ca. 15 bis 18 Prozent des Ursprungspreises privat übernehmen.\n\nPrüfen Sie Ihre Gehaltsbasis mit unserem [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) oder vergleichen Sie die Mobilitätskosten mit dem [Pendlerpauschale Rechner](/rechner/pendlerpauschale-rechner/) und dem [Fahrtkostenrechner](/rechner/fahrtkostenrechner/).',
+        },
+        {
+          title: 'Einfluss von Gehalt, Steuerklasse und Arbeitgeberzuschuss',
+          content: 'Die tatsächliche Netto-Ersparnis hängt von mehreren persönlichen Faktoren ab:\n- **Grenzsteuersatz**: Je höher Ihr Bruttoeinkommen, desto größer ist die Steuerersparnis bei der Gehaltsumwandlung.\n- **Arbeitgeberzuschuss**: Beteiligt sich der Arbeitgeber freiwillig mit einem monatlichen Zuschuss (z. B. 20 bis 50 Euro), sinkt Ihr Eigenanteil drastisch.\n- **Vollständige Kostenübernahme**: Übernimmt der Arbeitgeber das Dienstrad zusätzlich zum regulären Gehalt als Extra, ist die Gestellung für Arbeitnehmer nach § 3 Nr. 37 EStG sogar komplett steuer- und sozialabgabenfrei.',
+        },
+        {
+          title: 'Unabhängiger Rechner für JobRad, Bikeleasing, BusinessBike und weitere Anbieter',
+          content: 'Dieser Rechner arbeitet vollständig anbieterunabhängig auf Basis des deutschen Steuerrechts (§ 6 Abs. 1 Nr. 4 Satz 6 EStG). Das Berechnungsprinzip der Gehaltsumwandlung gilt einheitlich für alle deutschen Leasinggesellschaften – darunter JobRad GmbH, Deutsche Dienstrad, Bikeleasing-Service, BusinessBike, Lease a Bike und KazenMaier. RechenHafen steht in keinem geschäftlichen oder gesellschaftsrechtlichen Verhältnis zu diesen Marken.',
         },
       ],
-      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie gleich lautende Erlasse der obersten Finanzbehörden der Länder zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Kennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung).',
+      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie gleich lautende Erlasse der obersten Finanzbehörden der Länder zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Kennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung). Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/firmenwagen-geldwerter-vorteil-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/).',
     },
     faqs: [
       { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 6 Abs. 1 Nr. 4 Satz 6 EStG wird für die private Nutzung eines Dienstfahrrads monatlich 1 Prozent eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung (UVP) als geldwerter Vorteil angesetzt. Das entspricht effektiv 0,25 Prozent des Bruttolistenpreises.' },
@@ -988,8 +1020,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Dienstrad-Leasing vs. Privatkauf: Was ist günstiger?', answer: 'Aufgrund der Ersparnis bei Lohnsteuer und Sozialabgaben sowie des günstigen Übernahmepreises nach 36 Monaten (typischerweise ca. 17 bis 18 Prozent des UVP) ist das Dienstrad-Leasing in den allermeisten Fällen 20 bis 35 Prozent günstiger als der private Barkauf mit Ratenkredit.' },
       { question: 'Wer kann ein Dienstfahrrad über die Gehaltsumwandlung nutzen?', answer: 'Jeder festangestellte Arbeitnehmer, dessen Arbeitgeber einen Rahmenvertrag mit einem Leasinganbieter geschlossen hat. Auch Beamte in Bund und den meisten Bundesländern sowie Selbstständige können Dienstrad-Leasingmodelle steuerlich nutzen.' },
       { question: 'Warum wird dieser Rechner auch als JobRad-Rechner bezeichnet?', answer: 'JobRad ist eine geschützte Marke der JobRad GmbH und einer der bekanntesten Pioniere des Dienstrad-Leasings in Deutschland. Der Rechner berechnet herstellerunabhängig die gesetzliche Gehaltsumwandlung, die gleichermaßen für JobRad, Deutsche Dienstrad, Bikeleasing, BusinessBike, Lease a Bike und weitere Anbieter gilt. RechenHafen steht in keiner geschäftlichen Verbindung zu JobRad.' },
+      { question: 'Was geschieht am Ende der 36 Monate Leasinglaufzeit?', answer: 'Am Ende des Leasingvertrags bietet die Leasinggesellschaft das Fahrrad in der Regel zur privaten Übernahme für rund 17 bis 18 Prozent des ursprünglichen UVP an. Alternativ kann das Rad zurückgegeben und ein neues Dienstfahrrad geleast werden.' },
     ],
-    relatedSlugs: ['pendlerpauschale-rechner', 'dienstwagen-1-prozent-rechner', 'teilzeit-gehaltsrechner', 'stundenlohnrechner'],
+    relatedSlugs: ['brutto-netto-rechner', 'pendlerpauschale-rechner', 'fahrtkostenrechner', 'firmenwagen-geldwerter-vorteil-rechner', 'einkommensteuerrechner', 'stromkostenrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

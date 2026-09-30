@@ -191,8 +191,8 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 8. Schalungssteine
     const stein = getCalculatorBySlug('schalungssteine-rechner');
-    expect(stein?.metaTitle).toBe('Schalungssteine Rechner: Steine & Füllbeton (m³) für Stützmauer berechnen');
-    expect(stein?.h1).toBe('Schalungssteine Rechner – Steinbedarf, Füllbeton (m³) & Bewehrungsstahl berechnen');
+    expect(stein?.metaTitle).toBe('Schalungssteine Rechner: Menge für Ihre Mauer berechnen');
+    expect(stein?.h1).toBe('Schalungssteine berechnen: Menge für Ihre Mauer');
     expect(stein?.workedExample.description).toBeDefined();
     expect(stein?.faqs.length).toBeGreaterThanOrEqual(4);
   });
