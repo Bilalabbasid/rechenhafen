@@ -7,7 +7,7 @@ import styles from '@/styles/calculator.module.css';
 import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe } from '@/lib/formatters';
-import { getUpcomingEasterDateString } from '@/lib/calculators/dateMath';
+import { getUpcomingEasterDateString, parseDateParts } from '@/lib/calculators/dateMath';
 import {
   trackCalculatorView,
   trackCalculationCompleted,
@@ -100,8 +100,10 @@ export default function CalculatorRunner({
                     changed = true;
                   }
                 } else if (inp.type === 'date') {
-                  if (/^\d{4}-\d{2}-\d{2}$/.test(raw.trim())) {
-                    updated[inp.id] = raw.trim();
+                  const dp = parseDateParts(raw.trim());
+                  if (dp) {
+                    const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+                    updated[inp.id] = `${dp.year}-${pad(dp.month)}-${pad(dp.day)}`;
                     changed = true;
                   }
                 } else {
@@ -568,7 +570,7 @@ export default function CalculatorRunner({
                         value={inputs[field.id] ?? ''}
                         onChange={(e) => handleInputChange(field.id, e.target.value)}
                       />
-                      {inputs[field.id] && (
+                      {Boolean(inputs[field.id] && formatDateDe(inputs[field.id])) && (
                         <div className={styles.dateFormattedHint}>
                           <Calendar size={13} />
                           <span>Datum: {formatDateDe(inputs[field.id])}</span>
@@ -723,6 +725,11 @@ export default function CalculatorRunner({
                       ? `${result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}`
                       : '-')}
                 </span>
+                {result.primary.helpText && (
+                  <p style={{ margin: 'var(--space-2) 0 0', fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
+                    {result.primary.helpText}
+                  </p>
+                )}
               </div>
 
               {((result.secondary && result.secondary.length > 0) ||
@@ -740,6 +747,11 @@ export default function CalculatorRunner({
                             ? `${sec.value}${sec.unit ? ' ' + sec.unit : ''}`
                             : '-')}
                       </span>
+                      {sec.helpText && (
+                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                          {sec.helpText}
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -1,6 +1,6 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
-import { parseDateParts } from '@/lib/calculators/dateMath';
+import { parseDateParts, calculateAnniversaryDate } from '@/lib/calculators/dateMath';
 
 export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
   // ==================== DATUM & ZEIT (2) ====================
@@ -75,35 +75,87 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'entryDate', label: 'Eintrittsdatum in das Unternehmen', type: 'date', defaultValue: '2016-01-01' },
     ],
     calculate: (inputs) => {
-      const parts = parseDateParts(inputs.entryDate || '2016-01-01');
-      if (!parts) {
-        return { primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: 'Ungültig' }, error: 'Bitte geben Sie ein gültiges Datum im Format TT.MM.JJJJ oder JJJJ-MM-TT ein.' };
+      const rawDate = inputs.entryDate;
+      if (rawDate === undefined || rawDate === null || (typeof rawDate === 'string' && rawDate.trim() === '')) {
+        return {
+          primary: { id: 'error', label: 'Eintrittsdatum', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie ein Eintrittsdatum ein.',
+        };
       }
-      const y = parts.year;
-      const m = parts.month;
-      const d = parts.day;
+
+      const parts = parseDateParts(rawDate);
+      if (!parts) {
+        return {
+          primary: { id: 'error', label: 'Eintrittsdatum', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie ein gültiges Datum ein.',
+        };
+      }
+
+      const { year: y, month: m, day: d } = parts;
+      const isLeapDayEntry = m === 2 && d === 29;
       const pad = (n: number) => (n < 10 ? '0' + n : String(n));
-      const j10 = `${pad(d)}.${pad(m)}.${y + 10}`;
-      const j25 = `${pad(d)}.${pad(m)}.${y + 25}`;
-      const j40 = `${pad(d)}.${pad(m)}.${y + 40}`;
-      const j50 = `${pad(d)}.${pad(m)}.${y + 50}`;
+      const entryFormatted = `${pad(d)}.${pad(m)}.${y}`;
+
+      const res10 = calculateAnniversaryDate(y, m, d, 10);
+      const res25 = calculateAnniversaryDate(y, m, d, 25);
+      const res40 = calculateAnniversaryDate(y, m, d, 40);
+      const res50 = calculateAnniversaryDate(y, m, d, 50);
+
+      const j10 = res10.formatted;
+      const j25 = res25.formatted;
+      const j40 = res40.formatted;
+      const j50 = res50.formatted;
+
+      const leapDayExplanation = isLeapDayEntry
+        ? 'Bei einem Eintritt am 29. Februar verwenden wir in Nicht-Schaltjahren den 28. Februar als rechnerischen Jahrestag.'
+        : undefined;
+
+      const summaryText = isLeapDayEntry
+        ? `Bei einem Diensteintritt am ${entryFormatted} vollenden Sie Ihr 10-jähriges Jubiläum am ${j10}, Ihr 25-jähriges Jubiläum am ${j25}, Ihr 40-jähriges Jubiläum am ${j40} und Ihr 50-jähriges Jubiläum am ${j50}. Bei einem Eintritt am 29. Februar verwenden wir in Nicht-Schaltjahren den 28. Februar als rechnerischen Jahrestag. Dies ist die kalendarische Konvention des Rechners und keine rechtsverbindliche Feststellung von Ansprüchen. Anerkannte Vordienstzeiten sowie geltende vertragliche oder tarifliche Regelungen (z. B. TVöD) können das tatsächliche Dienstjubiläum beeinflussen.`
+        : `Bei einem Diensteintritt am ${entryFormatted} vollenden Sie Ihr 10-jähriges Jubiläum am ${j10}, Ihr 25-jähriges Jubiläum am ${j25}, Ihr 40-jähriges Jubiläum am ${j40} und Ihr 50-jähriges Jubiläum am ${j50}. Bitte beachten Sie: Anerkannte Vordienstzeiten sowie geltende vertragliche oder tarifliche Regelungen (z. B. TVöD) können das tatsächliche Dienstjubiläum beeinflussen.`;
+
       return {
-        primary: { id: 'j25', label: '25-jähriges Dienstjubiläum', value: y + 25, formattedValue: j25, highlight: true },
+        primary: {
+          id: 'j25',
+          label: '25-jähriges Dienstjubiläum',
+          value: y + 25,
+          formattedValue: j25,
+          highlight: true,
+          helpText: leapDayExplanation,
+        },
         secondary: [
-          { id: 'j10', label: '10-jähriges Jubiläum', value: y + 10, formattedValue: j10 },
-          { id: 'j40', label: '40-jähriges Jubiläum', value: y + 40, formattedValue: j40 },
-          { id: 'j50', label: '50-jähriges Jubiläum', value: y + 50, formattedValue: j50 },
+          {
+            id: 'j10',
+            label: '10-jähriges Jubiläum',
+            value: y + 10,
+            formattedValue: j10,
+            helpText: res10.isLeapShiftedTo28 ? 'Nicht-Schaltjahr: 28. Februar' : undefined,
+          },
+          {
+            id: 'j40',
+            label: '40-jähriges Jubiläum',
+            value: y + 40,
+            formattedValue: j40,
+            helpText: res40.isLeapPreserved ? 'Schaltjahr: 29. Februar' : undefined,
+          },
+          {
+            id: 'j50',
+            label: '50-jähriges Jubiläum',
+            value: y + 50,
+            formattedValue: j50,
+            helpText: res50.isLeapShiftedTo28 ? 'Nicht-Schaltjahr: 28. Februar' : undefined,
+          },
         ],
-        summaryText: `Bei einem Diensteintritt am ${pad(d)}.${pad(m)}.${y} vollenden Sie Ihr 10-jähriges Jubiläum am ${j10}, Ihr 25-jähriges Jubiläum am ${j25} und Ihr 40-jähriges Jubiläum am ${j40}.`,
+        summaryText,
       };
     },
     formula: 'Jubiläumsdatum = Eintrittsdatum + N Jahre Betriebszugehörigkeit',
-    formulaExplanation: 'Nach deutschem Arbeits- und Tarifrecht (z. B. TVöD § 23) werden 25- und 40-jährige Dienstjubiläen ab dem offiziellen Tag des Diensteintritts vollendet.',
+    formulaExplanation: 'Nach deutschem Arbeits- und Tarifrecht (z. B. TVöD § 23) werden 25- und 40-jährige Dienstjubiläen ab dem offiziellen Tag des Diensteintritts vollendet. Bei einem Eintritt am 29. Februar verwenden wir in Nicht-Schaltjahren den 28. Februar als rechnerischen Jahrestag.',
     workedExample: {
       title: 'Beispiel: Eintritt am 01.01.2016',
-      description: '10 Jahre: 01.01.2026. 25 Jahre: 01.01.2041.',
+      description: '10 Jahre: 01.01.2026. 25 Jahre: 01.01.2041. 40 Jahre: 01.01.2056. 50 Jahre: 01.01.2066.',
       inputs: { entryDate: '2016-01-01' },
-      resultSummary: '10 Jahre voll am 01.01.2026',
+      resultSummary: '10 Jahre: 01.01.2026, 25 Jahre: 01.01.2041',
     },
     content: {
       intro: 'Dieser Jubiläumsrechner ermittelt die exakten Stichtage für 10-, 25-, 40- und 50-jährige Dienst- und Firmenjubiläen im Arbeitsverhältnis.',

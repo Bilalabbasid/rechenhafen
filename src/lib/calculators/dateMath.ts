@@ -87,12 +87,12 @@ export function parseDateParts(
   if (typeof dateInput === 'string') {
     const trimmed = dateInput.trim();
     // Match ISO YYYY-MM-DD
-    const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
+    const isoMatch = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimmed);
     if (isoMatch) {
       const year = parseInt(isoMatch[1], 10);
       const month = parseInt(isoMatch[2], 10);
       const day = parseInt(isoMatch[3], 10);
-      if (month >= 1 && month <= 12 && day >= 1 && day <= getDaysInMonth(year, month)) {
+      if (year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= getDaysInMonth(year, month)) {
         return { year, month, day };
       }
     }
@@ -103,7 +103,7 @@ export function parseDateParts(
       const day = parseInt(deMatch[1], 10);
       const month = parseInt(deMatch[2], 10);
       const year = parseInt(deMatch[3], 10);
-      if (month >= 1 && month <= 12 && day >= 1 && day <= getDaysInMonth(year, month)) {
+      if (year > 0 && month >= 1 && month <= 12 && day >= 1 && day <= getDaysInMonth(year, month)) {
         return { year, month, day };
       }
     }
@@ -130,6 +130,55 @@ export function formatDateGerman(
   if (!parts) return '';
   const pad = (n: number) => (n < 10 ? '0' + n : String(n));
   return `${pad(parts.day)}.${pad(parts.month)}.${parts.year}`;
+}
+
+/**
+ * Calculates anniversary date given entry date parts and years to add.
+ * Calendar-year arithmetic convention:
+ * - Preserves day and month where possible.
+ * - For a 29 February start date:
+ *   - Uses 29 February in leap years.
+ *   - Uses 28 February in non-leap years.
+ * Completely timezone-independent, operating solely on integer year, month, day.
+ */
+export function calculateAnniversaryDate(
+  year: number,
+  month: number,
+  day: number,
+  yearsToAdd: number
+): {
+  year: number;
+  month: number;
+  day: number;
+  formatted: string;
+  isLeapPreserved: boolean;
+  isLeapShiftedTo28: boolean;
+} {
+  const targetYear = year + yearsToAdd;
+  let targetDay = day;
+  const targetMonth = month;
+  let isLeapPreserved = false;
+  let isLeapShiftedTo28 = false;
+
+  if (month === 2 && day === 29) {
+    if (isLeapYear(targetYear)) {
+      targetDay = 29;
+      isLeapPreserved = true;
+    } else {
+      targetDay = 28;
+      isLeapShiftedTo28 = true;
+    }
+  }
+
+  const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+  return {
+    year: targetYear,
+    month: targetMonth,
+    day: targetDay,
+    formatted: `${pad(targetDay)}.${pad(targetMonth)}.${targetYear}`,
+    isLeapPreserved,
+    isLeapShiftedTo28,
+  };
 }
 
 /**
