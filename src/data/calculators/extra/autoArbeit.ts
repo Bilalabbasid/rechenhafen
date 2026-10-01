@@ -17,6 +17,19 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     searchKeywords: ['kfz steuer rechner', 'kraftfahrzeugsteuer berechnen', 'autosteuer rechner', 'kfz steuer rechner 2026', 'diesel kfz steuer tabelle', 'kfz steuer elektroauto berechnen', 'kfz steuer nach hubraum berechnen', 'wie hoch ist meine kfz steuer', 'autosteuer berechnen co2 hubraum'],
     inputs: [
       {
+        id: 'firstRegistration',
+        label: 'Zulassungszeitraum des Fahrzeugs',
+        type: 'select',
+        defaultValue: 'from_2021',
+        options: [
+          { value: 'from_2021', label: 'Erstzulassung ab 01.01.2021 (WLTP-Messung & progressive CO₂-Staffel)' },
+          { value: '2014_2020', label: 'Erstzulassung 01.01.2014 bis 31.12.2020 (Freibetrag 95 g/km, linear 2,00 €/g)' },
+          { value: '2012_2013', label: 'Erstzulassung 01.01.2012 bis 31.12.2013 (Freibetrag 110 g/km, linear 2,00 €/g)' },
+          { value: '2009_2011', label: 'Erstzulassung 01.07.2009 bis 31.12.2011 (Freibetrag 120 g/km, linear 2,00 €/g)' },
+          { value: 'before_2009', label: 'Erstzulassung vor dem 01.07.2009 (Altfahrzeuge nach Schadstoffnorm)' },
+        ],
+      },
+      {
         id: 'engineType',
         label: 'Antriebsart',
         type: 'select',
@@ -24,89 +37,259 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         options: [
           { value: 'petrol', label: 'Benziner (2,00 € je angefangene 100 cm³)' },
           { value: 'diesel', label: 'Diesel (9,50 € je angefangene 100 cm³)' },
-          { value: 'electric', label: 'Elektrofahrzeug (Bis 2030 steuerbefreit, danach 50 % ermäßigt)' },
+          { value: 'electric', label: 'Elektrofahrzeug (§ 3d KraftStG / 50 % Gewichtstarif)' },
         ],
       },
       { id: 'displacementCc', label: 'Hubraum in cm³ (Feld P.1 im Fahrzeugschein)', type: 'number', defaultValue: 1998, min: 0, max: 8000, step: 100, unit: 'cm³' },
       { id: 'co2EmissionsGkm', label: 'CO2-Ausstoß in g/km (Feld V.7 nach WLTP)', type: 'number', defaultValue: 135, min: 0, max: 400, step: 1, unit: 'g/km' },
+      { id: 'evRegistrationYear', label: 'Erstzulassungsjahr des Elektrofahrzeugs', type: 'number', defaultValue: 2023, min: 2011, max: 2030, step: 1, unit: 'Jahr' },
+      { id: 'grossWeightKg', label: 'Zulässiges Gesamtgewicht in kg (Feld F.1/F.2, nach Ablauf der 10-jährigen Steuerbefreiung)', type: 'number', defaultValue: 2100, min: 500, max: 3500, step: 100, unit: 'kg' },
     ],
     calculate: (inputs) => {
+      const regPeriod = inputs.firstRegistration || 'from_2021';
       const type = inputs.engineType || 'petrol';
-      const cc = parseInt(inputs.displacementCc, 10) || 0;
-      const co2 = parseInt(inputs.co2EmissionsGkm, 10) || 0;
 
-      if (type === 'electric') {
+      // 1. Altfahrzeuge vor dem 01.07.2009 ablehnen
+      if (regPeriod === 'before_2009') {
         return {
-          primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '0,00 € (Steuerbefreit)', highlight: true },
-          secondary: [
-            { id: 'exemptUntil', label: 'Steuerbefreiung', value: 0, formattedValue: 'Bis 31.12.2030 nach § 3d KraftStG' },
-          ],
-          summaryText: 'Reine Elektrofahrzeuge sind bei Erstzulassung bis Ende 2025 bis zu 10 Jahre bzw. längstens bis zum 31.12.2030 komplett von der KFZ-Steuer befreit.',
+          primary: { id: 'totalTax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+          error: 'Pkw mit Erstzulassung vor dem 01.07.2009 werden nach den alten Hubraumsteuersätzen je nach Schadstoffnorm (Euro 1 bis Euro 4) besteuert und werden von diesem Rechner nicht unterstützt (unterstützter Zulassungszeitraum: ab 01.07.2009).',
         };
       }
 
-      // Hubraumbetrag je angefangene 100 cm³
+      // 2. Elektrofahrzeuge (§ 3d KraftStG und § 9 Abs. 2 i.V.m. § 9 Abs. 1 Nr. 3)
+      if (type === 'electric') {
+        let rawEvYear: number;
+        if (inputs.evRegistrationYear !== undefined && inputs.evRegistrationYear !== null && String(inputs.evRegistrationYear).trim() !== '') {
+          rawEvYear = parseInt(inputs.evRegistrationYear, 10);
+        } else if (inputs.firstRegistration === '2012_2013') {
+          rawEvYear = 2013;
+        } else if (inputs.firstRegistration === '2009_2011') {
+          rawEvYear = 2011;
+        } else if (inputs.firstRegistration === '2014_2020') {
+          rawEvYear = 2018;
+        } else {
+          rawEvYear = 2023;
+        }
+        if (isNaN(rawEvYear) || rawEvYear < 2011 || rawEvYear > 2030) {
+          return {
+            primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie ein gültiges Erstzulassungsjahr zwischen 2011 und 2030 für das Elektrofahrzeug an.',
+          };
+        }
+
+        // Berechnung für das Steuerjahr 2026: Befreiung gilt für 10 Jahre, längstens bis 31.12.2035 (§ 3d Abs. 1 KraftStG)
+        const exemptEndYear = Math.min(2035, rawEvYear + 10);
+        const calculationYear = 2026;
+        const isExempt = calculationYear <= exemptEndYear;
+
+        if (isExempt) {
+          return {
+            primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '0,00 € (Steuerbefreit)', highlight: true },
+            secondary: [
+              { id: 'exemptUntil', label: 'Dauer der Steuerbefreiung', value: 0, formattedValue: `Bis 31.12.${exemptEndYear} (§ 3d Abs. 1 KraftStG)` },
+              { id: 'status', label: 'Befreiungsstatus', value: 0, formattedValue: '10 Jahre ab Erstzulassung steuerbefreit' },
+            ],
+            summaryText: `Für Ihr Elektrofahrzeug (Erstzulassung ${rawEvYear}) gilt nach § 3d Abs. 1 KraftStG eine 10-jährige Steuerbefreiung bis zum 31.12.${exemptEndYear}. Im Steuerjahr ${calculationYear} fällt keine Kraftfahrzeugsteuer an.`,
+          };
+        }
+
+        // Nach Ablauf der 10-jährigen Steuerbefreiung: Gewichtstarif nach § 9 Abs. 2 i. V. m. § 9 Abs. 1 Nr. 3 KraftStG
+        if (inputs.grossWeightKg === undefined || inputs.grossWeightKg === null || String(inputs.grossWeightKg).trim() === '') {
+          return {
+            primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+            error: 'Die 10-jährige Steuerbefreiung für dieses Erstzulassungsjahr ist abgelaufen. Bitte geben Sie das zulässige Gesamtgewicht in kg ein.',
+          };
+        }
+        const weight = parseInt(inputs.grossWeightKg, 10);
+        if (isNaN(weight) || weight <= 0) {
+          return {
+            primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie ein gültiges Gesamtgewicht größer als 0 kg ein.',
+          };
+        }
+
+        // § 9 Abs. 1 Nr. 3 Buchstabe a (Pkw/Nutzfahrzeuge je angefangene 200 kg):
+        // bis 2.000 kg: 11,25 € je 200 kg
+        // 2.001 bis 3.000 kg: 12,02 € je 200 kg
+        // 3.001 bis 3.500 kg: 12,78 € je 200 kg
+        let fullWeightTax = 0;
+        const wTier1 = Math.min(weight, 2000);
+        fullWeightTax += Math.ceil(wTier1 / 200) * 11.25;
+
+        if (weight > 2000) {
+          const wTier2 = Math.min(weight, 3000) - 2000;
+          fullWeightTax += Math.ceil(wTier2 / 200) * 12.02;
+        }
+        if (weight > 3000) {
+          const wTier3 = Math.min(weight, 3500) - 3000;
+          fullWeightTax += Math.ceil(wTier3 / 200) * 12.78;
+        }
+
+        // § 9 Abs. 2 KraftStG: Ermäßigung um 50 %
+        const discountedTax = fullWeightTax * 0.50;
+        // § 11 Abs. 5 KraftStG: Abrundung auf volle Euro nach unten
+        const payableTax = Math.floor(discountedTax);
+
+        return {
+          primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: payableTax, formattedValue: formatCurrency(payableTax), highlight: true },
+          secondary: [
+            { id: 'status', label: 'Befreiungsstatus', value: 0, formattedValue: `Steuerbefreiung endete am 31.12.${exemptEndYear}` },
+            { id: 'fullWeightTax', label: 'Volle gewichtsbasierte Steuer (§ 9 Abs. 1 Nr. 3)', value: fullWeightTax, formattedValue: formatCurrency(fullWeightTax) },
+            { id: 'reduction', label: '50 % Elektro-Ermäßigung (§ 9 Abs. 2)', value: discountedTax, formattedValue: `-${formatCurrency(fullWeightTax - discountedTax)}` },
+            { id: 'monthlyEff', label: 'Monatliche Belastung', value: payableTax / 12, formattedValue: formatCurrency(payableTax / 12) },
+          ],
+          summaryText: `Die 10-jährige Steuerbefreiung endete am 31.12.${exemptEndYear}. Nach § 9 Abs. 2 KraftStG wird die Steuer nach dem Fahrzeuggewicht (${weight} kg) ermittelt und um 50 % ermäßigt. Die Steuer beträgt nach gesetzlicher Abrundung (§ 11 Abs. 5 KraftStG) ${formatCurrency(payableTax)} pro Jahr.`,
+        };
+      }
+
+      // 3. Verbrenner: Benziner und Diesel
+      if (inputs.displacementCc === undefined || inputs.displacementCc === null || String(inputs.displacementCc).trim() === '') {
+        return {
+          primary: { id: 'totalTax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den Hubraum in cm³ an.',
+        };
+      }
+      const cc = parseInt(inputs.displacementCc, 10);
+      if (isNaN(cc) || cc <= 0) {
+        return {
+          primary: { id: 'totalTax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen gültigen Hubraum über 0 cm³ an.',
+        };
+      }
+
+      if (inputs.co2EmissionsGkm === undefined || inputs.co2EmissionsGkm === null || String(inputs.co2EmissionsGkm).trim() === '') {
+        return {
+          primary: { id: 'totalTax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den CO2-Ausstoß in g/km an.',
+        };
+      }
+      const co2 = parseInt(inputs.co2EmissionsGkm, 10);
+      if (isNaN(co2) || co2 < 0) {
+        return {
+          primary: { id: 'totalTax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '-' },
+          error: 'Der CO2-Ausstoß darf nicht negativ sein.',
+        };
+      }
+
       const ccPortions = Math.ceil(cc / 100);
       const ccRate = type === 'diesel' ? 9.50 : 2.00;
       const baseTax = ccPortions * ccRate;
 
-      // CO2-Zuschlag über 95 g/km (Stufentarif)
+      // CO2-Zuschlag je nach Zulassungszeitraum
       let co2Tax = 0;
-      const excess = Math.max(0, co2 - 95);
-      if (excess > 0) {
-        if (excess <= 20) co2Tax += excess * 2.00;
-        else if (excess <= 40) co2Tax += 20 * 2.00 + (excess - 20) * 2.20;
-        else if (excess <= 60) co2Tax += 20 * 2.00 + 20 * 2.20 + (excess - 40) * 2.50;
-        else if (excess <= 80) co2Tax += 20 * 2.00 + 20 * 2.20 + 20 * 2.50 + (excess - 60) * 2.90;
-        else if (excess <= 100) co2Tax += 20 * 2.00 + 20 * 2.20 + 20 * 2.50 + 20 * 2.90 + (excess - 80) * 3.40;
-        else co2Tax += 20 * 2.00 + 20 * 2.20 + 20 * 2.50 + 20 * 2.90 + 20 * 3.40 + (excess - 100) * 4.00;
+      if (regPeriod === 'from_2021') {
+        // § 9 Abs. 1 Nr. 2 Buchst. b KraftStG: Progressive CO2-Staffel ab 2021
+        const excess = Math.max(0, co2 - 95);
+        if (excess > 0) {
+          if (excess <= 20) co2Tax += excess * 2.00;
+          else if (excess <= 40) co2Tax += 20 * 2.00 + (excess - 20) * 2.20;
+          else if (excess <= 60) co2Tax += 20 * 2.00 + 20 * 2.20 + (excess - 40) * 2.50;
+          else if (excess <= 80) co2Tax += 20 * 2.00 + 20 * 2.20 + 20 * 2.50 + (excess - 60) * 2.90;
+          else if (excess <= 100) co2Tax += 20 * 2.00 + 20 * 2.20 + 20 * 2.50 + 20 * 2.90 + (excess - 80) * 3.40;
+          else co2Tax += 20 * 2.00 + 20 * 2.20 + 20 * 2.50 + 20 * 2.90 + 20 * 3.40 + (excess - 100) * 4.00;
+        }
+      } else if (regPeriod === '2014_2020') {
+        // 01.01.2014 bis 31.12.2020: 95 g/km Freibetrag, linear 2,00 € je g/km
+        const excess = Math.max(0, co2 - 95);
+        co2Tax = excess * 2.00;
+      } else if (regPeriod === '2012_2013') {
+        // 01.01.2012 bis 31.12.2013: 110 g/km Freibetrag, linear 2,00 € je g/km
+        const excess = Math.max(0, co2 - 110);
+        co2Tax = excess * 2.00;
+      } else if (regPeriod === '2009_2011') {
+        // 01.07.2009 bis 31.12.2011: 120 g/km Freibetrag, linear 2,00 € je g/km
+        const excess = Math.max(0, co2 - 120);
+        co2Tax = excess * 2.00;
       }
 
-      const totalTax = Math.round(baseTax + co2Tax);
+      // § 11 Abs. 5 KraftStG: Die zu entrichtende Steuer ist auf volle Euro nach unten abzurunden!
+      const totalTax = Math.floor(baseTax + co2Tax);
+
       return {
         primary: { id: 'totalTax', label: 'Jährliche KFZ-Steuer', value: totalTax, formattedValue: formatCurrency(totalTax), highlight: true },
         secondary: [
           { id: 'baseTax', label: 'Hubraumbasierter Anteil', value: baseTax, formattedValue: formatCurrency(baseTax) },
-          { id: 'co2Tax', label: 'CO2-Aufschlag (über 95 g/km)', value: co2Tax, formattedValue: formatCurrency(co2Tax) },
+          { id: 'co2Tax', label: 'CO2-Aufschlag', value: co2Tax, formattedValue: formatCurrency(co2Tax) },
           { id: 'monthlyEff', label: 'Monatliche Belastung', value: totalTax / 12, formattedValue: formatCurrency(totalTax / 12) },
         ],
-        summaryText: `Für Ihr Fahrzeug (${cc} cm³, ${co2} g/km CO2) beträgt die jährliche KFZ-Steuer ${formatCurrency(totalTax)} (${formatCurrency(baseTax)} Hubraum + ${formatCurrency(co2Tax)} CO2-Zuschlag).`,
+        summaryText: `Für Ihr Fahrzeug (${cc} cm³, ${co2} g/km CO2) beträgt die jährliche KFZ-Steuer nach gesetzlicher Abrundung (§ 11 Abs. 5 KraftStG) ${formatCurrency(totalTax)} (${formatCurrency(baseTax)} Hubraum + ${formatCurrency(co2Tax)} CO2-Zuschlag).`,
       };
     },
-    formula: 'KFZ-Steuer = (Hubraum / 100) × Sockelbetrag + gestaffelter CO2-Zuschlag über 95 g/km',
-    formulaExplanation: 'Rechtsgrundlage ist § 9 KraftStG mit progressiver CO2-Staffel für Zulassungen ab 2021.',
+    formula: 'KFZ-Steuer = Math.floor(Hubraumbetrag + CO2-Zuschlag)',
+    formulaExplanation: 'Rechtsgrundlage ist § 9 KraftStG i. V. m. der zwingenden Abrundungsvorschrift nach § 11 Abs. 5 KraftStG.',
     workedExample: {
-      title: 'Beispiel: 1.998 cm³ Benziner mit 135 g/km CO2',
-      description: 'Berechnung für einen 1.998 cm³ Benziner mit 135 g/km CO2-Ausstoß: Hubraum-Sockelbetrag (20 × 2,00 € = 40,00 €) plus progressiver CO2-Aufschlag (40 g über Freigrenze 95 g/km = 84,00 €) ergibt 124,00 € KFZ-Steuer pro Jahr.',
-      inputValues: [{ label: 'Hubraum', value: '1.998 cm³' }, { label: 'CO2', value: '135 g/km' }],
-      steps: ['Hubraum: 20 × 2,00 € = 40,00 €', 'CO2-Zuschlag (40 g über 95): 20 × 2,00 € + 20 × 2,20 € = 84,00 €', 'Gesamt = 40 € + 84 € = 124,00 €/Jahr'],
+      title: 'Beispiel: 1.998 cm³ Benziner mit 135 g/km CO2 (ab 2021)',
+      description: 'Berechnung für einen 1.998 cm³ Benziner mit 135 g/km CO2-Ausstoß (Erstzulassung ab 2021): Hubraum-Sockelbetrag (20 × 2,00 € = 40,00 €) plus progressiver CO2-Aufschlag (40 g über Freigrenze 95 g/km: 20 × 2,00 € + 20 × 2,20 € = 84,00 €) ergibt exakt 124,00 € KFZ-Steuer pro Jahr.',
+      inputValues: [{ label: 'Hubraum', value: '1.998 cm³' }, { label: 'CO2', value: '135 g/km' }, { label: 'Zulassung', value: 'ab 2021' }],
+      steps: ['Hubraum: 20 × 2,00 € = 40,00 €', 'CO2-Zuschlag (40 g über 95): 20 × 2,00 € + 20 × 2,20 € = 84,00 €', 'Gesamt = 40 € + 84 € = 124,00 €/Jahr (abgerundet nach § 11 Abs. 5 KraftStG)'],
       result: '124,00 € jährliche Steuer',
     },
     content: {
       intro: 'Die deutsche Kraftfahrzeugsteuer nach dem KraftStG bemisst sich bei Pkw mit Erstzulassung ab 2021 zweigeteilt: aus einem festen Hubraumbetrag je angefangene 100 cm³ und einem progressiv gestaffelten CO₂-Zuschlag für jede Emission über der Freigrenze von 95 g/km.',
-      details: 'Die relevanten Messwerte finden Sie in Ihrer Zulassungsbescheinigung Teil I (Fahrzeugschein): Der Hubraum steht in Feld P.1, der kombinierte CO₂-Wert nach WLTP in Feld V.7 und die Antriebsart in Feld 14. Benziner zahlen 2,00 € je 100 cm³, Dieselfahrzeuge 9,50 € je 100 cm³. Reine Elektrofahrzeuge sind bei Erstzulassung bis Ende 2025 für bis zu 10 Jahre, längstens bis zum 31.12.2030, komplett von der Steuer befreit. Planen Sie auch Ihre laufenden Betriebskosten mit unserem [Spritkostenrechner](/rechner/spritkostenrechner/) und dem [Auto-Wertverlust-Rechner](/rechner/auto-wertverlust-rechner/).',
+      details: 'Die relevanten Messwerte finden Sie in Ihrer Zulassungsbescheinigung Teil I (Fahrzeugschein): Der Hubraum steht in Feld P.1, der kombinierte CO₂-Wert nach WLTP in Feld V.7 und die Antriebsart in Feld 14. Benziner zahlen 2,00 € je 100 cm³, Dieselfahrzeuge 9,50 € je 100 cm³. Reine Elektrofahrzeuge sind bei Erstzulassung in der Zeit vom 18.05.2011 bis 31.12.2030 für zehn Jahre ab dem Tag der erstmaligen Zulassung komplett von der Steuer befreit, längstens jedoch bis zum 31.12.2035 (§ 3d Abs. 1 KraftStG). Nach Ablauf der Befreiung gilt eine 50 % ermäßigte gewichtsbasierte Steuer nach § 9 Abs. 2 KraftStG.',
     },
     faqs: [
       { question: 'Wo finde ich Hubraum und CO₂-Ausstoß im Fahrzeugschein (Zulassungsbescheinigung Teil I)?', answer: 'Der Hubraum in Kubikzentimetern (cm³) ist in Feld P.1 vermerkt. Der für die Steuer maßgebliche CO₂-Ausstoß in g/km (nach dem realistischeren WLTP-Messverfahren) ist in Feld V.7 eingetragen. Die Antriebsart (z. B. Benzin, Diesel, Elektro) steht in Feld 14.' },
-      { question: 'Warum ist die KFZ-Steuer für Diesel so viel höher als für Benziner?', answer: 'Diesel-Pkw werden mit 9,50 € pro angefangene 100 cm³ besteuert (Benziner: 2,00 €). Der Gesetzgeber gleicht damit die niedrigere Mineralölsteuer bzw. Energiesteuer auf Dieselkraftstoff an den Tankstellen steuerlich aus.' },
-      { question: 'Wie funktioniert die progressive CO₂-Staffel ab Erstzulassung 2021?', answer: 'Emissionen bis 95 g/km sind zuschlagfrei. Darüber greift ein Stufentarif: 96–115 g/km kosten 2,00 € je Gramm; 116–135 g/km kosten 2,20 €; 136–155 g/km kosten 2,50 €; 156–175 g/km kosten 2,90 €; 176–195 g/km kosten 3,40 €; ab 196 g/km fallen 4,00 € je Gramm an.' },
-      { question: 'Gilt die Steuerbefreiung für Elektroautos auch bei Halterwechsel?', answer: 'Ja. Die bis zu zehnjährige Steuerbefreiung nach § 3d KraftStG (maximal bis zum 31.12.2030) ist fahrzeuggebunden und geht bei Verkauf oder Umschreibung eines gebrauchten E-Autos auf den neuen Halter über.' },
-      { question: 'Wie werden Plug-in-Hybride (PHEV) bei der KFZ-Steuer behandelt?', answer: 'Plug-in-Hybride gelten steuerlich nicht als reine Elektroautos. Sie werden wie herkömmliche Verbrenner nach Hubraum (Benzin oder Diesel) plus CO₂-Ausstoß besteuert, profitieren aber durch den Elektromotor meist von einem sehr geringen offiziellen CO₂-Wert.' },
+      { question: 'Warum ist die KFZ-Steuer für Diesel so viel höher als für Benziner?', answer: 'Diesel-Pkw werden mit 9,50 € pro angefangene 100 cm³ besteuert (Benziner: 2,00 €). Der Gesetzgeber gleicht damit die niedrigere Energiesteuer auf Dieselkraftstoff an den Tankstellen steuerlich aus.' },
+      { question: 'Wie funktioniert die progressive CO₂-Staffel ab Erstzulassung 2021?', answer: 'Emissionen bis 95 g/km sind zuschlagfrei. Darüber greift ein Stufentarif nach § 9 Abs. 1 Nr. 2 Buchst. b KraftStG: 96–115 g/km kosten 2,00 € je Gramm; 116–135 g/km kosten 2,20 €; 136–155 g/km kosten 2,50 €; 156–175 g/km kosten 2,90 €; 176–195 g/km kosten 3,40 €; ab 196 g/km fallen 4,00 € je Gramm an.' },
+      { question: 'Wie lange sind Elektroautos von der KFZ-Steuer befreit?', answer: 'Nach § 3d Abs. 1 KraftStG sind reine Elektrofahrzeuge bei einer Erstzulassung zwischen dem 18.05.2011 und 31.12.2030 für zehn Jahre ab dem Tag der erstmaligen Zulassung steuerbefreit (längstens bis 31.12.2035). Nach Ablauf dieser Frist wird die Steuer nach dem zulässigen Gesamtgewicht berechnet und nach § 9 Abs. 2 KraftStG um 50 % ermäßigt.' },
+      { question: 'Wie wird die KFZ-Steuer gesetzlich gerundet?', answer: 'Nach § 11 Abs. 5 KraftStG ist die zu entrichtende Jahressteuer zwingend auf volle Euro nach unten abzurunden (z. B. werden 108,50 € gesetzlich auf 108,00 € abgerundet).' },
+      { question: 'Wie werden Plug-in-Hybride (PHEV) bei der KFZ-Steuer behandelt?', answer: 'Plug-in-Hybride gelten steuerlich nicht als reine Elektroautos. Sie werden wie herkömmliche Verbrenner nach Hubraum (Benzin oder Diesel) plus CO₂-Ausstoß besteuert, profitieren aber durch den Elektromotor meist von einem geringeren offiziellen CO₂-Wert.' },
     ],
     relatedSlugs: ['motorrad-unterhaltskosten-rechner', 'co2-auto-rechner', 'dienstwagen-1-prozent-rechner', 'spritkostenrechner', 'auto-wertverlust-rechner', 'autokreditrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Kraftfahrzeugsteuergesetz (§ 8, § 9 KraftStG)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-01-15',
+      source: 'Kraftfahrzeugsteuergesetz (§ 9, § 11 Abs. 5, § 3d KraftStG)',
+      sourceUrl: 'https://www.gesetze-im-internet.de/kraftstg/',
+      lastVerified: '2026-10-01',
     },
     trustMeta: {
-      legalBasis: 'Kraftfahrzeugsteuergesetz (§ 8, § 9, § 3d KraftStG)',
-      sourceName: 'Bundesfinanzministerium (BMF)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastReviewed: '2026-01-15',
+      legalBasis: 'Kraftfahrzeugsteuergesetz (§ 9, § 11 Abs. 5, § 3d KraftStG)',
+      sourceName: 'Bundesministerium der Finanzen / Gesetze im Internet',
+      sourceUrl: 'https://www.gesetze-im-internet.de/kraftstg/',
+      lastReviewed: '2026-10-01',
+      limitations: [
+        'Gilt für Personenkraftwagen (Pkw) mit Erstzulassung ab 01.07.2009.',
+        'Altfahrzeuge vor dem 01.07.2009 (Schadstoffgruppen Euro 1 bis Euro 4) werden von diesem Rechner nicht unterstützt.',
+        'Sonderregelungen für Oldtimer (H-Kennzeichen pauschal 191,73 €) oder landwirtschaftliche Zugmaschinen sind nicht abgebildet.',
+      ],
     },
+    legalFootnotes: [
+      {
+        index: 1,
+        citation: '§ 9 Abs. 1 Nr. 2 KraftStG',
+        text: 'Steuersätze für Personenkraftwagen nach Hubraum (2,00 € je 100 cm³ für Benziner, 9,50 € für Diesel) und gestaffelter CO₂-Zuschlag für Emissionen über 95 g/km ab Erstzulassung 2021.',
+        url: 'https://www.gesetze-im-internet.de/kraftstg/__9.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 2,
+        citation: '§ 11 Abs. 5 KraftStG',
+        text: 'Gesetzliche Rundungsvorschrift: Die zu entrichtende Steuer ist auf volle Euro nach unten abzurunden.',
+        url: 'https://www.gesetze-im-internet.de/kraftstg/__11.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 3,
+        citation: '§ 3d Abs. 1 KraftStG',
+        text: 'Steuerbefreiung für reine Elektrofahrzeuge bei Erstzulassung vom 18.05.2011 bis 31.12.2030 für zehn Jahre ab Erstzulassung, längstens bis zum 31.12.2035.',
+        url: 'https://www.gesetze-im-internet.de/kraftstg/__3d.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 4,
+        citation: '§ 9 Abs. 2 i. V. m. Abs. 1 Nr. 3 KraftStG',
+        text: 'Ermäßigung um 50 % auf die gewichtsbasierte Steuer für reine Elektrofahrzeuge nach Ablauf der zehnjährigen Steuerbefreiung.',
+        url: 'https://www.gesetze-im-internet.de/kraftstg/__9.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+    ],
   },
 
   {
@@ -2155,9 +2338,48 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'leaveMonths', label: 'Dauer der Freistellungsphase (Sabbatical) in Monaten', type: 'number', defaultValue: 12, min: 1, max: 24, step: 1, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const net = parseFloat(inputs.regularNet) || 2800;
-      const workM = parseInt(inputs.workMonths, 10) || 12;
-      const leaveM = parseInt(inputs.leaveMonths, 10) || 12;
+      if (inputs.regularNet === undefined || inputs.regularNet === null || String(inputs.regularNet).trim() === '') {
+        return {
+          primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie Ihr bisheriges monatliches Nettogehalt ein.',
+        };
+      }
+      const net = parseFloat(inputs.regularNet);
+      if (isNaN(net) || net <= 0) {
+        return {
+          primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie ein gültiges monatliches Nettogehalt größer als 0 € ein.',
+        };
+      }
+
+      if (inputs.workMonths === undefined || inputs.workMonths === null || String(inputs.workMonths).trim() === '') {
+        return {
+          primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Dauer der Arbeitsphase / Ansparphase in Monaten an.',
+        };
+      }
+      const workM = parseFloat(inputs.workMonths);
+      if (isNaN(workM) || workM <= 0 || !Number.isInteger(workM)) {
+        return {
+          primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Ansparphase als positive ganze Zahl in vollen Monaten an.',
+        };
+      }
+
+      if (inputs.leaveMonths === undefined || inputs.leaveMonths === null || String(inputs.leaveMonths).trim() === '') {
+        return {
+          primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Dauer der Freistellungsphase in Monaten an.',
+        };
+      }
+      const leaveM = parseFloat(inputs.leaveMonths);
+      if (isNaN(leaveM) || leaveM <= 0 || !Number.isInteger(leaveM)) {
+        return {
+          primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Freistellungsphase als positive ganze Zahl in vollen Monaten an.',
+        };
+      }
+
       const totalMonths = workM + leaveM;
 
       // Gehaltsquote über den gesamten Zeitraum
@@ -2700,86 +2922,248 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'buergergeld-anspruch-rechner',
     slug: 'buergergeld-anspruch-rechner',
-    name: 'Bürgergeld-Rechner (Regelsatz & Kosten der Unterkunft SGB II)',
+    name: 'Bürgergeld-Rechner (Regelsatz, Mehrbedarfe & Miete SGB II)',
     shortName: 'Bürgergeld-Rechner',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Netto',
     metaTitle: 'Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen',
-    metaDescription: 'Berechnen Sie Ihren Bürgergeld-Anspruch 2026 nach SGB II: Gesetzliche Regelbedarfe (563 € für Alleinstehende), Warmmiete (KdU) und Freibeträge bei Erwerbseinkommen.',
+    metaDescription: 'Berechnen Sie Ihren geschätzten Bürgergeld-Anspruch 2026 nach SGB II: Gesetzliche Regelbedarfe (563 € für Alleinstehende, Kinder nach Altersstufen), Miete, Heizung und Mehrbedarfe.',
     h1: 'Bürgergeld-Rechner 2026 – Gesetzlichen Anspruch nach SGB II ermitteln',
-    shortDescription: 'Kalkuliert den monatlichen Gesamtbedarf nach SGB II aus gesetzlichem Regelsatz, Miete, Heizung und anrechenbarem Einkommen.',
+    shortDescription: 'Kalkuliert den monatlichen Gesamtbedarf nach SGB II aus gesetzlichem Regelsatz, Miete, Heizung, Mehrbedarfen und anrechenbarem Einkommen.',
     searchKeywords: ['buergergeld rechner 2026', 'buergergeld anspruch berechnen', 'regelsatz buergergeld alleinerziehend', 'kosten der unterkunft kdu buergergeld', 'sgb ii anspruch berechnen', 'schonvermoegen buergergeld', 'buergergeld miete heizung'],
     inputs: [
       {
         id: 'householdType',
-        label: 'Haushaltsform',
+        label: 'Haushaltskonstellation',
         type: 'select',
         defaultValue: 'single',
         options: [
-          { value: 'single', label: 'Alleinstehend / Alleinerziehend (563 € Regelsatz)' },
-          { value: 'couple', label: 'Paar / Lebenspartner je Partner (506 € = 1.012 € gesamt)' },
+          { value: 'single', label: 'Alleinstehend / Alleinerziehend (Regelbedarfsstufe 1: 563 €)' },
+          { value: 'couple', label: 'Paar / Partner in Bedarfsgemeinschaft (Regelbedarfsstufe 2: je 506 € = 1.012 €)' },
         ],
       },
-      { id: 'childrenCount', label: 'Anzahl Kinder im Haushalt', type: 'number', defaultValue: 1, min: 0, max: 6, step: 1 },
-      { id: 'warmRentActual', label: 'Tatsächliche Warmmiete (inkl. Heizung)', type: 'number', defaultValue: 720, min: 100, step: 25, unit: '€' },
-      { id: 'earnedNetIncome', label: 'Eigenes monatliches Nettoeinkommen (nach Freibetrag)', type: 'number', defaultValue: 0, min: 0, step: 50, unit: '€' },
+      {
+        id: 'isSingleParent',
+        label: 'Alleinerziehend (§ 21 Abs. 3 SGB II)',
+        type: 'boolean',
+        defaultValue: false,
+        helpText: 'Gesetzlicher Mehrbedarf für Alleinerziehende bei Zusammenleben mit minderjährigen Kindern.',
+      },
+      { id: 'children0to5', label: 'Kinder von 0 bis 5 Jahren (Regelbedarfsstufe 6: 357 €)', type: 'number', defaultValue: 0, min: 0, max: 10, step: 1 },
+      { id: 'children6to13', label: 'Kinder von 6 bis 13 Jahren (Regelbedarfsstufe 5: 390 €)', type: 'number', defaultValue: 0, min: 0, max: 10, step: 1 },
+      { id: 'children14to17', label: 'Jugendliche von 14 bis 17 Jahren (Regelbedarfsstufe 4: 471 €)', type: 'number', defaultValue: 0, min: 0, max: 10, step: 1 },
+      { id: 'coldRent', label: 'Kaltmiete / Grundmiete monatlich in € (anerkannte Kosten)', type: 'number', defaultValue: 450, min: 0, step: 25, unit: '€', helpText: '0 € bei mietfreiem Wohnen oder Wohneigentum ohne laufende Kaltmiete.' },
+      { id: 'heatingCosts', label: 'Heizkosten monatlich in € (tatsächlich/angemessen)', type: 'number', defaultValue: 100, min: 0, step: 10, unit: '€', helpText: '0 € falls keine separaten Heizkosten anfallen.' },
+      { id: 'earnedNetIncome', label: 'Bereits bereinigtes, anrechenbares Einkommen in € (§ 11b SGB II)', type: 'number', defaultValue: 0, min: 0, step: 50, unit: '€', helpText: 'Einkommen aller Haushaltsmitglieder nach Abzug der gesetzlichen Absetzbeträge und Freibeträge nach § 11b SGB II.' },
     ],
     calculate: (inputs) => {
-      const isSingle = inputs.householdType === 'single';
-      const kids = parseInt(inputs.childrenCount, 10) || 0;
-      const rent = parseFloat(inputs.warmRentActual) || 720;
-      const earned = parseFloat(inputs.earnedNetIncome) || 0;
+      const isSingle = inputs.householdType !== 'couple';
 
+      // 1. Validierung der Kaltmiete
+      if (inputs.coldRent === undefined || inputs.coldRent === null || String(inputs.coldRent).trim() === '') {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die monatliche Kaltmiete ein (0 € bei mietfreiem Wohnen).',
+        };
+      }
+      const coldRent = parseFloat(inputs.coldRent);
+      if (isNaN(coldRent) || coldRent < 0) {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Die Kaltmiete darf nicht negativ sein.',
+        };
+      }
+
+      // 2. Validierung der Heizkosten
+      if (inputs.heatingCosts === undefined || inputs.heatingCosts === null || String(inputs.heatingCosts).trim() === '') {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die monatlichen Heizkosten ein (0 € wenn keine Heizkosten anfallen).',
+        };
+      }
+      const heating = parseFloat(inputs.heatingCosts);
+      if (isNaN(heating) || heating < 0) {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Die Heizkosten dürfen nicht negativ sein.',
+        };
+      }
+
+      // 3. Validierung der Kinderangaben
+      const parseChildCount = (val: any) => {
+        if (val === undefined || val === null || String(val).trim() === '') return 0;
+        const n = Number(val);
+        if (isNaN(n) || n < 0 || !Number.isInteger(n)) return null;
+        return n;
+      };
+
+      const c0 = parseChildCount(inputs.children0to5);
+      const c6 = parseChildCount(inputs.children6to13);
+      const c14 = parseChildCount(inputs.children14to17);
+
+      if (c0 === null || c6 === null || c14 === null) {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie für die Kinderzahlen jeweils eine gültige ganze Zahl ab 0 ein.',
+        };
+      }
+
+      // 4. Validierung des anrechenbaren Einkommens
+      if (inputs.earnedNetIncome === undefined || inputs.earnedNetIncome === null || String(inputs.earnedNetIncome).trim() === '') {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie das anrechenbare Einkommen ein (0 € bei keinem Einkommen).',
+        };
+      }
+      const income = parseFloat(inputs.earnedNetIncome);
+      if (isNaN(income) || income < 0) {
+        return {
+          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
+          error: 'Das anrechenbare Einkommen darf nicht negativ sein.',
+        };
+      }
+
+      // Standard-Regelbedarfe Erwachsene (§ 20 SGB II)
       const adultRegel = isSingle ? 563 : 1012;
-      const childRegelAvg = kids * 390; // Durchschnitt Regelbedarf Kind ca. 390 €
-      const totalRegel = adultRegel + childRegelAvg;
-      const totalDemand = totalRegel + rent;
-      const finalBenefit = Math.max(0, totalDemand - earned);
+
+      // Kinder-Regelbedarfe (§ 23 SGB II, BMAS Bekanntmachung 2026)
+      // 0–5 Jahre: 357 € (Stufe 6)
+      // 6–13 Jahre: 390 € (Stufe 5)
+      // 14–17 Jahre: 471 € (Stufe 4)
+      const child0Regel = c0 * 357;
+      const child6Regel = c6 * 390;
+      const child14Regel = c14 * 471;
+      const totalChildRegel = child0Regel + child6Regel + child14Regel;
+      const totalKids = c0 + c6 + c14;
+
+      // Mehrbedarf für Alleinerziehende (§ 21 Abs. 3 SGB II)
+      let singleParentNeed = 0;
+      const isSingleParent = Boolean(inputs.isSingleParent) && isSingle && totalKids > 0;
+      if (isSingleParent) {
+        // § 21 Abs. 3 Nr. 1: 36 % wenn 1 Kind unter 7 Jahren (c0 > 0) oder 2–3 Kinder unter 16 Jahren ((c0 + c6) >= 2)
+        if (c0 > 0 || (c0 + c6) >= 2) {
+          singleParentNeed = Math.round(563 * 0.36 * 100) / 100; // 202,68 €
+        } else {
+          // § 21 Abs. 3 Nr. 2: 12 % je Kind, maximal 60 %
+          const pct = Math.min(0.60, totalKids * 0.12);
+          singleParentNeed = Math.round(563 * pct * 100) / 100;
+        }
+      }
+
+      const totalRegel = adultRegel + totalChildRegel;
+      const totalHousing = coldRent + heating;
+      const totalDemand = totalRegel + singleParentNeed + totalHousing;
+      const finalBenefit = Math.max(0, totalDemand - income);
 
       return {
-        primary: { id: 'finalBenefit', label: 'Monatlicher Bürgergeld-Auszahlungsanspruch', value: finalBenefit, formattedValue: formatCurrency(finalBenefit), highlight: true },
+        primary: {
+          id: 'finalBenefit',
+          label: 'Geschätzter monatlicher Leistungsbetrag',
+          value: finalBenefit,
+          formattedValue: formatCurrency(finalBenefit),
+          highlight: true,
+          helpText: 'Unverbindliche Orientierungsberechnung. Vorbehaltlich behördlicher Prüfung der Angemessenheit von Miete/Heizung und Vermögen.',
+        },
         secondary: [
-          { id: 'totalRegel', label: 'Gesamter Regelbedarf', value: totalRegel, formattedValue: formatCurrency(totalRegel) },
-          { id: 'rentShare', label: 'Übernommene Kosten für Miete & Heizung (KdU)', value: rent, formattedValue: formatCurrency(rent) },
+          { id: 'totalRegel', label: 'Gesamter Regelbedarf (Erwachsene + Kinder)', value: totalRegel, formattedValue: formatCurrency(totalRegel) },
+          { id: 'singleParent', label: 'Mehrbedarf für Alleinerziehende (§ 21 Abs. 3)', value: singleParentNeed, formattedValue: formatCurrency(singleParentNeed) },
+          { id: 'coldRentShare', label: 'Kaltmiete / Grundmiete', value: coldRent, formattedValue: formatCurrency(coldRent) },
+          { id: 'heatingShare', label: 'Heizkosten (separat erfasst)', value: heating, formattedValue: formatCurrency(heating) },
           { id: 'totalDemand', label: 'Gesamtbedarf des Haushalts', value: totalDemand, formattedValue: formatCurrency(totalDemand) },
+          { id: 'deductedIncome', label: 'Angerechnetes Einkommen (§ 11b SGB II)', value: income, formattedValue: `-${formatCurrency(income)}` },
         ],
-        summaryText: `Ihr Gesamtbedarf nach SGB II liegt bei ${formatCurrency(totalDemand)} (${formatCurrency(totalRegel)} Regelsatz + ${formatCurrency(rent)} Wohnkosten). Bei ${formatCurrency(earned)} anrechenbarem Einkommen beträgt der Anspruch ${formatCurrency(finalBenefit)}.`,
+        summaryText: `Ihr rechnerischer Gesamtbedarf liegt bei ${formatCurrency(totalDemand)} (bestehend aus ${formatCurrency(totalRegel)} Regelbedarf${singleParentNeed > 0 ? `, ${formatCurrency(singleParentNeed)} Mehrbedarf` : ''} und ${formatCurrency(totalHousing)} Kosten der Unterkunft). Nach Abzug des anrechenbaren Einkommens von ${formatCurrency(income)} ergibt sich ein geschätzter monatlicher Leistungsbetrag von ${formatCurrency(finalBenefit)}.`,
       };
     },
-    formula: 'Bürgergeld = Regelbedarf + Kosten der Unterkunft - anrechenbares Einkommen',
-    formulaExplanation: 'Im ersten Jahr des Bürgergeldbezugs gilt eine Karenzzeit für Wohnen und Vermögen: Die tatsächlichen Wohnkosten werden in voller Höhe übernommen.',
+    formula: 'Bürgergeld = Regelbedarf + Mehrbedarfe + anerkannte Wohnkosten - anrechenbares Einkommen',
+    formulaExplanation: 'Gesetzliche Regelbedarfe nach § 20, § 23 SGB II zzgl. anerkannter Kosten für Unterkunft und Heizung (§ 22 SGB II) abzüglich anrechenbarem Nettoeinkommen (§ 11b SGB II).',
     workedExample: {
-      title: 'Beispiel: Alleinstehend mit 1 Kind und 720 € Warmmiete',
-      description: 'Berechnung für eine alleinstehende Person mit einem Kind und 720 € tatsächlicher Warmmiete: Der Regelbedarf für Alleinstehende (563 €) und Kind (ca. 390 €) ergibt 953 € Regelbedarf. Zusammen mit den Wohnkosten (720 €) beläuft sich der monatliche Auszahlungsanspruch auf 1.673,00 €.',
-      inputValues: [{ label: 'Typ', value: 'Alleinstehend' }, { label: 'Kinder', value: '1 Kind' }, { label: 'Warmmiete', value: '720 €' }],
-      steps: ['Regelsatz Erwachsene = 563 €', 'Regelsatz Kind ca. = 390 €', 'Wohnkosten = 720 €', 'Gesamtanspruch = 1.673 € monatlich'],
-      result: '1.673,00 € monatlicher Anspruch',
+      title: 'Beispiel: Alleinstehend mit 1 Kind (4 Jahre) und 450 € Kaltmiete + 100 € Heizung',
+      description: 'Berechnung für eine alleinerziehende Person mit einem Kind (4 Jahre), 450 € Kaltmiete und 100 € Heizkosten: Regelbedarf Erwachsene (563 €) + Regelbedarf Kind 0–5 Jahre (357 €) + Mehrbedarf für Alleinerziehende (36 % = 202,68 €) + Wohnkosten (550 €) ergibt einen geschätzten Anspruch von 1.672,68 € monatlich.',
+      inputValues: [{ label: 'Typ', value: 'Alleinstehend' }, { label: 'Kind', value: '1 Kind (0–5 Jahre)' }, { label: 'Alleinerziehend', value: 'Ja' }, { label: 'Wohnkosten', value: '550 €' }],
+      steps: ['Regelsatz Erwachsene = 563,00 €', 'Regelsatz Kind (0–5 Jahre) = 357,00 €', 'Mehrbedarf Alleinerziehend (36 %) = 202,68 €', 'Kosten für Miete & Heizung = 550,00 €', 'Geschätzter Leistungsbetrag = 1.672,68 €'],
+      result: '1.672,68 € geschätzter Monatsbetrag',
     },
     content: {
-      intro: 'Das Bürgergeld (Grundsicherung für Arbeitsuchende nach dem Zweiten Buch Sozialgesetzbuch – SGB II) sichert das verfassungsrechtlich garantierte Existenzminimum für erwerbsfähige Hilfebedürftige und deren Familienmitglieder.',
-      details: 'Der monatliche Bürgergeld-Gesamtbedarf setzt sich aus den gesetzlichen Regelbedarfen (563 € für Alleinstehende, 506 € je volljährigem Partner in einer Bedarfsgemeinschaft) und den tatsächlichen Kosten der Unterkunft und Heizung (KdU) zusammen. Im ersten Bezugsjahr (Karenzzeit) übernimmt das Jobcenter die tatsächlichen Warmmietkosten in voller Höhe. Erwerbseinkommen wird nicht voll abgezogen: Über den Grundabsetzbetrag (100 €) und prozentuale Erwerbstätigenfreibeträge lohnt sich eigenes Arbeiten immer. Vergleichen Sie Ihr Einkommen auch mit unserem [Teilzeit-Gehaltsrechner](/rechner/teilzeit-gehaltsrechner/) oder prüfen Sie die Nebenkosten mit dem [Warmmiete zu Kaltmiete Rechner](/rechner/warmmiete-zu-kaltmiete-rechner/). Ausführliche rechtliche Grundlagen finden Sie im [Ratgeber Teilzeitgehalt berechnen](/ratgeber/teilzeit-gehalt-berechnen/).',
+      intro: 'Das Bürgergeld (Grundsicherung für Arbeitsuchende nach dem Zweiten Buch Sozialgesetzbuch – SGB II) sichert das soziokulturelle Existenzminimum für erwerbsfähige Hilfebedürftige und deren Bedarfsgemeinschaft.',
+      details: 'Der monatliche Bürgergeld-Gesamtbedarf setzt sich aus den gesetzlichen Regelbedarfen (563 € für Alleinstehende, 506 € je volljährigem Partner in einer Bedarfsgemeinschaft, gestaffelte Sätze für Kinder nach § 23 SGB II) und den anerkannten Kosten der Unterkunft und Heizung (KdU nach § 22 SGB II) zusammen. Im ersten Bezugsjahr (Karenzzeit) gilt eine Angemessenheitsvermutung für die Kaltmiete; Heizkosten müssen jedoch auch während der Karenzzeit angemessen sein. Nach Ablauf der Karenzzeit gelten die örtlichen Angemessenheitsrichtlinien der jeweiligen Kommune. Erwerbseinkommen wird nicht voll abgezogen: Nach § 11b SGB II mindern Grundabsetzbetrag (100 €) und prozentuale Erwerbstätigenfreibeträge den anzurechnenden Betrag.',
     },
     faqs: [
-      { question: 'Wie hoch ist der Bürgergeld-Regelsatz 2026?', answer: 'Für Alleinstehende und Alleinerziehende beträgt der Regelsatz 563 € monatlich. Volljährige Partner in einer Bedarfsgemeinschaft erhalten jeweils 506 €. Für Kinder und Jugendliche gelten gestaffelte Sätze: 357 € (0–5 Jahre), 390 € (6–13 Jahre) und 471 € (14–17 Jahre).' },
-      { question: 'Welches Schonvermögen ist in der Karenzzeit geschützt?', answer: 'In den ersten 12 Monaten des Bürgergeldbezugs (Karenzzeit) bleibt ein Vermögen von bis zu 40.000 € für die erste Person und jeweils 15.000 € für jede weitere Person im Haushalt unberücksichtigt. Nach der Karenzzeit gilt ein einheitlicher Freibetrag von 15.000 € pro Person.' },
-      { question: 'Wie viel darf ich zum Bürgergeld anrechnungsfrei hinzuverdienen?', answer: 'Die ersten 100 € Bruttoeinkommen aus Erwerbstätigkeit sind als Grundabsetzbetrag komplett anrechnungsfrei. Im Bereich von 100 € bis 520 € bleiben 20 % anrechnungsfrei, von 520 € bis 1.000 € bleiben 30 % frei (bei Kindern bis 1.200 € bzw. 1.500 €).' },
-      { question: 'Welche Wohnkosten werden vom Jobcenter übernommen?', answer: 'Das Jobcenter übernimmt die angemessene Kaltmiete sowie die Betriebskosten und tatsächlichen Heizkosten. Im ersten Jahr gilt eine Angemessenheitsvermutung (Karenzzeit) für die Miethöhe; Heizkosten müssen jedoch auch während der Karenzzeit in angemessenem Rahmen bleiben.' },
-      { question: 'Wann lohnt sich Wohngeld und Kinderzuschlag mehr als Bürgergeld?', answer: 'Wenn Ihr eigenes Einkommen knapp ausreicht, um den Lebensunterhalt ohne SGB II zu decken, haben Wohngeld und der Kinderzuschlag (KiZ) Vorrang. Dies schützt vor dem Gang zum Jobcenter und vermeidet die Offenlegung der Vermögensverhältnisse im Rahmen des Bürgergelds.' },
+      { question: 'Wie hoch sind die Bürgergeld-Regelsätze 2026 nach Altersstufen?', answer: 'Für Alleinstehende und Alleinerziehende gilt die Regelbedarfsstufe 1 mit 563 € monatlich. Volljährige Partner erhalten je 506 € (Stufe 2). Für Kinder und Jugendliche gelten gesetzlich gestaffelte Sätze: 357 € für Kinder von 0 bis 5 Jahren (Stufe 6), 390 € für Kinder von 6 bis 13 Jahren (Stufe 5) und 471 € für Jugendliche von 14 bis 17 Jahren (Stufe 4).' },
+      { question: 'Welcher Mehrbedarf steht Alleinerziehenden zu?', answer: 'Nach § 21 Abs. 3 SGB II erhalten Alleinerziehende einen Mehrbedarf von 36 % des Erwachsenen-Regelbedarfs (202,68 €), wenn sie mit einem Kind unter 7 Jahren oder mit zwei bzw. drei Kindern unter 16 Jahren zusammenleben. In anderen Konstellationen beträgt der Zuschlag 12 % je Kind (maximal 60 %).' },
+      { question: 'Werden die gesamten Miet- und Heizkosten uneingeschränkt übernommen?', answer: 'Nein. Im ersten Bezugsjahr (Karenzzeit nach § 22 Abs. 1 SGB II) werden die tatsächlichen Kaltmietkosten in der Regel anerkannt, sofern sie nicht offensichtlich unangemessen sind. Heizkosten müssen jedoch stets angemessen sein. Nach dem ersten Jahr übernimmt das Jobcenter nur noch die nach dem örtlichen Mietspiegel bzw. den kommunalen Richtlinien als angemessen definierten Kosten.' },
+      { question: 'Welches Schonvermögen ist beim Bürgergeld geschützt?', answer: 'In der einjährigen Karenzzeit gilt nach § 12 SGB II ein Schonvermögen von 40.000 € für die erste Person und 15.000 € für jedes weitere Mitglied der Bedarfsgemeinschaft. Nach Ablauf der Karenzzeit gilt ein einheitlicher Freibetrag von 15.000 € pro Person.' },
+      { question: 'Welche Freibeträge gelten bei eigenem Erwerbseinkommen (§ 11b SGB II)?', answer: 'Die ersten 100 € Bruttoeinkommen aus Erwerbstätigkeit sind als Grundabsetzbetrag anrechnungsfrei. Im Bereich von 100 € bis 520 € bleiben 20 % anrechnungsfrei, von 520 € bis 1.000 € bleiben 30 % frei (bei Kindern im Haushalt bis 1.200 € bzw. 1.500 €).' },
     ],
     relatedSlugs: ['arbeitslosengeld-1-rechner', 'warmmiete-zu-kaltmiete-rechner', 'teilzeit-gehaltsrechner', 'brutto-netto-rechner', 'midijob-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Bundesministerium für Arbeit und Soziales (§ 20 SGB II)',
-      sourceUrl: 'https://www.bmas.de',
-      lastVerified: '2026-01-15',
+      source: 'Zweites Buch Sozialgesetzbuch (SGB II) & BMAS Bekanntmachung',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/',
+      lastVerified: '2026-10-01',
     },
     trustMeta: {
-      legalBasis: 'Zweites Buch Sozialgesetzbuch (§ 20, § 22 SGB II)',
+      legalBasis: 'Zweites Buch Sozialgesetzbuch (§ 20, § 21, § 22, § 23, § 11b SGB II)',
       sourceName: 'Bundesministerium für Arbeit und Soziales (BMAS)',
       sourceUrl: 'https://www.bmas.de',
-      lastReviewed: '2026-01-15',
+      lastReviewed: '2026-10-01',
+      limitations: [
+        'Orientierungsberechnung: Die verbindliche Feststellung obliegt ausschließlich dem zuständigen Jobcenter.',
+        'Örtliche Mietobergrenzen (Angemessenheitsrichtlinien der jeweiligen kreisfreien Stadt oder des Landkreises) sind nicht integriert.',
+        'Vermögensprüfung (§ 12 SGB II), vorrangige Sozialleistungen (Wohngeld, Kinderzuschlag) und individuelle Sonderbedarfe (z. B. Schwangerschaft oder kostenaufwändige Ernährung nach § 21 Abs. 5) sind gesondert zu prüfen.',
+      ],
     },
+    legalFootnotes: [
+      {
+        index: 1,
+        citation: '§ 20 SGB II',
+        text: 'Regelbedarf zur Sicherung des Lebensunterhalts: 563 € für Alleinstehende/Alleinerziehende (Stufe 1) und 506 € je volljährigem Partner (Stufe 2).',
+        url: 'https://www.gesetze-im-internet.de/sgb_2/__20.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 2,
+        citation: '§ 23 SGB II i. V. m. BMAS-Fortschreibung 2026',
+        text: 'Regelbedarfe für Kinder und Jugendliche: 357 € (0–5 Jahre, Stufe 6), 390 € (6–13 Jahre, Stufe 5) und 471 € (14–17 Jahre, Stufe 4).',
+        url: 'https://www.gesetze-im-internet.de/sgb_2/__23.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 3,
+        citation: '§ 21 Abs. 3 SGB II',
+        text: 'Mehrbedarf für Alleinerziehende: 36 % bei 1 Kind unter 7 Jahren oder 2–3 Kindern unter 16 Jahren; sonst 12 % je Kind bis maximal 60 %.',
+        url: 'https://www.gesetze-im-internet.de/sgb_2/__21.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 4,
+        citation: '§ 22 SGB II',
+        text: 'Bedarfe für Unterkunft und Heizung: Getrennte Berücksichtigung von Kaltmiete und Heizkosten sowie Begrenzung auf angemessene Aufwendungen.',
+        url: 'https://www.gesetze-im-internet.de/sgb_2/__22.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 5,
+        citation: '§ 11b SGB II',
+        text: 'Absetzbeträge vom Einkommen vor Anrechnung auf den Bürgergeldanspruch (Grundabsetzbetrag und Erwerbstätigenfreibeträge).',
+        url: 'https://www.gesetze-im-internet.de/sgb_2/__11b.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 6,
+        citation: 'BMAS Bekanntmachung Regelbedarfsstufen 2026',
+        text: 'Amtliche Festsetzung der Regelbedarfsstufen für das Jahr 2026 nach dem Regelbedarfs-Ermittlungsgesetz.',
+        url: 'https://www.bmas.de/DE/Service/Publikationen/Broschueren/a-206k-infoblatt-fortschreibung-der-regelbedarfe-ab-2026.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+    ],
   },
 
   {

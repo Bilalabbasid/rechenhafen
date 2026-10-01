@@ -245,6 +245,7 @@ export default async function CalculatorPage({ params }: PageProps) {
         category={calc.category}
         timeSensitiveMeta={calc.timeSensitiveMeta}
         trustMeta={calc.trustMeta}
+        legalFootnotes={calc.legalFootnotes}
       />
 
       {/* Worked Example(s) */}

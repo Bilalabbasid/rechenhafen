@@ -3,30 +3,82 @@ import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
 export function calculateFuelCost(inputs: Record<string, any>): CalculationResult {
-  const distance = parseFloat(inputs.distance) || 100;
-  const consumption = parseFloat(inputs.consumption) || 6.5; // l / 100km
-  const pricePerLiter = parseFloat(inputs.pricePerLiter) || 1.75; // € / l
-  const tripType = inputs.tripType || 'single'; // 'single' vs 'roundtrip'
-  const tripsCount = Math.max(1, parseInt(inputs.tripsCount || '1', 10));
-  const passengers = Math.max(1, parseInt(inputs.passengers || '1', 10));
-
-  if (distance <= 0 || consumption <= 0 || pricePerLiter <= 0) {
+  if (inputs.distance === undefined || inputs.distance === null || String(inputs.distance).trim() === '') {
     return {
-      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte geben Sie positive Werte für Distanz, Verbrauch und Kraftstoffpreis an.',
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Fahrstrecke in Kilometern ein.',
     };
   }
+  const distance = parseFloat(inputs.distance);
+  if (isNaN(distance) || distance < 0) {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Fahrstrecke ab 0 km ein.',
+    };
+  }
+
+  if (inputs.consumption === undefined || inputs.consumption === null || String(inputs.consumption).trim() === '') {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Kraftstoffverbrauch auf 100 km ein.',
+    };
+  }
+  const consumption = parseFloat(inputs.consumption);
+  if (isNaN(consumption) || consumption <= 0) {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen positiven Durchschnittsverbrauch über 0 l/100km an.',
+    };
+  }
+
+  if (inputs.pricePerLiter === undefined || inputs.pricePerLiter === null || String(inputs.pricePerLiter).trim() === '') {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Kraftstoffpreis pro Liter ein.',
+    };
+  }
+  const pricePerLiter = parseFloat(inputs.pricePerLiter);
+  if (isNaN(pricePerLiter) || pricePerLiter < 0) {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Der Kraftstoffpreis darf nicht negativ sein.',
+    };
+  }
+
+  const rawTrips = inputs.tripsCount !== undefined && inputs.tripsCount !== null && String(inputs.tripsCount).trim() !== ''
+    ? Number(inputs.tripsCount)
+    : 1;
+  if (isNaN(rawTrips) || rawTrips < 1 || !Number.isInteger(rawTrips)) {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Anzahl der Fahrten als positive ganze Zahl (mindestens 1) an.',
+    };
+  }
+  const tripsCount = rawTrips;
+
+  const rawPassengers = inputs.passengers !== undefined && inputs.passengers !== null && String(inputs.passengers).trim() !== ''
+    ? Number(inputs.passengers)
+    : 1;
+  if (isNaN(rawPassengers) || rawPassengers < 1 || !Number.isInteger(rawPassengers)) {
+    return {
+      primary: { id: 'cost', label: 'Spritkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Personenzahl als ganze Zahl an (mindestens 1 Person inklusive Fahrer).',
+    };
+  }
+  const passengers = rawPassengers;
+
+  const tripType = inputs.tripType || 'single'; // 'single' vs 'roundtrip'
 
   // Effektive Strecke pro Fahrt
   const effectiveDistancePerTrip = tripType === 'roundtrip' ? distance * 2 : distance;
   const totalKm = effectiveDistancePerTrip * tripsCount;
 
-  // Kraftstoffbedarf
+  // Kraftstoffbedarf & Kosten
   const litersPerTrip = (effectiveDistancePerTrip * consumption) / 100;
   const totalLiters = litersPerTrip * tripsCount;
   const costPerTrip = litersPerTrip * pricePerLiter;
   const totalCost = costPerTrip * tripsCount;
-  const costPerKm = costPerTrip / effectiveDistancePerTrip;
+  const costPerKm = effectiveDistancePerTrip > 0 ? costPerTrip / effectiveDistancePerTrip : 0;
   const costPer100Km = (consumption * pricePerLiter);
   const costPerPerson = totalCost / passengers;
 
@@ -40,17 +92,18 @@ export function calculateFuelCost(inputs: Record<string, any>): CalculationResul
   if (passengers > 1) {
     secondary.unshift({
       id: 'costPerPerson',
-      label: `Kosten pro Person (${passengers} Mitfahrer)`,
+      label: `Kosten pro Person (${passengers} Personen inkl. Fahrer)`,
       value: costPerPerson,
       formattedValue: formatCurrency(costPerPerson),
     });
   }
 
-  // Pendel-Hochrechnung
-  const monthlyCost = (distance * 2 * consumption / 100 * pricePerLiter) * 21;
-  const yearlyCost = (distance * 2 * consumption / 100 * pricePerLiter) * 220;
+  // Pendel-Hochrechnung (tägliche Hin- & Rückfahrt) ohne Doppelmultiplikation mit tripsCount
+  const dailyCommuteKm = tripType === 'roundtrip' ? effectiveDistancePerTrip : distance * 2;
+  const monthlyCost = (dailyCommuteKm * consumption / 100 * pricePerLiter) * 21;
+  const yearlyCost = (dailyCommuteKm * consumption / 100 * pricePerLiter) * 220;
   secondary.push(
-    { id: 'monthlyCommute', label: 'Monatlich bei täglichem Pendeln (21 Tage Hin & Zurück)', value: monthlyCost, formattedValue: formatCurrency(monthlyCost) },
+    { id: 'monthlyCommute', label: 'Monatlich bei täglichem Pendeln (21 Arbeitstage Hin & Zurück)', value: monthlyCost, formattedValue: formatCurrency(monthlyCost) },
     { id: 'yearlyCommute', label: 'Jährlich bei 220 Pendeltagen (Hin & Zurück)', value: yearlyCost, formattedValue: formatCurrency(yearlyCost) },
   );
 
@@ -61,7 +114,7 @@ export function calculateFuelCost(inputs: Record<string, any>): CalculationResul
 
   let summary = `Für eine Strecke von ${formatNumber(effectiveDistancePerTrip, 1)} km (${tripType === 'roundtrip' ? 'Hin- und Rückfahrt' : 'einfache Fahrt'}) fallen bei ${formatCurrency(pricePerLiter)} je Liter Spritkosten in Höhe von ${formatCurrency(costPerTrip)} an (${formatCurrency(costPerKm, 3)}/km).`;
   if (passengers > 1) {
-    summary += ` Bei ${passengers} Mitfahrern beträgt der Anteil ${formatCurrency(costPerPerson)} pro Person.`;
+    summary += ` Bei ${passengers} Personen im Fahrzeug (Fahrer und Mitfahrer) beträgt der faire Anteil ${formatCurrency(costPerPerson)} pro Person.`;
   }
 
   return {

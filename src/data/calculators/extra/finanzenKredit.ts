@@ -549,60 +549,148 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die gesetzliche Steuerbelastung auf Zinsen, Dividenden und Aktiengewinne nach § 32d EStG.',
     searchKeywords: ['kapitalertragsteuer rechner', 'abgeltungsteuer berechnen formel', 'steuern aktiengewinne rechner', 'solidaritaetszuschlag zinsen'],
     inputs: [
-      { id: 'profit', label: 'Zu versteuernder Kapitalertrag', type: 'number', defaultValue: 3000, min: 10, step: 100, unit: '€' },
+      { id: 'profit', label: 'Zu versteuernder Kapitalertrag in € (nach Sparer-Pauschbetrag)', type: 'number', defaultValue: 3000, min: 0, step: 100, unit: '€', helpText: 'Betrag der steuerpflichtigen Erträge nach Abzug des Sparer-Pauschbetrags (1.000 € einzeln / 2.000 € zusammen) und Verlustverrechnung.' },
       {
         id: 'churchState',
-        label: 'Kirchensteuer',
+        label: 'Kirchensteuerpflicht',
         type: 'select',
         defaultValue: 'none',
         options: [
-          { value: 'none', label: 'Keine Kirchensteuer (26,375 % Gesamtsteuer)' },
-          { value: '8', label: 'Bayern & Baden-Württemberg (8 % = 27,82 %)' },
-          { value: '9', label: 'Übrige Bundesländer (9 % = 27,99 %)' },
+          { value: 'none', label: 'Keine Kirchensteuer (26,375 % Gesamtbelastung)' },
+          { value: '8', label: 'Bayern & Baden-Württemberg (8 % Kirchensteuer)' },
+          { value: '9', label: 'Übrige Bundesländer (9 % Kirchensteuer)' },
         ],
       },
     ],
     calculate: (inputs) => {
-      const p = parseFloat(inputs.profit) || 3000;
+      if (inputs.profit === undefined || inputs.profit === null || String(inputs.profit).trim() === '') {
+        return {
+          primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den zu versteuernden Kapitalertrag ein.',
+        };
+      }
+      const p = parseFloat(inputs.profit);
+      if (isNaN(p) || p < 0) {
+        return {
+          primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '-' },
+          error: 'Der zu versteuernde Kapitalertrag darf nicht negativ sein.',
+        };
+      }
+
       const church = inputs.churchState || 'none';
-      let totalRate = 0.26375;
-      if (church === '8') totalRate = 0.2782;
-      else if (church === '9') totalRate = 0.2799;
-      const totalTax = p * totalRate;
-      const netGain = p - totalTax;
+      const k = church === '8' ? 0.08 : church === '9' ? 0.09 : 0;
+
+      // Sonderfall 0 € Ertrag
+      if (p === 0) {
+        return {
+          primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '0,00 €', highlight: true },
+          secondary: [
+            { id: 'net', label: 'Netto-Auszahlung auf Konto', value: 0, formattedValue: '0,00 €' },
+            { id: 'kapEst', label: 'Kapitalertragsteuer (25 %)', value: 0, formattedValue: '0,00 €' },
+            { id: 'solz', label: 'Solidaritätszuschlag (5,5 %)', value: 0, formattedValue: '0,00 €' },
+            { id: 'kist', label: `Kirchensteuer (${k > 0 ? (k * 100).toFixed(0) + ' %' : 'Keine'})`, value: 0, formattedValue: '0,00 €' },
+            { id: 'rate', label: 'Effektiver Steuersatz', value: 0, formattedValue: '0,00 %' },
+          ],
+          summaryText: 'Auf einen steuerpflichtigen Kapitalertrag von 0,00 € fällt keine Kapitalertragsteuer an.',
+        };
+      }
+
+      // Gesetzliche Formel nach § 32d Abs. 1 Satz 4-5 EStG:
+      // Bei Kirchensteuerpflicht ermäßigt sich die Kapitalertragsteuer auf: KapESt = e / (4 + k)
+      const kapEstExact = p / (4 + k);
+      const solzExact = kapEstExact * 0.055;
+      const kistExact = kapEstExact * k;
+
+      // Kaufmännische Rundung auf Cent nach Abzugsregeln (§ 43a EStG)
+      const kapEst = Math.round(kapEstExact * 100) / 100;
+      const solz = Math.round(solzExact * 100) / 100;
+      const kist = Math.round(kistExact * 100) / 100;
+      const totalTax = Math.round((kapEst + solz + kist) * 100) / 100;
+      const netGain = Math.round((p - totalTax) * 100) / 100;
+      const effectiveRate = (totalTax / p) * 100;
+
       return {
         primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: totalTax, formattedValue: formatCurrency(totalTax), highlight: true },
         secondary: [
           { id: 'net', label: 'Netto-Auszahlung auf Konto', value: netGain, formattedValue: formatCurrency(netGain) },
-          { id: 'rate', label: 'Effektiver Steuersatz', value: totalRate * 100, formattedValue: formatPercent(totalRate * 100, 2) },
+          { id: 'kapEst', label: `Kapitalertragsteuer (${k > 0 ? formatPercent((kapEst / p) * 100, 2) : '25,00 %'})`, value: kapEst, formattedValue: formatCurrency(kapEst) },
+          { id: 'solz', label: 'Solidaritätszuschlag (5,5 % auf KapESt)', value: solz, formattedValue: formatCurrency(solz) },
+          { id: 'kist', label: `Kirchensteuer (${k > 0 ? (k * 100).toFixed(0) + ' % auf KapESt' : 'Keine'})`, value: kist, formattedValue: formatCurrency(kist) },
+          { id: 'rate', label: 'Effektiver Gesamtsteuersatz', value: effectiveRate, formattedValue: formatPercent(effectiveRate, 2) },
         ],
-        summaryText: `Auf einen Ertrag von ${formatCurrency(p)} zahlen Sie ${formatCurrency(totalTax)} Steuern (${formatPercent(totalRate * 100, 2)}).`,
+        summaryText: `Auf einen zu versteuernden Kapitalertrag von ${formatCurrency(p)} zahlen Sie insgesamt ${formatCurrency(totalTax)} Steuern (${formatPercent(effectiveRate, 2)} effektive Belastung). Nach Steuereinbehalt verbleiben Ihnen ${formatCurrency(netGain)} Netto.`,
       };
     },
-    formula: 'Steuer = Ertrag × (25 % + 5,5 % Soli auf KapESt + Kirchensteuer)',
-    formulaExplanation: 'In Deutschland gilt eine pauschale Abgeltungsteuer von 25 % zzgl. 5,5 % Solidaritätszuschlag.',
+    formula: 'KapESt = Ertrag / (4 + k); SolZ = 5,5 % × KapESt; KiSt = k × KapESt (Gesamtsteuer = KapESt + SolZ + KiSt)',
+    formulaExplanation: 'Gesetzliche Modifikation nach § 32d Abs. 1 Satz 4 EStG: Bei Kirchensteuerpflicht ermäßigt sich die Abgeltungsteuer, da die Kirchensteuer als Sonderausgabe pauschal steuermindernd berücksichtigt wird.',
     workedExample: {
       title: 'Beispiel: 3.000 € steuerpflichtiger Ertrag ohne Kirchensteuer',
-      description: 'Abgeltungsteuer + Soli = 791,25 € (26,375 %). Netto-Ertrag: 2.208,75 €.',
+      description: 'Kapitalertragsteuer (25 % = 750,00 €) + Solidaritätszuschlag (5,5 % von 750 € = 41,25 €) ergibt exakt 791,25 € Gesamtsteuer (26,375 %). Netto-Ertrag: 2.208,75 €.',
       inputs: { profit: 3000, churchState: 'none' },
-      resultSummary: '791,25 € Steuer (26,38 %)',
+      resultSummary: '791,25 € Gesamtsteuer (26,38 %)',
     },
     content: {
       intro: 'Die Abgeltungsteuer auf Kapitalerträge (Zinsen, Dividenden, realisierte Kursgewinne) beträgt in Deutschland pauschal 25 Prozent zuzüglich Solidaritätszuschlag und Kirchensteuer.',
-      details: 'Der reguläre Steuersatz beträgt 26,375 % (25 % Abgeltungsteuer + 5,5 % Soli darauf). Bei Kirchensteuerpflicht sinkt die Abgeltungsteuerformel leicht auf 24,45 % (bei 9 % KiSt in Bayern/Baden-Württemberg: 24,51 %).',
+      details: 'Der reguläre Steuersatz ohne Kirchensteuer beträgt exakt 26,375 % (25 % Abgeltungsteuer + 5,5 % Solidaritätszuschlag darauf). Bei Kirchensteuerpflicht ermäßigt sich die Abgeltungsteuer nach der gesetzlichen Formel § 32d Abs. 1 Satz 4 EStG: In Bayern und Baden-Württemberg (8 % Kirchensteuer) sinkt der Abgeltungsteuersatz auf 24,51 % (Gesamtsteuer: ca. 27,82 %). In den übrigen Bundesländern (9 % Kirchensteuer) sinkt er auf 24,45 % (Gesamtsteuer: ca. 28,00 %). Unter "zu versteuernder Kapitalertrag" versteht der Gesetzgeber den Gewinn nach Abzug des Sparer-Pauschbetrags (§ 20 Abs. 9 EStG: 1.000 € für Alleinstehende bzw. 2.000 € für Ehegatten) und nach Verrechnung mit Verlusten.',
     },
     faqs: [
-      { question: 'Wann lohnt sich die Günstigerprüfung in der Steuererklärung?', answer: 'Wenn Ihr persönlicher Grenzsteuersatz unter 25 % liegt (zu versteuerndes Einkommen unter ca. 20.000 €), werden Kapitalerträge mit Ihrem niedrigeren individuellen Tarif besteuert.' },
-      { question: 'Werden Verluste aus Aktienverkäufen mit Zinserträgen verrechnet?', answer: 'Nein, nach deutschem Steuerrecht (§ 20 Abs. 6 EStG) dürfen Aktienverluste nur mit Gewinnen aus anderen Aktienverkäufen verrechnet werden (separater Verlustverrechnungstopf).' },
+      { question: 'Wie wirkt sich die Kirchensteuer auf die Abgeltungsteuer aus?', answer: 'Da Kirchensteuer als Sonderausgabe abzugsfähig ist, mindert sie bei Kapitalerträgen direkt den Steuersatz der Kapitalertragsteuer (§ 32d Abs. 1 Satz 4 EStG). Die Formel lautet e / (4 + k). Dadurch sinkt die KapESt in Bayern und Baden-Württemberg auf ca. 24,51 % (bei 8 % KiSt) bzw. in den übrigen Bundesländern auf ca. 24,45 % (bei 9 % KiSt).' },
+      { question: 'Wann fällt beim Kapitalertrag der Solidaritätszuschlag an?', answer: 'Auf Kapitalerträge fällt der Solidaritätszuschlag (5,5 % auf die Kapitalertragsteuer) uneingeschränkt an. Die Freigrenzen nach dem Gesetz zur Rückführung des Solidaritätszuschlags gelten nur für die reguläre tarifliche Einkommensteuer, nicht für die pauschale Abgeltungsteuer (§ 4 SolzG 1995).' },
+      { question: 'Wann lohnt sich die Günstigerprüfung in der Steuererklärung (§ 32d Abs. 6 EStG)?', answer: 'Wenn Ihr persönlicher Grenzsteuersatz bei der Einkommensteuer unter 25 % liegt (zu versteuerndes Gesamteinkommen unter ca. 20.000 € für Alleinstehende), können Sie eine Günstigerprüfung beantragen. Das Finanzamt besteuert Ihre Kapitalerträge dann mit Ihrem niedrigeren individuellen Einkommensteuertarif und erstattet zu viel einbehaltene Abgeltungsteuer.' },
+      { question: 'Wie funktioniert der Sparer-Pauschbetrag nach § 20 Abs. 9 EStG?', answer: 'Jedem Steuerpflichtigen steht ein jährlicher Sparer-Pauschbetrag von 1.000 € (für zusammenveranlagte Ehepartner: 2.000 €) zu. Bis zu diesem Betrag bleiben Erträge komplett steuerfrei, sofern bei der Bank ein entsprechender Freistellungsauftrag eingerichtet wurde.' },
     ],
     relatedSlugs: ['kirchensteuer-rechner', 'freistellungsauftrag-rechner', 'etf-sparplan-rechner', 'renditerechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Einkommensteuergesetz (§ 32d, § 43a EStG, § 4 SolzG)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-01-15',
-    }
+      source: 'Einkommensteuergesetz (§ 32d, § 43a, § 20 Abs. 9 EStG, § 4 SolzG)',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32d.html',
+      lastVerified: '2026-10-01',
+    },
+    trustMeta: {
+      legalBasis: 'Einkommensteuergesetz (§ 32d, § 43a, § 20 Abs. 9 EStG) & Solidaritätszuschlaggesetz (§ 4 SolzG)',
+      sourceName: 'Bundesministerium der Finanzen / Gesetze im Internet',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32d.html',
+      lastReviewed: '2026-10-01',
+      limitations: [
+        'Gilt für inländische Kapitalerträge von unbeschränkt Steuerpflichtigen ohne Anrechnung ausländischer Quellensteuern (q = 0 nach § 32d Abs. 1 Satz 4 EStG).',
+        'Ausländische Quellensteueranrechnungen nach § 32d Abs. 5 EStG oder Teilfreistellungen nach dem Investmentsteuergesetz (z. B. 30 % bei Aktienfonds) sind separat zu berücksichtigen.',
+      ],
+    },
+    legalFootnotes: [
+      {
+        index: 1,
+        citation: '§ 32d Abs. 1 Satz 1 bis 5 EStG',
+        text: 'Gesonderter Steuertarif von 25 % für Einkünfte aus Kapitalvermögen sowie gesetzliche Ermäßigungsformel e / (4 + k) bei Kirchensteuerpflicht (k = 0,08 in Bayern und Baden-Württemberg, k = 0,09 in den übrigen Bundesländern).',
+        url: 'https://www.gesetze-im-internet.de/estg/__32d.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 2,
+        citation: '§ 43a Abs. 1 Nr. 1 EStG',
+        text: 'Bemessung der Kapitalertragsteuer und Abzug an der Quelle mit abgeltender Wirkung nach § 43 Abs. 5 EStG.',
+        url: 'https://www.gesetze-im-internet.de/estg/__43a.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 3,
+        citation: '§ 4 SolzG 1995',
+        text: 'Erhebung des Solidaritätszuschlags in Höhe von 5,5 % auf die Kapitalertragsteuer ohne Anwendung der allgemeinen Freigrenze.',
+        url: 'https://www.gesetze-im-internet.de/solzg_1995/__4.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 4,
+        citation: '§ 20 Abs. 9 EStG',
+        text: 'Sparer-Pauschbetrag von 1.000 € für Alleinstehende und 2.000 € für zusammenveranlagte Ehepartner als steuerfreier Abzugsbetrag bei Kapitaleinkünften.',
+        url: 'https://www.gesetze-im-internet.de/estg/__20.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+    ],
   },
   {
     id: 'depotgebuehren-rechner',

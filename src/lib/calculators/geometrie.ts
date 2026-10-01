@@ -2,12 +2,17 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
 export function calculateCircle(inputs: Record<string, any>): CalculationResult {
-  const radius = parseFloat(inputs.radius) || (parseFloat(inputs.diameter) ? parseFloat(inputs.diameter) / 2 : 5);
-
-  if (radius <= 0) {
+  if (inputs.radius === undefined || inputs.radius === null || String(inputs.radius).trim() === '') {
     return {
-      primary: { id: 'area', label: 'Kreisfläche', value: 0, formattedValue: '0' },
-      error: 'Der Radius muss größer als 0 sein.',
+      primary: { id: 'area', label: 'Flächeninhalt (A)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Kreisradius ein.',
+    };
+  }
+  const radius = parseFloat(inputs.radius);
+  if (isNaN(radius) || radius <= 0) {
+    return {
+      primary: { id: 'area', label: 'Flächeninhalt (A)', value: 0, formattedValue: '-' },
+      error: 'Der Kreisradius muss größer als 0 cm sein.',
     };
   }
 
@@ -35,13 +40,31 @@ export function calculateCircle(inputs: Record<string, any>): CalculationResult 
 }
 
 export function calculateCylinder(inputs: Record<string, any>): CalculationResult {
-  const radius = parseFloat(inputs.radius) || 4;
-  const height = parseFloat(inputs.height) || 10;
-
-  if (radius <= 0 || height <= 0) {
+  if (inputs.radius === undefined || inputs.radius === null || String(inputs.radius).trim() === '') {
     return {
-      primary: { id: 'volume', label: 'Zylindervolumen', value: 0, formattedValue: '0' },
-      error: 'Radius und Höhe müssen größer als null sein.',
+      primary: { id: 'volume', label: 'Volumen (V)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Radius der Grundfläche ein.',
+    };
+  }
+  const radius = parseFloat(inputs.radius);
+  if (isNaN(radius) || radius <= 0) {
+    return {
+      primary: { id: 'volume', label: 'Volumen (V)', value: 0, formattedValue: '-' },
+      error: 'Der Radius muss größer als 0 cm sein.',
+    };
+  }
+
+  if (inputs.height === undefined || inputs.height === null || String(inputs.height).trim() === '') {
+    return {
+      primary: { id: 'volume', label: 'Volumen (V)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Höhe des Zylinders ein.',
+    };
+  }
+  const height = parseFloat(inputs.height);
+  if (isNaN(height) || height <= 0) {
+    return {
+      primary: { id: 'volume', label: 'Volumen (V)', value: 0, formattedValue: '-' },
+      error: 'Die Höhe muss größer als 0 cm sein.',
     };
   }
 
@@ -68,13 +91,31 @@ export function calculateCylinder(inputs: Record<string, any>): CalculationResul
 }
 
 export function calculateRectangle(inputs: Record<string, any>): CalculationResult {
-  const a = parseFloat(inputs.lengthA) || 8;
-  const b = parseFloat(inputs.widthB) || 5;
-
-  if (a <= 0 || b <= 0) {
+  if (inputs.lengthA === undefined || inputs.lengthA === null || String(inputs.lengthA).trim() === '') {
     return {
-      primary: { id: 'area', label: 'Fläche', value: 0, formattedValue: '0' },
-      error: 'Seitenlängen müssen positiv sein.',
+      primary: { id: 'area', label: 'Flächeninhalt (A)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Länge (Seite a) ein.',
+    };
+  }
+  const a = parseFloat(inputs.lengthA);
+  if (isNaN(a) || a <= 0) {
+    return {
+      primary: { id: 'area', label: 'Flächeninhalt (A)', value: 0, formattedValue: '-' },
+      error: 'Die Länge (Seite a) muss größer als 0 m sein.',
+    };
+  }
+
+  if (inputs.widthB === undefined || inputs.widthB === null || String(inputs.widthB).trim() === '') {
+    return {
+      primary: { id: 'area', label: 'Flächeninhalt (A)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Breite (Seite b) ein.',
+    };
+  }
+  const b = parseFloat(inputs.widthB);
+  if (isNaN(b) || b <= 0) {
+    return {
+      primary: { id: 'area', label: 'Flächeninhalt (A)', value: 0, formattedValue: '-' },
+      error: 'Die Breite (Seite b) muss größer als 0 m sein.',
     };
   }
 

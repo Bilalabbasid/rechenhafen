@@ -3,17 +3,50 @@ import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
 export function calculateElectricityCost(inputs: Record<string, any>): CalculationResult {
-  const watts = parseFloat(inputs.watts) || 100;
-  const rawTime = parseFloat(inputs.usageTime || inputs.hoursPerDay) || 4;
-  const timeUnit = inputs.usageTimeUnit || 'hoursPerDay'; // 'hoursPerDay', 'minutesPerDay', 'hoursPerWeek', 'hoursPerYear'
-  const pricePerKwh = parseFloat(inputs.pricePerKwh) || GERMAN_DATA_2026.strompreis_durchschnitt.value;
-
-  if (watts <= 0 || rawTime <= 0 || pricePerKwh <= 0) {
+  if (inputs.watts === undefined || inputs.watts === null || String(inputs.watts).trim() === '') {
     return {
-      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte positive Werte für Leistung, Nutzungsdauer und Strompreis angeben.',
+      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Leistungsaufnahme des Geräts in Watt ein.',
     };
   }
+  const watts = parseFloat(inputs.watts);
+  if (isNaN(watts) || watts <= 0) {
+    return {
+      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Leistung größer als 0 Watt an.',
+    };
+  }
+
+  const timeVal = inputs.usageTime !== undefined && inputs.usageTime !== '' ? inputs.usageTime : inputs.hoursPerDay;
+  if (timeVal === undefined || timeVal === null || String(timeVal).trim() === '') {
+    return {
+      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die tägliche Nutzungsdauer ein.',
+    };
+  }
+  const rawTime = parseFloat(timeVal);
+  if (isNaN(rawTime) || rawTime <= 0) {
+    return {
+      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Nutzungsdauer größer als 0 an.',
+    };
+  }
+
+  if (inputs.pricePerKwh === undefined || inputs.pricePerKwh === null || String(inputs.pricePerKwh).trim() === '') {
+    return {
+      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Strompreis pro kWh ein.',
+    };
+  }
+  const pricePerKwh = parseFloat(inputs.pricePerKwh);
+  if (isNaN(pricePerKwh) || pricePerKwh < 0) {
+    return {
+      primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Der Strompreis darf nicht negativ sein.',
+    };
+  }
+
+  const timeUnit = inputs.usageTimeUnit || 'hoursPerDay'; // 'hoursPerDay', 'minutesPerDay', 'hoursPerWeek', 'hoursPerYear'
 
   // Effektive Stunden pro Tag berechnen
   let effectiveHoursPerDay = rawTime;
@@ -93,20 +126,80 @@ export function calculateStandbyCost(inputs: Record<string, any>): CalculationRe
 
 export function calculateGasCost(inputs: Record<string, any>): CalculationResult {
   const inputType = inputs.inputType || 'kwh'; // 'kwh' or 'm3'
-  const rawAmount = parseFloat(inputs.amount);
-  const amount = !isNaN(rawAmount) && rawAmount >= 0 ? rawAmount : 12000;
-  const calorificValue = parseFloat(inputs.calorificValue) > 0 ? parseFloat(inputs.calorificValue) : 10.3; // Brennwert kWh/m³
-  const stateFactor = parseFloat(inputs.stateFactor) > 0 ? parseFloat(inputs.stateFactor) : 0.95; // Zustandszahl z
-  const rawPrice = parseFloat(inputs.pricePerKwh);
-  const pricePerKwh = !isNaN(rawPrice) && rawPrice >= 0 ? rawPrice : GERMAN_DATA_2026.gaspreis_durchschnitt.value;
-  const rawBase = parseFloat(inputs.basePricePerMonth);
-  const basePricePerMonth = !isNaN(rawBase) && rawBase >= 0 ? rawBase : 12.0;
 
-  if (amount < 0 || pricePerKwh < 0 || basePricePerMonth < 0) {
+  if (inputs.amount === undefined || inputs.amount === null || String(inputs.amount).trim() === '') {
     return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte geben Sie positive Zahlenwerte für Verbrauch, Arbeitspreis und Grundpreis ein.',
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihre Verbrauchsmenge bzw. die Zählerdifferenz ein.',
     };
+  }
+  const amount = parseFloat(inputs.amount);
+  if (isNaN(amount) || amount < 0) {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen gültigen Verbrauch ab 0 ein.',
+    };
+  }
+
+  if (inputs.pricePerKwh === undefined || inputs.pricePerKwh === null || String(inputs.pricePerKwh).trim() === '') {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Arbeitspreis pro kWh ein.',
+    };
+  }
+  const pricePerKwh = parseFloat(inputs.pricePerKwh);
+  if (isNaN(pricePerKwh) || pricePerKwh < 0) {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Der Arbeitspreis darf nicht negativ sein.',
+    };
+  }
+
+  if (inputs.basePricePerMonth === undefined || inputs.basePricePerMonth === null || String(inputs.basePricePerMonth).trim() === '') {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den monatlichen Grundpreis ein.',
+    };
+  }
+  const basePricePerMonth = parseFloat(inputs.basePricePerMonth);
+  if (isNaN(basePricePerMonth) || basePricePerMonth < 0) {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Der monatliche Grundpreis darf nicht negativ sein.',
+    };
+  }
+
+  let calorificValue = 10.3;
+  let stateFactor = 0.95;
+
+  if (inputType === 'm3') {
+    if (inputs.calorificValue === undefined || inputs.calorificValue === null || String(inputs.calorificValue).trim() === '') {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie den Brennwert ein (üblich sind ca. 9,5 bis 11,5 kWh/m³).',
+      };
+    }
+    calorificValue = parseFloat(inputs.calorificValue);
+    if (isNaN(calorificValue) || calorificValue <= 0) {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Der Brennwert muss größer als 0 sein (üblich sind ca. 9,5 bis 11,5 kWh/m³).',
+      };
+    }
+
+    if (inputs.stateFactor === undefined || inputs.stateFactor === null || String(inputs.stateFactor).trim() === '') {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie die Zustandszahl z ein (üblich sind ca. 0,90 bis 0,96).',
+      };
+    }
+    stateFactor = parseFloat(inputs.stateFactor);
+    if (isNaN(stateFactor) || stateFactor <= 0) {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Die Zustandszahl z muss größer als 0 sein (üblich sind ca. 0,90 bis 0,96).',
+      };
+    }
   }
 
   let totalKwh = amount;

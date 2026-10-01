@@ -5,7 +5,12 @@ import {
   calculateCalendarDiff,
   calculateTagerechner,
   calculateTageBisWeihnachten,
+  dateToDayNumber,
+  dayNumberToDate,
   formatDateGerman,
+  getBerlinTodayParts,
+  getGermanWeekday,
+  getISOWeekFromParts,
   parseDateParts,
 } from '@/lib/calculators/dateMath';
 
@@ -79,19 +84,46 @@ export function calculateAge(inputs: Record<string, any>): CalculationResult {
 }
 
 export function calculateAgeInDays(inputs: Record<string, any>): CalculationResult {
-  const birth = new Date(inputs.birthDate || '1995-01-01');
-  const target = inputs.targetDate ? new Date(inputs.targetDate) : new Date();
-
-  if (isNaN(birth.getTime()) || isNaN(target.getTime()) || target < birth) {
+  if (inputs.birthDate === undefined || inputs.birthDate === null || String(inputs.birthDate).trim() === '') {
     return {
-      primary: { id: 'days', label: 'Alter in Tagen', value: 0, formattedValue: '0 Tage' },
-      error: 'Ungültiges Geburtsdatum oder Vergleichsdatum liegt vor Geburt.',
+      primary: { id: 'days', label: 'Alter in Tagen', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein Geburtsdatum ein.',
+    };
+  }
+  const birthParts = parseDateParts(inputs.birthDate);
+  if (!birthParts) {
+    return {
+      primary: { id: 'days', label: 'Alter in Tagen', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Geburtsdatum ein.',
     };
   }
 
-  const days = Math.floor((target.getTime() - birth.getTime()) / (1000 * 60 * 60 * 24));
+  let targetParts = getBerlinTodayParts();
+  if (inputs.targetDate !== undefined && inputs.targetDate !== null && String(inputs.targetDate).trim() !== '') {
+    const parsedTarget = parseDateParts(inputs.targetDate);
+    if (!parsedTarget) {
+      return {
+        primary: { id: 'days', label: 'Alter in Tagen', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie ein gültiges Vergleichsdatum (Stichtag) ein.',
+      };
+    }
+    targetParts = parsedTarget;
+  }
+
+  const birthDayNum = dateToDayNumber(birthParts.year, birthParts.month, birthParts.day);
+  const targetDayNum = dateToDayNumber(targetParts.year, targetParts.month, targetParts.day);
+
+  if (targetDayNum < birthDayNum) {
+    return {
+      primary: { id: 'days', label: 'Alter in Tagen', value: 0, formattedValue: '-' },
+      error: 'Das Vergleichsdatum (Stichtag) darf nicht vor dem Geburtsdatum liegen.',
+    };
+  }
+
+  const days = targetDayNum - birthDayNum;
   const hours = days * 24;
   const minutes = hours * 60;
+  const weeks = Math.floor(days / 7);
 
   return {
     primary: {
@@ -102,11 +134,11 @@ export function calculateAgeInDays(inputs: Record<string, any>): CalculationResu
       highlight: true,
     },
     secondary: [
-      { id: 'hours', label: 'Alter in Stunden', value: hours, formattedValue: `${formatNumber(hours, 0)} Std.` },
-      { id: 'minutes', label: 'Alter in Minuten', value: minutes, formattedValue: `${formatNumber(minutes, 0)} Min.` },
-      { id: 'weeks', label: 'Alter in Wochen', value: Math.floor(days / 7), formattedValue: `${formatNumber(Math.floor(days / 7), 0)} Wochen` },
+      { id: 'hours', label: 'Äquivalent in Stunden (24 h/Tag)', value: hours, formattedValue: `${formatNumber(hours, 0)} Stunden` },
+      { id: 'minutes', label: 'Äquivalent in Minuten (1.440 min/Tag)', value: minutes, formattedValue: `${formatNumber(minutes, 0)} Minuten` },
+      { id: 'weeks', label: 'Vollendete Lebenswochen', value: weeks, formattedValue: `${formatNumber(weeks, 0)} Wochen` },
     ],
-    summaryText: `Vom Geburtsdatum bis zum Stichtag sind genau ${formatNumber(days, 0)} Tage vergangen.`,
+    summaryText: `Vom ${formatDateGerman(birthParts)} bis zum Stichtag (${formatDateGerman(targetParts)}) sind genau ${formatNumber(days, 0)} Kalendertage vergangen. Hinweis: Die Angaben zu Stunden (${formatNumber(hours, 0)} Std.) und Minuten (${formatNumber(minutes, 0)} Min.) sind rechnerische Tagesäquivalente, da ohne genaue Geburtsuhrzeit volle Kalendertage zugrunde gelegt werden.`,
   };
 }
 
@@ -356,38 +388,62 @@ export function calculateWorkdays(inputs: Record<string, any>): CalculationResul
 }
 
 export function calculateDateAdd(inputs: Record<string, any>): CalculationResult {
-  const base = new Date(inputs.startDate || '2026-01-01');
-  const days = parseInt(inputs.days || '0', 10);
-  const operation = inputs.operation || 'add';
-
-  if (isNaN(base.getTime())) {
+  if (inputs.startDate === undefined || inputs.startDate === null || String(inputs.startDate).trim() === '') {
     return {
       primary: { id: 'resultDate', label: 'Zieldatum', value: '', formattedValue: '-' },
-      error: 'Ungültiges Basisdatum.',
+      error: 'Bitte geben Sie ein Ausgangsdatum ein.',
+    };
+  }
+  const baseParts = parseDateParts(inputs.startDate);
+  if (!baseParts) {
+    return {
+      primary: { id: 'resultDate', label: 'Zieldatum', value: '', formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Ausgangsdatum ein.',
     };
   }
 
-  const target = new Date(base);
-  const dayDelta = operation === 'subtract' ? -Math.abs(days) : Math.abs(days);
-  target.setDate(target.getDate() + dayDelta);
+  if (inputs.days === undefined || inputs.days === null || String(inputs.days).trim() === '') {
+    return {
+      primary: { id: 'resultDate', label: 'Zieldatum', value: '', formattedValue: '-' },
+      error: 'Bitte geben Sie die Anzahl der Tage ein.',
+    };
+  }
+  const rawDays = Number(inputs.days);
+  if (isNaN(rawDays) || !Number.isInteger(rawDays) || rawDays < 0) {
+    return {
+      primary: { id: 'resultDate', label: 'Zieldatum', value: '', formattedValue: '-' },
+      error: 'Bitte geben Sie eine ganze Zahl von Tagen (mindestens 0) ein.',
+    };
+  }
 
-  const weekdays = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-  const weekdayName = weekdays[target.getDay()];
+  const operation = inputs.operation || 'add';
+  const dayDelta = operation === 'subtract' ? -rawDays : rawDays;
+
+  const baseDayNum = dateToDayNumber(baseParts.year, baseParts.month, baseParts.day);
+  const targetDayNum = baseDayNum + dayDelta;
+  const targetParts = dayNumberToDate(targetDayNum);
+
+  const weekdayName = getGermanWeekday(targetParts.year, targetParts.month, targetParts.day);
+  const kw = getISOWeekFromParts(targetParts.year, targetParts.month, targetParts.day);
+  const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+  const targetIso = `${targetParts.year}-${pad(targetParts.month)}-${pad(targetParts.day)}`;
+  const targetFormatted = formatDateGerman(targetParts);
+  const baseFormatted = formatDateGerman(baseParts);
 
   return {
     primary: {
       id: 'resultDate',
       label: 'Berechnetes Datum',
-      value: target.toISOString().split('T')[0],
-      formattedValue: formatDateDe(target),
+      value: targetIso,
+      formattedValue: targetFormatted,
       highlight: true,
     },
     secondary: [
       { id: 'weekday', label: 'Wochentag', value: weekdayName, formattedValue: weekdayName },
       { id: 'delta', label: 'Verschiebung', value: dayDelta, formattedValue: `${dayDelta >= 0 ? '+' : ''}${dayDelta} Tage` },
-      { id: 'calendarWeek', label: 'Kalenderwoche', value: getISOWeek(target), formattedValue: `KW ${getISOWeek(target)}` },
+      { id: 'calendarWeek', label: 'Kalenderwoche', value: kw, formattedValue: `KW ${kw}` },
     ],
-    summaryText: `${formatDateDe(base)} ${dayDelta >= 0 ? 'plus' : 'minus'} ${Math.abs(days)} Tage ergibt ${weekdayName}, den ${formatDateDe(target)}.`,
+    summaryText: `${baseFormatted} ${dayDelta >= 0 ? 'plus' : 'minus'} ${rawDays} Tage ergibt ${weekdayName}, den ${targetFormatted}.`,
   };
 }
 

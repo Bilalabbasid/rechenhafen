@@ -1320,12 +1320,76 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const l = Math.max(0, Number(inputs.wallLength) || 0);
-      const h = Math.max(0, Number(inputs.wallHeight) || 0);
+      if (inputs.wallLength === undefined || inputs.wallLength === null || String(inputs.wallLength).trim() === '') {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Mauerlänge ein.',
+        };
+      }
+      const l = parseFloat(inputs.wallLength);
+      if (isNaN(l) || l <= 0) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Mauerlänge größer als 0 m ein.',
+        };
+      }
+
+      if (inputs.wallHeight === undefined || inputs.wallHeight === null || String(inputs.wallHeight).trim() === '') {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Mauerhöhe ein.',
+        };
+      }
+      const h = parseFloat(inputs.wallHeight);
+      if (isNaN(h) || h <= 0) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Mauerhöhe größer als 0 m ein.',
+        };
+      }
+
+      const rawOpenings = inputs.openingsArea !== undefined && inputs.openingsArea !== null && String(inputs.openingsArea).trim() !== ''
+        ? parseFloat(inputs.openingsArea)
+        : 0;
+      if (isNaN(rawOpenings) || rawOpenings < 0) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Die Abzugsfläche für Öffnungen darf nicht negativ sein.',
+        };
+      }
+      const openings = rawOpenings;
       const grossArea = l * h;
-      const openings = Math.max(0, Number(inputs.openingsArea) || 0);
-      const wallArea = Math.max(0, grossArea - openings);
-      const wasteFactor = 1 + (Math.max(0, Number(inputs.waste) || 0) / 100);
+      if (openings > grossArea) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: `Die Abzugsfläche für Öffnungen (${formatNumber(openings, 2)} m²) darf nicht größer als die Brutto-Wandfläche (${formatNumber(grossArea, 2)} m²) sein.`,
+        };
+      }
+
+      const rawWaste = inputs.waste !== undefined && inputs.waste !== null && String(inputs.waste).trim() !== ''
+        ? parseFloat(inputs.waste)
+        : 0;
+      if (isNaN(rawWaste) || rawWaste < 0) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Der Verschnitt darf nicht negativ sein.',
+        };
+      }
+      const wastePercent = rawWaste;
+      const wasteFactor = 1 + (wastePercent / 100);
+
+      const wallArea = grossArea - openings;
+      if (wallArea <= 0.0001) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine (50×25 cm)', value: 0, formattedValue: '0 Stück', highlight: true },
+          secondary: [
+            { id: 'concreteM3', label: 'Verfüllbeton Gesamtvolumen', value: 0, formattedValue: '0,00 m³ (ca. 0,0 t Normalbeton)' },
+            { id: 'rebar', label: 'Bewehrungsstahl (Ø 10 mm inkl. 10 % Überdeckung)', value: 0, formattedValue: '0 lfd. Meter' },
+            { id: 'wallArea', label: 'Netto-Ansichtsfläche der Mauer', value: 0, formattedValue: '0,00 m²' },
+          ],
+          summaryText: 'Bei einer Netto-Wandfläche von 0,00 m² (die Öffnungen entsprechen der gesamten Wandfläche) wird kein Baumaterial benötigt.',
+        };
+      }
       
       // Standardmaß Schalungsstein: 50 cm lang, 25 cm hoch -> 8 Steine pro m²
       const stonesCount = Math.ceil(wallArea * 8 * wasteFactor);
@@ -1337,11 +1401,14 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       
       const concreteM3 = (wallArea * (concretePerM2 / 1000)) * wasteFactor;
       const concreteTonnes = concreteM3 * 2.3; // Normalbeton Dichte ~2,3 t/m³
-      // Bewehrungsstahl: 2 horizontale Stäbe je Schicht (alle 25 cm) + Vertikalstäbe alle 25 cm
+
+      // Bewehrungsstahl: 2 horizontale Stäbe je Schicht (alle 25 cm) + Vertikalstäbe alle 25 cm,
+      // skaliert anhand der verbleibenden Netto-Wandfläche
       const layers = Math.ceil(h / 0.25);
-      const horizontalRebarM = layers * 2 * l;
-      const verticalRebarM = Math.ceil(l / 0.25) * h;
-      const totalRebarMeters = Math.ceil((horizontalRebarM + verticalRebarM) * 1.1); // 10 % Überdeckung/Verschnitt
+      const grossHorizontalRebarM = layers * 2 * l;
+      const grossVerticalRebarM = Math.ceil(l / 0.25) * h;
+      const areaFactor = wallArea / grossArea;
+      const totalRebarMeters = Math.ceil((grossHorizontalRebarM + grossVerticalRebarM) * 1.1 * areaFactor);
       
       return {
         primary: { id: 'stones', label: 'Benötigte Schalungssteine (50×25 cm)', value: stonesCount, formattedValue: stonesCount + ' Stück', highlight: true },
@@ -1350,11 +1417,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { id: 'rebar', label: 'Bewehrungsstahl (Ø 10 mm inkl. 10 % Überdeckung)', value: totalRebarMeters, formattedValue: 'ca. ' + totalRebarMeters + ' lfd. Meter' },
           { id: 'wallArea', label: 'Netto-Ansichtsfläche der Mauer', value: wallArea, formattedValue: formatNumber(wallArea, 2) + ' m²' },
         ],
-        summaryText: 'Für ' + formatNumber(wallArea, 2) + ' m² Wandfläche benötigen Sie ' + stonesCount + ' Schalungssteine (50×25 cm), ca. ' + formatNumber(concreteM3, 2) + ' m³ Verfüllbeton (ca. ' + formatNumber(concreteTonnes, 1) + ' t bei 2,3 t/m³) und rund ' + totalRebarMeters + ' m Bewehrungsstahl. Hinweis: Modellrechnung für Standard-Bedingungen ohne statische Einzelprüfung.',
+        summaryText: `Für ${formatNumber(wallArea, 2)} m² Wandfläche benötigen Sie ${stonesCount} Schalungssteine (50×25 cm, inkl. ${wastePercent} % Verschnitt), ca. ${formatNumber(concreteM3, 2)} m³ Verfüllbeton (ca. ${formatNumber(concreteTonnes, 1)} t bei 2,3 t/m³ Normalbeton-Dichte) und rund ${totalRebarMeters} m Bewehrungsstahl. Hinweis: Modellrechnung für Standard-Bedingungen als Orientierungswert – ersetzt keine statische Einzelprüfung.`,
       };
     },
-    formula: "Steine = Netto-Wandfläche × 8 Stk./m² × Verschnitt; Füllbeton = Netto-Wandfläche × Liter/m² × Verschnitt; Stahl = (2 × Lagen × Länge + Vertikalstäbe × Höhe) × 1,1",
-    formulaExplanation: "Schalungssteine werden trocken im Halbsteinverband aufgesetzt (8 Stk./m² bei 50×25 cm Format), mit Baustahl horizontal (2 Stäbe je 25-cm-Lage) und vertikal bewehrt und anschließend mit flüssigem Normalbeton (Dichte ~2,3 t/m³) verfüllt. Bei Stützmauern über 1,0 m Höhe ist vorab eine statische Prüfung erforderlich.",
+    formula: "Steine = Netto-Wandfläche × 8 Stk./m² × (1 + Verschnitt/100); Füllbeton = Netto-Wandfläche × Liter/m² × (1 + Verschnitt/100); Stahl = (2 × Lagen × Länge + Vertikalstäbe × Höhe) × 1,1 × (Nettofläche / Bruttofläche)",
+    formulaExplanation: "Schalungssteine werden trocken im Halbsteinverband aufgesetzt (8 Stk./m² bei 50×25 cm Format), mit Baustahl horizontal (2 Stäbe je 25-cm-Lage) und vertikal bewehrt und anschließend mit flüssigem Normalbeton (Dichte ~2,3 t/m³) verfüllt. Der Verschnittzuschlag wird über den Multiplikator (1 + Verschnitt / 100) berechnet. Alle Angaben zu Stahl und Beton sind Schätzwerte und stellen keine statische Bemessung dar. Bei Stützmauern ist vorab eine statische Prüfung erforderlich.",
     workedExample: {
       title: "Beispiel: 8 m × 1,5 m Stützmauer mit 24er Schalungssteinen",
       description: "Für eine Stützmauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen (145 l/m² Beton) und 5 % Verschnitt werden 101 Schalungssteine (Standardmaß 50×25 cm) sowie ca. 1,83 m³ Verfüllbeton (ca. 4,2 Tonnen bei 2,3 t/m³) und rund 159 Meter Bewehrungsstahl benötigt.",

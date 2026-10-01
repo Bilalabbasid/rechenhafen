@@ -214,6 +214,35 @@ export function dateToDayNumber(year: number, month: number, day: number): numbe
 }
 
 /**
+ * Converts a continuous integer Day Number back to DateParts using pure UTC arithmetic.
+ * Zero timezone shift, zero DST jump.
+ */
+export function dayNumberToDate(dayNumber: number): DateParts {
+  const d = new Date(dayNumber * 86400000);
+  return {
+    year: d.getUTCFullYear(),
+    month: d.getUTCMonth() + 1,
+    day: d.getUTCDate(),
+  };
+}
+
+/**
+ * Calculates the ISO 8601 calendar week for any date.
+ * Strict ISO 8601: Week starts on Monday. Week 1 is the week containing the first Thursday (or Jan 4).
+ * Completely timezone-proof and daylight-saving safe using UTC.
+ */
+export function getISOWeekFromParts(year: number, month: number, day: number): number {
+  const d = new Date(Date.UTC(year, month - 1, day));
+  // Monday is 1, Sunday is 7
+  const dayOfWeek = ((d.getUTCDay() + 6) % 7) + 1;
+  // Move to nearest Thursday: current date + 4 - dayOfWeek
+  d.setUTCDate(d.getUTCDate() - dayOfWeek + 4);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return weekNo;
+}
+
+/**
  * Returns the German weekday name for a given date.
  */
 export function getGermanWeekday(year: number, month: number, day: number): string {

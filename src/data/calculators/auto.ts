@@ -23,7 +23,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet Kraftstoffkosten, Literbedarf und Kosten pro Kilometer für Einzelfahrten, Fahrgemeinschaften und Pendelstrecken.',
     searchKeywords: ['spritkostenrechner', 'spritkosten berechnen', 'fahrtkosten berechnen auto', 'spritkosten pro km', 'benzinkosten rechner', 'spritkosten teilen', 'fahrtkosten fahrgemeinschaft'],
     inputs: [
-      { id: 'distance', label: 'Fahrstrecke in Kilometern', type: 'number', defaultValue: 50, min: 1, step: 1, unit: 'km' },
+      { id: 'distance', label: 'Fahrstrecke in Kilometern', type: 'number', defaultValue: 50, min: 0, step: 1, unit: 'km' },
       {
         id: 'tripType',
         label: 'Fahrtart',
@@ -37,7 +37,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
       { id: 'consumption', label: 'Verbrauch auf 100 km', type: 'number', defaultValue: 6.8, min: 1, step: 0.1, unit: 'l/100km' },
       { id: 'pricePerLiter', label: 'Kraftstoffpreis pro Liter', type: 'number', defaultValue: 1.78, min: 0.5, step: 0.01, unit: '€/Liter' },
       { id: 'tripsCount', label: 'Anzahl der Fahrten', type: 'number', defaultValue: 1, min: 1, step: 1, helpText: 'z.B. 1 für Einzelfahrt oder mehr bei regelmäßigen Touren' },
-      { id: 'passengers', label: 'Anzahl Personen (Fahrgemeinschaft)', type: 'number', defaultValue: 1, min: 1, max: 9, step: 1, helpText: 'Teilt die Kosten auf alle Mitfahrer auf' },
+      { id: 'passengers', label: 'Anzahl Personen (inklusive Fahrer)', type: 'number', defaultValue: 1, min: 1, max: 9, step: 1, helpText: 'Gesamtzahl der Personen im Fahrzeug inklusive Fahrer' },
     ],
     calculate: calculateFuelCost,
     formula: 'Spritkosten = (Strecke in km / 100) × Verbrauch in l × Literpreis in €',

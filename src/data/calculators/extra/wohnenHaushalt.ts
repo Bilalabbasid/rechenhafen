@@ -1305,18 +1305,66 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'gasPricePerKwh', label: 'Gaspreis in Cent pro kWh', type: 'number', defaultValue: 10.5, min: 4, max: 30, step: 0.1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const m3 = parseFloat(inputs.gasCubicMeters) || 1200;
-      const bw = parseFloat(inputs.brennwert) || 11.2;
-      const z = parseFloat(inputs.zustandszahl) || 0.95;
-      const price = parseFloat(inputs.gasPricePerKwh) || 10.5;
+      const m3Str = String(inputs.gasCubicMeters ?? '').trim();
+      const bwStr = String(inputs.brennwert ?? '').trim();
+      const zStr = String(inputs.zustandszahl ?? '').trim();
+      const priceStr = String(inputs.gasPricePerKwh ?? '').trim();
+
+      if (!m3Str || !bwStr || !zStr || !priceStr) {
+        return {
+          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte füllen Sie alle erforderlichen Felder aus.',
+        };
+      }
+
+      const m3 = parseFloat(m3Str.replace(',', '.'));
+      const bw = parseFloat(bwStr.replace(',', '.'));
+      const z = parseFloat(zStr.replace(',', '.'));
+      const price = parseFloat(priceStr.replace(',', '.'));
+
+      if (isNaN(m3) || isNaN(bw) || isNaN(z) || isNaN(price)) {
+        return {
+          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Zahlenwerte ein.',
+        };
+      }
+
+      if (m3 < 0) {
+        return {
+          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Der Gasverbrauch in m³ darf nicht negativ sein.',
+        };
+      }
+
+      if (bw <= 0 || z <= 0) {
+        return {
+          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Brennwert und Zustandszahl müssen größer als 0 sein.',
+        };
+      }
+
+      if (price < 0) {
+        return {
+          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Der Gaspreis darf nicht negativ sein.',
+        };
+      }
+
       const kwh = m3 * bw * z;
       const totalCost = (kwh * price) / 100;
+      const costPerM3 = m3 > 0 ? totalCost / m3 : (bw * z * price) / 100;
+
       return {
         primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: kwh, formattedValue: `${formatNumber(kwh, 0)} kWh`, highlight: true },
         secondary: [
           { id: 'totalCost', label: 'Gesamte Gaskosten', value: totalCost, formattedValue: formatCurrency(totalCost) },
           { id: 'monthlyCost', label: 'Monatlicher Abschlag', value: totalCost / 12, formattedValue: formatCurrency(totalCost / 12) },
-          { id: 'costPerM3', label: 'Effektiver Preis pro m³', value: totalCost / m3, formattedValue: formatCurrency(totalCost / m3) },
+          { id: 'costPerM3', label: 'Effektiver Preis pro m³', value: costPerM3, formattedValue: formatCurrency(costPerM3) },
         ],
         summaryText: `${formatNumber(m3, 0)} m³ Gas entsprechen ca. ${formatNumber(kwh, 0)} kWh Energie. Bei ${formatNumber(price, 1)} ct/kWh betragen die Kosten ${formatCurrency(totalCost)}.`,
       };

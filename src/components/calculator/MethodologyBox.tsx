@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, AlertCircle, Scale, Leaf, Calculator, ExternalLink } from 'lucide-react';
-import { TrustMetadata } from '@/types/calculator';
+import { ShieldCheck, AlertCircle, Scale, Leaf, Calculator, ExternalLink, BookOpen } from 'lucide-react';
+import { TrustMetadata, LegalFootnote } from '@/types/calculator';
 
 interface Props {
   category: string;
@@ -12,13 +12,15 @@ interface Props {
     lastVerified: string;
   };
   trustMeta?: TrustMetadata;
+  legalFootnotes?: LegalFootnote[];
 }
 
-export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta }: Props) {
+export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta, legalFootnotes }: Props) {
   const isHealth = category === 'gesundheit-fitness';
   const isLegalOrTax = ['arbeit-gehalt', 'recht-steuern', 'finanzen', 'kredit-schulden'].includes(category);
   const isEnvironmental = ['haushalt-energie', 'energie-umwelt', 'haus-garten'].includes(category);
   const isFinance = ['finanzen', 'kredit-schulden'].includes(category);
+  const hasFootnotes = Boolean(legalFootnotes && legalFootnotes.length > 0);
 
   return (
     <section
@@ -33,11 +35,11 @@ export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta 
       }}
       aria-labelledby="methodik-transparenz-heading"
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: 'var(--space-3)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', marginBottom: 'var(--space-4)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ShieldCheck size={20} style={{ color: 'var(--color-primary)' }} />
-          <h2 id="methodik-transparenz-heading" style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-            Berechnungsmethodik, Annahmen & Verlässlichkeit
+          <Scale size={20} style={{ color: 'var(--color-primary)' }} />
+          <h2 id="methodik-transparenz-heading" style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
+            {hasFootnotes ? 'Rechtsgrundlagen, Quellen und Berechnungsannahmen' : 'Berechnungsmethodik, Annahmen & Verlässlichkeit'}
           </h2>
         </div>
         {timeSensitiveMeta && (
@@ -53,6 +55,48 @@ export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta 
           </span>
         )}
       </div>
+
+      {/* Visible Legal Footnotes Section */}
+      {hasFootnotes && (
+        <div style={{
+          background: 'var(--color-surface-hover)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          padding: '16px',
+          marginBottom: 'var(--space-4)',
+        }}>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: '0 0 10px', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <BookOpen size={16} style={{ color: 'var(--color-primary)' }} />
+            <span>Verifizierte Rechtsquellen & amtliche Normen</span>
+          </h3>
+          <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {legalFootnotes!.map((fn, idx) => (
+              <li key={idx} id={`quelle-${idx + 1}`} style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.55 }}>
+                <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                  [{idx + 1}] {fn.citation}:
+                </span>{' '}
+                <span>{fn.text}</span>{' '}
+                {fn.url && (
+                  <a
+                    href={fn.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--color-primary)', textDecoration: 'underline', display: 'inline-flex', alignItems: 'center', gap: '2px', margin: '0 4px' }}
+                  >
+                    Amtlicher Text <ExternalLink size={11} />
+                  </a>
+                )}
+                <span style={{ display: 'inline-block', fontSize: '0.775rem', background: 'var(--color-surface)', padding: '1px 6px', borderRadius: '4px', border: '1px solid var(--color-border)', margin: '2px 4px' }}>
+                  Rechtsstand: {fn.effectiveDate}
+                </span>
+                <span style={{ display: 'inline-block', fontSize: '0.775rem', background: '#ecfdf5', color: '#065f46', padding: '1px 6px', borderRadius: '4px', border: '1px solid #a7f3d0', margin: '2px 4px' }}>
+                  Quelle geprüft am: {fn.reviewedDate}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       {/* Category Specific Trust Guidance */}
       {isHealth && (

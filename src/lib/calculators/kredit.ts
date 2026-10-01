@@ -2,33 +2,80 @@ import { CalculationResult, CalculationBreakdownRow } from '@/types/calculator';
 import { formatCurrency, formatPercent } from '@/lib/formatters';
 
 export function calculateInstallmentLoan(inputs: Record<string, any>): CalculationResult {
-  const loanAmount = parseFloat(inputs.loanAmount) || 10000;
-  const annualInterest = (parseFloat(inputs.annualInterest) || 4.5) / 100;
-  const rawTerm = parseInt(inputs.term || inputs.termMonths || '48', 10);
-  const termUnit = inputs.termUnit || 'months'; // 'months' vs 'years'
-  const termMonths = termUnit === 'years' ? rawTerm * 12 : rawTerm;
-  const annualSpecialRepayment = Math.max(0, parseFloat(inputs.sondertilgung || '0'));
-
-  if (loanAmount <= 0 || termMonths <= 0) {
+  if (inputs.loanAmount === undefined || inputs.loanAmount === null || inputs.loanAmount === '') {
     return {
-      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte geben Sie einen positiven Kreditbetrag und eine gültige Laufzeit an.',
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen Kreditbetrag ein.',
+    };
+  }
+  const loanAmount = parseFloat(inputs.loanAmount);
+  if (isNaN(loanAmount) || loanAmount <= 0) {
+    return {
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen positiven Kreditbetrag über 0 € an.',
     };
   }
 
-  const monthlyRateInterest = annualInterest / 12;
+  if (inputs.annualInterest === undefined || inputs.annualInterest === null || inputs.annualInterest === '') {
+    return {
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Zinssatz an.',
+    };
+  }
+  const rawInterest = parseFloat(inputs.annualInterest);
+  if (isNaN(rawInterest) || rawInterest < 0) {
+    return {
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen gültigen Zinssatz ab 0 % an.',
+    };
+  }
+  const annualInterest = rawInterest / 100;
+
+  const termVal = inputs.term !== undefined && inputs.term !== '' ? inputs.term : inputs.termMonths;
+  if (termVal === undefined || termVal === null || termVal === '') {
+    return {
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die gewünschte Kreditlaufzeit an.',
+    };
+  }
+  const rawTerm = parseFloat(termVal);
+  if (isNaN(rawTerm) || rawTerm <= 0 || !Number.isInteger(rawTerm)) {
+    return {
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Laufzeit in vollen Zeiteinheiten an.',
+    };
+  }
+  const termUnit = inputs.termUnit || 'months'; // 'months' vs 'years'
+  const termMonths = termUnit === 'years' ? rawTerm * 12 : rawTerm;
+
+  const rawSpecial = inputs.sondertilgung !== undefined && inputs.sondertilgung !== '' ? parseFloat(inputs.sondertilgung) : 0;
+  if (isNaN(rawSpecial) || rawSpecial < 0) {
+    return {
+      primary: { id: 'monthlyRate', label: 'Monatliche Rate', value: 0, formattedValue: '-' },
+      error: 'Die Sondertilgung darf nicht negativ sein.',
+    };
+  }
+  const annualSpecialRepayment = Math.max(0, rawSpecial);
+
+  let monthlyRateInterest = 0;
   let monthlyPayment = 0;
 
-  if (monthlyRateInterest === 0) {
+  if (annualInterest === 0) {
+    monthlyRateInterest = 0;
     monthlyPayment = loanAmount / termMonths;
+  } else if (inputs.isEffectiveRate || inputs.useEffectiveRate) {
+    // Effektiver Jahreszins: r = (1 + annualEffectiveRate)^(1/12) - 1
+    monthlyRateInterest = Math.pow(1 + annualInterest, 1 / 12) - 1;
+    monthlyPayment = loanAmount * (monthlyRateInterest / (1 - Math.pow(1 + monthlyRateInterest, -termMonths)));
   } else {
-    // Annuitätenformel: R = K * (q^n * (q - 1)) / (q^n - 1)
+    // Nominaler Sollzins p.a.
+    monthlyRateInterest = annualInterest / 12;
     const q = 1 + monthlyRateInterest;
     const qPow = Math.pow(q, termMonths);
     monthlyPayment = loanAmount * ((qPow * (q - 1)) / (qPow - 1));
   }
 
-  // Tilgungsplan (Jahresbasis) unter Berücksichtigung von Sondertilgungen
+  // Tilgungsplan (Jahresbasis) unter Berücksichtigung von Ratenrundung & Sondertilgungen
   const rows: CalculationBreakdownRow[] = [];
   let remainingDebt = loanAmount;
   let accumulatedInterest = 0;
@@ -38,21 +85,28 @@ export function calculateInstallmentLoan(inputs: Record<string, any>): Calculati
   const totalYears = Math.ceil(termMonths / 12);
   let currentMonth = 1;
 
-  for (let year = 1; year <= totalYears && remainingDebt > 0.01; year++) {
+  for (let year = 1; year <= totalYears && remainingDebt > 0.005; year++) {
     let yearInterest = 0;
     let yearRepayment = 0;
 
-    for (let m = 0; m < 12 && currentMonth <= termMonths && remainingDebt > 0.01; m++, currentMonth++) {
+    for (let m = 0; m < 12 && currentMonth <= termMonths && remainingDebt > 0.005; m++, currentMonth++) {
       actualMonths++;
-      const interestForMonth = remainingDebt * monthlyRateInterest;
-      const repaymentForMonth = Math.min(remainingDebt, monthlyPayment - interestForMonth);
+      const interestForMonth = monthlyRateInterest === 0 ? 0 : remainingDebt * monthlyRateInterest;
+      
+      let repaymentForMonth: number;
+      if (currentMonth === termMonths || annualSpecialRepayment === 0 && remainingDebt <= monthlyPayment) {
+        // Letzter Monat: Tilgung gleicht Restschuld exakt aus
+        repaymentForMonth = remainingDebt;
+      } else {
+        repaymentForMonth = Math.min(remainingDebt, monthlyPayment - interestForMonth);
+      }
 
       yearInterest += interestForMonth;
       yearRepayment += repaymentForMonth;
       remainingDebt = Math.max(0, remainingDebt - repaymentForMonth);
 
       // Sondertilgung am Jahresende (Monat 12, 24, ...)
-      if (m === 11 && annualSpecialRepayment > 0 && remainingDebt > 0.01) {
+      if (m === 11 && annualSpecialRepayment > 0 && remainingDebt > 0.005) {
         const actualSpecial = Math.min(remainingDebt, annualSpecialRepayment);
         yearRepayment += actualSpecial;
         remainingDebt = Math.max(0, remainingDebt - actualSpecial);

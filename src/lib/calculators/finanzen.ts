@@ -2,21 +2,78 @@ import { CalculationResult, CalculationBreakdownRow } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
 export function calculateCompoundInterest(inputs: Record<string, any>): CalculationResult {
-  const initial = parseFloat(inputs.initialAmount) || 0;
-  const initialMonthly = parseFloat(inputs.monthlyContribution) || 0;
-  const rateAnnual = (parseFloat(inputs.annualRate) || 0) / 100;
-  const years = parseInt(inputs.years || '10', 10);
+  if (inputs.initialAmount === undefined || inputs.initialAmount === null || String(inputs.initialAmount).trim() === '') {
+    if (inputs.monthlyContribution === undefined || inputs.monthlyContribution === null || String(inputs.monthlyContribution).trim() === '') {
+      return {
+        primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie ein Startkapital oder eine monatliche Sparrate an.',
+      };
+    }
+  }
+
+  const rawInitial = inputs.initialAmount !== undefined && inputs.initialAmount !== null && String(inputs.initialAmount).trim() !== ''
+    ? parseFloat(inputs.initialAmount)
+    : 0;
+  if (isNaN(rawInitial) || rawInitial < 0) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Das Startkapital darf nicht negativ sein.',
+    };
+  }
+  const initial = rawInitial;
+
+  const rawMonthly = inputs.monthlyContribution !== undefined && inputs.monthlyContribution !== null && String(inputs.monthlyContribution).trim() !== ''
+    ? parseFloat(inputs.monthlyContribution)
+    : 0;
+  if (isNaN(rawMonthly) || rawMonthly < 0) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Die monatliche Sparrate darf nicht negativ sein.',
+    };
+  }
+  const initialMonthly = rawMonthly;
+
+  if (initial === 0 && initialMonthly === 0) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein Startkapital oder eine monatliche Sparrate größer als 0 € ein.',
+    };
+  }
+
+  if (inputs.annualRate === undefined || inputs.annualRate === null || String(inputs.annualRate).trim() === '') {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den jährlichen Zinssatz an (0 % für zinsfreies Sparen).',
+    };
+  }
+  const rawRate = parseFloat(inputs.annualRate);
+  if (isNaN(rawRate) || rawRate < 0) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Der Zinssatz darf nicht negativ sein.',
+    };
+  }
+  const rateAnnual = rawRate / 100;
+
+  if (inputs.years === undefined || inputs.years === null || String(inputs.years).trim() === '') {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Anlagedauer in Jahren ein.',
+    };
+  }
+  const rawYears = parseFloat(inputs.years);
+  if (isNaN(rawYears) || rawYears < 1 || !Number.isInteger(rawYears)) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Die Laufzeit muss mindestens 1 volles Jahr betragen.',
+    };
+  }
+  const years = rawYears;
+
   const compoundFreq = Math.max(1, parseInt(inputs.compoundFrequency || '12', 10)); // 1, 2, 4, 12
   const depositTiming = inputs.depositTiming || 'end'; // 'end' = nachschüssig, 'start' = vorschüssig
   const dynamicRatePercent = parseFloat(inputs.dynamicIncrease || '0') / 100; // jährliche Sparratendynamik
   const inflationRatePercent = parseFloat(inputs.inflationRate || '0') / 100; // optionale Inflationsbereinigung
-
-  if (years <= 0) {
-    return {
-      primary: { id: 'endAmount', label: 'Endkapital', value: initial, formattedValue: formatCurrency(initial) },
-      error: 'Die Laufzeit muss mindestens 1 Jahr betragen.',
-    };
-  }
 
   let balance = initial;
   let totalDeposits = initial;

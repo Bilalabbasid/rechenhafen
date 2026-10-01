@@ -744,52 +744,113 @@ export function calculateAbfindung(inputs: Record<string, any>): CalculationResu
 // ==========================================
 // 13. RENTEN-BRUTTO-NETTO-RECHNER
 // ==========================================
+export function getPensionTaxableRate(retirementYear: number): number {
+  if (retirementYear <= 2005) return 0.50;
+  if (retirementYear <= 2020) return 0.50 + (retirementYear - 2005) * 0.02;
+  if (retirementYear === 2021) return 0.81;
+  if (retirementYear === 2022) return 0.82;
+  // Ab 2023: Wachstumschancengesetz +0,5 % pro Jahr
+  return Math.min(1.0, 0.825 + (retirementYear - 2023) * 0.005);
+}
+
 export function calculateRenteBruttoNetto(inputs: Record<string, any>): CalculationResult {
-  const grossPension = Math.max(0, Number(inputs.grossPension) || 1800);
+  if (inputs.grossPension === undefined || inputs.grossPension === null || String(inputs.grossPension).trim() === '') {
+    return {
+      primary: { id: 'netPension', label: 'Monatliche Netto-Rente', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihre monatliche Brutto-Altersrente ein.',
+    };
+  }
+  const grossPension = parseFloat(inputs.grossPension);
+  if (isNaN(grossPension) || grossPension < 0) {
+    return {
+      primary: { id: 'netPension', label: 'Monatliche Netto-Rente', value: 0, formattedValue: '-' },
+      error: 'Die Brutto-Altersrente darf nicht negativ sein.',
+    };
+  }
+
   const retirementYear = Math.max(2005, Math.min(2040, parseInt(inputs.retirementYear || '2026', 10)));
   const config = getTaxConfig('2026');
 
-  // Gesetzlicher Besteuerungsanteil nach Kohortenprinzip (§ 22 EStG)
-  // Bis 2005: 50 %, dann bis 2020 je +2 %/Jahr (80 %), danach nach Wachstumschancengesetz je +0,5 %/Jahr
-  let taxableRate = 0.50;
-  if (retirementYear <= 2005) taxableRate = 0.50;
-  else if (retirementYear <= 2020) taxableRate = 0.50 + (retirementYear - 2005) * 0.02;
-  else taxableRate = 0.80 + (retirementYear - 2020) * 0.005;
-  taxableRate = Math.min(1.0, taxableRate);
+  // Gesetzlicher Besteuerungsanteil nach amtlicher Kohortentabelle (§ 22 Nr. 1 Satz 3 Buchst. a Doppelbuchst. aa EStG)
+  const taxableRate = getPensionTaxableRate(retirementYear);
+
+  // Kassenindividueller Zusatzbeitrag der GKV (§ 242 SGB V, Halbtagung nach § 249a SGB V)
+  const rawZusatz = inputs.additionalHealthRate !== undefined && inputs.additionalHealthRate !== null && String(inputs.additionalHealthRate).trim() !== ''
+    ? parseFloat(inputs.additionalHealthRate)
+    : 2.5;
+  const zusatz = isNaN(rawZusatz) || rawZusatz < 0 ? 2.5 : rawZusatz;
+  // Allgemeiner Beitragssatz 14,6 % (7,3 % Rentneranteil) + halber Zusatzbeitrag
+  const kvdrRate = 0.073 + (zusatz / 100) / 2;
+
+  // Pflegeversicherungsbeitrag der Rentner (PVdR, § 55 SGB XI - allein vom Rentner zu tragen)
+  let pvdrRate = 0.034;
+  const careOption = inputs.careInsuranceOption || (inputs.children === '0' || inputs.children === 0 ? 'childless' : '1_child');
+  if (careOption === 'childless') {
+    // 3,40 % Grundbeitrag + 0,60 % Kinderlosenzuschlag ab 23 Jahren (§ 55 Abs. 3 SGB XI)
+    pvdrRate = 0.040;
+  } else if (careOption === '1_child' || careOption === 'childless_exempt') {
+    pvdrRate = 0.034;
+  } else if (careOption === '2_children') {
+    pvdrRate = 0.0315; // -0,25 % Abschlag (§ 55 Abs. 3a SGB XI)
+  } else if (careOption === '3_children') {
+    pvdrRate = 0.0290; // -0,50 % Abschlag
+  } else if (careOption === '4_children') {
+    pvdrRate = 0.0265; // -0,75 % Abschlag
+  } else if (careOption === '5_plus_children') {
+    pvdrRate = 0.0240; // -1,00 % Abschlag (maximaler Abschlag)
+  }
+
+  // Sonderfall 0 € Rente: ergibt exakt 0 €
+  if (grossPension === 0) {
+    return {
+      primary: { id: 'netPension', label: 'Monatliche Netto-Rente (nach Steuern)', value: 0, formattedValue: '0,00 €', highlight: true },
+      secondary: [
+        { id: 'payoutAfterSocial', label: 'Rentenauszahlung (vor Steuern)', value: 0, formattedValue: '0,00 €' },
+        { id: 'kvdr', label: 'Krankenversicherung der Rentner (KVdR)', value: 0, formattedValue: '0,00 €' },
+        { id: 'pvdr', label: 'Pflegeversicherung (PVdR)', value: 0, formattedValue: '0,00 €' },
+        { id: 'est', label: 'Voraussichtliche Einkommensteuer', value: 0, formattedValue: '0,00 €' },
+        { id: 'taxablePortion', label: 'Besteuerungsanteil nach Renteneintritt', value: taxableRate * 100, formattedValue: formatPercent(taxableRate * 100, 1) },
+      ],
+      summaryText: `Bei einer Brutto-Altersrente von 0,00 € fallen weder Kranken- und Pflegeversicherungsbeiträge noch Einkommensteuer an.`,
+    };
+  }
 
   const annualGross = grossPension * 12;
   const taxableAnnualPension = annualGross * taxableRate;
 
-  // KVdR (7,3 % + 1,25 % Zusatzbeitrag) und PVdR (3,6 % + ggf. 0,6 % Kinderlos)
-  const kvdrRate = 0.073 + config.zusatzbeitragKrankenversicherungDurchschnitt / 2;
-  const isKinderlos = inputs.children === '0' || inputs.children === 0;
-  const pvdrRate = config.beitragssatzPflegeversicherung + (isKinderlos ? config.pflegeZuschlagKinderlos : 0);
+  // 1. Sozialabgabenabzug (direkter Einbehalt durch die Deutsche Rentenversicherung)
+  const monthlyKvdr = Math.round(grossPension * kvdrRate * 100) / 100;
+  const monthlyPvdr = Math.round(grossPension * pvdrRate * 100) / 100;
+  const monthlySocialDeductions = monthlyKvdr + monthlyPvdr;
+  const payoutAfterSocial = Math.round(Math.max(0, grossPension - monthlySocialDeductions) * 100) / 100;
 
-  const monthlyKvdr = grossPension * kvdrRate;
-  const monthlyPvdr = grossPension * pvdrRate;
-  const monthlyHealthDeductions = monthlyKvdr + monthlyPvdr;
-
-  // Einkommensteuer auf steuerpflichtigen Rentenanteil (nach Abzug von Vorsorgeaufwendungen)
-  const taxableBase = Math.max(0, taxableAnnualPension - (monthlyHealthDeductions * 12) - 102); // 102 € Werbungskostenpauschbetrag
+  // 2. Einkommensteuer auf steuerpflichtigen Rentenanteil (nach Abzug von Vorsorgeaufwendungen § 10 EStG und Werbungskostenpauschbetrag 102 € nach § 9a EStG)
+  const taxableBase = Math.max(0, taxableAnnualPension - (monthlySocialDeductions * 12) - 102);
   const annualESt = computeEStSingle(taxableBase, config);
-  const monthlyESt = annualESt / 12;
+  const monthlyESt = Math.round((annualESt / 12) * 100) / 100;
 
-  const monthlyNetPension = Math.max(0, grossPension - monthlyHealthDeductions - monthlyESt);
+  // 3. Verbleibendes Netto nach Steuern
+  const monthlyNetPension = Math.round(Math.max(0, payoutAfterSocial - monthlyESt) * 100) / 100;
+
+  const summaryText = `Bei einer Brutto-Altersrente von ${formatCurrency(grossPension)} und Renteneintritt im Jahr ${retirementYear} (gesetzlicher Besteuerungsanteil: ${formatPercent(taxableRate * 100, 1)}) überweist die Rentenversicherung nach Abzug der Kranken- (${formatCurrency(monthlyKvdr)}) und Pflegeversicherung (${formatCurrency(monthlyPvdr)}) monatlich ${formatCurrency(payoutAfterSocial)} auf Ihr Konto. Unter Berücksichtigung der geschätzten Einkommensteuer (ca. ${formatCurrency(monthlyESt)}/Monat, nicht im Rentenabzug einbehalten) verbleibt ein kalkulatorisches Netto von ${formatCurrency(monthlyNetPension)}.`;
 
   return {
     primary: {
       id: 'netPension',
-      label: 'Monatliche Netto-Rente',
+      label: 'Monatliche Netto-Rente (nach Steuern)',
       value: monthlyNetPension,
       formattedValue: formatCurrency(monthlyNetPension),
+      highlight: true,
+      helpText: 'Kalkulatorisches Netto nach geschätzter jährlicher Einkommensteuer (wird nicht direkt von der Rente einbehalten).',
     },
     secondary: [
-      { id: 'grossPension', label: 'Brutto-Rente', value: grossPension, formattedValue: formatCurrency(grossPension) },
-      { id: 'kvdr', label: 'Krankenversicherung der Rentner (KVdR)', value: monthlyKvdr, formattedValue: formatCurrency(monthlyKvdr) },
-      { id: 'pvdr', label: 'Pflegeversicherung (PVdR)', value: monthlyPvdr, formattedValue: formatCurrency(monthlyPvdr) },
-      { id: 'est', label: 'Einkommensteuer (monatlich geschätzt)', value: monthlyESt, formattedValue: formatCurrency(monthlyESt) },
-      { id: 'taxablePortion', label: 'Besteuerungsanteil nach Renteneintritt', value: taxableRate * 100, formattedValue: formatPercent(taxableRate * 100) },
+      { id: 'payoutAfterSocial', label: 'Rentenauszahlungsbetrag (Kontoüberweisung vor Steuern)', value: payoutAfterSocial, formattedValue: formatCurrency(payoutAfterSocial) },
+      { id: 'kvdr', label: `KVdR (${formatPercent(kvdrRate * 100, 2)}, inkl. halbem Zusatzbeitrag)`, value: monthlyKvdr, formattedValue: formatCurrency(monthlyKvdr) },
+      { id: 'pvdr', label: `PVdR (${formatPercent(pvdrRate * 100, 2)} nach § 55 SGB XI)`, value: monthlyPvdr, formattedValue: formatCurrency(monthlyPvdr) },
+      { id: 'est', label: 'Voraussichtliche Einkommensteuer (monatlich geschätzt)', value: monthlyESt, formattedValue: formatCurrency(monthlyESt) },
+      { id: 'taxablePortion', label: 'Gesetzlicher Besteuerungsanteil (§ 22 EStG)', value: taxableRate * 100, formattedValue: formatPercent(taxableRate * 100, 1) },
     ],
+    summaryText,
   };
 }
 

@@ -16,6 +16,7 @@ import {
   calculateTageBisWeihnachten,
 } from '@/lib/calculators/datumZeit';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
+import { getBerlinTodayString } from '@/lib/calculators/dateMath';
 
 const FEDERAL_STATE_OPTIONS = [
   { value: 'bundesweit', label: 'Bundesweit (nur 9 einheitliche Feiertage)' },
@@ -94,11 +95,11 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     searchKeywords: ['alter in tagen', 'wie viele tage lebe ich', 'lebenstage rechner', 'alter in stunden'],
     inputs: [
       { id: 'birthDate', label: 'Geburtsdatum', type: 'date', defaultValue: '1995-05-15' },
-      { id: 'targetDate', label: 'Stichtag', type: 'date', defaultValue: '2026-01-01' },
+      { id: 'targetDate', label: 'Stichtag', type: 'date', defaultValue: getBerlinTodayString(), helpText: 'Referenzdatum (Zeitzone Europe/Berlin; standardmäßig heute)' },
     ],
     calculate: calculateAgeInDays,
-    formula: 'Tage = (Stichtag - Geburtsdatum) / 86.400 Sekunden',
-    formulaExplanation: 'Die Zeitdifferenz zwischen beiden Zeitpunkten wird in Millisekunden ermittelt und durch die Anzahl der Millisekunden eines Tages (86.400.000 ms) geteilt.',
+    formula: 'Tage = Stichtag - Geburtsdatum (kalendertägliche Differenz)',
+    formulaExplanation: 'Exakte kalendarische Zählung der Kalendertage zwischen Geburtsdatum und Stichtag unter Berücksichtigung aller Schaltjahre. Stunden und Minuten werden als rechnerische Tagesäquivalente (24 Stunden bzw. 1.440 Minuten je vollem Kalendertag) ausgewiesen.',
     workedExample: {
       title: 'Beispiel: Geburt am 15.05.1995 bis 01.01.2026',
       description: 'Zeitspanne von über 30 Jahren.',

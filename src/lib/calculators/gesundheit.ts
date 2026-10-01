@@ -70,19 +70,52 @@ export function calculateBMI(inputs: Record<string, any>): CalculationResult {
 
 export function calculateCalorieNeeds(inputs: Record<string, any>): CalculationResult {
   const gender = inputs.gender || 'male'; // 'male' or 'female'
-  const weight = parseFloat(inputs.weight) || 75;
-  const heightCm = parseFloat(inputs.height) || 178;
-  const age = parseInt(inputs.age || '30', 10);
+
+  if (inputs.weight === undefined || inputs.weight === null || String(inputs.weight).trim() === '') {
+    return {
+      primary: { id: 'targetCal', label: 'Kalorienbedarf', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihr Körpergewicht in kg ein.',
+    };
+  }
+  const weight = parseFloat(inputs.weight);
+  if (isNaN(weight) || weight <= 0) {
+    return {
+      primary: { id: 'targetCal', label: 'Kalorienbedarf', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Körpergewicht größer als 0 kg an.',
+    };
+  }
+
+  if (inputs.height === undefined || inputs.height === null || String(inputs.height).trim() === '') {
+    return {
+      primary: { id: 'targetCal', label: 'Kalorienbedarf', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihre Körpergröße in cm ein.',
+    };
+  }
+  const heightCm = parseFloat(inputs.height);
+  if (isNaN(heightCm) || heightCm <= 0) {
+    return {
+      primary: { id: 'targetCal', label: 'Kalorienbedarf', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Körpergröße größer als 0 cm an.',
+    };
+  }
+
+  if (inputs.age === undefined || inputs.age === null || String(inputs.age).trim() === '') {
+    return {
+      primary: { id: 'targetCal', label: 'Kalorienbedarf', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihr Alter in Jahren ein.',
+    };
+  }
+  const age = parseFloat(inputs.age);
+  if (isNaN(age) || age <= 0 || !Number.isInteger(age)) {
+    return {
+      primary: { id: 'targetCal', label: 'Kalorienbedarf', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Alter in vollen Jahren an.',
+    };
+  }
+
   const pal = parseFloat(inputs.activityLevel) || 1.4; // PAL
   const formula = inputs.formula || 'mifflin'; // 'mifflin' vs 'harris_benedict'
   const goal = inputs.goal || 'maintain'; // 'maintain', 'lose', 'gain'
-
-  if (weight <= 0 || heightCm <= 0 || age <= 0) {
-    return {
-      primary: { id: 'tdee', label: 'Kalorienbedarf', value: 0, formattedValue: '0 kcal' },
-      error: 'Bitte vollständige und positive Angaben machen.',
-    };
-  }
 
   let bmr = 0;
   let formulaName = 'Mifflin-St Jeor Formel';

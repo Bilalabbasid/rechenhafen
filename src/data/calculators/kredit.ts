@@ -109,10 +109,61 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       { id: 'termMonths', label: 'Finanzierungslaufzeit', type: 'number', defaultValue: 48, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.carPrice) || 25000;
-      const down = parseFloat(inputs.downPayment) || 5000;
-      const loan = Math.max(0, price - down);
-      const res = calculateInstallmentLoan({ loanAmount: loan, annualInterest: inputs.annualInterest, termMonths: inputs.termMonths });
+      if (inputs.carPrice === undefined || inputs.carPrice === null || inputs.carPrice === '') {
+        return {
+          primary: { id: 'carRate', label: 'Monatliche Autorate', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den Fahrzeugkaufpreis ein.',
+        };
+      }
+      const price = parseFloat(inputs.carPrice);
+      if (isNaN(price) || price <= 0) {
+        return {
+          primary: { id: 'carRate', label: 'Monatliche Autorate', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen gültigen Fahrzeugkaufpreis über 0 € ein.',
+        };
+      }
+
+      const rawDown = inputs.downPayment !== undefined && inputs.downPayment !== null && inputs.downPayment !== ''
+        ? parseFloat(inputs.downPayment)
+        : 0;
+      if (isNaN(rawDown) || rawDown < 0) {
+        return {
+          primary: { id: 'carRate', label: 'Monatliche Autorate', value: 0, formattedValue: '-' },
+          error: 'Die Anzahlung darf nicht negativ sein.',
+        };
+      }
+
+      if (rawDown > price) {
+        return {
+          primary: { id: 'carRate', label: 'Monatliche Autorate', value: 0, formattedValue: '-' },
+          error: 'Die Anzahlung darf den Fahrzeugkaufpreis nicht übersteigen.',
+        };
+      }
+
+      if (rawDown === price) {
+        return {
+          primary: { id: 'carRate', label: 'Monatliche Autorate', value: 0, formattedValue: '0,00 €', highlight: true },
+          secondary: [
+            { id: 'loanNeeded', label: 'Nettodarlehen (nach Anzahlung)', value: 0, formattedValue: '0,00 €' },
+            { id: 'totalInterest', label: 'Gesamtzinskosten', value: 0, formattedValue: '0,00 €' },
+            { id: 'totalPayment', label: 'Gesamtbetrag Rückzahlung', value: 0, formattedValue: '0,00 €' },
+          ],
+          summaryText: 'Keine Finanzierung erforderlich. Der Fahrzeugkaufpreis ist durch Ihre Anzahlung vollständig gedeckt.',
+        };
+      }
+
+      const loan = price - rawDown;
+      const res = calculateInstallmentLoan({
+        loanAmount: loan,
+        annualInterest: inputs.annualInterest,
+        termMonths: inputs.termMonths,
+        isEffectiveRate: true,
+      });
+
+      if (res.error) {
+        return res;
+      }
+
       return {
         ...res,
         primary: { id: 'carRate', label: 'Monatliche Autorate', value: res.primary.value, formattedValue: res.primary.formattedValue, highlight: true },
@@ -120,16 +171,16 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
           { id: 'loanNeeded', label: 'Nettodarlehen (nach Anzahlung)', value: loan, formattedValue: formatCurrency(loan) },
           ...(res.secondary || []),
         ],
-        summaryText: `Für Ihr Fahrzeug (${formatCurrency(price)}) nach Abzug von ${formatCurrency(down)} Anzahlung beträgt die monatliche Rate ${res.primary.formattedValue}.`,
+        summaryText: `Für Ihr Fahrzeug (${formatCurrency(price)}) nach Abzug von ${formatCurrency(rawDown)} Anzahlung beträgt das Nettodarlehen ${formatCurrency(loan)}. Bei ${inputs.termMonths} Monaten Laufzeit und ${inputs.annualInterest}% effektivem Jahreszins beträgt die monatliche Rate ${res.primary.formattedValue} (Gesamtbetrag: ${res.secondary?.find(s => s.id === 'totalPayment')?.formattedValue ?? ''}). Hinweis: Dies ist eine vereinfachte Orientierungsrechnung auf Basis des Effektivzinssatzes ohne individuelle Bonitätszuschläge oder Bankgebühren.`,
       };
     },
-    formula: 'Nettodarlehen = Kaufpreis - Anzahlung',
-    formulaExplanation: 'Ratenkreditberechnung auf den tatsächlich zu finanzierenden Differenzbetrag.',
+    formula: 'Monatsrate = Nettodarlehen × r / (1 - (1 + r)^(-Laufzeit)) mit r = (1 + Effektiver Jahreszins)^(1/12) - 1',
+    formulaExplanation: 'Ratenkreditberechnung auf den tatsächlich zu finanzierenden Differenzbetrag (Kaufpreis minus Anzahlung). Der monatliche Zinsfaktor r wird finanzmathematisch aus dem effektiven Jahreszins abgeleitet. Bei 0 % Zinsen entspricht die Rate exakt dem Nettodarlehen geteilt durch die Monate. Vereinfachtes Modell ohne individuelle Bearbeitungs- oder Nebengebühren.',
     workedExample: {
       title: 'Beispiel: 25.000 € Auto mit 5.000 € Anzahlung über 48 Monate bei 5,2 %',
-      description: 'Fahrzeugkaufpreis 25.000 € abzüglich 5.000 € Anzahlung (oder Inzahlungnahme des Altwagens) ergibt ein Nettodarlehen von 20.000 €. Bei einem effektiven Jahreszins von 5,2 % und 48 Monaten Laufzeit beträgt die feste Monatsrate ca. 462,34 €.',
+      description: 'Fahrzeugkaufpreis 25.000 € abzüglich 5.000 € Anzahlung ergibt ein Nettodarlehen von 20.000 €. Bei einem effektiven Jahreszins von 5,2 % (Monatszins r ≈ 0,4236 %) und 48 Monaten Laufzeit beträgt die feste Monatsrate ca. 461,31 € (Gesamtzinsen: ca. 2.142,70 €; Gesamtrückzahlung: ca. 22.142,70 €).',
       inputs: { carPrice: 25000, downPayment: 5000, annualInterest: 5.2, termMonths: 48 },
-      resultSummary: '462,34 € monatlich',
+      resultSummary: '461,31 € monatlich',
     },
     content: {
       intro: 'Ein zweckgebundener Autokredit (Fahrzeugfinanzierung als klassischer Ratenkredit) ermöglicht es Ihnen, einen Neu- oder Gebrauchtwagen planbar und in gleichbleibenden Monatsraten ohne unkalkulierbare Restschuld abzubezahlen.',

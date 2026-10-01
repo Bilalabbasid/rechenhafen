@@ -60,14 +60,55 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '62.435,00 € (über 25.000 € Zinsgewinn)',
     },
     content: {
-      intro: 'Der Zinseszinseffekt beschreibt das exponentielle Vermögenswachstum, wenn erwirtschaftete Zinsen oder Dividenden wiederangelegt werden und in den Folgejahren selbst Erträge abwerfen.',
-      details: 'Die finanzmathematische Zinseszinsformel lautet Kn = K0 · (1 + p/100)^n. Über lange Zeithorizonte von 20 oder 30 Jahren übersteigt der kumulierte Zinsertrag bei soliden Marktrenditen häufig die Summe aller selbst eingezahlten Sparbeiträge.',
+      intro: 'Der Zinseszinseffekt beschreibt das exponentielle Vermögenswachstum, wenn erwirtschaftete Zinsen oder Erträge reinvestiert werden und in den Folgeperioden selbst Zinsen abwerfen.',
+      details: 'In der Bundesrepublik Deutschland existiert kein gesetzlich vorgeschriebener Einheitszinssatz oder einheitlicher Zinsturnus für Spar- und Anlageprodukte. Je nach Finanzprodukt und Kreditinstitut unterscheiden sich Zinsgutschriftintervalle (monatlich, quartalsweise oder jährlich) sowie Zinsberechnungskonventionen (z. B. deutsche Zinsmethode 30/360 oder act/360). Nach der Preisangabenverordnung (PAngV) müssen Banken den effektiven Jahreszins transparent ausweisen. Beachten Sie, dass die Ergebnisse dieses Rechners Vorsteuer-Werte darstellen: Zinserträge unterliegen grundsätzlich der Kapitalertragsteuer (25 % Abgeltungsteuer zzgl. Solidaritätszuschlag und ggf. Kirchensteuer nach § 32d EStG), soweit sie den Sparer-Pauschbetrag (§ 20 Abs. 9 EStG: 1.000 € für Alleinstehende / 2.000 € für Verheiratete) übersteigen.',
     },
     faqs: [
       { question: 'Was ist die 72er-Regel für den Zinseszins?', answer: 'Teilt man 72 durch den jährlichen Zinssatz, erhält man näherungsweise die Jahre bis zur Verdopplung des Kapitals (z. B. bei 6 % p.a.: 72 / 6 = 12 Jahre).' },
-      { question: 'Wie wirkt sich die Häufigkeit der Zinsgutschrift aus?', answer: 'Je häufiger Zinsen gutgeschrieben werden (monatlich oder quartalsweise statt jährlich), desto schneller entfaltet der Zinseszins seine Wirkung (effektiver Jahreszins steigt leicht).' },
+      { question: 'Wie wirkt sich die Häufigkeit der Zinsgutschrift aus?', answer: 'Je häufiger Zinsen gutgeschrieben werden (monatlich oder vierteljährlich statt jährlich), desto schneller entfaltet der Zinseszins seine Wirkung, da unterjährige Zinsen bereits in den Folgemonaten mitverzinst werden (effektiver Jahreszins steigt).' },
+      { question: 'Werden Steuern auf die erwirtschafteten Zinsen automatisch abgezogen?', answer: 'In diesem Rechner werden Brutto-Ergebnisse vor Steuern dargestellt. In der Praxis führt die depotführende Bank in Deutschland bei Überschreiten des Freistellungsauftrags 25 % Abgeltungsteuer plus 5,5 % Soli (zusammen 26,375 %) automatisch an das Finanzamt ab.' },
     ],
     relatedSlugs: ['sparrechner', 'sparzielrechner', 'etf-sparplan-rechner', 'renditerechner', 'inflationsrechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'Finanzmathematische Standards & Preisangabenverordnung (PAngV)',
+      sourceUrl: 'https://www.gesetze-im-internet.de/pangv_2022/',
+      lastVerified: '2026-10-01',
+    },
+    trustMeta: {
+      methodology: 'Diskrete Zinseszinsberechnung mit exponentiellem Zins- und Ratensparmodell.',
+      assumptions: [
+        'Konstanter Nominalzinssatz über die gesamte gewählte Laufzeit',
+        'Regelmäßige Einzahlung gemäß gewähltem Modus (vorschüssig oder nachschüssig)',
+        'Berechnung vor Steuern und ohne individuelle Transaktions- oder Depotentgelte',
+      ],
+      limitations: [
+        'Tatsächliche Marktzinsen, Fondskosten oder Kursgewinnschwankungen können variieren.',
+        'Zinserträge unterliegen bei Überschreiten des Sparer-Pauschbetrags der Kapitalertragsteuer (§ 32d EStG).',
+      ],
+      sourceName: 'Gesetze im Internet / Deutsche Bundesbank',
+      sourceUrl: 'https://www.gesetze-im-internet.de/pangv_2022/',
+      lastReviewed: '2026-10-01',
+    },
+    legalFootnotes: [
+      {
+        index: 1,
+        citation: '§ 6 Preisangabenverordnung (PAngV)',
+        text: 'Gesetzliche Transparenzvorschriften für die Angabe von Zinssätzen, unterjährigen Zinseszinsperioden und effektiven Jahreszinsen bei Finanzgeschäften.',
+        url: 'https://www.gesetze-im-internet.de/pangv_2022/__6.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+      {
+        index: 2,
+        citation: '§ 20 Abs. 9 i. V. m. § 32d EStG',
+        text: 'Besteuerung von Zinserträgen über dem Sparer-Pauschbetrag (1.000 € / 2.000 €) mit pauschaler Abgeltungsteuer (25 % zzgl. Soli und ggf. Kirchensteuer).',
+        url: 'https://www.gesetze-im-internet.de/estg/__20.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '01.10.2026',
+      },
+    ],
   },
   {
     id: 'etf-sparplan-rechner',

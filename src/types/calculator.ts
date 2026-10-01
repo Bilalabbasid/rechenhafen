@@ -67,6 +67,15 @@ export interface WorkedExample {
 
 export type CalculationFunction = (inputs: Record<string, any>) => CalculationResult;
 
+export interface LegalFootnote {
+  index?: number;
+  citation: string;
+  text: string;
+  url?: string;
+  effectiveDate: string;
+  reviewedDate: string;
+}
+
 export interface TrustMetadata {
   methodology?: string;
   assumptions?: string[];
@@ -116,6 +125,7 @@ export interface CalculatorDefinition {
     lastVerified: string;
   };
   trustMeta?: TrustMetadata;
+  legalFootnotes?: LegalFootnote[];
 }
 
 export interface CategoryDefinition {

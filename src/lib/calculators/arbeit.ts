@@ -37,14 +37,51 @@ export function calculateHourlyWage(inputs: Record<string, any>): CalculationRes
 }
 
 export function calculatePartTimeSalary(inputs: Record<string, any>): CalculationResult {
-  const fullTimeSalary = parseFloat(inputs.fullTimeSalary) || 4000;
-  const fullTimeHours = parseFloat(inputs.fullTimeHours) || 40;
-  const partTimeHours = parseFloat(inputs.partTimeHours) || 28;
-
-  if (fullTimeSalary <= 0 || fullTimeHours <= 0 || partTimeHours <= 0) {
+  if (inputs.fullTimeSalary === undefined || inputs.fullTimeSalary === null || String(inputs.fullTimeSalary).trim() === '') {
     return {
-      primary: { id: 'partTimeSalary', label: 'Teilzeitgehalt', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte gültige Werte angeben.',
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie das bisherige Vollzeit-Gehalt ein.',
+    };
+  }
+  const fullTimeSalary = parseFloat(inputs.fullTimeSalary);
+  if (isNaN(fullTimeSalary) || fullTimeSalary <= 0) {
+    return {
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Vollzeit-Gehalt größer als 0 € ein.',
+    };
+  }
+
+  if (inputs.fullTimeHours === undefined || inputs.fullTimeHours === null || String(inputs.fullTimeHours).trim() === '') {
+    return {
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die bisherigen Vollzeit-Wochenstunden ein.',
+    };
+  }
+  const fullTimeHours = parseFloat(inputs.fullTimeHours);
+  if (isNaN(fullTimeHours) || fullTimeHours <= 0) {
+    return {
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Wochenstundenzahl größer als 0 an.',
+    };
+  }
+
+  if (inputs.partTimeHours === undefined || inputs.partTimeHours === null || String(inputs.partTimeHours).trim() === '') {
+    return {
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die gewünschten Teilzeit-Wochenstunden ein.',
+    };
+  }
+  const partTimeHours = parseFloat(inputs.partTimeHours);
+  if (isNaN(partTimeHours) || partTimeHours < 0) {
+    return {
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: 'Die Teilzeit-Wochenstunden dürfen nicht negativ sein.',
+    };
+  }
+  if (partTimeHours > fullTimeHours) {
+    return {
+      primary: { id: 'partTimeSalary', label: 'Teilzeit-Gehalt (brutto)', value: 0, formattedValue: '-' },
+      error: `Die gewünschten Wochenstunden (${partTimeHours} Std.) übersteigen die Vollzeit-Basis (${fullTimeHours} Std.). Eine Aufstockung über Vollzeit ist keine Teilzeit im Sinne von § 2 TzBfG. Bitte passen Sie die Vollzeit-Referenzstunden an oder reduzieren Sie die Zielarbeitszeit.`,
     };
   }
 
