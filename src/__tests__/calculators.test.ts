@@ -15,6 +15,11 @@ import { calculateLengthConversion, calculateTemperatureConversion } from '@/lib
 import { calculatePortions, calculateBakingPan, calculateGramsToMl } from '@/lib/calculators/kochen';
 import { calculateMargin, calculateVat, calculateBreakEven } from '@/lib/calculators/business';
 import { calculateGradeAverage, calculateOhmsLaw } from '@/lib/calculators/statistik';
+import { calculateRentalYield } from '@/lib/calculators/wohnen';
+import { calculateRenteBruttoNetto } from '@/lib/calculators/steuernGehalt';
+import { EXTRA_WOHNEN_HAUSHALT } from '@/data/calculators/extra/wohnenHaushalt';
+import { EXTRA_FINANZEN_KREDIT } from '@/data/calculators/extra/finanzenKredit';
+import { EXTRA_AUTO_ARBEIT } from '@/data/calculators/extra/autoArbeit';
 
 describe('RechenHafen Calculation Engines', () => {
   describe('Datum & Zeit', () => {
@@ -215,6 +220,76 @@ describe('RechenHafen Calculation Engines', () => {
     it('calculates Ohms law voltage from current and resistance', () => {
       const res = calculateOhmsLaw({ current: 2, resistance: 50, target: 'voltage' });
       expect(res.primary.value).toBe(100);
+    });
+  });
+
+  describe('Statutory & Hidden-Default Regression Checks', () => {
+    it('handles leap day birthdates and rejects invalid dates in calculateAge', () => {
+      const leapAge = calculateAge({ birthDate: '2000-02-29', targetDate: '2026-02-28' });
+      expect(leapAge.primary.value).toBe(25);
+      const invalidAge = calculateAge({ birthDate: '2023-02-29', targetDate: '2026-01-01' });
+      expect(invalidAge.error).toBeDefined();
+    });
+
+    it('calculates rental yield preserving zero ancillary costs', () => {
+      const res = calculateRentalYield({
+        purchasePrice: 250000,
+        purchaseFees: 0,
+        monthlyRentCold: 850,
+        annualNonRecoverableCosts: 0,
+      });
+      expect(res.primary.value).toBe(4.08);
+      const totalInv = res.secondary?.find((s) => s.id === 'totalInvestment');
+      expect(totalInv?.value).toBe(250000);
+    });
+
+    it('preserves valid zero in Mietminderung and Staffelmiete', () => {
+      const mietminderung = EXTRA_WOHNEN_HAUSHALT.find((c) => c.slug === 'mietminderung-rechner');
+      const mmRes = mietminderung?.calculate({ warmRent: 950, reductionPercent: 0, days: 10 });
+      expect(mmRes?.primary.value).toBe(0);
+
+      const staffelmiete = EXTRA_WOHNEN_HAUSHALT.find((c) => c.slug === 'staffelmiete-rechner');
+      const smRes = staffelmiete?.calculate({ startRent: 800, increaseAmount: 0, intervalMonths: 12, totalYears: 5 });
+      expect(smRes?.primary.value).toBe(800);
+      expect(smRes?.breakdown?.rows).toHaveLength(5);
+    });
+
+    it('preserves 0% in Festgeld and Depotgebühren', () => {
+      const festgeld = EXTRA_FINANZEN_KREDIT.find((c) => c.slug === 'festgeld-rechner');
+      const fgRes = festgeld?.calculate({ depositAmount: 10000, interestRate: 0, termMonths: 12 });
+      expect(fgRes?.primary.value).toBe(0);
+
+      const depot = EXTRA_FINANZEN_KREDIT.find((c) => c.slug === 'depotgebuehren-rechner');
+      const dpRes = depot?.calculate({ portfolioValue: 40000, custodyFee: 0, ter: 0, tradesPerYear: 0, orderVolume: 0 });
+      expect(dpRes?.primary.value).toBe(0);
+    });
+
+    it('calculates 2026 pension deductions accurately', () => {
+      const res = calculateRenteBruttoNetto({
+        grossPension: 1800,
+        careInsuranceOption: 'childless',
+        additionalHealthRate: 2.9,
+        retirementYear: '2026',
+      });
+      const kv = res.secondary?.find((s) => s.id === 'kvdr');
+      const pv = res.secondary?.find((s) => s.id === 'pvdr');
+      const payout = res.secondary?.find((s) => s.id === 'payoutAfterSocial');
+      expect(kv?.value).toBe(157.50);
+      expect(pv?.value).toBe(75.60);
+      expect(payout?.value).toBe(1566.90);
+    });
+
+    it('calculates Bürgergeld § 11b SGB II allowances', () => {
+      const buergergeld = EXTRA_AUTO_ARBEIT.find((c) => c.slug === 'buergergeld-anspruch-rechner');
+      const bgRes = buergergeld?.calculate({
+        householdType: 'single',
+        coldRent: 400,
+        heatingCosts: 100,
+        grossEarnedIncome: 1200,
+        netEarnedIncome: 950,
+      });
+      const allowance = bgRes?.secondary?.find((s) => s.id === 'earningsAllowance');
+      expect(allowance?.value).toBe(348);
     });
   });
 });

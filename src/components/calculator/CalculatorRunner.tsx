@@ -62,6 +62,20 @@ export default function CalculatorRunner({
 
   // Reference to loaded engine function
   const engineRef = useRef<((inp: Record<string, any>) => CalculationResult) | null>(null);
+  const trackTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debounceTrackCompleted = () => {
+    if (trackTimerRef.current) clearTimeout(trackTimerRef.current);
+    trackTimerRef.current = setTimeout(() => {
+      trackCalculationCompleted(slug, category || 'allgemein');
+    }, 400);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (trackTimerRef.current) clearTimeout(trackTimerRef.current);
+    };
+  }, []);
 
   // Track privacy-safe calculator view event
   useEffect(() => {
@@ -221,7 +235,7 @@ export default function CalculatorRunner({
         if (nextResult.error) {
           trackValidationError(slug, 'calculation_error');
         } else {
-          trackCalculationCompleted(slug, category || 'allgemein');
+          debounceTrackCompleted();
         }
       } catch {
         trackValidationError(slug, 'calculation_exception');
