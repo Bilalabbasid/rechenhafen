@@ -775,29 +775,33 @@ export function calculateRenteBruttoNetto(inputs: Record<string, any>): Calculat
   const taxableRate = getPensionTaxableRate(retirementYear);
 
   // Kassenindividueller Zusatzbeitrag der GKV (§ 242 SGB V, Halbtagung nach § 249a SGB V)
+  // Gesetzlich amtlicher durchschnittlicher Zusatzbeitrag 2026: 2,9 % (Schätzerkreis/BMG)
   const rawZusatz = inputs.additionalHealthRate !== undefined && inputs.additionalHealthRate !== null && String(inputs.additionalHealthRate).trim() !== ''
     ? parseFloat(inputs.additionalHealthRate)
-    : 2.5;
-  const zusatz = isNaN(rawZusatz) || rawZusatz < 0 ? 2.5 : rawZusatz;
-  // Allgemeiner Beitragssatz 14,6 % (7,3 % Rentneranteil) + halber Zusatzbeitrag
+    : 2.9;
+  const zusatz = isNaN(rawZusatz) || rawZusatz < 0 ? 2.9 : rawZusatz;
+  // Allgemeiner Beitragssatz 14,6 % (7,3 % Rentneranteil nach § 249a SGB V) + halber Zusatzbeitrag
   const kvdrRate = 0.073 + (zusatz / 100) / 2;
 
   // Pflegeversicherungsbeitrag der Rentner (PVdR, § 55 SGB XI - allein vom Rentner zu tragen)
-  let pvdrRate = 0.034;
+  // Gültige Sätze 2026: Regulär 3,60 %, Kinderlose ab 23 Jahren 4,20 % (inkl. 0,60 % Beitragszuschlag)
+  // Gestaffelte Kinderabschläge für das 2. bis 5. Kind unter 25 Jahren (je -0,25 %)
+  let pvdrRate = 0.036;
   const careOption = inputs.careInsuranceOption || (inputs.children === '0' || inputs.children === 0 ? 'childless' : '1_child');
   if (careOption === 'childless') {
-    // 3,40 % Grundbeitrag + 0,60 % Kinderlosenzuschlag ab 23 Jahren (§ 55 Abs. 3 SGB XI)
-    pvdrRate = 0.040;
+    // 3,60 % Grundbeitrag + 0,60 % Kinderlosenzuschlag ab 23 Jahren (§ 55 Abs. 3 SGB XI) -> 4,20 %
+    pvdrRate = 0.042;
   } else if (careOption === '1_child' || careOption === 'childless_exempt') {
-    pvdrRate = 0.034;
+    // 1 Kind (lebenslange Elterneigenschaft) oder vor 1940 geboren / unter 23 -> 3,60 %
+    pvdrRate = 0.036;
   } else if (careOption === '2_children') {
-    pvdrRate = 0.0315; // -0,25 % Abschlag (§ 55 Abs. 3a SGB XI)
+    pvdrRate = 0.0335; // 3,60 % - 0,25 % Abschlag (§ 55 Abs. 3a SGB XI)
   } else if (careOption === '3_children') {
-    pvdrRate = 0.0290; // -0,50 % Abschlag
+    pvdrRate = 0.0310; // 3,60 % - 0,50 % Abschlag
   } else if (careOption === '4_children') {
-    pvdrRate = 0.0265; // -0,75 % Abschlag
+    pvdrRate = 0.0285; // 3,60 % - 0,75 % Abschlag
   } else if (careOption === '5_plus_children') {
-    pvdrRate = 0.0240; // -1,00 % Abschlag (maximaler Abschlag)
+    pvdrRate = 0.0260; // 3,60 % - 1,00 % Abschlag (maximaler Abschlag)
   }
 
   // Sonderfall 0 € Rente: ergibt exakt 0 €
@@ -832,7 +836,8 @@ export function calculateRenteBruttoNetto(inputs: Record<string, any>): Calculat
   // 3. Verbleibendes Netto nach Steuern
   const monthlyNetPension = Math.round(Math.max(0, payoutAfterSocial - monthlyESt) * 100) / 100;
 
-  const summaryText = `Bei einer Brutto-Altersrente von ${formatCurrency(grossPension)} und Renteneintritt im Jahr ${retirementYear} (gesetzlicher Besteuerungsanteil: ${formatPercent(taxableRate * 100, 1)}) überweist die Rentenversicherung nach Abzug der Kranken- (${formatCurrency(monthlyKvdr)}) und Pflegeversicherung (${formatCurrency(monthlyPvdr)}) monatlich ${formatCurrency(payoutAfterSocial)} auf Ihr Konto. Unter Berücksichtigung der geschätzten Einkommensteuer (ca. ${formatCurrency(monthlyESt)}/Monat, nicht im Rentenabzug einbehalten) verbleibt ein kalkulatorisches Netto von ${formatCurrency(monthlyNetPension)}.`;
+  const isEarlierCohort = retirementYear < 2026;
+  const summaryText = `Bei einer Brutto-Altersrente von ${formatCurrency(grossPension)} und Renteneintritt im Jahr ${retirementYear} (gesetzlicher Besteuerungsanteil: ${formatPercent(taxableRate * 100, 1)}${isEarlierCohort ? ' [Näherung]' : ''}) überweist die Rentenversicherung nach Abzug der Kranken- (${formatCurrency(monthlyKvdr)}) und Pflegeversicherung (${formatCurrency(monthlyPvdr)}) monatlich ${formatCurrency(payoutAfterSocial)} (Rentenauszahlung vor Einkommensteuer) auf Ihr Konto. Unter Berücksichtigung der geschätzten Einkommensteuer (ca. ${formatCurrency(monthlyESt)}/Monat, nicht im Rentenabzug einbehalten) verbleibt ein kalkulatorisches Netto von ${formatCurrency(monthlyNetPension)}.`;
 
   return {
     primary: {
@@ -844,11 +849,11 @@ export function calculateRenteBruttoNetto(inputs: Record<string, any>): Calculat
       helpText: 'Kalkulatorisches Netto nach geschätzter jährlicher Einkommensteuer (wird nicht direkt von der Rente einbehalten).',
     },
     secondary: [
-      { id: 'payoutAfterSocial', label: 'Rentenauszahlungsbetrag (Kontoüberweisung vor Steuern)', value: payoutAfterSocial, formattedValue: formatCurrency(payoutAfterSocial) },
+      { id: 'payoutAfterSocial', label: 'Rentenauszahlung vor Einkommensteuer', value: payoutAfterSocial, formattedValue: formatCurrency(payoutAfterSocial) },
       { id: 'kvdr', label: `KVdR (${formatPercent(kvdrRate * 100, 2)}, inkl. halbem Zusatzbeitrag)`, value: monthlyKvdr, formattedValue: formatCurrency(monthlyKvdr) },
       { id: 'pvdr', label: `PVdR (${formatPercent(pvdrRate * 100, 2)} nach § 55 SGB XI)`, value: monthlyPvdr, formattedValue: formatCurrency(monthlyPvdr) },
       { id: 'est', label: 'Voraussichtliche Einkommensteuer (monatlich geschätzt)', value: monthlyESt, formattedValue: formatCurrency(monthlyESt) },
-      { id: 'taxablePortion', label: 'Gesetzlicher Besteuerungsanteil (§ 22 EStG)', value: taxableRate * 100, formattedValue: formatPercent(taxableRate * 100, 1) },
+      { id: 'taxablePortion', label: isEarlierCohort ? 'Gesetzlicher Besteuerungsanteil (Näherung für frühere Kohorte)' : 'Gesetzlicher Besteuerungsanteil (§ 22 EStG Kohorte 2026)', value: taxableRate * 100, formattedValue: formatPercent(taxableRate * 100, 1) },
     ],
     summaryText,
   };

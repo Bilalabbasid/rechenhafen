@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360" role="img" aria-labelledby="barHeaterTitle barHeaterDesc">
+  <title id="barHeaterTitle">Balkendiagramm: Monatskosten eines 2.000-Watt-Heizlüfters bei 1, 2 und 4 Stunden täglicher Nutzung</title>
+  <desc id="barHeaterDesc">Vergleich der monatlichen Stromkosten für 30 Tage bei 2.000 Watt Dauerbetrieb und 35 Cent pro Kilowattstunde: 1 Stunde täglich kostet 21 Euro, 2 Stunden kosten 42 Euro und 4 Stunden kosten 84 Euro. Die Balkenlängen sind proportional zu den Werten.</desc>
+  <defs>
+    <style>
+      .canvas { fill: #ffffff; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 16px; }
+      .text-body { fill: #475569; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .label-head { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 600; font-size: 14px; }
+      .label-detail { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; }
+      .val-text { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 18px; }
+      .bar-1 { fill: #38bdf8; rx: 6; }
+      .bar-2 { fill: #0284c7; rx: 6; }
+      .bar-3 { fill: #0369a1; rx: 6; }
+      .grid-line { stroke: #e2e8f0; stroke-width: 1; stroke-dasharray: 4,4; }
+    </style>
+  </defs>
+
+  <rect width="800" height="360" class="canvas" />
+
+  <!-- Outer Card Frame -->
+  <rect x="20" y="20" width="760" height="320" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2" />
+
+  <!-- Header & Assumptions -->
+  <g transform="translate(45, 50)">
+    <text class="text-title" font-size="18">Monatliche Stromkosten (30 Tage) bei verschiedenen täglichen Laufzeiten</text>
+    <text class="text-body" y="22">Modellannahmen: 2.000 Watt durchgehender Heizbetrieb • 30 Tage • Strompreis: 0,35 €/kWh (35 ct)</text>
+  </g>
+
+  <!-- Axis Grid Lines (Scale: 0 €, 20 €, 40 €, 60 €, 80 €, 100 €) -->
+  <!-- Bar Start X = 250. Max value 100 € = 520 px (5.2 px per Euro) -->
+  <g transform="translate(250, 95)">
+    <line x1="0" y1="0" x2="0" y2="185" stroke="#cbd5e1" stroke-width="2" />
+    <text x="0" y="205" text-anchor="middle" class="label-detail">0 €</text>
+
+    <line x1="110" y1="0" x2="110" y2="185" class="grid-line" />
+    <text x="110" y="205" text-anchor="middle" class="label-detail">21 €</text>
+
+    <line x1="220" y1="0" x2="220" y2="185" class="grid-line" />
+    <text x="220" y="205" text-anchor="middle" class="label-detail">42 €</text>
+
+    <line x1="440" y1="0" x2="440" y2="185" class="grid-line" />
+    <text x="440" y="205" text-anchor="middle" class="label-detail">84 €</text>
+  </g>
+
+  <!-- BAR 1: 1 Stunde / Tag (60 kWh in 30 Tagen = 21,00 €) -->
+  <!-- Length: 110 px -->
+  <g transform="translate(45, 110)">
+    <text x="0" y="16" class="label-head">1 Stunde / Tag</text>
+    <text x="0" y="32" class="label-detail">60 kWh in 30 Tagen</text>
+
+    <rect x="205" y="0" width="110" height="38" class="bar-1" />
+    <text x="325" y="25" class="val-text">21,00 €</text>
+  </g>
+
+  <!-- BAR 2: 2 Stunden / Tag (120 kWh in 30 Tagen = 42,00 €) -->
+  <!-- Length: 220 px (exakt 2 × Bar 1) -->
+  <g transform="translate(45, 170)">
+    <text x="0" y="16" class="label-head">2 Stunden / Tag</text>
+    <text x="0" y="32" class="label-detail">120 kWh in 30 Tagen</text>
+
+    <rect x="205" y="0" width="220" height="38" class="bar-2" />
+    <text x="435" y="25" class="val-text">42,00 €</text>
+  </g>
+
+  <!-- BAR 3: 4 Stunden / Tag (240 kWh in 30 Tagen = 84,00 €) -->
+  <!-- Length: 440 px (exakt 4 × Bar 1) -->
+  <g transform="translate(45, 230)">
+    <text x="0" y="16" class="label-head">4 Stunden / Tag</text>
+    <text x="0" y="32" class="label-detail">240 kWh in 30 Tagen</text>
+
+    <rect x="205" y="0" width="440" height="38" class="bar-3" />
+    <text x="655" y="25" class="val-text" fill="#0369a1">84,00 €</text>
+  </g>
+</svg>

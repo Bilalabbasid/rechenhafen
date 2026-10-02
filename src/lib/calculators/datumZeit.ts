@@ -17,52 +17,75 @@ import {
 export { calculateTagerechner, calculateTageBisWeihnachten };
 
 export function calculateAge(inputs: Record<string, any>): CalculationResult {
-  const birthDateStr = inputs.birthDate || '1990-01-01';
-  const targetDateStr = inputs.targetDate || new Date().toISOString().split('T')[0];
-
-  const birth = new Date(birthDateStr);
-  const target = new Date(targetDateStr);
-
-  if (isNaN(birth.getTime()) || isNaN(target.getTime())) {
+  if (inputs.birthDate === undefined || inputs.birthDate === null || String(inputs.birthDate).trim() === '') {
     return {
-      primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: 'Ungültiges Datum' },
-      error: 'Bitte geben Sie gültige Kalenderdaten ein.',
+      primary: { id: 'years', label: 'Exaktes Alter', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihr Geburtsdatum ein.',
     };
   }
 
-  if (target < birth) {
+  const birthParts = parseDateParts(inputs.birthDate);
+  if (!birthParts) {
     return {
-      primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '0 Jahre' },
+      primary: { id: 'years', label: 'Exaktes Alter', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Geburtsdatum ein (z. B. TT.MM.JJJJ oder JJJJ-MM-TT). Ungültige oder unmögliche Kalendertage (wie der 29. Februar in Nicht-Schaltjahren) werden nicht akzeptiert.',
+    };
+  }
+
+  const targetParts = inputs.targetDate && String(inputs.targetDate).trim() !== ''
+    ? parseDateParts(inputs.targetDate)
+    : getBerlinTodayParts();
+
+  if (!targetParts) {
+    return {
+      primary: { id: 'years', label: 'Exaktes Alter', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie ein gültiges Vergleichsdatum (Stichtag) ein.',
+    };
+  }
+
+  const birthDayNum = dateToDayNumber(birthParts.year, birthParts.month, birthParts.day);
+  const targetDayNum = dateToDayNumber(targetParts.year, targetParts.month, targetParts.day);
+
+  if (targetDayNum < birthDayNum) {
+    return {
+      primary: { id: 'years', label: 'Exaktes Alter', value: 0, formattedValue: '-' },
       error: 'Das Vergleichsdatum darf nicht vor dem Geburtsdatum liegen.',
     };
   }
 
-  let years = target.getFullYear() - birth.getFullYear();
-  let months = target.getMonth() - birth.getMonth();
-  let days = target.getDate() - birth.getDate();
-
-  if (days < 0) {
-    months--;
-    const prevMonthDays = new Date(target.getFullYear(), target.getMonth(), 0).getDate();
-    days += prevMonthDays;
-  }
-  if (months < 0) {
-    years--;
-    months += 12;
+  const diff = calculateCalendarDiff(birthParts, targetParts, false);
+  if (!diff) {
+    return {
+      primary: { id: 'years', label: 'Exaktes Alter', value: 0, formattedValue: '-' },
+      error: 'Fehler bei der Berechnung der kalendarischen Altersdifferenz.',
+    };
   }
 
-  const diffMs = target.getTime() - birth.getTime();
-  const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const totalWeeks = Math.floor(totalDays / 7);
+  const years = diff.years;
+  const months = diff.months;
+  const days = diff.days;
+  const totalDays = diff.totalDays;
+  const totalWeeks = diff.totalWeeks;
   const totalMonths = years * 12 + months;
   const totalHours = totalDays * 24;
 
-  // Next birthday calculation
-  const nextBday = new Date(target.getFullYear(), birth.getMonth(), birth.getDate());
-  if (nextBday < target) {
-    nextBday.setFullYear(target.getFullYear() + 1);
+  // Next birthday calculation with leap year safety (29. Februar)
+  let nextBdayYear = targetParts.year;
+  let nextBdayDay = birthParts.day;
+  const nextBdayMonth = birthParts.month;
+  if (birthParts.month === 2 && birthParts.day === 29 && !isLeapYear(nextBdayYear)) {
+    nextBdayDay = 28;
   }
-  const daysUntilNext = Math.ceil((nextBday.getTime() - target.getTime()) / (1000 * 60 * 60 * 24));
+  let nextBdayDayNum = dateToDayNumber(nextBdayYear, nextBdayMonth, nextBdayDay);
+  if (nextBdayDayNum < targetDayNum) {
+    nextBdayYear += 1;
+    let bDay = birthParts.day;
+    if (birthParts.month === 2 && birthParts.day === 29 && !isLeapYear(nextBdayYear)) {
+      bDay = 28;
+    }
+    nextBdayDayNum = dateToDayNumber(nextBdayYear, nextBdayMonth, bDay);
+  }
+  const daysUntilNext = nextBdayDayNum - targetDayNum;
 
   return {
     primary: {

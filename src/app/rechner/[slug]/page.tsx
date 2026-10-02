@@ -226,6 +226,7 @@ export default async function CalculatorPage({ params }: PageProps) {
         initialResult={initialResult}
         isTimeSensitive={calc.isTimeSensitive}
         timeSensitiveMeta={calc.timeSensitiveMeta}
+        shortDescription={calc.shortDescription}
       />
 
       {/* Progressiver Tarif- & Zonen-Visualisierer für Einkommensteuer & Grenzsteuersatz */}

@@ -3,6 +3,116 @@ import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
 export function calculateElectricityCost(inputs: Record<string, any>): CalculationResult {
+  // Haushalt-Stromkostenrechner Modus (wenn annualKwh oder basePricePerMonth vorhanden oder kein watts übergeben)
+  if (inputs.annualKwh !== undefined || inputs.basePricePerMonth !== undefined || inputs.watts === undefined) {
+    if (inputs.annualKwh === undefined || inputs.annualKwh === null || String(inputs.annualKwh).trim() === '') {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie Ihren jährlichen Stromverbrauch in kWh ein.',
+      };
+    }
+    const annualKwh = parseFloat(inputs.annualKwh);
+    if (isNaN(annualKwh) || annualKwh < 0) {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Der Stromverbrauch in kWh darf nicht negativ sein.',
+      };
+    }
+
+    if (inputs.pricePerKwh === undefined || inputs.pricePerKwh === null || String(inputs.pricePerKwh).trim() === '') {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie den Arbeitspreis pro kWh ein.',
+      };
+    }
+    const pricePerKwh = parseFloat(inputs.pricePerKwh);
+    if (isNaN(pricePerKwh) || pricePerKwh < 0) {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Der Arbeitspreis darf nicht negativ sein.',
+      };
+    }
+
+    const basePricePerMonth = inputs.basePricePerMonth !== undefined && inputs.basePricePerMonth !== null && String(inputs.basePricePerMonth).trim() !== ''
+      ? parseFloat(inputs.basePricePerMonth)
+      : 12.0;
+    if (isNaN(basePricePerMonth) || basePricePerMonth < 0) {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Stromkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Der monatliche Grundpreis darf nicht negativ sein.',
+      };
+    }
+
+    const workCost = annualKwh * pricePerKwh;
+    const annualBaseCost = basePricePerMonth * 12;
+    const totalAnnualCost = workCost + annualBaseCost;
+    const monthlyAverage = totalAnnualCost / 12;
+    const dailyCost = totalAnnualCost / 365;
+
+    return {
+      primary: {
+        id: 'totalCost',
+        label: 'Gesamte Stromkosten pro Jahr',
+        value: totalAnnualCost,
+        formattedValue: formatCurrency(totalAnnualCost),
+        highlight: true,
+      },
+      secondary: [
+        {
+          id: 'monthlyAverage',
+          label: 'Rechnerischer Monatsdurchschnitt (Orientierung für den Abschlag)',
+          value: monthlyAverage,
+          formattedValue: formatCurrency(monthlyAverage),
+          highlight: true,
+          helpText: 'Reine rechnerische Orientierung (Jahreskosten ÷ 12). Der tatsächliche Abschlag Ihres Stromversorgers kann stichtags- oder anbieterbedingt abweichen.',
+        },
+        {
+          id: 'workCost',
+          label: 'Reine Verbrauchskosten (Arbeitspreis)',
+          value: workCost,
+          formattedValue: formatCurrency(workCost),
+        },
+        {
+          id: 'baseCost',
+          label: 'Fester Grundpreis pro Jahr',
+          value: annualBaseCost,
+          formattedValue: `${formatCurrency(annualBaseCost)} (${formatCurrency(basePricePerMonth)}/Monat)`,
+        },
+        {
+          id: 'dailyCost',
+          label: 'Durchschnittliche Stromkosten pro Tag',
+          value: dailyCost,
+          formattedValue: formatCurrency(dailyCost),
+        },
+        {
+          id: 'annualKwh',
+          label: 'Jahresverbrauch',
+          value: annualKwh,
+          formattedValue: `${formatNumber(annualKwh, 0)} kWh`,
+        },
+      ],
+      summaryText: `Bei einem Jahresverbrauch von ${formatNumber(annualKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 2)}/kWh betragen die jährlichen Gesamtstromkosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis ${formatCurrency(totalAnnualCost)}. Das entspricht einem monatlichen Durchschnitt von ${formatCurrency(monthlyAverage)}.`,
+      directAnswer: `Bei einem Jahresverbrauch von ${formatNumber(annualKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 2)}/kWh betragen deine jährlichen Gesamtstromkosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis ${formatCurrency(totalAnnualCost)} (durchschnittlich ${formatCurrency(monthlyAverage)} pro Monat).`,
+      qualifications: [
+        'Gesamtkosten inklusive des eingegebenen Grundpreises.',
+        'Rechnerischer Monatsdurchschnitt (Jahreskosten ÷ 12); der tatsächliche Abschlag des Stromanbieters kann abweichen (z. B. 11 statt 12 Abschläge oder Rundungen).',
+      ],
+      calculationSteps: [
+        `Verbrauchskosten = ${formatNumber(annualKwh, 0)} kWh × ${formatCurrency(pricePerKwh, 2)}/kWh = ${formatCurrency(workCost)}`,
+        `Grundpreis = ${formatCurrency(basePricePerMonth)}/Monat × 12 Monate = ${formatCurrency(annualBaseCost)}`,
+        `Gesamtkosten = ${formatCurrency(workCost)} + ${formatCurrency(annualBaseCost)} = ${formatCurrency(totalAnnualCost)}`,
+        `Monatlicher Richtwert = ${formatCurrency(totalAnnualCost)} ÷ 12 Monate = ${formatCurrency(monthlyAverage)}`,
+      ],
+      basisSummary: [
+        { label: 'Jahresverbrauch', value: `${formatNumber(annualKwh, 0)} kWh` },
+        { label: 'Arbeitspreis', value: `${formatCurrency(pricePerKwh, 2)}/kWh` },
+        { label: 'Grundpreis', value: `${formatCurrency(basePricePerMonth)}/Monat (${formatCurrency(annualBaseCost)}/Jahr)` },
+        { label: 'Betrachtungszeitraum', value: '1 Jahr (365 Tage)' },
+      ],
+    };
+  }
+
+  // Geräte-Modus (Rückwärtskompatibilität für Geräte-Berechnungen mit watts)
   if (inputs.watts === undefined || inputs.watts === null || String(inputs.watts).trim() === '') {
     return {
       primary: { id: 'annualCost', label: 'Stromkosten pro Jahr', value: 0, formattedValue: '-' },
@@ -219,10 +329,11 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
   const secondary: ResultItem[] = [
     {
       id: 'monthlyPayment',
-      label: 'Durchschnittliche monatliche Kosten (Abschlag)',
+      label: 'Rechnerischer Monatsdurchschnitt (Orientierung für den Abschlag)',
       value: monthlyAdvancePayment,
       formattedValue: formatCurrency(monthlyAdvancePayment),
       highlight: true,
+      helpText: 'Reine rechnerische Orientierung (Jahreskosten ÷ 12). Der tatsächliche vertragliche monatliche Abschlag Ihres Gasversorgers kann je nach Abrechnungsrhythmus (z. B. 11 statt 12 Abschläge) oder saisonaler Gewichtung abweichen.',
     },
     {
       id: 'dailyCost',
@@ -307,7 +418,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
   return {
     primary: {
       id: 'totalAnnualCost',
-      label: 'Gesamte Gaskosten pro Jahr',
+      label: 'Gesamte jährliche Gaskosten (inkl. Grundpreis)',
       value: totalAnnualCost,
       formattedValue: formatCurrency(totalAnnualCost),
       highlight: true,
@@ -321,6 +432,28 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       rows: breakdownRows,
     },
     summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem jährlichen Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich jährliche Gesamtkosten von ${formatCurrency(totalAnnualCost)} (monatlicher Abschlag: ${formatCurrency(monthlyAdvancePayment)}, ca. ${formatCurrency(dailyCost)} pro Tag). Hinweis: Es handelt sich um eine Modellrechnung; Abrechnungsdetails Ihres Versorgers können abweichen.`,
+    directAnswer: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh betragen deine jährlichen Gesamtkosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis ${formatCurrency(totalAnnualCost)} (durchschnittlich ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
+    qualifications: [
+      'Gesamtkosten inklusive des eingegebenen monatlichen Grundpreises.',
+      'Rechnerischer Monatsdurchschnitt (Jahreskosten ÷ 12); dein tatsächlicher monatlicher Versorgerabschlag kann abweichen (z. B. 11 statt 12 Abschläge).',
+      inputType === 'm3' ? `Umrechnung nach DVGW G 685: Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = Faktor ${formatNumber(conversionFactor, 3)} kWh/m³.` : 'Berechnet direkt aus thermischer Energie in Kilowattstunden (kWh).',
+    ],
+    calculationSteps: [
+      inputType === 'm3'
+        ? `Thermische Energie = ${formatNumber(amount, 0)} m³ × ${formatNumber(calorificValue, 2)} kWh/m³ × ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh`
+        : `Energieverbrauch = ${formatNumber(totalKwh, 0)} kWh`,
+      `Reine Verbrauchskosten = ${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwh, 3)}/kWh = ${formatCurrency(workCost)}`,
+      `Fester Jahresgrundpreis = ${formatCurrency(basePricePerMonth)}/Monat × 12 Monate = ${formatCurrency(annualBaseCost)}`,
+      `Gesamte Jahreskosten = ${formatCurrency(workCost)} + ${formatCurrency(annualBaseCost)} = ${formatCurrency(totalAnnualCost)}`,
+      `Rechnerischer Monatsdurchschnitt = ${formatCurrency(totalAnnualCost)} ÷ 12 = ${formatCurrency(monthlyAdvancePayment)}`,
+    ],
+    basisSummary: [
+      { label: 'Eingabewert', value: inputType === 'm3' ? `${formatNumber(amount, 0)} m³` : `${formatNumber(totalKwh, 0)} kWh` },
+      { label: 'Berechnete Energie', value: `${formatNumber(totalKwh, 0)} kWh` },
+      { label: 'Arbeitspreis', value: `${formatCurrency(pricePerKwh, 3)}/kWh` },
+      { label: 'Grundpreis', value: `${formatCurrency(basePricePerMonth)}/Monat (${formatCurrency(annualBaseCost)}/Jahr)` },
+      { label: 'Zeitraum', value: '1 Jahr (365 Tage)' },
+    ],
   };
 }
 

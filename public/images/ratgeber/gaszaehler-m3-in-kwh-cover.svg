@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="coverGasTitle coverGasDesc">
+  <title id="coverGasTitle">Illustration: Gaszähler und Gasabrechnung</title>
+  <desc id="coverGasDesc">Ein Balgengaszähler mit Ziffernanzeige in Kubikmetern neben einer vereinfachten Gasrechnung mit Umrechnung in Kilowattstunden.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 2; rx: 16; }
+      .primary { fill: #0284c7; }
+      .primary-dark { fill: #0369a1; }
+      .primary-light { fill: #e0f2fe; }
+      .text-dark { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .text-muted { fill: #475569; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      .counter-box { fill: #0f172a; stroke: #334155; stroke-width: 2; }
+      .digit { fill: #ffffff; font-family: "Courier New", monospace; font-weight: bold; font-size: 28px; }
+      .digit-red { fill: #ef4444; font-family: "Courier New", monospace; font-weight: bold; font-size: 28px; }
+      .pipe { fill: #94a3b8; stroke: #64748b; stroke-width: 3; }
+      .bill-bg { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .accent-line { stroke: #0284c7; stroke-width: 3; stroke-linecap: round; }
+      .badge-bg { fill: #e0f2fe; rx: 8; }
+      .badge-text { fill: #0369a1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 14px; }
+    </style>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="800" height="450" class="bg" />
+
+  <!-- Left: Gas Meter Device -->
+  <g transform="translate(60, 40)">
+    <!-- Pipes at the top -->
+    <path d="M 120,40 L 120,0 L 160,0 L 160,40" class="pipe" />
+    <path d="M 240,40 L 240,0 L 280,0 L 280,40" class="pipe" />
+    <rect x="100" y="32" width="80" height="16" rx="4" fill="#64748b" />
+    <rect x="220" y="32" width="80" height="16" rx="4" fill="#64748b" />
+
+    <!-- Gas Meter Body -->
+    <rect x="40" y="45" width="320" height="320" rx="28" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="3" />
+    <rect x="55" y="60" width="290" height="290" rx="20" fill="#f1f5f9" />
+
+    <!-- Brand / Manufacturer Plate -->
+    <rect x="90" y="80" width="220" height="30" rx="6" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    <text x="200" y="101" text-anchor="middle" class="text-dark" font-weight="700" font-size="14" letter-spacing="1">BALGEN-GASZÄHLER G4</text>
+
+    <!-- Window for Display -->
+    <rect x="75" y="125" width="250" height="110" rx="12" fill="#ffffff" stroke="#94a3b8" stroke-width="2" />
+
+    <!-- Mechanical Roll Counter -->
+    <g transform="translate(95, 145)">
+      <!-- 5 Integer Digits (Black on White/Black background) -->
+      <rect x="0" y="0" width="36" height="48" rx="4" class="counter-box" />
+      <text x="18" y="34" text-anchor="middle" class="digit">0</text>
+
+      <rect x="40" y="0" width="36" height="48" rx="4" class="counter-box" />
+      <text x="58" y="34" text-anchor="middle" class="digit">8</text>
+
+      <rect x="80" y="0" width="36" height="48" rx="4" class="counter-box" />
+      <text x="98" y="34" text-anchor="middle" class="digit">4</text>
+
+      <rect x="120" y="0" width="36" height="48" rx="4" class="counter-box" />
+      <text x="138" y="34" text-anchor="middle" class="digit">5</text>
+
+      <rect x="160" y="0" width="36" height="48" rx="4" class="counter-box" />
+      <text x="178" y="34" text-anchor="middle" class="digit">0</text>
+
+      <!-- Comma separator -->
+      <circle cx="202" cy="40" r="3" fill="#0f172a" />
+
+      <!-- Fractional Red Digit -->
+      <rect x="210" y="0" width="36" height="48" rx="4" fill="#fee2e2" stroke="#ef4444" stroke-width="2" />
+      <text x="228" y="34" text-anchor="middle" class="digit-red">0</text>
+    </g>
+
+    <!-- Meter Unit Label -->
+    <text x="200" y="222" text-anchor="middle" class="text-dark" font-weight="800" font-size="16">Volumen: m³ (Kubikmeter)</text>
+
+    <!-- Technical Specs Stamp -->
+    <rect x="85" y="250" width="230" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" />
+    <text x="100" y="272" class="text-muted" font-size="12">Qmax: 6 m³/h | pmax: 0,1 bar</text>
+    <text x="100" y="292" class="text-muted" font-size="12">EN 1359 DVGW-geprüft</text>
+    <text x="100" y="310" class="primary-dark" font-weight="600" font-size="12">Aktueller Zählerstand: 8.450 m³</text>
+  </g>
+
+  <!-- Arrow between Meter and Bill -->
+  <g transform="translate(420, 210)">
+    <circle cx="25" cy="0" r="28" fill="#e0f2fe" />
+    <path d="M 12,-8 L 28,0 L 12,8" fill="none" stroke="#0284c7" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="25" y="44" text-anchor="middle" class="text-muted" font-weight="600" font-size="12">Umrechnung</text>
+  </g>
+
+  <!-- Right: Energy Bill Sheet -->
+  <g transform="translate(490, 50)">
+    <rect width="260" height="340" rx="14" class="bill-bg" />
+    
+    <!-- Bill Header -->
+    <rect x="20" y="22" width="40" height="40" rx="8" fill="#0284c7" />
+    <text x="40" y="48" text-anchor="middle" fill="#ffffff" font-weight="800" font-size="20">⚡</text>
+    
+    <text x="72" y="38" class="text-dark" font-weight="700" font-size="16">Gasabrechnung</text>
+    <text x="72" y="55" class="text-muted" font-size="12">Jahresrechnung Erdgas</text>
+    <line x1="20" y1="74" x2="240" y2="74" stroke="#e2e8f0" stroke-width="1.5" />
+
+    <!-- Zählerstände Zeilen -->
+    <text x="20" y="100" class="text-muted" font-size="13">Zählerstand neu:</text>
+    <text x="240" y="100" text-anchor="end" class="text-dark" font-weight="700" font-size="13">8.450 m³</text>
+
+    <text x="20" y="124" class="text-muted" font-size="13">Zählerstand alt:</text>
+    <text x="240" y="124" text-anchor="end" class="text-dark" font-weight="700" font-size="13">7.250 m³</text>
+
+    <line x1="20" y1="138" x2="240" y2="138" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3" />
+
+    <!-- Differenz -->
+    <text x="20" y="160" class="text-dark" font-weight="700" font-size="13">Verbrauch (m³):</text>
+    <text x="240" y="160" text-anchor="end" class="primary-dark" font-weight="800" font-size="14">1.200 m³</text>
+
+    <!-- Faktoren Box -->
+    <rect x="20" y="178" width="220" height="64" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
+    <text x="30" y="198" class="text-muted" font-size="12">× Brennwert (Hs):</text>
+    <text x="230" y="198" text-anchor="end" class="text-dark" font-weight="600" font-size="12">10,8 kWh/m³</text>
+    <text x="30" y="222" class="text-muted" font-size="12">× Zustandszahl (z):</text>
+    <text x="230" y="222" text-anchor="end" class="text-dark" font-weight="600" font-size="12">0,95</text>
+
+    <!-- Energie Ergebnis Card -->
+    <rect x="20" y="254" width="220" height="66" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5" />
+    <text x="130" y="276" text-anchor="middle" class="primary-dark" font-weight="700" font-size="12">ABGERECHNETE ENERGIE</text>
+    <text x="130" y="306" text-anchor="middle" class="primary-dark" font-weight="800" font-size="22">12.312 kWh</text>
+  </g>
+</svg>

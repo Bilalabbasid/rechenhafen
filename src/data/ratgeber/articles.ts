@@ -1651,6 +1651,347 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     ],
     relatedArticleSlugs: ['werktage-arbeitstage-unterschied', 'teilzeit-gehalt-berechnen'],
   },
+  {
+    slug: 'gaszaehler-m3-in-kwh-umrechnen',
+    title: 'Gas m³ in kWh umrechnen: Zählerstand richtig berechnen',
+    metaTitle: 'Gas m³ in kWh umrechnen: Zählerstand richtig berechnen',
+    metaDescription: 'Gasverbrauch aus zwei Zählerständen berechnen: mit Brennwert, Zustandszahl und einem Beispiel für kWh, Verbrauchskosten und Grundpreis.',
+    h1: 'Gas m³ in kWh umrechnen: So wird aus dem Zählerstand Ihr Verbrauch',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-02',
+    updatedAt: '2026-10-02',
+    readingTimeMin: 6,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Haushaltsfinanzen',
+    },
+    coverIllustration: {
+      src: '/images/ratgeber/gaszaehler-m3-in-kwh-cover.svg',
+      alt: 'Illustration eines Balgengaszählers in Kubikmetern neben einer Gasabrechnung mit Umrechnung in kWh',
+      caption: 'Am Gaszähler wird das physikalische Volumen in Kubikmetern (m³) gemessen – abgerechnet wird thermisch in Kilowattstunden (kWh).',
+      width: 800,
+      height: 450,
+    },
+    summary:
+      'Der Gaszähler zeigt Kubikmeter an, die Rechnung nennt Kilowattstunden. Für die Umrechnung brauchen Sie den verbrauchten Gasumfang, den Brennwert und die Zustandszahl. Wichtig ist der erste Schritt: Ein einzelner Zählerstand ist noch kein Verbrauch.',
+    keyTakeaways: [
+      'Ein einzelner Zählerstand ist kein Verbrauch: Sie müssen immer zwei Ablesungen voneinander abziehen (Differenzbildung).',
+      'Die amtliche Umrechnungsformel nach DVGW G 685 lautet: kWh = m³ × Brennwert (Hs) × Zustandszahl (z).',
+      'Der Brennwert beschreibt den Energiegehalt (typisch 9,5 bis 11,5 kWh/m³), die Zustandszahl korrigiert Druck und Höhenlage (ca. 0,90 bis 0,96).',
+      'Verbrauchskosten sind nicht die gesamte Rechnung: Zum Arbeitspreis (kWh × ct/kWh) kommt stets der feste monatliche Grundpreis hinzu.',
+    ],
+    primaryCalculator: {
+      slug: 'gasverbrauch-kwh-m3-rechner',
+      title: 'Gasverbrauch Rechner (m³ in kWh & Gaskosten)',
+      ctaText: 'Zählerstand in kWh umrechnen',
+      description: 'Wandeln Sie abgelesene Kubikmeter vom Gaszähler mit Brennwert und Zustandszahl Ihrer Rechnung präzise in Kilowattstunden um.',
+      badge: 'Primärer Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'gaskostenrechner',
+        title: 'Gaskostenrechner (Verbrauch & monatlicher Abschlag)',
+        ctaText: 'Gaskosten & Abschlag berechnen',
+        description: 'Ermittelt jährliche Gesamtkosten und monatliche Abschlagszahlungen aus Arbeitspreis und Grundpreis.',
+      },
+    ],
+    sections: [
+      {
+        id: 'differenz-bilden',
+        title: 'Erst die Differenz der Zählerstände bilden',
+        paragraphs: [
+          'Auf dem Gaszähler im Keller oder Hausanschlussraum wird das durchgeströmte Gasvolumen in Kubikmetern (m³) erfasst. Um zu wissen, wie viel Energie Sie verbraucht haben, benötigen Sie zwei Ablesungen desselben Zählers zu unterschiedlichen Zeitpunkten.',
+          'Nehmen wir zwei konkrete Ablesungen als Beispiel: Alter Zählerstand 7.250 m³, neuer Zählerstand 8.450 m³. Sie rechnen 8.450 − 7.250 = 1.200 m³. Diese 1.200 m³ gehören exakt zum Zeitraum zwischen diesen beiden Ablesungen. Liegen die Ablesungen beispielsweise drei Monate auseinander (etwa November bis Januar), spiegelt dies den Winterbedarf wider – es ist jedoch keinesfalls Ihr Jahresverbrauch.',
+          'Besonderheit bei einem Zählerwechsel: Wurde der Gaszähler im Abrechnungsjahr von Ihrem Netzbetreiber getauscht, müssen die Verbräuche des alten und des neuen Geräts getrennt ermittelt werden. Die Stände verschiedener Zähler einfach voneinander abzuziehen, ergibt keinen sinnvollen Verbrauch.',
+        ],
+        table: {
+          headers: ['Angabe laut Zähler', 'Beispielwert', 'Bedeutung für die Abrechnung'],
+          rows: [
+            ['Alter Zählerstand', '7.250 m³', 'Ablesung zu Beginn des Verbrauchszeitraums'],
+            ['Neuer Zählerstand', '8.450 m³', 'Aktuelle Ablesung am Ende des Zeitraums'],
+            ['Verbrauch im Zeitraum', '1.200 m³', 'Rechnerische Differenz (8.450 m³ − 7.250 m³)'],
+          ],
+        },
+      },
+      {
+        id: 'brennwert-zustandszahl',
+        title: 'Brennwert und Zustandszahl von der Rechnung übernehmen',
+        paragraphs: [
+          'Gas ist ein kompressibles Naturprodukt. Wie viel thermische Energie in einem Kubikmeter Gas enthalten ist, hängt von der chemischen Zusammensetzung des Gases, von der geografischen Höhenlage Ihres Wohnorts sowie vom lokalen Luftdruck und der Gastemperatur ab.',
+          'Der Brennwert (Hs) beschreibt den Energiegehalt des Gases. Seine Einheit ist kWh/m³. In Deutschland unterscheidet man vor allem zwischen L-Gas (niedriger Energiegehalt, ca. 9,5 bis 10,5 kWh/m³) und H-Gas (hoher Energiegehalt, ca. 11,0 bis 11,7 kWh/m³).',
+          'Die Zustandszahl (z) berücksichtigt unter anderem, dass das gemessene Gasvolumen von Druck und Temperatur abhängt. Sie setzt das Gasvolumen im Betriebszustand am heimischen Zähler ins Verhältnis zum Normzustand (0 °C und 1.013,25 mbar) und liegt meist zwischen 0,90 und 0,96.',
+          'Übernehmen Sie beide Angaben stets aus Ihrer letzten offiziellen Abrechnung. Beispielwerte aus einem Rechner können beim Überschlagen helfen, ersetzen aber nicht die Werte für Ihren konkreten Anschluss und Abrechnungszeitraum.',
+        ],
+        illustration: {
+          src: '/images/ratgeber/gaszaehler-m3-in-kwh-berechnung.svg',
+          alt: 'Infografik: Rechenweg von Zählerständen zu Kilowattstunden (kWh) in zwei Schritten',
+          caption: 'Schritt 1: Zählerdifferenz bilden (8.450 − 7.250 = 1.200 m³). Schritt 2: Thermische Umrechnung mit Brennwert und Zustandszahl (1.200 × 10,8 × 0,95 = 12.312 kWh).',
+          width: 800,
+          height: 360,
+        },
+      },
+      {
+        id: 'beispiel-umrechnung',
+        title: 'Beispiel: 1.200 m³ in kWh umrechnen',
+        paragraphs: [
+          'Für unsere Modellrechnung verwenden wir realistische Werte: Gasverbrauch 1.200 m³, Brennwert 10,8 kWh/m³ und Zustandszahl 0,95.',
+          'Daraus ergeben sich: 1.200 × 10,8 × 0,95 = 12.312 kWh.',
+          'Mit denselben Faktoren entsprechen 100 m³ genau 1.026 kWh. Das ist keine allgemeingültige Umrechnung für jeden Haushalt: Ändern sich Brennwert oder Zustandszahl, ändert sich auch das Ergebnis.',
+          'Im [Gasverbrauch-Rechner](/rechner/gasverbrauch-kwh-m3-rechner/) können Sie Ihre Verbrauchsmenge und die Faktoren Ihrer Rechnung einsetzen.',
+        ],
+        callout: {
+          type: 'info',
+          title: 'Faustformel für den schnellen Überschlag',
+          text: 'Für eine grobe Schätzung im Kopf multiplizieren viele Verbraucher die Kubikmeter mit dem Faktor 10 (1.200 m³ ≈ 12.000 kWh). Für die genaue Kostenkontrolle zählen jedoch stets die tatsächlichen Faktoren Ihrer Abrechnung.',
+        },
+      },
+      {
+        id: 'kosten-berechnen',
+        title: 'Aus kWh werden Euro – der Grundpreis kommt hinzu',
+        paragraphs: [
+          'Bei einem angenommenen Brutto-Arbeitspreis von 11 Cent pro kWh betragen die Verbrauchskosten: 12.312 × 0,11 € = 1.354,32 €.',
+          'Das sind noch nicht die vollständigen Jahreskosten. Wenn der betrachtete Zeitraum ein Jahr umfasst und der Grundpreis 12 € monatlich beträgt, kommen 144 € hinzu: 1.354,32 € + 144 € = 1.498,32 € pro Jahr.',
+          'Auf zwölf Monate verteilt sind das 124,86 €. Dieser Monatsdurchschnitt ist eine Orientierung, keine Zusage über den Abschlag Ihres Versorgers.',
+          'Verwenden Sie Preise auf derselben Grundlage. Sind die eingesetzten Preise bereits brutto, schlagen Sie die Mehrwertsteuer nicht nochmals auf. Separat berechnete Entgelte müssen gegebenenfalls zusätzlich berücksichtigt werden. Für diesen zweiten Schritt eignet sich der [Gaskostenrechner](/rechner/gaskostenrechner/).',
+        ],
+      },
+      {
+        id: 'fehler-und-abweichungen',
+        title: 'Drei Fehler, die das Ergebnis verfälschen',
+        paragraphs: [
+          'In der Praxis führen drei Fehler regelmäßig zu falschen Berechnungen:',
+          '1. Den gesamten Zählerstand eingeben: Benötigt wird immer die verbrauchte Menge zwischen zwei Ablesungen, nicht der seit Montage aufgelaufene Gesamtwert.',
+          '2. m³ pauschal mit zehn multiplizieren: Das ist nur ein Überschlag. Für die Rechnung zählen die tatsächlichen Umrechnungsfaktoren Ihres Netzbezirks.',
+          '3. Verbrauchskosten mit der vollständigen Rechnung verwechseln: Grundpreis, unterjährige Preisänderungen und weitere separat berechnete Posten wie Messstellenbetrieb können sonst fehlen.',
+          'Warum weicht meine Rechnung trotzdem ab? Prüfen Sie zunächst den Zeitraum, die Ablesewerte und die verwendeten Faktoren. Hat sich der Arbeitspreis geändert, kann eine Rechnung mehrere Preisabschnitte enthalten. Bereits gezahlte Abschläge verändern den offenen Endbetrag, nicht aber den tatsächlichen Energieverbrauch.',
+          'Notieren Sie für eine Rückfrage beim Versorger die konkreten Unterschiede: Welche Ablesung, welcher Faktor oder welcher Preis passt nicht? Damit lässt sich die Rechnung gezielter prüfen als mit einer pauschalen Verbrauchsschätzung.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: Gasabrechnung für ein Einfamilienhaus (1.200 m³ Zählerdifferenz)',
+      scenario: 'Zählerstand alt am 01. Januar: 7.250 m³, Zählerstand neu am 31. Dezember: 8.450 m³. Laut Abrechnung beträgt der Brennwert 10,8 kWh/m³, die Zustandszahl 0,95, der Arbeitspreis 11 ct/kWh und der monatliche Grundpreis 12,00 €.',
+      formula: 'Verbrauch in kWh = (Zählerstand neu − Zählerstand alt) × Brennwert × Zustandszahl',
+      steps: [
+        { label: 'Schritt 1: Zählerdifferenz bilden', calculation: '8.450 m³ − 7.250 m³ = 1.200 m³ Gasvolumen' },
+        { label: 'Schritt 2: In thermische Energie umrechnen', calculation: '1.200 m³ × 10,8 kWh/m³ × 0,95 = 12.312 kWh' },
+        { label: 'Schritt 3: Verbrauchskosten (Arbeitspreis)', calculation: '12.312 kWh × 0,11 €/kWh = 1.354,32 €' },
+        { label: 'Schritt 4: Grundpreis addieren (12 Monate)', calculation: '12 Monate × 12,00 €/Monat = 144,00 €' },
+        { label: 'Schritt 5: Gesamtjahreskosten ermitteln', calculation: '1.354,32 € + 144,00 € = 1.498,32 € (ca. 124,86 €/Monat)' },
+      ],
+      resultSummary: '12.312 kWh Energieverbrauch und 1.498,32 € jährliche Gesamtkosten',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Den Zählerstand am Stichtag direkt als Verbrauch eingeben.',
+        correction: 'Immer den alten Zählerstand vom neuen abziehen, um die tatsächlich verbrauchte Kubikmeter-Menge zu erhalten.',
+      },
+      {
+        mistake: 'Kubikmeter direkt mit dem kWh-Arbeitspreis multiplizieren.',
+        correction: 'Gas muss erst über Brennwert und Zustandszahl in kWh umgerechnet werden – sonst unterschätzen Sie die Kosten um den Faktor 10.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel kWh sind 100 m³ Gas?',
+        answer: 'Bei typischen Werten (Brennwert 10,8 kWh/m³ und Zustandszahl 0,95) entsprechen 100 m³ Gas genau 1.026 kWh. Je nach Gasqualität (L- oder H-Gas) und Höhenlage liegt der Wert in der Regel zwischen 950 und 1.150 kWh.',
+      },
+      {
+        question: 'Wo finde ich Brennwert und Zustandszahl für meinen Gasanschluss?',
+        answer: 'Beide Werte stehen verbindlich auf Ihrer letzten detaillierten Jahresabrechnung des Gasversorgers. Alternativ veröffentlicht der örtliche Verteilnetzbetreiber die monatlichen Brennwerte für Ihr Netzgebiet im Internet.',
+      },
+      {
+        question: 'Was ist der Unterschied zwischen L-Gas und H-Gas?',
+        answer: 'L-Gas („Low calorific“) hat einen geringeren Methangehalt und liefert ca. 8 bis 10 kWh pro Kubikmeter. H-Gas („High calorific“) hat einen höheren Methangehalt und liefert ca. 10 bis 12 kWh pro Kubikmeter.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'DVGW Deutscher Verein des Gas- und Wasserfaches',
+        citation: 'Arbeitsblatt DVGW G 685: Thermische Gasabrechnung (Standardisierte Ermittlung von Brennwert und Zustandszahl)',
+        url: 'https://www.dvgw.de/themen/gas/verbraucherinformationen/gasabrechnung',
+      },
+      {
+        title: 'Bundesnetzagentur',
+        citation: 'Leitfaden für Strom- und Gasabrechnungen sowie Mindestanforderungen an Rechnungsangaben',
+        url: 'https://www.bundesnetzagentur.de/DE/Vportal/Energie/RechnungenSperrungen/Rechnungen-table.html',
+      },
+      {
+        title: 'Verbraucherzentrale Bundesverband',
+        citation: 'Ratgeber und Orientierungswerte für Gasabschläge und Gasabrechnungen',
+        url: 'https://www.verbraucherzentrale.de/wissen/energie/preise-tarife-anbieterwechsel/rechner-das-ist-ihr-passender-abschlag-fuer-strom-gas-oder-fernwaerme-75669',
+      },
+    ],
+    relatedArticleSlugs: ['stromverbrauch-geraete-berechnen', 'mietbelastungsquote-berechnen'],
+  },
+  {
+    slug: 'heizluefter-2000-watt-stromkosten',
+    title: 'Heizlüfter mit 2000 Watt: Kosten pro Stunde und Monat',
+    metaTitle: 'Heizlüfter mit 2000 Watt: Kosten pro Stunde und Monat',
+    metaDescription: 'Was kostet ein Heizlüfter mit 2000 Watt? Beispiele für eine Stunde und 30 Tage, eine Strompreis-Tabelle und die Grenzen der Rechnung.',
+    h1: 'Was kostet ein Heizlüfter mit 2.000 Watt pro Stunde?',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-02',
+    updatedAt: '2026-10-02',
+    readingTimeMin: 6,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Haushaltsfinanzen',
+    },
+    coverIllustration: {
+      src: '/images/ratgeber/heizluefter-2000-watt-cover.svg',
+      alt: 'Illustration eines 2000-Watt-Heizlüfters mit Zeituhr und Stromkosten-Berechnung',
+      caption: 'Ein 2.000-Watt-Heizlüfter verbraucht in einer Stunde 2 Kilowattstunden Strom – bei 35 ct/kWh sind das genau 0,70 € pro Stunde.',
+      width: 800,
+      height: 450,
+    },
+    summary:
+      'Ein Heizlüfter mit 2.000 Watt verbraucht bei gleichbleibender voller Leistung in einer Stunde 2 kWh Strom. Bei einem angenommenen Arbeitspreis von 35 Cent pro kWh kostet diese Stunde 70 Cent. Die 35 Cent sind ein Rechenbeispiel; für Ihre Kosten zählt der Arbeitspreis Ihres Tarifs.',
+    keyTakeaways: [
+      'Leistung zu Verbrauch: 2.000 Watt entsprechen 2,0 Kilowatt (kW). In einer Stunde Dauerbetrieb werden exakt 2 kWh Strom verbraucht.',
+      'Kosten pro Stunde: Bei 35 Cent/kWh Arbeitspreis kostet eine Betriebsstunde bei voller Leistung genau 0,70 Euro.',
+      'Monatskosten (30 Tage): 1 Stunde täglich kostet 21,00 €, 2 Stunden kosten 42,00 € und 4 Stunden kosten 84,00 € im Monat.',
+      'Thermostat beachten: Ein Heizlüfter mit Thermostat heizt nicht ununterbrochen durch, sondern schaltet periodisch ab, sobald die Zieltemperatur erreicht ist.',
+    ],
+    primaryCalculator: {
+      slug: 'stromkosten-geraete-rechner',
+      title: 'Stromkosten-Rechner für Elektrogeräte (Watt in Euro)',
+      ctaText: 'Heizlüfter-Kosten berechnen',
+      description: 'Berechnen Sie die Stromkosten Ihres Heizlüfters nach Watt-Leistung, Betriebsstunden und eigenem Strompreis.',
+      badge: 'Primärer Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'stromkostenrechner',
+        title: 'Stromkostenrechner für Haushaltsgeräte',
+        ctaText: 'Haushaltsstrom berechnen',
+        description: 'Ermittelt jährliche und monatliche Stromkosten einzelner Haushaltsgeräte.',
+      },
+    ],
+    sections: [
+      {
+        id: 'strompreis-berechnen',
+        title: 'So rechnen Sie mit Ihrem eigenen Strompreis',
+        paragraphs: [
+          'Teilen Sie die Leistung durch 1.000 und multiplizieren Sie mit der Laufzeit und dem Strompreis: Kosten = Watt ÷ 1.000 × Stunden × Euro pro kWh.',
+          'Für eine Stunde bei voller Leistung von 2.000 Watt und 35 Cent pro kWh (0,35 €): 2.000 ÷ 1.000 × 1 × 0,35 € = 0,70 €.',
+          'Auch eine kurze Nutzung lässt sich berechnen: 15 Minuten entsprechen 0,25 Stunden. Im Beispiel entstehen dafür 2 kW × 0,25 h × 0,35 € = 0,175 €, also rund 18 Cent.',
+        ],
+      },
+      {
+        id: 'strompreis-tabelle',
+        title: 'Kosten bei verschiedenen Strompreisen',
+        paragraphs: [
+          'Die folgende Tabelle gilt für eine Betriebsstunde mit durchgehend 2.000 Watt Leistung (2 kWh Verbrauch) bei typischen Arbeitspreisen in Deutschland.',
+          'Berechnet werden die zusätzlichen Verbrauchskosten. Ein ohnehin anfallender Grundpreis des Stromvertrags wird nicht jeder Betriebsstunde nochmals zugerechnet.',
+        ],
+        table: {
+          headers: ['Arbeitspreis je kWh', 'Verbrauch je Stunde', 'Kosten pro Stunde (2.000 W)'],
+          rows: [
+            ['25 ct/kWh (0,25 €)', '2 kWh', '0,50 €'],
+            ['30 ct/kWh (0,30 €)', '2 kWh', '0,60 €'],
+            ['35 ct/kWh (0,35 €)', '2 kWh', '0,70 €'],
+            ['40 ct/kWh (0,40 €)', '2 kWh', '0,80 €'],
+            ['45 ct/kWh (0,45 €)', '2 kWh', '0,90 €'],
+          ],
+        },
+      },
+      {
+        id: 'laufzeit-monat',
+        title: 'Eine Stunde am Tag oder ein ganzer Abend?',
+        paragraphs: [
+          'Für 30 Nutzungstage und einen Arbeitspreis von 0,35 €/kWh ergeben sich folgende Modellwerte bei voller Leistung von 2.000 Watt:',
+        ],
+        illustration: {
+          src: '/images/ratgeber/heizluefter-2000-watt-kosten-diagramm.svg',
+          alt: 'Balkendiagramm: Monatskosten eines 2.000-Watt-Heizlüfters bei 1, 2 und 4 Stunden täglicher Nutzung für 30 Tage',
+          caption: 'Monatskosten für 30 Tage bei 2.000 Watt Dauerbetrieb (0,35 €/kWh): 1 Stunde täglich = 21,00 €, 2 Stunden = 42,00 €, 4 Stunden = 84,00 €. Die Balkenlängen sind proportional.',
+          width: 800,
+          height: 360,
+        },
+        table: {
+          headers: ['Tägliche Laufzeit bei voller Leistung', 'Verbrauch in 30 Tagen', 'Kosten (bei 35 ct/kWh)'],
+          rows: [
+            ['30 Minuten', '30 kWh', '10,50 €'],
+            ['1 Stunde', '60 kWh', '21,00 €'],
+            ['2 Stunden', '120 kWh', '42,00 €'],
+            ['4 Stunden', '240 kWh', '84,00 €'],
+          ],
+        },
+      },
+      {
+        id: 'wattzahl-und-thermostat',
+        title: 'Warum die Wattzahl nicht immer den tatsächlichen Verbrauch ergibt',
+        paragraphs: [
+          'Die Angabe 2.000 Watt beschreibt eine Leistungsstufe. Ein Thermostat kann die Heizung zwischendurch abschalten; eine niedrigere Stufe kann weniger Leistung aufnehmen. Zwei Stunden eingeschaltet bedeuten deshalb nicht bei jedem Gerät zwei Stunden durchgehenden Heizbetrieb.',
+          'Wenn die Heizung innerhalb eines zweistündigen Zeitraums insgesamt nur eine Stunde mit 2.000 Watt läuft, entfallen auf diesen Heizbetrieb 2 kWh. Lüfter und andere Funktionen können zusätzlichen Strom benötigen.',
+          'Wie oft das Gerät heizt, hängt unter anderem von Raumtemperatur, Wärmeverlusten und der Einstellung ab. Ein Strommessgerät erfasst den tatsächlichen Verbrauch über einen gewählten Zeitraum zuverlässiger als eine Rechnung mit der maximalen Wattzahl. Beachten Sie die zulässige Belastung des Messgeräts und die Herstellerhinweise.',
+          'Spart die niedrigere Leistungsstufe automatisch Geld? Bei gleicher Laufzeit verbraucht eine niedrigere Leistungsstufe weniger Energie. Daraus folgt aber nicht, dass sie denselben Raum insgesamt günstiger auf dieselbe Temperatur bringt. Muss das Gerät dafür länger laufen, kann ein Teil der rechnerischen Ersparnis entfallen. Vergleichen Sie deshalb die verbrauchten kWh über eine vergleichbare Nutzung, nicht nur die Wattzahl auf dem Schalter.',
+        ],
+        callout: {
+          type: 'warning',
+          title: 'Heizlüfter im Budget richtig einordnen',
+          text: 'Im Beispiel kosten zwei Stunden täglich über 30 Tage 42 €. Vier Stunden kosten 84 €. Mit dieser Rechnung können Sie entscheiden, welche zusätzliche Ausgabe für Ihre geplante Nutzung entsteht. Die vollständige Stromrechnung enthält daneben den Verbrauch anderer Geräte und feste Tarifkosten. Der Heizlüfterwert allein erklärt deshalb nicht Ihre gesamte Monatsrechnung.',
+        },
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: Heizlüfter als Zusatzheizung (2 Stunden täglich über 30 Tage)',
+      scenario: 'Ein 2.000-Watt-Heizlüfter läuft an 30 Tagen im Monat jeweils 2 Stunden mit voller Leistung bei einem Strompreis von 35 Cent/kWh.',
+      formula: 'Kosten = (Watt ÷ 1.000) × Stunden/Tag × Tage × Strompreis in €/kWh',
+      steps: [
+        { label: 'Schritt 1: Leistung in Kilowatt umrechnen', calculation: '2.000 W ÷ 1.000 = 2,0 kW' },
+        { label: 'Schritt 2: Täglicher Energieverbrauch', calculation: '2,0 kW × 2 Stunden = 4,0 kWh pro Tag' },
+        { label: 'Schritt 3: Monatsverbrauch in 30 Tagen', calculation: '4,0 kWh/Tag × 30 Tage = 120 kWh im Monat' },
+        { label: 'Schritt 4: Stromkosten ermitteln', calculation: '120 kWh × 0,35 €/kWh = 42,00 €' },
+      ],
+      resultSummary: '120 kWh Stromverbrauch und 42,00 € zusätzliche Stromkosten für 30 Tage',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Heizlüfter als dauerhafte Hauptheizung für die gesamte Wohnung einsetzen.',
+        correction: 'Direkte Stromheizungen sind im Dauerbetrieb 3- bis 4-mal teurer als Zentralheizungen und eignen sich wirtschaftlich nur für kurze Übergangszeiten.',
+      },
+      {
+        mistake: 'Die Wattzahl auf dem Schalter mit dem exakten Dauerverbrauch gleichsetzen.',
+        correction: 'Eingebaute Thermostate schalten den Heizdraht periodisch ab, sobald die Raumtemperatur erreicht ist.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was kostet ein 2000 Watt Heizlüfter pro Stunde?',
+        answer: 'Bei voller Leistung verbraucht ein 2.000-Watt-Heizlüfter genau 2 kWh Strom pro Stunde. Bei einem durchschnittlichen Strompreis von 35 Cent pro kWh kostet eine Betriebsstunde 70 Cent.',
+      },
+      {
+        question: 'Wie viel Strom verbraucht ein Heizlüfter im Monat?',
+        answer: 'Bei 1 Stunde täglicher Nutzung sind es 60 kWh (ca. 21 €), bei 2 Stunden täglich 120 kWh (ca. 42 €) und bei 4 Stunden täglich 240 kWh (ca. 84 €) in 30 Tagen bei 35 ct/kWh.',
+      },
+      {
+        question: 'Darf ein 2000-Watt-Heizlüfter an einer Mehrfachsteckdose betrieben werden?',
+        answer: 'Nein, es wird dringend davon abgeraten. Bei 2.000 Watt fließen rund 8,7 Ampere Dauerstrom. Günstige Mehrfachleisten können überhitzen. Schließen Sie Heizlüfter stets direkt an eine Wandsteckdose an.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'GASAG Magazin Energiemarkt',
+        citation: 'Physikalische Grundlagen zur Umrechnung von Watt in Kilowattstunden (kWh) bei Elektrogeräten',
+        url: 'https://www.gasag.de/magazin/energiemarkt/watt-in-kwh-umrechnen/',
+      },
+      {
+        title: 'GASAG Ratgeber Heizstrom',
+        citation: 'Methodik zur Berechnung von Heizstrom und Betriebskosten elektrischer Zusatzheizungen',
+        url: 'https://www.gasag.de/magazin/energiesparen/heizstromverbrauch-berechnen/',
+      },
+      {
+        title: 'Verbraucherzentrale Bundesverband',
+        citation: 'Energiesparen im Haushalt: Risiken und Kosten elektrischer Direktheizgeräte und Heizlüfter',
+        url: 'https://www.verbraucherzentrale.de/wissen/energie/strom-sparen/energiesparen-mit-kleinem-budget-85926',
+      },
+    ],
+    relatedArticleSlugs: ['stromverbrauch-geraete-berechnen', 'gaszaehler-m3-in-kwh-umrechnen'],
+  },
 ];
 
 // O(1) Lookup Maps

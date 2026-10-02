@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { calculateInstallmentLoan } from '../lib/calculators/kredit';
 import { calculateGasCost, calculateElectricityCost } from '../lib/calculators/haushalt';
-import { calculateFuelCost } from '../lib/calculators/auto';
-import { calculateDateAdd, calculateAgeInDays } from '../lib/calculators/datumZeit';
+import { calculateFuelCost, calculateCommuterAllowance } from '../lib/calculators/auto';
+import { formatCurrency } from '../lib/formatters';
+import { calculateDateAdd, calculateAgeInDays, calculateAge } from '../lib/calculators/datumZeit';
+import { calculateRentalYield } from '../lib/calculators/wohnen';
 import { calculateCalorieNeeds } from '../lib/calculators/gesundheit';
 import { calculateRenteBruttoNetto } from '../lib/calculators/steuernGehalt';
 import { calculatePartTimeSalary } from '../lib/calculators/arbeit';
@@ -626,22 +628,52 @@ describe('10. Renten brutto/netto Statutory Audit Verification', () => {
     expect(kv?.value).toBe(171.00);
   });
 
-  it('correctly applies care insurance rate tiers based on child count (§ 55 SGB XI)', () => {
-    // Childless: 4.0 % -> 80.00 €
+  it('correctly applies 2026 care insurance rate tiers based on child count (§ 55 SGB XI)', () => {
+    // Childless: 4.20 % -> 84.00 € on 2,000 €
     const resChildless = calculateRenteBruttoNetto({ grossPension: 2000, healthInsurance: 'statutory', careInsuranceOption: 'childless' });
-    expect(resChildless.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(80.00);
+    expect(resChildless.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(84.00);
 
-    // 1 Child: 3.4 % -> 68.00 €
+    // 1 Child / Elterneigenschaft: 3.60 % -> 72.00 € on 2,000 €
     const res1Child = calculateRenteBruttoNetto({ grossPension: 2000, healthInsurance: 'statutory', careInsuranceOption: '1_child' });
-    expect(res1Child.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(68.00);
+    expect(res1Child.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(72.00);
 
-    // 2 Children: 3.15 % -> 63.00 €
+    // 2 Children under 25: 3.35 % -> 67.00 € on 2,000 €
     const res2Children = calculateRenteBruttoNetto({ grossPension: 2000, healthInsurance: 'statutory', careInsuranceOption: '2_children' });
-    expect(res2Children.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(63.00);
+    expect(res2Children.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(67.00);
 
-    // 5+ Children: 2.40 % -> 48.00 €
+    // 3 Children under 25: 3.10 % -> 62.00 € on 2,000 €
+    const res3Children = calculateRenteBruttoNetto({ grossPension: 2000, healthInsurance: 'statutory', careInsuranceOption: '3_children' });
+    expect(res3Children.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(62.00);
+
+    // 4 Children under 25: 2.85 % -> 57.00 € on 2,000 €
+    const res4Children = calculateRenteBruttoNetto({ grossPension: 2000, healthInsurance: 'statutory', careInsuranceOption: '4_children' });
+    expect(res4Children.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(57.00);
+
+    // 5+ Children under 25: 2.60 % -> 52.00 € on 2,000 €
     const res5Children = calculateRenteBruttoNetto({ grossPension: 2000, healthInsurance: 'statutory', careInsuranceOption: '5_plus_children' });
-    expect(res5Children.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(48.00);
+    expect(res5Children.secondary?.find((s) => s.id === 'pvdr')?.value).toBe(52.00);
+  });
+
+  it('verifies official 2026 pension fixture: 1,800 € gross, 2.9% additional health, 4.2% childless care', () => {
+    const res = calculateRenteBruttoNetto({
+      grossPension: 1800,
+      retirementYear: '2026',
+      additionalHealthRate: 2.9,
+      careInsuranceOption: 'childless',
+    });
+    expect(res.error).toBeUndefined();
+    // KVdR: 1,800 * (7.3% + 2.9%/2) = 1,800 * 8.75% = 157.50 €
+    const kv = res.secondary?.find((s) => s.id === 'kvdr')?.value;
+    expect(kv).toBe(157.50);
+    // PVdR: 1,800 * 4.2% = 75.60 €
+    const pv = res.secondary?.find((s) => s.id === 'pvdr')?.value;
+    expect(pv).toBe(75.60);
+    // Payout before income tax: 1,800 - 157.50 - 75.60 = 1,566.90 €
+    const payout = res.secondary?.find((s) => s.id === 'payoutAfterSocial')?.value;
+    expect(payout).toBe(1566.90);
+    // Taxable portion 84.0%
+    const taxableRate = res.secondary?.find((s) => s.id === 'taxablePortion')?.value;
+    expect(taxableRate).toBe(84);
   });
 
   it('distinguishes monthly payout from annual net pension and validates negative pension', () => {
@@ -847,4 +879,326 @@ describe('14. Preserved Auxiliary Calculators Verification', () => {
     expect(resValid.error).toBeUndefined();
     expect(resValid.primary.value).toBe(12768);
   });
+
+  describe('Audited Numerical Checks and Consistency Guarantees', () => {
+    it('verifies Household Electricity: 2,500 kWh, 0.35 €/kWh, 12 €/month base price', () => {
+      const res = calculateElectricityCost({
+        annualKwh: 2500,
+        pricePerKwh: 0.35,
+        basePricePerMonth: 12.0,
+      });
+      expect(res.error).toBeUndefined();
+      expect(res.primary.value).toBe(1019);
+      expect(res.primary.formattedValue).toBe(formatCurrency(1019));
+
+      const workCost = res.secondary?.find((s) => s.id === 'workCost')?.value;
+      const baseCost = res.secondary?.find((s) => s.id === 'baseCost')?.value;
+      const monthlyAvg = res.secondary?.find((s) => s.id === 'monthlyAverage')?.value;
+      const monthlyAvgFormatted = res.secondary?.find((s) => s.id === 'monthlyAverage')?.formattedValue;
+
+      expect(workCost).toBe(875);
+      expect(baseCost).toBe(144);
+      expect(monthlyAvg).toBeCloseTo(84.92, 2);
+      expect(monthlyAvgFormatted).toBe(formatCurrency(84.92));
+
+      // Zero consumption preserves valid fixed charges
+      const resZero = calculateElectricityCost({
+        annualKwh: 0,
+        pricePerKwh: 0.35,
+        basePricePerMonth: 12.0,
+      });
+      expect(resZero.primary.value).toBe(144);
+      expect(resZero.secondary?.find((s) => s.id === 'monthlyAverage')?.value).toBe(12);
+    });
+
+    it('verifies Device Electricity: 2,000 W, 2 h/day, 30 days, 35 ct/kWh without silent 365-day extrapolation', () => {
+      const calc = extraWohnenCalculators.find((c) => c.slug === 'stromkosten-geraete-rechner')!;
+      expect(calc).toBeDefined();
+
+      const res = calc.calculate({
+        powerWatts: 2000,
+        hoursPerDay: 2,
+        usageDays: 30,
+        electricityPrice: 35,
+      });
+      expect(res.error).toBeUndefined();
+      expect(res.primary.value).toBe(42);
+      expect(res.primary.formattedValue).toBe(formatCurrency(42));
+
+      const kwh = res.secondary?.find((s) => s.id === 'totalKwhPeriod')?.value;
+      const costPerHour = res.secondary?.find((s) => s.id === 'costPerHour')?.value;
+      expect(kwh).toBe(120);
+      expect(costPerHour).toBeCloseTo(0.70, 2);
+    });
+
+    it('verifies Gas Conversion from two readings: 7,250 m³ to 8,450 m³ with bw 10.8 and z 0.95', () => {
+      const calc = extraWohnenCalculators.find((c) => c.slug === 'gasverbrauch-kwh-m3-rechner')!;
+      expect(calc).toBeDefined();
+
+      const res = calc.calculate({
+        inputMode: 'readings',
+        meterReadingOld: 7250,
+        meterReadingNew: 8450,
+        brennwert: 10.8,
+        zustandszahl: 0.95,
+        gasPricePerKwh: 11.0,
+      });
+      expect(res.error).toBeUndefined();
+      expect(res.primary.value).toBe(12312);
+      expect(res.primary.formattedValue).toBe('12.312 kWh');
+
+      const m3 = res.secondary?.find((s) => s.id === 'consumedM3')?.value;
+      const consumptionCost = res.secondary?.find((s) => s.id === 'consumptionCost')?.value;
+      expect(m3).toBe(1200);
+      expect(consumptionCost).toBe(1354.32);
+    });
+
+    it('verifies Gas Costs: 12,312 kWh, 0.11 €/kWh, 12 €/month base price', () => {
+      const res = calculateGasCost({
+        inputType: 'kwh',
+        amount: 12312,
+        pricePerKwh: 0.11,
+        basePricePerMonth: 12.0,
+      });
+      expect(res.error).toBeUndefined();
+      expect(res.primary.value).toBe(1498.32);
+      expect(res.primary.formattedValue).toBe(formatCurrency(1498.32));
+
+      const workCost = res.secondary?.find((s) => s.id === 'workCost')?.value;
+      const baseCost = res.secondary?.find((s) => s.id === 'baseCost')?.value;
+      const monthlyAvg = res.secondary?.find((s) => s.id === 'monthlyPayment')?.value;
+
+      expect(workCost).toBe(1354.32);
+      expect(baseCost).toBe(144);
+      expect(monthlyAvg).toBe(124.86);
+
+      // Zero gas consumption preserves valid fixed charges
+      const resZero = calculateGasCost({
+        inputType: 'kwh',
+        amount: 0,
+        pricePerKwh: 0.11,
+        basePricePerMonth: 12.0,
+      });
+      expect(resZero.primary.value).toBe(144);
+      expect(resZero.secondary?.find((s) => s.id === 'monthlyPayment')?.value).toBe(12);
+    });
+
+    it('verifies Zero Cases: 0 distance in commuter allowance and 0% loan interest', () => {
+      const commuteRes = calculateCommuterAllowance({
+        distanceKm: 0,
+        workdays: 220,
+      });
+      expect(commuteRes.error).toBeUndefined();
+      expect(commuteRes.primary.value).toBe(0);
+      expect(commuteRes.summaryText).toContain('0 km');
+
+      const carLoanCalc = extraFinanzenCalculators.find((c) => c.slug === 'ballonfinanzierung-rechner')!;
+      const loanRes = carLoanCalc.calculate({
+        carPrice: 20000,
+        downPayment: 5000,
+        interestRate: 0,
+        months: 30,
+        balloonPayment: 0,
+      });
+      expect(loanRes.error).toBeUndefined();
+      expect(loanRes.primary.value).toBe(500); // 15000 / 30 = 500 €/Monat
+      const totalCost = loanRes.secondary?.find((s) => s.id === 'totalCost')?.value;
+      expect(totalCost).toBe(20000); // exactly price with 0 interest
+    });
+  });
 });
+
+describe('15. Prompt-Mandated Bugfixes and Regression Suite', () => {
+  it('mietminderung-rechner: 1,000 € monthly rent, 0% reduction, 30 affected days yields 0 € reduction', () => {
+    const calc = extraWohnenCalculators.find((c) => c.slug === 'mietminderung-rechner')!;
+    const res = calc.calculate({
+      monthlyRent: 1000,
+      reductionPercent: 0,
+      days: 30,
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.primary.value).toBe(0);
+    expect(res.primary.formattedValue).toBe(formatCurrency(0));
+    expect(res.summaryText).toContain('0,00 €');
+  });
+
+  it('mietminderung-rechner: test zero affected days yields 0 € reduction under 30-day legal convention', () => {
+    const calc = extraWohnenCalculators.find((c) => c.slug === 'mietminderung-rechner')!;
+    const res = calc.calculate({
+      monthlyRent: 1000,
+      reductionPercent: 20,
+      days: 0,
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.primary.value).toBe(0);
+    expect(res.summaryText).toContain('0 Tage');
+  });
+
+  it('staffelmiete-rechner: 800 € starting rent, 0 € increase, annual interval, 5 years -> every step stays 800 €', () => {
+    const calc = extraWohnenCalculators.find((c) => c.slug === 'staffelmiete-rechner')!;
+    const res = calc.calculate({
+      startRent: 800,
+      increaseAmount: 0,
+      intervalMonths: 12,
+      years: 5,
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.primary.value).toBe(800);
+    // Breakdown must exist and every year must have exactly 800 € rent
+    expect(res.breakdown?.rows).toBeDefined();
+    expect(res.breakdown?.rows.length).toBe(5);
+    for (const row of res.breakdown?.rows || []) {
+      expect(String(row.values.rent).replace(/\u00a0/g, ' ')).toContain('800,00 €');
+    }
+  });
+
+  it('festgeldrechner: 10,000 € deposit, 0% interest, 12 months (1 year) yields 0 € interest and 10,000 € final balance', () => {
+    const calc = extraFinanzenCalculators.find((c) => c.slug === 'festgeld-rechner')!;
+    const res = calc.calculate({
+      principal: 10000,
+      interestRate: 0,
+      years: 1,
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.primary.value).toBe(0); // 0 € interest
+    const endVal = res.secondary?.find((s) => s.id === 'endVal')?.value;
+    expect(endVal).toBe(10000); // 10,000 € final balance
+  });
+
+  it('etf-kostenrechner / depotgebuehren-rechner: 40,000 € portfolio, 0% TER yields 0 € TER-related cost', () => {
+    const calc = extraFinanzenCalculators.find((c) => c.slug === 'depotgebuehren-rechner')!;
+    const res = calc.calculate({
+      portfolioVal: 40000,
+      ter: 0,
+      custodyFee: 0,
+      years: 20,
+      grossReturn: 7.0,
+    });
+    expect(res.error).toBeUndefined();
+    expect(res.primary.value).toBe(0); // 0 € total cost loss
+    const terCostItem = res.secondary?.find((s) => s.id === 'terCostOnly')?.value;
+    expect(terCostItem).toBe(0);
+    expect(res.summaryText).toContain('0 %');
+  });
+
+  it('calculateRentalYield: 250,000 € purchase price, 0 € purchase fees, 850 € cold rent, 0 € nonrecoverable costs -> 250,000 € investment and 4.08% yield', () => {
+    const res = calculateRentalYield({
+      purchasePrice: 250000,
+      purchaseFees: 0,
+      monthlyRentCold: 850,
+      annualNonRecoverableCosts: 0,
+    });
+    expect(res.error).toBeUndefined();
+    // 850 * 12 = 10,200 € annual rent
+    // 10,200 / 250,000 = 0.0408 = 4.08%
+    expect(res.primary.value).toBeCloseTo(4.08, 2);
+    const totalInv = res.secondary?.find((s) => s.id === 'totalInvestment')?.value;
+    expect(totalInv).toBe(250000);
+    // Summary must mention 0,00 € assumptions and note statutory taxes/notary fees
+    expect(res.summaryText).toContain(formatCurrency(250000));
+    expect(res.summaryText).toContain('Grunderwerbsteuer');
+  });
+
+  it('altersrechner: clearing birthdate shows German validation message and invalidates previous result', () => {
+    const resEmpty = calculateAge({ birthDate: '' });
+    expect(resEmpty.error).toBe('Bitte geben Sie Ihr Geburtsdatum ein.');
+    expect(resEmpty.primary.value).toBe(0);
+    expect(resEmpty.primary.formattedValue).toBe('-');
+
+    const resNull = calculateAge({ birthDate: null });
+    expect(resNull.error).toBe('Bitte geben Sie Ihr Geburtsdatum ein.');
+  });
+
+  it('altersrechner: rejects impossible dates (e.g. 2023-02-29) and correctly handles leap year (2000-02-29)', () => {
+    // 2023 is not a leap year -> 2023-02-29 is impossible
+    const resImpossible = calculateAge({ birthDate: '2023-02-29', targetDate: '2026-03-01' });
+    expect(resImpossible.error).toBeDefined();
+    expect(resImpossible.error).toContain('Ungültige oder unmögliche Kalendertage');
+
+    // 2000 is a leap year -> 2000-02-29 is valid
+    const resLeap = calculateAge({ birthDate: '2000-02-29', targetDate: '2024-03-01' });
+    expect(resLeap.error).toBeUndefined();
+    expect(resLeap.primary.value).toBe(24); // 24 years old on 2024-03-01
+  });
+
+  it('buergergeld-anspruch-rechner: verifies § 11b SGB II earnings allowances (348 € at 1,200 € gross and 378 € at 1,500 € gross)', () => {
+    const calc = extraAutoArbeitCalculators.find((c) => c.slug === 'buergergeld-anspruch-rechner')!;
+
+    // 1. Standard single person, 1,200 € gross (no children)
+    // § 11b: 100 € base + 20% on 420 € (84 €) + 30% on 480 € (144 €) + 10% on 200 € (20 €) = 348 €
+    const res1200 = calc.calculate({
+      householdType: 'single',
+      children0to5: 0,
+      children6to13: 0,
+      children14to17: 0,
+      isSingleParent: false,
+      coldRent: 400,
+      heatingCosts: 100,
+      grossEarnedIncome: 1200,
+      netEarnedIncome: 950,
+    });
+    expect(res1200.error).toBeUndefined();
+    const allowanceItem1200 = res1200.secondary?.find((s) => s.id === 'earningsAllowance');
+    expect(allowanceItem1200?.value).toBe(348);
+    // Net: 950 - 348 = 602 € deducted
+    const deductedItem1200 = res1200.secondary?.find((s) => s.id === 'deductedEarnedIncome');
+    expect(deductedItem1200?.value).toBe(602);
+
+    // 2. Household with minor child, 1,500 € gross (extended 10% threshold to 1,500 €)
+    // § 11b: 100 + 84 + 144 + (500 * 0.10 = 50) = 378 €
+    const res1500 = calc.calculate({
+      householdType: 'single',
+      children0to5: 1, // minor child present
+      children6to13: 0,
+      children14to17: 0,
+      isSingleParent: false,
+      coldRent: 400,
+      heatingCosts: 100,
+      grossEarnedIncome: 1500,
+      netEarnedIncome: 1200,
+    });
+    expect(res1500.error).toBeUndefined();
+    const allowanceItem1500 = res1500.secondary?.find((s) => s.id === 'earningsAllowance');
+    expect(allowanceItem1500?.value).toBe(378);
+    // Net: 1200 - 378 = 822 € deducted
+    const deductedItem1500 = res1500.secondary?.find((s) => s.id === 'deductedEarnedIncome');
+    expect(deductedItem1500?.value).toBe(822);
+  });
+
+  it('buergergeld-anspruch-rechner: single parent age threshold distinctions (§ 21 Abs. 3 SGB II)', () => {
+    const calc = extraAutoArbeitCalculators.find((c) => c.slug === 'buergergeld-anspruch-rechner')!;
+
+    // Single parent with 1 child under 7 years via explicit field -> 36 % (202.68 €)
+    const resUnder7 = calc.calculate({
+      householdType: 'single',
+      isSingleParent: true,
+      singleParentChildUnder7: true,
+      singleParentChildrenUnder16: 1,
+      children0to5: 0,
+      children6to13: 1, // age 6 (under 7)
+      children14to17: 0,
+      coldRent: 400,
+      heatingCosts: 100,
+      grossEarnedIncome: 0,
+    });
+    const spNeedUnder7 = resUnder7.secondary?.find((s) => s.id === 'singleParent')?.value;
+    expect(spNeedUnder7).toBeCloseTo(202.68, 2);
+
+    // Single parent with 2 children under 16 years -> 36 % (202.68 €)
+    const res2Under16 = calc.calculate({
+      householdType: 'single',
+      isSingleParent: true,
+      singleParentChildUnder7: false,
+      singleParentChildrenUnder16: 2,
+      children0to5: 0,
+      children6to13: 0,
+      children14to17: 2, // e.g. both age 14 and 15 (< 16)
+      coldRent: 400,
+      heatingCosts: 100,
+      grossEarnedIncome: 0,
+    });
+    const spNeed2Under16 = res2Under16.secondary?.find((s) => s.id === 'singleParent')?.value;
+    expect(spNeed2Under16).toBeCloseTo(202.68, 2);
+  });
+});
+

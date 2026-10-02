@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { getAllArticles, getArticleBySlug, getRelatedArticles } from '@/data/ratgeber/articles';
@@ -164,6 +165,25 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
             <h1 className={styles.articleTitle}>{article.h1}</h1>
             <p className={styles.articleSummary}>{article.summary}</p>
 
+            {article.coverIllustration && (
+              <figure className={styles.articleFigure} style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-5)' }}>
+                <Image
+                  src={article.coverIllustration.src}
+                  alt={article.coverIllustration.alt}
+                  width={article.coverIllustration.width || 800}
+                  height={article.coverIllustration.height || 450}
+                  className={styles.articleFigureImage}
+                  priority
+                  unoptimized
+                />
+                {article.coverIllustration.caption && (
+                  <figcaption className={styles.articleFigureCaption}>
+                    {article.coverIllustration.caption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
+
             <div className={styles.authorBox}>
               <div className={styles.authorAvatar} aria-hidden="true">
                 RH
@@ -210,6 +230,24 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
                 {article.sections.map((section) => (
                   <section key={section.id} id={section.id}>
                     <h2>{section.title}</h2>
+                    {section.illustration && (
+                      <figure className={styles.articleFigure}>
+                        <Image
+                          src={section.illustration.src}
+                          alt={section.illustration.alt}
+                          width={section.illustration.width || 800}
+                          height={section.illustration.height || 360}
+                          className={styles.articleFigureImage}
+                          loading="lazy"
+                          unoptimized
+                        />
+                        {section.illustration.caption && (
+                          <figcaption className={styles.articleFigureCaption}>
+                            {section.illustration.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    )}
                     {section.paragraphs?.map((p, pIdx) => (
                       <p key={pIdx}>{renderParagraphWithLinks(p)}</p>
                     ))}

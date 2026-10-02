@@ -322,7 +322,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const price = parseFloat(inputs.grossListPrice) || 48000;
-      const km = parseFloat(inputs.distanceWorkKm) || 20;
+      const km = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? parseFloat(inputs.distanceWorkKm) : 20;
       const type = inputs.carDriveType || 'combustion';
       const taxRate = (parseFloat(inputs.taxRate) || 38) / 100;
 
@@ -396,7 +396,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const costs = parseFloat(inputs.yearlyActualCarCosts) || 10500;
       const totalKm = parseFloat(inputs.totalYearlyKm) || 25000;
       const privPct = (parseFloat(inputs.privateSharePct) || 20) / 100;
-      const dist = parseFloat(inputs.distanceWorkKm) || 18;
+      const dist = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? parseFloat(inputs.distanceWorkKm) : 18;
 
       // 1. 1-%-Methode p.a.
       const onePctMonthly = (blp * 0.01) + (blp * 0.0003 * dist);
@@ -2058,7 +2058,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     calculate: (inputs) => {
       const gross = parseFloat(inputs.monthlyGross) || 4500;
       const blp = parseFloat(inputs.grossListPrice) || 45000;
-      const km = parseFloat(inputs.distanceWorkKm) || 15;
+      const km = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? parseFloat(inputs.distanceWorkKm) : 15;
       const type = inputs.engineType || 'combustion';
 
       let pRate = 0.01;
@@ -2949,12 +2949,32 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         defaultValue: false,
         helpText: 'Gesetzlicher Mehrbedarf für Alleinerziehende bei Zusammenleben mit minderjährigen Kindern.',
       },
+      {
+        id: 'singleParentChildUnder7',
+        label: 'Alleinerziehend: Kind unter 7 Jahren im Haushalt? (§ 21 Abs. 3 Nr. 1)',
+        type: 'boolean',
+        defaultValue: false,
+        helpText: 'Berechtigt bei Alleinerziehenden zu 36 % Mehrbedarf (202,68 €).',
+      },
+      {
+        id: 'singleParentChildrenUnder16',
+        label: 'Alleinerziehend: Anzahl der Kinder unter 16 Jahren im Haushalt (§ 21 Abs. 3 Nr. 1)',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        max: 10,
+        step: 1,
+        helpText: 'Bei 2 oder 3 Kindern unter 16 Jahren besteht ebenfalls Anspruch auf 36 % Mehrbedarf (202,68 €).',
+      },
       { id: 'children0to5', label: 'Kinder von 0 bis 5 Jahren (Regelbedarfsstufe 6: 357 €)', type: 'number', defaultValue: 0, min: 0, max: 10, step: 1 },
       { id: 'children6to13', label: 'Kinder von 6 bis 13 Jahren (Regelbedarfsstufe 5: 390 €)', type: 'number', defaultValue: 0, min: 0, max: 10, step: 1 },
       { id: 'children14to17', label: 'Jugendliche von 14 bis 17 Jahren (Regelbedarfsstufe 4: 471 €)', type: 'number', defaultValue: 0, min: 0, max: 10, step: 1 },
       { id: 'coldRent', label: 'Kaltmiete / Grundmiete monatlich in € (anerkannte Kosten)', type: 'number', defaultValue: 450, min: 0, step: 25, unit: '€', helpText: '0 € bei mietfreiem Wohnen oder Wohneigentum ohne laufende Kaltmiete.' },
       { id: 'heatingCosts', label: 'Heizkosten monatlich in € (tatsächlich/angemessen)', type: 'number', defaultValue: 100, min: 0, step: 10, unit: '€', helpText: '0 € falls keine separaten Heizkosten anfallen.' },
-      { id: 'earnedNetIncome', label: 'Bereits bereinigtes, anrechenbares Einkommen in € (§ 11b SGB II)', type: 'number', defaultValue: 0, min: 0, step: 50, unit: '€', helpText: 'Einkommen aller Haushaltsmitglieder nach Abzug der gesetzlichen Absetzbeträge und Freibeträge nach § 11b SGB II.' },
+      { id: 'grossEarnedIncome', label: 'Monatliches Bruttoerwerbseinkommen in € (§ 11b SGB II)', type: 'number', defaultValue: 0, min: 0, step: 50, unit: '€', helpText: 'Dient der Berechnung der gesetzlichen Freibeträge nach § 11b SGB II (100 € Grundabsetzbetrag + 20 % / 30 % / 10 % Stufen).' },
+      { id: 'netEarnedIncome', label: 'Monatliches Nettoerwerbseinkommen in €', type: 'number', defaultValue: 0, min: 0, step: 50, unit: '€', helpText: 'Vom Nettoeinkommen wird der errechnete Freibetrag abgezogen. Nur der Rest wird angerechnet.' },
+      { id: 'otherIncome', label: 'Sonstige anzurechnende Einkünfte in € (z. B. Kindergeld, Unterhalt)', type: 'number', defaultValue: 0, min: 0, step: 25, unit: '€', helpText: 'Laufende Einnahmen der Haushaltsmitglieder ohne Erwerbstätigenfreibetrag, die bedarfsmindernd angerechnet werden.' },
+      { id: 'earnedNetIncome', label: 'Bereits bereinigtes, anrechenbares Einkommen in € (optionales Direktfeld)', type: 'number', defaultValue: 0, min: 0, step: 50, unit: '€', helpText: 'Falls bereits berechnet oder bekannt: Direkt anzurechnendes Einkommen.' },
     ],
     calculate: (inputs) => {
       const isSingle = inputs.householdType !== 'couple';
@@ -3000,26 +3020,31 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const c0 = parseChildCount(inputs.children0to5);
       const c6 = parseChildCount(inputs.children6to13);
       const c14 = parseChildCount(inputs.children14to17);
+      const cUnder16Manual = parseChildCount(inputs.singleParentChildrenUnder16);
 
-      if (c0 === null || c6 === null || c14 === null) {
+      if (c0 === null || c6 === null || c14 === null || cUnder16Manual === null) {
         return {
           primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
           error: 'Bitte geben Sie für die Kinderzahlen jeweils eine gültige ganze Zahl ab 0 ein.',
         };
       }
 
-      // 4. Validierung des anrechenbaren Einkommens
-      if (inputs.earnedNetIncome === undefined || inputs.earnedNetIncome === null || String(inputs.earnedNetIncome).trim() === '') {
+      // 4. Validierung des Erwerbs- und sonstigen Einkommens (§ 11b SGB II)
+      const parseMoney = (val: any) => {
+        if (val === undefined || val === null || String(val).trim() === '') return 0;
+        const num = parseFloat(val);
+        return isNaN(num) || num < 0 ? null : num;
+      };
+
+      const grossRaw = parseMoney(inputs.grossEarnedIncome);
+      const netRaw = parseMoney(inputs.netEarnedIncome);
+      const otherIncome = parseMoney(inputs.otherIncome);
+      const legacyIncome = parseMoney(inputs.earnedNetIncome);
+
+      if (grossRaw === null || netRaw === null || otherIncome === null || legacyIncome === null) {
         return {
           primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
-          error: 'Bitte geben Sie das anrechenbare Einkommen ein (0 € bei keinem Einkommen).',
-        };
-      }
-      const income = parseFloat(inputs.earnedNetIncome);
-      if (isNaN(income) || income < 0) {
-        return {
-          primary: { id: 'finalBenefit', label: 'Geschätzter monatlicher Leistungsbetrag', value: 0, formattedValue: '-' },
-          error: 'Das anrechenbare Einkommen darf nicht negativ sein.',
+          error: 'Die Einkommensangaben dürfen nicht negativ oder ungültig sein.',
         };
       }
 
@@ -3038,22 +3063,64 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
 
       // Mehrbedarf für Alleinerziehende (§ 21 Abs. 3 SGB II)
       let singleParentNeed = 0;
-      const isSingleParent = Boolean(inputs.isSingleParent) && isSingle && totalKids > 0;
+      let singleParentPct = 0;
+      const hasChildUnder7 = Boolean(inputs.singleParentChildUnder7) || c0 > 0;
+      const countUnder16 = (cUnder16Manual !== null && cUnder16Manual > 0) ? cUnder16Manual : (c0 + c6);
+      const isSingleParent = Boolean(inputs.isSingleParent) && isSingle && (totalKids > 0 || hasChildUnder7 || countUnder16 > 0);
+
       if (isSingleParent) {
-        // § 21 Abs. 3 Nr. 1: 36 % wenn 1 Kind unter 7 Jahren (c0 > 0) oder 2–3 Kinder unter 16 Jahren ((c0 + c6) >= 2)
-        if (c0 > 0 || (c0 + c6) >= 2) {
-          singleParentNeed = Math.round(563 * 0.36 * 100) / 100; // 202,68 €
-        } else {
-          // § 21 Abs. 3 Nr. 2: 12 % je Kind, maximal 60 %
-          const pct = Math.min(0.60, totalKids * 0.12);
-          singleParentNeed = Math.round(563 * pct * 100) / 100;
+        // § 21 Abs. 3 Nr. 1: 36 % wenn 1 Kind unter 7 Jahren oder 2–3 Kinder unter 16 Jahren
+        const meets36Condition = hasChildUnder7 || (countUnder16 >= 2 && countUnder16 <= 3) || countUnder16 >= 2;
+        // § 21 Abs. 3 Nr. 2: 12 % je Kind, maximal 60 %
+        const effectiveCount = Math.max(totalKids, countUnder16, hasChildUnder7 ? 1 : 0);
+        const perChildPct = Math.min(0.60, effectiveCount * 0.12);
+
+        singleParentPct = meets36Condition ? Math.max(0.36, perChildPct) : perChildPct;
+        singleParentNeed = Math.round(563 * singleParentPct * 100) / 100;
+      }
+
+      // Freibeträge nach § 11b SGB II
+      // 1. Grundabsetzbetrag: 100 € (§ 11b Abs. 2 Satz 1)
+      // 2. 20 % für 100–520 € (max. 84 €)
+      // 3. 30 % für 520–1.000 € (max. 144 €)
+      // 4. 10 % für 1.000–1.200 € (max. 20 €) bzw. 1.500 € bei minderjährigem Kind (§ 11b Abs. 3 Satz 3, max. 50 €)
+      const hasMinorInHousehold = totalKids > 0 || hasChildUnder7 || countUnder16 > 0;
+      const upperLimit = hasMinorInHousehold ? 1500 : 1200;
+
+      let allowanceBase = 0;
+      let band100to520 = 0;
+      let band520to1000 = 0;
+      let band1000toMax = 0;
+
+      if (grossRaw > 0) {
+        allowanceBase = Math.min(grossRaw, 100);
+        if (grossRaw > 100) {
+          band100to520 = (Math.min(grossRaw, 520) - 100) * 0.20;
+        }
+        if (grossRaw > 520) {
+          band520to1000 = (Math.min(grossRaw, 1000) - 520) * 0.30;
+        }
+        if (grossRaw > 1000) {
+          band1000toMax = (Math.min(grossRaw, upperLimit) - 1000) * 0.10;
         }
       }
+
+      const totalEarningsAllowance = Math.round((allowanceBase + band100to520 + band520to1000 + band1000toMax) * 100) / 100;
+
+      let anrechenbaresErwerb = 0;
+      if (grossRaw > 0) {
+        const netBase = (netRaw !== null && netRaw > 0) ? netRaw : grossRaw;
+        anrechenbaresErwerb = Math.max(0, Math.round((netBase - totalEarningsAllowance) * 100) / 100);
+      } else if (legacyIncome !== null && legacyIncome > 0) {
+        anrechenbaresErwerb = legacyIncome;
+      }
+
+      const totalDeductedIncome = Math.round((anrechenbaresErwerb + (otherIncome || 0)) * 100) / 100;
 
       const totalRegel = adultRegel + totalChildRegel;
       const totalHousing = coldRent + heating;
       const totalDemand = totalRegel + singleParentNeed + totalHousing;
-      const finalBenefit = Math.max(0, totalDemand - income);
+      const finalBenefit = Math.max(0, Math.round((totalDemand - totalDeductedIncome) * 100) / 100);
 
       return {
         primary: {
@@ -3066,13 +3133,15 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         },
         secondary: [
           { id: 'totalRegel', label: 'Gesamter Regelbedarf (Erwachsene + Kinder)', value: totalRegel, formattedValue: formatCurrency(totalRegel) },
-          { id: 'singleParent', label: 'Mehrbedarf für Alleinerziehende (§ 21 Abs. 3)', value: singleParentNeed, formattedValue: formatCurrency(singleParentNeed) },
+          { id: 'singleParent', label: `Mehrbedarf für Alleinerziehende (${formatPercent(singleParentPct * 100, 1)} nach § 21 Abs. 3)`, value: singleParentNeed, formattedValue: formatCurrency(singleParentNeed) },
           { id: 'coldRentShare', label: 'Kaltmiete / Grundmiete', value: coldRent, formattedValue: formatCurrency(coldRent) },
           { id: 'heatingShare', label: 'Heizkosten (separat erfasst)', value: heating, formattedValue: formatCurrency(heating) },
           { id: 'totalDemand', label: 'Gesamtbedarf des Haushalts', value: totalDemand, formattedValue: formatCurrency(totalDemand) },
-          { id: 'deductedIncome', label: 'Angerechnetes Einkommen (§ 11b SGB II)', value: income, formattedValue: `-${formatCurrency(income)}` },
+          { id: 'earningsAllowance', label: 'Gesetzlicher Erwerbstätigenfreibetrag (§ 11b SGB II)', value: totalEarningsAllowance, formattedValue: formatCurrency(totalEarningsAllowance) },
+          { id: 'deductedEarnedIncome', label: 'Anrechenbares Erwerbseinkommen', value: anrechenbaresErwerb, formattedValue: `-${formatCurrency(anrechenbaresErwerb)}` },
+          { id: 'otherIncomeDeducted', label: 'Sonstige anzurechnende Einkünfte (Kindergeld etc.)', value: otherIncome || 0, formattedValue: `-${formatCurrency(otherIncome || 0)}` },
         ],
-        summaryText: `Ihr rechnerischer Gesamtbedarf liegt bei ${formatCurrency(totalDemand)} (bestehend aus ${formatCurrency(totalRegel)} Regelbedarf${singleParentNeed > 0 ? `, ${formatCurrency(singleParentNeed)} Mehrbedarf` : ''} und ${formatCurrency(totalHousing)} Kosten der Unterkunft). Nach Abzug des anrechenbaren Einkommens von ${formatCurrency(income)} ergibt sich ein geschätzter monatlicher Leistungsbetrag von ${formatCurrency(finalBenefit)}.`,
+        summaryText: `Ihr rechnerischer Gesamtbedarf liegt bei ${formatCurrency(totalDemand)} (bestehend aus ${formatCurrency(totalRegel)} Regelbedarf${singleParentNeed > 0 ? `, ${formatCurrency(singleParentNeed)} Mehrbedarf für Alleinerziehende` : ''} und ${formatCurrency(totalHousing)} Kosten der Unterkunft). Nach Abzug des anzurechnenden Einkommens von ${formatCurrency(totalDeductedIncome)} (Erwerbseinkommen nach § 11b SGB II: ${formatCurrency(anrechenbaresErwerb)}${(otherIncome || 0) > 0 ? `, sonstige Einnahmen: ${formatCurrency(otherIncome || 0)}` : ''}) ergibt sich ein geschätzter monatlicher Leistungsbetrag von ${formatCurrency(finalBenefit)}.`,
       };
     },
     formula: 'Bürgergeld = Regelbedarf + Mehrbedarfe + anerkannte Wohnkosten - anrechenbares Einkommen',

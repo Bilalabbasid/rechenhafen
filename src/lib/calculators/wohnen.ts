@@ -137,20 +137,56 @@ export function calculatePropertyPurchaseFees(inputs: Record<string, any>): Calc
 }
 
 export function calculateRentalYield(inputs: Record<string, any>): CalculationResult {
-  const purchasePrice = parseFloat(inputs.purchasePrice) || 250000;
-  const purchaseFees = parseFloat(inputs.purchaseFees) || 25000;
-  const monthlyRentCold = parseFloat(inputs.monthlyRentCold) || 850;
-  const annualNonRecoverableCosts = parseFloat(inputs.annualNonRecoverableCosts) || 1200; // Verwaltung, Instandhaltungsrücklage
+  if (inputs.purchasePrice === undefined || inputs.purchasePrice === null || String(inputs.purchasePrice).trim() === '') {
+    return {
+      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Kaufpreis ein.',
+    };
+  }
+  const purchasePrice = parseFloat(inputs.purchasePrice);
+  if (isNaN(purchasePrice) || purchasePrice <= 0) {
+    return {
+      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '-' },
+      error: 'Der Kaufpreis muss größer als 0 € sein.',
+    };
+  }
+
+  if (inputs.monthlyRentCold === undefined || inputs.monthlyRentCold === null || String(inputs.monthlyRentCold).trim() === '') {
+    return {
+      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die monatliche Kaltmiete ein.',
+    };
+  }
+  const monthlyRentCold = parseFloat(inputs.monthlyRentCold);
+  if (isNaN(monthlyRentCold) || monthlyRentCold <= 0) {
+    return {
+      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '-' },
+      error: 'Die monatliche Kaltmiete muss größer als 0 € sein.',
+    };
+  }
+
+  const purchaseFees = inputs.purchaseFees !== undefined && inputs.purchaseFees !== null && String(inputs.purchaseFees).trim() !== ''
+    ? parseFloat(inputs.purchaseFees)
+    : 0;
+  if (isNaN(purchaseFees) || purchaseFees < 0) {
+    return {
+      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '-' },
+      error: 'Die Kaufnebenkosten dürfen nicht negativ sein.',
+    };
+  }
+
+  const annualNonRecoverableCosts = inputs.annualNonRecoverableCosts !== undefined && inputs.annualNonRecoverableCosts !== null && String(inputs.annualNonRecoverableCosts).trim() !== ''
+    ? parseFloat(inputs.annualNonRecoverableCosts)
+    : 0;
+  if (isNaN(annualNonRecoverableCosts) || annualNonRecoverableCosts < 0) {
+    return {
+      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '-' },
+      error: 'Die nicht umlegbaren Betriebskosten dürfen nicht negativ sein.',
+    };
+  }
 
   const totalInvestment = purchasePrice + purchaseFees;
   const annualGrossRent = monthlyRentCold * 12;
-
-  if (purchasePrice <= 0 || annualGrossRent <= 0) {
-    return {
-      primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '0 %' },
-      error: 'Bitte positive Werte für Kaufpreis und Kaltmiete eingeben.',
-    };
-  }
 
   // Bruttomietrendite = (Jahreskaltmiete / Kaufpreis) * 100
   const grossYield = (annualGrossRent / purchasePrice) * 100;
@@ -159,6 +195,10 @@ export function calculateRentalYield(inputs: Record<string, any>): CalculationRe
   const netAnnualIncome = annualGrossRent - annualNonRecoverableCosts;
   const netYield = (netAnnualIncome / totalInvestment) * 100;
   const factor = purchasePrice / annualGrossRent;
+
+  const summaryText = purchaseFees === 0 && annualNonRecoverableCosts === 0
+    ? `Unter der Annahme von 0,00 € Kaufnebenkosten und 0,00 € nicht umlegbaren Bewirtschaftungskosten beläuft sich die Gesamtinvestition auf ${formatCurrency(totalInvestment)}. Die Brutto- und Nettomietrendite betragen jeweils ${formatPercent(netYield, 2)} (Kaufpreisfaktor ${formatNumber(factor, 1)}). Hinweis: Beim regulären Immobilienerwerb fallen auch ohne Makler gesetzliche Grunderwerbsteuer, Notar- und Grundbuchkosten an.`
+    : `Die Liegenschaft erzielt eine Bruttomietrendite von ${formatPercent(grossYield, 2)} (Faktor ${formatNumber(factor, 1)}). Unter Berücksichtigung von ${formatCurrency(purchaseFees)} Nebenkosten (Gesamtinvestition: ${formatCurrency(totalInvestment)}) und ${formatCurrency(annualNonRecoverableCosts)} nicht umlegbaren Jahreskosten beträgt die reale Nettomietrendite ${formatPercent(netYield, 2)}.`;
 
   return {
     primary: {
@@ -170,11 +210,12 @@ export function calculateRentalYield(inputs: Record<string, any>): CalculationRe
     },
     secondary: [
       { id: 'grossYield', label: 'Bruttomietrendite (p.a.)', value: grossYield, formattedValue: formatPercent(grossYield, 2) },
+      { id: 'totalInvestment', label: 'Gesamtinvestition (Kaufpreis + Nebenkosten)', value: totalInvestment, formattedValue: formatCurrency(totalInvestment) },
       { id: 'factor', label: 'Kaufpreisfaktor (Vervielfältiger)', value: factor, formattedValue: `${formatNumber(factor, 1)} ×` },
       { id: 'annualRent', label: 'Jahreskaltmiete', value: annualGrossRent, formattedValue: formatCurrency(annualGrossRent) },
       { id: 'netIncome', label: 'Reiner Jahresreinertrag', value: netAnnualIncome, formattedValue: formatCurrency(netAnnualIncome) },
     ],
-    summaryText: `Die Liegenschaft erzielt eine Bruttomietrendite von ${formatPercent(grossYield, 2)} (Faktor ${formatNumber(factor, 1)}). Nach Abzug der nicht umlegbaren Kosten und unter Berücksichtigung der Nebenkosten beträgt die reale Nettomietrendite ${formatPercent(netYield, 2)}.`,
+    summaryText,
   };
 }
 

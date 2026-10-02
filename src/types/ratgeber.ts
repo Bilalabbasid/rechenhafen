@@ -42,6 +42,15 @@ export interface RatgeberSection {
     title: string;
     text: string;
   };
+  illustration?: RatgeberIllustration;
+}
+
+export interface RatgeberIllustration {
+  src: string;
+  alt: string;
+  caption?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface RatgeberOfficialSource {
@@ -69,6 +78,7 @@ export interface RatgeberArticle {
   publishedAt: string;
   updatedAt: string;
   readingTimeMin: number;
+  coverIllustration?: RatgeberIllustration;
   author: {
     name: string;
     role: string;

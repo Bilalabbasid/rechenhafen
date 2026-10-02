@@ -7,7 +7,7 @@ describe('RechenHafen Ratgeber / Blog QA Verification', () => {
   const articles = getAllArticles();
 
   it('contains published articles with unique valid slugs', () => {
-    expect(articles.length).toBe(11);
+    expect(articles.length).toBeGreaterThanOrEqual(13);
     const slugs = new Set<string>();
 
     for (const a of articles) {

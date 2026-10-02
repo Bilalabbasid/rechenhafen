@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useId } from 'react';
 import Link from 'next/link';
 import { CalculatorInput, CalculationResult } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
-import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe } from '@/lib/formatters';
 import { getUpcomingEasterDateString, parseDateParts } from '@/lib/calculators/dateMath';
@@ -28,6 +28,7 @@ interface Props {
     sourceUrl?: string;
     lastVerified: string;
   };
+  shortDescription?: string;
 }
 
 export default function CalculatorRunner({
@@ -38,8 +39,12 @@ export default function CalculatorRunner({
   initialResult,
   isTimeSensitive,
   timeSensitiveMeta,
+  shortDescription,
 }: Props) {
   const formId = useId();
+
+  // Field validation errors state
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Initialize inputs with default values
   const [inputs, setInputs] = useState<Record<string, any>>(() => {
@@ -171,18 +176,34 @@ export default function CalculatorRunner({
     const updatedInputs = { ...inputs, [id]: value };
     setInputs(updatedInputs);
 
-    // Track input validation errors safely without exposing user values
+    // Track input validation errors and update inline field errors
+    const newFieldErrors = { ...fieldErrors };
     const fieldDef = inputDefs.find((inp) => inp.id === id);
     if (fieldDef && fieldDef.type === 'number') {
-      const numVal = Number(value);
-      if (isNaN(numVal)) {
-        trackValidationError(slug, 'invalid_number');
-      } else if (fieldDef.min !== undefined && numVal < fieldDef.min) {
-        trackValidationError(slug, 'range_underflow');
-      } else if (fieldDef.max !== undefined && numVal > fieldDef.max) {
-        trackValidationError(slug, 'range_overflow');
+      const valStr = String(value ?? '').trim().replace(',', '.');
+      if (valStr === '') {
+        newFieldErrors[id] = 'Bitte geben Sie einen Wert ein.';
+      } else {
+        const numVal = parseFloat(valStr);
+        if (isNaN(numVal)) {
+          newFieldErrors[id] = 'Bitte eine gültige Zahl eingeben.';
+          trackValidationError(slug, 'invalid_number');
+        } else if (fieldDef.min !== undefined && numVal < fieldDef.min) {
+          newFieldErrors[id] = `Mindestwert: ${fieldDef.min}${fieldDef.unit ? ' ' + fieldDef.unit : ''}`;
+          trackValidationError(slug, 'range_underflow');
+        } else if (fieldDef.max !== undefined && numVal > fieldDef.max) {
+          newFieldErrors[id] = `Maximalwert: ${fieldDef.max}${fieldDef.unit ? ' ' + fieldDef.unit : ''}`;
+          trackValidationError(slug, 'range_overflow');
+        } else {
+          delete newFieldErrors[id];
+        }
       }
+    } else if (value === '' && fieldDef && fieldDef.type !== 'boolean') {
+      newFieldErrors[id] = 'Eingabe erforderlich.';
+    } else {
+      delete newFieldErrors[id];
     }
+    setFieldErrors(newFieldErrors);
 
     let fn = engineRef.current;
     if (!fn) {
@@ -362,6 +383,7 @@ export default function CalculatorRunner({
     for (const inp of inputDefs) {
       defaultVals[inp.id] = inp.defaultValue;
     }
+    setFieldErrors({});
     setDynamicBreaks([30]);
     setInputs(defaultVals);
     if (engineRef.current) {
@@ -409,6 +431,12 @@ export default function CalculatorRunner({
         <h2 className={styles.calculatorTitle}>{name}</h2>
         <span className={styles.clientTag}>Lokale Echtzeit-Berechnung</span>
       </div>
+
+      {shortDescription && (
+        <div className={styles.purposeBanner}>
+          <strong>Zweck:</strong> {shortDescription}
+        </div>
+      )}
 
       <div className={styles.calculatorLayout}>
         {/* Eingabebereich */}
@@ -550,7 +578,8 @@ export default function CalculatorRunner({
                   {field.type === 'select' ? (
                     <select
                       id={inputId}
-                      className={styles.select}
+                      className={`${styles.select} ${fieldErrors[field.id] ? styles.inputInvalid : ''}`}
+                      aria-invalid={Boolean(fieldErrors[field.id])}
                       value={inputs[field.id] ?? ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                     >
@@ -566,7 +595,8 @@ export default function CalculatorRunner({
                         id={inputId}
                         type="date"
                         lang="de"
-                        className={styles.input}
+                        className={`${styles.input} ${fieldErrors[field.id] ? styles.inputInvalid : ''}`}
+                        aria-invalid={Boolean(fieldErrors[field.id])}
                         value={inputs[field.id] ?? ''}
                         onChange={(e) => handleInputChange(field.id, e.target.value)}
                       />
@@ -593,7 +623,8 @@ export default function CalculatorRunner({
                       id={inputId}
                       type="text"
                       placeholder={field.placeholder}
-                      className={styles.input}
+                      className={`${styles.input} ${fieldErrors[field.id] ? styles.inputInvalid : ''}`}
+                      aria-invalid={Boolean(fieldErrors[field.id])}
                       value={inputs[field.id] ?? ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                     />
@@ -606,10 +637,18 @@ export default function CalculatorRunner({
                       min={field.min}
                       max={field.max}
                       placeholder={field.placeholder}
-                      className={styles.input}
+                      className={`${styles.input} ${fieldErrors[field.id] ? styles.inputInvalid : ''}`}
+                      aria-invalid={Boolean(fieldErrors[field.id])}
                       value={inputs[field.id] ?? ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                     />
+                  )}
+
+                  {fieldErrors[field.id] && (
+                    <div className={styles.fieldError} role="alert">
+                      <AlertCircle size={13} />
+                      <span>{fieldErrors[field.id]}</span>
+                    </div>
                   )}
 
                   {slug === 'arbeitszeitrechner' && field.id === 'endTime' && isOvernight && (
@@ -707,6 +746,13 @@ export default function CalculatorRunner({
             </div>
           ) : (
             <>
+              {Object.keys(fieldErrors).length > 0 && (
+                <div className={styles.staleNotice} role="alert">
+                  <AlertTriangle size={15} />
+                  <span>Eingaben unvollständig oder fehlerhaft. Das Ergebnis wird aktualisiert, sobald alle Felder gültig sind.</span>
+                </div>
+              )}
+
               {result.warning && (
                 <div className={styles.warningAlert} role="status">
                   <AlertTriangle size={18} className={styles.warningIcon} />
@@ -716,52 +762,114 @@ export default function CalculatorRunner({
                   </div>
                 </div>
               )}
-              <div className={styles.resultBox}>
-              <div className={styles.primaryResult}>
-                <span className={styles.primaryLabel}>{result.primary.label}</span>
-                <span className={styles.primaryValue}>
-                  {result.primary.formattedValue ??
-                    (result.primary.value !== undefined && result.primary.value !== null
-                      ? `${result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}`
-                      : '-')}
-                </span>
-                {result.primary.helpText && (
-                  <p style={{ margin: 'var(--space-2) 0 0', fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
-                    {result.primary.helpText}
+
+              {/* Plain German direct answer at top of result */}
+              {(result.directAnswer || result.summaryText) && (
+                <div className={styles.directAnswerCard}>
+                  <div className={styles.directAnswerHeader}>
+                    <Check size={16} className={styles.directAnswerIcon} />
+                    <span className={styles.directAnswerTitle}>Antwort auf einen Blick</span>
+                  </div>
+                  <p className={styles.directAnswerText}>
+                    {result.directAnswer || result.summaryText}
                   </p>
+                </div>
+              )}
+
+              <div className={styles.resultBox}>
+                <div className={styles.primaryResult}>
+                  <span className={styles.primaryLabel}>{result.primary.label}</span>
+                  <span className={styles.primaryValue}>
+                    {result.primary.formattedValue ??
+                      (result.primary.value !== undefined && result.primary.value !== null
+                        ? `${result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}`
+                        : '-')}
+                  </span>
+                  {result.primary.helpText && (
+                    <p style={{ margin: 'var(--space-2) 0 0', fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
+                      {result.primary.helpText}
+                    </p>
+                  )}
+                </div>
+
+                {/* Material Qualifications & Inclusions */}
+                {result.qualifications && result.qualifications.length > 0 && (
+                  <div className={styles.qualificationsContainer}>
+                    {result.qualifications.map((qual: string, qIdx: number) => (
+                      <div key={qIdx} className={styles.qualificationBadge}>
+                        <Info size={13} className={styles.qualificationIcon} />
+                        <span>{qual}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              </div>
 
-              {((result.secondary && result.secondary.length > 0) ||
-                (result.details && result.details.length > 0)) && (
-                <div className={styles.secondaryGrid}>
-                  {(result.secondary && result.secondary.length > 0
-                    ? result.secondary
-                    : result.details!
-                  ).map((sec, idx) => (
-                    <div key={sec.id || sec.label || idx} className={styles.secondaryItem}>
-                      <span className={styles.secondaryLabel}>{sec.label}</span>
-                      <span className={styles.secondaryValue}>
-                        {sec.formattedValue ??
-                          (sec.value !== undefined && sec.value !== null
-                            ? `${sec.value}${sec.unit ? ' ' + sec.unit : ''}`
-                            : '-')}
-                      </span>
-                      {sec.helpText && (
-                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                          {sec.helpText}
+                {/* Secondary Results Grid */}
+                {((result.secondary && result.secondary.length > 0) ||
+                  (result.details && result.details.length > 0)) && (
+                  <div className={styles.secondaryGrid}>
+                    {(result.secondary && result.secondary.length > 0
+                      ? result.secondary
+                      : result.details!
+                    ).map((sec, idx) => (
+                      <div key={sec.id || sec.label || idx} className={styles.secondaryItem}>
+                        <span className={styles.secondaryLabel}>{sec.label}</span>
+                        <span className={styles.secondaryValue}>
+                          {sec.formattedValue ??
+                            (sec.value !== undefined && sec.value !== null
+                              ? `${sec.value}${sec.unit ? ' ' + sec.unit : ''}`
+                              : '-')}
                         </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                        {sec.helpText && (
+                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                            {sec.helpText}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-              {result.summaryText && (
-                <div className={styles.summaryText}>
-                  <p>{result.summaryText}</p>
+                {/* Compact "Deine Berechnungsgrundlage" Box */}
+                <div className={styles.basisSummaryBox}>
+                  <div className={styles.basisSummaryHeader}>
+                    <span className={styles.basisSummaryTitle}>Deine Berechnungsgrundlage</span>
+                  </div>
+                  <div className={styles.basisGrid}>
+                    {(result.basisSummary && result.basisSummary.length > 0
+                      ? result.basisSummary
+                      : inputDefs
+                          .filter((def) => !def.dependsOn || (inputs[def.dependsOn.field] === def.dependsOn.value))
+                          .map((def) => ({
+                            label: def.label,
+                            value: inputs[def.id] !== undefined && inputs[def.id] !== ''
+                              ? `${inputs[def.id]}${def.unit ? ' ' + def.unit : ''}`
+                              : '–',
+                          }))
+                    ).map((bItem: { label: string; value: string }, bIdx: number) => (
+                      <div key={bIdx} className={styles.basisItem}>
+                        <span className={styles.basisLabel}>{bItem.label}</span>
+                        <span className={styles.basisValue}>{bItem.value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {result.calculationSteps && result.calculationSteps.length > 0 && (
+                    <div className={styles.stepsContainer}>
+                      <div className={styles.stepsTitle}>Rechenschritte:</div>
+                      {result.calculationSteps.map((step: string, sIdx: number) => (
+                        <div key={sIdx} className={styles.stepItem}>{step}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Scope notice for date and legal calculations */}
+                {(slug.includes('tage') || slug.includes('datum') || slug.includes('arbeitstage') || slug.includes('werktage') || slug.includes('alter')) && (
+                  <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 'var(--space-3)', lineHeight: 1.4 }}>
+                    Berechnung basiert auf der Zeitzone Europe/Berlin (MEZ/MESZ) unter Berücksichtigung von Schaltjahren und Feiertagsgesetzen.
+                  </div>
+                )}
 
               {/* Actions Bar */}
               <div className={styles.resultActionsBar}>

@@ -131,17 +131,41 @@ export function calculateFuelCost(inputs: Record<string, any>): CalculationResul
 }
 
 export function calculateCommuterAllowance(inputs: Record<string, any>): CalculationResult {
-  const distanceKm = parseInt(inputs.distanceKm || '25', 10);
-  const workdays = parseInt(inputs.workdays || '220', 10);
+  const rawDist = inputs.distanceKm !== undefined && inputs.distanceKm !== null && String(inputs.distanceKm).trim() !== ''
+    ? parseInt(String(inputs.distanceKm), 10)
+    : 25;
+  const rawWorkdays = inputs.workdays !== undefined && inputs.workdays !== null && String(inputs.workdays).trim() !== ''
+    ? parseInt(String(inputs.workdays), 10)
+    : 220;
   const homeOfficeDays = Math.max(0, parseInt(inputs.homeOfficeDays || '0', 10));
   const transportMode = inputs.transportMode || 'car'; // 'car' vs 'public'
 
-  if (distanceKm <= 0 || workdays <= 0) {
+  if (isNaN(rawDist) || rawDist < 0 || isNaN(rawWorkdays) || rawWorkdays < 0) {
     return {
-      primary: { id: 'allowance', label: 'Entfernungspauschale', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte positive Werte für einfache Entfernung und Arbeitstage angeben.',
+      primary: { id: 'totalAllowance', label: 'Steuerliche Entfernungspauschale (pro Jahr)', value: 0, formattedValue: '0,00 €' },
+      error: 'Bitte gültige Werte ab 0 für einfache Entfernung und Arbeitstage angeben.',
     };
   }
+
+  if (rawDist === 0 || rawWorkdays === 0) {
+    return {
+      primary: {
+        id: 'totalAllowance',
+        label: 'Steuerliche Entfernungspauschale (pro Jahr)',
+        value: 0,
+        formattedValue: '0,00 €',
+        highlight: true,
+      },
+      secondary: [
+        { id: 'effectiveDays', label: 'Anerkannte Fahrt-Tage', value: 0, formattedValue: '0 Tage' },
+        { id: 'perDay', label: 'Pauschale pro Pendeltag', value: 0, formattedValue: '0,00 €' },
+      ],
+      summaryText: 'Bei 0 km einfacher Entfernung zur ersten Tätigkeitsstätte oder 0 Pendeltagen fällt keine Entfernungspauschale an.',
+    };
+  }
+
+  const distanceKm = rawDist;
+  const workdays = rawWorkdays;
 
   const effectiveWorkdays = Math.max(0, workdays - homeOfficeDays);
 

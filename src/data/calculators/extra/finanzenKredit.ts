@@ -84,13 +84,49 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     searchKeywords: ['festgeld rechner', 'festgeld zinsen berechnen', 'festgeldanlage endkapital', 'zinsgarantie rechner'],
     inputs: [
       { id: 'principal', label: 'Anlagebetrag', type: 'number', defaultValue: 15000, min: 500, step: 500, unit: '€' },
-      { id: 'interestRate', label: 'Festzinssatz p.a.', type: 'number', defaultValue: 3.2, min: 0.1, step: 0.1, unit: '%' },
+      { id: 'interestRate', label: 'Festzinssatz p.a.', type: 'number', defaultValue: 3.2, min: 0, step: 0.1, unit: '%' },
       { id: 'years', label: 'Laufzeit in Jahren', type: 'number', defaultValue: 3, min: 1, max: 10, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const p = parseFloat(inputs.principal) || 15000;
-      const r = parseFloat(inputs.interestRate) || 3.2;
-      const y = parseInt(inputs.years, 10) || 3;
+      if (inputs.principal === undefined || inputs.principal === null || String(inputs.principal).trim() === '') {
+        return {
+          primary: { id: 'interest', label: 'Garantierter Zinsgewinn', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen Anlagebetrag ein.',
+        };
+      }
+      const p = parseFloat(inputs.principal);
+      if (isNaN(p) || p < 0) {
+        return {
+          primary: { id: 'interest', label: 'Garantierter Zinsgewinn', value: 0, formattedValue: '-' },
+          error: 'Der Anlagebetrag darf nicht negativ sein.',
+        };
+      }
+      if (inputs.interestRate === undefined || inputs.interestRate === null || String(inputs.interestRate).trim() === '') {
+        return {
+          primary: { id: 'interest', label: 'Garantierter Zinsgewinn', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den Festzinssatz ein (0 % falls zinsfrei).',
+        };
+      }
+      const r = parseFloat(inputs.interestRate);
+      if (isNaN(r) || r < 0) {
+        return {
+          primary: { id: 'interest', label: 'Garantierter Zinsgewinn', value: 0, formattedValue: '-' },
+          error: 'Der Festzinssatz darf nicht negativ sein.',
+        };
+      }
+      if (inputs.years === undefined || inputs.years === null || String(inputs.years).trim() === '') {
+        return {
+          primary: { id: 'interest', label: 'Garantierter Zinsgewinn', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Laufzeit in Jahren ein.',
+        };
+      }
+      const y = parseInt(inputs.years, 10);
+      if (isNaN(y) || y <= 0 || !Number.isInteger(Number(inputs.years))) {
+        return {
+          primary: { id: 'interest', label: 'Garantierter Zinsgewinn', value: 0, formattedValue: '-' },
+          error: 'Die Laufzeit muss eine ganze Zahl von mindestens 1 Jahr sein.',
+        };
+      }
       const endVal = p * Math.pow(1 + r / 100, y);
       const totalInterest = endVal - p;
       return {
@@ -99,7 +135,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           { id: 'endVal', label: 'Auszahlungsbetrag nach Laufzeit', value: endVal, formattedValue: formatCurrency(endVal) },
           { id: 'perYear', label: 'Zins pro Jahr', value: totalInterest / y, formattedValue: formatCurrency(totalInterest / y) },
         ],
-        summaryText: `Nach ${y} Jahren Festgeldanlage erhalten Sie insgesamt ${formatCurrency(endVal)} zurück (inklusive ${formatCurrency(totalInterest)} Zinsen).`,
+        summaryText: `Nach ${y} ${y === 1 ? 'Jahr' : 'Jahren'} Festgeldanlage erhalten Sie insgesamt ${formatCurrency(endVal)} zurück (inklusive ${formatCurrency(totalInterest)} Zinsen vor etwaigen gesondert anfallenden Kontoführungs- oder Transaktionsgebühren).`,
       };
     },
     formula: 'Endkapital = K₀ × (1 + p/100)^n',
@@ -712,23 +748,76 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'grossReturn', label: 'Bruttorendite des Marktes p.a.', type: 'number', defaultValue: 7.0, min: 1, step: 0.5, unit: '%' },
     ],
     calculate: (inputs) => {
-      const p = parseFloat(inputs.portfolioVal) || 40000;
-      const ter = parseFloat(inputs.ter) || 0.22;
-      const custody = parseFloat(inputs.custodyFee) || 0;
-      const y = parseInt(inputs.years, 10) || 20;
-      const gross = parseFloat(inputs.grossReturn) || 7.0;
+      if (inputs.portfolioVal === undefined || inputs.portfolioVal === null || String(inputs.portfolioVal).trim() === '') {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie das Anlagevermögen ein.',
+        };
+      }
+      const p = parseFloat(inputs.portfolioVal);
+      if (isNaN(p) || p < 0) {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Das Anlagevermögen darf nicht negativ sein.',
+        };
+      }
+      if (inputs.ter === undefined || inputs.ter === null || String(inputs.ter).trim() === '') {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die laufenden Fondskosten (TER) ein (0 % falls keine TER anfällt).',
+        };
+      }
+      const ter = parseFloat(inputs.ter);
+      if (isNaN(ter) || ter < 0) {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Die Fondskosten (TER) dürfen nicht negativ sein.',
+        };
+      }
+      const custody = inputs.custodyFee !== undefined && inputs.custodyFee !== null && String(inputs.custodyFee).trim() !== ''
+        ? parseFloat(inputs.custodyFee)
+        : 0;
+      if (isNaN(custody) || custody < 0) {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Die Depotführungsgebühr darf nicht negativ sein.',
+        };
+      }
+      const y = parseInt(inputs.years, 10);
+      if (isNaN(y) || y <= 0 || !Number.isInteger(Number(inputs.years))) {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Der Anlagezeitraum muss eine ganze Zahl von mindestens 1 Jahr sein.',
+        };
+      }
+      const gross = inputs.grossReturn !== undefined && inputs.grossReturn !== null && String(inputs.grossReturn).trim() !== ''
+        ? parseFloat(inputs.grossReturn)
+        : 7.0;
+      if (isNaN(gross) || gross < 0) {
+        return {
+          primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: 0, formattedValue: '-' },
+          error: 'Die Bruttorendite darf nicht negativ sein.',
+        };
+      }
       const grossVal = p * Math.pow(1 + gross / 100, y);
       const netRate = Math.max(0, gross - ter);
       let netVal = p;
-      for (let i = 0; i < y; i++) netVal = netVal * (1 + netRate / 100) - custody;
+      for (let i = 0; i < y; i++) netVal = Math.max(0, netVal * (1 + netRate / 100) - custody);
       const lost = Math.max(0, grossVal - netVal);
+      const terLostOnly = ter === 0 ? 0 : Math.max(0, grossVal - (p * Math.pow(1 + (gross - ter) / 100, y)));
+
+      const summaryText = ter === 0 && custody === 0
+        ? `Bei 0 % laufenden Fondskosten (TER) und 0 € Depotführungsgebühr entsteht kein Kostenverlust über die Laufzeit. Eventuelle Transaktions- oder Ausgabeaufschläge sind gesondert zu berücksichtigen.`
+        : `Durch laufende Produktkosten (${formatPercent(ter)} TER)${custody > 0 ? ` und Depotführungsgebühren (${formatCurrency(custody)}/Jahr)` : ''} entgehen Ihnen in ${y} Jahren ca. ${formatCurrency(lost)} an Vermögenswachstum (davon ca. ${formatCurrency(terLostOnly)} rein TER-bedingt).`;
+
       return {
         primary: { id: 'lost', label: 'Gesamter Kostenverlust über die Laufzeit', value: lost, formattedValue: formatCurrency(lost), highlight: true },
         secondary: [
           { id: 'withCosts', label: 'Endvermögen mit Kosten', value: netVal, formattedValue: formatCurrency(netVal) },
           { id: 'withoutCosts', label: 'Endvermögen ohne Kosten', value: grossVal, formattedValue: formatCurrency(grossVal) },
+          { id: 'terCostOnly', label: 'Davon rein TER-bedingte Kostenminderung', value: terLostOnly, formattedValue: formatCurrency(terLostOnly) },
         ],
-        summaryText: `Durch laufende Kosten von ${formatPercent(ter)} TER entgehen Ihnen in ${y} Jahren ca. ${formatCurrency(lost)} an Vermögenswachstum.`,
+        summaryText,
       };
     },
     formula: 'Kostenverlust = Endwert_ohne_Kosten - Endwert_mit_Kosten',
@@ -1082,13 +1171,13 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     searchKeywords: ['baufinanzierung rechner', 'immobiliendarlehen monatsrate', 'baugeld zinsbindung rechner', 'tilgungsplan hauskauf'],
     inputs: [
       { id: 'loanAmount', label: 'Darlehensbetrag (Kreditsumme)', type: 'number', defaultValue: 300000, min: 10000, step: 5000, unit: '€' },
-      { id: 'interestRate', label: 'Sollzinssatz p.a.', type: 'number', defaultValue: 3.6, min: 0.5, step: 0.1, unit: '%' },
+      { id: 'interestRate', label: 'Sollzinssatz p.a.', type: 'number', defaultValue: 3.6, min: 0, step: 0.1, unit: '%' },
       { id: 'initialRepayment', label: 'Anfängliche Tilgung', type: 'number', defaultValue: 2.0, min: 1.0, max: 10, step: 0.25, unit: '%' },
       { id: 'fixedYears', label: 'Sollzinsbindung in Jahren', type: 'number', defaultValue: 15, min: 5, max: 30, step: 5, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
       const loan = parseFloat(inputs.loanAmount) || 300000;
-      const z = parseFloat(inputs.interestRate) || 3.6;
+      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 3.6;
       const t = parseFloat(inputs.initialRepayment) || 2.0;
       const years = parseInt(inputs.fixedYears, 10) || 15;
       const annualAnnuity = loan * ((z + t) / 100);
@@ -1145,14 +1234,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     inputs: [
       { id: 'carPrice', label: 'Fahrzeugpreis', type: 'number', defaultValue: 28000, min: 1000, step: 500, unit: '€' },
       { id: 'downPayment', label: 'Anzahlung / Inzahlungnahme', type: 'number', defaultValue: 5000, min: 0, step: 500, unit: '€' },
-      { id: 'interestRate', label: 'Effektiver Jahreszins', type: 'number', defaultValue: 5.5, min: 0.5, step: 0.1, unit: '%' },
+      { id: 'interestRate', label: 'Effektiver Jahreszins', type: 'number', defaultValue: 5.5, min: 0, step: 0.1, unit: '%' },
       { id: 'months', label: 'Laufzeit in Monaten', type: 'number', defaultValue: 48, min: 12, max: 96, step: 6, unit: 'Monate' },
       { id: 'balloonPayment', label: 'Schlussrate (0 € bei klassischem Kredit)', type: 'number', defaultValue: 8000, min: 0, step: 500, unit: '€' },
     ],
     calculate: (inputs) => {
       const price = parseFloat(inputs.carPrice) || 28000;
       const down = parseFloat(inputs.downPayment) || 5000;
-      const rate = parseFloat(inputs.interestRate) || 5.5;
+      const rate = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 5.5;
       const m = parseInt(inputs.months, 10) || 48;
       const balloon = parseFloat(inputs.balloonPayment) || 0;
       const loan = Math.max(0, price - down);
@@ -1318,12 +1407,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     ],
     inputs: [
       { id: 'monthlyBudget', label: 'Monatlich leistbare Kreditrate', type: 'number', defaultValue: 500, min: 50, step: 25, unit: '€' },
-      { id: 'interestRate', label: 'Angenommener Zinssatz p.a.', type: 'number', defaultValue: 4.5, min: 0.5, step: 0.1, unit: '%' },
+      { id: 'interestRate', label: 'Angenommener Zinssatz p.a.', type: 'number', defaultValue: 4.5, min: 0, step: 0.1, unit: '%' },
       { id: 'termYears', label: 'Gewünschte Laufzeit in Jahren', type: 'number', defaultValue: 5, min: 1, max: 35, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
       const rate = parseFloat(inputs.monthlyBudget) || 500;
-      const z = parseFloat(inputs.interestRate) || 4.5;
+      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 4.5;
       const years = parseInt(inputs.termYears, 10) || 5;
       const r = (z / 100) / 12;
       const m = years * 12;
@@ -1449,17 +1538,17 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     searchKeywords: ['volltilger rechner', 'volltilgerdarlehen monatsrate', 'kredit ohne restschuld tilgen', 'schuldenfrei nach 20 jahren'],
     inputs: [
       { id: 'loanAmount', label: 'Darlehensbetrag', type: 'number', defaultValue: 200000, min: 10000, step: 5000, unit: '€' },
-      { id: 'interestRate', label: 'Fester Sollzins p.a.', type: 'number', defaultValue: 3.5, min: 0.5, step: 0.1, unit: '%' },
+      { id: 'interestRate', label: 'Fester Sollzins p.a.', type: 'number', defaultValue: 3.5, min: 0, step: 0.1, unit: '%' },
       { id: 'years', label: 'Wunschlaufzeit bis Schuldenfreiheit', type: 'number', defaultValue: 20, min: 5, max: 35, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
       const loan = parseFloat(inputs.loanAmount) || 200000;
-      const z = parseFloat(inputs.interestRate) || 3.5;
+      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 3.5;
       const years = parseInt(inputs.years, 10) || 20;
       const r = (z / 100) / 12;
       const m = years * 12;
-      const monthlyRate = loan * (r / (1 - Math.pow(1 + r, -m)));
-      const initialTilgung = ((monthlyRate * 12) / loan) * 100 - z;
+      const monthlyRate = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
+      const initialTilgung = r > 0 ? ((monthlyRate * 12) / loan) * 100 - z : (100 / years);
       return {
         primary: { id: 'rate', label: 'Monatliche Volltilger-Rate', value: monthlyRate, formattedValue: formatCurrency(monthlyRate), highlight: true },
         secondary: [
@@ -1501,16 +1590,16 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     searchKeywords: ['modernisierungskredit rechner', 'wohnkredit sanierung zinsen', 'kredit waermepumpe berechnen', 'renovierungskredit ohne grundschuld'],
     inputs: [
       { id: 'amount', label: 'Modernisierungsbudget', type: 'number', defaultValue: 35000, min: 5000, step: 2500, unit: '€' },
-      { id: 'interestRate', label: 'Sollzins p.a.', type: 'number', defaultValue: 4.8, min: 1, step: 0.1, unit: '%' },
+      { id: 'interestRate', label: 'Sollzins p.a.', type: 'number', defaultValue: 4.8, min: 0, step: 0.1, unit: '%' },
       { id: 'termYears', label: 'Laufzeit in Jahren', type: 'number', defaultValue: 8, min: 2, max: 15, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
       const loan = parseFloat(inputs.amount) || 35000;
-      const z = parseFloat(inputs.interestRate) || 4.8;
+      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 4.8;
       const y = parseInt(inputs.termYears, 10) || 8;
       const r = (z / 100) / 12;
       const m = y * 12;
-      const rate = loan * (r / (1 - Math.pow(1 + r, -m)));
+      const rate = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
       return {
         primary: { id: 'rate', label: 'Monatliche Rate', value: rate, formattedValue: formatCurrency(rate), highlight: true },
         secondary: [

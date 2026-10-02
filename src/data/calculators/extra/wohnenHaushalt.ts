@@ -16,24 +16,75 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die Mietminderung auf die Bruttowarmmiete bei Mängeln an der Mietsache (§ 536 BGB).',
     searchKeywords: ['mietminderung rechner', 'mietminderungstabelle schimmel', 'mietminderung heizungsausfall prozent', 'miete mindern paragraph 536 bgb'],
     inputs: [
-      { id: 'warmRent', label: 'Monatliche Warmmiete (Bruttomiete inkl. Nebenkosten)', type: 'number', defaultValue: 950, min: 100, step: 25, unit: '€' },
-      { id: 'defectPct', label: 'Minderungssatz laut Urteilen / Minderungstabelle', type: 'number', defaultValue: 20, min: 1, max: 100, step: 1, unit: '%' },
-      { id: 'defectDays', label: 'Dauer des Mangels im Monat (Tage)', type: 'number', defaultValue: 30, min: 1, max: 31, step: 1, unit: 'Tage' },
+      { id: 'warmRent', label: 'Monatliche Warmmiete (Bruttomiete inkl. Nebenkosten)', type: 'number', defaultValue: 950, min: 0, step: 25, unit: '€' },
+      { id: 'defectPct', label: 'Minderungssatz laut Urteilen / Minderungstabelle', type: 'number', defaultValue: 20, min: 0, max: 100, step: 1, unit: '%' },
+      { id: 'defectDays', label: 'Dauer des Mangels im Monat (Tage)', type: 'number', defaultValue: 30, min: 0, max: 31, step: 1, unit: 'Tage', helpText: 'Abrechnungskonvention: Im deutschen Mietrecht wird der Abrechnungsmonat einheitlich mit 30 Tagen berechnet (§ 536 BGB / BGH).' },
     ],
     calculate: (inputs) => {
-      const warm = parseFloat(inputs.warmRent) || 950;
-      const pct = parseFloat(inputs.defectPct) || 20;
-      const days = parseInt(inputs.defectDays, 10) || 30;
+      const warmStr = String(inputs.warmRent ?? inputs.monthlyRent ?? '').trim();
+      const pctStr = String(inputs.defectPct ?? inputs.reductionPercent ?? '').trim();
+      const daysStr = String(inputs.defectDays ?? inputs.days ?? '').trim();
+
+      if (warmStr === '') {
+        return {
+          primary: { id: 'reduction', label: 'Errechnete Mietminderung', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie die monatliche Warmmiete ein.',
+        };
+      }
+      if (pctStr === '') {
+        return {
+          primary: { id: 'reduction', label: 'Errechnete Mietminderung', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie den Minderungssatz in % ein (0 % falls keine Minderung anfällt).',
+        };
+      }
+      if (daysStr === '') {
+        return {
+          primary: { id: 'reduction', label: 'Errechnete Mietminderung', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie die Dauer des Mangels in Tagen ein (0 bis 30 Tage).',
+        };
+      }
+
+      const warm = parseFloat(warmStr.replace(',', '.'));
+      const pct = parseFloat(pctStr.replace(',', '.'));
+      const days = parseInt(daysStr, 10);
+
+      if (isNaN(warm) || isNaN(pct) || isNaN(days) || warm < 0 || pct < 0 || days < 0) {
+        return {
+          primary: { id: 'reduction', label: 'Errechnete Mietminderung', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Zahlenwerte ein (Warmmiete, Minderungssatz und Tage dürfen nicht negativ sein).',
+        };
+      }
+
       const fullMonthReduction = warm * (pct / 100);
-      const actualReduction = (fullMonthReduction * days) / 30;
+      const actualReduction = (days > 0 && pct > 0) ? (fullMonthReduction * days) / 30 : 0;
       const reducedRent = warm - actualReduction;
+      const dailySaving = (days > 0 && actualReduction > 0) ? actualReduction / days : 0;
+
       return {
         primary: { id: 'reduction', label: 'Errechnete Mietminderung', value: actualReduction, formattedValue: formatCurrency(actualReduction), highlight: true },
         secondary: [
           { id: 'reducedRent', label: 'Geminderte Restmiete', value: reducedRent, formattedValue: formatCurrency(reducedRent) },
-          { id: 'dailySaving', label: 'Minderung pro Tag', value: actualReduction / days, formattedValue: formatCurrency(actualReduction / days) },
+          { id: 'dailySaving', label: 'Minderung pro Tag', value: dailySaving, formattedValue: formatCurrency(dailySaving) },
         ],
-        summaryText: `Bei einem Minderungssatz von ${formatPercent(pct, 0)} über ${days} Tage mindert sich Ihre Monatsmiete um ${formatCurrency(actualReduction)} auf ${formatCurrency(reducedRent)}.`,
+        summaryText: actualReduction === 0
+          ? `Bei einem Minderungssatz von ${formatPercent(pct, 0)} über ${days} Tage beträgt die Mietminderung 0,00 €. Die monatliche Miete verbleibt unverändert bei ${formatCurrency(warm)}.`
+          : `Bei einem Minderungssatz von ${formatPercent(pct, 0)} über ${days} Tage mindert sich Ihre Monatsmiete um ${formatCurrency(actualReduction)} auf ${formatCurrency(reducedRent)}.`,
+        directAnswer: actualReduction === 0
+          ? `Bei ${formatCurrency(warm)} Warmmiete und ${formatPercent(pct, 0)} Minderung für ${days} Tage beträgt die Mietminderung ${formatCurrency(0)}. Die Miete bleibt bei ${formatCurrency(warm)}.`
+          : `Bei ${formatCurrency(warm)} Warmmiete und ${formatPercent(pct, 0)} Minderung für ${days} Tage beträgt die Mietminderung ${formatCurrency(actualReduction)}. Die geminderte Monatsmiete beträgt ${formatCurrency(reducedRent)}.`,
+        qualifications: [
+          'Berechnungsgrundlage ist nach ständiger BGH-Rechtsprechung (BGH VIII ZR 225/03) die Bruttowarmmiete.',
+          'Monats-/Tageskonvention: Der Kalendermonat wird juristisch einheitlich mit 30 Tagen berechnet (§ 536 BGB / BGH VIII ZR 296/09).',
+        ],
+        basisSummary: [
+          { label: 'Warmmiete', value: formatCurrency(warm) },
+          { label: 'Minderungssatz', value: formatPercent(pct, 0) },
+          { label: 'Ausfalltage', value: `${days} von 30 Tagen` },
+        ],
       };
     },
     formula: 'Mietminderung = Warmmiete × (Minderungssatz / 100) × (Tage des Mangels / 30)',
@@ -68,27 +119,78 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Simuliert den vertraglich vereinbarten Verlauf von Staffelungsmieten über die Vertragslaufzeit.',
     searchKeywords: ['staffelmiete rechner', 'staffelmietvertrag mieterhoehung', 'staffelmiete prozent oder betrag', 'paragraph 557a bgb'],
     inputs: [
-      { id: 'startRent', label: 'Anfangs-Kaltmiete', type: 'number', defaultValue: 750, min: 100, step: 25, unit: '€' },
-      { id: 'increaseAmount', label: 'Mieterhöhung je Staffel (Betrag in Euro)', type: 'number', defaultValue: 35, min: 5, step: 5, unit: '€' },
+      { id: 'startRent', label: 'Anfangs-Kaltmiete', type: 'number', defaultValue: 750, min: 0, step: 25, unit: '€' },
+      { id: 'increaseAmount', label: 'Mieterhöhung je Staffel (Betrag in Euro)', type: 'number', defaultValue: 35, min: 0, step: 5, unit: '€', helpText: 'Vereinbarter Erhöhungsbetrag je Staffel in Euro. Bei 0 € bleibt die Miete unverändert.' },
       { id: 'intervalMonths', label: 'Staffelabstand in Monaten (mindestens 12 Monate)', type: 'number', defaultValue: 12, min: 12, max: 60, step: 12, unit: 'Monate' },
       { id: 'totalYears', label: 'Betrachtungszeitraum in Jahren', type: 'number', defaultValue: 5, min: 1, max: 15, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const start = parseFloat(inputs.startRent) || 750;
-      const inc = parseFloat(inputs.increaseAmount) || 35;
-      const interval = parseInt(inputs.intervalMonths, 10) || 12;
-      const years = parseInt(inputs.totalYears, 10) || 5;
+      const startStr = String(inputs.startRent ?? '').trim();
+      const incStr = String(inputs.increaseAmount ?? '').trim();
+      const intervalStr = String(inputs.intervalMonths ?? '').trim();
+      const yearsStr = String(inputs.totalYears ?? inputs.years ?? '').trim();
+
+      const start = startStr !== '' ? parseFloat(startStr.replace(',', '.')) : 750;
+      const inc = incStr !== '' ? parseFloat(incStr.replace(',', '.')) : 35;
+      const interval = intervalStr !== '' ? parseInt(intervalStr, 10) : 12;
+      const years = yearsStr !== '' ? parseInt(yearsStr, 10) : 5;
+
+      if (isNaN(start) || isNaN(inc) || isNaN(interval) || isNaN(years) || start < 0 || inc < 0 || interval < 12 || years < 1) {
+        return {
+          primary: { id: 'endRent', label: 'Kaltmiete nach Laufzeit', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Staffelabstand mindestens 12 Monate nach § 557a BGB).',
+        };
+      }
+
       const stepsCount = Math.floor((years * 12) / interval);
       const endRent = start + (stepsCount * inc);
       const totalPaid = start * years * 12 + (stepsCount * (stepsCount + 1) / 2) * inc * (interval / 12) * 12;
+      const pctIncrease = start > 0 ? ((endRent - start) / start) * 100 : 0;
+
+      const breakdownRows = [];
+      for (let y = 1; y <= years; y++) {
+        const passedIntervals = Math.floor((y * 12) / interval);
+        const rentAtYear = start + (passedIntervals * inc);
+        breakdownRows.push({
+          period: `Jahr ${y}`,
+          values: {
+            year: `Jahr ${y}`,
+            rent: formatCurrency(rentAtYear),
+            increase: formatCurrency(rentAtYear - start),
+          },
+        });
+      }
+
       return {
         primary: { id: 'endRent', label: `Kaltmiete nach ${years} Jahren`, value: endRent, formattedValue: formatCurrency(endRent), highlight: true },
         secondary: [
           { id: 'totalIncrease', label: 'Gesamte Mietsteigerung', value: endRent - start, formattedValue: formatCurrency(endRent - start) },
-          { id: 'percentIncrease', label: 'Steigerung in Prozent', value: ((endRent - start) / start) * 100, formattedValue: formatPercent(((endRent - start) / start) * 100, 1) },
+          { id: 'percentIncrease', label: 'Steigerung in Prozent', value: pctIncrease, formattedValue: formatPercent(pctIncrease, 1) },
           { id: 'stepsCount', label: 'Anzahl Mieterhöhungen', value: stepsCount, formattedValue: `${stepsCount} Staffeln` },
         ],
-        summaryText: `Nach ${years} Jahren und ${stepsCount} Staffeln steigt Ihre Kaltmiete von ${formatCurrency(start)} auf ${formatCurrency(endRent)} (${formatPercent(((endRent - start) / start) * 100, 1)} Zuwachs).`,
+        breakdown: {
+          columns: [
+            { key: 'year', label: 'Jahr' },
+            { key: 'rent', label: 'Monatliche Kaltmiete' },
+            { key: 'increase', label: 'Gesamterhöhung' },
+          ],
+          rows: breakdownRows,
+        },
+        summaryText: `Nach ${years} Jahren und ${stepsCount} Staffeln steigt Ihre Kaltmiete von ${formatCurrency(start)} auf ${formatCurrency(endRent)} (${formatPercent(pctIncrease, 1)} Zuwachs).`,
+        directAnswer: inc === 0
+          ? `Bei 0,00 € Staffelbetrag bleibt die Kaltmiete nach ${years} Jahren und ${stepsCount} Intervallen unverändert bei ${formatCurrency(endRent)}.`
+          : `Nach ${years} Jahren und ${stepsCount} Staffeln à ${formatCurrency(inc)} steigt die Kaltmiete von ${formatCurrency(start)} auf ${formatCurrency(endRent)} (+${formatCurrency(endRent - start)}).`,
+        qualifications: [
+          'Mathematische Projektion der Mietentwicklung über den gewählten Zeitraum.',
+          'Rechtlicher Rahmen (§ 557a BGB): Eine rechtswirksame Staffelmietvereinbarung verlangt bezifferte Beträge und Mindestabstände von einem Jahr.',
+        ],
+        basisSummary: [
+          { label: 'Anfangsmiete', value: formatCurrency(start) },
+          { label: 'Erhöhungsbetrag', value: `${formatCurrency(inc)} / Staffel` },
+          { label: 'Staffelintervall', value: `${interval} Monate` },
+          { label: 'Laufzeit', value: `${years} Jahre (${stepsCount} Staffeln)` },
+        ],
       };
     },
     formula: 'Endmiete = Anfangsmiete + (Anzahl Staffeln × Staffelbetrag)',
@@ -1231,38 +1333,107 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt den Stromverbrauch und die jährlichen Stromkosten für beliebige Haushaltsgeräte.',
     searchKeywords: ['stromkosten rechner geraete', 'watt in euro umrechnen', 'kwh rechner stromkosten', 'stromverbrauch haushalt berechnen'],
     inputs: [
-      { id: 'powerWatts', label: 'Leistungsaufnahme des Geräts in Watt', type: 'number', defaultValue: 150, min: 1, step: 5, unit: 'W' },
+      { id: 'powerWatts', label: 'Leistungsaufnahme des Geräts in Watt', type: 'number', defaultValue: 150, min: 0, step: 5, unit: 'W' },
       { id: 'hoursPerDay', label: 'Nutzungsdauer pro Tag in Stunden', type: 'number', defaultValue: 4, min: 0.1, max: 24, step: 0.5, unit: 'Std./Tag' },
-      { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 10, max: 90, step: 0.5, unit: 'ct/kWh' },
+      { id: 'usageDays', label: 'Nutzungstage im Betrachtungszeitraum', type: 'number', defaultValue: 365, min: 1, max: 365, step: 1, unit: 'Tage', helpText: 'z. B. 30 Tage für einen Monat, 365 Tage für ein ganzes Jahr oder 10 Tage für temporäre Heizgeräte' },
+      { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 5, max: 90, step: 0.5, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const watts = parseFloat(inputs.powerWatts) || 150;
-      const hours = parseFloat(inputs.hoursPerDay) || 4;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
-      const kwhPerDay = (watts * hours) / 1000;
-      const kwhPerYear = kwhPerDay * 365;
-      const costYear = (kwhPerYear * priceCent) / 100;
-      const costMonth = costYear / 12;
+      const wattsStr = String(inputs.powerWatts ?? '').trim();
+      const hoursStr = String(inputs.hoursPerDay ?? '').trim();
+      const priceStr = String(inputs.electricityPrice ?? '').trim();
+      const daysStr = String(inputs.usageDays ?? '').trim();
+
+      const watts = wattsStr !== '' ? parseFloat(wattsStr.replace(',', '.')) : 150;
+      const hours = hoursStr !== '' ? parseFloat(hoursStr.replace(',', '.')) : 4;
+      const days = daysStr !== '' ? parseFloat(daysStr.replace(',', '.')) : 365;
+      const priceCent = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 36;
+
+      if (isNaN(watts) || isNaN(hours) || isNaN(days) || isNaN(priceCent)) {
+        return {
+          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Zahlenwerte ein.',
+        };
+      }
+
+      if (watts < 0 || hours < 0 || days <= 0 || priceCent < 0) {
+        return {
+          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Leistung, Stunden und Strompreis dürfen nicht negativ sein. Die Nutzungstage müssen mindestens 1 betragen.',
+        };
+      }
+
+      const kwhPerHour = watts / 1000;
+      const kwhPerDay = kwhPerHour * hours;
+      const totalKwhPeriod = kwhPerDay * days;
+      const costPeriod = (totalKwhPeriod * priceCent) / 100;
+      const costPerHour = (kwhPerHour * priceCent) / 100;
+      const costPerDay = (kwhPerDay * priceCent) / 100;
+
+      const isFullYear = days === 365;
+      const periodLabel = isFullYear ? 'Stromkosten pro Jahr (365 Tage)' : `Stromkosten für ${days} Nutzungstage`;
+
       return {
-        primary: { id: 'costYear', label: 'Jährliche Stromkosten', value: costYear, formattedValue: formatCurrency(costYear), highlight: true },
+        primary: {
+          id: 'costPeriod',
+          label: periodLabel,
+          value: costPeriod,
+          formattedValue: formatCurrency(costPeriod),
+          highlight: true,
+        },
         secondary: [
-          { id: 'costMonth', label: 'Monatliche Kosten', value: costMonth, formattedValue: formatCurrency(costMonth) },
-          { id: 'kwhPerYear', label: 'Stromverbrauch pro Jahr', value: kwhPerYear, formattedValue: `${formatNumber(kwhPerYear, 1)} kWh` },
-          { id: 'costDay', label: 'Kosten pro Tag', value: costYear / 365, formattedValue: formatCurrency(costYear / 365) },
+          { id: 'totalKwhPeriod', label: `Stromverbrauch (${days} Tage)`, value: totalKwhPeriod, formattedValue: `${formatNumber(totalKwhPeriod, 1)} kWh` },
+          { id: 'costPerHour', label: 'Kosten pro Betriebsstunde', value: costPerHour, formattedValue: `${formatCurrency(costPerHour)} / Std.` },
+          { id: 'costPerDay', label: 'Kosten pro Nutzungstag', value: costPerDay, formattedValue: `${formatCurrency(costPerDay)} / Tag` },
+          { id: 'costYearExtrapolated', label: 'Hochrechnung auf 365 Tage', value: costPerDay * 365, formattedValue: formatCurrency(costPerDay * 365) },
         ],
-        summaryText: `Bei ${watts} Watt und ${hours} Stunden täglich verbraucht das Gerät ${formatNumber(kwhPerYear, 1)} kWh im Jahr. Das kostet ca. ${formatCurrency(costYear)} jährlich (${formatCurrency(costMonth)}/Monat).`,
+        summaryText: `Dein Gerät verbraucht bei ${formatNumber(watts, 0)} Watt und täglich ${formatNumber(hours, 1)} Stunden Nutzung in ${days} Tagen insgesamt ${formatNumber(totalKwhPeriod, 1)} kWh. Bei ${formatNumber(priceCent, 1)} Cent/kWh kostet das ${formatCurrency(costPeriod)}.`,
+        directAnswer: `Dein Gerät verbraucht bei ${formatNumber(watts, 0)} Watt und täglich ${formatNumber(hours, 1)} Stunden Nutzung in ${days} Tagen insgesamt ${formatNumber(totalKwhPeriod, 1)} kWh. Bei ${formatNumber(priceCent, 1)} Cent/kWh kostet das ${formatCurrency(costPeriod)}.`,
+        qualifications: [
+          'Nur reine Verbrauchskosten; ohne Grundpreis des Stromversorgers.',
+          'Schätzung bei durchgehend voller Leistung; Thermostate oder Ruhemodi können den tatsächlichen Verbrauch reduzieren.',
+          isFullYear
+            ? 'Berechnet für ein volles Kalenderjahr (365 Nutzungstage).'
+            : `Berechnet für exakt ${days} Nutzungstage (keine Zwangshochrechnung auf das Gesamtjahr).`,
+        ],
+        calculationSteps: [
+          `${formatNumber(watts / 1000, 2)} kW × ${formatNumber(hours, 1)} Stunden pro Tag × ${days} Tage = ${formatNumber(totalKwhPeriod, 1)} kWh`,
+          `${formatNumber(totalKwhPeriod, 1)} kWh × ${formatCurrency(priceCent / 100, 2)}/kWh = ${formatCurrency(costPeriod)}`,
+        ],
+        basisSummary: [
+          { label: 'Leistung des Geräts', value: `${formatNumber(watts, 0)} Watt` },
+          { label: 'Nutzung pro Tag', value: `${formatNumber(hours, 1)} Stunden` },
+          { label: 'Nutzungstage', value: `${days} Tage` },
+          { label: 'Strompreis', value: `${formatNumber(priceCent, 1)} Cent/kWh` },
+        ],
       };
     },
-    formula: 'Kosten/Jahr = (Watt × Stunden/Tag × 365 / 1000) × Strompreis in €',
-    formulaExplanation: 'Watt dividiert durch 1.000 ergibt Kilowatt (kW). Multipliziert mit den Betriebsstunden und dem Arbeitspreis je kWh erhält man die Gesamtkosten.',
+    formula: 'Kosten = (Watt × Stunden/Tag × Nutzungstage / 1000) × Strompreis in €',
+    formulaExplanation: 'Watt dividiert durch 1.000 ergibt Kilowatt (kW). Multipliziert mit den Betriebsstunden, den tatsächlichen Nutzungstagen und dem Arbeitspreis je kWh erhält man die Gesamtkosten ohne pauschale Zwangshochrechnung auf 365 Tage.',
     workedExample: {
-      title: 'Beispiel: 150-Watt Fernseher 4 Stunden täglich bei 36 ct/kWh',
-      inputValues: [{ label: 'Leistung', value: '150 Watt' }, { label: 'Betriebszeit', value: '4 Std./Tag' }, { label: 'Strompreis', value: '36 ct/kWh' }],
-      steps: ['Täglich: 150 W × 4 h = 600 Wh = 0,6 kWh/Tag', 'Jährlich: 0,6 kWh × 365 = 219 kWh', 'Kosten: 219 kWh × 0,36 € = 78,84 €'],
+      title: 'Beispiel 1: 150-Watt Fernseher 4 Stunden täglich an 365 Tagen bei 36 ct/kWh',
+      inputValues: [{ label: 'Leistung', value: '150 Watt' }, { label: 'Betriebszeit', value: '4 Std./Tag' }, { label: 'Nutzungstage', value: '365 Tage' }, { label: 'Strompreis', value: '36 ct/kWh' }],
+      steps: ['Täglich: 150 W × 4 h = 600 Wh = 0,6 kWh/Tag', '365 Tage: 0,6 kWh × 365 = 219 kWh', 'Kosten: 219 kWh × 0,36 € = 78,84 €'],
       result: '78,84 € Stromkosten pro Jahr',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: 150-Watt Fernseher 4 Stunden täglich an 365 Tagen bei 36 ct/kWh',
+        description: 'Täglich: 0,6 kWh. Jährlich (365 Tage): 219 kWh. Kosten: 78,84 € pro Jahr.',
+        inputs: { powerWatts: 150, hoursPerDay: 4, usageDays: 365, electricityPrice: 36 },
+        resultSummary: '78,84 € pro Jahr (219 kWh)',
+      },
+      {
+        title: 'Beispiel 2: 2.000-Watt Heizlüfter 2 Stunden täglich an genau 30 Tagen bei 35 ct/kWh',
+        description: 'Täglich: 2.000 W × 2 h = 4 kWh/Tag. 30 Tage: 4 kWh × 30 = 120 kWh. Kosten: 120 kWh × 0,35 € = 42,00 €.',
+        inputs: { powerWatts: 2000, hoursPerDay: 2, usageDays: 30, electricityPrice: 35 },
+        resultSummary: '42,00 € für 30 Tage (120 kWh, 0,70 €/Std.)',
+      },
+    ],
     content: {
-      intro: 'Dieser Gerätekostenrechner beziffert die laufenden Kosten einzelner Verbraucher (Waschmaschine, PC, Backofen, Heizlüfter) pro Nutzung, Tag, Monat und Jahr.',
+      intro: 'Dieser Gerätekostenrechner beziffert die laufenden Kosten einzelner Verbraucher (Waschmaschine, PC, Backofen, Heizlüfter) pro Nutzung, Tag, Monat und Jahr. Eine detaillierte Beispielrechnung mit Kosten pro Stunde und Monat für Heizgeräte finden Sie in unserem Ratgeber [Heizlüfter mit 2000 Watt: Kosten pro Stunde und Monat](/ratgeber/heizluefter-2000-watt-stromkosten/).',
       details: 'Kosten = (Leistung in Watt / 1.000) · Betriebsstunden · Strompreis je kWh. Ein Heizlüfter mit 2.000 Watt verursacht bei 35 Cent/kWh pro Betriebsstunde bereits 0,70 Euro Stromkosten.',
     },
     faqs: [
@@ -1299,88 +1470,160 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       'm3 in kwh gas',
     ],
     inputs: [
-      { id: 'gasCubicMeters', label: 'Abgelesener Gasverbrauch in Kubikmetern (m³)', type: 'number', defaultValue: 1200, min: 1, step: 10, unit: 'm³' },
-      { id: 'brennwert', label: 'Brennwert (üblich 10,2 bis 11,5 bei H-Gas)', type: 'number', defaultValue: 11.2, min: 8, max: 13, step: 0.1, unit: 'kWh/m³' },
-      { id: 'zustandszahl', label: 'Zustandszahl z-Zahl (üblich ca. 0,95)', type: 'number', defaultValue: 0.95, min: 0.8, max: 1.1, step: 0.01 },
-      { id: 'gasPricePerKwh', label: 'Gaspreis in Cent pro kWh', type: 'number', defaultValue: 10.5, min: 4, max: 30, step: 0.1, unit: 'ct/kWh' },
+      {
+        id: 'inputMode',
+        label: 'Berechnungsgrundlage',
+        type: 'select',
+        defaultValue: 'volume',
+        options: [
+          { value: 'volume', label: 'Verbrauchtes Gasvolumen direkt in m³ (aus Abrechnung oder Zählerdifferenz)' },
+          { value: 'readings', label: 'Aus 2 Zählerständen berechnen (Zählerstand alt & neu)' },
+        ],
+      },
+      { id: 'gasCubicMeters', label: 'Verbrauchtes Gasvolumen in Kubikmetern (m³)', type: 'number', defaultValue: 1200, min: 0, step: 10, unit: 'm³', helpText: 'Wird bei Auswahl „Verbrauchtes Gasvolumen“ direkt herangezogen.' },
+      { id: 'meterReadingOld', label: 'Alter Zählerstand in m³ (Vorablesung)', type: 'number', defaultValue: 7250, min: 0, step: 10, unit: 'm³', helpText: 'Zählerstand zu Beginn des Zeitraums (nur bei „Aus 2 Zählerständen“).' },
+      { id: 'meterReadingNew', label: 'Neuer Zählerstand in m³ (Aktuelle Ablesung)', type: 'number', defaultValue: 8450, min: 0, step: 10, unit: 'm³', helpText: 'Aktueller Zählerstand am Ende des Zeitraums.' },
+      { id: 'brennwert', label: 'Brennwert Hs in kWh/m³ (laut Gasrechnung)', type: 'number', defaultValue: 10.8, min: 8, max: 13, step: 0.1, unit: 'kWh/m³', helpText: 'Üblich: 10,2 bis 11,5 kWh/m³ bei H-Gas, 8,5 bis 10,0 bei L-Gas' },
+      { id: 'zustandszahl', label: 'Zustandszahl z (laut Gasrechnung)', type: 'number', defaultValue: 0.95, min: 0.8, max: 1.1, step: 0.01, helpText: 'Berücksichtigt Höhenlage, Druck und Temperatur (üblich: ca. 0,90 bis 0,97)' },
+      { id: 'gasPricePerKwh', label: 'Arbeitspreis in Cent pro kWh', type: 'number', defaultValue: 11.0, min: 0, max: 35, step: 0.1, unit: 'ct/kWh', helpText: 'Reiner Arbeitspreis laut Gastarif (ohne Grundpreis)' },
     ],
     calculate: (inputs) => {
-      const m3Str = String(inputs.gasCubicMeters ?? '').trim();
+      const mode = inputs.inputMode || 'volume';
       const bwStr = String(inputs.brennwert ?? '').trim();
       const zStr = String(inputs.zustandszahl ?? '').trim();
       const priceStr = String(inputs.gasPricePerKwh ?? '').trim();
 
-      if (!m3Str || !bwStr || !zStr || !priceStr) {
-        return {
-          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Bitte füllen Sie alle erforderlichen Felder aus.',
-        };
+      const bw = bwStr !== '' ? parseFloat(bwStr.replace(',', '.')) : 10.8;
+      const z = zStr !== '' ? parseFloat(zStr.replace(',', '.')) : 0.95;
+      const price = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 11.0;
+
+      let m3 = 0;
+      if (mode === 'readings') {
+        const oldStr = String(inputs.meterReadingOld ?? '').trim();
+        const newStr = String(inputs.meterReadingNew ?? '').trim();
+        if (oldStr === '' || newStr === '') {
+          return {
+            primary: { id: 'kwh', label: 'Energieverbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+            secondary: [],
+            error: 'Bitte geben Sie sowohl den alten als auch den neuen Zählerstand ein.',
+          };
+        }
+        const oldReading = parseFloat(oldStr.replace(',', '.'));
+        const newReading = parseFloat(newStr.replace(',', '.'));
+        if (isNaN(oldReading) || isNaN(newReading)) {
+          return {
+            primary: { id: 'kwh', label: 'Energieverbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+            secondary: [],
+            error: 'Bitte geben Sie gültige Zahlenwerte für beide Zählerstände ein.',
+          };
+        }
+        if (newReading < oldReading) {
+          return {
+            primary: { id: 'kwh', label: 'Energieverbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+            secondary: [],
+            error: `Der neue Zählerstand (${formatNumber(newReading, 0)} m³) darf nicht kleiner sein als der alte Zählerstand (${formatNumber(oldReading, 0)} m³). Bei einem Zählerwechsel müssen alter und neuer Zähler separat abgerechnet werden.`,
+          };
+        }
+        m3 = newReading - oldReading;
+      } else {
+        const m3Str = String(inputs.gasCubicMeters ?? '').trim();
+        if (m3Str === '') {
+          return {
+            primary: { id: 'kwh', label: 'Energieverbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+            secondary: [],
+            error: 'Bitte geben Sie das verbrauchte Gasvolumen in m³ ein.',
+          };
+        }
+        m3 = parseFloat(m3Str.replace(',', '.'));
+        if (isNaN(m3) || m3 < 0) {
+          return {
+            primary: { id: 'kwh', label: 'Energieverbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+            secondary: [],
+            error: 'Das Gasvolumen darf nicht negativ sein.',
+          };
+        }
       }
 
-      const m3 = parseFloat(m3Str.replace(',', '.'));
-      const bw = parseFloat(bwStr.replace(',', '.'));
-      const z = parseFloat(zStr.replace(',', '.'));
-      const price = parseFloat(priceStr.replace(',', '.'));
-
-      if (isNaN(m3) || isNaN(bw) || isNaN(z) || isNaN(price)) {
+      if (isNaN(bw) || isNaN(z) || isNaN(price) || bw <= 0 || z <= 0 || price < 0) {
         return {
-          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
+          primary: { id: 'kwh', label: 'Energieverbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
           secondary: [],
-          error: 'Bitte geben Sie gültige Zahlenwerte ein.',
-        };
-      }
-
-      if (m3 < 0) {
-        return {
-          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Der Gasverbrauch in m³ darf nicht negativ sein.',
-        };
-      }
-
-      if (bw <= 0 || z <= 0) {
-        return {
-          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Brennwert und Zustandszahl müssen größer als 0 sein.',
-        };
-      }
-
-      if (price < 0) {
-        return {
-          primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Der Gaspreis darf nicht negativ sein.',
+          error: 'Brennwert und Zustandszahl müssen größer als 0 sein. Der Arbeitspreis darf nicht negativ sein.',
         };
       }
 
       const kwh = m3 * bw * z;
-      const totalCost = (kwh * price) / 100;
-      const costPerM3 = m3 > 0 ? totalCost / m3 : (bw * z * price) / 100;
+      const consumptionCost = (kwh * price) / 100;
+      const costPerM3 = m3 > 0 ? consumptionCost / m3 : (bw * z * price) / 100;
+      const reference100Kwh = 100 * bw * z;
 
       return {
-        primary: { id: 'kwh', label: 'Verbrauch in Kilowattstunden', value: kwh, formattedValue: `${formatNumber(kwh, 0)} kWh`, highlight: true },
+        primary: {
+          id: 'kwh',
+          label: 'Energieverbrauch in Kilowattstunden',
+          value: kwh,
+          formattedValue: `${formatNumber(kwh, 0)} kWh`,
+          highlight: true,
+        },
         secondary: [
-          { id: 'totalCost', label: 'Gesamte Gaskosten', value: totalCost, formattedValue: formatCurrency(totalCost) },
-          { id: 'monthlyCost', label: 'Monatlicher Abschlag', value: totalCost / 12, formattedValue: formatCurrency(totalCost / 12) },
-          { id: 'costPerM3', label: 'Effektiver Preis pro m³', value: costPerM3, formattedValue: formatCurrency(costPerM3) },
+          { id: 'consumedM3', label: 'Verbrauchtes Gasvolumen', value: m3, formattedValue: `${formatNumber(m3, 0)} m³` },
+          {
+            id: 'consumptionCost',
+            label: 'Reine Verbrauchskosten (ohne Grundpreis)',
+            value: consumptionCost,
+            formattedValue: formatCurrency(consumptionCost),
+            helpText: 'Reine verbrauchsabhängige Kosten (kWh × Arbeitspreis). Feste monatliche Grundpreise Ihres Versorgers sind hierin nicht enthalten.',
+          },
+          { id: 'reference100Kwh', label: 'Energiegehalt je 100 m³ Gas', value: reference100Kwh, formattedValue: `${formatNumber(reference100Kwh, 0)} kWh` },
+          { id: 'costPerM3', label: 'Effektiver Arbeitspreis pro m³', value: costPerM3, formattedValue: `${formatCurrency(costPerM3, 3)} / m³` },
         ],
-        summaryText: `${formatNumber(m3, 0)} m³ Gas entsprechen ca. ${formatNumber(kwh, 0)} kWh Energie. Bei ${formatNumber(price, 1)} ct/kWh betragen die Kosten ${formatCurrency(totalCost)}.`,
+        summaryText: `${formatNumber(m3, 0)} m³ Gas entsprechen ${formatNumber(kwh, 0)} kWh thermischer Energie (Brennwert: ${formatNumber(bw, 1)} kWh/m³, z-Zahl: ${formatNumber(z, 2)}). Bei ${formatNumber(price, 1)} ct/kWh Arbeitspreis betragen die reinen Verbrauchskosten ${formatCurrency(consumptionCost)} (ohne Grundpreis).`,
+        directAnswer: `Aus ${formatNumber(m3, 0)} m³ Erdgas entstehen bei Brennwert ${formatNumber(bw, 1)} kWh/m³ und Zustandszahl ${formatNumber(z, 2)} genau ${formatNumber(kwh, 0)} kWh thermische Energie. Bei ${formatNumber(price, 1)} ct/kWh entspricht das reinen Verbrauchskosten von ${formatCurrency(consumptionCost)} (ohne Grundpreis).`,
+        qualifications: [
+          'Nur reine Verbrauchskosten; ohne Grundpreis des Gasversorgers.',
+          'Brennwert und Zustandszahl variieren je nach Gasnetz und Höhenlage; die exakten Werte stehen auf der Gasabrechnung.',
+        ],
+        calculationSteps: [
+          mode === 'readings' && inputs.meterReadingNew !== undefined && inputs.meterReadingOld !== undefined
+            ? `Gasvolumen = ${formatNumber(parseFloat(String(inputs.meterReadingNew).replace(',', '.')), 0)} m³ − ${formatNumber(parseFloat(String(inputs.meterReadingOld).replace(',', '.')), 0)} m³ = ${formatNumber(m3, 0)} m³`
+            : `Gasvolumen = ${formatNumber(m3, 0)} m³`,
+          `Thermische Energie = ${formatNumber(m3, 0)} m³ × ${formatNumber(bw, 2)} kWh/m³ × ${formatNumber(z, 4)} = ${formatNumber(kwh, 0)} kWh`,
+          `Reine Verbrauchskosten = ${formatNumber(kwh, 0)} kWh × ${formatCurrency(price / 100, 3)}/kWh = ${formatCurrency(consumptionCost)}`,
+        ],
+        basisSummary: [
+          { label: 'Ermitteltes Gasvolumen', value: `${formatNumber(m3, 0)} m³` },
+          { label: 'Brennwert (Hs)', value: `${formatNumber(bw, 2)} kWh/m³` },
+          { label: 'Zustandszahl (z)', value: `${formatNumber(z, 4)}` },
+          { label: 'Arbeitspreis', value: `${formatNumber(price, 1)} ct/kWh` },
+        ],
       };
     },
     formula: 'Energie (kWh) = Kubikmeter (m³) × Brennwert × Zustandszahl (z)',
-    formulaExplanation: 'Gaszähler messen das Betriebsvolumen in m³. Der Energiegehalt variiert nach Temperatur, Höhenlage (Zustandszahl) und Gasqualität (Brennwert nach DVGW G 685).',
+    formulaExplanation: 'Gaszähler messen das Betriebsvolumen in m³. Der Energiegehalt variiert nach Temperatur, Höhenlage (Zustandszahl) und Gasqualität (Brennwert nach DVGW G 685). Die reinen Verbrauchskosten berechnen sich aus kWh × Arbeitspreis (exklusive Grundpreis).',
     workedExample: {
-      title: 'Beispiel: 1.200 m³ mit Brennwert 11,2 und z-Zahl 0,95 bei 10,5 ct/kWh',
-      description: '1.200 m³ Gasverbrauch mit Brennwert 11,2 kWh/m³ und Zustandszahl 0,95 ergeben 12.768 kWh Energie. Bei einem Arbeitspreis von 10,5 ct/kWh betragen die jährlichen Gaskosten 1.340,64 € (monatlicher Abschlag: ca. 111,72 €).',
-      inputValues: [{ label: 'Gasverbrauch', value: '1.200 m³' }, { label: 'Brennwert', value: '11,2' }, { label: 'z-Zahl', value: '0,95' }],
-      steps: ['kWh = 1.200 × 11,2 × 0,95 = 12.768 kWh', 'Kosten = 12.768 kWh × 0,105 € = 1.340,64 €'],
-      result: '12.768 kWh (1.340,64 € Gaskosten)',
-      resultSummary: '12.768 kWh (1.340,64 € Gaskosten)',
+      title: 'Beispiel: Zwei Zählerstände (7.250 m³ auf 8.450 m³) bei 10,8 Brennwert, 0,95 z-Zahl & 11 ct/kWh',
+      description: 'Zählerdifferenz: 8.450 − 7.250 = 1.200 m³. Thermische Energie: 1.200 m³ × 10,8 × 0,95 = 12.312 kWh. Reine Verbrauchskosten bei 11 ct/kWh: 1.354,32 € (ohne Grundpreis).',
+      inputValues: [{ label: 'Zählerstand alt', value: '7.250 m³' }, { label: 'Zählerstand neu', value: '8.450 m³' }, { label: 'Brennwert', value: '10,8' }, { label: 'z-Zahl', value: '0,95' }],
+      steps: ['Zählerdifferenz: 8.450 − 7.250 = 1.200 m³', 'Energie: 1.200 × 10,8 × 0,95 = 12.312 kWh', 'Verbrauchskosten: 12.312 × 0,11 € = 1.354,32 € (ohne Grundpreis)'],
+      result: '12.312 kWh Energie (1.354,32 € Verbrauchskosten)',
+      resultSummary: '12.312 kWh Energie (1.354,32 € Verbrauchskosten)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Zwei Zählerstände (7.250 m³ auf 8.450 m³) bei 10,8 Brennwert, 0,95 z-Zahl & 11 ct/kWh',
+        description: 'Zählerdifferenz: 8.450 − 7.250 = 1.200 m³. Energie: 1.200 × 10,8 × 0,95 = 12.312 kWh. Reine Verbrauchskosten bei 11 ct/kWh: 1.354,32 € (zzgl. Grundpreis im Gaskostenrechner).',
+        inputs: { inputMode: 'readings', meterReadingOld: 7250, meterReadingNew: 8450, brennwert: 10.8, zustandszahl: 0.95, gasPricePerKwh: 11.0 },
+        resultSummary: '12.312 kWh (1.354,32 € reine Verbrauchskosten)',
+      },
+      {
+        title: 'Beispiel 2: 1.200 m³ Direktvolumen mit Brennwert 11,2 und z-Zahl 0,95 bei 10,5 ct/kWh',
+        description: '1.200 m³ Gasverbrauch mit Brennwert 11,2 kWh/m³ und Zustandszahl 0,95 ergeben 12.768 kWh Energie. Bei einem Arbeitspreis von 10,5 ct/kWh betragen die reinen Verbrauchskosten 1.340,64 €.',
+        inputs: { inputMode: 'volume', gasCubicMeters: 1200, brennwert: 11.2, zustandszahl: 0.95, gasPricePerKwh: 10.5 },
+        resultSummary: '12.768 kWh (1.340,64 € reine Verbrauchskosten)',
+      },
+    ],
     content: {
-      intro: 'Mit unserem kostenlosen Rechner können Sie Ihren Gasverbrauch berechnen und Kubikmeter (m³) vom Gaszähler unkompliziert in Kilowattstunden (kWh) sowie in konkrete Euro-Gaskosten umrechnen. Da Gasversorger die Abrechnung in kWh vornehmen, der Zähler im Keller den Verbrauch jedoch in m³ misst, ist diese Umrechnung für jede Heizkostenabrechnung unverzichtbar.',
+      intro: 'Mit unserem kostenlosen Rechner können Sie Ihren Gasverbrauch berechnen und Kubikmeter (m³) vom Gaszähler unkompliziert in Kilowattstunden (kWh) sowie in konkrete Euro-Gaskosten umrechnen. Da Gasversorger die Abrechnung in kWh vornehmen, der Zähler im Keller den Verbrauch jedoch in m³ misst, ist diese Umrechnung für jede Heizkostenabrechnung unverzichtbar. Eine schrittweise Anleitung mit Zählerstandsbeispiel bietet unser Ratgeber [Gas m³ in kWh umrechnen: Zählerstand richtig berechnen](/ratgeber/gaszaehler-m3-in-kwh-umrechnen/).',
       details: 'Die amtliche Umrechnung erfolgt nach DVGW-Arbeitsblatt G 685 mit der Formel: Energie (kWh) = Volumen (m³) × Brennwert (Hs) × Zustandszahl (z). Der Brennwert beziffert den Energiegehalt des gelieferten Erdgases (bei H-Gas meist 10,2 bis 11,5 kWh/m³), während die Zustandszahl das Verhältnis vom tatsächlichen Betriebsvolumen zum Normzustand unter lokalem Höhendruck und Temperatur angibt (typischerweise ca. 0,92 bis 0,97). Als praxisnaher Faustwert gilt: 1 m³ Gas entspricht rund 10,0 bis 10,5 kWh.',
     },
     faqs: [

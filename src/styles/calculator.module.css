@@ -687,4 +687,185 @@
   background-color: var(--color-primary-light);
 }
 
+/* ==========================================================================
+   Enhanced Calculator UI Components (Direct Answer, Basis Summary, Inclusions)
+   ========================================================================== */
+
+.purposeBanner {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-subtle);
+  border-left: 3px solid var(--color-primary);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin-bottom: var(--space-4);
+}
+
+.directAnswerCard {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1px solid #86efac;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.directAnswerHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.directAnswerIcon {
+  color: #15803d;
+  flex-shrink: 0;
+}
+
+.directAnswerTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #166534;
+}
+
+.directAnswerText {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #14532d;
+  margin: 0;
+  font-weight: 500;
+}
+
+.qualificationsContainer {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qualificationBadge {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.775rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+
+.qualificationIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.basisSummaryBox {
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.basisSummaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.basisSummaryTitle {
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.basisGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px 12px;
+  margin-bottom: var(--space-3);
+}
+
+.basisItem {
+  font-size: 0.8rem;
+}
+
+.basisLabel {
+  color: var(--color-text-muted);
+  display: block;
+  font-size: 0.725rem;
+}
+
+.basisValue {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stepsContainer {
+  border-top: 1px dashed var(--color-border);
+  padding-top: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.stepsTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.stepItem {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.775rem;
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+}
+
+.fieldError {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.775rem;
+  color: #dc2626;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.inputInvalid {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2 !important;
+}
+
+.inputInvalid:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15) !important;
+}
+
+.staleNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  color: #9a3412;
+  font-size: 0.8rem;
+  margin-bottom: var(--space-3);
+}
+
+
 

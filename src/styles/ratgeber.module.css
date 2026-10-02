@@ -608,3 +608,32 @@
   align-items: center;
   gap: 4px;
 }
+
+/* Article Illustrations & Infographics */
+.articleFigure {
+  margin: var(--space-6) 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: clamp(var(--space-3), 3vw, var(--space-4));
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.articleFigureImage {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.articleFigureCaption {
+  margin-top: var(--space-3);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  text-align: center;
+  font-style: normal;
+}
+

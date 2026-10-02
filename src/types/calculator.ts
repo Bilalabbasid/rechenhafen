@@ -35,6 +35,11 @@ export interface CalculationBreakdownRow {
   values: Record<string, string | number>;
 }
 
+export interface CalculationBasisItem {
+  label: string;
+  value: string;
+}
+
 export interface CalculationResult {
   primary: ResultItem;
   secondary?: ResultItem[];
@@ -44,6 +49,10 @@ export interface CalculationResult {
     rows: CalculationBreakdownRow[];
   };
   summaryText?: string;
+  directAnswer?: string;
+  qualifications?: string[];
+  calculationSteps?: string[];
+  basisSummary?: CalculationBasisItem[];
   error?: string;
   warning?: string;
   [key: string]: any;

@@ -41,4 +41,5 @@ Thumbs.db
 # Audit & temporary reports
 audit-results.json
 seo-audit-report.json
+scratch/
 
