@@ -5,7 +5,7 @@ import { calculateCompoundInterest, calculateSavingsTarget, calculateInflation }
 import { calculateInstallmentLoan, calculateAnnuity, calculateSpecialRepayment } from '@/lib/calculators/kredit';
 import { calculateFuelCost, calculateCommuterAllowance, calculateEVCharging } from '@/lib/calculators/auto';
 import { calculateRentBurden, calculatePropertyPurchaseFees } from '@/lib/calculators/wohnen';
-import { calculateElectricityCost, calculateLedSavings } from '@/lib/calculators/haushalt';
+import { calculateElectricityCost, calculateLedSavings, calculateGasCost } from '@/lib/calculators/haushalt';
 import { calculateHourlyWage, calculatePartTimeSalary, calculateVacationDays } from '@/lib/calculators/arbeit';
 import { calculateBMI, calculateCalorieNeeds, calculateRunningPace } from '@/lib/calculators/gesundheit';
 import { calculatePregnancyDueDate } from '@/lib/calculators/familie';
@@ -20,6 +20,7 @@ import { calculateRenteBruttoNetto } from '@/lib/calculators/steuernGehalt';
 import { EXTRA_WOHNEN_HAUSHALT } from '@/data/calculators/extra/wohnenHaushalt';
 import { EXTRA_FINANZEN_KREDIT } from '@/data/calculators/extra/finanzenKredit';
 import { EXTRA_AUTO_ARBEIT } from '@/data/calculators/extra/autoArbeit';
+import { EXTRA_BAUEN_GEOMETRIE } from '@/data/calculators/extra/bauenGeometrie';
 
 describe('RechenHafen Calculation Engines', () => {
   describe('Datum & Zeit', () => {
@@ -115,6 +116,22 @@ describe('RechenHafen Calculation Engines', () => {
       // 200.000 * 5.5% / 12 = 916.67
       expect(res.primary.value).toBeCloseTo(916.67, 1);
     });
+
+    it('calculates maximum loan affordability from household budget', () => {
+      const maximalKredit = EXTRA_FINANZEN_KREDIT.find((c) => c.slug === 'maximaler-kredit-rechner');
+      const res = maximalKredit?.calculate({
+        netIncome: 3500,
+        fixedExpenses: 1600,
+        existingLoans: 0,
+        safetyBuffer: 200,
+        interestRate: 3.5,
+        termYears: 25,
+        equity: 30000,
+      });
+      expect(res?.primary.value).toBeGreaterThan(300000);
+      const availableRate = res?.secondary?.find((s) => s.id === 'availableRate');
+      expect(availableRate?.value).toBe(1700);
+    });
   });
 
   describe('Auto & Mobilität', () => {
@@ -146,6 +163,27 @@ describe('RechenHafen Calculation Engines', () => {
       const res = calculateElectricityCost({ watts: 1000, hoursPerDay: 1, pricePerKwh: 0.40 });
       // 1 kWh/day * 365 = 365 kWh * 0.40 = 146 €
       expect(res.primary.value).toBeCloseTo(146, 1);
+    });
+
+    it('calculates gas costs with kWh and meter reading modes', () => {
+      const resKwh = calculateGasCost({ inputType: 'kwh', annualKwh: 12000, pricePerKwh: 0.10, basePrice: 10, basePricePeriod: 'monthly' });
+      expect(resKwh.primary.value).toBe(1320);
+
+      const resM3 = calculateGasCost({ inputType: 'm3', meterOld: 10000, meterNew: 11400, calorificValue: 10.3, stateFactor: 0.95, pricePerKwh: 0.11, basePrice: 12, basePricePeriod: 'monthly' });
+      expect(resM3.primary.value).toBeGreaterThan(1600);
+    });
+
+    it('calculates warm rent from cold rent, operating and heating components', () => {
+      const warmmiete = EXTRA_WOHNEN_HAUSHALT.find((c) => c.slug === 'warmmiete-zu-kaltmiete-rechner');
+      const res = warmmiete?.calculate({
+        calculationMode: 'warm_from_components',
+        coldRentInput: 850,
+        operatingCosts: 170,
+        heatingCosts: 130,
+        livingAreaMode1: 75,
+      });
+      expect(res?.primary.value).toBe(1150);
+      expect(res?.primary.label).toContain('Warmmiete');
     });
   });
 
@@ -182,6 +220,21 @@ describe('RechenHafen Calculation Engines', () => {
       const res = calculateRectangle({ lengthA: 5, widthB: 4 });
       expect(res.primary.value).toBe(20);
     });
+
+    it('calculates concrete and stone count for Schalungssteine', () => {
+      const schalungssteine = EXTRA_BAUEN_GEOMETRIE.find((c) => c.slug === 'schalungssteine-rechner');
+      const res = schalungssteine?.calculate({
+        wallLength: 8,
+        wallHeight: 1.5,
+        fillMode: 'preset_delfing24',
+        stoneReserve: 5,
+        concreteReserve: 5,
+        openingsArea: 0,
+      });
+      expect(res?.primary.value).toBe(101);
+      const concreteSec = res?.secondary?.find((s) => s.id === 'concreteM3');
+      expect(concreteSec?.value).toBeCloseTo(1.638, 3);
+    });
   });
 
   describe('Business & Finanzen', () => {
@@ -215,6 +268,14 @@ describe('RechenHafen Calculation Engines', () => {
     it('calculates German grade average', () => {
       const res = calculateGradeAverage({ grades: '1; 2; 3' });
       expect(res.primary.value).toBe(2.0);
+    });
+
+    it('calculates weighted ECTS grade average', () => {
+      const res = calculateGradeAverage({
+        calculationMode: 'weighted',
+        weightedGrades: '1,0 * 5; 2,0 * 10',
+      });
+      expect(res.primary.value).toBeCloseTo(1.67, 2);
     });
 
     it('calculates Ohms law voltage from current and resistance', () => {
