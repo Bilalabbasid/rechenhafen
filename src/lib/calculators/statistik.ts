@@ -2,6 +2,104 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
 export function calculateGradeAverage(inputs: Record<string, any>): CalculationResult {
+  const mode = inputs.calculationMode || 'simple'; // 'simple' | 'weighted'
+
+  if (mode === 'weighted') {
+    const rawWeighted = String(inputs.weightedGrades || inputs.grades || '1,7 * 5; 2,3 * 10; 1,3 * 6; 2,0 * 5');
+    // Split entries by semicolon, comma-followed-by-number, or newline
+    const entries = rawWeighted
+      .split(/[;\n]+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    const parsedItems: { grade: number; weight: number; product: number; raw: string }[] = [];
+
+    for (const entry of entries) {
+      // Formats supported:
+      // "1,7 * 5", "1.7 x 5", "1,7 (5)", "1,7:5", "Note: 1,7 / Gewicht: 5", "1,7" (defaults to weight 1)
+      const clean = entry.replace(/ECTS|CP|Credits|Punkte|Gewicht/gi, '').trim();
+      const match = clean.match(/^([0-9]+[.,]?[0-9]*)\s*[*xX:(]?\s*([0-9]+[.,]?[0-9]*)?\)?$/);
+
+      if (match) {
+        const gradeVal = parseFloat(match[1].replace(',', '.'));
+        const weightVal = match[2] ? parseFloat(match[2].replace(',', '.')) : 1.0;
+
+        if (Number.isFinite(gradeVal) && gradeVal >= 0.7 && gradeVal <= 6.0 && Number.isFinite(weightVal) && weightVal > 0) {
+          parsedItems.push({
+            grade: gradeVal,
+            weight: weightVal,
+            product: gradeVal * weightVal,
+            raw: entry,
+          });
+        }
+      }
+    }
+
+    if (parsedItems.length === 0) {
+      return {
+        primary: { id: 'averageGrade', label: 'Notendurchschnitt (gewichtet)', value: 0, formattedValue: '-' },
+        error: 'Bitte mindestens eine gültige Note (1,0 bis 6,0) mit Gewichtung (z. B. „1,7 * 5 ECTS“ oder „2,0 (10)“) eingeben.',
+      };
+    }
+
+    const totalWeight = parsedItems.reduce((acc, item) => acc + item.weight, 0);
+    const totalWeightedPoints = parsedItems.reduce((acc, item) => acc + item.product, 0);
+    const weightedAvg = totalWeightedPoints / totalWeight;
+    const gradesOnly = parsedItems.map((i) => i.grade);
+    const best = Math.min(...gradesOnly);
+    const worst = Math.max(...gradesOnly);
+
+    return {
+      primary: {
+        id: 'averageGrade',
+        label: 'Gewichteter Notendurchschnitt',
+        value: weightedAvg,
+        formattedValue: formatNumber(weightedAvg, 2),
+        highlight: true,
+      },
+      secondary: [
+        { id: 'modeLabel', label: 'Berechnungsverfahren', value: 0, formattedValue: 'Gewichtetes Mittel (z. B. nach ECTS / Modul-Credits)' },
+        { id: 'count', label: 'Anzahl gewichteter Noten', value: parsedItems.length, formattedValue: `${parsedItems.length} Module / Fächer` },
+        { id: 'totalWeight', label: 'Gesamtsumme Gewichte (ECTS / Credits)', value: totalWeight, formattedValue: formatNumber(totalWeight, 1) },
+        { id: 'totalWeightedPoints', label: 'Summe der Produkte (Note × Gewicht)', value: totalWeightedPoints, formattedValue: formatNumber(totalWeightedPoints, 2) },
+        { id: 'best', label: 'Beste Einzelnote', value: best, formattedValue: formatNumber(best, 1) },
+        { id: 'worst', label: 'Schlechteste Einzelnote', value: worst, formattedValue: formatNumber(worst, 1) },
+      ],
+      basisSummary: [
+        { label: 'Eingabemodus', value: 'Gewichteter Notendurchschnitt' },
+        { label: 'Berücksichtigte Einträge', value: parsedItems.map((p) => `${formatNumber(p.grade, 1)} (Gewicht: ${formatNumber(p.weight, 1)})`).join('; ') },
+        { label: 'Gesamtgewicht (ECTS/Faktoren)', value: formatNumber(totalWeight, 1) },
+        { label: 'Summe Note × Gewicht', value: formatNumber(totalWeightedPoints, 2) },
+      ],
+      breakdown: {
+        columns: [
+          { key: 'subject', label: 'Fach / Eintrag' },
+          { key: 'grade', label: 'Note' },
+          { key: 'weight', label: 'Gewicht / ECTS' },
+          { key: 'product', label: 'Gewichtetes Produkt' },
+        ],
+        rows: parsedItems.map((p, idx) => ({
+          period: `Modul / Fach ${idx + 1}`,
+          values: {
+            subject: `Modul / Fach ${idx + 1}`,
+            grade: formatNumber(p.grade, 1),
+            weight: formatNumber(p.weight, 1),
+            product: formatNumber(p.product, 2),
+          },
+        })),
+      },
+      calculationSteps: [
+        `Schritt 1 (Gewichtung): Noten mit ECTS/Gewicht multiplizieren → Gesamtsumme der Produkte = ${formatNumber(totalWeightedPoints, 2)}`,
+        `Schritt 2 (Mittelwert): Summe der Produkte durch Gesamtgewicht teilen → ${formatNumber(totalWeightedPoints, 2)} ÷ ${formatNumber(totalWeight, 1)} = ${formatNumber(weightedAvg, 2)}`,
+      ],
+      summaryText: `Aus ${parsedItems.length} Modulen mit insgesamt ${formatNumber(totalWeight, 1)} Credit Points / Gewichtungseinheiten ergibt sich ein gewichteter Notenschnitt von ${formatNumber(weightedAvg, 2)}.`,
+      notes: [
+        'Hinweis zu Prüfungsordnungen (PO): Viele Universitäten und Hochschulen runden erst das Endergebnis oder schneiden Dezimalstellen nach der ersten oder zweiten Nachkommastelle ungerundet ab. Unbenotete Studienleistungen (z. B. bestanden / unbenotet) fließen nicht in den Notenschnitt ein.',
+      ],
+    };
+  }
+
+  // Simple arithmetic average (default)
   const gradesInput = String(inputs.grades || '2; 1; 3; 2; 1.5; 2.7');
   const grades = gradesInput
     .split(/[;, \n]+/)
@@ -12,7 +110,7 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
 
   if (grades.length === 0) {
     return {
-      primary: { id: 'avg', label: 'Notenschnitt', value: 0, formattedValue: '-' },
+      primary: { id: 'averageGrade', label: 'Notendurchschnitt', value: 0, formattedValue: '-' },
       error: 'Bitte mindestens eine gültige Schulnote zwischen 1,0 und 6,0 eingeben.',
     };
   }
@@ -25,18 +123,32 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
   return {
     primary: {
       id: 'averageGrade',
-      label: 'Notendurchschnitt',
+      label: 'Notendurchschnitt (arithmetisch)',
       value: avg,
       formattedValue: formatNumber(avg, 2),
       highlight: true,
     },
     secondary: [
+      { id: 'modeLabel', label: 'Berechnungsverfahren', value: 0, formattedValue: 'Einfaches arithmetisches Mittel (gleiche Gewichtung)' },
       { id: 'count', label: 'Anzahl eingetragener Noten', value: grades.length, formattedValue: `${grades.length} Noten` },
       { id: 'best', label: 'Beste Note', value: best, formattedValue: formatNumber(best, 1) },
       { id: 'worst', label: 'Schlechteste Note', value: worst, formattedValue: formatNumber(worst, 1) },
       { id: 'sum', label: 'Notensumme', value: sum, formattedValue: formatNumber(sum, 2) },
     ],
-    summaryText: `Aus ${grades.length} eingetragenen Noten ergibt sich ein Notenschnitt von ${formatNumber(avg, 2)}.`,
+    basisSummary: [
+      { label: 'Berechnungsmodus', value: 'Einfacher Durchschnitt (gleichwertige Fächer)' },
+      { label: 'Eingetragene Noten', value: grades.map((g) => formatNumber(g, 1)).join(', ') },
+      { label: 'Anzahl Noten', value: `${grades.length}` },
+      { label: 'Notensumme', value: formatNumber(sum, 2) },
+    ],
+    calculationSteps: [
+      `Schritt 1: Noten aufsummieren → Summe = ${formatNumber(sum, 2)}`,
+      `Schritt 2: Notensumme durch Anzahl der Noten dividieren → ${formatNumber(sum, 2)} ÷ ${grades.length} = ${formatNumber(avg, 2)}`,
+    ],
+    summaryText: `Aus ${grades.length} eingetragenen Noten ergibt sich ein arithmetischer Notenschnitt von ${formatNumber(avg, 2)}.`,
+    notes: [
+      'Gleichgewichtung: Jedes Fach zählt hier exakt gleich viel. Wenn Fächer wie Hauptfächer, Leistungskurse oder Uni-Module unterschiedlich gewichtet werden sollen, wechseln Sie auf die Option „Gewichteter Durchschnitt (ECTS / Gewichtung)“.',
+    ],
   };
 }
 

@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="cupsTitle cupsDesc">
+  <title id="cupsTitle">Schematischer Vergleich: Drei gebräuchliche Cup-Größen und ihr Volumen</title>
+  <desc id="cupsDesc">Drei Messbecher im direkten Vergleich: US customary cup mit 236,6 ml, US legal cup mit 240 ml und metrischer Cup mit 250 ml. Schematische Darstellung mit Füllstandsmarkierungen.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 2; rx: 16; }
+      .primary { fill: #0284c7; }
+      .primary-dark { fill: #0369a1; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; }
+      .text-sub { fill: #475569; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .cup-glass { fill: #ffffff; stroke: #94a3b8; stroke-width: 2.5; stroke-linejoin: round; }
+      .cup-liquid { fill: #e0f2fe; stroke: #38bdf8; stroke-width: 1.5; }
+      .cup-liquid-top { fill: #bae6fd; stroke: #38bdf8; stroke-width: 1.5; }
+      .cup-mark { stroke: #64748b; stroke-width: 1.5; stroke-linecap: round; }
+      .badge-ml { rx: 8; fill: #f0f9ff; stroke: #0284c7; stroke-width: 1.5; }
+      .badge-ml-text { fill: #0369a1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 16px; text-anchor: middle; }
+      .badge-note { rx: 6; fill: #f1f5f9; }
+      .badge-note-text { fill: #334155; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 600; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="800" height="450" class="bg" />
+
+  <!-- Outer Frame -->
+  <rect x="20" y="20" width="760" height="410" class="card" />
+
+  <!-- Title Area -->
+  <g transform="translate(45, 52)">
+    <text class="text-title" font-size="20">Cup-Größen im metrischen Vergleich (Schematisch)</text>
+    <text class="text-sub" y="22">Nicht jedes englischsprachige Rezept meint dasselbe Volumen: US Customary vs. Legal vs. Metrisch</text>
+  </g>
+
+  <!-- Cup 1: US Customary Cup (236,6 ml) -->
+  <g transform="translate(65, 110)">
+    <rect x="0" y="0" width="200" height="250" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    
+    <!-- Title -->
+    <text x="100" y="28" text-anchor="middle" class="text-title" font-size="15">US Customary</text>
+    <text x="100" y="44" text-anchor="middle" class="text-sub" font-size="11">US-Backrezepte (traditionell)</text>
+    
+    <!-- Measuring Cup Vessel -->
+    <g transform="translate(40, 60)">
+      <!-- Handle -->
+      <path d="M 120,40 C 145,40 145,95 120,95" fill="none" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
+      
+      <!-- Liquid Body (236,6 ml -> Height ~100px) -->
+      <path d="M 12,38 L 108,38 L 98,125 L 22,125 Z" class="cup-liquid" />
+      <ellipse cx="60" cy="38" rx="48" ry="8" class="cup-liquid-top" />
+      
+      <!-- Glass Outline -->
+      <path d="M 5,20 L 115,20 L 100,130 C 98,134 94,136 88,136 L 32,136 C 26,136 22,134 20,130 L 5,20 Z" fill="none" class="cup-glass" />
+      <ellipse cx="60" cy="20" rx="55" ry="9" fill="none" class="cup-glass" />
+      
+      <!-- Scale markings -->
+      <line x1="20" y1="90" x2="38" y2="90" class="cup-mark" />
+      <text x="42" y="93" font-size="9" fill="#64748b" font-family="sans-serif">½</text>
+      <line x1="16" y1="62" x2="38" y2="62" class="cup-mark" />
+      <text x="42" y="65" font-size="9" fill="#64748b" font-family="sans-serif">¾</text>
+      <line x1="12" y1="38" x2="42" y2="38" stroke="#0284c7" stroke-width="2" stroke-linecap="round" />
+      <text x="46" y="41" font-size="10" fill="#0284c7" font-weight="700" font-family="sans-serif">1 Cup</text>
+    </g>
+
+    <!-- Volume Badge -->
+    <rect x="35" y="200" width="130" height="32" class="badge-ml" />
+    <text x="100" y="222" class="badge-ml-text">236,6 ml</text>
+    
+    <!-- Milk Weight Footnote -->
+    <text x="100" y="242" text-anchor="middle" font-size="11" fill="#475569" font-family="sans-serif">Milch: ca. 244 g (1,03 g/ml)</text>
+  </g>
+
+  <!-- Cup 2: US Legal Cup (240 ml) -->
+  <g transform="translate(300, 110)">
+    <rect x="0" y="0" width="200" height="250" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    
+    <!-- Title -->
+    <text x="100" y="28" text-anchor="middle" class="text-title" font-size="15">US Legal Cup</text>
+    <text x="100" y="44" text-anchor="middle" class="text-sub" font-size="11">US-Nährwertangaben (FDA)</text>
+    
+    <!-- Measuring Cup Vessel -->
+    <g transform="translate(40, 60)">
+      <!-- Handle -->
+      <path d="M 120,40 C 145,40 145,95 120,95" fill="none" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
+      
+      <!-- Liquid Body (240 ml -> Height ~102px) -->
+      <path d="M 11,36 L 109,36 L 98,125 L 22,125 Z" class="cup-liquid" />
+      <ellipse cx="60" cy="36" rx="49" ry="8" class="cup-liquid-top" />
+      
+      <!-- Glass Outline -->
+      <path d="M 5,20 L 115,20 L 100,130 C 98,134 94,136 88,136 L 32,136 C 26,136 22,134 20,130 L 5,20 Z" fill="none" class="cup-glass" />
+      <ellipse cx="60" cy="20" rx="55" ry="9" fill="none" class="cup-glass" />
+      
+      <!-- Scale markings -->
+      <line x1="20" y1="88" x2="38" y2="88" class="cup-mark" />
+      <text x="42" y="91" font-size="9" fill="#64748b" font-family="sans-serif">½</text>
+      <line x1="16" y1="60" x2="38" y2="60" class="cup-mark" />
+      <text x="42" y="63" font-size="9" fill="#64748b" font-family="sans-serif">¾</text>
+      <line x1="11" y1="36" x2="42" y2="36" stroke="#0284c7" stroke-width="2" stroke-linecap="round" />
+      <text x="46" y="39" font-size="10" fill="#0284c7" font-weight="700" font-family="sans-serif">240 ml</text>
+    </g>
+
+    <!-- Volume Badge -->
+    <rect x="35" y="200" width="130" height="32" class="badge-ml" />
+    <text x="100" y="222" class="badge-ml-text">240,0 ml</text>
+    
+    <!-- Milk Weight Footnote -->
+    <text x="100" y="242" text-anchor="middle" font-size="11" fill="#475569" font-family="sans-serif">Milch: ca. 247 g (1,03 g/ml)</text>
+  </g>
+
+  <!-- Cup 3: Metrischer Cup (250 ml) -->
+  <g transform="translate(535, 110)">
+    <rect x="0" y="0" width="200" height="250" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    
+    <!-- Title -->
+    <text x="100" y="28" text-anchor="middle" class="text-title" font-size="15">Metrischer Cup</text>
+    <text x="100" y="44" text-anchor="middle" class="text-sub" font-size="11">Australien, Neuseeland, UK</text>
+    
+    <!-- Measuring Cup Vessel -->
+    <g transform="translate(40, 60)">
+      <!-- Handle -->
+      <path d="M 120,40 C 145,40 145,95 120,95" fill="none" stroke="#94a3b8" stroke-width="5" stroke-linecap="round" />
+      
+      <!-- Liquid Body (250 ml -> Height ~108px) -->
+      <path d="M 9,30 L 111,30 L 98,125 L 22,125 Z" class="cup-liquid" />
+      <ellipse cx="60" cy="30" rx="51" ry="8.5" class="cup-liquid-top" />
+      
+      <!-- Glass Outline -->
+      <path d="M 5,20 L 115,20 L 100,130 C 98,134 94,136 88,136 L 32,136 C 26,136 22,134 20,130 L 5,20 Z" fill="none" class="cup-glass" />
+      <ellipse cx="60" cy="20" rx="55" ry="9" fill="none" class="cup-glass" />
+      
+      <!-- Scale markings -->
+      <line x1="20" y1="84" x2="38" y2="84" class="cup-mark" />
+      <text x="42" y="87" font-size="9" fill="#64748b" font-family="sans-serif">½</text>
+      <line x1="15" y1="56" x2="38" y2="56" class="cup-mark" />
+      <text x="42" y="59" font-size="9" fill="#64748b" font-family="sans-serif">¾</text>
+      <line x1="9" y1="30" x2="42" y2="30" stroke="#0284c7" stroke-width="2" stroke-linecap="round" />
+      <text x="46" y="33" font-size="10" fill="#0284c7" font-weight="700" font-family="sans-serif">250 ml</text>
+    </g>
+
+    <!-- Volume Badge -->
+    <rect x="35" y="200" width="130" height="32" class="badge-ml" />
+    <text x="100" y="222" class="badge-ml-text">250,0 ml</text>
+    
+    <!-- Milk Weight Footnote -->
+    <text x="100" y="242" text-anchor="middle" font-size="11" fill="#475569" font-family="sans-serif">Milch: ca. 258 g (1,03 g/ml)</text>
+  </g>
+
+  <!-- Bottom Caution Box -->
+  <g transform="translate(45, 375)">
+    <rect width="710" height="38" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <text x="355" y="24" text-anchor="middle" font-size="12" fill="#475569" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <tspan font-weight="700" fill="#0f172a">Wichtig:</tspan> Eine gewöhnliche deutsche Haushaltskasse schwankt ungenormt zwischen 150 und 280 ml und ersetzt kein Mess-Cup.
+    </text>
+  </g>
+</svg>

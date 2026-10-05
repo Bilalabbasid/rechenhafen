@@ -235,93 +235,147 @@ export function calculateStandbyCost(inputs: Record<string, any>): CalculationRe
 }
 
 export function calculateGasCost(inputs: Record<string, any>): CalculationResult {
-  const inputType = inputs.inputType || 'kwh'; // 'kwh' or 'm3'
+  const inputType = inputs.inputType || 'kwh'; // 'kwh' (Mode A) or 'm3' (Mode B)
 
-  if (inputs.amount === undefined || inputs.amount === null || String(inputs.amount).trim() === '') {
-    return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-      error: 'Bitte geben Sie Ihre Verbrauchsmenge bzw. die Zählerdifferenz ein.',
-    };
-  }
-  const amount = parseFloat(inputs.amount);
-  if (isNaN(amount) || amount < 0) {
-    return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-      error: 'Bitte geben Sie einen gültigen Verbrauch ab 0 ein.',
-    };
-  }
-
-  if (inputs.pricePerKwh === undefined || inputs.pricePerKwh === null || String(inputs.pricePerKwh).trim() === '') {
-    return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-      error: 'Bitte geben Sie den Arbeitspreis pro kWh ein.',
-    };
-  }
-  const pricePerKwh = parseFloat(inputs.pricePerKwh);
-  if (isNaN(pricePerKwh) || pricePerKwh < 0) {
-    return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-      error: 'Der Arbeitspreis darf nicht negativ sein.',
-    };
-  }
-
-  if (inputs.basePricePerMonth === undefined || inputs.basePricePerMonth === null || String(inputs.basePricePerMonth).trim() === '') {
-    return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-      error: 'Bitte geben Sie den monatlichen Grundpreis ein.',
-    };
-  }
-  const basePricePerMonth = parseFloat(inputs.basePricePerMonth);
-  if (isNaN(basePricePerMonth) || basePricePerMonth < 0) {
-    return {
-      primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-      error: 'Der monatliche Grundpreis darf nicht negativ sein.',
-    };
-  }
-
+  let totalKwh = 0;
+  let volumeM3 = 0;
   let calorificValue = 10.3;
   let stateFactor = 0.95;
-
-  if (inputType === 'm3') {
-    if (inputs.calorificValue === undefined || inputs.calorificValue === null || String(inputs.calorificValue).trim() === '') {
-      return {
-        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-        error: 'Bitte geben Sie den Brennwert ein (üblich sind ca. 9,5 bis 11,5 kWh/m³).',
-      };
-    }
-    calorificValue = parseFloat(inputs.calorificValue);
-    if (isNaN(calorificValue) || calorificValue <= 0) {
-      return {
-        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-        error: 'Der Brennwert muss größer als 0 sein (üblich sind ca. 9,5 bis 11,5 kWh/m³).',
-      };
-    }
-
-    if (inputs.stateFactor === undefined || inputs.stateFactor === null || String(inputs.stateFactor).trim() === '') {
-      return {
-        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-        error: 'Bitte geben Sie die Zustandszahl z ein (üblich sind ca. 0,90 bis 0,96).',
-      };
-    }
-    stateFactor = parseFloat(inputs.stateFactor);
-    if (isNaN(stateFactor) || stateFactor <= 0) {
-      return {
-        primary: { id: 'totalAnnualCost', label: 'Gesamte Gaskosten pro Jahr', value: 0, formattedValue: '-' },
-        error: 'Die Zustandszahl z muss größer als 0 sein (üblich sind ca. 0,90 bis 0,96).',
-      };
-    }
-  }
-
-  let totalKwh = amount;
   let conversionFactor = 1;
+
   if (inputType === 'm3') {
-    // kWh = m³ * Brennwert * Zustandszahl
+    // Mode B: Meter readings or m³ volume
+    if (inputs.meterOld !== undefined && inputs.meterNew !== undefined && String(inputs.meterOld).trim() !== '' && String(inputs.meterNew).trim() !== '') {
+      const oldVal = parseFloat(inputs.meterOld);
+      const newVal = parseFloat(inputs.meterNew);
+      if (isNaN(oldVal) || oldVal < 0) {
+        return {
+          primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen gültigen alten Zählerstand ab 0 m³ ein.',
+        };
+      }
+      if (isNaN(newVal) || newVal < 0) {
+        return {
+          primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen gültigen neuen Zählerstand ab 0 m³ ein.',
+        };
+      }
+      if (newVal < oldVal) {
+        return {
+          primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+          error: `Der neue Zählerstand (${formatNumber(newVal, 1)} m³) darf nicht kleiner sein als der alte Zählerstand (${formatNumber(oldVal, 1)} m³). Bei einem Zählerwechsel bitte die Differenz direkt eingeben.`,
+        };
+      }
+      volumeM3 = newVal - oldVal;
+    } else if (inputs.amount !== undefined && inputs.amount !== null && String(inputs.amount).trim() !== '') {
+      const parsedAmount = parseFloat(inputs.amount);
+      if (isNaN(parsedAmount) || parsedAmount < 0) {
+        return {
+          primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Verbrauchsmenge in m³ ab 0 ein.',
+        };
+      }
+      volumeM3 = parsedAmount;
+    } else {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte tragen Sie Ihre Zählerstände (alt und neu) oder das verbrauchte Gasvolumen in m³ ein.',
+      };
+    }
+
+    if (inputs.calorificValue !== undefined && inputs.calorificValue !== null && String(inputs.calorificValue).trim() !== '') {
+      calorificValue = parseFloat(inputs.calorificValue);
+      if (isNaN(calorificValue) || calorificValue <= 0 || calorificValue < 5 || calorificValue > 25) {
+        return {
+          primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen realistischen Brennwert ein (üblich sind ca. 9,5 bis 12,5 kWh/m³ laut Gasrechnung).',
+        };
+      }
+    }
+
+    if (inputs.stateFactor !== undefined && inputs.stateFactor !== null && String(inputs.stateFactor).trim() !== '') {
+      stateFactor = parseFloat(inputs.stateFactor);
+      if (isNaN(stateFactor) || stateFactor <= 0 || stateFactor < 0.5 || stateFactor > 1.5) {
+        return {
+          primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine realistische Zustandszahl z ein (üblich sind ca. 0,90 bis 0,98 laut Gasrechnung).',
+        };
+      }
+    }
+
     conversionFactor = calorificValue * stateFactor;
-    totalKwh = amount * conversionFactor;
+    totalKwh = volumeM3 * conversionFactor;
+  } else {
+    // Mode A: Annual usage in kWh
+    const rawKwh = inputs.annualKwh !== undefined && inputs.annualKwh !== null && String(inputs.annualKwh).trim() !== ''
+      ? inputs.annualKwh
+      : inputs.amount;
+
+    if (rawKwh === undefined || rawKwh === null || String(rawKwh).trim() === '') {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie Ihren Jahresverbrauch in kWh ein.',
+      };
+    }
+    const parsedKwh = parseFloat(rawKwh);
+    if (isNaN(parsedKwh) || parsedKwh < 0) {
+      return {
+        primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie einen gültigen Jahresverbrauch ab 0 kWh ein.',
+      };
+    }
+    totalKwh = parsedKwh;
   }
 
-  const workCost = totalKwh * pricePerKwh;
-  const annualBaseCost = basePricePerMonth * 12;
+  // Arbeitspreis ermitteln (in €/kWh)
+  if (inputs.pricePerKwh === undefined || inputs.pricePerKwh === null || String(inputs.pricePerKwh).trim() === '') {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Arbeitspreis ein.',
+    };
+  }
+  const rawPrice = parseFloat(inputs.pricePerKwh);
+  if (isNaN(rawPrice) || rawPrice < 0) {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Der Arbeitspreis darf nicht negativ sein (0 € ist zulässig).',
+    };
+  }
+  // Falls Eingabe in Cent (z. B. 10.5 ct/kWh oder >= 1) bzw. Euro (z. B. 0.105 €/kWh)
+  let pricePerKwhInEuro = rawPrice;
+  if (inputs.priceUnit === 'ct') {
+    pricePerKwhInEuro = rawPrice / 100;
+  } else if (inputs.priceUnit === 'eur') {
+    pricePerKwhInEuro = rawPrice;
+  } else {
+    // Auto-Erkennung: Werte >= 1 sind ct/kWh (z.B. 10.5 ct), Werte < 1 sind €/kWh (z.B. 0.105 €)
+    pricePerKwhInEuro = rawPrice >= 1.0 ? rawPrice / 100 : rawPrice;
+  }
+
+  // Grundpreis ermitteln
+  const rawBase = inputs.basePrice !== undefined && inputs.basePrice !== null && String(inputs.basePrice).trim() !== ''
+    ? inputs.basePrice
+    : inputs.basePricePerMonth;
+
+  if (rawBase === undefined || rawBase === null || String(rawBase).trim() === '') {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Grundpreis ein (0 € falls kein Grundpreis erhoben wird).',
+    };
+  }
+  const baseValue = parseFloat(rawBase);
+  if (isNaN(baseValue) || baseValue < 0) {
+    return {
+      primary: { id: 'totalAnnualCost', label: 'Geschätzte Gesamtkosten pro Jahr', value: 0, formattedValue: '-' },
+      error: 'Der Grundpreis darf nicht negativ sein (0 € ist zulässig).',
+    };
+  }
+
+  const isYearlyBase = inputs.basePricePeriod === 'yearly';
+  const annualBaseCost = isYearlyBase ? baseValue : baseValue * 12;
+  const basePricePerMonth = isYearlyBase ? baseValue / 12 : baseValue;
+
+  const workCost = totalKwh * pricePerKwhInEuro;
   const totalAnnualCost = workCost + annualBaseCost;
   const monthlyAdvancePayment = totalAnnualCost / 12;
   const dailyCost = totalAnnualCost / 365;
@@ -329,51 +383,52 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
   const secondary: ResultItem[] = [
     {
       id: 'monthlyPayment',
-      label: 'Rechnerischer Monatsdurchschnitt (Orientierung für den Abschlag)',
+      label: 'Durchschnittliche Kosten pro Monat (Orientierung)',
       value: monthlyAdvancePayment,
       formattedValue: formatCurrency(monthlyAdvancePayment),
       highlight: true,
-      helpText: 'Reine rechnerische Orientierung (Jahreskosten ÷ 12). Der tatsächliche vertragliche monatliche Abschlag Ihres Gasversorgers kann je nach Abrechnungsrhythmus (z. B. 11 statt 12 Abschläge) oder saisonaler Gewichtung abweichen.',
-    },
-    {
-      id: 'dailyCost',
-      label: 'Geschätzte tägliche Gaskosten',
-      value: dailyCost,
-      formattedValue: formatCurrency(dailyCost),
-    },
-    {
-      id: 'totalKwh',
-      label: 'Gasverbrauch',
-      value: totalKwh,
-      formattedValue: inputType === 'm3' ? `${formatNumber(totalKwh, 0)} kWh (${formatNumber(amount, 0)} m³)` : `${formatNumber(totalKwh, 0)} kWh`,
-    },
-    {
-      id: 'pricePerKwh',
-      label: 'Arbeitspreis',
-      value: pricePerKwh,
-      formattedValue: `${formatNumber(pricePerKwh * 100, 2)} ct/kWh (${formatCurrency(pricePerKwh, 3)}/kWh)`,
-    },
-    {
-      id: 'baseCost',
-      label: 'Jährlicher Grundpreis',
-      value: annualBaseCost,
-      formattedValue: `${formatCurrency(annualBaseCost)} (${formatCurrency(basePricePerMonth)}/Monat)`,
+      helpText: 'Reine rechnerische Orientierung (Jahreskosten ÷ 12). Der tatsächliche vertragliche Versorgerabschlag kann abweichen (z. B. 11 statt 12 Abschläge oder Rundungen).',
     },
     {
       id: 'workCost',
       label: 'Reine Verbrauchskosten (Arbeitspreis)',
       value: workCost,
       formattedValue: formatCurrency(workCost),
+      helpText: `${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwhInEuro, 4)}/kWh`,
+    },
+    {
+      id: 'baseCost',
+      label: 'Grundpreis pro Jahr',
+      value: annualBaseCost,
+      formattedValue: `${formatCurrency(annualBaseCost)} (${formatCurrency(basePricePerMonth)}/Monat)`,
+    },
+    {
+      id: 'totalKwh',
+      label: 'Thermisches Energievolumen (Verbrauch)',
+      value: totalKwh,
+      formattedValue: `${formatNumber(totalKwh, 0)} kWh`,
+    },
+    {
+      id: 'dailyCost',
+      label: 'Geschätzte Gaskosten pro Tag',
+      value: dailyCost,
+      formattedValue: formatCurrency(dailyCost),
     },
   ];
 
   if (inputType === 'm3') {
+    secondary.splice(3, 0, {
+      id: 'volumeM3',
+      label: 'Abgelesenes Gasvolumen',
+      value: volumeM3,
+      formattedValue: `${formatNumber(volumeM3, 1)} m³`,
+    });
     secondary.push({
       id: 'conversionFactor',
-      label: 'Umrechnungsfaktor (Brennwert × z-Zahl)',
+      label: 'Umrechnungsfaktor (Brennwert × Zustandszahl)',
       value: conversionFactor,
-      formattedValue: `${formatNumber(conversionFactor, 3)} kWh pro m³`,
-      helpText: 'Individueller Multiplikator laut Gasabrechnung (variiert regional)',
+      formattedValue: `${formatNumber(conversionFactor, 3)} kWh/m³`,
+      helpText: `Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)}`,
     });
   }
 
@@ -381,7 +436,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
     {
       period: 'Verbrauchskosten',
       values: {
-        beschreibung: `${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwh, 3)}/kWh`,
+        beschreibung: `${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwhInEuro, 4)}/kWh`,
         betrag: formatCurrency(workCost),
       },
     },
@@ -393,7 +448,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       },
     },
     {
-      period: 'Monatlicher Abschlag (Ø)',
+      period: 'Monatlicher Durchschnitt (Ø)',
       values: {
         beschreibung: 'Gesamtkosten auf 12 Monate aufgeteilt',
         betrag: formatCurrency(monthlyAdvancePayment),
@@ -415,13 +470,42 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
     },
   ];
 
+  const basisSummaryItems = [
+    { label: 'Berechnungsmodus', value: inputType === 'm3' ? 'Modus B: Zählerstände in Kubikmetern (m³)' : 'Modus A: Jahresverbrauch in kWh' },
+  ];
+
+  if (inputType === 'm3') {
+    if (inputs.meterOld !== undefined && inputs.meterNew !== undefined) {
+      basisSummaryItems.push(
+        { label: 'Alter Zählerstand', value: `${formatNumber(parseFloat(inputs.meterOld) || 0, 1)} m³` },
+        { label: 'Neuer Zählerstand', value: `${formatNumber(parseFloat(inputs.meterNew) || 0, 1)} m³` },
+        { label: 'Zählerdifferenz', value: `${formatNumber(volumeM3, 1)} m³` }
+      );
+    } else {
+      basisSummaryItems.push({ label: 'Gasvolumen', value: `${formatNumber(volumeM3, 1)} m³` });
+    }
+    basisSummaryItems.push(
+      { label: 'Brennwert (Hs)', value: `${formatNumber(calorificValue, 2)} kWh/m³` },
+      { label: 'Zustandszahl (z)', value: formatNumber(stateFactor, 4) },
+      { label: 'Umrechnungsfaktor', value: `${formatNumber(conversionFactor, 3)} kWh/m³` }
+    );
+  }
+
+  basisSummaryItems.push(
+    { label: 'Thermisches Energievolumen', value: `${formatNumber(totalKwh, 0)} kWh` },
+    { label: 'Arbeitspreis', value: `${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh (${formatCurrency(pricePerKwhInEuro, 4)}/kWh)` },
+    { label: 'Grundpreis', value: `${formatCurrency(basePricePerMonth)}/Monat (${formatCurrency(annualBaseCost)}/Jahr)` },
+    { label: 'Betrachtungszeitraum', value: '1 Jahr (365 Tage)' }
+  );
+
   return {
     primary: {
       id: 'totalAnnualCost',
-      label: 'Gesamte jährliche Gaskosten (inkl. Grundpreis)',
+      label: 'Geschätzte Gesamtkosten pro Jahr',
       value: totalAnnualCost,
       formattedValue: formatCurrency(totalAnnualCost),
       highlight: true,
+      helpText: 'Gesamtsumme aus verbrauchsabhängigem Arbeitspreis und verbrauchsunabhängigem Jahresgrundpreis (inkl. 19 % MwSt.).',
     },
     secondary,
     breakdown: {
@@ -431,29 +515,25 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       ],
       rows: breakdownRows,
     },
-    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem jährlichen Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich jährliche Gesamtkosten von ${formatCurrency(totalAnnualCost)} (monatlicher Abschlag: ${formatCurrency(monthlyAdvancePayment)}, ca. ${formatCurrency(dailyCost)} pro Tag). Hinweis: Es handelt sich um eine Modellrechnung; Abrechnungsdetails Ihres Versorgers können abweichen.`,
-    directAnswer: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatCurrency(pricePerKwh, 3)}/kWh betragen deine jährlichen Gesamtkosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis ${formatCurrency(totalAnnualCost)} (durchschnittlich ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
+    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Durchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag). Hinweis: Reine Orientierung – Ihr tatsächlicher Monatsabschlag des Versorgers kann abweichen.`,
+    directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (durchschnittlich ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
     qualifications: [
-      'Gesamtkosten inklusive des eingegebenen monatlichen Grundpreises.',
-      'Rechnerischer Monatsdurchschnitt (Jahreskosten ÷ 12); dein tatsächlicher monatlicher Versorgerabschlag kann abweichen (z. B. 11 statt 12 Abschläge).',
-      inputType === 'm3' ? `Umrechnung nach DVGW G 685: Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = Faktor ${formatNumber(conversionFactor, 3)} kWh/m³.` : 'Berechnet direkt aus thermischer Energie in Kilowattstunden (kWh).',
+      'Rechnerischer Monatsdurchschnitt (Jahreskosten ÷ 12): Der tatsächliche monatliche Abschlag Ihres Gasversorgers kann abweichen (z. B. 11 statt 12 Abschläge, Anpassungen nach Vorjahresverbrauch oder stichtagsbezogene Tarifänderungen).',
+      'Gesamtkosten inklusive Arbeitspreis, Grundpreis und aller gesetzlichen Steuern (19 % Mehrwertsteuer, CO₂-Preis, Erdgassteuer, Konzessionsabgabe).',
+      inputType === 'm3'
+        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh.`
+        : 'Berechnung basiert direkt auf der thermischen Energiemenge in Kilowattstunden (kWh).',
     ],
     calculationSteps: [
       inputType === 'm3'
-        ? `Thermische Energie = ${formatNumber(amount, 0)} m³ × ${formatNumber(calorificValue, 2)} kWh/m³ × ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh`
-        : `Energieverbrauch = ${formatNumber(totalKwh, 0)} kWh`,
-      `Reine Verbrauchskosten = ${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwh, 3)}/kWh = ${formatCurrency(workCost)}`,
-      `Fester Jahresgrundpreis = ${formatCurrency(basePricePerMonth)}/Monat × 12 Monate = ${formatCurrency(annualBaseCost)}`,
-      `Gesamte Jahreskosten = ${formatCurrency(workCost)} + ${formatCurrency(annualBaseCost)} = ${formatCurrency(totalAnnualCost)}`,
-      `Rechnerischer Monatsdurchschnitt = ${formatCurrency(totalAnnualCost)} ÷ 12 = ${formatCurrency(monthlyAdvancePayment)}`,
+        ? `Gasvolumen in thermische Energie: ${formatNumber(volumeM3, 1)} m³ × ${formatNumber(calorificValue, 2)} kWh/m³ × ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh`
+        : `Verbrauchsmenge: ${formatNumber(totalKwh, 0)} kWh`,
+      `Verbrauchskosten (Arbeitspreis): ${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwhInEuro, 4)}/kWh = ${formatCurrency(workCost)}`,
+      `Bereitstellungskosten (Grundpreis): ${formatCurrency(basePricePerMonth)}/Monat × 12 Monate = ${formatCurrency(annualBaseCost)}`,
+      `Geschätzte Gesamtkosten pro Jahr: ${formatCurrency(workCost)} + ${formatCurrency(annualBaseCost)} = ${formatCurrency(totalAnnualCost)}`,
+      `Rechnerischer Monatsdurchschnitt: ${formatCurrency(totalAnnualCost)} ÷ 12 Monate = ${formatCurrency(monthlyAdvancePayment)}`,
     ],
-    basisSummary: [
-      { label: 'Eingabewert', value: inputType === 'm3' ? `${formatNumber(amount, 0)} m³` : `${formatNumber(totalKwh, 0)} kWh` },
-      { label: 'Berechnete Energie', value: `${formatNumber(totalKwh, 0)} kWh` },
-      { label: 'Arbeitspreis', value: `${formatCurrency(pricePerKwh, 3)}/kWh` },
-      { label: 'Grundpreis', value: `${formatCurrency(basePricePerMonth)}/Monat (${formatCurrency(annualBaseCost)}/Jahr)` },
-      { label: 'Zeitraum', value: '1 Jahr (365 Tage)' },
-    ],
+    basisSummary: basisSummaryItems,
   };
 }
 

@@ -333,38 +333,42 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
     });
 
     // 7. Schalungssteine
-    it('fixture: Schalungssteine matches shared truth for 101 stones, 1.83 m³ concrete, 4.2 t, and 159 m rebar', () => {
+    it('fixture: Schalungssteine matches acceptance fixture for 96 base stones, 101 reserve stones, 1.56 m³ and 1.638 m³ concrete', () => {
       const calc = getCalculatorBySlug('schalungssteine-rechner');
       expect(calc).toBeDefined();
 
       const defaults = {
         wallLength: 8,
         wallHeight: 1.5,
-        stoneWidth: '24',
-        waste: 5,
+        fillMode: 'preset_delfing24',
+        stoneReserve: 5,
+        concreteReserve: 0,
+        openingsArea: 0,
       };
-      const res = calc!.calculate(defaults);
+      const res0 = calc!.calculate(defaults);
 
-      // 1. Stones: ceil(12 * 8 * 1.05) = 101
-      expect(res.primary.value).toBe(101);
-      expect(res.primary.formattedValue).toBe('101 Stück');
+      // 1. Stones: 12 * 8 = 96 base, ceil(96 * 1.05) = 101 reserve
+      expect(res0.primary.value).toBe(101);
+      expect(res0.primary.formattedValue).toBe('101 Stück');
+      const baseStones = res0.secondary?.find((s) => s.id === 'baseStones');
+      expect(baseStones?.value).toBe(96);
 
-      // 2. Concrete: 12 * 0.145 * 1.05 = 1.827 m³ -> 1,83 m³ and ca. 4,2 t
-      const concreteSec = res.secondary?.find((s) => s.id === 'concreteM3');
-      expect(concreteSec?.formattedValue).toContain('1,83 m³');
-      expect(concreteSec?.formattedValue).toContain('4,2 t');
+      // 2. Concrete 0 % reserve: 12 * 0.130 = 1.56 m³
+      const concreteSec0 = res0.secondary?.find((s) => s.id === 'concreteM3');
+      expect(concreteSec0?.value).toBe(1.56);
+      expect(concreteSec0?.formattedValue).toContain('1,56 m³');
 
-      // 3. Rebar: 6 layers * 2 * 8m = 96m horizontal + 32 * 1.5m = 48m vertical -> (96+48)*1.1 = 158.4 -> 159 m
-      const rebarSec = res.secondary?.find((s) => s.id === 'rebar');
-      expect(rebarSec?.value).toBe(159);
-      expect(rebarSec?.formattedValue).toBe('ca. 159 lfd. Meter');
+      // 3. Concrete 5 % reserve: 1.56 * 1.05 = 1.638 m³ -> display 1,64 m³
+      const res5 = calc!.calculate({ ...defaults, concreteReserve: 5 });
+      const concreteSec5 = res5.secondary?.find((s) => s.id === 'concreteM3');
+      expect(concreteSec5?.value).toBeCloseTo(1.638, 3);
+      expect(concreteSec5?.formattedValue).toContain('1,64 m³');
 
       // 4. Stated values in workedExample match exactly
-      expect(calc!.workedExample.result).toContain('101 Schalungssteine');
-      expect(calc!.workedExample.result).toContain('1,83 m³');
-      expect(calc!.workedExample.result).toContain('159 m Bewehrungsstahl');
-      expect(calc!.workedExample.description).toContain('159 Meter Bewehrungsstahl');
-      expect(calc!.workedExample.description).not.toContain('115 Meter');
+      expect(calc!.workedExample.result).toContain('101 Steine');
+      expect(calc!.workedExample.result).toContain('1,56 m³');
+      expect(calc!.workedExample.result).toContain('1,638 m³');
+      expect(calc!.workedExample.description).toContain('1,56 m³');
     });
 
     // 8. Arbeitszeitrechner: required test cases & legal guidance

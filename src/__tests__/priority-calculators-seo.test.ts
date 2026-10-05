@@ -122,26 +122,42 @@ describe('Focused Organic-Ranking Sprint Verification for Priority Pages', () =>
       expect(entries.length).toBe(1);
     });
 
-    it('calculates correct stone count, concrete volume, and rebar without contradictions', () => {
-      const res = calc!.calculate({
+    it('calculates correct stone count and concrete volume matching acceptance fixture', () => {
+      // Acceptance fixture: 8 m × 1.5 m, no openings, 8 stones/m², 130 l/m², stone reserve 5%, concrete reserve 0%:
+      // 96 base stones, 101 stones including reserve, 1.56 m³ fill concrete.
+      const res0 = calc!.calculate({
         wallLength: 8,
         wallHeight: 1.5,
-        stoneWidth: '24',
-        waste: 5,
+        fillMode: 'preset_delfing24',
+        stoneReserve: 5,
+        concreteReserve: 0,
         openingsArea: 0,
       });
-      expect(res.primary.value).toBe(101);
-      const concreteSec = res.secondary?.find((s) => s.id === 'concreteM3');
-      expect(concreteSec?.formattedValue).toContain('1,83 m³');
-      expect(concreteSec?.formattedValue).toContain('4,2 t');
-      const rebarSec = res.secondary?.find((s) => s.id === 'rebar');
-      expect(rebarSec?.value).toBe(159);
+      expect(res0.primary.value).toBe(101);
+      const baseStones0 = res0.secondary?.find((s) => s.id === 'baseStones');
+      expect(baseStones0?.value).toBe(96);
+      const concreteSec0 = res0.secondary?.find((s) => s.id === 'concreteM3');
+      expect(concreteSec0?.value).toBe(1.56);
+      expect(concreteSec0?.formattedValue).toContain('1,56 m³');
+
+      // With concrete reserve 5%: 1.638 m³ concrete before display rounding
+      const res5 = calc!.calculate({
+        wallLength: 8,
+        wallHeight: 1.5,
+        fillMode: 'preset_delfing24',
+        stoneReserve: 5,
+        concreteReserve: 5,
+        openingsArea: 0,
+      });
+      const concreteSec5 = res5.secondary?.find((s) => s.id === 'concreteM3');
+      expect(concreteSec5?.value).toBeCloseTo(1.638, 3);
+      expect(concreteSec5?.formattedValue).toContain('1,64 m³');
     });
 
-    it('has German examples for small garden wall and retaining wall', () => {
+    it('has German worked examples with explicit manufacturer assumptions', () => {
       expect(calc!.workedExamples).toBeDefined();
       expect(calc!.workedExamples!.length).toBeGreaterThanOrEqual(2);
-      expect(calc!.workedExamples![0].title).toContain('Hang-Stützmauer');
+      expect(calc!.workedExamples![0].title).toContain('12 m² Mauer');
       expect(calc!.workedExamples![1].title).toContain('Gartenmauer');
     });
 
@@ -151,6 +167,106 @@ describe('Focused Organic-Ranking Sprint Verification for Priority Pages', () =>
       expect(calc!.relatedSlugs).toContain('beton-mischungsverhaeltnis-rechner');
       expect(calc!.relatedSlugs).toContain('estrich-rechner');
       expect(calc!.relatedSlugs).toContain('aushub-erdarbeiten-rechner');
+    });
+  });
+
+  describe('4. Maximaler Kredit Rechner (/rechner/maximaler-kredit-rechner/)', () => {
+    const calc = getCalculatorBySlug('maximaler-kredit-rechner');
+
+    it('exists and satisfies search intent "wie viel kredit bekomme ich"', async () => {
+      expect(calc).toBeDefined();
+      expect(calc!.metaTitle).toBe('Wie viel Kredit bekomme ich? Maximaler Kredit Rechner');
+      expect(calc!.h1).toBe('Wie viel Kredit bekomme ich? – Maximaler Kredit Rechner');
+
+      const meta = await generateMetadata({ params: Promise.resolve({ slug: 'maximaler-kredit-rechner' }) });
+      expect(meta.alternates?.canonical).toBe('https://rechenhafen.de/rechner/maximaler-kredit-rechner/');
+    });
+
+    it('calculates realistic loan affordability based on household budget', () => {
+      // 3.500 € net income, 1.600 € fixed, 200 € safety buffer, 3.5% interest, 25 years
+      // Available rate = 3500 - 1600 - 200 = 1700 €/month
+      const res = calc!.calculate({
+        netIncome: 3500,
+        fixedExpenses: 1600,
+        existingLoans: 0,
+        safetyBuffer: 200,
+        interestRate: 3.5,
+        termYears: 25,
+        equity: 30000,
+      });
+
+      expect(res.primary.value).toBeGreaterThan(300000);
+      const availableRate = res.secondary?.find((s) => s.id === 'availableRate');
+      expect(availableRate?.value).toBe(1700);
+      const totalBudget = res.secondary?.find((s) => s.id === 'totalBudget');
+      expect(totalBudget?.value).toBeGreaterThan(res.primary.value as number);
+      expect(res.basisSummary).toBeDefined();
+      expect(res.notes?.[0].toLowerCase()).toContain('unverbindliche orientierung');
+    });
+  });
+
+  describe('5. Warmmiete Rechner (/rechner/warmmiete-zu-kaltmiete-rechner/)', () => {
+    const calc = getCalculatorBySlug('warmmiete-zu-kaltmiete-rechner');
+
+    it('exists and answers "warmmiete berechnen"', async () => {
+      expect(calc).toBeDefined();
+      expect(calc!.metaTitle).toContain('Warmmiete berechnen');
+      expect(calc!.h1).toContain('Warmmiete berechnen');
+
+      const meta = await generateMetadata({ params: Promise.resolve({ slug: 'warmmiete-zu-kaltmiete-rechner' }) });
+      expect(meta.alternates?.canonical).toBe('https://rechenhafen.de/rechner/warmmiete-zu-kaltmiete-rechner/');
+    });
+
+    it('calculates Warmmiete = Kaltmiete + Betriebskosten + Heizkosten cleanly', () => {
+      const res = calc!.calculate({
+        calculationDirection: 'warm_from_components',
+        coldRentInput: 850,
+        operatingCosts: 170,
+        heatingCosts: 130,
+        livingAreaMode1: 75,
+      });
+
+      expect(res.primary.value).toBe(1150);
+      expect(res.primary.label).toContain('Warmmiete');
+      const kalt = res.secondary?.find((s) => s.id === 'coldRent');
+      expect(kalt?.value).toBe(850);
+      const neben = res.secondary?.find((s) => s.id === 'operatingCosts');
+      expect(neben?.value).toBe(170);
+      const heiz = res.secondary?.find((s) => s.id === 'heatingCosts');
+      expect(heiz?.value).toBe(130);
+      expect(res.basisSummary).toBeDefined();
+    });
+  });
+
+  describe('6. Notendurchschnitt Rechner (/rechner/notendurchschnitt-rechner/)', () => {
+    const calc = getCalculatorBySlug('notendurchschnitt-rechner');
+
+    it('exists and targets "notendurchschnitt berechnen"', async () => {
+      expect(calc).toBeDefined();
+      expect(calc!.metaTitle).toContain('Notendurchschnitt berechnen');
+      expect(calc!.h1).toContain('Notendurchschnitt berechnen');
+
+      const meta = await generateMetadata({ params: Promise.resolve({ slug: 'notendurchschnitt-rechner' }) });
+      expect(meta.alternates?.canonical).toBe('https://rechenhafen.de/rechner/notendurchschnitt-rechner/');
+    });
+
+    it('calculates both simple arithmetic and weighted averages', () => {
+      // Simple arithmetic
+      const resSimple = calc!.calculate({
+        calculationMode: 'simple',
+        grades: '1,0; 2,0; 3,0',
+      });
+      expect(resSimple.primary.value).toBe(2.0);
+
+      // Weighted (ECTS)
+      // 1.0 (5 ECTS) + 2.0 (10 ECTS) = 5 + 20 = 25 / 15 = 1.6666...
+      const resWeighted = calc!.calculate({
+        calculationMode: 'weighted',
+        weightedGrades: '1,0 * 5; 2,0 * 10',
+      });
+      expect(resWeighted.primary.value).toBeCloseTo(1.67, 2);
+      expect(resWeighted.basisSummary).toBeDefined();
+      expect(resWeighted.breakdown).toBeDefined();
     });
   });
 });

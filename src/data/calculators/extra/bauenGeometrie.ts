@@ -1251,9 +1251,9 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
     metaTitle: 'Schalungssteine Rechner: Menge für Ihre Mauer berechnen',
-    metaDescription: 'Schalungssteine berechnen: Exakte Steinanzahl, Füllbeton-Volumen (m³) & Bewehrungsstahl für Stützmauer, Gartenmauer oder Fundament ermitteln.',
+    metaDescription: 'Schalungssteine berechnen: Exakte Steinanzahl und Füllbeton-Volumen (m³) nach Wandfläche und Herstellerangaben für Garten- und Stützmauern ermitteln.',
     h1: 'Schalungssteine berechnen: Menge für Ihre Mauer',
-    shortDescription: 'Ermittelt die exakte Stückzahl an Schalungssteinen, den Betonbedarf in m³ und die benötigte Länge an Bewehrungsstahl für Garten- und Stützmauern.',
+    shortDescription: 'Ermittelt die Stückzahl an Schalungssteinen und den Füllbetonbedarf in m³ basierend auf Wandmaßen, Herstellerwerten und getrennten Reserven.',
     searchKeywords: [
       "schalungssteine rechner",
       "schalungssteine berechnen",
@@ -1261,26 +1261,26 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       "schalungssteine menge mauer",
       "fuellbeton m3 schalungsstein",
       "betonschalungssteine menge stuetzmauer",
-      "bewehrungsstahl schalungsstein",
       "schalungsstein bedarf pro m2",
+      "schalungssteine betonbedarf berechnen",
     ],
     inputs: [
       {
         id: "wallLength",
-        label: "Mauerlänge",
+        label: "Mauerlänge (m)",
         type: "number",
         defaultValue: 8,
-        min: 0.5,
+        min: 0.1,
         max: 100,
         step: 0.5,
         unit: "m"
       },
       {
         id: "wallHeight",
-        label: "Mauerhöhe",
+        label: "Mauerhöhe (m)",
         type: "number",
         defaultValue: 1.5,
-        min: 0.25,
+        min: 0.1,
         max: 5,
         step: 0.25,
         unit: "m"
@@ -1297,24 +1297,56 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         helpText: "Fläche von Durchbrüchen oder Toren, die nicht aufgemauert werden"
       },
       {
-        id: "stoneWidth",
-        label: "Steinbreite (Wandstärke)",
+        id: "stoneFormat",
+        label: "Steinformat & Grundbedarf",
         type: "select",
-        defaultValue: "24",
+        defaultValue: "8",
         options: [
-          { value: "17.5", label: "17,5 cm Breite (ca. 100 l Füllbeton / m²)" },
-          { value: "24", label: "24,0 cm Breite (ca. 145 l Füllbeton / m²)" },
-          { value: "30", label: "30,0 cm Breite (ca. 195 l Füllbeton / m²)" },
-          { value: "36.5", label: "36,5 cm Breite (ca. 240 l Füllbeton / m²)" }
+          { value: "8", label: "Standardformat 50 × 25 cm (exakt 8 Steine je m² Wandfläche)" }
         ]
       },
       {
-        id: "waste",
-        label: "Verschnitt für Zuschnitte & Passstücke",
+        id: "fillMode",
+        label: "Hersteller-Füllmenge (Betonbedarf)",
+        type: "select",
+        defaultValue: "preset_delfing24",
+        options: [
+          { value: "preset_delfing24", label: "Delfing DP 24 cm (Herstellerwert: ca. 130 l/m²)" },
+          { value: "preset_delfing175", label: "Delfing DP 17,5 cm (Herstellerwert: ca. 80 l/m²)" },
+          { value: "preset_beyhl24", label: "Beyhl 24 cm (Herstellerwert: ca. 18 l/Stein ≈ 144 l/m² bei 8 Stk./m²)" },
+          { value: "preset_beyhl175", label: "Beyhl 17,5 cm (Herstellerwert: ca. 12 l/Stein ≈ 96 l/m² bei 8 Stk./m²)" },
+          { value: "customM2", label: "Eigener Herstellerwert in Liter je m² Wandfläche" },
+          { value: "customStone", label: "Eigener Herstellerwert in Liter je Stein" }
+        ]
+      },
+      {
+        id: "customFillValue",
+        label: "Eigene Hersteller-Füllmenge (l/m² oder l/Stein)",
+        type: "number",
+        defaultValue: 130,
+        min: 1,
+        max: 500,
+        step: 1,
+        unit: "Liter",
+        helpText: "Wird verwendet, wenn oben ein eigener Herstellerwert gewählt wurde"
+      },
+      {
+        id: "stoneReserve",
+        label: "Steinreserve für Zuschnitt & Bruch (%)",
         type: "number",
         defaultValue: 5,
         min: 0,
-        max: 20,
+        max: 25,
+        step: 1,
+        unit: "%"
+      },
+      {
+        id: "concreteReserve",
+        label: "Zuschlag für Betonbestellung (%)",
+        type: "number",
+        defaultValue: 0,
+        min: 0,
+        max: 25,
         step: 1,
         unit: "%"
       }
@@ -1366,132 +1398,236 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         };
       }
 
-      const rawWaste = inputs.waste !== undefined && inputs.waste !== null && String(inputs.waste).trim() !== ''
-        ? parseFloat(inputs.waste)
-        : 0;
-      if (isNaN(rawWaste) || rawWaste < 0) {
+      // Stone Reserve (Verschnitt / Bruch)
+      const rawStoneReserve = inputs.stoneReserve !== undefined && inputs.stoneReserve !== null && String(inputs.stoneReserve).trim() !== ''
+        ? parseFloat(inputs.stoneReserve)
+        : (inputs.waste !== undefined ? parseFloat(inputs.waste) : 5);
+      if (isNaN(rawStoneReserve) || rawStoneReserve < 0) {
         return {
           primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
-          error: 'Der Verschnitt darf nicht negativ sein.',
+          error: 'Die Steinreserve darf nicht negativ sein.',
         };
       }
-      const wastePercent = rawWaste;
-      const wasteFactor = 1 + (wastePercent / 100);
+      const stoneReservePercent = rawStoneReserve;
+      const stoneReserveFactor = 1 + (stoneReservePercent / 100);
+
+      // Concrete Ordering Reserve
+      const rawConcreteReserve = inputs.concreteReserve !== undefined && inputs.concreteReserve !== null && String(inputs.concreteReserve).trim() !== ''
+        ? parseFloat(inputs.concreteReserve)
+        : 0;
+      if (isNaN(rawConcreteReserve) || rawConcreteReserve < 0) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          error: 'Der Betonzuschlag darf nicht negativ sein.',
+        };
+      }
+      const concreteReservePercent = rawConcreteReserve;
+      const concreteReserveFactor = 1 + (concreteReservePercent / 100);
 
       const wallArea = grossArea - openings;
       if (wallArea <= 0.0001) {
         return {
-          primary: { id: 'stones', label: 'Benötigte Schalungssteine (50×25 cm)', value: 0, formattedValue: '0 Stück', highlight: true },
+          primary: { id: 'stones', label: 'Schalungssteine (inkl. Steinreserve)', value: 0, formattedValue: '0 Stück', highlight: true },
           secondary: [
-            { id: 'concreteM3', label: 'Verfüllbeton Gesamtvolumen', value: 0, formattedValue: '0,00 m³ (ca. 0,0 t Normalbeton)' },
-            { id: 'rebar', label: 'Bewehrungsstahl (Ø 10 mm inkl. 10 % Überdeckung)', value: 0, formattedValue: '0 lfd. Meter' },
+            { id: 'concreteM3', label: 'Füllbeton (Bestellmenge)', value: 0, formattedValue: '0,00 m³' },
+            { id: 'baseStones', label: 'Steine Netto-Bedarf', value: 0, formattedValue: '0 Stück' },
+            { id: 'concreteBaseM3', label: 'Füllbeton Netto-Volumen', value: 0, formattedValue: '0,00 m³' },
             { id: 'wallArea', label: 'Netto-Ansichtsfläche der Mauer', value: 0, formattedValue: '0,00 m²' },
           ],
-          summaryText: 'Bei einer Netto-Wandfläche von 0,00 m² (die Öffnungen entsprechen der gesamten Wandfläche) wird kein Baumaterial benötigt.',
+          summaryText: 'Materialabschätzung: Bei einer Netto-Wandfläche von 0,00 m² (die Öffnungen entsprechen der gesamten Wandfläche) wird kein Wandbaustoff benötigt.',
         };
       }
-      
-      // Standardmaß Schalungsstein: 50 cm lang, 25 cm hoch -> 8 Steine pro m²
-      const stonesCount = Math.ceil(wallArea * 8 * wasteFactor);
-      
-      let concretePerM2 = 145; // Liter
-      if (inputs.stoneWidth === '17.5') concretePerM2 = 100;
-      else if (inputs.stoneWidth === '30') concretePerM2 = 195;
-      else if (inputs.stoneWidth === '36.5') concretePerM2 = 240;
-      
-      const concreteM3 = (wallArea * (concretePerM2 / 1000)) * wasteFactor;
-      const concreteTonnes = concreteM3 * 2.3; // Normalbeton Dichte ~2,3 t/m³
 
-      // Bewehrungsstahl: 2 horizontale Stäbe je Schicht (alle 25 cm) + Vertikalstäbe alle 25 cm,
-      // skaliert anhand der verbleibenden Netto-Wandfläche
-      const layers = Math.ceil(h / 0.25);
-      const grossHorizontalRebarM = layers * 2 * l;
-      const grossVerticalRebarM = Math.ceil(l / 0.25) * h;
-      const areaFactor = wallArea / grossArea;
-      const totalRebarMeters = Math.ceil((grossHorizontalRebarM + grossVerticalRebarM) * 1.1 * areaFactor);
-      
+      // Standardmaß: 50 cm lang, 25 cm hoch -> 8 Steine pro m²
+      const stonesPerM2 = 8;
+      const baseStones = Math.ceil(wallArea * stonesPerM2);
+      const stonesWithReserve = Math.ceil(wallArea * stonesPerM2 * stoneReserveFactor);
+
+      // Füllmenge in Liter je m² ermitteln
+      let litersPerM2 = 130; // Standardbeispiel: Delfing DP 24
+      const fillMode = inputs.fillMode;
+      const customVal = parseFloat(inputs.customFillValue) || 130;
+
+      if (fillMode === 'preset_delfing24') {
+        litersPerM2 = 130;
+      } else if (fillMode === 'preset_delfing175') {
+        litersPerM2 = 80;
+      } else if (fillMode === 'preset_beyhl24') {
+        litersPerM2 = 18 * stonesPerM2; // 144 l/m²
+      } else if (fillMode === 'preset_beyhl175') {
+        litersPerM2 = 12 * stonesPerM2; // 96 l/m²
+      } else if (fillMode === 'customM2') {
+        litersPerM2 = customVal;
+      } else if (fillMode === 'customStone') {
+        litersPerM2 = customVal * stonesPerM2;
+      } else if (inputs.stoneWidth) {
+        // Fallback for legacy parameters
+        if (inputs.stoneWidth === '17.5') litersPerM2 = 80;
+        else if (inputs.stoneWidth === '30') litersPerM2 = 195;
+        else if (inputs.stoneWidth === '36.5') litersPerM2 = 240;
+        else litersPerM2 = 130;
+      }
+
+      // Netto-Füllvolumen
+      const concreteBaseM3 = wallArea * (litersPerM2 / 1000);
+      // Bestellmenge mit separater Betonreserve
+      const concreteTotalM3 = concreteBaseM3 * concreteReserveFactor;
+
+      const concreteReserveSecValue = Number((concreteTotalM3 - concreteBaseM3).toFixed(3));
+
       return {
-        primary: { id: 'stones', label: 'Benötigte Schalungssteine (50×25 cm)', value: stonesCount, formattedValue: stonesCount + ' Stück', highlight: true },
+        primary: {
+          id: 'stones',
+          label: 'Schalungssteine (inkl. Reserve)',
+          value: stonesWithReserve,
+          formattedValue: `${stonesWithReserve} Stück`,
+          highlight: true,
+          helpText: `${baseStones} Stück Netto + ${stonesWithReserve - baseStones} Stück Reserve (${stoneReservePercent} % für Zuschnitt & Bruch)`,
+        },
         secondary: [
-          { id: 'concreteM3', label: 'Verfüllbeton Gesamtvolumen', value: concreteM3, formattedValue: formatNumber(concreteM3, 2) + ' m³ (ca. ' + formatNumber(concreteTonnes, 1) + ' t Normalbeton)' },
-          { id: 'rebar', label: 'Bewehrungsstahl (Ø 10 mm inkl. 10 % Überdeckung)', value: totalRebarMeters, formattedValue: 'ca. ' + totalRebarMeters + ' lfd. Meter' },
-          { id: 'wallArea', label: 'Netto-Ansichtsfläche der Mauer', value: wallArea, formattedValue: formatNumber(wallArea, 2) + ' m²' },
+          {
+            id: 'concreteM3',
+            label: 'Finaler Betonbedarf (Bestellmenge)',
+            value: Number(concreteTotalM3.toFixed(3)),
+            formattedValue: `${formatNumber(concreteTotalM3, 2)} m³`,
+            highlight: true,
+            helpText: `Inklusive ${concreteReservePercent} % Bestellzuschlag`,
+          },
+          {
+            id: 'concreteBaseM3',
+            label: 'Füllbeton Netto-Volumen',
+            value: Number(concreteBaseM3.toFixed(3)),
+            formattedValue: `${formatNumber(concreteBaseM3, 2)} m³ (${formatNumber(concreteBaseM3 * 1000, 0)} Liter)`,
+            helpText: `Geometrisches Füllvolumen der Hohlkammern laut Herstellerangabe (${formatNumber(litersPerM2, 1)} l/m²)`,
+          },
+          {
+            id: 'concreteReserveAmount',
+            label: 'Betonreserve / Bestellzuschlag',
+            value: concreteReservePercent,
+            formattedValue: `${concreteReservePercent} % (+${formatNumber(concreteReserveSecValue, 2)} m³)`,
+          },
+          {
+            id: 'baseStones',
+            label: 'Schalungssteine Netto-Bedarf',
+            value: baseStones,
+            formattedValue: `${baseStones} Stück (ohne Reserve)`,
+          },
+          {
+            id: 'stoneReserveAmount',
+            label: 'Steinreserve (Zuschnitt & Bruch)',
+            value: stoneReservePercent,
+            formattedValue: `${stoneReservePercent} % (+${stonesWithReserve - baseStones} Steine)`,
+          },
+          {
+            id: 'wallArea',
+            label: 'Netto-Wandfläche',
+            value: Number(wallArea.toFixed(2)),
+            formattedValue: `${formatNumber(wallArea, 2)} m²`,
+            helpText: `Brutto ${formatNumber(grossArea, 2)} m² minus ${formatNumber(openings, 2)} m² Öffnungen`,
+          },
+          {
+            id: 'wallDimensions',
+            label: 'Mauerabmessungen',
+            value: `${formatNumber(l, 2)} × ${formatNumber(h, 2)} m`,
+            formattedValue: `${formatNumber(l, 2)} m Länge × ${formatNumber(h, 2)} m Höhe`,
+          },
+          {
+            id: 'stoneDimensions',
+            label: 'Ausgewählte Steinmaße',
+            value: '50 × 25 cm',
+            formattedValue: '50 × 25 cm (exakt 8 Steine je m²)',
+            helpText: 'Handelsübliches Standard-Rastermaß nach DIN EN 771-3',
+          },
         ],
-        summaryText: `Für ${formatNumber(wallArea, 2)} m² Wandfläche benötigen Sie ${stonesCount} Schalungssteine (50×25 cm, inkl. ${wastePercent} % Verschnitt), ca. ${formatNumber(concreteM3, 2)} m³ Verfüllbeton (ca. ${formatNumber(concreteTonnes, 1)} t bei 2,3 t/m³ Normalbeton-Dichte) und rund ${totalRebarMeters} m Bewehrungsstahl. Hinweis: Modellrechnung für Standard-Bedingungen als Orientierungswert – ersetzt keine statische Einzelprüfung.`,
+        directAnswer: `Für Ihre Mauer (${formatNumber(l, 2)} m × ${formatNumber(h, 2)} m = ${formatNumber(wallArea, 2)} m² Nettofläche) benötigen Sie ${baseStones} Schalungssteine (${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Reserve) sowie ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton (Netto-Füllvolumen: ${formatNumber(concreteBaseM3, 2)} m³).`,
+        qualifications: [
+          'Reine Materialermittlung: Die Berechnung ersetzt keinen statischen Standsicherheitsnachweis und keine individuelle Bewehrungsbemessung.',
+          'Herstellerangaben beachten: Hohlraumvolumen variieren je nach Hersteller und Wandstärke (z. B. Delfing DP 24 ca. 130 l/m², Beyhl 24er ca. 144 l/m²).',
+          'Fundament getrennt bemessen: Der Fundamentbeton für das Streifenfundament ist eine separate Position und nicht im Füllvolumen der Steine enthalten.',
+        ],
+        calculationSteps: [
+          `Netto-Wandfläche = ${formatNumber(l, 2)} m Länge × ${formatNumber(h, 2)} m Höhe − ${formatNumber(openings, 2)} m² Öffnungen = ${formatNumber(wallArea, 2)} m²`,
+          `Grundbedarf Steine = ${formatNumber(wallArea, 2)} m² × 8 Steine/m² = ${baseStones} Schalungssteine`,
+          `Steine inkl. ${stoneReservePercent} % Reserve = ${baseStones} × ${formatNumber(stoneReserveFactor, 2)} = ${stonesWithReserve} Stück`,
+          `Netto-Füllbeton = ${formatNumber(wallArea, 2)} m² × ${formatNumber(litersPerM2, 1)} l/m² ÷ 1.000 = ${formatNumber(concreteBaseM3, 2)} m³ (${formatNumber(concreteBaseM3 * 1000, 0)} Liter)`,
+          `Finaler Betonbedarf inkl. ${concreteReservePercent} % Bestellzuschlag = ${formatNumber(concreteBaseM3, 2)} m³ × ${formatNumber(concreteReserveFactor, 2)} = ${formatNumber(concreteTotalM3, 2)} m³`,
+        ],
+        basisSummary: [
+          { label: 'Mauerlänge', value: `${formatNumber(l, 2)} m` },
+          { label: 'Mauerhöhe', value: `${formatNumber(h, 2)} m` },
+          { label: 'Netto-Wandfläche', value: `${formatNumber(wallArea, 2)} m²` },
+          { label: 'Steinformat', value: '50 × 25 cm (8 Steine/m²)' },
+          { label: 'Hersteller-Füllmenge', value: `${formatNumber(litersPerM2, 1)} Liter je m²` },
+          { label: 'Steinreserve', value: `${stoneReservePercent} %` },
+          { label: 'Betonbestellzuschlag', value: `${concreteReservePercent} %` },
+        ],
+        summaryText: `Materialabschätzung: Für ${formatNumber(wallArea, 2)} m² Netto-Wandfläche benötigen Sie ${baseStones} Schalungssteine (${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Steinreserve). Das geometrische Füllvolumen beträgt ${formatNumber(concreteBaseM3, 2)} m³ (bei ${litersPerM2} l/m² Herstellerangabe). Mit ${concreteReservePercent} % Betonbestellzuschlag ergibt sich eine empfohlene Liefermenge von ca. ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton. Hinweis: Reine Materialermittlung – ersetzt keinen statischen Standsicherheitsnachweis und keine individuelle Bewehrungsbemessung.`,
       };
     },
-    formula: "Steine = Netto-Wandfläche × 8 Stk./m² × (1 + Verschnitt/100); Füllbeton = Netto-Wandfläche × Liter/m² × (1 + Verschnitt/100); Stahl = (2 × Lagen × Länge + Vertikalstäbe × Höhe) × 1,1 × (Nettofläche / Bruttofläche)",
-    formulaExplanation: "Schalungssteine werden trocken im Halbsteinverband aufgesetzt (8 Stk./m² bei 50×25 cm Format), mit Baustahl horizontal (2 Stäbe je 25-cm-Lage) und vertikal bewehrt und anschließend mit flüssigem Normalbeton (Dichte ~2,3 t/m³) verfüllt. Der Verschnittzuschlag wird über den Multiplikator (1 + Verschnitt / 100) berechnet. Alle Angaben zu Stahl und Beton sind Schätzwerte und stellen keine statische Bemessung dar. Bei Stützmauern ist vorab eine statische Prüfung erforderlich.",
+    formula: "Steine = Netto-Wandfläche × 8 Stk./m² × (1 + Steinreserve/100); Füllbeton = Netto-Wandfläche × Hersteller-Füllmenge (l/m²) × (1 + Betonzuschlag/100) ÷ 1.000",
+    formulaExplanation: "Schalungssteine (Standardformat 50 × 25 cm) decken je Stein 0,125 m² Wandfläche ab, woraus sich exakt 8 Steine je m² Nettofläche ergeben. Das erforderliche Betonvolumen richtet sich nach dem herstellerspezifischen Hohlraumvolumen des gewählten Steins (z. B. 130 l/m² bei Delfing DP 24). Steinreserve (für Bruch und Zuschnitt) und Betonbestellzuschlag werden als getrennte Reserven kalkuliert. Die Berechnung liefert eine reine Materialabschätzung und ersetzt keine statische Tragwerksplanung.",
     workedExample: {
-      title: "Beispiel: 8 m × 1,5 m Stützmauer mit 24er Schalungssteinen",
-      description: "Für eine Stützmauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen (145 l/m² Beton) und 5 % Verschnitt werden 101 Schalungssteine (Standardmaß 50×25 cm) sowie ca. 1,83 m³ Verfüllbeton (ca. 4,2 Tonnen bei 2,3 t/m³) und rund 159 Meter Bewehrungsstahl benötigt.",
+      title: "Beispiel: 8 m × 1,5 m Mauer mit 24er Schalungssteinen (Herstellerangabe 130 l/m²)",
+      description: "Für eine Mauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen (130 l/m² Herstellerangabe, z. B. Delfing DP 24) und 5 % Steinreserve werden rechnerisch 96 Steine Netto bzw. 101 Schalungssteine inkl. Reserve benötigt. Das Netto-Betonvolumen beträgt 1,56 m³ (bei 5 % Bestellzuschlag ca. 1,64 m³).",
       inputValues: [
-        { label: "Wandmaß", value: "8 m × 1,5 m (12 m²)" },
-        { label: "Steinbreite", value: "24 cm (145 l/m²)" },
-        { label: "Verschnitt", value: "5 %" }
+        { label: "Wandmaß", value: "8 m × 1,5 m (12 m² Ansichtsfläche)" },
+        { label: "Hersteller-Füllmenge", value: "130 l/m² (z. B. Delfing DP 24)" },
+        { label: "Steinreserve", value: "5 %" },
+        { label: "Betonzuschlag", value: "0 % (optional 5 %)" }
       ],
       steps: [
-        "Wandfläche: 8 m × 1,5 m = 12 m²",
-        "Steine: 12 m² × 8 Stk./m² × 1,05 = 100,8 → 101 Schalungssteine (50×25 cm)",
-        "Füllbeton: 12 m² × 0,145 m³/m² × 1,05 = 1,827 m³ ≈ 1,83 m³ (bei 2,3 t/m³ ≈ 4,2 Tonnen)",
-        "Bewehrung: 6 Lagen × 2 Stäbe × 8 m = 96 m horizontal; 32 Stäbe × 1,5 m = 48 m vertikal; (96 m + 48 m) × 1,10 = 158,4 m → 159 lfd. Meter"
+        "Netto-Wandfläche: 8 m × 1,5 m = 12 m²",
+        "Grundbedarf Steine: 12 m² × 8 Stk./m² = 96 Schalungssteine (50 × 25 cm)",
+        "Steine inkl. 5 % Reserve: 96 × 1,05 = 100,8 → aufgerundet 101 Steine",
+        "Netto-Füllbeton: 12 m² × 130 l/m² = 1.560 Liter = 1,56 m³",
+        "Betonbestellmenge (bei optional 5 % Zuschlag): 1,56 m³ × 1,05 = 1,638 m³ ≈ 1,64 m³"
       ],
-      result: "101 Schalungssteine, 1,83 m³ Verfüllbeton (ca. 4,2 t) und 159 m Bewehrungsstahl"
+      result: "96 Steine Netto (101 Steine inkl. Reserve) und 1,56 m³ Füllbeton (1,638 m³ bzw. ca. 1,64 m³ mit 5 % Bestellzuschlag)."
     },
     workedExamples: [
       {
-        title: "Beispiel 1: Hang-Stützmauer (8 m × 1,5 m mit 24er Schalungssteinen)",
-        description: "Für eine 8 m lange und 1,5 m hohe Hangabstützung (12 m² Ansichtsfläche) mit 24er Steinen und 5 % Verschnitt werden 101 Schalungssteine, 1,83 m³ Füllbeton (ca. 4,2 t) sowie 159 Meter Bewehrungsstahl benötigt.",
-        inputs: { wallLength: 8, wallHeight: 1.5, stoneWidth: '24', waste: 5, openingsArea: 0 },
-        resultSummary: "101 Schalungssteine, 1,83 m³ Beton, 159 m Stahl",
+        title: "Beispiel 1: 12 m² Mauer mit 24er Steinen (Delfing DP 24, 130 l/m²)",
+        description: "Für eine 8 m lange und 1,5 m hohe Wand (12 m² Ansichtsfläche) mit 24er Steinen, 5 % Steinreserve und 0 % Betonzuschlag ergeben sich 96 Steine Netto, 101 Steine inkl. Reserve und 1,56 m³ Füllbeton (bei 5 % Betonzuschlag: 1,638 m³).",
+        inputs: { wallLength: 8, wallHeight: 1.5, fillMode: 'preset_delfing24', stoneReserve: 5, concreteReserve: 0, openingsArea: 0 },
+        resultSummary: "101 Schalungssteine (inkl. 5 % Reserve), 1,56 m³ Füllbeton",
       },
       {
-        title: "Beispiel 2: Kleine Gartenmauer (6 m × 0,75 m mit 17,5er Schalungssteinen)",
-        description: "Für eine freistehende Gartenmauer von 6 m Länge und 0,75 m Höhe (4,5 m² Fläche) mit 17,5er Steinen und 5 % Verschnitt werden 38 Schalungssteine (4,5 × 8 × 1,05), ca. 0,47 m³ Füllbeton (ca. 1,1 t) und rund 60 m Bewehrungsstahl benötigt.",
-        inputs: { wallLength: 6, wallHeight: 0.75, stoneWidth: '17.5', waste: 5, openingsArea: 0 },
-        resultSummary: "38 Schalungssteine, 0,47 m³ Beton, 60 m Stahl",
+        title: "Beispiel 2: Kleine Gartenmauer (6 m × 0,75 m mit 17,5er Steinen, 80 l/m²)",
+        description: "Für eine Gartenmauer von 6 m Länge und 0,75 m Höhe (4,5 m² Fläche) mit 17,5er Steinen (80 l/m² Füllmenge) und 5 % Steinreserve werden 36 Steine Netto (38 Steine inkl. Reserve) und 0,36 m³ Füllbeton benötigt.",
+        inputs: { wallLength: 6, wallHeight: 0.75, fillMode: 'preset_delfing175', stoneReserve: 5, concreteReserve: 0, openingsArea: 0 },
+        resultSummary: "38 Schalungssteine (inkl. 5 % Reserve), 0,36 m³ Füllbeton",
       },
     ],
     content: {
-      intro: 'Schalungssteine (auch Beton-Schalungssteine oder Hohlkammersteine genannt) sind das ideale Bauelement für massive Gartenstützmauern, Poolwände, Zaunsockel und Kellerwände. Sie kombinieren die schnelle Trockenverlegung mit der hohen Stabilität einer monolithischen Stahlbetonwand.',
+      intro: 'Schalungssteine (Betonschalungssteine oder Hohlkammersteine) werden trocken im Verband aufgeschichtet und mit Füllbeton vergossen. Eine detaillierte Anleitung zur Mengenermittlung nach Herstellerdaten und getrennten Reserven bietet unser Ratgeber [Schalungssteine: Betonbedarf berechnen mit Beispiel](/ratgeber/schalungssteine-betonbedarf-berechnen/).',
       sections: [
         {
-          title: 'Schalungssteine berechnen – so ermitteln Sie den genauen Bedarf',
-          content: 'Die Bedarfsrechnung für Schalungssteine basiert auf der Ansichtsfläche Ihrer Mauer:\n- **Standardformat**: Nahezu alle Beton-Schalungssteine im Baustoffhandel messen einheitlich 50 cm Länge und 25 cm Höhe.\n- **Steine pro Quadratmeter**: Ein Stein deckt 0,5 m × 0,25 m = 0,125 m² Fläche ab. Daraus folgt die exakte Grundregel: **Exakt 8 Schalungssteine pro 1 m² Wandfläche**.\n- **Verschnitt & Bruch**: Planen Sie mindestens 5 Prozent Reserve für Passstücke an den Mauerenden, Eckschnitte und unvermeidbaren Bruch ein. Bei vielen Ecken oder Schrägschnitten empfehlen sich 8 bis 10 Prozent.',
+          title: 'Schalungssteine berechnen – Wandfläche und Steinbedarf',
+          content: 'Die Bedarfsrechnung für Schalungssteine basiert auf der Netto-Ansichtsfläche Ihrer Mauer:\n- **Standardformat**: Die meisten Beton-Schalungssteine messen 50 cm Länge und 25 cm Höhe (Ansichtsfläche je Stein: 0,125 m²).\n- **Steine pro Quadratmeter**: Daraus ergibt sich die feste Grundregel von **exakt 8 Schalungssteinen je 1 m² Wandfläche**.\n- **Steinreserve getrennt planen**: Planen Sie mindestens 5 Prozent Reserve für Passstücke, Eckschnitte und unvermeidbaren Bruch ein. Diese Reservesteine erhöhen nicht das geometrische Füllvolumen der fertigen Wand.',
         },
         {
-          title: 'Wie viel Füllbeton wird pro Quadratmeter benötigt?',
-          content: 'Das erforderliche Betonvolumen richtet sich maßgeblich nach der Mauerstärke (Steinbreite):\n- **17,5 cm Steinbreite**: ca. 100 Liter Beton je m² (geeignet für Zaunsockel, kleine Beeteinfassungen bis 80 cm)\n- **24,0 cm Steinbreite**: ca. 145 Liter Beton je m² (Standard für Stützmauern bis ca. 1,5 m und Poolwände)\n- **30,0 cm Steinbreite**: ca. 195 Liter Beton je m² (für höhere Erddrücke und Stützmauern bis 2,0 m)\n- **36,5 cm Steinbreite**: ca. 240 Liter Beton je m² (für schwere Hangabfangungen und Kellerwände)\n\nBerechnen Sie die Zement- und Sandmengen zum Selbermischen mit unserem [Beton-Mischungsverhältnis Rechner](/rechner/beton-mischungsverhaeltnis-rechner/) oder ermitteln Sie größere Fertigbetonmengen im [Betonrechner](/rechner/betonrechner/).',
+          title: 'Füllbetonbedarf nach Herstellerdatenblatt bestimmen',
+          content: 'Die Wandstärke allein reicht für die Betonberechnung nicht aus, da Steggeometrie und Hohlraumanteil je nach Hersteller und Serie variieren:\n- **Delfing DP 17,5 cm**: ca. 80 Liter Beton je m² Wandfläche\n- **Delfing DP 24 cm**: ca. 130 Liter Beton je m² Wandfläche\n- **Beyhl 17,5 cm**: ca. 12 Liter je Stein (entspricht ca. 96 l/m² bei 8 Steinen/m²)\n- **Beyhl 24 cm**: ca. 18 Liter je Stein (entspricht ca. 144 l/m² bei 8 Steinen/m²)\n\nPrüfen Sie stets das technische Datenblatt Ihres konkreten Steins. Für die Betonbestellung empfiehlt sich ein separat kalkulierter Zuschlag von 3 bis 8 Prozent. Größere Mengen berechnen Sie direkt im [Betonrechner](/rechner/betonrechner/).',
         },
         {
-          title: 'Bewehrungsstahl für Stützmauern richtig dimensionieren',
-          content: 'Ohne Stahlbewehrung kann eine Schalungssteinwand keine Erddrücke oder Zugkräfte aufnehmen:\n- **Horizontale Bewehrung**: In jede Steinlage (alle 25 cm Höhe) werden 2 Stäbe Betonstahl (Ø 10 mm oder Ø 12 mm) in die werkseitigen Einkerbungen der Steine eingelegt. An Stößen ist eine Überdeckung von mindestens 40 bis 50 cm einzuhalten.\n- **Vertikale Bewehrung**: Vertikalstäbe werden alle 25 bis 50 cm in die Hohlkammern gesteckt und müssen als Anschlussbewehrung fest im Betonfundament verankert sein.\n- Planen Sie für Bewehrungsstahl mindestens **10 Prozent Zuschlag für Stossüberdeckungen und Biegungen** ein.',
-        },
-        {
-          title: 'Schritt-für-Schritt: Mauer aus Schalungssteinen errichten',
-          content: '1. **Frostfreies Fundament**: Erstellen Sie ein mindestens 80 cm tiefes Streifenfundament mit unserem [Fundament Rechner](/rechner/fundament-rechner/) und setzen Sie Anschlussbewehrungseisen senkrecht in den noch feuchten Beton.\n2. **Erste Reihe im Mörtelbett**: Die unterste Steinreihe wird exakt in Waage in Mörtel gesetzt, um Unebenheiten des Fundaments auszugleichen.\n3. **Trockener Halbsteinverband**: Ab der 2. Reihe werden die Schalungssteine trocken und fugenlos mit 25 cm Halbstein-Versatz aufgeschichtet. In jede Reihe wird horizontal Bewehrungsstahl eingelegt.\n4. **Abschnittsweise verfüllen**: Verfüllen Sie niemals mehr als 3 bis 4 Steinreihen (ca. 75 bis 100 cm) auf einmal, um ein Bersten der Steine durch den hydrostatischen Betondruck zu verhindern.',
-        },
-        {
-          title: 'Wann ist ein statischer Nachweis für Stützmauern erforderlich?',
-          content: 'Für freistehende Gartenmauern bis ca. 1,0 m Höhe genügt meist die Ausführung nach handwerklichen Regeln mit ausreichender Fundamentierung. Bei Hangstützmauern, Anschüttungen mit Erddruck sowie Mauern ab 1,5 bis 2,0 m Höhe ist in Deutschland baurechtlich ein statischer Standsicherheitsnachweis durch einen Statiker vorgeschrieben. Zudem muss hinter Stützmauern stets eine funktionierende Frostschutz-Drainage (Rollkies und Drainagerohr) eingebaut werden, um hydrostatischen Staudruck zu verhindern.',
+          title: 'Wichtiger Hinweis zu Fundament, Bewehrung und Statik',
+          content: 'Dieser Rechner liefert eine reine Materialabschätzung für Steine und Füllbeton. Er ersetzt keine statische Tragwerksplanung:\n- **Bewehrungsstahl**: Durchmesser, Anzahl, Lage und Verankerung der Bewehrungseisen hängen von Erddruck, Windlast, Mauerhöhe und Belastung ab und müssen statisch bemessen werden.\n- **Fundament**: Fundamentbeton ist eine getrennte Position und darf nicht aus der Schalungsstein-Füllmenge abgeleitet werden.\n- **Herstellerrichtlinien**: Beachten Sie die Verarbeitungsrichtlinien des Herstellers bezüglich maximaler Füllhöhe je Betoniertag und Frischbetonkonsistenz.',
         },
       ],
-      details: 'Die Steine werden trocken und fugenlos im Halbsteinverband aufgesetzt, mit horizontalem und vertikalem Bewehrungsstahl armiert und anschließend mit flüssigem Verfüllbeton (mindestens Festigkeitsklasse C20/25) ausgegossen. Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden exakt 8 Steine pro Quadratmeter Mauerfläche benötigt. Berechnen Sie das genaue Mischverhältnis und Material für den Beton mit unserem [Betonrechner](/rechner/betonrechner/), dem [Fundament Rechner](/rechner/fundament-rechner/), dem [Estrich Rechner](/rechner/estrich-rechner/) oder ermitteln Sie Erdaushubmengen mit dem [Aushub & Erdarbeiten Rechner](/rechner/aushub-erdarbeiten-rechner/).',
+      details: 'Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden genau 8 Steine je Quadratmeter Nettofläche benötigt. Füllbeton und Fundamentbeton müssen getrennt berechnet werden. Weiterführende Werkzeuge: [Betonrechner](/rechner/betonrechner/) und [Beton-Mischungsverhältnis Rechner](/rechner/beton-mischungsverhaeltnis-rechner/).',
     },
     faqs: [
-      { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Handelsübliche Schalungssteine haben die Maße 50 cm Länge und 25 cm Höhe. Für einen Quadratmeter Maueransichtsfläche werden daher genau 8 Steine benötigt (1 m² / (0,5 m × 0,25 m) = 8 Stück). Planen Sie ca. 5 % Verschnitt für Passstücke und Ecksteine ein.' },
-      { question: 'Wie viel Füllbeton benötigt man für Schalungssteine (17,5er, 24er, 30er)?', answer: 'Der Betonbedarf liegt bei 17,5 cm Steinen bei ca. 100 l/m², bei 24 cm Steinen bei ca. 145 l/m², bei 30 cm Steinen bei ca. 195 l/m² und bei 36,5 cm Steinen bei ca. 240 l/m². Für eine 8 m × 1,5 m Stützmauer mit 24er Steinen werden rund 1,83 m³ Beton (ca. 4,2 Tonnen) benötigt.' },
-      { question: 'Welcher Beton eignet sich am besten zum Verfüllen von Schalungssteinen?', answer: 'Empfohlen wird Normalbeton der Festigkeitsklasse C20/25 oder C25/30 mit Fließkonsistenz (F3/F4) und einer maximalen Gesteinskörnung von 8 bis 16 mm, damit sich der Beton ohne Hohlräume um die Armierungseisen verteilt.' },
-      { question: 'Wie viel Bewehrungsstahl gehört in eine Schalungssteinwand?', answer: 'In der Regel werden horizontal 2 Stäbe Baustahl (z. B. Ø 10 mm) in jede Steinlage in die Aussparungen gelegt sowie vertikal alle 25 bis 50 cm Stäbe eingesetzt, die kraftschlüssig mit dem Fundament verbunden sind. Bei einer 8 m langen und 1,5 m hohen Stützmauer mit Stäben alle 25 cm und 10 % Überdeckung sind dies rund 159 laufende Meter Baustahl.' },
-      { question: 'Wie viele Steinreihen darf man auf einmal mit Beton füllen?', answer: 'Wegen des hohen hydrostatischen Betondrucks sollten Sie maximal 3 bis 4 Steinreihen (ca. 75 bis 100 cm Höhe) in einem Betoniervorgang verfüllen und mit einem Rüttler oder Stab sorgfältig verdichten.' },
-      { question: 'Braucht man für eine Mauer aus Schalungssteinen ein Fundament?', answer: 'Ja, Schalungssteinmauern sind schwer (bis zu 400 kg/m² Wandfläche). Sie benötigen immer ein tragfähiges, frostfrei gegründetes Streifenfundament aus Beton mit mindestens 80 cm Tiefe und integrierter Anschlussbewehrung.' },
+      { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Handelsübliche Standard-Schalungssteine haben die Maße 50 cm Länge und 25 cm Höhe (Fläche 0,125 m²). Für einen Quadratmeter Wandfläche werden exakt 8 Steine benötigt. Rechnen Sie zusätzlich eine Steinreserve von ca. 5 % für Zuschnitt und Bruch ein.' },
+      { question: 'Wie viel Beton brauche ich für 24er Schalungssteine?', answer: 'Das hängt vom konkreten Produkt ab. Bei Delfing DP-Schalungssteinen (24 cm) sind es beispielsweise ca. 130 l/m², bei Beyhl-Schalungssteinen ca. 18 l pro Stein (entspricht ca. 144 l/m²). Für eine 12-m²-Mauer entspricht dies rund 1,56 bis 1,73 m³ Füllbeton vor Bestellzuschlag.' },
+      { question: 'Gehört das Fundament zum Füllbeton?', answer: 'Nein. Das Fundament und der Füllbeton der Hohlkammern sind getrennte Positionen. Berechnen Sie das Streifen- oder Plattenfundament nach den geplanten Abmessungen und addieren Sie es erst bei der Gesamtbestellung.' },
+      { question: 'Kann man den Bewehrungsstahl pauschal berechnen?', answer: 'Nein. Eine Materialberechnung ersetzt keinen statischen Nachweis. Durchmesser, Stababstände und Anschlussbewehrung hängen von Lastannahmen, Erddruck und Hangneigung ab und müssen fachgerecht geplant werden.' },
     ],
     relatedSlugs: ['betonrechner', 'fundament-rechner', 'beton-mischungsverhaeltnis-rechner', 'estrich-rechner', 'aushub-erdarbeiten-rechner', 'zaun-pfosten-rechner'],
     trustMeta: {
-      legalBasis: 'DIN 1045 (Tragwerke aus Beton, Stahlbeton und Spannbeton) & DIN EN 771-3',
-      sourceName: 'Bundesverband der Deutschen Transportbetonindustrie / DIN-Normen',
-      sourceUrl: 'https://www.transportbeton.de',
-      lastReviewed: '2026-01-15',
+      legalBasis: 'DIN EN 771-3 (Festlegungen für Mauersteine – Betonwerksteine) & DIN EN 1992 (Eurocode 2: Bemessung und Konstruktion von Stahlbetontragwerken)',
+      sourceName: 'Herstellerdatenblätter (Delfing, Beyhl, Jasto) & DIN-Normen',
+      sourceUrl: 'https://delfing.de',
+      lastReviewed: '2026-10-02',
     },
   },
   {

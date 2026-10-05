@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="schalungWallTitle schalungWallDesc">
+  <title id="schalungWallTitle">Schematische Ansicht: Schalungssteinmauer und Hohlkammerstein</title>
+  <desc id="schalungWallDesc">Links: Maueransicht mit 8,0 m Länge und 1,5 m Höhe ergibt 12 Quadratmeter Ansichtsfläche bei 6 Steinlagen. Rechts: Schematischer Schalungsstein mit zwei Hohlkammern und Abmessungen 50 mal 25 Zentimeter (8 Steine je Quadratmeter). Keine statische Bewehrungsvorgabe.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 2; rx: 16; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; }
+      .text-sub { fill: #475569; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .stone-block { fill: #e2e8f0; stroke: #94a3b8; stroke-width: 1.5; }
+      .stone-pattern { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.2; }
+      .dim-line { stroke: #0284c7; stroke-width: 1.5; stroke-linecap: round; }
+      .dim-text { fill: #0369a1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 13px; text-anchor: middle; }
+      .badge-stat { fill: #0284c7; rx: 6; }
+      .badge-text { fill: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 12px; }
+      .chamber { fill: #cbd5e1; stroke: #64748b; stroke-width: 1.5; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" class="bg" />
+
+  <!-- Outer Frame -->
+  <rect x="20" y="20" width="760" height="410" class="card" />
+
+  <!-- Title -->
+  <g transform="translate(45, 52)">
+    <text class="text-title" font-size="20">Mauerfläche &amp; Schalungsstein im Detail (Schematisch)</text>
+    <text class="text-sub" y="22">Beispiel: 8,0 m × 1,5 m Wandfläche (12 m²) und Standardstein 50 × 25 cm (8 Stk./m²)</text>
+  </g>
+
+  <!-- LEFT: WALL ELEVATION (8 m x 1.5 m) -->
+  <g transform="translate(45, 100)">
+    <!-- Wall Outline Box -->
+    <rect x="40" y="30" width="380" height="210" fill="#f8fafc" stroke="#94a3b8" stroke-width="2" />
+
+    <!-- 6 Rows of 50x25cm Blocks in Half-Stone Bond -->
+    <!-- Row 1 (top) -->
+    <g transform="translate(40, 30)">
+      <rect x="0" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="47.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="95" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="142.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="190" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="237.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="285" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="332.5" y="0" width="47.5" height="35" class="stone-pattern" />
+    </g>
+    <!-- Row 2 -->
+    <g transform="translate(40, 65)">
+      <rect x="0" y="0" width="23.75" height="35" class="stone-pattern" />
+      <rect x="23.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="71.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="118.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="166.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="213.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="261.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="308.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="356.25" y="0" width="23.75" height="35" class="stone-pattern" />
+    </g>
+    <!-- Row 3 -->
+    <g transform="translate(40, 100)">
+      <rect x="0" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="47.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="95" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="142.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="190" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="237.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="285" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="332.5" y="0" width="47.5" height="35" class="stone-pattern" />
+    </g>
+    <!-- Row 4 -->
+    <g transform="translate(40, 135)">
+      <rect x="0" y="0" width="23.75" height="35" class="stone-pattern" />
+      <rect x="23.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="71.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="118.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="166.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="213.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="261.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="308.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="356.25" y="0" width="23.75" height="35" class="stone-pattern" />
+    </g>
+    <!-- Row 5 -->
+    <g transform="translate(40, 170)">
+      <rect x="0" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="47.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="95" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="142.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="190" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="237.5" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="285" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="332.5" y="0" width="47.5" height="35" class="stone-pattern" />
+    </g>
+    <!-- Row 6 (bottom) -->
+    <g transform="translate(40, 205)">
+      <rect x="0" y="0" width="23.75" height="35" class="stone-pattern" />
+      <rect x="23.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="71.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="118.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="166.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="213.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="261.25" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="308.75" y="0" width="47.5" height="35" class="stone-pattern" />
+      <rect x="356.25" y="0" width="23.75" height="35" class="stone-pattern" />
+    </g>
+
+    <!-- Dimension Top: Length 8.00 m -->
+    <line x1="40" y1="18" x2="420" y2="18" class="dim-line" />
+    <line x1="40" y1="12" x2="40" y2="24" class="dim-line" />
+    <line x1="420" y1="12" x2="420" y2="24" class="dim-line" />
+    <rect x="195" y="8" width="70" height="20" rx="4" fill="#ffffff" stroke="#e2e8f0" />
+    <text x="230" y="23" class="dim-text">8,00 m</text>
+
+    <!-- Dimension Left: Height 1.50 m -->
+    <line x1="20" y1="30" x2="20" y2="240" class="dim-line" />
+    <line x1="14" y1="30" x2="26" y2="30" class="dim-line" />
+    <line x1="14" y1="240" x2="26" y2="240" class="dim-line" />
+    <rect x="2" y="125" width="36" height="20" rx="4" fill="#ffffff" stroke="#e2e8f0" />
+    <text x="20" y="140" class="dim-text" font-size="11">1,50 m</text>
+
+    <!-- Wall Info Badge -->
+    <rect x="100" y="252" width="260" height="28" rx="6" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5" />
+    <text x="230" y="271" text-anchor="middle" font-size="12" font-weight="700" fill="#0369a1" font-family="sans-serif">
+      12,0 m² Wandfläche = 96 Steine (Netto)
+    </text>
+  </g>
+
+  <!-- RIGHT: SCHEMATIC HOLLOW BLOCK (SCHALUNGSSTEIN) -->
+  <g transform="translate(480, 105)">
+    <!-- Container Card -->
+    <rect x="0" y="0" width="250" height="270" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+    
+    <text x="125" y="28" text-anchor="middle" class="text-title" font-size="15">Schalungsstein (Hohlblock)</text>
+    <text x="125" y="44" text-anchor="middle" class="text-sub" font-size="11">Standardformat 50 × 25 cm</text>
+
+    <!-- Isometric / Schematic Block Drawing -->
+    <g transform="translate(25, 60)">
+      <!-- Outer block -->
+      <rect x="15" y="25" width="170" height="95" rx="4" fill="#e2e8f0" stroke="#64748b" stroke-width="2" />
+      
+      <!-- Top perspective face (depth ~24 cm) -->
+      <polygon points="15,25 45,5 215,5 185,25" fill="#f1f5f9" stroke="#64748b" stroke-width="2" />
+      <!-- Right perspective face -->
+      <polygon points="185,25 215,5 215,100 185,120" fill="#cbd5e1" stroke="#64748b" stroke-width="2" />
+
+      <!-- Hollow Chamber 1 (Left) -->
+      <rect x="35" y="40" width="55" height="65" rx="4" class="chamber" />
+      <!-- Hollow Chamber 2 (Right) -->
+      <rect x="110" y="40" width="55" height="65" rx="4" class="chamber" />
+
+      <!-- Center divider web -->
+      <text x="62" y="78" text-anchor="middle" font-size="10" font-weight="700" fill="#334155" font-family="sans-serif">Kammer 1</text>
+      <text x="137" y="78" text-anchor="middle" font-size="10" font-weight="700" fill="#334155" font-family="sans-serif">Kammer 2</text>
+
+      <!-- Dimension label Length: 50 cm -->
+      <line x1="15" y1="130" x2="185" y2="130" class="dim-line" />
+      <text x="100" y="144" class="dim-text" font-size="11">Länge: 50 cm</text>
+
+      <!-- Dimension label Height: 25 cm -->
+      <line x1="5" y1="25" x2="5" y2="120" class="dim-line" />
+      <text x="5" y="160" class="dim-text" font-size="10" text-anchor="start">Höhe: 25 cm</text>
+    </g>
+
+    <!-- Block specs list -->
+    <g transform="translate(20, 205)">
+      <text x="0" y="16" font-size="12" fill="#0f172a" font-family="sans-serif" font-weight="600">• Wandfläche je Stein: 0,125 m²</text>
+      <text x="0" y="34" font-size="12" fill="#0f172a" font-family="sans-serif" font-weight="600">• Steinbedarf: Exakt 8 Stk. / m²</text>
+      <text x="0" y="52" font-size="11" fill="#475569" font-family="sans-serif">• Hohlraum-Füllbeton: Herstellerwert prüfen</text>
+    </g>
+  </g>
+
+  <!-- Bottom Notice: No prescriptive rebar -->
+  <g transform="translate(45, 388)">
+    <text x="355" y="15" text-anchor="middle" font-size="11" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      Hinweis: Schematische Übersicht zur Mengenermittlung. Bewehrungsdurchmesser, Fundamenttiefe und statische Eignung erfordern eine fachgerechte Tragwerksplanung.
+    </text>
+  </g>
+</svg>

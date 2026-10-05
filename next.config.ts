@@ -84,6 +84,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/rechner/beton-rechner',
+        destination: '/rechner/betonrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/beton-rechner/',
+        destination: '/rechner/betonrechner/',
+        permanent: true,
+      },
+      {
         source: '/rechner/kalorienbedarfrechner',
         destination: '/rechner/kalorienbedarf-rechner/',
         statusCode: 301,
@@ -151,6 +161,66 @@ const nextConfig: NextConfig = {
       {
         source: '/rechner/tage-bis-ostern/',
         destination: '/rechner/tage-zwischen-zwei-daten/?preset=ostern&mode=until',
+        permanent: true,
+      },
+      {
+        source: '/rechner/warmmiete-rechner',
+        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/warmmiete-rechner/',
+        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/warmmiete-berechnen',
+        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/warmmiete-berechnen/',
+        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/gasverbrauch-rechner',
+        destination: '/rechner/gaskostenrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/gasverbrauch-rechner/',
+        destination: '/rechner/gaskostenrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/gaskosten-rechner',
+        destination: '/rechner/gaskostenrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/gaskosten-rechner/',
+        destination: '/rechner/gaskostenrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/schalungsstein-rechner',
+        destination: '/rechner/schalungssteine-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/schalungsstein-rechner/',
+        destination: '/rechner/schalungssteine-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/wie-viel-kredit-bekomme-ich',
+        destination: '/rechner/maximaler-kredit-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/wie-viel-kredit-bekomme-ich/',
+        destination: '/rechner/maximaler-kredit-rechner/',
         permanent: true,
       },
     ];

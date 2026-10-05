@@ -1649,7 +1649,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         url: 'https://www.beuth.de',
       },
     ],
-    relatedArticleSlugs: ['werktage-arbeitstage-unterschied', 'teilzeit-gehalt-berechnen'],
+    relatedArticleSlugs: ['schalungssteine-betonbedarf-berechnen', 'werktage-arbeitstage-unterschied', 'teilzeit-gehalt-berechnen'],
   },
   {
     slug: 'gaszaehler-m3-in-kwh-umrechnen',
@@ -1753,7 +1753,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
           'Bei einem angenommenen Brutto-Arbeitspreis von 11 Cent pro kWh betragen die Verbrauchskosten: 12.312 × 0,11 € = 1.354,32 €.',
           'Das sind noch nicht die vollständigen Jahreskosten. Wenn der betrachtete Zeitraum ein Jahr umfasst und der Grundpreis 12 € monatlich beträgt, kommen 144 € hinzu: 1.354,32 € + 144 € = 1.498,32 € pro Jahr.',
           'Auf zwölf Monate verteilt sind das 124,86 €. Dieser Monatsdurchschnitt ist eine Orientierung, keine Zusage über den Abschlag Ihres Versorgers.',
-          'Verwenden Sie Preise auf derselben Grundlage. Sind die eingesetzten Preise bereits brutto, schlagen Sie die Mehrwertsteuer nicht nochmals auf. Separat berechnete Entgelte müssen gegebenenfalls zusätzlich berücksichtigt werden. Für diesen zweiten Schritt eignet sich der [Gaskostenrechner](/rechner/gaskostenrechner/).',
+          'Verwenden Sie Preise auf derselben Grundlage. Sind die eingesetzten Preise bereits brutto, schlagen Sie die Mehrwertsteuer nicht nochmals auf. Separat berechnete Entgelte müssen gegebenenfalls zusätzlich berücksichtigt werden. Für diesen zweiten Schritt eignen sich unser [Gaskostenrechner](/rechner/gaskostenrechner/) und der vertiefende Ratgeber [Gaskosten berechnen](/ratgeber/gaskosten-berechnen/).',
         ],
       },
       {
@@ -1823,7 +1823,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         url: 'https://www.verbraucherzentrale.de/wissen/energie/preise-tarife-anbieterwechsel/rechner-das-ist-ihr-passender-abschlag-fuer-strom-gas-oder-fernwaerme-75669',
       },
     ],
-    relatedArticleSlugs: ['stromverbrauch-geraete-berechnen', 'mietbelastungsquote-berechnen'],
+    relatedArticleSlugs: ['gaskosten-berechnen', 'stromverbrauch-geraete-berechnen', 'mietbelastungsquote-berechnen'],
   },
   {
     slug: 'heizluefter-2000-watt-stromkosten',
@@ -1991,6 +1991,608 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       },
     ],
     relatedArticleSlugs: ['stromverbrauch-geraete-berechnen', 'gaszaehler-m3-in-kwh-umrechnen'],
+  },
+  {
+    slug: '1-cup-milch-in-gramm',
+    title: '1 Cup Milch in Gramm: Umrechnung und Tabelle',
+    metaTitle: '1 Cup Milch in Gramm: Umrechnung und Tabelle',
+    metaDescription: '1 Cup Milch in Gramm umrechnen: Unterschiede zwischen US-Cup und 250-ml-Cup, Tabelle für typische Mengen und Tipps für amerikanische Rezepte.',
+    h1: 'Wie viel Gramm sind 1 Cup Milch?',
+    category: 'kochen-backen',
+    categoryName: 'Kochen & Backen',
+    publishedAt: '2026-10-03',
+    updatedAt: '2026-10-03',
+    readingTimeMin: 5,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Ernährung & Maßeinheiten',
+    },
+    reviewer: {
+      name: 'Ernährungsteam RechenHafen',
+      role: 'Lebensmittelchemie & Küchenmetrologie',
+    },
+    coverIllustration: {
+      src: '/images/ratgeber/cup-groessen-messbecher-vergleich.svg',
+      alt: 'Schematischer Vergleich dreier Messbecher für US customary cup (236,6 ml), US legal cup (240 ml) und metrischen Cup (250 ml)',
+      caption: 'Schematische Darstellung der drei gebräuchlichen Cup-Standards: US customary (236,6 ml), US legal (240 ml) und metrischer Cup (250 ml).',
+      width: 800,
+      height: 450,
+    },
+    summary:
+      'Ein US-Cup Milch wiegt ungefähr 244 Gramm. Gemeint ist dabei der amerikanische Cup mit rund 237 Millilitern. Verwendet dein Rezept dagegen einen 250-ml-Cup, sind es bei gleicher Milch ungefähr 258 Gramm. Die Werte sind Näherungen: Zusammensetzung und Temperatur beeinflussen die Dichte. Wenn im Rezept bereits Gramm oder Milliliter stehen, verwende diese Angaben direkt.',
+    keyTakeaways: [
+      '1 US-Cup (Customary Cup, ca. 236,6 ml) Vollmilch entspricht ungefähr 244 Gramm (bei angenommener Milchdichte von 1,03 g/ml).',
+      'Ein metrischer Cup (250 ml, z. B. in Australien und Neuseeland) ergibt bei gleicher Milchdichte ungefähr 258 Gramm.',
+      'Kaffeetassen sind ungeeignet: Gewöhnliche deutsche Haushaltsbecher schwanken ungenormt meist zwischen 150 und 280 ml.',
+      'Volumen vs. Gewicht: 1 Cup Mehl wiegt nur ca. 120–125 g, Zucker ca. 200 g und Milch ca. 244 g – Mengenangaben dürfen nicht übertragen werden.',
+    ],
+    primaryCalculator: {
+      slug: 'cups-in-gramm-rechner',
+      title: 'Cups in Gramm Rechner (US Cups für Backzutaten umrechnen)',
+      ctaText: 'Cups in Gramm berechnen',
+      description: 'Rechnen Sie beliebige Mengen an Milch, Mehl, Zucker oder Butter von US-Cups in Gramm und Milliliter um.',
+      badge: 'Primärer Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'gramm-in-ml-rechner',
+        title: 'Gramm in Milliliter Rechner (g in ml)',
+        ctaText: 'Gramm in ml umrechnen',
+        description: 'Wandelt Gewichtsangaben unter Berücksichtigung der Zutatendichte exakt in Milliliter um.',
+      },
+      {
+        slug: 'essloeffel-teeloeffel-gramm-rechner',
+        title: 'Esslöffel & Teelöffel in Gramm Rechner',
+        ctaText: 'Löffelmaße berechnen',
+        description: 'Rechnet Esslöffel (EL) und Teelöffel (TL) für Backzutaten in Gramm um.',
+      },
+    ],
+    sections: [
+      {
+        id: 'warum-ein-cup-keine-tasse-ist',
+        title: 'Warum ist ein Cup nicht einfach eine Tasse?',
+        paragraphs: [
+          '„Cup“ ist in amerikanischen Rezepten kein beliebiges Küchengeschirr, sondern ein fest definiertes Hohlmaß. Eine herkömmliche deutsche Kaffeetasse kann deutlich größer oder kleiner ausfallen (meist 150 bis 280 ml) und führt beim Backen schnell zu misslungenen Teigen.',
+          'Erschwerend kommt hinzu, dass im englischsprachigen Raum verschiedene Cup-Standards nebeneinander existieren. Wer ein englisches Rezept liest, sollte daher zunächst die geografische Herkunft der Kochanleitung prüfen:',
+        ],
+        table: {
+          headers: ['Cup-Größe', 'Volumen (ml)', 'Verwendung / Standard'],
+          rows: [
+            ['US customary cup', 'rund 236,6 ml (8 fl oz)', 'Klassische US-Koch- und Backrezepte'],
+            ['US legal cup', '240,0 ml', 'US-Lebensmittelkennzeichnung & Nährwertangaben (FDA)'],
+            ['Metrischer Cup', '250,0 ml', 'Australien, Neuseeland, Südafrika, teils UK & Kanada'],
+            ['Deutsche Kaffeetasse', 'ca. 150 bis 250 ml (variabel)', 'Keine Maßeinheit; rein willkürliches Haushaltsgeschirr'],
+          ],
+        },
+        callout: {
+          type: 'tip',
+          title: 'Herkunft des Rezepts prüfen',
+          text: 'Prüfen Sie zuerst die Mengenangaben oder Umrechnungshinweise des Rezepts. Nicht jedes englischsprachige Rezept verwendet denselben Cup. Stammt ein Rezept aus den USA, gilt fast immer der US customary cup mit 236,6 ml.',
+        },
+      },
+      {
+        id: 'milch-von-cups-in-gramm-umrechnen',
+        title: 'Milch von Cups in Gramm umrechnen: Tabelle für typische Mengen',
+        illustration: {
+          src: '/images/ratgeber/1-5-cups-milch-umrechnung-diagramm.svg',
+          alt: 'Rechenweg: 1,5 US-Cups Milch entsprechen 354,9 ml und wiegen bei einer Dichte von 1,03 g/ml rund 366 Gramm',
+          caption: 'Schrittweise Umrechnung: 1½ US-Cups (354,9 ml) wiegen bei 1,03 g/ml Dichte rund 366 Gramm.',
+          width: 800,
+          height: 360,
+        },
+        paragraphs: [
+          'Für die folgende Umrechnungstabelle rechnen wir beispielhaft mit dem weitverbreiteten US customary cup von 236,588 ml (rund 236,6 ml) und einer mittleren Milchdichte von 1,03 g/ml (Richtwert für Vollmilch bei Zimmertemperatur).',
+          'Die Tabelle zeigt das Volumen sowie das berechnete Gewicht für gängige Rezeptangaben von einem Viertel bis zu zwei Cups:',
+        ],
+        table: {
+          headers: ['Menge in Cups', 'Volumen ungefähr', 'Milch ungefähr (1,03 g/ml)', 'Zum Vergleich: Wasser (1,00 g/ml)'],
+          rows: [
+            ['¼ Cup', '59 ml', '61 g', '59 g'],
+            ['⅓ Cup', '79 ml', '81 g', '79 g'],
+            ['½ Cup', '118 ml', '122 g', '118 g'],
+            ['⅔ Cup', '158 ml', '162 g', '158 g'],
+            ['¾ Cup', '177 ml', '183 g', '177 g'],
+            ['1 Cup', '237 ml', '244 g', '237 g'],
+            ['1½ Cups', '355 ml', '366 g', '355 g'],
+            ['2 Cups', '473 ml', '487 g', '473 g'],
+          ],
+        },
+        callout: {
+          type: 'info',
+          title: 'Ungerundete Zwischenschritte',
+          text: 'Die Tabellenwerte werden jeweils aus den ungerundeten Ausgangszahlen berechnet. Deshalb sind zwei Cups (487 g) rechnerisch nicht zwingend das exakte Doppelte eines bereits auf ganze Gramm gerundeten Einheitswerts (244 g × 2 = 488 g).',
+        },
+      },
+      {
+        id: 'unterschied-mehl-milch',
+        title: 'Warum wiegt ein Cup Mehl anders als ein Cup Milch?',
+        paragraphs: [
+          'Ein Cup misst das Raumvolumen, nicht die Masse. Ein gefüllter Mess-Cup nimmt zwar immer den gleichen Rauminhalt ein, aber Milch, Mehl, Zucker und Speiseöl bringen physikalisch bedingt völlig unterschiedliche Gewichte auf die Küchenwaage.',
+          'Während 1 Cup Vollmilch rund 244 Gramm wiegt, bringt 1 Cup lockeres Mehl nur etwa 120 bis 125 Gramm auf die Waage. Speiseöl ist leichter als Wasser und wiegt rund 218 Gramm je Cup, während dichter weißer Kristallzucker auf rund 200 Gramm kommt.',
+          'Bei pulverförmigen und trockenen Zutaten wie Mehl oder Kakaopulver kommt hinzu, wie der Mess-Cup befüllt wurde: Mit dem Löffel locker eingefülltes und oben glatt abgestrichenes Mehl („spoon and level“) wiegt ca. 120–125 g. Wird der Cup dagegen direkt durch das Mehl in der Packung geschöpft („dip and sweep“), wird das Mehl komprimiert und kann bis zu 140–150 g wiegen – ein Unterschied von über 20 Prozent, der Kuchenteige schnell trocken werden lässt.',
+          'Übertragen Sie den ermittelten Milchwert keinesfalls pauschal auf Mehl, Zucker oder Fette. Nutzen Sie für feste Zutaten stets die Grammangabe des Autors oder unseren [Cups-in-Gramm-Rechner](/rechner/cups-in-gramm-rechner/). Falls Sie Grammangaben in Milliliter für Flüssigkeiten umrechnen möchten, hilft Ihnen der [Gramm in ml Rechner](/rechner/gramm-in-ml-rechner/).',
+        ],
+      },
+      {
+        id: 'fehler-vermeiden',
+        title: 'So vermeiden Sie typische Umrechnungsfehler',
+        paragraphs: [
+          'Beim Nachbacken US-amerikanischer oder britischer Rezepte führen kleine Missverständnisse häufig zu klebrigen oder trockenen Teigen. Beachten Sie folgende fünf Grundregeln:',
+          '1. Cup-Größe prüfen: Klären Sie vorab, ob ein US customary cup (236,6 ml), ein legal cup (240 ml) oder ein metrischer Cup (250 ml) gemeint ist.',
+          '2. Zutat im Rechner gezielt wählen: Milch hat eine andere Dichte als Wasser oder Öl.',
+          '3. Milliliter nicht mit Gramm verwechseln: Nur bei reinem Wasser wiegt 1 ml genau 1 g. Bei Milch wiegt 1 ml ca. 1,03 g.',
+          '4. Vorhandene Grammangaben vorrangig nutzen: Wenn das Rezept bereits Gramm ausweist, wiegen Sie direkt auf der Küchenwaage ab.',
+          '5. Erst am Ende runden: Runden Sie erst das Endergebnis für die Waage, um kumulierte Rundungsfehler zu vermeiden.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: 1½ Cups Milch für ein amerikanisches Rezept abwiegen',
+      scenario: 'Ein US-Rezept verlangt 1½ Cups Milch (US customary cup, ca. 236,6 ml). Sie möchten die Zutat auf einer digitalen Küchenwaage in Gramm abwiegen.',
+      formula: 'Gewicht in Gramm = Cups × 236,588 ml/Cup × Dichte in g/ml',
+      steps: [
+        { label: 'Schritt 1: Volumen in Millilitern bestimmen', calculation: '1,5 Cups × 236,588 ml = 354,88 ml (rund 355 ml)' },
+        { label: 'Schritt 2: Milchdichte (1,03 g/ml) anwenden', calculation: '354,88 ml × 1,03 g/ml = 365,53 g' },
+        { label: 'Schritt 3: Abwiegen auf der Küchenwaage', calculation: '365,53 g → rund 366 Gramm Milch abwiegen' },
+      ],
+      resultSummary: '1½ US-Cups Milch entsprechen ca. 355 ml bzw. 366 Gramm. Bei einem 250-ml-Cup wären es 375 ml bzw. ca. 386 Gramm.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Den Cup mit einer normalen Haushalts-Kaffeetasse abmessen.',
+        correction: 'Kaffeetassen sind ungenormt (150–280 ml). Nutzen Sie echte Mess-Cups oder wiegen Sie exakt in Gramm ab.',
+      },
+      {
+        mistake: 'Die Dichte von Milch mit der von Wasser (1,00 g/ml) gleichsetzen.',
+        correction: 'Milch enthält Fett und gelöste Stoffe, wodurch 1 Liter ca. 1.030 g wiegt (Dichte ca. 1,03 g/ml).',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Sind 1 Cup Milch immer 240 Gramm?',
+        answer: 'Nein. Die genaue Grammzahl hängt von der Cup-Definition und der Milchdichte ab. Für den klassischen US customary cup (236,6 ml) wiegt 1 Cup Milch rund 244 g. Bei einem metrischen Cup (250 ml) sind es rund 258 g.',
+      },
+      {
+        question: 'Wie viel sind ½ Cup Milch in Gramm?',
+        answer: 'Ein halber US-Cup Milch entspricht einem Volumen von etwa 118 ml und wiegt bei einer Dichte von 1,03 g/ml ungefähr 122 Gramm.',
+      },
+      {
+        question: 'Kann ich Milch und Wasser gleich umrechnen?',
+        answer: 'Nicht exakt. Wasser hat eine Dichte von 1,00 g/ml (236,6 ml wiegen 236,6 g). Milch ist aufgrund von Milchzucker, Eiweiß und Mineralstoffen schwerer und wiegt etwa 244 g je US-Cup.',
+      },
+      {
+        question: 'Kann ich eine normale Tasse zum Backen verwenden?',
+        answer: 'Nur wenn Sie das genaue Fassungsvermögen der Tasse vorab mit einem Messbecher ermittelt haben und es zum Rezept passt. Eine digitale Küchenwaage ist wesentlich genauer.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'NIST Physical Measurement Laboratory (OWM)',
+        citation: 'Metric Kitchen: Cooking Measurement Equivalencies and Metrological Volume Definitions',
+        url: 'https://www.nist.gov/pml/owm/metric-si/metric-kitchen/metric-kitchen-cooking-measurement-equivalencies',
+      },
+      {
+        title: 'Tetra Pak Dairy Processing Handbook',
+        citation: 'Chapter 2: Chemistry of Milk – Density, Specific Gravity and Physical Composition of Cow Milk',
+        url: 'https://dairyprocessinghandbook.tetrapak.com/chapter/chemistry-milk',
+      },
+      {
+        title: 'Physikalisch-Technische Bundesanstalt (PTB)',
+        citation: 'Einheitenverordnung & Metrologie im Alltag: Gesetzliche Maßeinheiten im Messwesen',
+        url: 'https://www.ptb.de',
+      },
+    ],
+    relatedArticleSlugs: ['zahnspachtel-groessen-tabelle-fliesen', 'schalungssteine-betonbedarf-berechnen'],
+  },
+  {
+    slug: 'schalungssteine-betonbedarf-berechnen',
+    title: 'Schalungssteine: Betonbedarf berechnen mit Beispiel',
+    metaTitle: 'Schalungssteine: Betonbedarf berechnen mit Beispiel',
+    metaDescription: 'Betonbedarf für Schalungssteine berechnen: Herstellerwerte in Liter pro m² oder Stein, Beispiel für eine 12-m²-Mauer und getrennte Materialreserven.',
+    h1: 'Wie viel Beton brauche ich für Schalungssteine?',
+    category: 'bauen-renovieren',
+    categoryName: 'Bauen & Renovieren',
+    publishedAt: '2026-10-03',
+    updatedAt: '2026-10-03',
+    readingTimeMin: 6,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Bauphysik & Baustoffe',
+    },
+    reviewer: {
+      name: 'Bautechnik-Team RechenHafen',
+      role: 'Massivbau & Materialbedarfsplanung',
+    },
+    coverIllustration: {
+      src: '/images/ratgeber/schalungssteine-mauer-ansicht-hohlblock.svg',
+      alt: 'Schematische Darstellung einer Schalungssteinmauer mit 8 m Länge und 1,5 m Höhe sowie Hohlkammer-Schalungsstein',
+      caption: 'Wandansicht (8 m × 1,5 m = 12 m²) und schematischer Hohlkammer-Schalungsstein (50 × 25 cm, 8 Steine je m²). Das Füllvolumen wird aus der Wandfläche und dem Herstellerwert ermittelt.',
+      width: 800,
+      height: 450,
+    },
+    summary:
+      'Den Betonbedarf einer Schalungssteinmauer berechnest du aus der Wandfläche und dem Füllvolumen des konkreten Steins. Die Angabe findest du beim Hersteller, meist in Litern pro Quadratmeter Wand oder Litern pro Stein. Die Wandstärke allein reicht nicht aus: Zwei 24er Schalungssteine können unterschiedliche Hohlräume haben und deshalb unterschiedliche Betonmengen benötigen.',
+    keyTakeaways: [
+      'Wandstärke allein genügt nicht: Schalungssteine verschiedener Hersteller haben unterschiedliche Stegbreiten und Hohlkammern (z. B. 130 l/m² bei Delfing vs. ca. 144 l/m² bei Beyhl bei 24 cm Wandstärke).',
+      'Formel für Füllbeton: Netto-Wandfläche (m²) × Hersteller-Füllmenge (l/m²) ergibt das Netto-Füllvolumen in Litern (geteilt durch 1.000 für Kubikmeter m³).',
+      'Reserven strikt trennen: Die Steinreserve für Zuschnitt und Bruch (z. B. 5 %) erhöht nicht das Hohlraumvolumen der fertigen Wand. Ein Bestellzuschlag für Beton wird getrennt kalkuliert.',
+      'Fundament und Bewehrung: Fundamentbeton ist eine getrennte Position. Rechnerische Materialbedarfe ersetzen keinen statischen Standsicherheitsnachweis.',
+    ],
+    primaryCalculator: {
+      slug: 'schalungssteine-rechner',
+      title: 'Schalungssteine Rechner (Mauerfläche, Steine & Füllbeton)',
+      ctaText: 'Betonbedarf für Schalungssteine berechnen',
+      description: 'Ermitteln Sie die exakte Steinanzahl und den Füllbetonbedarf nach Netto-Wandfläche und herstellerspezifischem Füllvolumen.',
+      badge: 'Primärer Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'betonrechner',
+        title: 'Betonrechner (Fundamente & Fertigbeton)',
+        ctaText: 'Fundamentbeton berechnen',
+        description: 'Ermittelt das Betonvolumen für Streifenfundamente und Bodenplatten in Kubikmetern und Fertigmischungssäcken.',
+      },
+      {
+        slug: 'beton-mischungsverhaeltnis-rechner',
+        title: 'Beton-Mischungsverhältnis Rechner',
+        ctaText: 'Mischungsverhältnis ermitteln',
+        description: 'Berechnet die benötigten Mengen an Zement, Sand, Kies und Wasser zum Selbermischen von Beton.',
+      },
+    ],
+    sections: [
+      {
+        id: 'welche-angaben-brauche-ich',
+        title: 'Welche Angaben brauche ich für die Mengenberechnung?',
+        paragraphs: [
+          'Für eine verlässliche Materialbedarfsberechnung einer Schalungssteinmauer benötigen Sie fünf zentrale Eingangsdaten:',
+          '1. Länge und Höhe der Mauer zur Ermittlung der Brutto-Ansichtsfläche.',
+          '2. Flächen von Öffnungen (z. B. Durchbrüche, Treppenausschnitte oder Tore), die nicht mit Steinen aufgemauert werden.',
+          '3. Das ausgewählte Steinformat bzw. den Herstellerbedarf an Steinen pro Quadratmeter (Standard: 8 Steine je m² bei 50 × 25 cm Format).',
+          '4. Die herstellerspezifische Füllbetonmenge des konkreten Produkts (in l/m² oder l/Stein laut Datenblatt).',
+          '5. Einen separat gewählten Zuschlag für die Betonbestellung (z. B. 3 bis 8 Prozent für Rüttelverluste und Unebenheiten).',
+        ],
+        callout: {
+          type: 'warning',
+          title: 'Steinreserve und Betonreserve sind getrennte Größen',
+          text: 'Zusätzliche Steine für Bruch oder Zuschnitte (z. B. 5 % Steinreserve) werden auf der Baustelle zugeschnitten, aber nicht alle vollständig in der Wand verbaut. Sie erhöhen daher nicht das Hohlraumvolumen der fertigen Wand. Berechnen Sie den Füllbeton deshalb immer aus der eingebauten Netto-Wandfläche!',
+        },
+      },
+      {
+        id: 'betonbedarf-berechnen',
+        title: 'Betonbedarf aus Litern pro Quadratmeter berechnen',
+        illustration: {
+          src: '/images/ratgeber/schalungssteine-betonbedarf-rechenweg.svg',
+          alt: 'Rechenweg Füllbeton: 12 m² Wandfläche mal 130 l/m² ergibt 1.560 Liter bzw. 1,56 m³, plus separater 5 % Betonzuschlag gleich 1,638 m³',
+          caption: 'Zweistufiger Rechenweg: 12 m² Wandfläche × 130 l/m² (Herstellerangabe) = 1,56 m³ Füllbeton. Der 5 % Betonzuschlag wird separat addiert (1,638 m³ ≈ 1,64 m³ Gesamtbestellung).',
+          width: 800,
+          height: 360,
+        },
+        paragraphs: [
+          'Zuerst bestimmen Sie die Netto-Wandfläche:\nNetto-Wandfläche = Länge × Höhe − Öffnungsflächen.',
+          'Anschließend berechnen Sie das Hohlraum-Füllvolumen:\nFüllbeton in Litern = Netto-Wandfläche × Herstellerangabe in l/m².\nFür Kubikmeter (m³) teilen Sie das Ergebnis einfach durch 1.000.',
+          'Beispiel: Eine 8 m lange und 1,5 m hohe Wand ohne Öffnungen hat 12 m² Ansichtsfläche. Gibt das technische Datenblatt für den ausgewählten Stein 130 l/m² an, ergibt sich:\n12 × 130 = 1.560 Liter = 1,56 m³ Füllbeton.',
+          'Ein frei gewählter Bestellzuschlag von beispielsweise 5 % für Betonverluste beim Befüllen ergibt:\n1,56 × 1,05 = 1,638 m³, gerundet etwa 1,64 m³ Fertigbeton. Die 5 % sind eine individuelle Beispielannahme für die Bestellung, keine starre Ausführungsvorgabe.',
+        ],
+      },
+      {
+        id: 'warum-unterscheiden-sich-herstellerwerte',
+        title: 'Warum unterscheiden sich die Herstellerwerte?',
+        paragraphs: [
+          'Die erforderliche Betonmenge hängt maßgeblich von der Geometrie des einzelnen Steins ab. Wandstärken der Außenstege, Dicke der Querrippen, Aussparungen für Bewehrungseisen und integrierte Kammern variieren von Hersteller zu Hersteller erheblich.',
+          'Die folgende Tabelle vergleicht veröffentlichte Herstellerangaben für typische Schalungssteine:',
+        ],
+        table: {
+          headers: ['Hersteller / Produktbeispiel', 'Wandstärke', 'Angegebene Füllmenge', 'Umgerechnet je m² Wand'],
+          rows: [
+            ['Delfing DP-Schalungssteine', '17,5 cm', 'ca. 80 l/m²', 'ca. 80 l/m²'],
+            ['Delfing DP-Schalungssteine', '24,0 cm', 'ca. 130 l/m²', 'ca. 130 l/m²'],
+            ['Beyhl Schalungssteine', '17,5 cm', 'ca. 12 l/Stein (bei 8 Stk./m²)', 'ca. 96 l/m²'],
+            ['Beyhl Schalungssteine', '24,0 cm', 'ca. 18 l/Stein (bei 8 Stk./m²)', 'ca. 144 l/m²'],
+          ],
+        },
+        callout: {
+          type: 'info',
+          title: 'Produktspezifische Datenblätter beachten',
+          text: 'Beim Beyhl-Beispiel mit 24 cm Wandstärke entsprechen 18 Liter je Stein bei 8 Steinen pro Quadratmeter rechnerisch 144 l/m². Eine 12-m²-Mauer benötigt hier rund 1.728 Liter bzw. 1,728 m³ Füllbeton vor Zuschlag. Das ist kein Widerspruch, sondern spiegelt unterschiedliche Stegdicken wider.',
+        },
+      },
+      {
+        id: 'steinmenge-berechnen',
+        title: 'Wie berechne ich gleichzeitig die Steinmenge?',
+        paragraphs: [
+          'Handelsübliche Schalungssteine messen in Deutschland und Mitteleuropa nahezu einheitlich 50 cm in der Länge und 25 cm in der Höhe. Ein Stein deckt 0,5 m × 0,25 m = 0,125 m² Fläche ab. Daraus folgt die feste Grundregel von exakt 8 Steinen je Quadratmeter Wandfläche.',
+          'Für eine 12 m² große Wand ergibt sich:\n12 m² × 8 = 96 Steine ohne Reserve.',
+          'Mit einem marktüblichen Steinzuschlag von 5 % für Bruch und Passstücke:\n96 × 1,05 = 100,8 → kaufmännisch aufgerundet 101 Steine.',
+          'Die zusätzliche Steinreserve von 5 Steinen erhöht nicht das geometrische Füllvolumen der fertigen Wand. Die Stückzahl ist eine Bedarfsabschätzung für den Materialeinkauf. Ecken, Pfeiler, Endsteine, der Halbsteinverband und Lagenabfolgen müssen im Verlegeplan berücksichtigt werden. Nutzen Sie dafür unseren [Schalungssteine-Rechner](/rechner/schalungssteine-rechner/).',
+        ],
+      },
+      {
+        id: 'fundament-und-statik',
+        title: 'Gehört das Fundament zum Füllbeton?',
+        paragraphs: [
+          'Nein. Der Füllbeton für die Hohlkammern der Schalungssteine und der Beton für das Fundament sind bautechnisch und kalkulatorisch getrennte Positionen.',
+          'Schalungssteinmauern sind massiv und erfordern in der Regel ein frostfrei gegründetes Streifenfundament (meist mindestens 80 cm tief im Erdreich). Berechnen Sie das Fundamentvolumen aus den geplanten Fundamentabmessungen (Länge × Breite × Tiefe) mit unserem [Betonrechner](/rechner/betonrechner/) und addieren Sie diesen Bedarf erst anschließend zur Gesamtbestellung beim Transportbetonwerk.',
+          'Eine Materialberechnung bestimmt weder die Tragfähigkeit noch die erforderliche Bewehrung. Sie legt auch keine geeignete Fundamentgröße, zulässige Mauerhöhe oder Ausführung der Drainage fest. Für tragende oder hinterfüllte Hang- und Stützmauern ist die konkrete Tragwerksplanung (Standsicherheitsnachweis nach Eurocode 2 / DIN EN 1992) maßgeblich.',
+        ],
+      },
+      {
+        id: 'checkliste-betonbestellung',
+        title: 'Checkliste vor der Betonbestellung',
+        paragraphs: [
+          'Beachten Sie vor dem Absenden der Betonbestellung folgende sechs Punkte:',
+          '1. Produkt und Steinvariante eindeutig bestimmen (Datenblatt des Herstellers heranziehen).',
+          '2. Netto-Wandfläche nach Abzug aller Öffnungen prüfen.',
+          '3. Hersteller-Füllmenge samt Einheit (l/m² oder l/Stein) fehlerfrei übernehmen.',
+          '4. Füllbeton und Fundamentbeton getrennt berechnen.',
+          '5. Steinreserve (für Zuschnitt) und Betonreserve (für Verdichtung/Lieferung) getrennt ansetzen.',
+          '6. Lieferform, Körnung (meist 0–8 mm oder 0–16 mm Fließbeton) und Einbauzeitfenster mit dem Transportbetonwerk abstimmen.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Praxisbeispiel: 12-m²-Mauer mit 24er Schalungssteinen nachrechnen',
+      scenario: 'Eine Mauer hat eine Länge von 8,0 m und eine Höhe von 1,5 m ohne Öffnungen (12,0 m² Ansichtsfläche). Verwendet werden 24er Schalungssteine mit einer Herstellerangabe von 130 l/m² (z. B. Delfing DP 24). Steinreserve beträgt 5 %, der Betonbestellzuschlag 5 %.',
+      formula: 'Füllbeton (m³) = Netto-Wandfläche × Füllmenge (l/m²) ÷ 1.000 × (1 + Betonzuschlag/100)',
+      steps: [
+        { label: 'Schritt 1: Netto-Wandfläche berechnen', calculation: '8,0 m × 1,5 m = 12,0 m² Wandfläche' },
+        { label: 'Schritt 2: Grundbedarf Schalungssteine', calculation: '12,0 m² × 8 Steine/m² = 96 Steine Netto' },
+        { label: 'Schritt 3: Steine inklusive 5 % Steinreserve', calculation: '96 × 1,05 = 100,8 → 101 Schalungssteine' },
+        { label: 'Schritt 4: Netto-Füllbetonvolumen', calculation: '12,0 m² × 130 l/m² = 1.560 Liter = 1,56 m³' },
+        { label: 'Schritt 5: Betonbestellmenge mit 5 % Bestellzuschlag', calculation: '1,56 m³ × 1,05 = 1,638 m³ ≈ 1,64 m³ Füllbeton' },
+      ],
+      resultSummary: '96 Schalungssteine Netto (101 Stück inkl. Reserve) und 1,56 m³ Netto-Füllbeton (Bestellmenge ca. 1,64 m³ bei 5 % Zuschlag).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Das äußere Wandvolumen (Länge × Höhe × Wandstärke) als Betonmenge bestellen.',
+        correction: 'Schalungssteine bestehen aus Stegen und Schalen. Wer das Außenvolumen (12 m² × 0,24 m = 2,88 m³) bestellt, kauft fast doppelt so viel Beton wie benötigt (Hohlraumvolumen nur 1,56 m³).',
+      },
+      {
+        mistake: 'Steinreserve und Betonreserve zusammenrechnen.',
+        correction: 'Zusätzliche Reservesteine für Bruch oder Zuschnitte erhöhen nicht die Wandfläche und benötigen keinen zusätzlichen Füllbeton.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Beton brauche ich für 24er Schalungssteine?',
+        answer: 'Das hängt vom gewählten Stein ab: Datenblätter nennen typischerweise ca. 130 bis 145 l/m² (z. B. Delfing ca. 130 l/m², Beyhl ca. 18 l/Stein bzw. 144 l/m²). Für 10 m² Wand sind das rund 1,30 bis 1,45 m³ Füllbeton.',
+      },
+      {
+        question: 'Kann ich Länge × Höhe × Wandstärke rechnen?',
+        answer: 'Nein, damit berechnen Sie das äußere Raumvolumen einer massiven Wand. Die Stege und Schalen der Steine nehmen jedoch rund 40 bis 50 % dieses Raums ein. Nutzen Sie die Liter-Angabe des Herstellers.',
+      },
+      {
+        question: 'Sind acht Steine pro Quadratmeter immer richtig?',
+        answer: 'Für das mitteleuropäische Standardformat von 50 cm Länge und 25 cm Höhe ja (1 m² / (0,5 m × 0,25 m) = 8 Stück). Bei abweichenden Formaten (z. B. 60 cm Länge oder 20 cm Höhe) muss die Stückzahl angepasst werden.',
+      },
+      {
+        question: 'Kann ich aus der Betonmenge die Bewehrung bestimmen?',
+        answer: 'Nein. Bewehrungsdurchmesser, Stababstände und statische Anschlussbewehrung hängen von Lastannahmen, Wandhöhe und Erddruck ab und müssen fachgerecht statisch dimensioniert werden.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Delfing Baustoffwerk',
+        citation: 'Technisches Datenblatt & FAQ: Betonbedarf für DP-Schalungssteine 17,5 cm und 24 cm',
+        url: 'https://delfing.de/faq-items/wie-viel-beton-wird-fuer-eine-mauer-mit-dp-schalungssteinen-benoetigt/',
+      },
+      {
+        title: 'Beyhl Betonwerk',
+        citation: 'Leistungsübersicht & technische Produktdaten: Schalungssteine Normalbeton',
+        url: 'https://www.beyhl.de/leistungen/betonwerk/schalungssteine/',
+      },
+      {
+        title: 'Jasto Baustoffwerke',
+        citation: 'Gartenwelt & Mauersysteme: Technische Richtlinien für Schalungssteine und Verfüllbeton',
+        url: 'https://jasto.de/gartenwelt/mauersysteme/schalungssteine/',
+      },
+      {
+        title: 'Deutsches Institut für Normung (DIN)',
+        citation: 'DIN EN 771-3 (Mauersteine aus Beton) & DIN EN 1992 (Eurocode 2: Bemessung von Stahlbeton)',
+        url: 'https://www.din.de',
+      },
+    ],
+    relatedArticleSlugs: ['zahnspachtel-groessen-tabelle-fliesen', '1-cup-milch-in-gramm'],
+  },
+  {
+    slug: 'gaskosten-berechnen',
+    title: 'Gaskosten berechnen: Formel, Gasrechnung & m³ in kWh umrechnen',
+    metaTitle: 'Gaskosten berechnen: Formel, Zählerstand & Gasrechnung',
+    metaDescription: 'Gaskosten berechnen: Unterschied von Arbeitspreis und Grundpreis, Gaszähler in kWh umrechnen, Rechenbeispiel und monatlichen Abschlag prüfen.',
+    h1: 'Gaskosten berechnen: Anleitung, Formel und Beispiel für Ihre Gasabrechnung',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-05',
+    updatedAt: '2026-10-05',
+    readingTimeMin: 7,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Haushaltsfinanzen',
+    },
+    reviewer: {
+      name: 'Fachteam Energiewirtschaft',
+      role: 'Tarif- und Versorgerabrechnungen',
+    },
+    coverIllustration: {
+      src: '/images/ratgeber/gaskosten-berechnung-formel-zusammensetzung.svg',
+      alt: 'Diagramm zur Gaskostenberechnung: Umwandlung von Kubikmetern in kWh, Arbeitspreis, Grundpreis und Monatsabschlag',
+      caption: 'Zusammensetzung der jährlichen Gaskosten aus thermischem Energieverbrauch (Arbeitspreis in ct/kWh) und verbrauchsunabhängigem Grundpreis sowie monatlicher Orientierungswert.',
+      width: 800,
+      height: 450,
+    },
+    summary:
+      'Gaskosten berechnen sich in Deutschland aus zwei klar getrennten Komponenten: den verbrauchsabhängigen Kilowattstunden multipliziert mit dem Arbeitspreis und der festen Jahresgrundgebühr. Da Gaszähler das physikalische Volumen in Kubikmetern (m³) erfassen, wird der Zählerstand über Brennwert und Zustandszahl in Kilowattstunden (kWh) umgerechnet. Erfahren Sie hier Schritt für Schritt, wie Sie Ihre Abrechnung nachvollziehen und den fairen monatlichen Abschlag ermitteln.',
+    keyTakeaways: [
+      'Die Grundformel lautet: Jährliche Gaskosten = (Verbrauch in kWh × Arbeitspreis in €/kWh) + (Monatsgrundpreis in € × 12).',
+      'Physikalische Zählerumrechnung: kWh = m³ × Brennwert (Hs) × Zustandszahl (z). 1 m³ Erdgas entspricht je nach Gasbeschaffenheit rund 9,5 bis 11,5 kWh thermischer Energie.',
+      'Rechnerischer Monatsdurchschnitt: Jahresgesamtkosten geteilt durch 12 dienen als neutrale Orientierung. Vertragliche Versorgerabschläge können bei 11 Zahlungen oder Vorjahresgewichtungen abweichen.',
+      'Immer Bruttopreise vergleichen: Der Arbeitspreis muss alle Steuern und Abgaben (19 % Mehrwertsteuer, CO₂-Preis von 55 €/Tonne, Erdgassteuer und Netzentgelte) beinhalten.',
+    ],
+    primaryCalculator: {
+      slug: 'gaskostenrechner',
+      title: 'Gaskostenrechner (Verbrauch & Jahreskosten)',
+      ctaText: 'Gaskosten online berechnen',
+      description: 'Ermitteln Sie Ihre jährlichen Gesamtkosten und monatlichen Richtwerte centgenau aus Kilowattstunden oder Zählerständen in m³.',
+      badge: 'Direkt berechnen',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'gasverbrauch-kwh-m3-rechner',
+        title: 'Gasverbrauch Rechner (m³ in kWh)',
+        ctaText: 'Gaszähler umrechnen',
+        description: 'Rechnet zwei Gaszählerstände in m³ unter Berücksichtigung von Brennwert und Zustandszahl in kWh um.',
+      },
+      {
+        slug: 'heizkostenvergleich-rechner',
+        title: 'Heizkostenvergleich Rechner',
+        ctaText: 'Heizsysteme vergleichen',
+        description: 'Vergleicht Gasheizung, Wärmepumpe, Pelletheizung und Fernwärme nach laufenden Kosten pro Quadratmeter.',
+      },
+      {
+        slug: 'stromkostenrechner',
+        title: 'Stromkostenrechner für Haushaltsgeräte',
+        ctaText: 'Stromverbrauch kalkulieren',
+        description: 'Berechnet den Stromverbrauch einzelner Geräte und des gesamten Haushalts auf Jahres- und Monatsbasis.',
+      },
+    ],
+    sections: [
+      {
+        id: 'arbeitspreis-vs-grundpreis',
+        title: 'Arbeitspreis vs. Grundpreis: Die zwei Kostenbausteine',
+        paragraphs: [
+          'Auf jeder deutschen Gasrechnung stoßen Sie auf zwei elementare Preiskomponenten, die das Zustandekommen der Gesamtrechnung bestimmen:',
+          '1. **Arbeitspreis (Verbrauchspreis in Cent pro kWh bzw. € pro kWh)**: Dies ist der variable Preis für jede thermische Kilowattstunde Energie, die Sie durch Heizen und Warmwasser tatsächlich verbraucht haben. Er umfasst die reine Gasbeschaffung, den CO2-Preis nach dem Brennstoffemissionshandelsgesetz (BEHG), Netznutzungsentgelte, die Erdgassteuer (0,55 Cent/kWh) und 19 % Mehrwertsteuer. Ein typischer Arbeitspreis für Neukunden und Bestandskunden liegt 2026 zwischen 9,5 und 13,0 Cent/kWh.',
+          '2. **Grundpreis (Bereitstellungspreis in €/Monat oder €/Jahr)**: Eine feste Gebühr, die vollkommen unabhängig davon anfällt, wie viel oder wie wenig Sie heizen. Sie deckt die Bereitstellung des Gasanschlusses, den Messstellenbetrieb, die Zählermiete und vertragliche Verwaltungskosten ab. Typische Grundpreise liegen bei 10 bis 16 Euro monatlich (ca. 120 bis 190 Euro pro Jahr).',
+          'Wer nur auf einen niedrigen Arbeitspreis schaut, aber einen überhöhten Grundpreis akzeptiert, zahlt insbesondere bei sparsamem Heizverhalten oder kleiner Wohnfläche drauf. Berechnen Sie daher Ihre individuellen Tarifkosten direkt in unserem [Gaskostenrechner](/rechner/gaskostenrechner/).',
+        ],
+      },
+      {
+        id: 'wie-liest-man-eine-gasrechnung',
+        title: 'Wie liest man eine deutsche Gasrechnung?',
+        paragraphs: [
+          'Die Jahresabrechnung Ihres Gasversorgers wirkt auf den ersten Blick komplex, folgt aber einer gesetzlich geregelten Struktur nach § 40 EnWG (Energiewirtschaftsgesetz):',
+          'Auf Seite 1 finden Sie die **Gesamtabrechnung**: Hier stehen der Rechnungsbetrag, die Summe aller bereits geleisteten monatlichen Abschlagszahlungen und das resultierende Guthaben bzw. die Nachzahlung.',
+          'Auf den Folgeseiten finden Sie die **Mengenermittlung und Tarifaufschlüsselung**:\n- **Zählerstand alt und neu**: Datumsangaben und Kubikmeter-Stände zum Stichtag der Ablesung.\n- **Abgerechnetes Volumen (m³)**: Die Differenz beider Zählerstände.\n- **Brennwert (Hs)** und **Zustandszahl (z)**: Die exakten, vom örtlichen Netzbetreiber amtlich ermittelten Umrechnungskoeffizienten für Ihren Zählpunkt.\n- **Thermische Gasmenge (kWh)**: Das Produkt aus m³ × Brennwert × Zustandszahl.\n- **Brutto- und Nettopreise**: Achten Sie darauf, ob die ausgewiesenen Preise die 19 % Mehrwertsteuer bereits enthalten.',
+        ],
+      },
+      {
+        id: 'vom-gaszaehler-zur-energie',
+        title: 'Gaszähler in m³ in kWh umrechnen: Die physikalische Formel',
+        paragraphs: [
+          'Viele Verbraucher wundern sich, warum am Zähler Kubikmeter stehen, der Tarif aber in Kilowattstunden bezahlt wird. Der Grund: Erdgas ist ein Naturprodukt. Je nach Gasquelle (niederländisches L-Gas mit geringerem Energiegehalt oder norwegisches/russisches H-Gas mit hohem Methangehalt), Höhenlage des Wohnorts und aktuellem Luftdruck steckt in einem Kubikmeter Gas unterschiedlich viel thermische Energie.',
+          'Die bundesweit verbindliche Umrechnung erfolgt nach dem Arbeitsblatt **DVGW G 685** (Thermische Gasabrechnung) über folgende physikalische Formel:\n\n`Energie (kWh) = Volumen (m³) × Brennwert (Hs) × Zustandszahl (z)`',
+          '- **Brennwert (Hs in kWh/m³)**: Gibt die bei vollständiger Verbrennung freigesetzte Wärmeenergie inklusive der Kondensationswärme des Wasserdampfs an. Übliche Werte liegen zwischen 9,5 und 10,5 kWh/m³ (L-Gas) sowie 11,0 und 11,7 kWh/m³ (H-Gas). Der Bundesdurchschnitt beträgt ca. 10,3 kWh/m³.\n- **Zustandszahl (z)**: Beschreibt das Verhältnis des Gasvolumens im Betriebszustand (am Hauszähler) zum Normzustand (0 °C, 1.013,25 mbar). Da der Gasdruck mit zunehmender geodätischer Höhe abnimmt, variiert die z-Zahl regional meist zwischen 0,90 und 0,96.',
+          'Für schnelle Überschläge gilt die Faustregel: **1 m³ Gas entspricht rund 10 kWh Wärmeenergie**. Eine detaillierte Erklärung mit Tabellen zur z-Zahl finden Sie in unserem Fachartikel [Gas m³ in kWh umrechnen](/ratgeber/gaszaehler-m3-in-kwh-umrechnen/).',
+        ],
+        illustration: {
+          src: '/images/ratgeber/gaskosten-berechnung-formel-zusammensetzung.svg',
+          alt: 'Schritt-für-Schritt Rechenweg von Zählerstand m³ über kWh zu Gesamtkosten und Monatsabschlag',
+          caption: 'Infografik: Die drei Schritte von der Zählerablesung zur centgenauen Gaskostenkalkulation.',
+          width: 800,
+          height: 450,
+        },
+      },
+      {
+        id: 'schritt-fuer-schritt-beispiel',
+        title: 'Schritt-für-Schritt Rechenbeispiel mit transparenten Annahmen',
+        paragraphs: [
+          'Betrachten wir ein transparentes Rechenbeispiel für ein Reihenhaus mit Gas-Brennwertheizung:',
+          '**Ausgangsdaten des Haushalts:**\n- Alter Zählerstand am 01.01.: 12.400,0 m³\n- Neuer Zählerstand am 31.12.: 13.800,0 m³\n- Differenz (Gasvolumen): 1.400,0 m³\n- Brennwert laut Abrechnung: 10,3 kWh/m³\n- Zustandszahl z: 0,95\n- Vertraglicher Arbeitspreis (brutto): 10,5 Cent/kWh = 0,105 €/kWh\n- Monatlicher Grundpreis: 12,00 €/Monat',
+          '**Schritt 1: Ermittlung des thermischen Energieverbrauchs in kWh**\n`1.400 m³ × 10,3 kWh/m³ × 0,95 = 13.699 kWh`\nDer Haushalt hat im Kalenderjahr thermische Energie im Umfang von 13.699 kWh verbraucht.',
+          '**Schritt 2: Berechnung der reinen Verbrauchskosten (Arbeitspreis)**\n`13.699 kWh × 0,105 €/kWh = 1.438,40 €`',
+          '**Schritt 3: Berechnung des jährlichen Grundpreises**\n`12 Monate × 12,00 €/Monat = 144,00 €`',
+          '**Schritt 4: Gesamtkosten pro Jahr und Monatsdurchschnitt**\n`Gesamtkosten = 1.438,40 € + 144,00 € = 1.582,40 €`\n`Rechnerischer Monatsdurchschnitt = 1.582,40 € ÷ 12 Monate = 131,87 €`',
+          'Der Haushalt sollte bei diesem Tarif mit jährlichen Gaskosten von ca. 1.582,40 Euro rechnen, was einem monatlichen Richtwert von rund 132 Euro entspricht.',
+        ],
+      },
+      {
+        id: 'warum-ergebnisse-schaetzungen-sind',
+        title: 'Warum das Ergebnis immer eine Modellrechnung ist',
+        paragraphs: [
+          'Selbst die exakteste mathematische Berechnung liefert eine Schätzung und keinen centgenau garantierten Versorgerabschlag. Dafür gibt es vier reale Gründe in der Energiewirtschaft:',
+          '1. **Abschlagsrhythmus (11 statt 12 Abschläge)**: Viele Versorger erheben im Abrechnungsmonat keinen Abschlag, sondern verrechnen diesen direkt mit der Jahresendabrechnung. In diesem Fall verteilt sich die Jahressumme auf 11 Abschlagszahlungen (im obigen Beispiel: 1.582,40 € ÷ 11 = 143,85 € statt 131,87 €).',
+          '2. **Sicherheitszuschläge und Vorjahresgewichtung**: Wenn der vergangene Winter besonders mild war oder Preiserhöhungen anstehen, kalkulieren Versorger oft einen Puffer von 5 bis 10 % ein, um hohe Nachzahlungen für Kunden zu vermeiden.',
+          '3. **Witterungsabhängiger Mehrverbrauch**: Ein extrem kalter Winter kann den Heizenergiebedarf gegenüber dem Vorjahr um 15 bis 25 % steigern. Gas wird zu 75 bis 80 % zwischen Oktober und März verbraucht.',
+          '4. **Stichtagsbezogene Preisanpassungen**: Ändert sich der Gaspreis während des Jahres (z. B. durch gesetzliche Anpassung der CO2-Abgabe zum 1. Januar), wird der Verbrauch vom Versorger nach der sogenannten Gradtagszahlen-Tabelle zeitanteilig aufgeteilt.',
+        ],
+      },
+      {
+        id: 'checkliste-gasrechnung-pruefen',
+        title: 'Checkliste: Gasrechnung auf Richtigkeit prüfen',
+        paragraphs: [
+          'Verbraucherzentralen stellen regelmäßig fest, dass Gasabrechnungen fehlerhaft sind. Prüfen Sie Ihre Abrechnung anhand folgender fünf Punkte:',
+          '- **Zählerstand plausibel?** Wurde der Zählerstand tatsächlich abgelesen oder vom Versorger geschätzt? Steht auf der Rechnung ein Vermerk wie „maschinell geschätzt“, vergleichen Sie die Zahl sofort mit dem realen Zähler im Keller.',
+          '- **Abrechnungszeitraum korrekt?** Wurde exakt der vertraglich vereinbarte Zeitraum (meist 365 Tage) abgerechnet?',
+          '- **Brennwert und Zustandszahl stabil?** Weichen Brennwert oder z-Zahl drastisch von der Vorjahresrechnung ab? Der Brennwert darf sich nur im Rahmen der Netzverhältnisse leicht ändern.',
+          '- **Geleistete Abschläge voll angerechnet?** Zählen Sie nach, wie viele Abschlagszahlungen Sie per Lastschrift oder Überweisung getätigt haben. Häufig fehlt die letzte Abschlagszahlung in der Abrechnung.',
+          '- **Guthaben zeitnah auszahlen lassen**: Ergibt sich ein Guthaben, muss der Versorger dieses nach § 40c EnWG unverzüglich, spätestens jedoch binnen zwei Wochen, erstatten oder mit dem nächsten Abschlag verrechnen.',
+          'Vergleichen Sie Ihre Heizkosten auch mit alternativen Heizungen im [Heizkostenvergleich Rechner](/rechner/heizkostenvergleich-rechner/) oder analysieren Sie Einsparpotenziale mit dem [Ölheizung Verbrauch Rechner](/rechner/oelheizung-verbrauch-rechner/).',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: Gasabrechnung für ein Reihenhaus (1.400 m³ Zählerdifferenz)',
+      scenario: 'Ein Haushalt liest am 1. Januar 12.400 m³ und am 31. Dezember 13.800 m³ ab (Differenz: 1.400 m³). Brennwert: 10,3 kWh/m³, Zustandszahl: 0,95, Arbeitspreis: 10,5 ct/kWh (0,105 €/kWh), Grundpreis: 12,00 €/Monat.',
+      formula: 'Jahreskosten = (Zählerdifferenz in m³ × Brennwert × Zustandszahl × Arbeitspreis) + (Grundpreis × 12)',
+      steps: [
+        { label: 'Schritt 1: Zählerdifferenz bilden', calculation: '13.800 m³ − 12.400 m³ = 1.400 m³ Gasvolumen' },
+        { label: 'Schritt 2: In thermische Energie (kWh) umrechnen', calculation: '1.400 m³ × 10,3 kWh/m³ × 0,95 = 13.699 kWh' },
+        { label: 'Schritt 3: Verbrauchskosten berechnen', calculation: '13.699 kWh × 0,105 €/kWh = 1.438,40 €' },
+        { label: 'Schritt 4: Fester Grundpreis (12 Monate)', calculation: '12 Monate × 12,00 €/Monat = 144,00 €' },
+        { label: 'Schritt 5: Gesamtkosten pro Jahr und Monatsdurchschnitt', calculation: '1.438,40 € + 144,00 € = 1.582,40 € (Monatsdurchschnitt: 131,87 €)' },
+      ],
+      resultSummary: '13.699 kWh Gasverbrauch und 1.582,40 € jährliche Gesamtkosten (ca. 132 € monatlicher Richtwert)',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Den Zählerstand am Stichtag direkt als Jahresverbrauch ansetzen.',
+        correction: 'Immer die Differenz zwischen altem und neuem Zählerstand bilden – der Zählerstand ist ein kumulierter Zähler.',
+      },
+      {
+        mistake: 'Kubikmeter direkt mit dem Gaspreis multiplizieren.',
+        correction: 'Da Gasverträge nach thermischer Energie in kWh abrechnen, müssen Kubikmeter erst mit Brennwert und Zustandszahl multipliziert werden.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie berechne ich meine jährlichen Gaskosten am schnellsten?',
+        answer: 'Multiplizieren Sie Ihren Jahresverbrauch in kWh mit dem Arbeitspreis in Cent/kWh (geteilt durch 100 für Euro) und addieren Sie 12 Monatsgrundpreise. Beispiel: (12.000 kWh × 0,11 €) + (12 × 12 €) = 1.320 € + 144 € = 1.464 € im Jahr.',
+      },
+      {
+        question: 'Wie rechne ich m³ Gas in Euro um?',
+        answer: 'Zuerst rechnen Sie Kubikmeter in Kilowattstunden um: kWh = m³ × Brennwert (ca. 10,3) × Zustandszahl (ca. 0,95). Anschließend multiplizieren Sie die kWh mit Ihrem Arbeitspreis pro kWh und addieren den anteiligen Grundpreis.',
+      },
+      {
+        question: 'Warum unterscheidet sich mein monatlicher Abschlag vom rechnerischen Durchschnitt?',
+        answer: 'Der Rechner teilt die Jahreskosten gleichmäßig durch 12 Monate. Manche Versorger erheben jedoch nur 11 Abschläge im Jahr, runden auf volle 5- oder 10-Euro-Beträge oder schlagen einen Witterungspuffer für kalte Wintermonate auf.',
+      },
+      {
+        question: 'Welcher Gasverbrauch ist für eine Wohnung oder ein Haus normal?',
+        answer: 'Als Richtwerte gelten: 50-m²-Wohnung ca. 5.000–7.000 kWh/Jahr, 100-m²-Wohnung ca. 10.000–14.000 kWh/Jahr, Reihenhaus ca. 13.000–17.000 kWh/Jahr und freistehendes Einfamilienhaus (150 m²) ca. 16.000–22.000 kWh/Jahr.',
+      },
+      {
+        question: 'Ist der CO2-Preis in den Gaskosten enthalten?',
+        answer: 'Ja, der nationale CO2-Preis nach dem Brennstoffemissionshandelsgesetz (BEHG) ist im vertraglichen Arbeitspreis bereits enthalten und wird vom Gasversorger über die Kilowattstunden abgeführt.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'DVGW Deutscher Verein des Gas- und Wasserfaches e.V.',
+        citation: 'Arbeitsblatt DVGW G 685: Thermische Gasabrechnung (physikalische Grundlagen und Koeffizientenermittlung)',
+        url: 'https://www.dvgw.de/themen/gas/verbraucherinformationen/gasabrechnung',
+      },
+      {
+        title: 'Bundesnetzagentur (BNetzA)',
+        citation: 'Verbraucherleitfaden: Gasrechnungen und monatliche Abschlagsberechnung nach § 40 EnWG',
+        url: 'https://www.bundesnetzagentur.de',
+      },
+      {
+        title: 'Verbraucherzentrale Bundesverband (vzbv)',
+        citation: 'Ratgeber Energiepreise: Gasabrechnung richtig prüfen und Abschlagsänderungen verstehen',
+        url: 'https://www.verbraucherzentrale.de',
+      },
+    ],
+    relatedArticleSlugs: ['gaszaehler-m3-in-kwh-umrechnen', 'schalungssteine-betonbedarf-berechnen', 'stromverbrauch-geraete-berechnen'],
   },
 ];
 

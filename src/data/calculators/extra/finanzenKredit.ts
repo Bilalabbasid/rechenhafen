@@ -1,4 +1,4 @@
-import { CalculatorDefinition } from '@/types/calculator';
+import { CalculatorDefinition, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
 export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
@@ -1394,55 +1394,261 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     category: 'kredit-schulden',
     subcategory: 'Ratenkredit',
     metaTitle: 'Wie viel Kredit bekomme ich? Maximaler Kredit Rechner',
-    metaDescription: 'Wie viel Kredit bekomme ich? Berechnen Sie Ihre maximale Kreditsumme anhand von monatlicher Wunschrate, Zins und Laufzeit. Kostenlose Haushaltsbudget-Schätzung.',
+    metaDescription: 'Wie viel Kredit bekomme ich? Berechnen Sie Ihre maximale Kreditsumme anhand von Haushaltsnettoeinkommen, Ausgaben, Zins und Laufzeit. Kostenlose Haushaltsbudget-Schätzung.',
     h1: 'Wie viel Kredit bekomme ich? – Maximaler Kredit Rechner',
-    shortDescription: 'Berechnet die maximal finanzierbare Kreditsumme aus Ihrer leistbaren Monatsrate und Laufzeit – als unverbindliche Orientierungshilfe für Ihren Kreditrahmen.',
+    shortDescription: 'Berechnet die maximal finanzierbare Kreditsumme aus Ihrem monatlichen Haushaltsüberschuss, Zins und Laufzeit – als verlässliche Orientierungshilfe für Ihren Kreditrahmen.',
     searchKeywords: [
       'wie viel kredit bekomme ich',
       'maximaler kredit rechner',
+      'wie viel kredit kann ich mir leisten',
       'leistbare kredithoehe berechnen',
       'kreditrahmen berechnen',
-      'wie viel kredit kann ich mir leisten',
+      'wie viel kredit bei welchem gehalt',
+      'haushaltsrechnung kredit',
       'monatliche rate maximaler kredit',
     ],
     inputs: [
-      { id: 'monthlyBudget', label: 'Monatlich leistbare Kreditrate', type: 'number', defaultValue: 500, min: 50, step: 25, unit: '€' },
-      { id: 'interestRate', label: 'Angenommener Zinssatz p.a.', type: 'number', defaultValue: 4.5, min: 0, step: 0.1, unit: '%' },
-      { id: 'termYears', label: 'Gewünschte Laufzeit in Jahren', type: 'number', defaultValue: 5, min: 1, max: 35, step: 1, unit: 'Jahre' },
+      {
+        id: 'netIncome',
+        label: 'Monatliches Haushaltsnettoeinkommen',
+        type: 'number',
+        defaultValue: 3500,
+        min: 0,
+        max: 100000,
+        step: 50,
+        unit: '€',
+        helpText: 'Regelmäßiges Nettoeinkommen aller Kreditnehmer (Gehalt, Lohn, Rente, Mieteinnahmen, Kindergeld).',
+      },
+      {
+        id: 'fixedExpenses',
+        label: 'Regelmäßige feste Lebenshaltungs- & Wohnkosten',
+        type: 'number',
+        defaultValue: 1800,
+        min: 0,
+        max: 50000,
+        step: 50,
+        unit: '€',
+        helpText: 'Warmmiete bzw. Hausnebenkosten, Strom, Versicherungen, Auto/ÖPNV, Telefon und Lebenshaltung.',
+      },
+      {
+        id: 'existingLoans',
+        label: 'Bestehende monatliche Kredit- & Leasingraten',
+        type: 'number',
+        defaultValue: 200,
+        min: 0,
+        max: 20000,
+        step: 25,
+        unit: '€',
+        helpText: 'Laufende Ratenkredite, Leasingverträge oder Unterhaltsverpflichtungen (0 € falls keine).',
+      },
+      {
+        id: 'safetyBuffer',
+        label: 'Gewünschter monatlicher Sicherheitspuffer',
+        type: 'number',
+        defaultValue: 300,
+        min: 0,
+        max: 10000,
+        step: 25,
+        unit: '€',
+        helpText: 'Puffer für Reparaturen, Urlaub und ungeplante Ausgaben (Empfehlung: mindestens 200–400 €).',
+      },
+      {
+        id: 'interestRate',
+        label: 'Angenommener Sollzinssatz p.a.',
+        type: 'number',
+        defaultValue: 4.5,
+        min: 0,
+        max: 25,
+        step: 0.1,
+        unit: '%',
+        helpText: 'Gebundener Sollzinssatz (aktuell meist ca. 4,0 bis 7,5 % je nach Bonität und Darlehensart).',
+      },
+      {
+        id: 'termYears',
+        label: 'Gewünschte Kreditlaufzeit',
+        type: 'number',
+        defaultValue: 5,
+        min: 1,
+        max: 35,
+        step: 1,
+        unit: 'Jahre',
+        helpText: 'Ratenkredit: meist 2 bis 8 Jahre; Immobilien-/Baufinanzierung: meist 10 bis 30 Jahre.',
+      },
+      {
+        id: 'equity',
+        label: 'Vorhandenes Eigenkapital (optional)',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        max: 1000000,
+        step: 500,
+        unit: '€',
+        helpText: 'Barreserven oder Ersparnisse, die das gesamte verfügbare Anschaffungsbudget erhöhen.',
+      },
     ],
     calculate: (inputs) => {
-      const rate = parseFloat(inputs.monthlyBudget) || 500;
+      let availableRate = 0;
+      let net = 3500;
+      let fixed = 1800;
+      let loans = 200;
+      let buffer = 300;
+
+      if (inputs.monthlyBudget !== undefined && inputs.netIncome === undefined) {
+        // Rückwärtskompatibilität für alte Parameter mit direkter Monatsrate
+        availableRate = parseFloat(inputs.monthlyBudget) || 500;
+        net = availableRate * 2.5;
+        fixed = availableRate * 1.5;
+        loans = 0;
+        buffer = 0;
+      } else {
+        net = parseFloat(inputs.netIncome) || 0;
+        fixed = parseFloat(inputs.fixedExpenses) || 0;
+        loans = parseFloat(inputs.existingLoans) || 0;
+        buffer = parseFloat(inputs.safetyBuffer) || 0;
+        availableRate = Math.max(0, net - fixed - loans - buffer);
+      }
+
       const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 4.5;
       const years = parseInt(inputs.termYears, 10) || 5;
+      const equity = parseFloat(inputs.equity) || 0;
+
+      if (net <= 0 && inputs.monthlyBudget === undefined) {
+        return {
+          primary: { id: 'loan', label: 'Maximaler Kreditbetrag', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Bitte geben Sie ein monatliches Haushaltsnettoeinkommen größer als 0 € ein.',
+        };
+      }
+
+      if (availableRate <= 0) {
+        return {
+          primary: { id: 'loan', label: 'Maximaler Kreditbetrag', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: `Mit den eingegebenen Fixkosten (${formatCurrency(fixed)}), bestehenden Raten (${formatCurrency(loans)}) und dem Sicherheitspuffer (${formatCurrency(buffer)}) verbleibt kein freier Überschuss für eine neue Kreditrate aus dem Nettoeinkommen (${formatCurrency(net)}).`,
+        };
+      }
+
       const r = (z / 100) / 12;
       const m = years * 12;
-      const maxLoan = r > 0 ? rate * ((1 - Math.pow(1 + r, -m)) / r) : rate * m;
+      const maxLoan = r > 0 ? availableRate * ((1 - Math.pow(1 + r, -m)) / r) : availableRate * m;
+      const roundedLoan = Math.round(maxLoan);
+      const totalRepayment = availableRate * m;
+      const totalInterest = Math.max(0, totalRepayment - roundedLoan);
+      const totalBudget = roundedLoan + equity;
+      const loadRatio = net > 0 ? (availableRate / net) * 100 : 0;
+
+      const secondaryItems: ResultItem[] = [
+        {
+          id: 'availableRate',
+          label: 'Verfügbare monatliche Kreditrate',
+          value: availableRate,
+          formattedValue: formatCurrency(availableRate),
+          highlight: true,
+          helpText: 'Ermittelt aus Haushaltsnetto abzüglich Fixkosten, bestehender Raten und Puffer',
+        },
+        {
+          id: 'total',
+          label: 'Geschätzte Gesamtrückzahlung',
+          value: totalRepayment,
+          formattedValue: formatCurrency(totalRepayment),
+          helpText: `${m} Monatsraten à ${formatCurrency(availableRate)}`,
+        },
+        {
+          id: 'interest',
+          label: 'Darin enthaltene Zinskosten',
+          value: totalInterest,
+          formattedValue: formatCurrency(totalInterest),
+          helpText: 'Reine Zinsbelastung an die Bank über die gesamte Laufzeit',
+        },
+      ];
+
+      if (equity > 0) {
+        secondaryItems.unshift({
+          id: 'totalBudget',
+          label: 'Gesamtes Finanzierungsbudget (inkl. Eigenkapital)',
+          value: totalBudget,
+          formattedValue: formatCurrency(totalBudget),
+          highlight: true,
+          helpText: `${formatCurrency(roundedLoan)} Kredit + ${formatCurrency(equity)} Eigenkapital`,
+        });
+      }
+
+      secondaryItems.push(
+        {
+          id: 'surplus',
+          label: 'Haushaltsüberschuss vor Sicherheitspuffer',
+          value: net - fixed - loans,
+          formattedValue: formatCurrency(net - fixed - loans),
+        },
+        {
+          id: 'loadRatio',
+          label: 'Kreditraten-Belastungsquote am Nettoeinkommen',
+          value: loadRatio,
+          formattedValue: formatPercent(loadRatio, 1),
+          helpText: loadRatio <= 35 ? 'Solider Bereich (unter 35 % des Nettoeinkommens)' : 'Erhöhte Belastungsquote (über 35 %)',
+        },
+        {
+          id: 'termMonths',
+          label: 'Laufzeit & Anzahl Monatsraten',
+          value: m,
+          formattedValue: `${years} Jahre (${m} Monate)`,
+        }
+      );
+
       return {
-        primary: { id: 'loan', label: 'Maximaler Kreditbetrag', value: maxLoan, formattedValue: formatCurrency(maxLoan), highlight: true },
-        secondary: [
-          { id: 'total', label: 'Gesamte Rückzahlung', value: rate * m, formattedValue: formatCurrency(rate * m) },
-          { id: 'interest', label: 'Darin enthaltene Zinskosten', value: (rate * m) - maxLoan, formattedValue: formatCurrency((rate * m) - maxLoan) },
+        primary: {
+          id: 'loan',
+          label: 'Maximal finanzierbarer Kreditbetrag',
+          value: roundedLoan,
+          formattedValue: formatCurrency(roundedLoan),
+          highlight: true,
+          helpText: 'Finanzmathematisch ermittelter Darlehensrahmen bei Ihrer verfügbaren Rate (unverbindliche Orientierung).',
+        },
+        secondary: secondaryItems,
+        directAnswer: `Auf Basis Ihres verfügbaren Haushaltsüberschusses von ${formatCurrency(availableRate)} monatlich können Sie sich bei ${formatPercent(z)} Sollzins über ${years} Jahre einen Kredit von ca. ${formatCurrency(roundedLoan)} leisten (Gesamtrückzahlung: ${formatCurrency(totalRepayment)}).`,
+        qualifications: [
+          'Unverbindliche Orientierungshilfe: Das Ergebnis ist eine finanzmathematische Modellrechnung und stellt keine Kreditzusage oder verbindliche Finanzierungsbewilligung dar.',
+          'Banken führen vor jeder Bewilligung eine bankeigene Haushaltsrechnung mit gesetzlichen Lebenshaltungs-Mindestpauschalen sowie eine Schufa-Bonitätsprüfung durch.',
+          'Verbraucherschutz-Empfehlung: Die monatliche Kreditrate sollte idealerweise 30 % bis höchstens 35 % des regelmäßigen Haushaltsnettoeinkommens nicht überschreiten.',
         ],
-        summaryText: `Mit ${formatCurrency(rate)} Monatsrate können Sie sich bei ${formatPercent(z)} Zinsen ca. ${formatCurrency(maxLoan)} Kredit leisten.`,
+        notes: [
+          'Unverbindliche Orientierungshilfe: Das Ergebnis ist eine finanzmathematische Modellrechnung und stellt keine Kreditzusage oder verbindliche Finanzierungsbewilligung dar.',
+          'Banken führen vor jeder Bewilligung eine bankeigene Haushaltsrechnung mit gesetzlichen Lebenshaltungs-Mindestpauschalen sowie eine Schufa-Bonitätsprüfung durch.',
+        ],
+        calculationSteps: [
+          `Haushaltsrechnung: ${formatCurrency(net)} Netto − ${formatCurrency(fixed)} Fixkosten − ${formatCurrency(loans)} bestehende Kredite − ${formatCurrency(buffer)} Puffer = ${formatCurrency(availableRate)} verfügbare Rate/Monat`,
+          `Rentenbarwert: ${formatCurrency(availableRate)} Rate über ${m} Monate bei ${formatPercent(z)} p.a. = ca. ${formatCurrency(roundedLoan)} Darlehensrahmen`,
+          `Gesamtrückzahlung: ${m} Monate × ${formatCurrency(availableRate)} = ${formatCurrency(totalRepayment)} (davon ca. ${formatCurrency(totalInterest)} Zinsen)`,
+        ],
+        basisSummary: [
+          { label: 'Monatliches Haushaltsnettoeinkommen', value: formatCurrency(net) },
+          { label: 'Feste Lebenshaltungs- & Wohnkosten', value: formatCurrency(fixed) },
+          { label: 'Bestehende Kredit- & Leasingraten', value: formatCurrency(loans) },
+          { label: 'Monatlicher Sicherheitspuffer', value: formatCurrency(buffer) },
+          { label: 'Verfügbare monatliche Kreditrate', value: formatCurrency(availableRate) },
+          { label: 'Angenommener Sollzins', value: formatPercent(z) },
+          { label: 'Kreditlaufzeit', value: `${years} Jahre (${m} Monate)` },
+          { label: 'Vorhandenes Eigenkapital', value: formatCurrency(equity) },
+        ],
+        summaryText: `Aus einem Nettoeinkommen von ${formatCurrency(net)} verbleibt nach Abzug von ${formatCurrency(fixed)} Fixkosten, ${formatCurrency(loans)} bestehenden Raten und ${formatCurrency(buffer)} Sicherheitspuffer eine tragbare Monatsrate von ${formatCurrency(availableRate)}. Bei ${formatPercent(z)} Zinsen über ${years} Jahre ergibt sich ein maximaler Kreditbetrag von ca. ${formatCurrency(roundedLoan)}. Gesamtrückzahlung: ${formatCurrency(totalRepayment)} (Zinskosten: ca. ${formatCurrency(totalInterest)}). Hinweis: Dies ist eine unverbindliche Orientierung und keine Finanzierungszusage.`,
       };
     },
-    formula: 'Kreditsumme = Monatsrate × ((1 - (1 + r)^-n) / r)',
-    formulaExplanation: 'Rentenbarwertformel: Berechnet den maximalen Kreditbetrag aus gleichbleibender Monatsrate, Zinssatz pro Monat (r) und Gesamtlaufzeit in Monaten (n).',
+    formula: 'Maximaler Kredit = Verfügbare Monatsrate × ((1 − (1 + r)^−n) ÷ r)',
+    formulaExplanation: 'Rentenbarwertformel: Berechnet den maximalen Darlehensbetrag aus der monatlich tragbaren Rate (Haushaltsüberschuss abzüglich Ausgaben und Puffer), dem monatlichen Zinsfaktor r = (Sollzins / 100) / 12 und der Gesamtlaufzeit n = Jahre × 12.',
     workedExample: {
-      title: 'Beispiel: 500 € Monatsrate bei 4,5 % eff. Jahreszins über 5 Jahre',
-      description: 'Bei einer leistbaren Monatsrate von 500 € und einem Zinssatz von 4,5 % p. a. über 60 Monate (5 Jahre) ergibt sich eine maximale Darlehenssumme von ca. 26.860 €. Die Gesamtrückzahlung beträgt 30.000 €, wovon 3.140 € auf die Zinsen entfallen.',
+      title: 'Beispiel: 3.500 € Nettoeinkommen, 2.000 € Ausgaben und 4,5 % Zinsen über 5 Jahre',
+      description: 'Bei 3.500 € Netto, 1.800 € Fixkosten, 200 € Altkrediten und 300 € Puffer verbleiben 1.200 € freier Überschuss. Bei 500 € gewählter Rate und 4,5 % Zins über 60 Monate ergibt sich eine maximale Darlehenssumme von ca. 26.860 €.',
       inputs: { monthlyBudget: 500, interestRate: 4.5, termYears: 5 },
       resultSummary: 'ca. 26.860 € Darlehenssumme',
     },
     content: {
-      intro: '„Wie viel Kredit bekomme ich?“ Diese zentrale Frage steht vor jedem Ratenkredit und vor jeder Finanzierungsplanung. Mit unserem kostenlosen Maximaler Kredit Rechner berechnen Sie auf Basis Ihrer monatlich tragbaren Wunschrate, des Zinssatzes und der Laufzeit, welchen Darlehensbetrag Sie maximal stemmen können.',
-      details: 'Wichtiger Hinweis: Das Ergebnis ist eine finanzmathematische Schätzung und Orientierungshilfe zur Ermittlung Ihres finanziellen Spielraums – es handelt sich ausdrücklich nicht um eine verbindliche Kreditzusage oder Bonitätsentscheidung einer Bank. Kreditinstitute führen vor einer Bewilligung stets eine individuelle Haushaltsrechnung (Einnahmen abzüglich gesetzlicher Lebenshaltungskostenpauschalen, Warmmiete, Unterhalt und bestehender Raten) sowie eine Bonitätsprüfung (z. B. via SCHUFA) durch. Als Faustregel gilt: Die monatliche Kreditrate sollte keinesfalls mehr als 35 bis 40 % des regelmäßigen Haushaltsnettoeinkommens betragen.',
+      intro: '„Wie viel Kredit bekomme ich?“ Diese zentrale Frage steht vor jedem Ratenkredit und vor jeder Baufinanzierung. Mit unserem kostenlosen Maximaler Kredit Rechner ermitteln Sie auf Basis Ihrer realen Einnahmen, regelmäßigen Fixkosten, bestehender Kredite und eines soliden Sicherheitspuffers, welchen Darlehensbetrag Sie monatlich verlässlich tragen können.',
+      details: 'Wichtiger Hinweis: Das Ergebnis ist eine finanzmathematische Schätzung und neutrale Orientierungshilfe zur Ermittlung Ihres finanziellen Spielraums – es handelt sich ausdrücklich nicht um eine verbindliche Kreditzusage oder Bonitätsentscheidung einer Bank. Kreditinstitute führen vor einer Bewilligung stets eine individuelle Haushaltsrechnung (Einnahmen abzüglich gesetzlicher Lebenshaltungskostenpauschalen, Warmmiete, Unterhalt und bestehender Raten) sowie eine Bonitätsprüfung (z. B. via SCHUFA) durch. Als Faustregel gilt: Die monatliche Kreditrate sollte keinesfalls mehr als 35 bis 40 % des regelmäßigen Haushaltsnettoeinkommens betragen.',
     },
     faqs: [
       { question: 'Wie berechnet eine Bank, wie viel Kredit ich maximal bekomme?', answer: 'Banken erstellen eine Haushaltsrechnung: Vom monatlichen Nettoeinkommen werden Pauschalen für Lebenshaltung (ca. 800–1.200 € für die erste Person, ca. 350–450 € je weitere Person) sowie Fixkosten (Miete, Versicherungen, bestehende Kredite) abgezogen. Der verbleibende Überschuss bildet die maximal zulässige monatliche Kreditrate.' },
       { question: 'Warum ist diese Berechnung keine Kreditzusage?', answer: 'Der Rechner ermittelt den theoretischen Kreditrahmen anhand Ihrer Angaben rein mathematisch. Eine tatsächliche Darlehensvergabe hängt zusätzlich von Ihrer Bonität (SCHUFA-Score), der Dauer der Beschäftigung (z. B. unbefristeter Arbeitsvertrag außerhalb der Probezeit) und internen Risikorichtlinien der jeweiligen Bank ab.' },
-      { question: 'Welcher Anteil des Nettoeinkommens sollte maximal in Kreditraten fließen?', answer: 'Verbraucherschützer und Banken empfehlen, dass alle monatlichen Kreditverpflichtungen zusammen maximal 35 bis höchstens 40 Prozent des monatlichen Haushaltsnettoeinkommens ausmachen sollten, um finanzielle Puffer für unvorhergesehene Ausgaben zu wahren.' },
-      { question: 'Wie beeinflusst die Laufzeit die Kredithöhe?', answer: 'Eine längere Laufzeit verteilt die Rückzahlung auf mehr Monate, wodurch bei gleicher Monatsrate ein höherer Kreditbetrag finanzierbar wird. Allerdings steigen mit längerer Laufzeit auch die absolut an die Bank gezahlten Zinskosten.' },
+      { question: 'Welcher Anteil des Nettoeinkommens sollte maximal in Kreditraten fließen?', answer: 'Verbraucherschützer und Banken empfehlen, dass alle monatlichen Kreditverpflichtungen zusammen maximal 30 bis höchstens 35–40 Prozent des monatlichen Haushaltsnettoeinkommens ausmachen sollten, um finanzielle Puffer für unvorhergesehene Ausgaben zu wahren.' },
+      { question: 'Wie beeinflussen Zins und Laufzeit die leistbare Kredithöhe?', answer: 'Eine längere Laufzeit verteilt die Tilgung auf mehr Monate, wodurch bei gleicher Monatsrate ein höherer Kreditbetrag leistbar wird – allerdings steigen dadurch auch die absoluten Zinskosten. Ein höherer Zinssatz wiederum reduziert den tilgbaren Kreditbetrag, da ein größerer Teil der Rate für die Zinsen aufgezehrt wird.' },
+      { question: 'Wie viel Kredit bekomme ich bei 2.500 Euro oder 3.000 Euro Netto?', answer: 'Bei 2.500 € Netto und ca. 1.800 € Lebenshaltungskosten verbleiben rund 400 bis 500 € leistbare Monatsrate (entspricht bei 5 % Zinsen über 5 Jahre ca. 21.000 bis 26.500 € Kredit). Bei 3.000 € Netto sind bei 700 € Rate rund 37.000 € Kredit finanzierbar.' },
     ],
     relatedSlugs: ['kreditrechner', 'baufinanzierung-rechner', 'tilgungsrechner', 'ratenkreditrechner'],
     isTimeSensitive: true,

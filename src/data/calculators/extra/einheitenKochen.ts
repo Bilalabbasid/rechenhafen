@@ -2924,120 +2924,172 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     category: "kochen-backen",
     subcategory: "Küchenmaße",
     metaTitle: 'Cups in Gramm Rechner – US Cups in g für Mehl, Zucker & Butter',
-    metaDescription: 'Rechnen Sie amerikanische Rezepte um: US Cups in Gramm für Mehl (125g), Kristallzucker (200g), braunen Zucker (220g), Butter (227g)',
+    metaDescription: 'Rechnen Sie amerikanische Rezepte um: US Cups in Gramm für Milch (244g), Mehl (125g), Kristallzucker (200g), Butter (227g) und Öl.',
     h1: 'Cups in Gramm Rechner – Amerikanische Cups in Gramm wiegen',
-    shortDescription: 'Wandelt US Cups in Gramm nach Zutat für US-Backrezepte um.',
-    searchKeywords: ["cups in gramm rechner us cups mehl zucker","1 cup mehl in gramm wieviel","1 cup butter in gramm 227g","amerikanischer cup umrechner backen"],
+    shortDescription: 'Wandelt US Cups in Gramm nach Zutat und Cup-Konvention für Rezepte um.',
+    searchKeywords: ["cups in gramm rechner us cups mehl zucker", "1 cup milch in gramm", "1 cup mehl in gramm wieviel", "1 cup butter in gramm 227g", "amerikanischer cup umrechner backen"],
     inputs: [
-          {
-                "id": "cupsAmount",
-                "label": "Anzahl Cups",
-                "type": "number",
-                "defaultValue": 1,
-                "min": 0.125,
-                "max": 20,
-                "step": 0.125,
-                "unit": "Cups"
-          },
-          {
-                "id": "ingredient",
-                "label": "Zutat",
-                "type": "select",
-                "defaultValue": "flour",
-                "options": [
-                      {
-                            "value": "flour",
-                            "label": "Weizenmehl All-Purpose (1 Cup ≈ 125 g)"
-                      },
-                      {
-                            "value": "sugarWhite",
-                            "label": "Weißer Kristallzucker (1 Cup ≈ 200 g)"
-                      },
-                      {
-                            "value": "sugarBrown",
-                            "label": "Brauner Zucker / Packed (1 Cup ≈ 220 g)"
-                      },
-                      {
-                            "value": "sugarPowder",
-                            "label": "Puderzucker / Confectioners (1 Cup ≈ 120 g)"
-                      },
-                      {
-                            "value": "butter",
-                            "label": "Butter (1 Cup = 2 Sticks = 227 g)"
-                      },
-                      {
-                            "value": "oats",
-                            "label": "Haferflocken (1 Cup ≈ 90 g)"
-                      },
-                      {
-                            "value": "chocolateChips",
-                            "label": "Schokodrops / Chocolate Chips (1 Cup ≈ 175 g)"
-                      },
-                      {
-                            "value": "liquids",
-                            "label": "Flüssigkeiten (Milch, Wasser, Öl – 1 Cup ≈ 240 ml)"
-                      }
-                ]
-          }
+      {
+        id: "cupsAmount",
+        label: "Anzahl Cups",
+        type: "number",
+        defaultValue: 1,
+        min: 0,
+        max: 50,
+        step: 0.125,
+        unit: "Cups"
+      },
+      {
+        id: "cupType",
+        label: "Cup-Konvention",
+        type: "select",
+        defaultValue: "usCustomary",
+        options: [
+          { value: "usCustomary", label: "US Customary Cup (ca. 236,6 ml – Standard in US-Rezepten)" },
+          { value: "usLegal", label: "US Legal Cup (240,0 ml – US-Nährwertangaben FDA)" },
+          { value: "metric", label: "Metrischer Cup (250,0 ml – z. B. Australien, Neuseeland)" }
+        ]
+      },
+      {
+        id: "ingredient",
+        label: "Zutat",
+        type: "select",
+        defaultValue: "milk",
+        options: [
+          { value: "milk", label: "Vollmilch (Dichte ca. 1,03 g/ml)" },
+          { value: "water", label: "Wasser (Dichte ca. 1,00 g/ml)" },
+          { value: "oil", label: "Pflanzenöl / Speiseöl (Dichte ca. 0,92 g/ml)" },
+          { value: "flour", label: "Weizenmehl All-Purpose (ca. 125 g je US-Cup)" },
+          { value: "sugarWhite", label: "Weißer Kristallzucker (ca. 200 g je US-Cup)" },
+          { value: "sugarBrown", label: "Brauner Zucker / Packed (ca. 220 g je US-Cup)" },
+          { value: "sugarPowder", label: "Puderzucker / Confectioners (ca. 120 g je US-Cup)" },
+          { value: "butter", label: "Butter (ca. 227 g je US-Cup = 2 Sticks)" },
+          { value: "oats", label: "Haferflocken (ca. 90 g je US-Cup)" },
+          { value: "chocolateChips", label: "Schokodrops / Chocolate Chips (ca. 175 g je US-Cup)" }
+        ]
+      }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const cups = Number(inputs.cupsAmount) || 0;
-      const ing = inputs.ingredient;
-      
-      const cupWeights = {
-        flour: 125,
-        sugarWhite: 200,
-        sugarBrown: 220,
-        sugarPowder: 120,
-        butter: 227,
-        oats: 90,
-        chocolateChips: 175,
-        liquids: 240,
+      if (inputs.cupsAmount === undefined || inputs.cupsAmount === null || String(inputs.cupsAmount).trim() === '') {
+        return {
+          primary: { id: 'grams', label: 'Gewicht in Gramm (g)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine Cup-Menge ein.',
+        };
+      }
+
+      const cups = parseFloat(inputs.cupsAmount);
+      if (isNaN(cups)) {
+        return {
+          primary: { id: 'grams', label: 'Gewicht in Gramm (g)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Zahl als Cup-Menge ein.',
+        };
+      }
+
+      if (cups < 0) {
+        return {
+          primary: { id: 'grams', label: 'Gewicht in Gramm (g)', value: 0, formattedValue: '-' },
+          error: 'Die Cup-Menge darf nicht negativ sein.',
+        };
+      }
+
+      const cupType = inputs.cupType || 'usCustomary';
+      let mlPerCup = 236.588; // US customary cup
+      let conventionName = 'US Customary Cup (236,6 ml)';
+      if (cupType === 'usLegal') {
+        mlPerCup = 240.0;
+        conventionName = 'US Legal Cup (240 ml)';
+      } else if (cupType === 'metric') {
+        mlPerCup = 250.0;
+        conventionName = 'Metrischer Cup (250 ml)';
+      }
+
+      const ing = inputs.ingredient || 'milk';
+      const INGREDIENT_DATA: Record<string, { name: string; densityGPerMl?: number; baseCustomaryG?: number }> = {
+        milk: { name: 'Vollmilch', densityGPerMl: 1.03 },
+        water: { name: 'Wasser', densityGPerMl: 1.00 },
+        oil: { name: 'Pflanzenöl', densityGPerMl: 0.92 },
+        flour: { name: 'Weizenmehl (All-Purpose)', baseCustomaryG: 125 },
+        sugarWhite: { name: 'Weißer Kristallzucker', baseCustomaryG: 200 },
+        sugarBrown: { name: 'Brauner Zucker (gepackt)', baseCustomaryG: 220 },
+        sugarPowder: { name: 'Puderzucker', baseCustomaryG: 120 },
+        butter: { name: 'Butter', baseCustomaryG: 227 },
+        oats: { name: 'Haferflocken', baseCustomaryG: 90 },
+        chocolateChips: { name: 'Schokodrops', baseCustomaryG: 175 },
+        liquids: { name: 'Flüssigkeit (Milch/Wasser)', densityGPerMl: 1.015 },
       };
-      
-      const cupWeightsMap: Record<string, any> = cupWeights;
-      const gPerCup = cupWeightsMap[ing] || 125;
+
+      const data = INGREDIENT_DATA[ing] || { name: 'Zutat', baseCustomaryG: 125 };
+      let gPerCup = 125;
+      if (data.densityGPerMl !== undefined) {
+        gPerCup = mlPerCup * data.densityGPerMl;
+      } else if (data.baseCustomaryG !== undefined) {
+        gPerCup = data.baseCustomaryG * (mlPerCup / 236.588);
+      }
+
       const totalGrams = cups * gPerCup;
-      const mlVolume = cups * 236.588; // 1 US Legal Cup = ca. 240 ml, Customary = 236.6 ml
-      
+      const totalMl = cups * mlPerCup;
+
+      if (cups === 0) {
+        return {
+          primary: { id: 'grams', label: 'Gewicht in Gramm (g)', value: 0, formattedValue: '0 g', highlight: true },
+          secondary: [
+            { id: 'volumeMl', label: 'Volumen (ml)', value: 0, formattedValue: '0 ml' },
+            { id: 'perCup', label: 'Gewicht je Cup', value: Math.round(gPerCup), formattedValue: `ca. ${Math.round(gPerCup)} g / Cup` },
+          ],
+          summaryText: `0 Cups entsprechen 0 Gramm (Volumen 0 ml).`,
+        };
+      }
+
       return {
-        primary: { id: 'grams', label: 'Gewicht in Gramm (g)', value: totalGrams, formattedValue: formatNumber(totalGrams, 1) + ' g', highlight: true },
+        primary: {
+          id: 'grams',
+          label: 'Gewicht in Gramm (g)',
+          value: totalGrams,
+          formattedValue: formatNumber(totalGrams, 1) + ' g',
+          highlight: true,
+        },
         secondary: [
-          { id: 'volumeMl', label: 'Flüssigkeitsvolumen (ml)', value: mlVolume, formattedValue: formatNumber(mlVolume, 0) + ' ml' },
-          { id: 'perCup', label: 'Dichte je 1 Cup', value: gPerCup, formattedValue: gPerCup + ' g / Cup' },
+          {
+            id: 'volumeMl',
+            label: 'Volumen (ml)',
+            value: totalMl,
+            formattedValue: formatNumber(totalMl, 1) + ' ml',
+          },
+          {
+            id: 'perCup',
+            label: 'Gewicht je Cup',
+            value: Math.round(gPerCup * 10) / 10,
+            formattedValue: `ca. ${formatNumber(gPerCup, 1)} g / Cup`,
+          },
         ],
-        summaryText: cups + ' Cup(s) dieser Zutat entsprechen genau ' + formatNumber(totalGrams, 1) + ' Gramm (Volumen ca. ' + formatNumber(mlVolume, 0) + ' ml).',
+        summaryText: `${formatNumber(cups, 2)} Cup(s) ${data.name} (${conventionName}) entsprechen ungefähr ${formatNumber(totalGrams, 1)} Gramm (Volumen ca. ${formatNumber(totalMl, 0)} ml). Annahme: Richtwert für die Küchenpraxis.`,
       };
     },
-    formula: "Gewicht (g) = Cups × Zutatengewicht pro Cup; 1 US Cup = ca. 236,6 ml",
-    formulaExplanation: "Ein US-Cup ist ein reines Volumenmaß (ca. 240 ml). Da 240 ml lockeres Mehl viel leichter sind als 240 ml kompakter Zucker, wiegt ein Cup Mehl nur 125 g, während ein Cup Zucker 200 g wiegt.",
+    formula: "Gewicht (g) = Cups × Volumen je Cup (ml) × Dichte (g/ml); 1 US Customary Cup = ca. 236,6 ml",
+    formulaExplanation: "Ein Cup ist ein reines Volumenmaß (beim US customary cup rund 236,6 ml). Das resultierende Gewicht in Gramm hängt von der Dichte der jeweiligen Zutat ab. Für Vollmilch wird praxisnah eine Dichte von ca. 1,03 g/ml angenommen (1 US-Cup entspricht somit rund 244 g).",
     workedExample: {
-          "title": "Beispiel: US-Brownie-Rezept mit 1,5 Cups braunem Zucker und 1 Cup Mehl",
-          "inputValues": [
-                {
-                      "label": "Brauner Zucker",
-                      "value": "1,5 Cups"
-                },
-                {
-                      "label": "Mehl",
-                      "value": "1 Cup"
-                }
-          ],
-          "steps": [
-                "Brauner Zucker = 1,5 × 220 g = 330 g",
-                "Mehl = 1 × 125 g = 125 g"
-          ],
-          "result": "330 g brauner Zucker und 125 g Mehl"
+      title: "Beispiel: 1½ Cups Milch nach amerikanischem Rezept umrechnen",
+      inputValues: [
+        { label: "Menge", value: "1,5 Cups" },
+        { label: "Konvention", value: "US Customary Cup (236,6 ml)" },
+        { label: "Zutat", value: "Vollmilch (ca. 1,03 g/ml)" }
+      ],
+      steps: [
+        "Volumen ermitteln: 1,5 Cups × 236,588 ml = 354,88 ml ≈ 355 ml",
+        "Gewicht berechnen: 354,88 ml × 1,03 g/ml = 365,53 g ≈ 366 g"
+      ],
+      result: "1,5 Cups Milch entsprechen ungefähr 355 ml bzw. rund 366 Gramm."
     },
     content: {
-      intro: 'Dieser US-Backrechner übersetzt amerikanische Cup-Volumenmaße in Gramm für Mehl, braunen Zucker, Butter und Haferflocken.',
-      details: '1 US Legal Cup = 240 ml (Customary Cup = 236,6 ml). 1 Cup Mehl (All-Purpose Flour) wiegt ca. 125 g; 1 Cup Kristallzucker wiegt 200 g; 1 Cup Butter wiegt 227 g (exakt 2 Sticks à 1/2 Cup).',
+      intro: 'Dieser US-Backrechner übersetzt amerikanische Cup-Volumenmaße in Gramm für Milch, Wasser, Speiseöl, Mehl, Zucker und Butter. Eine ausführliche Umrechnungstabelle für verschiedene Milchmengen und Hinweise zu US-Customary- und 250-ml-Cups finden Sie in unserem Ratgeber [1 Cup Milch in Gramm: Umrechnung und Tabelle](/ratgeber/1-cup-milch-in-gramm/).',
+      details: '1 US Customary Cup = ca. 236,6 ml (8 fl oz); 1 US Legal Cup = 240 ml; 1 Metrischer Cup = 250 ml. Bei Vollmilch (Dichte ca. 1,03 g/ml) wiegt 1 US-Cup rund 244 g, während 1 metrischer Cup etwa 258 g wiegt. Trockene Zutaten wie Mehl (ca. 120–125 g) oder Zucker (ca. 200 g) haben deutlich abweichende Schüttgewichte.',
     },
     faqs: [
-      { question: 'Warum scheitern US-Rezepte oft, wenn man Cups mit dem Messbecher abmisst?', answer: 'Weil Mehl im Cup "gescoopt" (geschaufelt) bis zu 150 g wiegen kann, gelöffelt und abgestrichen aber nur 120 g (Abweichung bis zu 25 % Trockenmasse).' },
-      { question: 'Was wiegt 1 Stick Butter in US-Rezepten?', answer: '1 Stick Butter entspricht exakt 1/2 Cup bzw. 8 US-Esslöffeln und wiegt genau 113,4 Gramm.' },
+      { question: 'Wie viel Gramm wiegt 1 Cup Milch?', answer: '1 US Customary Cup (ca. 236,6 ml) Vollmilch wiegt bei einer angenommenen Dichte von 1,03 g/ml rund 244 Gramm. Bei einem metrischen Cup (250 ml) sind es etwa 258 Gramm.' },
+      { question: 'Warum scheitern US-Rezepte oft, wenn man Cups mit dem Messbecher abmisst?', answer: 'Weil Mehl im Cup "gescoopt" (geschaufelt) bis zu 150 g wiegen kann, gelöffelt und abgestrichen aber nur ca. 120 bis 125 g (Abweichung bis zu 25 % Trockenmasse).' },
+      { question: 'Was wiegt 1 Stick Butter in US-Rezepten?', answer: '1 Stick Butter entspricht exakt 1/2 US-Cup bzw. 8 US-Esslöffeln und wiegt genau 113,4 Gramm (1 ganzer Cup Butter = 2 Sticks = ca. 227 g).' },
     ],
-    relatedSlugs: ['eiweiss-eigelb-ersatz-rechner', 'essloeffel-teeloeffel-gramm-rechner', 'gramm-in-ml-rechner', 'portionsrechner'],
+    relatedSlugs: ['gramm-in-ml-rechner', 'essloeffel-teeloeffel-gramm-rechner', 'portionsrechner', 'backzeit-temperatur-umluft-oberhitze-rechner'],
   },
   {
     id: "zucker-ersatz-rechner",

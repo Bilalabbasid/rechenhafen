@@ -111,11 +111,7 @@ export default async function CalculatorPage({ params }: PageProps) {
     applicationCategory: 'CalculatorApplication',
     operatingSystem: 'All',
     browserRequirements: 'Erfordert aktiviertes JavaScript. Funktioniert in allen modernen Webbrowsern.',
-    offers: {
-      '@type': 'Offer',
-      price: '0.00',
-      priceCurrency: 'EUR',
-    },
+    isAccessibleForFree: true,
   };
 
   // Serverseitige Vorberechnung mit Standardwerten für 0ms LCP und CLS = 0
