@@ -104,6 +104,16 @@ const nextConfig: NextConfig = {
         statusCode: 301,
       },
       {
+        source: '/rechner/warmmiete-zu-kaltmiete-rechner',
+        destination: '/rechner/warmmiete-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        destination: '/rechner/warmmiete-rechner/',
+        permanent: true,
+      },
+      {
         source: '/rechner/tagerechner',
         destination: '/rechner/tage-zwischen-zwei-daten/',
         permanent: true,

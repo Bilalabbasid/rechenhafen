@@ -1100,29 +1100,28 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wie berechnet man den Zeitwert einer Einbauküche fair?', answer: 'Nach der linearen Abschreibung: Anschaffungspreis abzüglich ca. 24 % Wertverlust im ersten Jahr und danach jährlich ca. 8 % über eine Gesamtnutzungsdauer von 10 Jahren.' },
       { question: 'Darf der Vormieter den Mietvertrag an eine Abstandsübernahme koppeln?', answer: 'Nein, nur der Vermieter entscheidet über den Mietvertragsabschluss; Koppelungsgeschäfte durch Vormieter sind rechtlich unzulässig.' },
     ],
-    relatedSlugs: ['mietkaution-zinsen-rechner', 'warmmiete-zu-kaltmiete-rechner', 'mietbelastungsquote-rechner'],
+    relatedSlugs: ['mietkaution-zinsen-rechner', 'warmmiete-rechner', 'mietbelastungsquote-rechner'],
   },
 
   {
-    id: 'warmmiete-zu-kaltmiete-rechner',
-    slug: 'warmmiete-zu-kaltmiete-rechner',
-    name: 'Warmmiete berechnen & Kaltmiete Rechner',
+    id: 'warmmiete-rechner',
+    slug: 'warmmiete-rechner',
+    name: 'Warmmiete-Rechner (Warmmiete berechnen)',
     shortName: 'Warmmiete berechnen',
     category: 'wohnen-immobilien',
     subcategory: 'Miete & Mietrecht',
     metaTitle: 'Warmmiete berechnen: Kaltmiete, Nebenkosten & Heizung',
-    metaDescription: 'Warmmiete berechnen: Ermitteln Sie die monatliche Warmmiete aus Kaltmiete, kalten Nebenkosten und Heizkosten oder schlüsseln Sie die Kaltmiete auf.',
-    h1: 'Warmmiete berechnen: Kaltmiete, Nebenkosten & Heizkosten',
-    shortDescription: 'Berechnet die monatliche Warmmiete aus Grundkaltmiete, kalten Betriebskosten und Heizkosten oder schlüsselt die Warmmiete nach Quadratmetern auf.',
+    metaDescription: 'Warmmiete berechnen: Ermitteln Sie die monatliche und jährliche Warmmiete aus Kaltmiete, kalten Nebenkosten und Heizkosten mit Formel & Aufschlüsselung.',
+    h1: 'Warmmiete berechnen',
+    shortDescription: 'Berechnet die monatliche und jährliche Warmmiete aus Kaltmiete, kalten Betriebskosten und Heizkosten transparent nach der Betriebskostenverordnung.',
     searchKeywords: [
       'warmmiete berechnen',
       'warmmiete rechner',
-      'warmmiete zu kaltmiete rechner',
-      'kaltmiete aus warmmiete berechnen',
-      'kaltmiete in warmmiete umrechnen',
       'warmmiete formel',
+      'kaltmiete in warmmiete umrechnen',
       'nebenkosten warmmiete berechnen',
-      'bruttomiete nettomiete',
+      'bruttowarmmiete rechner',
+      'kaltmiete betriebskosten heizkosten',
     ],
     inputs: [
       {
@@ -1138,38 +1137,50 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       // Modus 1 Inputs
       {
         id: 'coldRentInput',
-        label: 'Nettokaltmiete (Grundmiete in €)',
+        label: 'Kaltmiete pro Monat',
         type: 'number',
         defaultValue: 750,
         min: 0,
         max: 50000,
         step: 25,
         unit: '€',
-        helpText: 'Reine Miete für die Raumnutzung ohne Nebenkosten.',
+        helpText: 'Vereinbarte Nettokaltmiete für die Wohnraumnutzung ohne Nebenkosten.',
         dependsOn: { field: 'calculationMode', value: 'warm_from_components' },
       },
       {
         id: 'operatingCosts',
-        label: 'Kalte Betriebskosten (Nebenkosten in €)',
+        label: 'Betriebskosten / kalte Nebenkosten pro Monat',
         type: 'number',
         defaultValue: 150,
         min: 0,
         max: 10000,
         step: 10,
         unit: '€',
-        helpText: 'Müllabfuhr, Grundsteuer, Hausmeister, Wasser/Abwasser, Sach- & Haftpflichtversicherung etc.',
+        helpText: 'Müllabfuhr, Grundsteuer, Hausmeister, Sachversicherungen, Wasser/Abwasser etc.',
         dependsOn: { field: 'calculationMode', value: 'warm_from_components' },
       },
       {
         id: 'heatingCosts',
-        label: 'Heiz- und Warmwasserkosten (in €)',
+        label: 'Heizkosten pro Monat',
         type: 'number',
         defaultValue: 120,
         min: 0,
         max: 10000,
         step: 10,
         unit: '€',
-        helpText: 'Monatliche Vorauszahlung für Heizung und Warmwasserbereitung.',
+        helpText: 'Monatliche Vorauszahlung für Heizung und zentrale Warmwasserbereitung.',
+        dependsOn: { field: 'calculationMode', value: 'warm_from_components' },
+      },
+      {
+        id: 'otherOperatingCosts',
+        label: 'Sonstige umlagefähige Kosten (optional)',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        max: 5000,
+        step: 5,
+        unit: '€',
+        helpText: 'Zusätzliche umlagefähige Betriebskosten nach § 2 Nr. 17 BetrKV (z. B. Gartenpflege, Fahrstuhl, Treppenhausreinigung).',
         dependsOn: { field: 'calculationMode', value: 'warm_from_components' },
       },
       {
@@ -1181,13 +1192,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         max: 500,
         step: 5,
         unit: 'm²',
-        helpText: 'Ermöglicht den direkten Quadratmeter-Kostenvergleich (€/m²).',
+        helpText: 'Ermöglicht den direkten Quadratmeter-Kostenvergleich (€/m² warm & kalt).',
         dependsOn: { field: 'calculationMode', value: 'warm_from_components' },
       },
       // Modus 2 Inputs
       {
         id: 'warmRent',
-        label: 'Monatliche Warmmiete (Bruttomiete in €)',
+        label: 'Monatliche Warmmiete (in €)',
         type: 'number',
         defaultValue: 1020,
         min: 50,
@@ -1231,66 +1242,88 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         const utilities = area * rate;
         const coldRent = Math.max(0, warm - utilities);
         const coldRentPerSqm = area > 0 ? coldRent / area : 0;
+        const warmPerSqm = area > 0 ? warm / area : 0;
+        const warmYearly = warm * 12;
+
         return {
           primary: { id: 'coldRent', label: 'Errechnete Kaltmiete (Nettomiete)', value: coldRent, formattedValue: formatCurrency(coldRent), highlight: true },
           secondary: [
-            { id: 'utilities', label: 'Nebenkostenvorauszahlung (2. Miete)', value: utilities, formattedValue: formatCurrency(utilities) },
+            { id: 'warmRent', label: 'Warmmiete pro Monat', value: warm, formattedValue: formatCurrency(warm) },
+            { id: 'warmRentYearly', label: 'Warmmiete pro Jahr', value: warmYearly, formattedValue: formatCurrency(warmYearly) },
+            { id: 'utilities', label: 'Geschätzte Nebenkostenvorauszahlung', value: utilities, formattedValue: formatCurrency(utilities) },
             { id: 'coldRentPerSqm', label: 'Kaltmiete pro m²', value: coldRentPerSqm, formattedValue: `${formatNumber(coldRentPerSqm, 2)} €/m²` },
-            { id: 'utilPct', label: 'Anteil der Nebenkosten an Warmmiete', value: warm > 0 ? (utilities / warm) * 100 : 0, formattedValue: formatPercent(warm > 0 ? (utilities / warm) * 100 : 0, 1) },
+            { id: 'warmRentPerSqm', label: 'Warmmiete pro m²', value: warmPerSqm, formattedValue: `${formatNumber(warmPerSqm, 2)} €/m²` },
+            { id: 'utilPct', label: 'Anteil der Nebenkosten an der Warmmiete', value: warm > 0 ? (utilities / warm) * 100 : 0, formattedValue: formatPercent(warm > 0 ? (utilities / warm) * 100 : 0, 1) },
           ],
-          directAnswer: `Bei einer Warmmiete von ${formatCurrency(warm)} für ${area} m² Wohnfläche entfallen bei ca. ${formatNumber(rate, 2)} €/m² Nebenkosten rund ${formatCurrency(utilities)} auf Nebenkosten und ${formatCurrency(coldRent)} auf die reine Nettokaltmiete.`,
+          directAnswer: `Bei einer Warmmiete von ${formatCurrency(warm)} für ${area} m² Wohnfläche entfallen bei ca. ${formatNumber(rate, 2)} €/m² Nebenkosten rund ${formatCurrency(utilities)} auf Nebenkosten und rechnerisch ${formatCurrency(coldRent)} auf die reine Nettokaltmiete.`,
+          basisSummary: [
+            { label: 'Berechnungsmodus', value: 'Kaltmiete aus Warmmiete aufschlüsseln' },
+            { label: 'Monatliche Warmmiete', value: formatCurrency(warm) },
+            { label: 'Wohnfläche', value: `${area} m²` },
+            { label: 'Nebenkostensatz pro m²', value: `${formatNumber(rate, 2)} €/m²` },
+          ],
           summaryText: `Bei ${formatCurrency(warm)} Warmmiete für ${area} m² entfallen ca. ${formatCurrency(utilities)} auf Nebenkosten und ${formatCurrency(coldRent)} auf die reine Nettokaltmiete (${formatNumber(coldRentPerSqm, 2)} €/m²).`,
         };
       }
 
       // Modus 1: Warmmiete berechnen
-      const cold = parseFloat(inputs.coldRentInput) || 0;
-      const coldUtils = parseFloat(inputs.operatingCosts) || 0;
-      const heating = parseFloat(inputs.heatingCosts) || 0;
-      const area = parseFloat(inputs.livingAreaMode1) || 70;
+      const cold = Math.max(0, parseFloat(inputs.coldRentInput) || 0);
+      const coldUtils = Math.max(0, parseFloat(inputs.operatingCosts) || 0);
+      const heating = Math.max(0, parseFloat(inputs.heatingCosts) || 0);
+      const otherCosts = Math.max(0, parseFloat(inputs.otherOperatingCosts) || 0);
+      const area = Math.max(0, parseFloat(inputs.livingAreaMode1) || 0);
 
-      const totalUtilities = coldUtils + heating;
+      const totalUtilities = coldUtils + heating + otherCosts;
       const warmRent = cold + totalUtilities;
+      const warmRentYearly = warmRent * 12;
       const warmPerSqm = area > 0 ? warmRent / area : 0;
       const coldPerSqm = area > 0 ? cold / area : 0;
       const utilPct = warmRent > 0 ? (totalUtilities / warmRent) * 100 : 0;
 
-      return {
-        primary: {
-          id: 'warmRent',
-          label: 'Monatliche Warmmiete (Bruttomiete)',
-          value: warmRent,
-          formattedValue: formatCurrency(warmRent),
-          highlight: true,
-          helpText: 'Gesamte monatliche Zahlungsverpflichtung an den Vermieter (Kaltmiete + Nebenkosten + Heizung)',
+      const secondaryItems = [
+        {
+          id: 'coldRent',
+          label: 'Kaltmiete',
+          value: cold,
+          formattedValue: formatCurrency(cold),
+          helpText: 'Reine Grundmiete ohne Nebenkosten',
         },
-        secondary: [
-          {
-            id: 'coldRent',
-            label: 'Nettokaltmiete (Grundmiete)',
-            value: cold,
-            formattedValue: formatCurrency(cold),
-          },
-          {
-            id: 'totalUtilities',
-            label: 'Gesamte Nebenkostenvorauszahlung (2. Miete)',
-            value: totalUtilities,
-            formattedValue: formatCurrency(totalUtilities),
-            highlight: true,
-            helpText: `${formatCurrency(coldUtils)} kalte Betriebskosten + ${formatCurrency(heating)} Heizkosten`,
-          },
-          {
-            id: 'heatingCosts',
-            label: 'Darin enthaltene Heiz- & Warmwasserkosten',
-            value: heating,
-            formattedValue: formatCurrency(heating),
-          },
-          {
-            id: 'operatingCosts',
-            label: 'Darin enthaltene kalte Betriebskosten',
-            value: coldUtils,
-            formattedValue: formatCurrency(coldUtils),
-          },
+        {
+          id: 'operatingCosts',
+          label: 'Kalte Nebenkosten',
+          value: coldUtils,
+          formattedValue: formatCurrency(coldUtils),
+          helpText: 'Müll, Grundsteuer, Hausmeister, Wasser/Abwasser',
+        },
+        {
+          id: 'heatingCosts',
+          label: 'Heizkosten',
+          value: heating,
+          formattedValue: formatCurrency(heating),
+          helpText: 'Vorauszahlung für Heizung und Warmwasser',
+        },
+        ...(otherCosts > 0 ? [{
+          id: 'otherOperatingCosts',
+          label: 'Sonstige umlagefähige Kosten',
+          value: otherCosts,
+          formattedValue: formatCurrency(otherCosts),
+          helpText: 'Sonstige Betriebskosten nach § 2 Nr. 17 BetrKV',
+        }] : []),
+        {
+          id: 'warmRentYearly',
+          label: 'Warmmiete pro Jahr',
+          value: warmRentYearly,
+          formattedValue: formatCurrency(warmRentYearly),
+          highlight: true,
+          helpText: '12 Monats-Warmmieten als jährliche Gesamtsumme',
+        },
+        {
+          id: 'totalUtilities',
+          label: 'Gesamte Nebenkosten pro Monat',
+          value: totalUtilities,
+          formattedValue: formatCurrency(totalUtilities),
+        },
+        ...(area > 0 ? [
           {
             id: 'warmRentPerSqm',
             label: 'Warmmiete pro m²',
@@ -1303,55 +1336,93 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
             value: coldPerSqm,
             formattedValue: `${formatNumber(coldPerSqm, 2)} €/m²`,
           },
-          {
-            id: 'utilPct',
-            label: 'Anteil der Nebenkosten an der Warmmiete',
-            value: utilPct,
-            formattedValue: formatPercent(utilPct, 1),
-          },
-        ],
-        directAnswer: `Aus einer Kaltmiete von ${formatCurrency(cold)}, kalten Betriebskosten von ${formatCurrency(coldUtils)} und Heizkosten von ${formatCurrency(heating)} ergibt sich eine monatliche Warmmiete von ${formatCurrency(warmRent)} (Nebenkosten gesamt: ${formatCurrency(totalUtilities)} bzw. ${formatPercent(utilPct, 1)} der Warmmiete).`,
+        ] : []),
+        {
+          id: 'utilPct',
+          label: 'Anteil der Nebenkosten an der Warmmiete',
+          value: utilPct,
+          formattedValue: formatPercent(utilPct, 1),
+        },
+      ];
+
+      return {
+        primary: {
+          id: 'warmRent',
+          label: 'Warmmiete pro Monat',
+          value: warmRent,
+          formattedValue: formatCurrency(warmRent),
+          highlight: true,
+          helpText: 'Gesamte monatliche Zahlungsverpflichtung (Kaltmiete + kalte Nebenkosten + Heizkosten)',
+        },
+        secondary: secondaryItems,
+        directAnswer: `Aus ${formatCurrency(cold)} Kaltmiete, ${formatCurrency(coldUtils)} kalten Nebenkosten und ${formatCurrency(heating)} Heizkosten${otherCosts > 0 ? ` sowie ${formatCurrency(otherCosts)} sonstigen Betriebskosten` : ''} ergibt sich eine monatliche Warmmiete von ${formatCurrency(warmRent)} (${formatCurrency(warmRentYearly)} pro Jahr).`,
         qualifications: [
-          'Warmmiete = Kaltmiete + kalte Betriebskosten + Heiz- und Warmwasserkosten.',
-          'Haushaltsstrom und Telekommunikation (Internet, Festnetz) sind in der Warmmiete üblicherweise nicht enthalten und müssen vom Mieter separat bezahlt werden.',
-          'Die Nebenkosten sind eine monatliche Vorauszahlung; die endgültige Abrechnung erfolgt einmal jährlich durch den Vermieter.',
+          'Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten.',
+          'Die genaue Zusammensetzung richtet sich nach dem Mietvertrag und der jährlichen Betriebskostenabrechnung.',
+          'Haushaltsstrom und Internet sind in der Warmmiete üblicherweise nicht enthalten und müssen separat bezahlt werden.',
         ],
         calculationSteps: [
-          `Gesamte Nebenkosten = ${formatCurrency(coldUtils)} kalte Betriebskosten + ${formatCurrency(heating)} Heizkosten = ${formatCurrency(totalUtilities)}`,
-          `Warmmiete = ${formatCurrency(cold)} Kaltmiete + ${formatCurrency(totalUtilities)} Nebenkosten = ${formatCurrency(warmRent)}`,
-          area > 0 ? `Quadratmeterpreis = ${formatCurrency(warmRent)} ÷ ${area} m² = ${formatNumber(warmPerSqm, 2)} €/m² Warmmiete (${formatNumber(coldPerSqm, 2)} €/m² Kaltmiete)` : '',
+          `Kalte Nebenkosten + Heizkosten${otherCosts > 0 ? ' + Sonstige Kosten' : ''} = ${formatCurrency(coldUtils)} + ${formatCurrency(heating)}${otherCosts > 0 ? ` + ${formatCurrency(otherCosts)}` : ''} = ${formatCurrency(totalUtilities)} monatliche Nebenkosten`,
+          `Warmmiete pro Monat = ${formatCurrency(cold)} Kaltmiete + ${formatCurrency(totalUtilities)} Nebenkosten = ${formatCurrency(warmRent)}`,
+          `Warmmiete pro Jahr = ${formatCurrency(warmRent)} × 12 Monate = ${formatCurrency(warmRentYearly)}`,
+          area > 0 ? `Warmmiete pro m² = ${formatCurrency(warmRent)} ÷ ${area} m² = ${formatNumber(warmPerSqm, 2)} €/m² (${formatNumber(coldPerSqm, 2)} €/m² Kaltmiete)` : '',
         ].filter(Boolean),
         basisSummary: [
-          { label: 'Berechnungsmodus', value: 'Warmmiete aus Kaltmiete, Nebenkosten & Heizung berechnen' },
-          { label: 'Nettokaltmiete', value: formatCurrency(cold) },
-          { label: 'Kalte Betriebskosten', value: formatCurrency(coldUtils) },
-          { label: 'Heiz- & Warmwasserkosten', value: formatCurrency(heating) },
-          { label: 'Nebenkosten gesamt', value: formatCurrency(totalUtilities) },
-          { label: 'Wohnfläche', value: `${area} m²` },
+          { label: 'Berechnungsmodus', value: 'Warmmiete aus Kaltmiete & Nebenkosten berechnen' },
+          { label: 'Kaltmiete pro Monat', value: formatCurrency(cold) },
+          { label: 'Kalte Nebenkosten pro Monat', value: formatCurrency(coldUtils) },
+          { label: 'Heizkosten pro Monat', value: formatCurrency(heating) },
+          ...(otherCosts > 0 ? [{ label: 'Sonstige umlagefähige Kosten', value: formatCurrency(otherCosts) }] : []),
+          ...(area > 0 ? [{ label: 'Wohnfläche', value: `${area} m²` }] : []),
         ],
-        summaryText: `Bei einer Nettokaltmiete von ${formatCurrency(cold)}, kalten Betriebskosten von ${formatCurrency(coldUtils)} und Heizkosten von ${formatCurrency(heating)} beträgt die monatliche Warmmiete ${formatCurrency(warmRent)}. Die gesamten Nebenkosten belaufen sich auf ${formatCurrency(totalUtilities)} monatlich (${formatPercent(utilPct, 1)} der Gesamtmiete). Bei ${area} m² Wohnfläche entspricht dies ${formatNumber(warmPerSqm, 2)} €/m² Warmmiete.`,
+        summaryText: `Bei einer Kaltmiete von ${formatCurrency(cold)}, kalten Nebenkosten von ${formatCurrency(coldUtils)} und Heizkosten von ${formatCurrency(heating)}${otherCosts > 0 ? ` sowie ${formatCurrency(otherCosts)} sonstigen Kosten` : ''} beträgt die Warmmiete ${formatCurrency(warmRent)} pro Monat bzw. ${formatCurrency(warmRentYearly)} pro Jahr.`,
       };
     },
-    formula: 'Warmmiete = Kaltmiete + kalte Betriebskosten + Heizkosten',
-    formulaExplanation: 'Die Warmmiete (Bruttomiete) umfasst die reine Kaltmiete für die Raumnutzung zuzüglich aller umlegbaren Betriebskosten nach der Betriebskostenverordnung (BetrKV) sowie der Heiz- und Warmwasserkosten.',
+    formula: 'Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten',
+    formulaExplanation: 'Die Warmmiete (Bruttomiete) ergibt sich aus der reinen Nettokaltmiete zuzüglich der monatlichen Vorauszahlungen für kalte Betriebskosten sowie Heizung und Warmwasser nach der Betriebskostenverordnung (BetrKV).',
     workedExample: {
       title: 'Beispiel: 750 € Kaltmiete, 150 € kalte Nebenkosten und 120 € Heizkosten für 70 m²',
-      inputValues: [{ label: 'Kaltmiete', value: '750 €' }, { label: 'Kalte Nebenkosten', value: '150 €' }, { label: 'Heizkosten', value: '120 €' }, { label: 'Wohnfläche', value: '70 m²' }],
-      steps: ['Nebenkosten gesamt = 150 € + 120 € = 270 €', 'Warmmiete = 750 € + 270 € = 1.020 € (14,57 €/m² warm, 10,71 €/m² kalt)'],
-      result: '1.020,00 € monatliche Warmmiete (270,00 € Nebenkostenanteil)',
+      inputValues: [
+        { label: 'Kaltmiete pro Monat', value: '750 €' },
+        { label: 'Kalte Nebenkosten', value: '150 €' },
+        { label: 'Heizkosten pro Monat', value: '120 €' },
+        { label: 'Wohnfläche', value: '70 m²' },
+      ],
+      steps: [
+        'Nebenkosten gesamt = 150 € kalte Nebenkosten + 120 € Heizkosten = 270 €',
+        'Warmmiete pro Monat = 750 € Kaltmiete + 270 € Nebenkosten = 1.020,00 €',
+        'Warmmiete pro Jahr = 1.020 € × 12 Monate = 12.240,00 €',
+        'Quadratmeterpreis = 1.020 € ÷ 70 m² = 14,57 €/m² warm (10,71 €/m² kalt)',
+      ],
+      result: '1.020,00 € monatliche Warmmiete (12.240,00 € Warmmiete pro Jahr)',
     },
     content: {
-      intro: '„Warmmiete berechnen“: Die monatliche Warmmiete (Bruttowarmmiete) beziffert den tatsächlichen Gesamtbetrag, den Sie als Mieter jeden Monat an den Vermieter überweisen. Mit unserem kostenlosen Rechner ermitteln Sie Ihre Warmmiete transparent aus Nettokaltmiete, kalten Nebenkosten und Heizkosten oder schlüsseln eine bestehende Warmmiete nach Quadratmetern auf.',
-      details: 'Formel: Warmmiete = Kaltmiete + kalte Betriebskosten + Heizkosten. Die Kaltmiete deckt ausschließlich die Raumnutzung ab und bildet die Vergleichsgröße für den örtlichen Mietspiegel und die Mietpreisbremse. Die Nebenkostenvorauszahlung („zweite Miete“) umfasst kalte Betriebskosten (Müllabfuhr, Grundsteuer, Wasser/Abwasser, Hausmeister) sowie Heizungs- und Warmwasserkosten.',
+      intro: 'Die monatliche Warmmiete beziffert den Gesamtbetrag, den Sie als Mieter jeden Monat an den Vermieter überweisen. Mit unserem Warmmiete-Rechner ermitteln Sie Ihre Warmmiete transparent aus Kaltmiete, kalten Nebenkosten und Heizkosten – inklusive jährlicher Gesamtsumme und Quadratmeterpreisen. Die exakte Zusammensetzung hängt stets vom Mietvertrag und der jährlichen Betriebskostenabrechnung ab.',
+      details: 'Formel: Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten. Die Kaltmiete (Nettomiete) vergütet ausschließlich die Raumnutzung und dient als Referenz für Mietspiegel und Mietpreisbremse. Die Nebenkostenvorauszahlung umfasst kalte Betriebskosten (Müll, Grundsteuer, Hausmeister, Wasser/Abwasser) sowie Heizungs- und Warmwasserkosten gemäß der Betriebskostenverordnung (BetrKV). Prüfen Sie mit dem [Mietbelastungsquote Rechner](/rechner/mietbelastungsquote-rechner/) auch, ob die Miete zu Ihrem Gehalt passt, kalkulieren Sie Kaufnebenkosten mit dem [Kaufnebenkosten Rechner](/rechner/kaufnebenkosten-rechner/) oder vergleichen Sie Optionen im [Mietbudget Rechner](/rechner/mietbudget-rechner/).',
     },
     faqs: [
-      { question: 'Wie berechnet man die Warmmiete genau?', answer: 'Die Formel lautet: Warmmiete = Kaltmiete + kalte Betriebskosten + Heizkosten. Addieren Sie zur vereinbarten Nettokaltmiete die Vorauszahlungen für kalte Nebenkosten und Heizung laut Mietvertrag.' },
-      { question: 'Was ist der Unterschied zwischen Warmmiete und Kaltmiete?', answer: 'Die Kaltmiete (Nettomiete) ist der reine Preis für die Raumnutzung. Die Warmmiete (Bruttomiete) enthält zusätzlich alle Betriebskosten (Müll, Grundsteuer, Wasser) und Heizkosten, die monatlich als Abschlag an den Vermieter fließen.' },
-      { question: 'Ist Strom in der Warmmiete enthalten?', answer: 'In Deutschland ist Haushaltsstrom (für Beleuchtung, Fernseher, Waschmaschine) fast nie in der Warmmiete enthalten. Mieter schließen einen eigenen Vertrag mit einem Stromanbieter ab. Nur der Allgemeinstrom im Treppenhaus ist Teil der Betriebskosten.' },
-      { question: 'Darf der Vermieter bei gestiegenen Energiepreisen die Vorauszahlungen anheben?', answer: 'Nach § 560 Abs. 4 BGB darf jede Partei nach einer Abrechnung durch schriftliche Erklärung eine Anpassung der Vorauszahlungen auf eine angemessene Höhe vornehmen.' },
-      { question: 'Welche Posten gehören zu den kalten Nebenkosten?', answer: 'Grundsteuer, Wasser/Abwasser, Müllabfuhr, Gebäudeversicherung, Straßenreinigung, Hausmeister, Gartenpflege, Beleuchtung und Schornsteinreinigung nach der Betriebskostenverordnung (BetrKV).' },
+      {
+        question: 'Wie berechnet man die Warmmiete genau?',
+        answer: 'Die Grundformel lautet: Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten. Addieren Sie zur vereinbarten Nettokaltmiete die Vorauszahlungen für kalte Betriebskosten und die Heiz- und Warmwasserkosten laut Mietvertrag.',
+      },
+      {
+        question: 'Was ist der Unterschied zwischen Warmmiete und Kaltmiete?',
+        answer: 'Die Kaltmiete (Nettomiete) ist der reine Preis für die Überlassung der Wohnräume. Die Warmmiete (Bruttomiete) umfasst zusätzlich alle laufenden kalten Betriebskosten sowie die Heiz- und Warmwasserkosten, die monatlich als Abschlag an den Vermieter gezahlt werden.',
+      },
+      {
+        question: 'Welche Kosten gehören zu den kalten Nebenkosten?',
+        answer: 'Zu den kalten Betriebskosten nach § 2 BetrKV zählen unter anderem Grundsteuer, Müllabfuhr, Wasser und Abwasser, Sach- und Haftpflichtversicherungen des Gebäudes, Straßenreinigung, Hausmeisterdienst und Gartenpflege.',
+      },
+      {
+        question: 'Ist Haushaltsstrom in der Warmmiete enthalten?',
+        answer: 'Nein, Haushaltsstrom für Lampen, Haushaltsgeräte und Elektronik ist fast nie Teil der Warmmiete. Mieter schließen hierfür einen separaten Liefervertrag mit einem Stromanbieter ab. Lediglich der Allgemeinstrom für Treppenhausbeleuchtung und Aufzug ist in den Betriebskosten enthalten.',
+      },
+      {
+        question: 'Warum weicht die tatsächliche Jahresabrechnung von der Warmmiete ab?',
+        answer: 'Die in der Warmmiete enthaltenen Nebenkosten sind in der Regel monatliche Vorauszahlungen. Einmal jährlich rechnet der Vermieter die tatsächlichen Kosten ab (Betriebskostenabrechnung). Bei Mehr- oder Minderverbrauch an Wärme oder gestiegenen Preisen kommt es zu einer Nachzahlung oder einem Guthaben.',
+      },
     ],
-    relatedSlugs: ['mietbelastungsquote-rechner', 'mietbudget-rechner', 'untermiete-rechner', 'co2-abgabe-vermieter-mieter-rechner', 'mietminderung-rechner', 'stromkostenrechner'],
+    relatedSlugs: ['mietbelastungsquote-rechner', 'mietbudget-rechner', 'kaufnebenkosten-rechner', 'untermiete-rechner', 'stromkostenrechner', 'heizkostenvergleich-rechner'],
   },
 
   {
@@ -1408,7 +1479,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Benötigt man für die Untervermietung die Erlaubnis des Vermieters?', answer: 'Ja, nach § 553 BGB muss die Erlaubnis eingeholt werden. Bei berechtigtem Interesse (z. B. finanzielle Entlastung, Auslandsaufenthalt) hat der Mieter jedoch einen Rechtsanspruch auf Genehmigung.' },
       { question: 'Müssen Mieteinnahmen aus Untervermietung versteuert werden?', answer: 'Einnahmen aus Untervermietung müssen in der Steuererklärung angegeben werden; die eigene gezahlte Miete für das Zimmer kann jedoch als Werbungskosten voll gegengerechnet werden.' },
     ],
-    relatedSlugs: ['warmmiete-zu-kaltmiete-rechner', 'mietminderung-rechner', 'mietkaution-zinsen-rechner'],
+    relatedSlugs: ['warmmiete-rechner', 'mietminderung-rechner', 'mietkaution-zinsen-rechner'],
   },
 
   {
@@ -2891,7 +2962,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wie ermittelt der Vermieter die CO₂-Einstufung des Gebäudes?', answer: 'Anhand der CO₂-Menge aus der Brennstoffrechnung geteilt durch die Wohnfläche. Die Stufentabelle im CO2KostAufG weist den genauen prozentualen Verteilungsschlüssel aus.' },
       { question: 'Darf der Vermieter seinen CO₂-Anteil auf den Mieter abwälzen?', answer: 'Nein, vertragliche Vereinbarungen, die dem Mieter einen höheren CO₂-Kostenanteil auferlegen als gesetzlich vorgeschrieben, sind nach § 3 CO2KostAufG unwirksam.' },
     ],
-    relatedSlugs: ['gasverbrauch-kwh-m3-rechner', 'warmmiete-zu-kaltmiete-rechner', 'heizkostenvergleich-rechner'],
+    relatedSlugs: ['gasverbrauch-kwh-m3-rechner', 'warmmiete-rechner', 'heizkostenvergleich-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

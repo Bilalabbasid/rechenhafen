@@ -14,19 +14,37 @@ import ratgeberStyles from '@/styles/ratgeber.module.css';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'RechenHafen – Alle Rechner an einem Ort | Kostenlose Online-Rechner',
+    absolute: 'RechenHafen – Alle Rechner an einem Ort',
   },
-  description: 'Über 400 präzise Online-Rechner für Deutschland: Steuern, Gehalt, Finanzen, Zinsen, Brutto-Netto, Gesundheit, Datum, Geometrie und Alltag. Schnell, verlässlich & kostenlos.',
+  description:
+    'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
   alternates: {
     canonical: 'https://rechenhafen.de/',
   },
   openGraph: {
     title: 'RechenHafen – Alle Rechner an einem Ort',
-    description: 'Kostenlose, datenschutzfreundliche Online-Rechner für Alltag, Finanzen, Beruf und Mathematik in Deutschland.',
+    description:
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
     url: 'https://rechenhafen.de/',
     siteName: 'RechenHafen',
     locale: 'de_DE',
     type: 'website',
+    images: [
+      {
+        url: 'https://rechenhafen.de/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'RechenHafen – Kostenlose Online-Rechner',
+        type: 'image/jpeg',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'RechenHafen – Alle Rechner an einem Ort',
+    description:
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+    images: ['https://rechenhafen.de/og-image.jpg'],
   },
 };
 

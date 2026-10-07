@@ -211,6 +211,7 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "vorfaelligkeitsentschaedigung-baufinanzierung-rechner": "extraWohnenHaushalt",
   "abstandszahlung-rechner": "extraWohnenHaushalt",
   "warmmiete-zu-kaltmiete-rechner": "extraWohnenHaushalt",
+  "warmmiete-rechner": "extraWohnenHaushalt",
   "untermiete-rechner": "extraWohnenHaushalt",
   "erbbaurecht-erbbauzins-rechner": "extraWohnenHaushalt",
   "kaufpreis-faktor-rechner": "extraWohnenHaushalt",

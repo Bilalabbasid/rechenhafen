@@ -40,16 +40,28 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'RechenHafen – Alle Rechner an einem Ort',
-    description: 'Hunderte kostenlose deutsche Online-Rechner für Finanzen, Mobilität, Gesundheit und Alltag.',
-    url: 'https://rechenhafen.de',
+    description:
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+    url: 'https://rechenhafen.de/',
     siteName: 'RechenHafen',
     locale: 'de_DE',
     type: 'website',
+    images: [
+      {
+        url: 'https://rechenhafen.de/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'RechenHafen – Kostenlose Online-Rechner',
+        type: 'image/jpeg',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RechenHafen – Alle Rechner an einem Ort',
-    description: 'Präzise deutsche Online-Rechner für Finanzen, Mobilität, Mathematik und Alltag.',
+    description:
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+    images: ['https://rechenhafen.de/og-image.jpg'],
   },
   robots: {
     index: true,

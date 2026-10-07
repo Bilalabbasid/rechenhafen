@@ -6391,28 +6391,34 @@
       "seoNotes": null
     },
     {
-      "slug": "warmmiete-zu-kaltmiete-rechner",
-      "name": "Warmmiete zu Kaltmiete-Rechner (Betriebskostenspiegel)",
-      "url": "/rechner/warmmiete-zu-kaltmiete-rechner/",
+      "slug": "warmmiete-rechner",
+      "name": "Warmmiete-Rechner (Warmmiete berechnen)",
+      "url": "/rechner/warmmiete-rechner/",
       "category": "wohnen-immobilien",
       "categoryName": "Wohnen & Immobilien",
-      "tier": 3,
+      "tier": 2,
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": true,
-      "primaryKeyword": "warmmiete zu kaltmiete rechner",
+      "primaryKeyword": "warmmiete berechnen",
       "secondaryKeywords": [
-        "kaltmiete aus warmmiete berechnen",
-        "betriebskostenspiegel nebenkosten pro qm",
-        "bruttomiete nettomiete"
+        "warmmiete rechner",
+        "kaltmiete in warmmiete umrechnen",
+        "nebenkosten warmmiete berechnen",
+        "warmmiete formel"
       ],
-      "longtailKeywords": [],
-      "questionKeywords": [],
+      "longtailKeywords": [
+        "warmmiete aus kaltmiete und nebenkosten berechnen"
+      ],
+      "questionKeywords": [
+        "wie berechnet man die warmmiete"
+      ],
       "allKeywords": [
-        "warmmiete zu kaltmiete rechner",
-        "kaltmiete aus warmmiete berechnen",
-        "betriebskostenspiegel nebenkosten pro qm",
-        "bruttomiete nettomiete"
+        "warmmiete berechnen",
+        "warmmiete rechner",
+        "kaltmiete in warmmiete umrechnen",
+        "nebenkosten warmmiete berechnen",
+        "warmmiete formel"
       ],
       "serpCompetitors": [],
       "volumeDeMonthlyEstimate": "NOT VERIFIED",
@@ -12683,7 +12689,7 @@
     },
     {
       "slug": "alkohol-verkochungs-rechner",
-      "name": "Alkohol-Verkochungs-Rechner (Restalkohol in Saucen & Schmorgerichten)",
+      "name": "Alkohol beim Kochen & Backen Rechner (Verdampfung in Saucen)",
       "url": "/rechner/alkohol-verkochungs-rechner/",
       "category": "kochen-backen",
       "categoryName": "Kochen & Backen",
@@ -12691,19 +12697,21 @@
       "intent": "transactional",
       "serpType": "calculator",
       "ymyl": false,
-      "primaryKeyword": "alkohol verkochen rechner usda tabelle",
+      "primaryKeyword": "alkohol beim kochen verdampfen",
       "secondaryKeywords": [
-        "wieviel restalkohol nach 30 minuten kochen rotwein",
-        "verkocht alkohol vollstaendig schmorgericht",
-        "sauce mit wein fuer kinder schwangere restalkohol"
+        "alkohol verkochen tabelle usda",
+        "wie viel alkohol verkocht beim kochen",
+        "rotweinsauce alkoholgehalt nach kochzeit",
+        "alkohol beim backen verfluechtigen"
       ],
       "longtailKeywords": [],
       "questionKeywords": [],
       "allKeywords": [
-        "alkohol verkochen rechner usda tabelle",
-        "wieviel restalkohol nach 30 minuten kochen rotwein",
-        "verkocht alkohol vollstaendig schmorgericht",
-        "sauce mit wein fuer kinder schwangere restalkohol"
+        "alkohol beim kochen verdampfen",
+        "alkohol verkochen tabelle usda",
+        "wie viel alkohol verkocht beim kochen",
+        "rotweinsauce alkoholgehalt nach kochzeit",
+        "alkohol beim backen verfluechtigen"
       ],
       "serpCompetitors": [],
       "volumeDeMonthlyEstimate": "NOT VERIFIED",

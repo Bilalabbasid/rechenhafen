@@ -35,6 +35,11 @@ export function calculateRentBurden(inputs: Record<string, any>): CalculationRes
       { id: 'remainingIncome', label: 'Verbleibendes Einkommen nach Miete', value: remaining, formattedValue: formatCurrency(remaining) },
       { id: 'recommendedMaxRent', label: 'Empfohlene Maximalmiete (30 %)', value: netIncome * 0.3, formattedValue: formatCurrency(netIncome * 0.3) },
     ],
+    directAnswer: `Eine Warmmiete von ${formatCurrency(warmRent)} entspricht ${formatPercent(ratio, 1)} Ihres Haushaltsnettoeinkommens von ${formatCurrency(netIncome)}. Bewertung nach der 30-%-Regel: ${assessment}.`,
+    basisSummary: [
+      { label: 'Monatliches Haushaltsnettoeinkommen', value: formatCurrency(netIncome) },
+      { label: 'Monatliche Warmmiete', value: formatCurrency(warmRent) },
+    ],
     summaryText: `Ihre Warmmiete von ${formatCurrency(warmRent)} macht ${formatPercent(ratio, 1)} Ihres monatlichen Nettoeinkommens von ${formatCurrency(netIncome)} aus. Es verbleiben ${formatCurrency(remaining)} für Lebenshaltung, Sparen und Freizeit. Bewertung: ${assessment}.`,
   };
 }

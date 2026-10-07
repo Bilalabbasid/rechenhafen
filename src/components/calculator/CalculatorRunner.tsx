@@ -844,10 +844,10 @@ export default function CalculatorRunner({
                   </div>
                 )}
 
-                {/* Compact "Deine Berechnungsgrundlage" Box */}
+                {/* Compact "Ihre Eingaben" Box */}
                 <div className={styles.basisSummaryBox}>
                   <div className={styles.basisSummaryHeader}>
-                    <span className={styles.basisSummaryTitle}>Deine Berechnungsgrundlage</span>
+                    <span className={styles.basisSummaryTitle}>Ihre Eingaben</span>
                   </div>
                   <div className={styles.basisGrid}>
                     {(result.basisSummary && result.basisSummary.length > 0

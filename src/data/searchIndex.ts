@@ -2932,20 +2932,21 @@ export const SEARCH_INDEX: SearchItem[] = [
     ]
   },
   {
-    "id": "warmmiete-zu-kaltmiete-rechner",
-    "slug": "warmmiete-zu-kaltmiete-rechner",
-    "name": "Warmmiete zu Kaltmiete-Rechner (Betriebskostenspiegel)",
+    "id": "warmmiete-rechner",
+    "slug": "warmmiete-rechner",
+    "name": "Warmmiete-Rechner (Warmmiete berechnen)",
     "category": "wohnen-immobilien",
     "keywords": [
-      "warmmiete-zu-kaltmiete-rechner",
-      "warmmiete zu kaltmiete-rechner (betriebskostenspiegel)",
-      "warmmiete zu kaltmiete",
+      "warmmiete-rechner",
+      "warmmiete rechner",
+      "warmmiete berechnen",
+      "kaltmiete in warmmiete umrechnen",
+      "warmmiete formel",
+      "nebenkosten warmmiete berechnen",
       "wohnen-immobilien",
       "miete & mietrecht",
-      "warmmiete zu kaltmiete rechner",
-      "kaltmiete aus warmmiete berechnen",
-      "betriebskostenspiegel nebenkosten pro qm",
-      "bruttomiete nettomiete"
+      "bruttowarmmiete rechner",
+      "kaltmiete betriebskosten heizkosten"
     ]
   },
   {
@@ -6113,18 +6114,21 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "alkohol-verkochungs-rechner",
     "slug": "alkohol-verkochungs-rechner",
-    "name": "Alkohol-Verkochungs-Rechner (Restalkohol in Saucen & Schmorgerichten)",
+    "name": "Alkohol beim Kochen & Backen Rechner (Verdampfung in Saucen)",
     "category": "kochen-backen",
     "keywords": [
       "alkohol-verkochungs-rechner",
-      "alkohol-verkochungs-rechner (restalkohol in saucen & schmorgerichten)",
+      "alkohol beim kochen",
+      "alkohol beim kochen & backen rechner",
       "alkohol verkochen",
       "kochen-backen",
       "kochen & garen",
-      "alkohol verkochen rechner usda tabelle",
-      "wieviel restalkohol nach 30 minuten kochen rotwein",
-      "verkocht alkohol vollstaendig schmorgericht",
-      "sauce mit wein fuer kinder schwangere restalkohol"
+      "alkohol beim kochen verdampfen",
+      "alkohol verkochen tabelle usda",
+      "wie viel alkohol verkocht beim kochen",
+      "rotweinsauce alkoholgehalt nach kochzeit",
+      "alkohol beim backen verfluechtigen",
+      "weinsauce alkohol kinder"
     ]
   },
   {

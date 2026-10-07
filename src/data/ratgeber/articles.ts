@@ -655,10 +655,10 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         description: 'Ermittelt aus Ihrem monatlichen Gehalt die maximal empfohlene Kalt- und Warmmiete für Ihre Wohnungssuche.',
       },
       {
-        slug: 'warmmiete-zu-kaltmiete-rechner',
-        title: 'Warmmiete zu Kaltmiete Rechner',
-        ctaText: 'Nebenkostenanteil aufschlüsseln',
-        description: 'Schlüsselt die Warmmiete nach regionalem Betriebskostenspiegel in Grundmiete und Nebenkosten auf.',
+        slug: 'warmmiete-rechner',
+        title: 'Warmmiete Rechner',
+        ctaText: 'Warmmiete berechnen',
+        description: 'Ermittelt die monatliche Warmmiete aus Kaltmiete, kalten Nebenkosten und Heizkosten.',
       },
     ],
     sections: [

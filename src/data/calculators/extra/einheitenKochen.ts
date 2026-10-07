@@ -3725,78 +3725,85 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "alkohol-verkochungs-rechner",
     slug: "alkohol-verkochungs-rechner",
-    name: "Alkohol-Verkochungs-Rechner (Restalkohol in Saucen & Schmorgerichten)",
-    shortName: "Alkohol verkochen",
+    name: "Alkohol beim Kochen & Backen Rechner (Verdampfung in Saucen)",
+    shortName: "Alkohol beim Kochen",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: 'Alkohol Verkochen Rechner – Restalkohol nach Kochzeit berec...',
-    metaDescription: 'Berechnen Sie, wie viel Alkohol beim Kochen mit Wein oder Bier wirklich verdampft. Wissenschaftliche Werte nach USDA-Studie: Restalkohol nach 15 bis.',
-    h1: 'Alkohol Verkochen Rechner – Wie viel Restalkohol bleibt im Essen?',
-    shortDescription: 'Berechnet den verbleibenden Restalkoholgehalt in Gerichten nach Kochzeit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["alkohol verkochen rechner usda tabelle","wieviel restalkohol nach 30 minuten kochen rotwein","verkocht alkohol vollstaendig schmorgericht","sauce mit wein fuer kinder schwangere restalkohol"],
+    metaTitle: 'Alkohol beim Kochen berechnen: Verdampfung in Sauce & Essen',
+    metaDescription: 'Wie viel Alkohol bleibt beim Kochen, Backen und Schmoren im Essen? Berechnen Sie den verbleibenden Alkoholgehalt nach Zubereitungsart und Kochzeit.',
+    h1: 'Alkohol beim Kochen und Backen berechnen',
+    shortDescription: 'Berechnet den verbleibenden Alkoholgehalt in Speisen nach Kochzeit und Zubereitungsart auf Basis wissenschaftlicher USDA-Ernährungsdaten.',
+    searchKeywords: [
+      "alkohol beim kochen verdampfen",
+      "alkohol verkochen tabelle usda",
+      "wie viel alkohol verkocht beim kochen",
+      "rotweinsauce alkoholgehalt nach kochzeit",
+      "alkohol beim backen verfluechtigen",
+      "weinsauce alkohol kinder",
+    ],
     inputs: [
+      {
+        "id": "alcoholMl",
+        "label": "Zugegebene Alkoholmenge (z. B. Rotwein, Weißwein, Bier)",
+        "type": "number",
+        "defaultValue": 250,
+        "min": 10,
+        "max": 2000,
+        "step": 25,
+        "unit": "ml"
+      },
+      {
+        "id": "volPercent",
+        "label": "Alkoholgehalt des Getränks",
+        "type": "number",
+        "defaultValue": 13,
+        "min": 1,
+        "max": 80,
+        "step": 0.5,
+        "unit": "Vol.-%"
+      },
+      {
+        "id": "cookingMethod",
+        "label": "Zubereitungsart & Kochzeit (nach USDA Nutrient Data)",
+        "type": "select",
+        "defaultValue": "simmer30",
+        "options": [
           {
-                "id": "alcoholMl",
-                "label": "Zugegebene Alkoholmenge (z. B. Rotwein, Weißwein, Bier)",
-                "type": "number",
-                "defaultValue": 250,
-                "min": 10,
-                "max": 2000,
-                "step": 25,
-                "unit": "ml"
+            "value": "flambee",
+            "label": "Flambieren (kurz angezündet – ca. 75 % verbleibender Alkohol)"
           },
           {
-                "id": "volPercent",
-                "label": "Alkoholgehalt des Getränks",
-                "type": "number",
-                "defaultValue": 13,
-                "min": 1,
-                "max": 80,
-                "step": 0.5,
-                "unit": "Vol.-%"
+            "value": "stir15",
+            "label": "Kurz aufgekocht / 15 Min. köcheln (ca. 40 % verbleibender Alkohol)"
           },
           {
-                "id": "cookingMethod",
-                "label": "Zubereitungsart & Kochzeit (nach USDA Nutrient Data)",
-                "type": "select",
-                "defaultValue": "simmer30",
-                "options": [
-                      {
-                            "value": "flambee",
-                            "label": "Flambieren (kurz angezündet – ca. 75 % Restalkohol)"
-                      },
-                      {
-                            "value": "stir15",
-                            "label": "Kurz aufgekocht / 15 Min. köcheln (ca. 40 % Restalkohol)"
-                      },
-                      {
-                            "value": "simmer30",
-                            "label": "30 Minuten leicht köcheln (ca. 35 % Restalkohol)"
-                      },
-                      {
-                            "value": "simmer60",
-                            "label": "1 Stunde köcheln (ca. 25 % Restalkohol)"
-                      },
-                      {
-                            "value": "simmer120",
-                            "label": "2 Stunden Schmorgericht (ca. 10 % Restalkohol)"
-                      },
-                      {
-                            "value": "simmer150",
-                            "label": "Über 2,5 Stunden geschmort (ca. 5 % Restalkohol)"
-                      }
-                ]
+            "value": "simmer30",
+            "label": "30 Minuten leicht köcheln (ca. 35 % verbleibender Alkohol)"
           },
           {
-                "id": "portionsCount",
-                "label": "Anzahl Portionen des Gerichts",
-                "type": "number",
-                "defaultValue": 4,
-                "min": 1,
-                "max": 20,
-                "step": 1,
-                "unit": "Portionen"
+            "value": "simmer60",
+            "label": "1 Stunde köcheln (ca. 25 % verbleibender Alkohol)"
+          },
+          {
+            "value": "simmer120",
+            "label": "2 Stunden Schmorgericht (ca. 10 % verbleibender Alkohol)"
+          },
+          {
+            "value": "simmer150",
+            "label": "Über 2,5 Stunden geschmort (ca. 5 % verbleibender Alkohol)"
           }
+        ]
+      },
+      {
+        "id": "portionsCount",
+        "label": "Anzahl Portionen des Gerichts",
+        "type": "number",
+        "defaultValue": 4,
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "unit": "Portionen"
+      }
     ],
     calculate: (inputs: Record<string, any>) => {
       const ml = Number(inputs.alcoholMl) || 0;
@@ -3804,7 +3811,6 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const portions = Number(inputs.portionsCount) || 4;
       
       // Reines Ethanol in Gramm (Dichte Ethanol ≈ 0.789 g/ml):
-      // Reines Alkoholvolumen: ml * (vol / 100)
       const pureAlcoholMl = ml * (vol / 100);
       const pureAlcoholGramsInitial = pureAlcoholMl * 0.789;
       
@@ -3816,52 +3822,55 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       else if (inputs.cookingMethod === 'simmer150') retentionRate = 0.05;
       
       const remainingAlcoholGrams = pureAlcoholGramsInitial * retentionRate;
-      const remainingPerPortionG = remainingAlcoholGrams / portions;
-      // Zum Vergleich: 1 kleines Glas Bier (0.2l 5%) hat ca. 8g reinen Alkohol
-      const beerGlassEquiv = remainingPerPortionG / 8.0;
+      const remainingPerPortionG = portions > 0 ? remainingAlcoholGrams / portions : 0;
       
       return {
-        primary: { id: 'remainingGrams', label: 'Verbleibender Restalkohol gesamt', value: remainingAlcoholGrams, formattedValue: formatNumber(remainingAlcoholGrams, 1) + ' g reiner Alkohol', highlight: true },
+        primary: { id: 'remainingGrams', label: 'Verbleibender Alkohol im Gericht gesamt', value: remainingAlcoholGrams, formattedValue: formatNumber(remainingAlcoholGrams, 1) + ' g reiner Alkohol', highlight: true },
         secondary: [
-          { id: 'perPortion', label: 'Restalkohol pro Portion', value: remainingPerPortionG, formattedValue: formatNumber(remainingPerPortionG, 2) + ' g je Portion' },
-          { id: 'retentionPct', label: 'Verbliebener Prozentanteil', value: retentionRate * 100, formattedValue: (retentionRate * 100) + ' % des Alkohols' },
+          { id: 'perPortion', label: 'Alkoholmenge je Portion', value: remainingPerPortionG, formattedValue: formatNumber(remainingPerPortionG, 2) + ' g je Portion' },
+          { id: 'retentionPct', label: 'Verbliebener Anteil des Ausgangsalkohols', value: retentionRate * 100, formattedValue: (retentionRate * 100) + ' %' },
           { id: 'safetyHint', label: 'Eignung für Kinder & Schwangere', value: 0, formattedValue: remainingPerPortionG < 0.2 ? 'Spuren (vergleichbar mit reifem Fruchtsaft)' : 'Nicht empfohlen für Schwangere & Kinder' },
         ],
-        summaryText: 'Von ursprünglich ' + formatNumber(pureAlcoholGramsInitial, 1) + ' g Alkohol verbleiben nach dem Garen noch rund ' + formatNumber(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im Essen – das sind ca. ' + formatNumber(remainingPerPortionG, 2) + ' g pro Portion.',
+        qualifications: [
+          'Sicherheitshinweis: Die Berechnung dient rein kulinarischen Zwecken in der Küche. Kein Ergebnis dieser Seite darf herangezogen werden, um Fahrtauglichkeit, Verkehrssicherheit oder einen Blutalkoholwert zu beurteilen.',
+          'Wissenschaftliche Basis: Standardisierte Nährwertdaten des US Department of Agriculture (USDA Table of Nutrient Retention Factors).',
+          'Für Kinder, Schwangere und abstinent lebende Personen Speisen grundsätzlich alkoholfrei zubereiten.',
+        ],
+        basisSummary: [
+          { label: 'Zugegebene Flüssigkeitsmenge', value: `${ml} ml` },
+          { label: 'Alkoholgehalt der Zutat', value: `${vol} Vol.-%` },
+          { label: 'Ausgangsalkohol reines Ethanol', value: `${formatNumber(pureAlcoholGramsInitial, 1)} g` },
+          { label: 'Portionsanzahl', value: `${portions} Portionen` },
+        ],
+        directAnswer: 'Von ursprünglich ' + formatNumber(pureAlcoholGramsInitial, 1) + ' g reinem Alkohol verbleiben nach dem Kochen noch ca. ' + formatNumber(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im gesamten Gericht bzw. ' + formatNumber(remainingPerPortionG, 2) + ' g je Portion. Wichtiger Sicherheitshinweis: Nicht zur Beurteilung von Fahrtüchtigkeit oder Verkehrssicherheit geeignet.',
+        summaryText: 'Von ursprünglich ' + formatNumber(pureAlcoholGramsInitial, 1) + ' g reinem Alkohol verbleiben nach dem Garen noch rund ' + formatNumber(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im Essen – das sind ca. ' + formatNumber(remainingPerPortionG, 2) + ' g pro Portion. Hinweis: Dient rein küchentechnischen Zwecken, keine Aussage über Fahrtüchtigkeit.',
       };
     },
-    formula: "Restalkohol = Zugegebene Menge × Vol.-% × 0,789 × Rückhaltefaktor (nach USDA-Studie)",
-    formulaExplanation: "Entgegen dem weit verbreiteten Mythos verkocht Alkohol beim Kochen keineswegs vollständig. Selbst nach 2 Stunden Schmoren verbleiben noch ca. 10 % des ursprünglichen Alkohols im Gericht.",
+    formula: "Verbleibender Alkohol = Zugegebene Menge × Vol.-% × 0,789 × Rückhaltefaktor",
+    formulaExplanation: "Entgegen dem Alltagsmythos verflüchtigt sich Alkohol beim Kochen keineswegs augenblicklich. Der verbleibende Alkoholgehalt sinkt kontinuierlich mit der Gardauer nach den Messreihen der USDA-Studie.",
     workedExample: {
-          "title": "Beispiel: 250 ml Rotwein (13 Vol.-%) in 4 Portionen Gulasch, 2 Stunden geschmort",
-          "inputValues": [
-                {
-                      "label": "Wein",
-                      "value": "250 ml"
-                },
-                {
-                      "label": "Alkohol",
-                      "value": "13 Vol.-%"
-                },
-                {
-                      "label": "Kochzeit",
-                      "value": "2 Stunden (10 % Rest)"
-                }
-          ],
-          "steps": [
-                "Ausgangsalkohol = 250 × 0,13 × 0,789 = 25,6 g reines Ethanol",
-                "Rest nach 2h = 25,6 g × 0,10 = 2,56 g gesamt",
-                "Pro Portion (bei 4 Portionen) = 2,56 / 4 = 0,64 g Alkohol"
-          ],
-          "result": "0,64 g reiner Alkohol pro Portion"
+      "title": "Beispiel: 250 ml Rotwein (13 Vol.-%) in 4 Portionen Gulasch, 2 Stunden geschmort",
+      "inputValues": [
+        { "label": "Zugegebener Wein", "value": "250 ml" },
+        { "label": "Alkoholgehalt", "value": "13 Vol.-%" },
+        { "label": "Kochzeit", "value": "2 Stunden (10 % Verbleib)" }
+      ],
+      "steps": [
+        "Ausgangsalkohol = 250 ml × 0,13 × 0,789 g/ml = 25,6 g reines Ethanol",
+        "Verbleib nach 2 Stunden = 25,6 g × 0,10 = 2,56 g im gesamten Gericht",
+        "Je Portion (bei 4 Portionen) = 2,56 g ÷ 4 = 0,64 g reiner Alkohol"
+      ],
+      "result": "0,64 g reiner Alkohol pro Portion (2,56 g im gesamten Gericht)"
     },
     content: {
-      intro: 'Entgegen der Annahme verkocht Alkohol beim Kochen und Schmoren von Wein- oder Biersaucen nur langsam und bleibt über längere Zeit nachweisbar.',
-      details: 'Untersuchungen des US Department of Agriculture (USDA): Nach kurzem Aufkochen (Flambieren) verbleiben ca. 75 % Alkohol; nach 30 Minuten Köcheln noch ca. 35 %; erst nach 2,5 bis 3 Stunden Schmoren sinkt der Restalkohol auf unter 5 Prozent.',
+      intro: 'Entgegen der Annahme verkocht Alkohol beim Kochen und Schmoren von Wein- oder Biersaucen nur langsam und bleibt über längere Zeit nachweisbar. Mit unserem Küchenrechner ermitteln Sie den thermisch verbleibenden Alkoholgehalt in Saucen, Schmorgerichten und Gebäck.',
+      details: 'Sicherheitshinweis zur Verkehrssicherheit: Die thermische Verdampfung von Ethanol beim Kochen oder Backen steht in keinem Zusammenhang mit dem menschlichen Alkoholabbau im Körper. Kein Ergebnis dieses Rechners darf als Entscheidungshilfe herangezogen werden, ob jemand ein Kraftfahrzeug führen darf, fahrtüchtig ist oder die notwendige Fahrtüchtigkeit besitzt. Untersuchungen des US Department of Agriculture (USDA): Nach kurzem Aufkochen verbleiben ca. 75 % Alkohol; nach 30 Minuten Köcheln noch ca. 35 %; erst nach 2,5 bis 3 Stunden Schmoren sinkt der Alkoholanteil auf ca. 5 Prozent.',
     },
     faqs: [
-      { question: 'Dürfen Kinder Gerichte essen, die mit Rotwein abgelöscht wurden?', answer: 'Da auch nach einer Stunde Kochen noch ca. 25 % des Alkohols in der Sauce enthalten sind, sollten Speisen für Kinder, Schwangere oder trockene Alkoholiker alkoholfrei zubereitet werden (z. B. Traubensaft mit Balsamico).' },
-      { question: 'Warum verdampft Alkohol im Wasser-Gemisch nicht komplett bei 78 °C?', answer: 'Weil Wasser und Ethanol ein azeotropes Gemisch bilden, dessen Siedepunkt zwischen 78 °C und 100 °C liegt; der Alkohol entweicht nur kontinuierlich gemeinsam mit dem Wasserdampf.' },
+      { question: 'Verkocht Alkohol beim Kochen und Backen wirklich vollständig?', answer: 'Nein, das ist ein weit verbreiteter Irrglaube. Selbst nach 30 Minuten leichtem Köcheln verbleiben rund 35 Prozent des ursprünglich zugegebenen Alkohols in der Sauce. Erst nach über zwei Stunden Schmorzeit sinkt der Wert auf rund fünf bis zehn Prozent.' },
+      { question: 'Darf das Ergebnis genutzt werden, um die Fahrtüchtigkeit zu prüfen?', answer: 'Nein, keinesfalls! Die Berechnung beschreibt ausschließlich physikalische Verdampfungsprozesse im Kochtopf. Sie liefert keinerlei Aussage über Blutalkoholkonzentrationen oder Fahrtüchtigkeit. Wer Alkohol konsumiert hat, darf sich keinesfalls auf Küchenberechnungen stützen, um über das Autofahren zu entscheiden.' },
+      { question: 'Dürfen Kinder Gerichte essen, die mit Wein oder Bier zubereitet wurden?', answer: 'Nein. Da auch nach längerer Kochzeit nennenswerte Mengen Ethanol in der Sauce verbleiben und sich Kinder zudem an den typischen Alkoholgeschmack gewöhnen können, sollten Gerichte für Kinder, Schwangere und abstinente Personen stets komplett alkoholfrei zubereitet werden (z. B. mit Brühe, Traubensaft und Balsamico).' },
+      { question: 'Warum verdampft Alkohol bei 78 °C nicht sofort aus der Sauce?', answer: 'Wasser und Ethanol bilden ein azeotropes Gemisch mit wechselseitigen molekularen Bindungen. Dadurch liegt die gemeinsame Siedetemperatur höher als 78 °C, und der Alkohol entweicht erst nach und nach zusammen mit dem aufsteigenden Wasserdampf.' },
     ],
     relatedSlugs: ['cocktail-alkoholgehalt-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'portionsrechner'],
   },

@@ -174,16 +174,21 @@ describe('RechenHafen Calculation Engines', () => {
     });
 
     it('calculates warm rent from cold rent, operating and heating components', () => {
-      const warmmiete = EXTRA_WOHNEN_HAUSHALT.find((c) => c.slug === 'warmmiete-zu-kaltmiete-rechner');
+      const warmmiete = EXTRA_WOHNEN_HAUSHALT.find((c) => c.slug === 'warmmiete-rechner');
+      expect(warmmiete).toBeDefined();
       const res = warmmiete?.calculate({
         calculationMode: 'warm_from_components',
         coldRentInput: 850,
         operatingCosts: 170,
         heatingCosts: 130,
+        otherOperatingCosts: 20,
         livingAreaMode1: 75,
       });
-      expect(res?.primary.value).toBe(1150);
-      expect(res?.primary.label).toContain('Warmmiete');
+      expect(res?.primary.value).toBe(1170);
+      expect(res?.primary.label).toBe('Warmmiete pro Monat');
+      const yearly = res?.secondary?.find((s) => s.id === 'warmRentYearly');
+      expect(yearly?.value).toBe(1170 * 12);
+      expect(res?.basisSummary).toBeDefined();
     });
   });
 

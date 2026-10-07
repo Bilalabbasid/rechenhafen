@@ -196,4 +196,152 @@ describe('SEO & 301 Redirects Verification', () => {
     expect(stein?.workedExample.description).toBeDefined();
     expect(stein?.faqs.length).toBeGreaterThanOrEqual(4);
   });
+
+  it('verifies homepage Open Graph and Twitter social sharing metadata and static banner', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const { metadata: pageMeta } = await import('@/app/page');
+    const robotsFn = (await import('@/app/robots')).default;
+
+    // 1. Static asset verification
+    const ogImagePath = path.join(process.cwd(), 'public', 'og-image.jpg');
+    expect(fs.existsSync(ogImagePath)).toBe(true);
+
+    const stats = fs.statSync(ogImagePath);
+    expect(stats.size).toBeGreaterThan(10000); // realistic valid banner file
+
+    // 2. Homepage metadata verification
+    expect(pageMeta.title).toEqual({
+      absolute: 'RechenHafen – Alle Rechner an einem Ort',
+    });
+    expect(pageMeta.description).toBe(
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.'
+    );
+
+    // 3. Open Graph verification
+    const og = pageMeta.openGraph as any;
+    expect(og).toBeDefined();
+    expect(og.type).toBe('website');
+    expect(og.url).toBe('https://rechenhafen.de/');
+    expect(og.title).toBe('RechenHafen – Alle Rechner an einem Ort');
+    expect(og.description).toBe(
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.'
+    );
+    expect(Array.isArray(og.images)).toBe(true);
+    expect(og.images[0]).toEqual({
+      url: 'https://rechenhafen.de/og-image.jpg',
+      width: 1200,
+      height: 630,
+      alt: 'RechenHafen – Kostenlose Online-Rechner',
+      type: 'image/jpeg',
+    });
+
+    // 4. Twitter metadata verification
+    const twitter = pageMeta.twitter as any;
+    expect(twitter).toBeDefined();
+    expect(twitter.card).toBe('summary_large_image');
+    expect(twitter.title).toBe('RechenHafen – Alle Rechner an einem Ort');
+    expect(twitter.description).toBe(
+      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.'
+    );
+    expect(twitter.images).toEqual(['https://rechenhafen.de/og-image.jpg']);
+
+    // 5. Robots allow rule for crawlers
+    const robotsRules = robotsFn();
+    expect(robotsRules.rules).toBeDefined();
+    const rules = Array.isArray(robotsRules.rules) ? robotsRules.rules[0] : robotsRules.rules;
+    expect(rules.allow).toBe('/');
+  });
+
+  it('verifies 301 redirect and authoritative Warmmiete calculator page and de-optimized Mietbelastungsquote', async () => {
+    // 1. Redirect verification
+    const redirects = await nextConfig.redirects!();
+    const redirectWithSlash = redirects.find((r) => r.source === '/rechner/warmmiete-zu-kaltmiete-rechner/');
+    const redirectWithoutSlash = redirects.find((r) => r.source === '/rechner/warmmiete-zu-kaltmiete-rechner');
+    expect(redirectWithSlash).toBeDefined();
+    expect(redirectWithSlash?.destination).toBe('/rechner/warmmiete-rechner/');
+    expect(redirectWithSlash?.permanent).toBe(true);
+    expect(redirectWithoutSlash).toBeDefined();
+    expect(redirectWithoutSlash?.destination).toBe('/rechner/warmmiete-rechner/');
+    expect(redirectWithoutSlash?.permanent).toBe(true);
+
+    // 2. Authoritative Warmmiete calculator
+    const warmmiete = getCalculatorBySlug('warmmiete-rechner');
+    expect(warmmiete).toBeDefined();
+    expect(warmmiete?.h1).toBe('Warmmiete berechnen');
+    expect(warmmiete?.metaTitle).toBe('Warmmiete berechnen: Kaltmiete, Nebenkosten & Heizung');
+    expect(warmmiete?.formula).toBe('Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten');
+    expect(warmmiete?.inputs.some((i) => i.id === 'coldRentInput')).toBe(true);
+    expect(warmmiete?.inputs.some((i) => i.id === 'operatingCosts')).toBe(true);
+    expect(warmmiete?.inputs.some((i) => i.id === 'heatingCosts')).toBe(true);
+    expect(warmmiete?.inputs.some((i) => i.id === 'otherOperatingCosts')).toBe(true);
+
+    const calcResult = warmmiete?.calculate({
+      coldRentInput: 800,
+      operatingCosts: 160,
+      heatingCosts: 140,
+      otherOperatingCosts: 20,
+    });
+    expect(calcResult?.primary.label).toBe('Warmmiete pro Monat');
+    expect(calcResult?.primary.value).toBe(1120);
+    expect(calcResult?.secondary?.some((s) => s.id === 'warmRentYearly' && s.value === 1120 * 12)).toBe(true);
+    expect(calcResult?.basisSummary).toBeDefined();
+
+    // 3. Sitemap verification
+    const sitemapEntries = sitemap();
+    const urls = sitemapEntries.map((e) => e.url);
+    expect(urls).toContain('https://rechenhafen.de/rechner/warmmiete-rechner/');
+    expect(urls.some((u) => u.includes('warmmiete-zu-kaltmiete-rechner'))).toBe(false);
+
+    // 4. Mietbelastungsquote de-optimization
+    const mietbelastung = getCalculatorBySlug('mietbelastungsquote-rechner');
+    expect(mietbelastung).toBeDefined();
+    expect(mietbelastung?.h1).not.toContain('Warmmiete berechnen');
+    expect(mietbelastung?.metaTitle).not.toContain('Warmmiete berechnen');
+    expect(mietbelastung?.searchKeywords).not.toContain('warmmiete berechnen');
+  });
+
+  it('verifies Restalkohol safety fix: cooking intent only, no driving claims, safety disclaimer', () => {
+    const kochen = getCalculatorBySlug('alkohol-verkochungs-rechner');
+    expect(kochen).toBeDefined();
+    expect(kochen?.h1).toBe('Alkohol beim Kochen und Backen berechnen');
+    expect(kochen?.metaTitle).toBe('Alkohol beim Kochen berechnen: Verdampfung in Sauce & Essen');
+    
+    // Must NOT contain restalkohol in search keywords
+    expect(kochen?.searchKeywords.some((k) => k.toLowerCase().includes('restalkohol'))).toBe(false);
+
+    // Visible safety disclaimer in qualifications & details
+    const qualificationsText = kochen?.calculate({ alcoholMl: 250, volPercent: 12 }).qualifications?.join(' ') || '';
+    expect(qualificationsText).toContain('Sicherheitshinweis');
+    expect(qualificationsText).toContain('Fahrtauglichkeit');
+
+    // Details must contain safety notice
+    expect(kochen?.content?.details).toContain('Sicherheitshinweis zur Verkehrssicherheit');
+    expect(kochen?.content?.details).toContain('Fahrtüchtigkeit');
+  });
+
+  it('verifies JobRad calculator tax & legal audit, 2026 sources, results structure and basis summary', () => {
+    const jobrad = getCalculatorBySlug('dienstfahrrad-jobrad-rechner');
+    expect(jobrad).toBeDefined();
+    expect(jobrad?.isTimeSensitive).toBe(true);
+    expect(jobrad?.timeSensitiveMeta?.year).toBe(2026);
+    expect(jobrad?.timeSensitiveMeta?.source).toContain('§ 6 Abs. 1 Nr. 4 Satz 6 EStG');
+
+    const res = jobrad?.calculate({
+      bikePriceGross: 3500,
+      grossSalary: 3800,
+      serviceCost: 10,
+      taxClass: '1',
+    });
+    expect(res?.primary.label).toBe('Geschätzte monatliche Netto-Belastung');
+    expect(res?.secondary?.some((s) => s.id === 'leasingRate')).toBe(true);
+    expect(res?.secondary?.some((s) => s.id === 'grossDeduction')).toBe(true);
+    expect(res?.secondary?.some((s) => s.id === 'benefit')).toBe(true);
+    expect(res?.secondary?.some((s) => s.id === 'totalCostOverall')).toBe(true);
+    expect(res?.secondary?.some((s) => s.id === 'takeoverPrice')).toBe(true);
+    expect(res?.basisSummary).toBeDefined();
+    expect(res?.basisSummary?.length).toBeGreaterThanOrEqual(5);
+  });
 });
+
+

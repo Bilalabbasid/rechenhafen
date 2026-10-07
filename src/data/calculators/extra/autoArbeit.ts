@@ -1068,9 +1068,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
     metaTitle: 'JobRad Rechner: Dienstfahrrad-Leasing berechnen',
-    metaDescription: 'JobRad & Dienstfahrrad Rechner: Monatliche Netto-Belastung, Steuerersparnis und Übernahmepreis bei der 0,25-%-Gehaltsumwandlung präzise berechnen.',
+    metaDescription: 'JobRad & Dienstfahrrad Rechner 2026: Monatliche Netto-Kosten, 0,25-%-Geldwerten Vorteil, Steuerersparnis und Übernahmepreis bei Gehaltsumwandlung berechnen.',
     h1: 'JobRad Rechner: Dienstfahrrad-Leasing berechnen',
-    shortDescription: 'Berechnet die tatsächliche monatliche Netto-Belastung, die Steuerersparnis und die Gesamtersparnis gegenüber dem Neukauf beim Dienstrad-Leasing.',
+    shortDescription: 'Berechnet die tatsächliche monatliche Netto-Belastung, den geldwerten Vorteil nach 0,25-%-Regel und die Gesamtersparnis gegenüber dem privaten Neukauf.',
     searchKeywords: [
       'jobrad rechner',
       'dienstfahrrad rechner',
@@ -1108,36 +1108,50 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const service = Math.max(0, parseFloat(inputs.serviceCost) || 0);
       const taxClass = inputs.taxClass || '1';
 
-      // Leasingrate ca. 2,9 % des UVP (typischer Marktwert bei 36 Monaten Laufzeit)
+      // Marktübliche monatliche Leasingrate bei 36 Monaten Laufzeit (ca. 2,90 % der UVP):
       const leasingRate = price * 0.029;
-      // Brutto-Umwandlungsbetrag
+      // Monatlicher Brutto-Umwandlungsbetrag vom Gehalt
       const grossDeduction = Math.max(0, leasingRate + service - subsidy);
 
       // Geldwerter Vorteil nach § 6 Abs. 1 Nr. 4 Satz 6 EStG (0,25 % Regelung):
-      // 0,25 % auf das auf volle 100 € abgerundete Viertel des UVP
+      // Das auf volle 100 € abgerundete Viertel (25 %) der UVP wird mit 1 % monatlich versteuert:
       const quarterUvpRounded = Math.floor((price * 0.25) / 100) * 100;
-      // Monatlicher geldwerter Vorteil: 1 % von 25 % = 0,25 % von 100 %
       const taxableBenefit = Math.max(1, quarterUvpRounded * 0.01);
 
-      // Reale Steuer- & SV-Entlastung schätzen je nach Steuerklasse und Gehalt:
-      let marginalRate = 0.42;
+      // Steuer- und Sozialversicherungsentlastung nach Grenzsteuersatz und Beitragsbemessungsgrenzen 2026:
+      // Grenzsteuersatz Lohnsteuer schätzen:
+      let taxMarginal = 0.28;
       if (taxClass === '3') {
-        marginalRate = salary > 4500 ? 0.38 : salary > 2800 ? 0.32 : 0.28;
+        taxMarginal = salary > 5500 ? 0.35 : salary > 3500 ? 0.26 : 0.18;
       } else {
-        marginalRate = salary > 4500 ? 0.46 : salary > 2800 ? 0.42 : 0.36;
+        taxMarginal = salary > 5500 ? 0.42 : salary > 3500 ? 0.33 : 0.24;
       }
-      const taxSvSavings = grossDeduction * marginalRate;
-      const benefitTaxCost = taxableBenefit * marginalRate;
 
-      // Tatsächliche monatliche Netto-Belastung
+      // Sozialversicherungsentlastung (AN-Anteil ca. 20,5 %):
+      // BBG KV/PV 2026: 5.512,50 €; BBG RV/AV 2026: 8.050 €
+      let svRate = 0.205;
+      if (salary > 8050) {
+        svRate = 0.0; // Oberhalb beider BBGs keine SV-Ersparnis
+      } else if (salary > 5512.5) {
+        svRate = 0.106; // Nur RV/AV-Ersparnis (~10,6 % AN-Anteil)
+      }
+
+      const totalMarginalRate = taxMarginal + svRate;
+      const taxSvSavings = grossDeduction * totalMarginalRate;
+      const benefitTaxCost = taxableBenefit * taxMarginal;
+
+      // Tatsächliche monatliche Netto-Belastung auf der Gehaltsabrechnung:
       const actualNetDeduction = Math.max(5, grossDeduction - taxSvSavings + benefitTaxCost);
       const totalNetPaid36 = actualNetDeduction * 36;
 
-      // Typischer Übernahmepreis nach 36 Monaten (17-18 % der UVP)
+      // Typischer Übernahmepreis nach 36 Monaten (17-18 % der UVP laut Leasinganbieter):
       const takeoverPrice = price * 0.18;
-      const totalCost = totalNetPaid36 + takeoverPrice;
-      const savingsVsDirectPurchase = price - totalCost;
-      const savingsPct = price > 0 ? (savingsVsDirectPurchase / price) * 100 : 0;
+      const totalLeaseCost = totalNetPaid36 + takeoverPrice;
+
+      // Vergleich mit privatem Neukauf inkl. 3 Jahre gleichwertiger Versicherung (10 €/Monat):
+      const privatePurchaseEquivalent = price + (service * 36);
+      const savingsVsDirectPurchase = privatePurchaseEquivalent - totalLeaseCost;
+      const savingsPct = privatePurchaseEquivalent > 0 ? (savingsVsDirectPurchase / privatePurchaseEquivalent) * 100 : 0;
 
       return {
         primary: {
@@ -1146,24 +1160,40 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           value: actualNetDeduction,
           formattedValue: formatCurrency(actualNetDeduction),
           highlight: true,
+          helpText: 'Tatsächlicher monatlicher Netto-Gehaltsabzug unter Berücksichtigung von Steuer- und SV-Ersparnis',
         },
         secondary: [
-          { id: 'savingsVsDirectPurchase', label: 'Geschätzte Gesamtersparnis ggü. Direktkauf', value: savingsVsDirectPurchase, formattedValue: formatCurrency(savingsVsDirectPurchase) },
-          { id: 'pctSaved', label: 'Ersparnis in Prozent', value: savingsPct, formattedValue: formatPercent(savingsPct, 1) },
-          { id: 'leasingRate', label: 'Monatliche Leasingrate (brutto)', value: leasingRate, formattedValue: formatCurrency(leasingRate) },
-          { id: 'grossDeduction', label: 'Monatlicher Bruttoabzug vom Gehalt', value: grossDeduction, formattedValue: formatCurrency(grossDeduction) },
-          { id: 'benefit', label: 'Geldwerter Vorteil (0,25 % Regelung)', value: taxableBenefit, formattedValue: formatCurrency(taxableBenefit) },
-          { id: 'takeoverPrice', label: 'Voraussichtlicher Übernahmepreis nach 36 Monaten', value: takeoverPrice, formattedValue: formatCurrency(takeoverPrice) },
+          { id: 'leasingRate', label: 'Monatliche Leasingrate (brutto)', value: leasingRate, formattedValue: formatCurrency(leasingRate), helpText: 'Bruttorate vor Steuern & Abgaben (ca. 2,9 % UVP)' },
+          { id: 'grossDeduction', label: 'Monatlicher Bruttoabzug vom Gehalt', value: grossDeduction, formattedValue: formatCurrency(grossDeduction), helpText: 'Leasingrate + Versicherung abzüglich AG-Zuschuss' },
+          { id: 'benefit', label: 'Geldwerter Vorteil (0,25 % Regelung)', value: taxableBenefit, formattedValue: formatCurrency(taxableBenefit), helpText: '1 % auf das auf volle 100 € abgerundete Viertel des UVP (§ 6 EStG)' },
+          { id: 'totalCostOverall', label: 'Gesamtkosten über 36 Monate inkl. Übernahme', value: totalLeaseCost, formattedValue: formatCurrency(totalLeaseCost), highlight: true, helpText: 'Summe aus 36 Netto-Raten zzgl. 18 % Übernahmepreis' },
+          { id: 'takeoverPrice', label: 'Voraussichtlicher Übernahmepreis nach 36 Monaten', value: takeoverPrice, formattedValue: formatCurrency(takeoverPrice), helpText: 'Typisches Angebot zum Kauf nach Vertragsende (ca. 18 % UVP)' },
+          { id: 'savingsVsDirectPurchase', label: 'Geschätzte Gesamtersparnis ggü. Privatkauf', value: savingsVsDirectPurchase, formattedValue: formatCurrency(savingsVsDirectPurchase) },
+          { id: 'pctSaved', label: 'Ersparnis gegenüber privatem Sofortkauf', value: savingsPct, formattedValue: formatPercent(savingsPct, 1) },
         ],
         details: [
           { id: 'leaseTerm', label: 'Vertragslaufzeit', value: 36, formattedValue: '36 Monate' },
           { id: 'total36', label: 'Summe der 36 Netto-Monatsraten', value: totalNetPaid36, formattedValue: formatCurrency(totalNetPaid36) },
-          { id: 'totalCostOverall', label: 'Gesamtaufwand inkl. Übernahme', value: totalCost, formattedValue: formatCurrency(totalCost) },
+          { id: 'privateRef', label: 'Referenzkosten privater Neukauf inkl. Service', value: privatePurchaseEquivalent, formattedValue: formatCurrency(privatePurchaseEquivalent) },
         ],
+        qualifications: [
+          'Unverbindliche Orientierungsrechnung (Rechtsstand 2026): Das individuelle Nettoergebnis auf der Gehaltsabrechnung hängt von Ihren individuellen Steuermerkmalen, Kirchensteuer, Krankenversicherungssatz und den konkreten Vertragsbedingungen des Arbeitgebers ab.',
+          'Geldwerter Vorteil nach § 6 Abs. 1 Nr. 4 Satz 6 EStG: 0,25 % des geviertelten Bruttolistenpreises monatlich.',
+          'Dienstrad-Leasing per Gehaltsumwandlung unterscheidet sich grundlegend vom Privatkauf: Die Raten mindern das Bruttoentgelt, das Rad gehört während der 36 Monate dem Arbeitgeber/Leasinggeber.',
+        ],
+        basisSummary: [
+          { label: 'Fahrrad- / E-Bike-Kaufpreis (UVP)', value: formatCurrency(price) },
+          { label: 'Monatliches Bruttogehalt', value: formatCurrency(salary) },
+          { label: 'Steuerklasse', value: `Klasse ${taxClass}` },
+          { label: 'Monatlicher Arbeitgeberzuschuss', value: formatCurrency(subsidy) },
+          { label: 'Monatliche Inspektions- & Versicherungskosten', value: formatCurrency(service) },
+          { label: 'Leasinglaufzeit', value: '36 Monate' },
+        ],
+        directAnswer: `Bei einem UVP von ${formatCurrency(price)} beträgt die geschätzte monatliche Netto-Belastung ca. ${formatCurrency(actualNetDeduction)}. Über die 36 Monate Laufzeit belaufen sich die Gesamtkosten inklusive Übernahme auf ca. ${formatCurrency(totalLeaseCost)}. Gegenüber dem privaten Neukauf sparen Sie voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}).`,
         summaryText: `Bei einem Fahrradpreis von ${formatCurrency(price)} zahlen Sie bei 36 Monaten Laufzeit effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Zusammen mit dem voraussichtlichen Übernahmepreis von ca. ${formatCurrency(takeoverPrice)} sparen Sie gegenüber dem privaten Sofortkauf voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}). Hinweis: Unverbindliche Modellrechnung; keine Steuerberatung.`,
       };
     },
-    formula: 'Netto-Belastung ≈ Bruttoabzug - (Bruttoabzug × Grenzbelastung) + (0,25 % UVP × Grenzbelastung)',
+    formula: 'Netto-Belastung ≈ Bruttoabzug - (Bruttoabzug × Grenzbelastung) + (0,25 % UVP × Grenzsteuersatz)',
     formulaExplanation: 'Die Leasingrate wird vor Steuern und Sozialabgaben vom Bruttogehalt abgezogen (Gehaltsumwandlung). Versteuert werden muss monatlich lediglich der geldwerte Vorteil für die Privatnutzung nach der 0,25-%-Regel (§ 6 Abs. 1 Nr. 4 Satz 6 EStG). Dieser Rechner dient der Orientierung und ersetzt keine Steuerberatung.',
     workedExample: {
       title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Bruttogehalt (Steuerklasse 1)',
@@ -1172,7 +1202,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 68,00 € monatlich netto (ca. 420 € Gesamtersparnis)',
     },
     content: {
-      intro: 'Mit unserem kostenlosen Dienstfahrrad-Rechner ermitteln Sie Ihre monatliche Netto-Belastung und Ihre finanzielle Gesamtersparnis beim Dienstrad-Leasing per Gehaltsumwandlung. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad.',
+      intro: 'Mit unserem kostenlosen JobRad- & Dienstfahrrad-Rechner ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Sofortkauf beim Dienstrad-Leasing per Gehaltsumwandlung. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 Satz 6 EStG funktioniert. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad.',
       sections: [
         {
           title: 'So funktioniert das Dienstrad-Leasing per Gehaltsumwandlung',
@@ -1209,9 +1239,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 Satz 6 EStG / BMF-Erlass)',
+      source: '§ 6 Abs. 1 Nr. 4 Satz 6 EStG & BMF-Erlasse zur Dienstfahrradüberlassung',
       sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-02-01',
+      lastVerified: '2026-03-01',
     },
   },
 
@@ -3164,7 +3194,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Welches Schonvermögen ist beim Bürgergeld geschützt?', answer: 'In der einjährigen Karenzzeit gilt nach § 12 SGB II ein Schonvermögen von 40.000 € für die erste Person und 15.000 € für jedes weitere Mitglied der Bedarfsgemeinschaft. Nach Ablauf der Karenzzeit gilt ein einheitlicher Freibetrag von 15.000 € pro Person.' },
       { question: 'Welche Freibeträge gelten bei eigenem Erwerbseinkommen (§ 11b SGB II)?', answer: 'Die ersten 100 € Bruttoeinkommen aus Erwerbstätigkeit sind als Grundabsetzbetrag anrechnungsfrei. Im Bereich von 100 € bis 520 € bleiben 20 % anrechnungsfrei, von 520 € bis 1.000 € bleiben 30 % frei (bei Kindern im Haushalt bis 1.200 € bzw. 1.500 €).' },
     ],
-    relatedSlugs: ['arbeitslosengeld-1-rechner', 'warmmiete-zu-kaltmiete-rechner', 'teilzeit-gehaltsrechner', 'brutto-netto-rechner', 'midijob-rechner'],
+    relatedSlugs: ['arbeitslosengeld-1-rechner', 'warmmiete-rechner', 'teilzeit-gehaltsrechner', 'brutto-netto-rechner', 'midijob-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
