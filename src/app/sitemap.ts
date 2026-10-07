@@ -54,7 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // 16 Kategorieseiten
+  // 17 Kategorieseiten
   const categoryPages: MetadataRoute.Sitemap = CATEGORIES.map((cat) => ({
     url: `${baseUrl}/${cat.slug}/`,
     lastModified: platformUpdateDate,
@@ -63,12 +63,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // Rechnerseiten
-  const calculatorPages: MetadataRoute.Sitemap = ALL_CALCULATORS.map((calc) => ({
-    url: `${baseUrl}/rechner/${calc.slug}/`,
-    lastModified: platformUpdateDate,
-    changeFrequency: 'monthly',
-    priority: 0.7,
-  }));
+  const calculatorPages: MetadataRoute.Sitemap = ALL_CALCULATORS.map((calc) => {
+    const lastRev = calc.trustMeta?.lastReviewed || calc.timeSensitiveMeta?.lastVerified;
+    return {
+      url: `${baseUrl}/rechner/${calc.slug}/`,
+      lastModified: lastRev ? new Date(lastRev) : platformUpdateDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    };
+  });
 
   // Ratgeberseiten
   const ratgeberPages: MetadataRoute.Sitemap = getAllArticles().map((article) => ({

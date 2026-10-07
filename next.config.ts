@@ -174,23 +174,13 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: '/rechner/warmmiete-rechner',
-        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
-        permanent: true,
-      },
-      {
-        source: '/rechner/warmmiete-rechner/',
-        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
-        permanent: true,
-      },
-      {
         source: '/rechner/warmmiete-berechnen',
-        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        destination: '/rechner/warmmiete-rechner/',
         permanent: true,
       },
       {
         source: '/rechner/warmmiete-berechnen/',
-        destination: '/rechner/warmmiete-zu-kaltmiete-rechner/',
+        destination: '/rechner/warmmiete-rechner/',
         permanent: true,
       },
       {

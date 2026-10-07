@@ -3873,6 +3873,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Warum verdampft Alkohol bei 78 °C nicht sofort aus der Sauce?', answer: 'Wasser und Ethanol bilden ein azeotropes Gemisch mit wechselseitigen molekularen Bindungen. Dadurch liegt die gemeinsame Siedetemperatur höher als 78 °C, und der Alkohol entweicht erst nach und nach zusammen mit dem aufsteigenden Wasserdampf.' },
     ],
     relatedSlugs: ['cocktail-alkoholgehalt-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'portionsrechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-07',
+      sourceName: 'USDA Nutrient Data Laboratory (Ethanol Retention in Food Preparation)',
+      methodology: 'Empirische Rückhaltefaktoren nach Garzeit und Kochmethode',
+    },
   },
   {
     id: "eiweiss-eigelb-ersatz-rechner",

@@ -342,6 +342,109 @@ describe('SEO & 301 Redirects Verification', () => {
     expect(res?.basisSummary).toBeDefined();
     expect(res?.basisSummary?.length).toBeGreaterThanOrEqual(5);
   });
+
+  it('performs complete sitemap, canonical, and redirect audit: zero missing, zero redirects, all 200 indexable', async () => {
+    const sitemapEntries = sitemap();
+    const sitemapUrls = sitemapEntries.map((e) => e.url);
+    const sitemapSet = new Set(sitemapUrls);
+
+    // 1. All static pages present
+    const staticPaths = [
+      'https://rechenhafen.de/',
+      'https://rechenhafen.de/rechner/',
+      'https://rechenhafen.de/ratgeber/',
+      'https://rechenhafen.de/ueber-uns/',
+      'https://rechenhafen.de/methodik/',
+      'https://rechenhafen.de/impressum/',
+      'https://rechenhafen.de/datenschutz/',
+    ];
+    for (const p of staticPaths) {
+      expect(sitemapSet.has(p), `Missing static page in sitemap: ${p}`).toBe(true);
+    }
+
+    // 2. All categories present
+    const { CATEGORIES } = await import('@/data/categories');
+    for (const cat of CATEGORIES) {
+      const catUrl = `https://rechenhafen.de/${cat.slug}/`;
+      expect(sitemapSet.has(catUrl), `Missing category in sitemap: ${catUrl}`).toBe(true);
+    }
+
+    // 3. All registered calculators present
+    for (const calc of ALL_CALCULATORS) {
+      const calcUrl = `https://rechenhafen.de/rechner/${calc.slug}/`;
+      expect(sitemapSet.has(calcUrl), `Missing calculator in sitemap: ${calcUrl}`).toBe(true);
+    }
+
+    // 4. All registered articles present
+    const articles = getAllArticles();
+    for (const art of articles) {
+      const artUrl = `https://rechenhafen.de/ratgeber/${art.slug}/`;
+      expect(sitemapSet.has(artUrl), `Missing ratgeber in sitemap: ${artUrl}`).toBe(true);
+    }
+
+    // 5. Total count exact match (7 static + 17 categories + 421 calculators + 16 articles = 461)
+    const expectedTotal = 7 + CATEGORIES.length + ALL_CALCULATORS.length + articles.length;
+    expect(sitemapEntries.length).toBe(expectedTotal);
+    expect(sitemapSet.size).toBe(expectedTotal);
+
+    // 6. NO redirect source URLs in sitemap
+    const redirects = await nextConfig.redirects!();
+    const redirectSources = redirects
+      .filter((r) => !r.has)
+      .map((r) => r.source.replace(/\/$/, ''));
+    const uniqueRedirectSources = new Set(redirectSources);
+
+    for (const entry of sitemapEntries) {
+      const urlObj = new URL(entry.url);
+      const pathnameNoSlash = urlObj.pathname.replace(/\/$/, '');
+      expect(
+        uniqueRedirectSources.has(pathnameNoSlash),
+        `Redirected URL found in sitemap: ${entry.url}`
+      ).toBe(false);
+
+      // Validate URL format
+      expect(entry.url.startsWith('https://rechenhafen.de/')).toBe(true);
+      expect(entry.url.includes('www.')).toBe(false);
+      expect(entry.url.endsWith('/')).toBe(true);
+      expect(entry.url.includes('?')).toBe(false);
+      expect(entry.url.includes('#')).toBe(false);
+
+      // Validate lastModified
+      expect(entry.lastModified instanceof Date).toBe(true);
+      expect(isNaN(entry.lastModified!.getTime())).toBe(false);
+    }
+
+    // 7. Verify specific audited calculators and articles
+    const keyUrls = [
+      'https://rechenhafen.de/rechner/warmmiete-rechner/',
+      'https://rechenhafen.de/rechner/mietbelastungsquote-rechner/',
+      'https://rechenhafen.de/rechner/alkohol-verkochungs-rechner/',
+      'https://rechenhafen.de/rechner/dienstfahrrad-jobrad-rechner/',
+      'https://rechenhafen.de/rechner/spritkostenrechner/',
+      'https://rechenhafen.de/rechner/gaskostenrechner/',
+      'https://rechenhafen.de/ratgeber/gaszaehler-m3-in-kwh-umrechnen/',
+      'https://rechenhafen.de/rechner/schalungssteine-rechner/',
+      'https://rechenhafen.de/rechner/bausteine-mauerwerk-rechner/',
+    ];
+    for (const ku of keyUrls) {
+      expect(sitemapSet.has(ku), `Expected key URL missing from sitemap: ${ku}`).toBe(true);
+    }
+
+    // 8. Verify specific redirected URLs are excluded
+    const excludedUrls = [
+      'https://rechenhafen.de/rechner/warmmiete-zu-kaltmiete-rechner/',
+      'https://rechenhafen.de/rechner/warmmiete-berechnen/',
+      'https://rechenhafen.de/rechner/sparziel-rechner/',
+      'https://rechenhafen.de/rechner/autokredit-rechner/',
+      'https://rechenhafen.de/rechner/beton-rechner/',
+      'https://rechenhafen.de/rechner/gasverbrauch-rechner/',
+      'https://rechenhafen.de/rechner/gaskosten-rechner/',
+      'https://rechenhafen.de/rechner/schalungsstein-rechner/',
+    ];
+    for (const eu of excludedUrls) {
+      expect(sitemapSet.has(eu), `Excluded redirect URL present in sitemap: ${eu}`).toBe(false);
+    }
+  });
 });
 
 

@@ -1243,6 +1243,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       sourceUrl: 'https://www.bundesfinanzministerium.de',
       lastVerified: '2026-03-01',
     },
+    trustMeta: {
+      lastReviewed: '2026-10-07',
+      sourceName: 'Bundesfinanzministerium (BMF) & § 6 Abs. 1 Nr. 4 EStG',
+      legalBasis: '0,25 % Regelung bei Gehaltsumwandlung für Fahrräder und Pedelecs',
+    },
   },
 
   {

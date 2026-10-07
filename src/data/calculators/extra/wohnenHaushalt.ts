@@ -1423,6 +1423,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       },
     ],
     relatedSlugs: ['mietbelastungsquote-rechner', 'mietbudget-rechner', 'kaufnebenkosten-rechner', 'untermiete-rechner', 'stromkostenrechner', 'heizkostenvergleich-rechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-07',
+      sourceName: 'Betriebskostenverordnung (BetrKV) & Deutscher Mieterbund',
+      legalBasis: '§ 556 BGB, § 2 BetrKV',
+    },
   },
 
   {
