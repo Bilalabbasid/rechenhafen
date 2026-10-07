@@ -2180,18 +2180,22 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "kapitalertragsteuer-rechner",
     "slug": "kapitalertragsteuer-rechner",
-    "name": "Kapitalertragsteuer-Rechner (Abgeltungsteuer + Soli)",
+    "name": "Kapitalertragsteuer-Rechner (Abgeltungsteuer, Soli & Sparer-Pauschbetrag)",
     "category": "finanzen",
     "keywords": [
       "kapitalertragsteuer-rechner",
-      "kapitalertragsteuer-rechner (abgeltungsteuer + soli)",
+      "kapitalertragsteuer-rechner (abgeltungsteuer, soli & sparer-pauschbetrag)",
       "abgeltungsteuer",
       "finanzen",
       "sparen & vermögensaufbau",
       "kapitalertragsteuer rechner",
-      "abgeltungsteuer berechnen formel",
+      "abgeltungsteuer rechner",
+      "kapitalertragsteuer berechnen",
+      "sparer pauschbetrag rechner",
+      "kapitalertragsteuer soli kirchensteuer",
       "steuern aktiengewinne rechner",
-      "solidaritaetszuschlag zinsen"
+      "steuern dividenden zinsen rechner",
+      "abgeltungssteuer netto ertrag berechnen"
     ]
   },
   {

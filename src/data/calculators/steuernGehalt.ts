@@ -355,7 +355,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was bringt das Ehegattensplitting?', answer: 'Beim Splittingverfahren (§ 32a Abs. 5 EStG) wird das gemeinsame Einkommen beider Partner halbiert, die Steuer für die Hälfte berechnet und anschließend verdoppelt. Das bringt den größten Steuervorteil, wenn ein Partner deutlich mehr verdient als der andere.' },
       { question: 'Gilt der Spitzensteuersatz von 42 % für mein gesamtes Einkommen?', answer: 'Nein, das ist ein weit verbreiteter Irrtum. Der Spitzensteuersatz ist ein Grenzsteuersatz. Er fällt nur für den Betrag an, der die Tarifgrenze (69.879 € im Jahr 2026) übersteigt. Alle Einkommensbestandteile darunter werden mit den niedrigeren Zonensätzen besteuert.' },
     ],
-    relatedSlugs: ['grenzsteuersatz-rechner', 'brutto-netto-rechner', 'solidaritaetszuschlag-rechner', 'kirchensteuer-rechner'],
+    relatedSlugs: ['grenzsteuersatz-rechner', 'brutto-netto-rechner', 'solidaritaetszuschlag-rechner', 'kirchensteuer-rechner', 'kapitalertragsteuer-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -571,7 +571,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Gibt es eine Kappung bei sehr hohem Einkommen?', answer: 'Ja, in den meisten Bundesländern gibt es auf Antrag eine Kappung der Kirchensteuer auf 2,75 % bis 3,5 % des zu versteuernden Einkommens, um Spitzenverdiener nicht übermäßig zu belasten.' },
     ],
-    relatedSlugs: ['einkommensteuerrechner', 'brutto-netto-rechner', 'solidaritaetszuschlag-rechner'],
+    relatedSlugs: ['einkommensteuerrechner', 'brutto-netto-rechner', 'solidaritaetszuschlag-rechner', 'kapitalertragsteuer-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

@@ -62,13 +62,13 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Tagesgeld bietet tägliche Verfügbarkeit bei voller Einlagensicherung bis 100.000 € je Kunde und Bank nach EU-Recht.',
-      details: 'Zinsertrag = Anlagebetrag · (Zinssatz / 100) · (Tage / 360) nach deutscher Zinsmethode. Bei vierteljährlicher oder monatlicher Zinsgutschrift entsteht ein spürbarer Zinseszinseffekt.',
+      details: 'Zinsertrag = Anlagebetrag · (Zinssatz / 100) · (Tage / 360) nach deutscher Zinsmethode. Bei vierteljährlicher oder monatlicher Zinsgutschrift entsteht ein spürbarer Zinseszinseffekt. Zinserträge unterliegen bei Überschreiten des Sparer-Pauschbetrags der Abgeltungsteuer. Berechnen Sie Ihren Netto-Zinsertrag mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und verwalten Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
     },
     faqs: [
       { question: 'Wie sicher ist Tagesgeld bei Banken in der EU?', answer: 'Über die gesetzliche Einlagensicherung (EdB in Deutschland) sind Einlagen bis 100.000 € pro Person und Kreditinstitut gesetzlich garantiert abgesichert.' },
       { question: 'Was ist der Unterschied zwischen Aktionszins und Bestandskundenzins?', answer: 'Banken locken Neukunden oft mit zeitlich befristeten Zinsgarantien (z. B. für 3 bis 6 Monate); danach fällt der Zins auf das variable Niveau für Bestandskunden zurück.' },
     ],
-    relatedSlugs: ['liquiditaetsreserve-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'liquiditaetsreserve-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
   },
   {
     id: 'festgeld-rechner',
@@ -148,13 +148,13 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Festgeld garantiert einen festen Zinssatz über eine fest vereinbarte Laufzeit (z. B. 6, 12, 24 oder 36 Monate) ohne Zinsänderungsrisiko.',
-      details: 'Da das Kapital während der Laufzeit unkündbar gebunden ist, belohnen Banken Festgeld typischerweise mit planbaren Zinsen, die unabhängig von EZB-Zinssenkungen konstant bleiben.',
+      details: 'Da das Kapital während der Laufzeit unkündbar gebunden ist, belohnen Banken Festgeld typischerweise mit planbaren Zinsen, die unabhängig von EZB-Zinssenkungen konstant bleiben. Bei Zinsauszahlung zieht die Bank bei Überschreiten des Freibetrags die 25 %ige Kapitalertragsteuer zuzüglich Soli ab. Ermitteln Sie Ihren Reingewinn mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/).',
     },
     faqs: [
       { question: 'Kann man ein Festgeldkonto vor Ablauf der Laufzeit vorzeitig kündigen?', answer: 'Grundsätzlich nein. Nur in extremen Härtefällen (§ 314 BGB) stimmen Banken einer vorzeitigen Auflösung zu, meist unter vollständigem Verlust aller aufgelaufenen Zinsen.' },
       { question: 'Was ist die Festgeld-Treppen-Strategie?', answer: 'Man teilt das Sparvermögen auf mehrere Festgelder mit gestaffelten Laufzeiten (1, 2, 3 Jahre) auf; so wird jedes Jahr ein Teilbetrag fällig und liquide wiederanlegbar.' },
     ],
-    relatedSlugs: ['tagesgeld-rechner', 'zinseszinsrechner', 'spardauer-rechner'],
+    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'tagesgeld-rechner', 'zinseszinsrechner', 'spardauer-rechner'],
   },
   {
     id: 'spardauer-rechner',
@@ -404,7 +404,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Wann wird die Dividende in Deutschland ausgezahlt?', answer: 'Bei deutschen Aktiengesellschaften (AG) wird die Dividende einmal jährlich am dritten Werktag nach der ordentlichen Hauptversammlung (§ 58 Abs. 4 AktG) gutgeschrieben.' },
       { question: 'Ist eine extrem hohe Dividendenrendite immer ein gutes Zeichen?', answer: 'Nicht zwingend: Eine ungewöhnlich hohe Dividendenrendite (> 8 %) entsteht oft durch einen drastischen Kurseinbruch der Aktie wegen operativer Krisen, was Vorbote einer Dividendenkürzung sein kann.' },
     ],
-    relatedSlugs: ['renditerechner', 'etf-sparplan-rechner', 'zinseszinsrechner'],
+    relatedSlugs: ['renditerechner', 'etf-sparplan-rechner', 'zinseszinsrechner', 'kapitalertragsteuer-rechner'],
   },
   {
     id: 'ewige-rente-rechner',
@@ -575,156 +575,416 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
   {
     id: 'kapitalertragsteuer-rechner',
     slug: 'kapitalertragsteuer-rechner',
-    name: 'Kapitalertragsteuer-Rechner (Abgeltungsteuer + Soli)',
-    shortName: 'Abgeltungsteuer',
+    name: 'Kapitalertragsteuer-Rechner (Abgeltungsteuer, Soli & Sparer-Pauschbetrag)',
+    shortName: 'Kapitalertragsteuer',
     category: 'finanzen',
     subcategory: 'Sparen & Vermögensaufbau',
-    metaTitle: 'Kapitalertragsteuer Rechner – Abgeltungsteuer, Soli',
-    metaDescription: 'Berechnen Sie die exakte Steuerlast auf Kapitalerträge: 25 % Abgeltungsteuer, 5,5 % Soli und optionale Kirchensteuer in Bayern & NRW.',
-    h1: 'Kapitalertragsteuer & Abgeltungsteuer Rechner',
-    shortDescription: 'Ermittelt die gesetzliche Steuerbelastung auf Zinsen, Dividenden und Aktiengewinne nach § 32d EStG.',
-    searchKeywords: ['kapitalertragsteuer rechner', 'abgeltungsteuer berechnen formel', 'steuern aktiengewinne rechner', 'solidaritaetszuschlag zinsen'],
+    metaTitle: 'Kapitalertragsteuer Rechner 2026: Abgeltungsteuer, Soli & Freibetrag',
+    metaDescription: 'Kapitalertragsteuer berechnen für 2026: Exakte Abgeltungsteuer (25 %), Soli (5,5 %) & Kirchensteuer mit Sparer-Pauschbetrag (1.000 € / 2.000 €) und Netto-Ertrag.',
+    h1: 'Kapitalertragsteuer Rechner – Abgeltungsteuer & Netto-Ertrag berechnen',
+    shortDescription: 'Ermittelt die gesetzliche Abgeltungsteuer auf Zinsen, Dividenden und Kursgewinne unter Einbezug von Sparer-Pauschbetrag, Solidaritätszuschlag und Kirchensteuer nach § 32d EStG.',
+    searchKeywords: [
+      'kapitalertragsteuer rechner',
+      'abgeltungsteuer rechner',
+      'kapitalertragsteuer berechnen',
+      'sparer pauschbetrag rechner',
+      'kapitalertragsteuer soli kirchensteuer',
+      'steuern aktiengewinne rechner',
+      'steuern dividenden zinsen rechner',
+      'abgeltungssteuer netto ertrag berechnen',
+    ],
     inputs: [
-      { id: 'profit', label: 'Zu versteuernder Kapitalertrag in € (nach Sparer-Pauschbetrag)', type: 'number', defaultValue: 3000, min: 0, step: 100, unit: '€', helpText: 'Betrag der steuerpflichtigen Erträge nach Abzug des Sparer-Pauschbetrags (1.000 € einzeln / 2.000 € zusammen) und Verlustverrechnung.' },
+      {
+        id: 'capitalIncome',
+        label: 'Brutto-Kapitalertrag',
+        type: 'number',
+        defaultValue: 3000,
+        min: 0,
+        max: 50000000,
+        step: 50,
+        unit: '€',
+        helpText: 'Jährliche Bruttoerträge vor Steuern: Zinsen (Tagesgeld, Festgeld), Dividenden, Fondsausschüttungen oder realisierte Kursgewinne.',
+      },
+      {
+        id: 'maritalStatus',
+        label: 'Veranlagungsart & Sparer-Pauschbetrag',
+        type: 'select',
+        defaultValue: 'single',
+        options: [
+          { value: 'single', label: 'Einzelveranlagung (1.000 € Sparer-Pauschbetrag)' },
+          { value: 'married', label: 'Zusammenveranlagung / Verheiratet (2.000 € Sparer-Pauschbetrag)' },
+        ],
+        helpText: 'Gesetzlicher Sparer-Pauschbetrag (§ 20 Abs. 9 EStG): 1.000 € für Alleinstehende, 2.000 € für zusammenveranlagte Ehepartner.',
+      },
+      {
+        id: 'usedAllowance',
+        label: 'Bereits anderweitig genutzter Freibetrag',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        max: 2000,
+        step: 50,
+        unit: '€',
+        helpText: 'Teil Ihres Sparer-Pauschbetrags, den Sie bereits bei anderen Banken oder Brokern freigestellt oder für frühere Erträge verbraucht haben.',
+      },
       {
         id: 'churchState',
-        label: 'Kirchensteuerpflicht',
+        label: 'Kirchensteuerpflicht & Bundesland',
         type: 'select',
         defaultValue: 'none',
         options: [
-          { value: 'none', label: 'Keine Kirchensteuer (26,375 % Gesamtbelastung)' },
-          { value: '8', label: 'Bayern & Baden-Württemberg (8 % Kirchensteuer)' },
-          { value: '9', label: 'Übrige Bundesländer (9 % Kirchensteuer)' },
+          { value: 'none', label: 'Keine Kirchensteuer (Regelsteuersatz 26,375 % inkl. Soli)' },
+          { value: '8', label: 'Bayern & Baden-Württemberg (8 % Kirchensteuer – 27,82 % Gesamt)' },
+          { value: '9', label: 'Übrige 14 Bundesländer (9 % Kirchensteuer – 28,00 % Gesamt)' },
         ],
+        helpText: 'Bei Kirchensteuerpflicht ermäßigt sich die Kapitalertragsteuer gesetzlich nach § 32d Abs. 1 Satz 4 EStG auf e / (4 + k).',
       },
     ],
     calculate: (inputs) => {
-      if (inputs.profit === undefined || inputs.profit === null || String(inputs.profit).trim() === '') {
+      const grossInput = inputs.capitalIncome;
+      if (grossInput === undefined || grossInput === null || String(grossInput).trim() === '') {
         return {
           primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '-' },
-          error: 'Bitte geben Sie den zu versteuernden Kapitalertrag ein.',
-        };
-      }
-      const p = parseFloat(inputs.profit);
-      if (isNaN(p) || p < 0) {
-        return {
-          primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '-' },
-          error: 'Der zu versteuernde Kapitalertrag darf nicht negativ sein.',
+          error: 'Bitte geben Sie den Brutto-Kapitalertrag ein.',
         };
       }
 
-      const church = inputs.churchState || 'none';
-      const k = church === '8' ? 0.08 : church === '9' ? 0.09 : 0;
+      const gross = parseFloat(String(grossInput).replace(',', '.'));
+      if (isNaN(gross) || gross < 0) {
+        return {
+          primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '-' },
+          error: 'Der Brutto-Kapitalertrag darf nicht negativ sein.',
+        };
+      }
 
-      // Sonderfall 0 € Ertrag
-      if (p === 0) {
+      const maritalStatus = inputs.maritalStatus === 'married' ? 'married' : 'single';
+      const totalAllowance = maritalStatus === 'married' ? 2000 : 1000;
+
+      const rawUsed = parseFloat(String(inputs.usedAllowance || 0).replace(',', '.'));
+      const usedAllowance = isNaN(rawUsed) || rawUsed < 0 ? 0 : Math.min(rawUsed, totalAllowance);
+
+      const availableAllowance = Math.max(0, totalAllowance - usedAllowance);
+      const taxFreeAmount = Math.min(gross, availableAllowance);
+      const taxableAmount = Math.max(0, gross - taxFreeAmount);
+
+      const churchState = inputs.churchState || 'none';
+      const k = churchState === '8' ? 0.08 : churchState === '9' ? 0.09 : 0;
+
+      // Fall 1: Brutto-Ertrag 0 €
+      if (gross === 0) {
         return {
           primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '0,00 €', highlight: true },
           secondary: [
             { id: 'net', label: 'Netto-Auszahlung auf Konto', value: 0, formattedValue: '0,00 €' },
+            { id: 'taxFree', label: 'Steuerfreier Anteil (Sparer-Pauschbetrag)', value: 0, formattedValue: '0,00 €' },
+            { id: 'taxable', label: 'Steuerpflichtiger Kapitalertrag', value: 0, formattedValue: '0,00 €' },
             { id: 'kapEst', label: 'Kapitalertragsteuer (25 %)', value: 0, formattedValue: '0,00 €' },
             { id: 'solz', label: 'Solidaritätszuschlag (5,5 %)', value: 0, formattedValue: '0,00 €' },
-            { id: 'kist', label: `Kirchensteuer (${k > 0 ? (k * 100).toFixed(0) + ' %' : 'Keine'})`, value: 0, formattedValue: '0,00 €' },
-            { id: 'rate', label: 'Effektiver Steuersatz', value: 0, formattedValue: '0,00 %' },
+            { id: 'kist', label: 'Kirchensteuer', value: 0, formattedValue: '0,00 €' },
+            { id: 'effectiveRate', label: 'Effektiver Steuersatz', value: 0, formattedValue: '0,00 %' },
           ],
-          summaryText: 'Auf einen steuerpflichtigen Kapitalertrag von 0,00 € fällt keine Kapitalertragsteuer an.',
+          basisSummary: [
+            { label: 'Brutto-Kapitalertrag', value: '0,00 €' },
+            { label: 'Veranlagungsart', value: maritalStatus === 'married' ? 'Zusammenveranlagung (2.000 €)' : 'Einzelveranlagung (1.000 €)' },
+            { label: 'Bereits genutzter Freibetrag', value: formatCurrency(usedAllowance) },
+            { label: 'Verfügbarer Freibetrag hier', value: formatCurrency(availableAllowance) },
+            { label: 'Steuerpflichtiger Ertrag', value: '0,00 €' },
+            { label: 'Kirchensteuerstatus', value: k === 0.08 ? 'Bayern / Baden-Württemberg (8 %)' : k === 0.09 ? 'Übrige Bundesländer (9 %)' : 'Keine Kirchensteuer' },
+            { label: 'Rechtsstand', value: '2026 (§ 32d, § 20 Abs. 9 EStG)' },
+          ],
+          qualifications: [
+            'Gesetzliche Schätzung: Bei 0,00 € Ertrag fällt keine Kapitalertragsteuer an.',
+            'Unverbindliche Orientierungsberechnung nach § 32d EStG – keine steuerliche Beratung.',
+          ],
+          summaryText: 'Auf einen Brutto-Kapitalertrag von 0,00 € fällt keine Steuer an.',
         };
       }
 
-      // Gesetzliche Formel nach § 32d Abs. 1 Satz 4-5 EStG:
-      // Bei Kirchensteuerpflicht ermäßigt sich die Kapitalertragsteuer auf: KapESt = e / (4 + k)
-      const kapEstExact = p / (4 + k);
-      const solzExact = kapEstExact * 0.055;
-      const kistExact = kapEstExact * k;
+      // Fall 2: Ertrag vollständig innerhalb des Sparer-Pauschbetrags
+      if (taxableAmount === 0) {
+        return {
+          primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: 0, formattedValue: '0,00 €', highlight: true },
+          secondary: [
+            { id: 'net', label: 'Netto-Auszahlung auf Konto', value: gross, formattedValue: formatCurrency(gross) },
+            { id: 'taxFree', label: 'Steuerfreier Anteil (Sparer-Pauschbetrag)', value: taxFreeAmount, formattedValue: formatCurrency(taxFreeAmount) },
+            { id: 'taxable', label: 'Steuerpflichtiger Kapitalertrag', value: 0, formattedValue: '0,00 €' },
+            { id: 'kapEst', label: 'Kapitalertragsteuer', value: 0, formattedValue: '0,00 €' },
+            { id: 'solz', label: 'Solidaritätszuschlag', value: 0, formattedValue: '0,00 €' },
+            { id: 'kist', label: 'Kirchensteuer', value: 0, formattedValue: '0,00 €' },
+            { id: 'effectiveRate', label: 'Effektiver Steuersatz', value: 0, formattedValue: '0,00 %' },
+          ],
+          basisSummary: [
+            { label: 'Brutto-Kapitalertrag', value: formatCurrency(gross) },
+            { label: 'Veranlagungsart', value: maritalStatus === 'married' ? 'Zusammenveranlagung (2.000 €)' : 'Einzelveranlagung (1.000 €)' },
+            { label: 'Bereits genutzter Freibetrag', value: formatCurrency(usedAllowance) },
+            { label: 'Verfügbarer Freibetrag hier', value: formatCurrency(availableAllowance) },
+            { label: 'Tatsächlich genutzter Freibetrag', value: formatCurrency(taxFreeAmount) },
+            { label: 'Steuerpflichtiger Ertrag', value: '0,00 €' },
+            { label: 'Kirchensteuerstatus', value: k === 0.08 ? 'Bayern / Baden-Württemberg (8 %)' : k === 0.09 ? 'Übrige Bundesländer (9 %)' : 'Keine Kirchensteuer' },
+            { label: 'Rechtsstand', value: '2026 (§ 32d, § 20 Abs. 9 EStG)' },
+          ],
+          qualifications: [
+            '100 % Steuerfrei: Ihr Bruttoertrag liegt vollständig innerhalb des verfügbaren Sparer-Pauschbetrags.',
+            'Voraussetzung: Ein gültiger Freistellungsauftrag muss bei der auszahlenden Bank oder dem Broker eingerichtet sein (§ 44a EStG).',
+            'Unverbindliche Orientierungsberechnung nach § 32d EStG – keine steuerliche Beratung.',
+          ],
+          summaryText: `Ihr Brutto-Kapitalertrag von ${formatCurrency(gross)} ist durch Ihren verfügbaren Sparer-Pauschbetrag von ${formatCurrency(availableAllowance)} zu 100 % steuerfrei. Sie erhalten die vollen ${formatCurrency(gross)} ohne Steuerabzug auf Ihr Konto.`,
+        };
+      }
 
-      // Kaufmännische Rundung auf Cent nach Abzugsregeln (§ 43a EStG)
+      // Fall 3: Steuerpflichtiger Ertrag > 0
+      // Gesetzliche Formeln nach § 32d Abs. 1 Satz 1 bis 5 EStG & § 4 SolzG:
+      // Bei Kirchensteuer ermäßigt sich KapESt nach der Formel: KapESt = Ertrag / (4 + k)
+      const kapEstExact = taxableAmount / (4 + k);
       const kapEst = Math.round(kapEstExact * 100) / 100;
-      const solz = Math.round(solzExact * 100) / 100;
-      const kist = Math.round(kistExact * 100) / 100;
+      // SolZ (5,5 %) und KiSt (8 % / 9 %) bemessen sich auf die ermittelte KapESt (§ 4 SolzG / § 43a EStG)
+      const solz = Math.round(kapEst * 0.055 * 100) / 100;
+      const kist = Math.round(kapEst * k * 100) / 100;
       const totalTax = Math.round((kapEst + solz + kist) * 100) / 100;
-      const netGain = Math.round((p - totalTax) * 100) / 100;
-      const effectiveRate = (totalTax / p) * 100;
+      const net = Math.round((gross - totalTax) * 100) / 100;
+
+      const effectiveRateOnGross = (totalTax / gross) * 100;
+      const statutoryRateOnTaxable = (totalTax / taxableAmount) * 100;
+
+      const kapEstPctLabel = k > 0 ? formatPercent((kapEst / taxableAmount) * 100, 2) : '25,00 %';
 
       return {
-        primary: { id: 'tax', label: 'Gesamte Steuerbelastung', value: totalTax, formattedValue: formatCurrency(totalTax), highlight: true },
+        primary: {
+          id: 'tax',
+          label: 'Gesamte Steuerbelastung',
+          value: totalTax,
+          formattedValue: formatCurrency(totalTax),
+          highlight: true,
+        },
         secondary: [
-          { id: 'net', label: 'Netto-Auszahlung auf Konto', value: netGain, formattedValue: formatCurrency(netGain) },
-          { id: 'kapEst', label: `Kapitalertragsteuer (${k > 0 ? formatPercent((kapEst / p) * 100, 2) : '25,00 %'})`, value: kapEst, formattedValue: formatCurrency(kapEst) },
-          { id: 'solz', label: 'Solidaritätszuschlag (5,5 % auf KapESt)', value: solz, formattedValue: formatCurrency(solz) },
-          { id: 'kist', label: `Kirchensteuer (${k > 0 ? (k * 100).toFixed(0) + ' % auf KapESt' : 'Keine'})`, value: kist, formattedValue: formatCurrency(kist) },
-          { id: 'rate', label: 'Effektiver Gesamtsteuersatz', value: effectiveRate, formattedValue: formatPercent(effectiveRate, 2) },
+          {
+            id: 'net',
+            label: 'Netto-Auszahlung auf Konto',
+            value: net,
+            formattedValue: formatCurrency(net),
+            highlight: true,
+          },
+          {
+            id: 'taxFree',
+            label: 'Steuerfreier Anteil (Sparer-Pauschbetrag)',
+            value: taxFreeAmount,
+            formattedValue: formatCurrency(taxFreeAmount),
+          },
+          {
+            id: 'taxable',
+            label: 'Zu versteuernder Kapitalertrag',
+            value: taxableAmount,
+            formattedValue: formatCurrency(taxableAmount),
+          },
+          {
+            id: 'kapEst',
+            label: `Kapitalertragsteuer (${kapEstPctLabel})`,
+            value: kapEst,
+            formattedValue: formatCurrency(kapEst),
+          },
+          {
+            id: 'solz',
+            label: 'Solidaritätszuschlag (5,5 % auf KapESt)',
+            value: solz,
+            formattedValue: formatCurrency(solz),
+          },
+          {
+            id: 'kist',
+            label: `Kirchensteuer (${k > 0 ? (k * 100).toFixed(0) + ' % auf KapESt' : 'Keine'})`,
+            value: kist,
+            formattedValue: formatCurrency(kist),
+          },
+          {
+            id: 'effectiveRate',
+            label: 'Effektiver Steuersatz (auf Brutto)',
+            value: effectiveRateOnGross,
+            formattedValue: formatPercent(effectiveRateOnGross, 2),
+          },
+          {
+            id: 'statutoryRate',
+            label: 'Steuersatz auf steuerpflichtigen Ertrag',
+            value: statutoryRateOnTaxable,
+            formattedValue: formatPercent(statutoryRateOnTaxable, 2),
+          },
         ],
-        summaryText: `Auf einen zu versteuernden Kapitalertrag von ${formatCurrency(p)} zahlen Sie insgesamt ${formatCurrency(totalTax)} Steuern (${formatPercent(effectiveRate, 2)} effektive Belastung). Nach Steuereinbehalt verbleiben Ihnen ${formatCurrency(netGain)} Netto.`,
+        basisSummary: [
+          { label: 'Brutto-Kapitalertrag', value: formatCurrency(gross) },
+          { label: 'Veranlagung / Sparer-Pauschbetrag', value: maritalStatus === 'married' ? 'Zusammenveranlagung (2.000 €)' : 'Einzelveranlagung (1.000 €)' },
+          { label: 'Bereits genutzter Freibetrag', value: formatCurrency(usedAllowance) },
+          { label: 'Verfügbarer Freibetrag für diesen Ertrag', value: formatCurrency(availableAllowance) },
+          { label: 'Tatsächlich steuerfreier Betrag', value: formatCurrency(taxFreeAmount) },
+          { label: 'Steuerpflichtiger Kapitalertrag', value: formatCurrency(taxableAmount) },
+          { label: 'Kirchensteuerstatus', value: k === 0.08 ? 'Bayern / Baden-Württemberg (8 %)' : k === 0.09 ? 'Übrige Bundesländer (9 %)' : 'Keine Kirchensteuer' },
+          { label: 'Rechtsstand', value: '2026 (§ 32d, § 20 Abs. 9 EStG)' },
+        ],
+        qualifications: [
+          'Gesetzliche Schätzung: Die Berechnung ermittelt den regelhaften Quellensteuerabzug nach § 32d und § 43a EStG. Individuelle Besonderheiten (Verlustvorträge, ausländische Quellensteuer, NV-Bescheinigung) können abweichen.',
+          'Günstigerprüfung (§ 32d Abs. 6 EStG): Liegt Ihr persönlicher Einkommensteuersatz unter 25 %, erstattet das Finanzamt im Rahmen der Steuererklärung (Anlage KAP) zu viel einbehaltene Abgeltungsteuer.',
+          'Teilfreistellung (§ 20 InvStG): Bei Aktienfonds sind 30 % der Erträge vorab steuerfrei (Mischfonds 15 %), was die Steuerlast weiter reduziert.',
+          'Unverbindliche Orientierungsberechnung – keine steuerliche Beratung.',
+        ],
+        summaryText: `Von ${formatCurrency(gross)} Brutto-Kapitalertrag bleiben nach Abzug von ${formatCurrency(taxFreeAmount)} Freibetrag noch ${formatCurrency(taxableAmount)} steuerpflichtig. Die gesamte Steuerlast beträgt ${formatCurrency(totalTax)} (${formatPercent(effectiveRateOnGross, 2)} bezogen auf den Bruttoertrag). Ihnen verbleiben ${formatCurrency(net)} Netto.`,
       };
     },
-    formula: 'KapESt = Ertrag / (4 + k); SolZ = 5,5 % × KapESt; KiSt = k × KapESt (Gesamtsteuer = KapESt + SolZ + KiSt)',
-    formulaExplanation: 'Gesetzliche Modifikation nach § 32d Abs. 1 Satz 4 EStG: Bei Kirchensteuerpflicht ermäßigt sich die Abgeltungsteuer, da die Kirchensteuer als Sonderausgabe pauschal steuermindernd berücksichtigt wird.',
+    formula: 'Steuerpflichtig = Brutto - Freibetrag; KapESt = Ertrag / (4 + k); SolZ = 5,5 % × KapESt; KiSt = k × KapESt',
+    formulaExplanation: 'Gesetzliche Formel nach § 32d Abs. 1 EStG: Ohne Kirchensteuer (k = 0) fallen 25 % Abgeltungsteuer und 5,5 % Soli an (zusammen 26,375 %). Bei Kirchensteuerpflicht ermäßigt sich die Kapitalertragsteuer auf e / (4 + k), da die Kirchensteuer als Sonderausgabe pauschaliert abgezogen wird. In Bayern & Baden-Württemberg (k = 0,08) beträgt die Gesamtsteuer ca. 27,82 %, in anderen Bundesländern (k = 0,09) ca. 28,00 %.',
     workedExample: {
-      title: 'Beispiel: 3.000 € steuerpflichtiger Ertrag ohne Kirchensteuer',
-      description: 'Kapitalertragsteuer (25 % = 750,00 €) + Solidaritätszuschlag (5,5 % von 750 € = 41,25 €) ergibt exakt 791,25 € Gesamtsteuer (26,375 %). Netto-Ertrag: 2.208,75 €.',
-      inputs: { profit: 3000, churchState: 'none' },
-      resultSummary: '791,25 € Gesamtsteuer (26,38 %)',
+      title: 'Beispiel: 3.000 € Ertrag, Einzelveranlagung, keine Kirchensteuer',
+      description: 'Vollständiger Sparer-Pauschbetrag (1.000 €) verfügbar. Steuerpflichtiger Ertrag: 2.000 €. KapESt (25 % = 500,00 €) + Soli (5,5 % = 27,50 €). Gesamtsteuer: 527,50 €. Netto-Auszahlung: 2.472,50 €.',
+      inputs: { capitalIncome: 3000, maritalStatus: 'single', usedAllowance: 0, churchState: 'none' },
+      resultSummary: '527,50 € Steuer (Netto: 2.472,50 €)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: 3.000 € Ertrag, Einzelveranlagung, keine Kirchensteuer',
+        description: 'Vollständiger Sparer-Pauschbetrag (1.000 €) verfügbar. Steuerpflichtiger Ertrag: 2.000 €. KapESt (25 % = 500,00 €) + Soli (5,5 % = 27,50 €). Gesamtsteuer: 527,50 €. Netto-Auszahlung: 2.472,50 € (effektive Steuerquote auf Brutto: 17,58 %).',
+        inputs: { capitalIncome: 3000, maritalStatus: 'single', usedAllowance: 0, churchState: 'none' },
+        resultSummary: '527,50 € Steuer (Netto: 2.472,50 €)',
+      },
+      {
+        title: 'Beispiel 2: 5.000 € Ertrag, Zusammenveranlagung, 500 € Freibetrag anderweitig genutzt, 9 % Kirchensteuer',
+        description: 'Sparer-Pauschbetrag 2.000 € abzüglich 500 € anderweitig verbraucht = 1.500 € verfügbar. Steuerpflichtig: 3.500 €. KapESt (3.500 / 4,09 = 855,75 €) + Soli (47,07 €) + KiSt (77,02 €). Gesamtsteuer: 979,84 €. Netto-Ertrag: 4.020,16 €.',
+        inputs: { capitalIncome: 5000, maritalStatus: 'married', usedAllowance: 500, churchState: '9' },
+        resultSummary: '979,84 € Steuer (Netto: 4.020,16 €)',
+      },
+      {
+        title: 'Beispiel 3: 750 € Ertrag, Einzelveranlagung, voller Freibetrag',
+        description: 'Der Bruttoertrag von 750 € liegt komplett innerhalb des Sparer-Pauschbetrags von 1.000 €. Es fällt 0,00 € Steuer an. Die Auszahlung erfolgt zu 100 % steuerfrei (750,00 € Netto).',
+        inputs: { capitalIncome: 750, maritalStatus: 'single', usedAllowance: 0, churchState: 'none' },
+        resultSummary: '0,00 € Steuer (100 % steuerfrei)',
+      },
+    ],
     content: {
-      intro: 'Die Abgeltungsteuer auf Kapitalerträge (Zinsen, Dividenden, realisierte Kursgewinne) beträgt in Deutschland pauschal 25 Prozent zuzüglich Solidaritätszuschlag und Kirchensteuer.',
-      details: 'Der reguläre Steuersatz ohne Kirchensteuer beträgt exakt 26,375 % (25 % Abgeltungsteuer + 5,5 % Solidaritätszuschlag darauf). Bei Kirchensteuerpflicht ermäßigt sich die Abgeltungsteuer nach der gesetzlichen Formel § 32d Abs. 1 Satz 4 EStG: In Bayern und Baden-Württemberg (8 % Kirchensteuer) sinkt der Abgeltungsteuersatz auf 24,51 % (Gesamtsteuer: ca. 27,82 %). In den übrigen Bundesländern (9 % Kirchensteuer) sinkt er auf 24,45 % (Gesamtsteuer: ca. 28,00 %). Unter "zu versteuernder Kapitalertrag" versteht der Gesetzgeber den Gewinn nach Abzug des Sparer-Pauschbetrags (§ 20 Abs. 9 EStG: 1.000 € für Alleinstehende bzw. 2.000 € für Ehegatten) und nach Verrechnung mit Verlusten.',
+      intro: 'Mit unserem kostenlosen Kapitalertragsteuer-Rechner für das Veranlagungsjahr 2026 ermitteln Sie die exakte Steuerlast und Ihren Netto-Ertrag aus Zinsen, Dividenden, Fondsausschüttungen und Aktiengewinnen. Der Rechner berücksichtigt den Sparer-Pauschbetrag (§ 20 Abs. 9 EStG: 1.000 € für Alleinstehende bzw. 2.000 € für Ehegatten), bereits anderweitig erteilte Freistellungsaufträge, den Solidaritätszuschlag sowie die gesetzliche Kirchensteuerermäßigung nach § 32d EStG.',
+      details: 'Die Abgeltungsteuer beträgt in Deutschland grundsätzlich 25 Prozent. Zuzüglich Solidaritätszuschlag (5,5 % auf die Kapitalertragsteuer) beläuft sich der reguläre Steuersatz auf exakt 26,375 %. Sind Sie kirchensteuerpflichtig, greift die gesetzliche Modifikation nach § 32d Abs. 1 Satz 4 EStG: Da Kirchensteuer als Sonderausgabe steuermindernd wirkt, sinkt der Steuersatz der Kapitalertragsteuer auf 24,51 % (in Bayern und Baden-Württemberg bei 8 % Kirchensteuer) bzw. 24,45 % (in den übrigen Bundesländern bei 9 % Kirchensteuer). Berechnen Sie parallel Ihre Erträge mit unserem [ETF-Sparplan-Rechner](/rechner/etf-sparplan-rechner/), unserem [Zinseszinsrechner](/rechner/zinseszinsrechner/) oder dem [Dividenden-Rechner](/rechner/dividenden-rechner/).',
+      sections: [
+        {
+          title: 'Wie hoch ist die Kapitalertragsteuer in Deutschland?',
+          content: 'Die Kapitalertragsteuer (auch bekannt als Abgeltungsteuer) ist eine Quellensteuer auf private Kapitaleinkünfte (§ 20 EStG). Sie wird von deutschen Kreditinstituten und Brokern bei der Auszahlung von Zinsen, Dividenden und realisierten Kursgewinnen automatisch einbehalten und an das Finanzamt abgeführt.\n\nDie Höhe der Steuer gliedert sich in folgende gesetzliche Bausteine:\n- **Pauschale Kapitalertragsteuer:** Gesetzlich 25,00 % auf den steuerpflichtigen Ertrag (§ 32d Abs. 1 Satz 1 EStG).\n- **Solidaritätszuschlag:** Gesetzlich 5,50 % der Kapitalertragsteuer (= 1,375 % auf den steuerpflichtigen Ertrag). Der Soli fällt auf Kapitalerträge weiterhin uneingeschränkt an (§ 4 SolzG 1995).\n- **Kirchensteuer (optional):** Sind Sie Mitglied einer steuererhebenden Religionsgemeinschaft, wird Kirchensteuer fällig (8 % in Bayern und Baden-Württemberg, 9 % in den übrigen Bundesländern). Gemäß § 32d Abs. 1 Satz 4 EStG ermäßigt sich die Kapitalertragsteuer auf Ertrag / (4 + k), da die Kirchensteuer pauschal als Sonderausgabe abgezogen wird.\n\n| Kirchensteuerstatus | KapESt-Satz | Soli-Satz | KiSt-Satz | Effektiver Gesamtsteuersatz |\n| --- | --- | --- | --- | --- |\n| Ohne Kirchensteuer | 25,00 % | 1,375 % | 0,00 % | **26,375 %** |\n| 8 % KiSt (BY, BW) | 24,51 % | 1,348 % | 1,961 % | **27,819 % (ca. 27,82 %)** |\n| 9 % KiSt (übrige 14 Länder) | 24,45 % | 1,345 % | 2,201 % | **27,995 % (ca. 28,00 %)** |',
+        },
+        {
+          title: 'Was ist der Sparer-Pauschbetrag und wie hoch ist er?',
+          content: 'Nach § 20 Abs. 9 EStG steht jedem Steuerpflichtigen ein jährlicher steuerfreier Grundbetrag auf Kapitaleinkünfte zu, der sogenannte Sparer-Pauschbetrag:\n- **1.000 € pro Kalenderjahr** für Alleinstehende / Einzelveranlagung.\n- **2.000 € pro Kalenderjahr** für zusammenveranlagte Ehepartner oder eingetragene Lebenspartner.\n\nErst Erträge, die diesen Pauschbetrag übersteigen, müssen versteuert werden. Im Gegenzug ist der Abzug tatsächlicher Werbungskosten (wie Depotgebühren, Fachliteratur oder Transaktionskosten) gesetzlich ausgeschlossen (§ 20 Abs. 9 Satz 1 Halbsatz 2 EStG).',
+        },
+        {
+          title: 'Wie funktioniert ein Freistellungsauftrag bei Banken?',
+          content: 'Damit Ihre Bank oder Ihr Broker die Kapitalertragsteuer nicht sofort abzieht, müssen Sie einen **Freistellungsauftrag** nach § 44a EStG einrichten:\n- Sie können Ihren Sparer-Pauschbetrag auf **beliebig viele Kreditinstitute aufteilen** (z. B. 400 € bei Bank A für Tagesgeld und 600 € bei Broker B für ETF-Gewinne).\n- Die Summe aller erteilten Freistellungsaufträge darf jedoch **1.000 € (bzw. 2.000 € bei Verheirateten) nicht überschreiten**.\n- Haben Sie keinen Freistellungsauftrag erteilt oder ist er zu niedrig bemessen, zieht das Kreditinstitut die Steuer ab. Sie können sich zu viel gezahlte Beträge über die **Anlage KAP** in Ihrer jährlichen Einkommensteuererklärung vom Finanzamt zurückholen. Planen Sie Ihre Freibeträge mit unserem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
+        },
+        {
+          title: 'Wann kann die Günstigerprüfung nach § 32d Abs. 6 EStG relevant sein?',
+          content: 'Die Abgeltungsteuer von 25 % soll Kapitaleinkünfte pauschal abgelten. Wenn Ihr **persönlicher Einkommensteuersatz** (Grenzsteuersatz) jedoch **unter 25 %** liegt, dürfen Sie in der Steuererklärung die sogenannte **Günstigerprüfung** beantragen:\n- Das Finanzamt prüft automatisch, ob die Versteuerung Ihrer Kapitalerträge mit Ihrem individuellen Steuersatz günstiger ist als der 25 %-Abgeltungsteuertarif.\n- Ist dies der Fall, wird die Differenz erstattet.\n- Typische Fälle sind Studierende, Rentner, Auszubildende oder Personen mit geringem oder unregelmäßigem Erwerbseinkommen (zu versteuerndes Einkommen unter ca. 20.000 € für Alleinstehende). Berechnen Sie Ihre individuelle Steuerprogression mit unserem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/) und dem [Kirchensteuer-Rechner](/rechner/kirchensteuer-rechner/).',
+        },
+        {
+          title: 'Was dieser Rechner nicht berücksichtigen kann (Besonderheiten & Grenzen)',
+          content: 'Dieser Online-Rechner ermittelt den regulären Quellensteuerabzug nach deutschem Steuerrecht. Folgende Sondersachverhalte können im Einzelfall abweichende Ergebnisse bedingen:\n- **Fonds-Teilfreistellung (§ 20 InvStG):** Bei Aktienfonds mit mindestens 51 % Aktienquote sind 30 % aller Erträge und Gewinne steuerfrei (bei Mischfonds mit mind. 25 % Aktienquote: 15 %). Unser Rechner ermittelt den Steuerabzug auf den steuerpflichtigen Ertrag nach Berücksichtigung dieser Teilfreistellung.\n- **Verlustverrechnungstöpfe (§ 20 Abs. 6 EStG):** Realisierte Verluste werden von Banken in getrennten Töpfen (Aktienverluste vs. sonstige Verluste) mit Gewinnen verrechnet, bevor Steuer anfällt.\n- **Ausländische Quellensteuer (§ 32d Abs. 5 EStG):** Bereits im Ausland einbehaltene Steuern (z. B. auf US-Dividenden nach Doppelbesteuerungsabkommen) können auf die deutsche Abgeltungsteuer angerechnet werden.\n- **Nichtveranlagungs-Bescheinigung (NV-Bescheinigung):** Liegt Ihr Gesamteinkommen unter dem Grundfreibetrag, können Sie beim Finanzamt eine NV-Bescheinigung beantragen; die Bank zahlt dann auch Erträge oberhalb von 1.000 € ohne Steuerabzug aus.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie wirkt sich die Kirchensteuer auf die Abgeltungsteuer aus?', answer: 'Da Kirchensteuer als Sonderausgabe abzugsfähig ist, mindert sie bei Kapitalerträgen direkt den Steuersatz der Kapitalertragsteuer (§ 32d Abs. 1 Satz 4 EStG). Die Formel lautet e / (4 + k). Dadurch sinkt die KapESt in Bayern und Baden-Württemberg auf ca. 24,51 % (bei 8 % KiSt) bzw. in den übrigen Bundesländern auf ca. 24,45 % (bei 9 % KiSt).' },
-      { question: 'Wann fällt beim Kapitalertrag der Solidaritätszuschlag an?', answer: 'Auf Kapitalerträge fällt der Solidaritätszuschlag (5,5 % auf die Kapitalertragsteuer) uneingeschränkt an. Die Freigrenzen nach dem Gesetz zur Rückführung des Solidaritätszuschlags gelten nur für die reguläre tarifliche Einkommensteuer, nicht für die pauschale Abgeltungsteuer (§ 4 SolzG 1995).' },
-      { question: 'Wann lohnt sich die Günstigerprüfung in der Steuererklärung (§ 32d Abs. 6 EStG)?', answer: 'Wenn Ihr persönlicher Grenzsteuersatz bei der Einkommensteuer unter 25 % liegt (zu versteuerndes Gesamteinkommen unter ca. 20.000 € für Alleinstehende), können Sie eine Günstigerprüfung beantragen. Das Finanzamt besteuert Ihre Kapitalerträge dann mit Ihrem niedrigeren individuellen Einkommensteuertarif und erstattet zu viel einbehaltene Abgeltungsteuer.' },
-      { question: 'Wie funktioniert der Sparer-Pauschbetrag nach § 20 Abs. 9 EStG?', answer: 'Jedem Steuerpflichtigen steht ein jährlicher Sparer-Pauschbetrag von 1.000 € (für zusammenveranlagte Ehepartner: 2.000 €) zu. Bis zu diesem Betrag bleiben Erträge komplett steuerfrei, sofern bei der Bank ein entsprechender Freistellungsauftrag eingerichtet wurde.' },
+      {
+        question: 'Wie hoch ist die Kapitalertragsteuer in Deutschland?',
+        answer: 'Die reguläre Abgeltungsteuer beträgt 25 % zuzüglich 5,5 % Solidaritätszuschlag auf die Steuer, was einer Gesamtbelastung von exakt 26,375 % entspricht. Bei Kirchensteuerpflicht ermäßigt sich die Kapitalertragsteuer nach § 32d Abs. 1 Satz 4 EStG auf Ertrag / (4 + k), sodass die Gesamtsteuer in Bayern und Baden-Württemberg ca. 27,82 % und in den übrigen Bundesländern ca. 28,00 % beträgt.',
+      },
+      {
+        question: 'Wie hoch ist der Sparer-Pauschbetrag für 2026?',
+        answer: 'Der gesetzliche Sparer-Pauschbetrag nach § 20 Abs. 9 EStG liegt unverändert bei 1.000 € für Alleinstehende (Einzelveranlagung) und 2.000 € für zusammenveranlagte Ehegatten oder eingetragene Lebenspartner.',
+      },
+      {
+        question: 'Muss man auf Kapitalerträge weiterhin den Solidaritätszuschlag zahlen?',
+        answer: 'Ja. Die Abschaffung des Solidaritätszuschlags für die meisten Steuerzahler gilt ausschließlich für die reguläre tarifliche Einkommensteuer (§ 32a EStG). Auf die gesonderte Kapitalertragsteuer (§ 32d EStG) wird der Solidaritätszuschlag nach § 4 SolzG 1995 weiterhin in voller Höhe von 5,5 % auf die Kapitalertragsteuer erhoben.',
+      },
+      {
+        question: 'Wie wirkt sich die Kirchensteuer auf die Kapitalertragsteuer aus?',
+        answer: 'Weil Kirchensteuer nach dem Einkommensteuergesetz als Sonderausgabe abzugsfähig ist, reduziert sie bei Kapitalerträgen direkt den Steuersatz der Kapitalertragsteuer. Nach der gesetzlichen Formel e / (4 + k) sinkt die KapESt auf 24,51 % bei 8 % Kirchensteuer (Bayern, Baden-Württemberg) bzw. 24,45 % bei 9 % Kirchensteuer (übrige Länder). Die Gesamtsteuerbelastung steigt dadurch moderat auf rund 27,82 % bzw. 28,00 % an.',
+      },
+      {
+        question: 'Was passiert, wenn man keinen Freistellungsauftrag eingerichtet hat?',
+        answer: 'Ohne Freistellungsauftrag behält das Kreditinstitut ab dem ersten Euro Ertrag automatisch 25 % Abgeltungsteuer plus Solidaritätszuschlag und ggf. Kirchensteuer ein und führt diese an das Finanzamt ab. Sie können sich zu viel gezahlte Steuern im Rahmen Ihrer Einkommensteuererklärung über die Anlage KAP zurückholen.',
+      },
+      {
+        question: 'Wann ist eine Günstigerprüfung nach § 32d Abs. 6 EStG sinnvoll?',
+        answer: 'Eine Günstigerprüfung lohnt sich immer dann, wenn Ihr persönlicher Einkommensteuersatz unter 25 % liegt (in der Regel bei einem zu versteuernden Gesamteinkommen unter ca. 20.000 € für Alleinstehende). Das Finanzamt berechnet die Steuer dann nach dem niedrigeren Tarif und erstattet die überzahlte Abgeltungsteuer.',
+      },
+      {
+        question: 'Gilt bei ETFs und Investmentfonds eine Teilfreistellung?',
+        answer: 'Ja, nach dem Investmentsteuergesetz (§ 20 InvStG) sind Gewinne und Ausschüttungen aus Aktienfonds mit mindestens 51 % Aktienquote zu 30 % steuerfrei. Bei Mischfonds mit mind. 25 % Aktienquote beträgt die Teilfreistellung 15 %, bei Immobilienfonds 60 % bzw. 80 %.',
+      },
     ],
-    relatedSlugs: ['kirchensteuer-rechner', 'freistellungsauftrag-rechner', 'etf-sparplan-rechner', 'renditerechner'],
+    relatedSlugs: [
+      'freistellungsauftrag-rechner',
+      'etf-sparplan-rechner',
+      'zinseszinsrechner',
+      'dividendenrendite-rechner',
+      'tagesgeld-rechner',
+      'festgeld-rechner',
+      'kirchensteuer-rechner',
+      'einkommensteuerrechner',
+    ],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
       source: 'Einkommensteuergesetz (§ 32d, § 43a, § 20 Abs. 9 EStG, § 4 SolzG)',
       sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32d.html',
-      lastVerified: '2026-10-01',
+      lastVerified: '2026-10-07',
     },
     trustMeta: {
-      legalBasis: 'Einkommensteuergesetz (§ 32d, § 43a, § 20 Abs. 9 EStG) & Solidaritätszuschlaggesetz (§ 4 SolzG)',
+      legalBasis: 'Einkommensteuergesetz (§ 32d, § 43, § 43a, § 20 Abs. 9 EStG) & Solidaritätszuschlaggesetz (§ 4 SolzG 1995)',
       sourceName: 'Bundesministerium der Finanzen / Gesetze im Internet',
       sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32d.html',
-      lastReviewed: '2026-10-01',
+      lastReviewed: '2026-10-07',
+      methodology: 'Exakte gesetzliche Quellensteuerberechnung nach § 32d Abs. 1 Satz 1 bis 5 EStG inklusive Sparer-Pauschbetrag (§ 20 Abs. 9 EStG) und gesetzlicher Kirchensteuerermäßigungsformel e / (4 + k).',
+      assumptions: [
+        'Inländische Kapitalerträge unbeschränkt steuerpflichtiger natürlicher Personen',
+        'Sparer-Pauschbetrag gemäß § 20 Abs. 9 EStG (1.000 € Einzelveranlagung / 2.000 € Zusammenveranlagung)',
+        'Centgenaue kaufmännische Rundung jedes Steuerabzugsbausteins nach § 43a EStG',
+        'Keine Anrechnung ausländischer Quellensteuer (q = 0) im Basismodell',
+      ],
       limitations: [
-        'Gilt für inländische Kapitalerträge von unbeschränkt Steuerpflichtigen ohne Anrechnung ausländischer Quellensteuern (q = 0 nach § 32d Abs. 1 Satz 4 EStG).',
-        'Ausländische Quellensteueranrechnungen nach § 32d Abs. 5 EStG oder Teilfreistellungen nach dem Investmentsteuergesetz (z. B. 30 % bei Aktienfonds) sind separat zu berücksichtigen.',
+        'Fonds-Teilfreistellungen nach § 20 InvStG (z. B. 30 % bei Aktien-ETFs) sind vor Eingabe des Bruttoertrags zu berücksichtigen.',
+        'Verlustverrechnungstöpfe bei Brokern und Banken (§ 20 Abs. 6 EStG) mindern den steuerpflichtigen Ertrag vorrangig.',
+        'Keine individuelle steuerliche Beratung; für Einzelfragen ist ein Steuerberater oder Lohnsteuerhilfeverein zu konsultieren.',
       ],
     },
     legalFootnotes: [
       {
         index: 1,
         citation: '§ 32d Abs. 1 Satz 1 bis 5 EStG',
-        text: 'Gesonderter Steuertarif von 25 % für Einkünfte aus Kapitalvermögen sowie gesetzliche Ermäßigungsformel e / (4 + k) bei Kirchensteuerpflicht (k = 0,08 in Bayern und Baden-Württemberg, k = 0,09 in den übrigen Bundesländern).',
+        text: 'Gesonderter Steuertarif von 25 % für Einkünfte aus Kapitalvermögen sowie gesetzliche Ermäßigungsformel e / (4 + k) bei Kirchensteuerpflicht (k = 0,08 in Bayern und Baden-Württemberg, k = 0,09 in den übrigen 14 Bundesländern).',
         url: 'https://www.gesetze-im-internet.de/estg/__32d.html',
         effectiveDate: '01.01.2026',
-        reviewedDate: '01.10.2026',
+        reviewedDate: '07.10.2026',
       },
       {
         index: 2,
-        citation: '§ 43a Abs. 1 Nr. 1 EStG',
-        text: 'Bemessung der Kapitalertragsteuer und Abzug an der Quelle mit abgeltender Wirkung nach § 43 Abs. 5 EStG.',
-        url: 'https://www.gesetze-im-internet.de/estg/__43a.html',
+        citation: '§ 20 Abs. 9 EStG',
+        text: 'Sparer-Pauschbetrag in Höhe von 1.000 € bei Einzelveranlagung und 2.000 € bei zusammenveranlagten Ehegatten oder Lebenspartnern als steuerfreier Abzug von Kapitaleinkünften; Ausschluss des tatsächlichen Werbungskostenabzugs.',
+        url: 'https://www.gesetze-im-internet.de/estg/__20.html',
         effectiveDate: '01.01.2026',
-        reviewedDate: '01.10.2026',
+        reviewedDate: '07.10.2026',
       },
       {
         index: 3,
         citation: '§ 4 SolzG 1995',
-        text: 'Erhebung des Solidaritätszuschlags in Höhe von 5,5 % auf die Kapitalertragsteuer ohne Anwendung der allgemeinen Freigrenze.',
+        text: 'Erhebung des Solidaritätszuschlags in Höhe von 5,5 % auf die Kapitalertragsteuer ohne Anwendung der Freigrenzen nach dem Gesetz zur Rückführung des Solidaritätszuschlags.',
         url: 'https://www.gesetze-im-internet.de/solzg_1995/__4.html',
         effectiveDate: '01.01.2026',
-        reviewedDate: '01.10.2026',
+        reviewedDate: '07.10.2026',
       },
       {
         index: 4,
-        citation: '§ 20 Abs. 9 EStG',
-        text: 'Sparer-Pauschbetrag von 1.000 € für Alleinstehende und 2.000 € für zusammenveranlagte Ehepartner als steuerfreier Abzugsbetrag bei Kapitaleinkünften.',
-        url: 'https://www.gesetze-im-internet.de/estg/__20.html',
+        citation: '§ 43, § 43a EStG',
+        text: 'Kapitalertragsteuerabzug an der Quelle durch das auszahlende Kreditinstitut mit abgeltender Wirkung (§ 43 Abs. 5 EStG) und centgenauer Bemessung des Steuerabzugs.',
+        url: 'https://www.gesetze-im-internet.de/estg/__43a.html',
         effectiveDate: '01.01.2026',
-        reviewedDate: '01.10.2026',
+        reviewedDate: '07.10.2026',
+      },
+      {
+        index: 5,
+        citation: '§ 44a EStG',
+        text: 'Abstandnahme vom Steuerabzug bei Vorliegen eines wirksamen Freistellungsauftrags bis zur Höhe des Sparer-Pauschbetrags.',
+        url: 'https://www.gesetze-im-internet.de/estg/__44a.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '07.10.2026',
       },
     ],
   },

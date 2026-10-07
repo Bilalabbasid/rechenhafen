@@ -66,9 +66,9 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Was ist die 72er-Regel für den Zinseszins?', answer: 'Teilt man 72 durch den jährlichen Zinssatz, erhält man näherungsweise die Jahre bis zur Verdopplung des Kapitals (z. B. bei 6 % p.a.: 72 / 6 = 12 Jahre).' },
       { question: 'Wie wirkt sich die Häufigkeit der Zinsgutschrift aus?', answer: 'Je häufiger Zinsen gutgeschrieben werden (monatlich oder vierteljährlich statt jährlich), desto schneller entfaltet der Zinseszins seine Wirkung, da unterjährige Zinsen bereits in den Folgemonaten mitverzinst werden (effektiver Jahreszins steigt).' },
-      { question: 'Werden Steuern auf die erwirtschafteten Zinsen automatisch abgezogen?', answer: 'In diesem Rechner werden Brutto-Ergebnisse vor Steuern dargestellt. In der Praxis führt die depotführende Bank in Deutschland bei Überschreiten des Freistellungsauftrags 25 % Abgeltungsteuer plus 5,5 % Soli (zusammen 26,375 %) automatisch an das Finanzamt ab.' },
+      { question: 'Werden Steuern auf die erwirtschafteten Zinsen automatisch abgezogen?', answer: 'In diesem Rechner werden Brutto-Ergebnisse vor Steuern dargestellt. In der Praxis führt die depotführende Bank in Deutschland bei Überschreiten des Sparer-Pauschbetrags 25 % Abgeltungsteuer plus 5,5 % Soli (zusammen 26,375 %) automatisch an das Finanzamt ab. Berechnen Sie Ihren exakten Steuerabzug und Netto-Zinsertrag mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und verwalten Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).' },
     ],
-    relatedSlugs: ['sparrechner', 'sparzielrechner', 'etf-sparplan-rechner', 'renditerechner', 'inflationsrechner'],
+    relatedSlugs: ['sparrechner', 'sparzielrechner', 'etf-sparplan-rechner', 'kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'renditerechner', 'inflationsrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -150,13 +150,13 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Ein breit diversifizierter ETF-Sparplan (z. B. auf den MSCI World oder FTSE All-World) ermöglicht langfristigen Vermögensaufbau über regelmäßige monatliche Sparraten.',
-      details: 'Der Rechner berücksichtigt die Gesamtkostenquote (TER), erwartete Marktrenditen und den Cost-Average-Effekt. Bei historisch langfristigen Aktienmarktrenditen von real ca. 6 bis 8 % p.a. bildet der Sparplan einen Kernbaustein der privaten Altersvorsorge.',
+      details: 'Der Rechner berücksichtigt die Gesamtkostenquote (TER), erwartete Marktrenditen und den Cost-Average-Effekt. Bei historisch langfristigen Aktienmarktrenditen von real ca. 6 bis 8 % p.a. bildet der Sparplan einen Kernbaustein der privaten Altersvorsorge. Berechnen Sie die steuerliche Belastung Ihrer Erträge und realisierten Kursgewinne mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und optimieren Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
     },
     faqs: [
       { question: 'Was bedeutet die Gesamtkostenquote (TER)?', answer: 'Die Total Expense Ratio (TER) beziffert die laufenden jährlichen Fondskosten (Management, Verwaltung), die direkt dem Fondsvermögen entnommen werden (typisch 0,07 % bis 0,25 % bei Standard-ETFs).' },
       { question: 'Gilt bei ETFs die steuerliche Teilfreistellung?', answer: 'Ja, nach § 20 InvStG sind bei Aktienfonds mit mindestens 51 % Aktienquote 30 Prozent aller Gewinne und Ausschüttungen von der Abgeltungsteuer freigestellt.' },
     ],
-    relatedSlugs: ['nikotin-rauchstopp-ersparnis-rechner', 'thesaurierend-vs-ausschuettend-rechner', 'depotgebuehren-rechner', 'dividendenrendite-rechner', 'zinseszinsrechner', 'sparrechner'],
+    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'thesaurierend-vs-ausschuettend-rechner', 'depotgebuehren-rechner', 'dividendenrendite-rechner', 'zinseszinsrechner', 'sparrechner'],
   },
   {
     id: 'sparrechner',
