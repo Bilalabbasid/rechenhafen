@@ -14,6 +14,7 @@ import RelatedCalculators from '@/components/calculator/RelatedCalculators';
 import PopularDateCalculators from '@/components/calculator/PopularDateCalculators';
 import TaxBracketVisualizer from '@/components/calculator/TaxBracketVisualizer';
 import AdSlot from '@/components/common/AdSlot';
+import FormattedContent, { renderInlineMarkdown } from '@/components/common/FormattedContent';
 import styles from '@/styles/layout.module.css';
 import { ShieldCheck, Info } from 'lucide-react';
 
@@ -57,32 +58,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'website',
     },
   };
-}
-
-function renderFormattedText(text: string) {
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  if (!regex.test(text)) return text;
-
-  const elements: (string | React.ReactNode)[] = [];
-  let lastIndex = 0;
-  regex.lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      elements.push(text.substring(lastIndex, match.index));
-    }
-    const [, label, href] = match;
-    elements.push(
-      <Link key={match.index} href={href} style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
-        {label}
-      </Link>
-    );
-    lastIndex = regex.lastIndex;
-  }
-  if (lastIndex < text.length) {
-    elements.push(text.substring(lastIndex));
-  }
-  return elements;
 }
 
 export default async function CalculatorPage({ params }: PageProps) {
@@ -209,7 +184,7 @@ export default async function CalculatorPage({ params }: PageProps) {
           margin: 0,
           maxWidth: '780px'
         }}>
-          {calc.shortDescription}
+          {renderInlineMarkdown(calc.shortDescription)}
         </p>
       </div>
 
@@ -266,7 +241,7 @@ export default async function CalculatorPage({ params }: PageProps) {
               </h2>
             </div>
             <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-              {ex.description}
+              {renderInlineMarkdown(ex.description)}
             </p>
             <div
               style={{
@@ -301,7 +276,7 @@ export default async function CalculatorPage({ params }: PageProps) {
             </h2>
           </div>
           <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-            {calc.workedExample.description}
+            {renderInlineMarkdown(calc.workedExample.description)}
           </p>
           <div
             style={{
@@ -334,7 +309,7 @@ export default async function CalculatorPage({ params }: PageProps) {
           }}
         >
           {calc.content.intro && (
-            <p style={{ marginBottom: 'var(--space-4)' }}>{renderFormattedText(calc.content.intro)}</p>
+            <FormattedContent content={calc.content.intro} style={{ marginBottom: 'var(--space-4)' }} />
           )}
 
           {calc.content.sections?.map((sec, sIdx) => (
@@ -343,100 +318,18 @@ export default async function CalculatorPage({ params }: PageProps) {
                 style={{
                   fontSize: '1.25rem',
                   fontWeight: 700,
-                  margin: '0 0 var(--space-2)',
+                  margin: '0 0 var(--space-3)',
                   color: 'var(--color-text-primary)',
                 }}
               >
                 {sec.title}
               </h2>
-              {sec.content.split('\n\n').map((paragraph, pIdx) => {
-                const trimmed = paragraph.trim();
-                // Check if paragraph is markdown list
-                if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
-                  const items = trimmed.split('\n').filter((l) => l.trim().length > 0);
-                  return (
-                    <ul key={pIdx} style={{ paddingLeft: '1.25rem', margin: '0 0 var(--space-3)' }}>
-                      {items.map((it, itIdx) => (
-                        <li key={itIdx} style={{ marginBottom: '4px' }}>
-                          {renderFormattedText(it.replace(/^[-•]\s*/, ''))}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                }
-                // Check if paragraph is markdown table
-                if (trimmed.includes('|') && trimmed.includes('---')) {
-                  const rows = trimmed
-                    .split('\n')
-                    .map((r) => r.trim())
-                    .filter((r) => r.startsWith('|') && r.endsWith('|'));
-                  if (rows.length >= 2) {
-                    const headerCols = rows[0]
-                      .slice(1, -1)
-                      .split('|')
-                      .map((c) => c.trim());
-                    const dataRows = rows.slice(2).map((r) =>
-                      r
-                        .slice(1, -1)
-                        .split('|')
-                        .map((c) => c.trim())
-                    );
-                    return (
-                      <div key={pIdx} style={{ overflowX: 'auto', margin: 'var(--space-4) 0' }}>
-                        <table
-                          style={{
-                            width: '100%',
-                            borderCollapse: 'collapse',
-                            fontSize: '0.9rem',
-                            background: 'var(--color-surface)',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: 'var(--radius-md)',
-                          }}
-                        >
-                          <thead>
-                            <tr style={{ background: 'var(--color-surface-hover)', textAlign: 'left' }}>
-                              {headerCols.map((col, cIdx) => (
-                                <th
-                                  key={cIdx}
-                                  style={{
-                                    padding: '8px 12px',
-                                    borderBottom: '2px solid var(--color-border)',
-                                    fontWeight: 700,
-                                    color: 'var(--color-text-primary)',
-                                  }}
-                                >
-                                  {col}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {dataRows.map((dRow, rIdx) => (
-                              <tr key={rIdx} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                                {dRow.map((cell, cIdx) => (
-                                  <td key={cIdx} style={{ padding: '8px 12px' }}>
-                                    {renderFormattedText(cell)}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    );
-                  }
-                }
-                return (
-                  <p key={pIdx} style={{ marginBottom: 'var(--space-3)' }}>
-                    {renderFormattedText(paragraph)}
-                  </p>
-                );
-              })}
+              <FormattedContent content={sec.content} />
             </div>
           ))}
 
           {calc.content.details && (
-            <p style={{ marginBottom: 'var(--space-4)' }}>{renderFormattedText(calc.content.details)}</p>
+            <FormattedContent content={calc.content.details} style={{ marginBottom: 'var(--space-4)' }} />
           )}
         </section>
       )}

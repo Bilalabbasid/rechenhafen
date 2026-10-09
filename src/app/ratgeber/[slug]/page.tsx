@@ -67,30 +67,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-function renderParagraphWithLinks(text: string) {
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  if (!regex.test(text)) return text;
+import { renderInlineMarkdown } from '@/components/common/FormattedContent';
 
-  const elements: (string | React.ReactNode)[] = [];
-  let lastIndex = 0;
-  regex.lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      elements.push(text.substring(lastIndex, match.index));
-    }
-    const [, label, href] = match;
-    elements.push(
-      <Link key={match.index} href={href} style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
-        {label}
-      </Link>
-    );
-    lastIndex = regex.lastIndex;
-  }
-  if (lastIndex < text.length) {
-    elements.push(text.substring(lastIndex));
-  }
-  return elements;
+function renderParagraphWithLinks(text: string) {
+  return renderInlineMarkdown(text);
 }
 
 export default async function RatgeberArticlePage({ params }: PageProps) {

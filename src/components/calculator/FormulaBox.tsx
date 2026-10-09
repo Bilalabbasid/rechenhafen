@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '@/styles/components.module.css';
+import { renderInlineMarkdown } from '@/components/common/FormattedContent';
 
 interface Props {
   formula: string;
@@ -15,7 +16,7 @@ export default function FormulaBox({ formula, formulaExplanation }: Props) {
       <div className={styles.formulaBox}>
         <code className={styles.formulaCode}>{formula}</code>
       </div>
-      <p className={styles.formulaDescription}>{formulaExplanation}</p>
+      <p className={styles.formulaDescription}>{renderInlineMarkdown(formulaExplanation)}</p>
     </section>
   );
 }

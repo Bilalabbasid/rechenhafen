@@ -14,6 +14,7 @@ import {
   trackResultCopied,
   trackValidationError,
 } from '@/lib/analytics/ga4';
+import { renderInlineMarkdown } from '@/components/common/FormattedContent';
 
 interface Props {
   slug: string;
@@ -448,7 +449,7 @@ export default function CalculatorRunner({
 
       {shortDescription && (
         <div className={styles.purposeBanner}>
-          <strong>Zweck:</strong> {shortDescription}
+          <strong>Zweck:</strong> {renderInlineMarkdown(shortDescription)}
         </div>
       )}
 

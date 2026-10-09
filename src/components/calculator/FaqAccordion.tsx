@@ -1,41 +1,7 @@
 import React from 'react';
-import Link from 'next/link';
 import { FAQItem } from '@/types/calculator';
 import styles from '@/styles/components.module.css';
-
-interface Props {
-  faqs: FAQItem[];
-}
-
-function stripMarkdown(text: string): string {
-  return text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-}
-
-function renderFormattedText(text: string) {
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  if (!regex.test(text)) return text;
-
-  const elements: (string | React.ReactNode)[] = [];
-  let lastIndex = 0;
-  regex.lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      elements.push(text.substring(lastIndex, match.index));
-    }
-    const [, label, href] = match;
-    elements.push(
-      <Link key={match.index} href={href} style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
-        {label}
-      </Link>
-    );
-    lastIndex = regex.lastIndex;
-  }
-  if (lastIndex < text.length) {
-    elements.push(text.substring(lastIndex));
-  }
-  return elements;
-}
+import { stripMarkdown, renderInlineMarkdown } from '@/components/common/FormattedContent';
 
 export default function FaqAccordion({ faqs }: Props) {
   if (!faqs || faqs.length === 0) return null;
@@ -67,7 +33,7 @@ export default function FaqAccordion({ faqs }: Props) {
               <span>{faq.question}</span>
             </summary>
             <div className={styles.faqAnswer}>
-              <p>{renderFormattedText(faq.answer)}</p>
+              <p>{renderInlineMarkdown(faq.answer)}</p>
             </div>
           </details>
         ))}
