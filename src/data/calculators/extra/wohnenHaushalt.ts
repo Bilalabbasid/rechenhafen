@@ -1613,15 +1613,39 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 5, max: 90, step: 0.5, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const wattsStr = String(inputs.powerWatts ?? '').trim();
-      const hoursStr = String(inputs.hoursPerDay ?? '').trim();
-      const priceStr = String(inputs.electricityPrice ?? '').trim();
-      const daysStr = String(inputs.usageDays ?? '').trim();
+      if (inputs.powerWatts === undefined || inputs.powerWatts === null || String(inputs.powerWatts).trim() === '') {
+        return {
+          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie die Leistungsaufnahme des Geräts in Watt ein.',
+        };
+      }
+      if (inputs.hoursPerDay === undefined || inputs.hoursPerDay === null || String(inputs.hoursPerDay).trim() === '') {
+        return {
+          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie die tägliche Nutzungsdauer in Stunden ein.',
+        };
+      }
+      if (inputs.electricityPrice === undefined || inputs.electricityPrice === null || String(inputs.electricityPrice).trim() === '') {
+        return {
+          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie den Strompreis in Cent pro kWh ein.',
+        };
+      }
 
-      const watts = wattsStr !== '' ? parseFloat(wattsStr.replace(',', '.')) : 150;
-      const hours = hoursStr !== '' ? parseFloat(hoursStr.replace(',', '.')) : 4;
-      const days = daysStr !== '' ? parseFloat(daysStr.replace(',', '.')) : 365;
-      const priceCent = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 36;
+      const wattsStr = String(inputs.powerWatts).trim();
+      const hoursStr = String(inputs.hoursPerDay).trim();
+      const priceStr = String(inputs.electricityPrice).trim();
+      const daysStr = inputs.usageDays !== undefined && inputs.usageDays !== null && String(inputs.usageDays).trim() !== ''
+        ? String(inputs.usageDays).trim()
+        : '365';
+
+      const watts = parseFloat(wattsStr.replace(',', '.'));
+      const hours = parseFloat(hoursStr.replace(',', '.'));
+      const days = parseFloat(daysStr.replace(',', '.'));
+      const priceCent = parseFloat(priceStr.replace(',', '.'));
 
       if (isNaN(watts) || isNaN(hours) || isNaN(days) || isNaN(priceCent)) {
         return {

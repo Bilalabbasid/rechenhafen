@@ -9,11 +9,20 @@ interface AuditFinding {
   category: string;
   calculatorSlug: string;
   calculatorName: string;
+  inputKey?: string;
   issue: string;
   details?: string;
 }
 
 const findings: AuditFinding[] = [];
+const seenKeys = new Set<string>();
+
+function addFinding(f: AuditFinding) {
+  const dedupKey = `${f.calculatorSlug}:${f.inputKey || ''}:${f.category}:${f.severity}`;
+  if (seenKeys.has(dedupKey)) return;
+  seenKeys.add(dedupKey);
+  findings.push(f);
+}
 
 // Registry sets for link checking
 const calculatorSlugs = new Set(ALL_CALCULATORS.map((c) => c.slug));
@@ -49,7 +58,7 @@ const financialLegalCategories = new Set([
   'immobilien-kauf',
 ]);
 
-console.log(`Starting audit across ${ALL_CALCULATORS.length} calculators...`);
+console.log(`Starting refined evidence-based audit across ${ALL_CALCULATORS.length} calculators...`);
 
 ALL_CALCULATORS.forEach((calc) => {
   const allTexts: string[] = [];
@@ -84,7 +93,7 @@ ALL_CALCULATORS.forEach((calc) => {
 
   for (const pf of plainFields) {
     if (pf.val && /(\*\*|`|\[.+?\]\(.+?\)|#)/.test(pf.val)) {
-      findings.push({
+      addFinding({
         severity: 'High',
         category: 'Formatting / Raw Markdown in Plain Field',
         calculatorSlug: calc.slug,
@@ -98,7 +107,7 @@ ALL_CALCULATORS.forEach((calc) => {
   for (const t of allTexts) {
     const backtickCount = (t.match(/`/g) || []).length;
     if (backtickCount % 2 !== 0) {
-      findings.push({
+      addFinding({
         severity: 'Medium',
         category: 'Formatting / Broken Markdown',
         calculatorSlug: calc.slug,
@@ -108,7 +117,7 @@ ALL_CALCULATORS.forEach((calc) => {
     }
     // Broken link syntax like [text]( without closing )
     if (/\[[^\]]+\]\([^)]*$/.test(t)) {
-      findings.push({
+      addFinding({
         severity: 'High',
         category: 'Formatting / Broken Link Syntax',
         calculatorSlug: calc.slug,
@@ -118,25 +127,26 @@ ALL_CALCULATORS.forEach((calc) => {
     }
   }
 
-  // 2. Numerical input where 0 becomes a fallback/default value
-  // We execute calculate with 0 for each numeric input
-  if (typeof calc.calculate === 'function') {
-    const zeroInputs: Record<string, any> = {};
-    const defaultInputs: Record<string, any> = {};
-    calc.inputs.forEach((inp) => {
-      defaultInputs[inp.id] = inp.defaultValue;
-      if (inp.type === 'number') {
-        zeroInputs[inp.id] = 0;
-      } else {
-        zeroInputs[inp.id] = inp.defaultValue;
-      }
-    });
+  // 2. Numerical input testing with default and zero inputs
+  const defaultInputs: Record<string, any> = {};
+  const zeroInputs: Record<string, any> = {};
+  calc.inputs.forEach((inp) => {
+    defaultInputs[inp.id] = inp.defaultValue;
+    if (inp.type === 'number') {
+      zeroInputs[inp.id] = 0;
+    } else {
+      zeroInputs[inp.id] = inp.defaultValue;
+    }
+  });
 
+  if (typeof calc.calculate === 'function') {
     try {
       const resZero = calc.calculate(zeroInputs);
-      // If passing 0 produced NaN or Infinity
-      if (typeof resZero.primary?.value === 'number' && (isNaN(resZero.primary.value) || !isFinite(resZero.primary.value))) {
-        findings.push({
+      if (
+        typeof resZero.primary?.value === 'number' &&
+        (isNaN(resZero.primary.value) || !isFinite(resZero.primary.value))
+      ) {
+        addFinding({
           severity: 'Critical',
           category: 'Calculation / Zero Input Failure',
           calculatorSlug: calc.slug,
@@ -145,18 +155,19 @@ ALL_CALCULATORS.forEach((calc) => {
         });
       }
     } catch {
-      // Calculator might require non-zero for specific divisors (handled gracefully by error returns)
+      // Calculator may require non-zero for specific divisors, handled below
     }
 
-    // Inspect calculator code or inputs where required input defaultValue is 0 but min > 0
+    // Inspect inputs where defaultValue is 0 but min > 0
     calc.inputs.forEach((inp) => {
       if (inp.type === 'number') {
         if (inp.min !== undefined && inp.min > 0 && inp.defaultValue === 0) {
-          findings.push({
+          addFinding({
             severity: 'High',
             category: 'Input Validation / Default Out of Bounds',
             calculatorSlug: calc.slug,
             calculatorName: calc.name,
+            inputKey: inp.id,
             issue: `Input '${inp.id}' has defaultValue=0 but min=${inp.min}.`,
           });
         }
@@ -164,19 +175,78 @@ ALL_CALCULATORS.forEach((calc) => {
     });
   }
 
-  // 3. Default values presented as user facts rather than clearly labelled “Beispielwert”
+  // 3. Evidence-based Numeric Input Quality Check
   calc.inputs.forEach((inp) => {
-    if (inp.type === 'number' && typeof inp.defaultValue === 'number' && inp.defaultValue > 0) {
-      const labelHasExample = /beispiel|richtwert|orientierung|muster/i.test(inp.label);
-      const helpHasExample = inp.helpText && /beispiel|richtwert|orientierung|anpassbar|muster/i.test(inp.helpText);
-      if (!labelHasExample && !helpHasExample) {
-        findings.push({
-          severity: 'Medium',
-          category: 'UX / Unlabelled Default Value',
-          calculatorSlug: calc.slug,
-          calculatorName: calc.name,
-          issue: `Numeric input '${inp.id}' (${inp.defaultValue}) is not clearly labelled as 'Beispielwert' or 'Richtwert' in label or helpText.`,
-        });
+    if (inp.type === 'number' && typeof inp.defaultValue === 'number') {
+      const defaultVal = inp.defaultValue;
+
+      // Complete local input context:
+      const localContext = [
+        inp.label || '',
+        inp.helpText || '',
+        inp.placeholder || '',
+        calc.subcategory || '',
+        calc.content?.intro || '',
+        calc.shortDescription || '',
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      // Clear indicator that value is editable, an assumption, guideline, or example:
+      const contextExplainsEditableOrExample =
+        /(beispiel|richtwert|orientierung|annahme|vorgabe|standard|default|muster|typisch|durchschnitt|z\.\s*b\.|beispielsweise|anpassbar|optional|kann|falls|sofern|eintragen|eingeben|wählen|anpassen|individuell|ihr|ihre|ihren|dein|deine|deinen|0\s*€|null|leer)/i.test(
+          localContext
+        );
+
+      // Check whether zero is a valid scenario
+      const minAllowsZero = inp.min === undefined || inp.min <= 0;
+      let zeroExecutionValid = false;
+      if (minAllowsZero && typeof calc.calculate === 'function') {
+        try {
+          const testInputs = { ...defaultInputs, [inp.id]: 0 };
+          const res = calc.calculate(testInputs);
+          zeroExecutionValid =
+            !res.error &&
+            typeof res.primary?.value === 'number' &&
+            !isNaN(res.primary.value) &&
+            isFinite(res.primary.value);
+        } catch {
+          zeroExecutionValid = false;
+        }
+      }
+
+      // Concepts where having 0 is a realistic user situation (subsidies, deductions, bonuses, optional fees, allowances, second incomes, etc.)
+      const isOptionalOrAddonConcept =
+        /(zuschuss|zulage|sonder|abzug|rabatt|nebenkosten|heizkosten|warmwasser|eigenkapital|sparrate|pauschale|steuer|kirche|gebühr|zusatz|bonus|aufschlag|reserve|freibetrag|absetzbar|entlastung|versorger|vorsorge|vermögen|unterhalt|miete|puffer)/i.test(
+          (inp.label || '') + ' ' + (inp.helpText || '')
+        );
+
+      const zeroIsValidScenario = minAllowsZero && zeroExecutionValid && isOptionalOrAddonConcept;
+
+      if (defaultVal > 0) {
+        if (zeroIsValidScenario && !contextExplainsEditableOrExample) {
+          // HIGH: zero is a valid scenario, defaultValue > 0, but visible context fails to explain that it's an assumption/example or that zero is valid
+          addFinding({
+            severity: 'High',
+            category: 'Input Clarity / Unexplained Positive Default Where Zero Is Valid',
+            calculatorSlug: calc.slug,
+            calculatorName: calc.name,
+            inputKey: inp.id,
+            issue: `Input '${inp.id}' (${inp.label}) defaults to ${defaultVal} where 0 is a valid user situation, but visible context does not indicate that this is an example/assumption or that 0 is permitted.`,
+          });
+        } else if (
+          !/(beispiel|richtwert|muster|orientierung)/i.test((inp.label || '') + ' ' + (inp.helpText || ''))
+        ) {
+          // INFORMATIONAL: General consistency suggestion where context already explains it's an input or zero is not a standard situation
+          addFinding({
+            severity: 'Informational',
+            category: 'Wording Consistency / Example Value Indicator',
+            calculatorSlug: calc.slug,
+            calculatorName: calc.name,
+            inputKey: inp.id,
+            issue: `Input '${inp.id}' (${inp.label}, default: ${defaultVal}) could benefit from explicit 'Beispielwert' or 'Richtwert' wording.`,
+          });
+        }
       }
     }
   });
@@ -206,7 +276,7 @@ ALL_CALCULATORS.forEach((calc) => {
     );
 
     if (!hasStand) {
-      findings.push({
+      addFinding({
         severity: 'Medium',
         category: 'Legal / Missing Stand Date',
         calculatorSlug: calc.slug,
@@ -216,7 +286,7 @@ ALL_CALCULATORS.forEach((calc) => {
     }
 
     if (!hasSource) {
-      findings.push({
+      addFinding({
         severity: 'High',
         category: 'Trust / Missing Source Link',
         calculatorSlug: calc.slug,
@@ -226,7 +296,7 @@ ALL_CALCULATORS.forEach((calc) => {
     }
 
     if (!hasDisclaimer) {
-      findings.push({
+      addFinding({
         severity: 'High',
         category: 'Legal / Missing Disclaimer',
         calculatorSlug: calc.slug,
@@ -238,7 +308,7 @@ ALL_CALCULATORS.forEach((calc) => {
 
   // 5. Title / H1 / Meta description mismatch
   if (!calc.h1 || calc.h1.trim().length === 0) {
-    findings.push({
+    addFinding({
       severity: 'High',
       category: 'SEO / Missing H1',
       calculatorSlug: calc.slug,
@@ -247,7 +317,7 @@ ALL_CALCULATORS.forEach((calc) => {
     });
   }
   if (!calc.metaTitle || calc.metaTitle.trim().length === 0) {
-    findings.push({
+    addFinding({
       severity: 'High',
       category: 'SEO / Missing Meta Title',
       calculatorSlug: calc.slug,
@@ -256,7 +326,7 @@ ALL_CALCULATORS.forEach((calc) => {
     });
   }
   if (!calc.metaDescription || calc.metaDescription.trim().length === 0) {
-    findings.push({
+    addFinding({
       severity: 'Medium',
       category: 'SEO / Missing Meta Description',
       calculatorSlug: calc.slug,
@@ -272,7 +342,6 @@ ALL_CALCULATORS.forEach((calc) => {
     while ((linkMatch = linkRegex.exec(t)) !== null) {
       const href = linkMatch[2].trim();
       if (href.startsWith('/')) {
-        // Normalize path
         const cleanPath = href.replace(/^\/+|\/+$/g, '');
         const parts = cleanPath.split('/');
         const section = parts[0];
@@ -280,10 +349,9 @@ ALL_CALCULATORS.forEach((calc) => {
 
         if (section === 'rechner') {
           if (targetSlug && !calculatorSlugs.has(targetSlug)) {
-            // Check if it's a known redirect
             const isRedirected = redirectSources.some((s) => s.includes(targetSlug));
             if (!isRedirected) {
-              findings.push({
+              addFinding({
                 severity: 'Critical',
                 category: 'Broken Internal Link',
                 calculatorSlug: calc.slug,
@@ -294,7 +362,7 @@ ALL_CALCULATORS.forEach((calc) => {
           }
         } else if (section === 'ratgeber') {
           if (targetSlug && !articleSlugs.has(targetSlug)) {
-            findings.push({
+            addFinding({
               severity: 'High',
               category: 'Broken Internal Link',
               calculatorSlug: calc.slug,
@@ -303,7 +371,7 @@ ALL_CALCULATORS.forEach((calc) => {
             });
           }
         } else if (!categorySlugs.has(section) && !staticRoutes.has(section)) {
-          findings.push({
+          addFinding({
             severity: 'High',
             category: 'Broken Internal Link',
             calculatorSlug: calc.slug,
@@ -319,7 +387,7 @@ ALL_CALCULATORS.forEach((calc) => {
   if (calc.relatedSlugs) {
     calc.relatedSlugs.forEach((rel) => {
       if (!calculatorSlugs.has(rel)) {
-        findings.push({
+        addFinding({
           severity: 'Critical',
           category: 'Broken Related Slug',
           calculatorSlug: calc.slug,
@@ -329,7 +397,7 @@ ALL_CALCULATORS.forEach((calc) => {
       }
     });
   } else {
-    findings.push({
+    addFinding({
       severity: 'Informational',
       category: 'Internal Linking / Missing Related Slugs',
       calculatorSlug: calc.slug,
@@ -339,10 +407,9 @@ ALL_CALCULATORS.forEach((calc) => {
   }
 
   // 7. Sitemap & Canonical Anomalies
-  // Check if calc.slug is among redirect sources
   const isRedirected = redirectSources.some((s) => s.includes(`/rechner/${calc.slug}`) || s === `/rechner/${calc.slug}/`);
   if (isRedirected) {
-    findings.push({
+    addFinding({
       severity: 'Critical',
       category: 'SEO / Redirected Calculator In Active Registry',
       calculatorSlug: calc.slug,
@@ -351,24 +418,21 @@ ALL_CALCULATORS.forEach((calc) => {
     });
   }
 
-  // 8. Intent Overlap / Duplicate detection
-  // Compare with other calculators for near-identical slugs or names
+  // 8. Duplicate detection
   ALL_CALCULATORS.forEach((other) => {
-    if (other.slug !== calc.slug) {
-      if (other.slug === calc.slug) {
-        findings.push({
-          severity: 'Critical',
-          category: 'Duplicate Calculator',
-          calculatorSlug: calc.slug,
-          calculatorName: calc.name,
-          issue: `Duplicate calculator slug found: '${calc.slug}'`,
-        });
-      }
+    if (other !== calc && other.slug === calc.slug) {
+      addFinding({
+        severity: 'Critical',
+        category: 'Duplicate Calculator',
+        calculatorSlug: calc.slug,
+        calculatorName: calc.name,
+        issue: `Duplicate calculator slug found: '${calc.slug}'`,
+      });
     }
   });
 });
 
-console.log(`Audit complete. Found ${findings.length} total findings.`);
+console.log(`Refined audit complete. Found ${findings.length} total findings.`);
 
 // Group findings
 const critical = findings.filter((f) => f.severity === 'Critical');
@@ -376,10 +440,37 @@ const high = findings.filter((f) => f.severity === 'High');
 const medium = findings.filter((f) => f.severity === 'Medium');
 const info = findings.filter((f) => f.severity === 'Informational');
 
+// Metrics requested
+const uniqueCalculatorsAffected = new Set(findings.map((f) => f.calculatorSlug)).size;
+const uniqueInputsAffected = new Set(
+  findings.filter((f) => f.inputKey).map((f) => `${f.calculatorSlug}:${f.inputKey}`)
+).size;
+
+// Category frequency
+const categoryCounts: Record<string, number> = {};
+findings.forEach((f) => {
+  const calc = ALL_CALCULATORS.find((c) => c.slug === f.calculatorSlug);
+  const cat = calc?.category || 'Sonstige';
+  categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+});
+const topCategories = Object.entries(categoryCounts)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 5);
+
 // Write machine-readable JSON report
 const jsonReport = {
   timestamp: new Date().toISOString(),
   totalCalculatorsAudited: ALL_CALCULATORS.length,
+  metrics: {
+    uniqueCalculatorsAffected,
+    uniqueInputsAffected,
+    highConfidenceIssues: high.length,
+    informationalSuggestions: info.length,
+    criticalIssues: critical.length,
+    mediumIssues: medium.length,
+    totalFindings: findings.length,
+    topAffectedCategories: topCategories.map(([category, count]) => ({ category, count })),
+  },
   summary: {
     critical: critical.length,
     high: high.length,
@@ -393,68 +484,77 @@ const jsonReport = {
 fs.writeFileSync(path.resolve(__dirname, '../audit-report.json'), JSON.stringify(jsonReport, null, 2), 'utf-8');
 
 // Build human-readable markdown report
-const markdown = `# RechenHafen Global Quality Gate Audit Report
+const markdown = `# RechenHafen Refined Quality Gate Audit Report
 
 **Audit-Datum:** ${new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}  
 **Geprüfte Rechner:** ${ALL_CALCULATORS.length}  
-**Status:** Audit abgeschlossen. Alle Befunde wurden zur manuellen Durchsicht klassifiziert (keine automatischen Massenänderungen).
+**Status:** Evidenzbasierte Prüfung abgeschlossen. Keine automatischen Massenänderungen vorgenommen.
 
 ---
 
-## 1. Zusammenfassung der Ergebnisse
+## 1. Zusammenfassung der Metriken
 
-| Schweregrad | Anzahl Befunde | Beschreibung |
+- **Betroffene eindeutige Rechner:** ${uniqueCalculatorsAffected} von ${ALL_CALCULATORS.length}
+- **Betroffene eindeutige Eingabefelder:** ${uniqueInputsAffected}
+- **High-Confidence Mängel (Hohe Priorität):** ${high.length}
+- **Informative Formulierungshinweise (Informational):** ${info.length}
+- **Kritische Systemmängel (Critical):** ${critical.length}
+- **Mittlere Auffälligkeiten (Medium):** ${medium.length}
+- **Gesamtzahl Befunde:** ${findings.length}
+
+### Top-Betroffene Rechner-Kategorien
+${topCategories.map(([cat, count], i) => `${i + 1}. **${cat}**: ${count} Befunde`).join('\n')}
+
+---
+
+## 2. Schweregrad-Übersicht
+
+| Schweregrad | Anzahl Befunde | Kriterien / Bedeutung |
 | :--- | :--- | :--- |
-| **Critical** | ${critical.length} | Defekte interne Links, Redirects im aktiven Rechnerbestand, Division durch Null |
-| **High** | ${high.length} | Fehlende Quellen / Disclaimer bei Rechts-/Finanzrechnern, unvollständige SEO-Header |
-| **Medium** | ${medium.length} | Nicht explizit als „Beispielwert“ deklarierte Vorgaben, fehlendes Stand-Jahr |
-| **Informational** | ${info.length} | Rechner ohne \`relatedSlugs\` oder Empfehlungen zur thematischen Vernetzung |
+| **Critical** | ${critical.length} | Defekte interne Links, Redirect-Kollisionen, Rechenabbrüche bei Null-Eingaben |
+| **High** | ${high.length} | Ungeklärte Positiv-Defaults bei realem 0-Szenario, fehlende Quellen/Disclaimer in Rechts-/Finanzrechnern |
+| **Medium** | ${medium.length} | Fehlendes Stand-Jahr, unvollständige Meta-Beschreibungen |
+| **Informational** | ${info.length} | Reine Formulierungsempfehlungen (z. B. Kennzeichnung als „Beispielwert“ / „Richtwert“) |
 | **Gesamt** | **${findings.length}** | |
 
 ---
 
-## 2. Kritische Befunde (Critical) — ${critical.length}
+## 3. Kritische Befunde (Critical) — ${critical.length}
 
-${critical.length === 0 ? '_Keine kritischen Fehler gefunden._' : critical.map((f, i) => `### ${i + 1}. [${f.calculatorSlug}](/rechner/${f.calculatorSlug}/) — ${f.calculatorName}
+${critical.length === 0 ? '_Keine kritischen Fehler vorhanden._' : critical.map((f, i) => `### ${i + 1}. [${f.calculatorSlug}](/rechner/${f.calculatorSlug}/) — ${f.calculatorName}
 - **Kategorie:** ${f.category}
 - **Problem:** ${f.issue}
 `).join('\n')}
 
 ---
 
-## 3. Hohe Priorität (High) — ${high.length}
+## 4. High-Confidence Befunde (High) — ${high.length}
 
-${high.length === 0 ? '_Keine Befunde mit hoher Priorität gefunden._' : high.slice(0, 50).map((f, i) => `### ${i + 1}. [${f.calculatorSlug}](/rechner/${f.calculatorSlug}/) — ${f.calculatorName}
+${high.length === 0 ? '_Keine High-Confidence Mängel gefunden._' : high.map((f, i) => `### ${i + 1}. [${f.calculatorSlug}](/rechner/${f.calculatorSlug}/) — ${f.calculatorName}
+- **Feld:** \`${f.inputKey || 'N/A'}\`
 - **Kategorie:** ${f.category}
 - **Problem:** ${f.issue}
 `).join('\n')}
-${high.length > 50 ? `\n_... und ${high.length - 50} weitere Befunde mit hoher Priorität (siehe vollständige Liste in \`audit-report.json\`)._` : ''}
 
 ---
 
-## 4. Mittlere Priorität (Medium) — ${medium.length}
+## 5. Mittlere Priorität (Medium) — ${medium.length}
 
-${medium.length === 0 ? '_Keine Befunde mit mittlerer Priorität gefunden._' : medium.slice(0, 30).map((f, i) => `### ${i + 1}. [${f.calculatorSlug}](/rechner/${f.calculatorSlug}/) — ${f.calculatorName}
+${medium.length === 0 ? '_Keine Befunde mittlerer Priorität._' : medium.slice(0, 20).map((f, i) => `### ${i + 1}. [${f.calculatorSlug}](/rechner/${f.calculatorSlug}/) — ${f.calculatorName}
 - **Kategorie:** ${f.category}
 - **Problem:** ${f.issue}
 `).join('\n')}
-${medium.length > 30 ? `\n_... und ${medium.length - 30} weitere Befunde mit mittlerer Priorität (siehe \`audit-report.json\`)._` : ''}
+${medium.length > 20 ? `\n_... und ${medium.length - 20} weitere Befunde mit mittlerer Priorität (vollständig in \`audit-report.json\`)._` : ''}
 
 ---
 
-## 5. Informelle Hinweise (Informational) — ${info.length}
+## 6. Informelle Formulierungsempfehlungen (Informational) — ${info.length}
 
-${info.length === 0 ? '_Keine informellen Hinweise._' : info.slice(0, 20).map((f, i) => `- **[${f.calculatorSlug}](/rechner/${f.calculatorSlug}/)**: ${f.issue}`).join('\n')}
-${info.length > 20 ? `\n_... und ${info.length - 20} weitere informelle Hinweise (siehe \`audit-report.json\`)._` : ''}
+_Hinweis: Diese Einträge stellen keine Defekte dar, sondern konsistente redaktionelle Vereinheitlichungsempfehlungen für zukünftige Content-Reviews._
 
----
-
-## 6. Nächste Schritte & Empfehlungen
-
-1. **Prioritäts-Korrekturen abgeschlossen:** Die vorrangigen Qualitätsverbesserungen für \`gaskostenrechner\`, \`dienstfahrrad-jobrad-rechner\` und \`schalungssteine-rechner\` sowie die systemweite Markdown-Rendering-Komponente wurden erfolgreich eingepflegt und getestet.
-2. **Review der High-Befunde:** Finanz- und Rechtsrechner, bei denen noch Quellenlinks oder standardisierte Hinweistexte fehlen, sollten sukzessive in gezielten thematischen Batches ergänzt werden.
-3. **Automatisierte CI-Integration:** Dieses Audit-Skript kann bei jedem Pull Request ausgeführt werden, um Regressionsfehler zu verhindern.
+${info.slice(0, 30).map((f, i) => `- **[${f.calculatorSlug}](/rechner/${f.calculatorSlug}/)** (\`${f.inputKey || 'allg.'}\`): ${f.issue}`).join('\n')}
+${info.length > 30 ? `\n_... und ${info.length - 30} weitere informative Hinweise (vollständig in \`audit-report.json\`)._` : ''}
 `;
 
 fs.writeFileSync(path.resolve(__dirname, '../AUDIT_REPORT.md'), markdown, 'utf-8');
-console.log('AUDIT_REPORT.md successfully generated.');
+console.log('AUDIT_REPORT.md successfully updated.');

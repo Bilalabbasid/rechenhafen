@@ -1622,16 +1622,71 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'warmRentMonthly', label: 'Monatliche Warmmiete', type: 'number', defaultValue: 780, min: 200, step: 25, unit: '€' },
     ],
     calculate: (inputs) => {
-      const kids = parseInt(inputs.childrenCount, 10) || 2;
-      const gross = parseFloat(inputs.parentsGrossIncome) || 2800;
-      const rent = parseFloat(inputs.warmRentMonthly) || 780;
+      if (inputs.childrenCount === undefined || inputs.childrenCount === null || String(inputs.childrenCount).trim() === '') {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Anzahl der Kinder an.',
+        };
+      }
+      const kids = parseInt(inputs.childrenCount, 10);
+      if (isNaN(kids) || kids < 1) {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Kinderanzahl ab 1 an.',
+        };
+      }
 
-      // Maximaler KiZ: bis zu 292 € pro Kind
+      if (inputs.parentsGrossIncome === undefined || inputs.parentsGrossIncome === null || String(inputs.parentsGrossIncome).trim() === '') {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie das monatliche Bruttoeinkommen der Eltern an.',
+        };
+      }
+      const gross = parseFloat(inputs.parentsGrossIncome);
+      if (isNaN(gross) || gross < 0) {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '-' },
+          error: 'Das monatliche Bruttoeinkommen darf nicht negativ sein.',
+        };
+      }
+
+      if (inputs.warmRentMonthly === undefined || inputs.warmRentMonthly === null || String(inputs.warmRentMonthly).trim() === '') {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die monatliche Warmmiete an.',
+        };
+      }
+      const rent = parseFloat(inputs.warmRentMonthly);
+      if (isNaN(rent) || rent < 0) {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '-' },
+          error: 'Die monatliche Warmmiete darf nicht negativ sein.',
+        };
+      }
+
+      // Maximaler KiZ: bis zu 292 € pro Kind (Stand 2026)
       const maxKizPerChild = 292;
       const maxTotalKiz = kids * maxKizPerChild;
 
-      // Mindesteinkommensgrenze: 900 € Brutto für Paare, 600 € für Alleinerziehende
-      const eligible = gross >= 900;
+      // Mindesteinkommensgrenze nach § 6a BKGG: 900 € Brutto für Paare, 600 € für Alleinerziehende
+      if (gross < 900) {
+        return {
+          primary: { id: 'calculatedKiz', label: 'Voraussichtlicher monatlicher Kinderzuschlag (gesamt)', value: 0, formattedValue: '0,00 €', highlight: true },
+          secondary: [
+            { id: 'perChild', label: 'Zuschlag pro Kind', value: 0, formattedValue: '0,00 €' },
+            { id: 'maxKiz', label: 'Gesetzlicher Höchstbetrag', value: maxTotalKiz, formattedValue: formatCurrency(maxTotalKiz) },
+            { id: 'extraBenefits', label: 'Hinweis zu Mindesteinkommen', value: 'Bürgergeld-Vorrang', formattedValue: 'Vorrangiger Bürgergeld-Anspruch' },
+          ],
+          summaryText: `Bei einem monatlichen Bruttoeinkommen von ${formatCurrency(gross)} wird das gesetzliche Mindesteinkommen von 900 € (§ 6a BKGG) nicht erreicht. In diesem Fall besteht kein Anspruch auf Kinderzuschlag, sondern vorrangig Anspruch auf Bürgergeld (SGB II) zur Sicherung des Lebensunterhalts.`,
+          basisSummary: [
+            { label: 'Kinder im Haushalt', value: `${kids}` },
+            { label: 'Bruttoeinkommen Eltern', value: formatCurrency(gross) },
+            { label: 'Monatliche Warmmiete', value: formatCurrency(rent) },
+            { label: 'Mindesteinkommensgrenze', value: '900,00 € (nicht erreicht)' },
+          ],
+        };
+      }
+
       // Reduzierung bei höherem Einkommen: Überhang über Bemessungsgrenze mindert KiZ um ca. 45 %
       const baseAllowance = 1600 + rent;
       const excess = Math.max(0, gross - baseAllowance);
@@ -1644,6 +1699,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           { id: 'perChild', label: 'Zuschlag pro Kind', value: calculatedKiz / kids, formattedValue: formatCurrency(calculatedKiz / kids) },
           { id: 'maxKiz', label: 'Gesetzlicher Höchstbetrag', value: maxTotalKiz, formattedValue: formatCurrency(maxTotalKiz) },
           { id: 'extraBenefits', label: 'Zusatzvorteil', value: 0, formattedValue: calculatedKiz > 0 ? 'Kostenlose Kita + Schulbedarf (BuT)' : 'Kein Anspruch' },
+        ],
+        basisSummary: [
+          { label: 'Kinder im Haushalt', value: `${kids}` },
+          { label: 'Bruttoeinkommen Eltern', value: formatCurrency(gross) },
+          { label: 'Monatliche Warmmiete', value: formatCurrency(rent) },
+          { label: 'Gesetzlicher Höchstsatz je Kind', value: '292,00 € / Monat' },
         ],
         summaryText: calculatedKiz > 0
           ? `Ihre Familie hat Anspruch auf ca. ${formatCurrency(calculatedKiz)} monatlichen Kinderzuschlag. Zudem sind Sie von den Kita-Gebühren befreit und erhalten Leistungen für Bildung und Teilhabe!`
@@ -1667,6 +1728,19 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wo wird der Kinderzuschlag beantragt?', answer: 'Online bei der zuständigen Familienkasse der Bundesagentur für Arbeit über das Portal Arbeitsagentur.de.' },
     ],
     relatedSlugs: ['kindergeld-rechner-2026', 'schulbedarfspaket-bu-t-rechner', 'unterhaltsvorschuss-rechner'],
+    trustMeta: {
+      legalBasis: '§ 6a Bundeskindergeldgesetz (BKGG) & Bundesministerium für Familie, Senioren, Frauen und Jugend',
+      sourceName: 'Bundesagentur für Arbeit (Familienkasse) / BMFSFJ',
+      sourceUrl: 'https://www.arbeitsagentur.de/familie-und-kinder/kiz-kinderzuschlag-verstehen',
+      lastReviewed: '2026-01-01',
+    },
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: '§ 6a BKGG (KiZ-Höchstbetrag 2026)',
+      sourceUrl: 'https://www.arbeitsagentur.de/familie-und-kinder/kiz-kinderzuschlag-verstehen',
+      lastVerified: '2026-01-01',
+    },
   },
 
   {
