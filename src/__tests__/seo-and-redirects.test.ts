@@ -411,7 +411,7 @@ describe('SEO & 301 Redirects Verification', () => {
 
       // Validate lastModified
       expect(entry.lastModified instanceof Date).toBe(true);
-      expect(isNaN(entry.lastModified!.getTime())).toBe(false);
+      expect(isNaN((entry.lastModified as Date).getTime())).toBe(false);
     }
 
     // 7. Verify specific audited calculators and articles

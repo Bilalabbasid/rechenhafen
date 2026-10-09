@@ -241,7 +241,7 @@ export default async function CalculatorPage({ params }: PageProps) {
               </h2>
             </div>
             <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-              {renderInlineMarkdown(ex.description)}
+              {renderInlineMarkdown(ex.description || '')}
             </p>
             <div
               style={{
@@ -276,7 +276,7 @@ export default async function CalculatorPage({ params }: PageProps) {
             </h2>
           </div>
           <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-            {renderInlineMarkdown(calc.workedExample.description)}
+            {renderInlineMarkdown(calc.workedExample.description || '')}
           </p>
           <div
             style={{

@@ -3,6 +3,10 @@ import { FAQItem } from '@/types/calculator';
 import styles from '@/styles/components.module.css';
 import { stripMarkdown, renderInlineMarkdown } from '@/components/common/FormattedContent';
 
+interface Props {
+  faqs: FAQItem[];
+}
+
 export default function FaqAccordion({ faqs }: Props) {
   if (!faqs || faqs.length === 0) return null;
 
