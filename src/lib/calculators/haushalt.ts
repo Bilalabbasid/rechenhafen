@@ -383,11 +383,11 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
   const secondary: ResultItem[] = [
     {
       id: 'monthlyPayment',
-      label: 'Durchschnittliche Kosten pro Monat (Orientierung)',
+      label: 'Rechnerischer Monatsdurchschnitt (Orientierungswert)',
       value: monthlyAdvancePayment,
       formattedValue: formatCurrency(monthlyAdvancePayment),
       highlight: true,
-      helpText: 'Reine rechnerische Orientierung (Jahreskosten ÷ 12). Der tatsächliche vertragliche Versorgerabschlag kann abweichen (z. B. 11 statt 12 Abschläge oder Rundungen).',
+      helpText: 'Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.',
     },
     {
       id: 'workCost',
@@ -450,7 +450,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
     {
       period: 'Monatlicher Durchschnitt (Ø)',
       values: {
-        beschreibung: 'Gesamtkosten auf 12 Monate aufgeteilt',
+        beschreibung: 'Gesamtkosten auf 12 Monate aufgeteilt (rechnerischer Orientierungswert)',
         betrag: formatCurrency(monthlyAdvancePayment),
       },
     },
@@ -505,7 +505,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       value: totalAnnualCost,
       formattedValue: formatCurrency(totalAnnualCost),
       highlight: true,
-      helpText: 'Gesamtsumme aus verbrauchsabhängigem Arbeitspreis und verbrauchsunabhängigem Jahresgrundpreis (inkl. 19 % MwSt.).',
+      helpText: 'Gesamtsumme aus verbrauchsabhängigem Arbeitspreis und verbrauchsunabhängigem Jahresgrundpreis (inkl. 19 % MwSt.). Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.',
     },
     secondary,
     breakdown: {
@@ -515,13 +515,13 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       ],
       rows: breakdownRows,
     },
-    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Durchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag). Hinweis: Reine Orientierung – Ihr tatsächlicher Monatsabschlag des Versorgers kann abweichen.`,
-    directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (durchschnittlich ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
+    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Monatsdurchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag). Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.`,
+    directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat; Ihr tatsächlicher Versorgerabschlag kann abweichen).`,
     qualifications: [
-      'Rechnerischer Monatsdurchschnitt (Jahreskosten ÷ 12): Der tatsächliche monatliche Abschlag Ihres Gasversorgers kann abweichen (z. B. 11 statt 12 Abschläge, Anpassungen nach Vorjahresverbrauch oder stichtagsbezogene Tarifänderungen).',
+      'Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen (z. B. bei 11 statt 12 Abschlägen im Abrechnungsjahr, individuellen Sicherheitszuschlägen oder kaufmännischen Rundungen).',
       'Gesamtkosten inklusive Arbeitspreis, Grundpreis und aller gesetzlichen Steuern (19 % Mehrwertsteuer, CO₂-Preis, Erdgassteuer, Konzessionsabgabe).',
       inputType === 'm3'
-        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh.`
+        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh. Für eine exakte Abrechnung sind die Werte Ihrer Jahresrechnung maßgeblich.`
         : 'Berechnung basiert direkt auf der thermischen Energiemenge in Kilowattstunden (kWh).',
     ],
     calculationSteps: [
@@ -531,7 +531,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       `Verbrauchskosten (Arbeitspreis): ${formatNumber(totalKwh, 0)} kWh × ${formatCurrency(pricePerKwhInEuro, 4)}/kWh = ${formatCurrency(workCost)}`,
       `Bereitstellungskosten (Grundpreis): ${formatCurrency(basePricePerMonth)}/Monat × 12 Monate = ${formatCurrency(annualBaseCost)}`,
       `Geschätzte Gesamtkosten pro Jahr: ${formatCurrency(workCost)} + ${formatCurrency(annualBaseCost)} = ${formatCurrency(totalAnnualCost)}`,
-      `Rechnerischer Monatsdurchschnitt: ${formatCurrency(totalAnnualCost)} ÷ 12 Monate = ${formatCurrency(monthlyAdvancePayment)}`,
+      `Rechnerischer Monatsdurchschnitt: ${formatCurrency(totalAnnualCost)} ÷ 12 Monate = ${formatCurrency(monthlyAdvancePayment)} (Orientierungswert)`,
     ],
     basisSummary: basisSummaryItems,
   };

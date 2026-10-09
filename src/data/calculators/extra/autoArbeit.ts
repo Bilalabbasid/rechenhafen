@@ -1209,7 +1209,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 68,00 € monatlich netto (ca. 420 € Gesamtersparnis)',
     },
     content: {
-      intro: 'Mit unserem kostenlosen Dienstrad-Rechner (oft auch als JobRad-Rechner bezeichnet) ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Kauf beim Dienstfahrrad-Leasing per Gehaltsumwandlung. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung funktioniert. Unabhängigkeitshinweis: RechenHafen ist ein unabhängiges Informationsportal und steht in keiner geschäftlichen oder gesellschaftsrechtlichen Verbindung zur JobRad GmbH oder anderen Leasinganbietern.',
+      intro: 'Mit unserem kostenlosen Dienstrad-Rechner ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Kauf beim Dienstfahrrad-Leasing per Gehaltsumwandlung. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung funktioniert. RechenHafen ist ein unabhängiges Informationsportal und steht in keiner geschäftlichen oder gesellschaftsrechtlichen Verbindung zur JobRad GmbH oder anderen Leasinganbietern.',
       sections: [
         {
           title: 'So funktioniert das Dienstrad-Leasing per Gehaltsumwandlung',
