@@ -1082,19 +1082,19 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       'e-bike leasing rechner',
     ],
     inputs: [
-      { id: 'bikePriceGross', label: 'Fahrrad- / E-Bike-Kaufpreis inkl. Zubehör (UVP)', type: 'number', defaultValue: 3500, min: 750, max: 15000, step: 100, unit: '€' },
-      { id: 'grossSalary', label: 'Ihr monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 1000, step: 100, unit: '€' },
+      { id: 'bikePriceGross', label: 'Fahrrad- / E-Bike-Kaufpreis inkl. Zubehör (UVP)', type: 'number', defaultValue: 3500, min: 750, max: 15000, step: 100, unit: '€', helpText: 'Unverbindliche Preisempfehlung (UVP) brutto inklusive Mehrwertsteuer und fest verbautem Zubehör (Beispielwert: 3.500 €)' },
+      { id: 'grossSalary', label: 'Ihr monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 1000, step: 100, unit: '€', helpText: 'Monatliches Bruttoeinkommen zur Ermittlung von Grenzsteuer- und Sozialversicherungsentlastung (Beispielwert: 3.800 €)' },
       {
         id: 'leaseTerm',
         label: 'Leasinglaufzeit',
         type: 'select',
         defaultValue: '36',
         options: [
-          { value: '36', label: '36 Monate (Regellaufzeit)' },
+          { value: '36', label: '36 Monate (Standard-Regellaufzeit)' },
         ],
       },
-      { id: 'employerSubsidy', label: 'Monatlicher Arbeitgeberzuschuss (optional)', type: 'number', defaultValue: 0, min: 0, max: 200, step: 5, unit: '€/Monat', helpText: 'Freiwilliger monatlicher Zuschuss Ihres Arbeitgebers zur Leasingrate' },
-      { id: 'serviceCost', label: 'Monatliche Inspektions- / Versicherungskosten', type: 'number', defaultValue: 10, min: 0, max: 50, step: 1, unit: '€/Monat', helpText: 'Vollkaskoversicherung und jährliche Inspektion' },
+      { id: 'employerSubsidy', label: 'Monatlicher Arbeitgeberzuschuss (optional)', type: 'number', defaultValue: 0, min: 0, max: 200, step: 5, unit: '€/Monat', helpText: 'Freiwilliger monatlicher Zuschuss Ihres Arbeitgebers zur Leasingrate (Beispielwert: 0 €; 0 € falls kein Zuschuss)' },
+      { id: 'serviceCost', label: 'Monatliche Inspektions- / Versicherungskosten (optional)', type: 'number', defaultValue: 10, min: 0, max: 50, step: 1, unit: '€/Monat', helpText: 'Vollkaskoversicherung und jährliche Inspektion (Beispielwert: 10 €; 0 € falls entfallend)' },
       { id: 'taxClass', label: 'Steuerklasse', type: 'select', defaultValue: '1', options: [
         { value: '1', label: 'Steuerklasse 1 (Ledig / getrennt lebend)' },
         { value: '3', label: 'Steuerklasse 3 (Verheiratet, Alleinverdiener)' },
@@ -1104,8 +1104,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     calculate: (inputs) => {
       const price = parseFloat(inputs.bikePriceGross) || 3500;
       const salary = parseFloat(inputs.grossSalary) || 3800;
-      const subsidy = Math.max(0, parseFloat(inputs.employerSubsidy) || 0);
-      const service = Math.max(0, parseFloat(inputs.serviceCost) || 0);
+      const subsidy = inputs.employerSubsidy !== undefined && inputs.employerSubsidy !== null && String(inputs.employerSubsidy).trim() !== ''
+        ? Math.max(0, parseFloat(inputs.employerSubsidy) || 0)
+        : 0;
+      const service = inputs.serviceCost !== undefined && inputs.serviceCost !== null && String(inputs.serviceCost).trim() !== ''
+        ? Math.max(0, parseFloat(inputs.serviceCost) || 0)
+        : 0;
       const taxClass = inputs.taxClass || '1';
 
       // Marktübliche monatliche Leasingrate bei 36 Monaten Laufzeit (ca. 2,90 % der UVP):
@@ -1113,13 +1117,15 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       // Monatlicher Brutto-Umwandlungsbetrag vom Gehalt
       const grossDeduction = Math.max(0, leasingRate + service - subsidy);
 
-      // Geldwerter Vorteil nach § 6 Abs. 1 Nr. 4 Satz 6 EStG (0,25 % Regelung):
-      // Das auf volle 100 € abgerundete Viertel (25 %) der UVP wird mit 1 % monatlich versteuert:
+      // Amtliche Reihenfolge laut BMF LStH 2025 Anhang 24 IV Nr. 4 & § 6 Abs. 1 Nr. 4 Satz 6 EStG:
+      // "1 % eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung ..."
+      // 1. UVP vierteln (25 %)
+      // 2. Dieses Viertel auf volle 100 Euro nach unten abrunden
+      // 3. 1 % des abgerundeten Betrags monatlich ansetzen
       const quarterUvpRounded = Math.floor((price * 0.25) / 100) * 100;
-      const taxableBenefit = Math.max(1, quarterUvpRounded * 0.01);
+      const taxableBenefit = quarterUvpRounded * 0.01;
 
       // Steuer- und Sozialversicherungsentlastung nach Grenzsteuersatz und Beitragsbemessungsgrenzen 2026:
-      // Grenzsteuersatz Lohnsteuer schätzen:
       let taxMarginal = 0.28;
       if (taxClass === '3') {
         taxMarginal = salary > 5500 ? 0.35 : salary > 3500 ? 0.26 : 0.18;
@@ -1131,9 +1137,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       // BBG KV/PV 2026: 5.512,50 €; BBG RV/AV 2026: 8.050 €
       let svRate = 0.205;
       if (salary > 8050) {
-        svRate = 0.0; // Oberhalb beider BBGs keine SV-Ersparnis
+        svRate = 0.0;
       } else if (salary > 5512.5) {
-        svRate = 0.106; // Nur RV/AV-Ersparnis (~10,6 % AN-Anteil)
+        svRate = 0.106;
       }
 
       const totalMarginalRate = taxMarginal + svRate;
@@ -1141,14 +1147,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const benefitTaxCost = taxableBenefit * taxMarginal;
 
       // Tatsächliche monatliche Netto-Belastung auf der Gehaltsabrechnung:
-      const actualNetDeduction = Math.max(5, grossDeduction - taxSvSavings + benefitTaxCost);
+      const actualNetDeduction = Math.max(0, grossDeduction - taxSvSavings + benefitTaxCost);
       const totalNetPaid36 = actualNetDeduction * 36;
 
-      // Typischer Übernahmepreis nach 36 Monaten (17-18 % der UVP laut Leasinganbieter):
+      // Typischer Übernahmepreis nach 36 Monaten (17-18 % der UVP laut Leasinganbietern):
       const takeoverPrice = price * 0.18;
       const totalLeaseCost = totalNetPaid36 + takeoverPrice;
 
-      // Vergleich mit privatem Neukauf inkl. 3 Jahre gleichwertiger Versicherung (10 €/Monat):
+      // Vergleich mit privatem Neukauf inkl. 3 Jahre gleichwertiger Service/Versicherung:
       const privatePurchaseEquivalent = price + (service * 36);
       const savingsVsDirectPurchase = privatePurchaseEquivalent - totalLeaseCost;
       const savingsPct = privatePurchaseEquivalent > 0 ? (savingsVsDirectPurchase / privatePurchaseEquivalent) * 100 : 0;
@@ -1165,21 +1171,22 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         secondary: [
           { id: 'leasingRate', label: 'Monatliche Leasingrate (brutto)', value: leasingRate, formattedValue: formatCurrency(leasingRate), helpText: 'Bruttorate vor Steuern & Abgaben (ca. 2,9 % UVP)' },
           { id: 'grossDeduction', label: 'Monatlicher Bruttoabzug vom Gehalt', value: grossDeduction, formattedValue: formatCurrency(grossDeduction), helpText: 'Leasingrate + Versicherung abzüglich AG-Zuschuss' },
-          { id: 'benefit', label: 'Geldwerter Vorteil (0,25 % Regelung)', value: taxableBenefit, formattedValue: formatCurrency(taxableBenefit), helpText: '1 % auf das auf volle 100 € abgerundete Viertel des UVP (§ 6 EStG)' },
+          { id: 'benefit', label: 'Geldwerter Vorteil (0,25 % Regelung)', value: taxableBenefit, formattedValue: formatCurrency(taxableBenefit), helpText: '1 % auf das auf volle 100 € abgerundete Viertel der UVP (BMF LStH Anhang 24)' },
           { id: 'totalCostOverall', label: 'Gesamtkosten über 36 Monate inkl. Übernahme', value: totalLeaseCost, formattedValue: formatCurrency(totalLeaseCost), highlight: true, helpText: 'Summe aus 36 Netto-Raten zzgl. 18 % Übernahmepreis' },
-          { id: 'takeoverPrice', label: 'Voraussichtlicher Übernahmepreis nach 36 Monaten', value: takeoverPrice, formattedValue: formatCurrency(takeoverPrice), helpText: 'Typisches Angebot zum Kauf nach Vertragsende (ca. 18 % UVP)' },
+          { id: 'takeoverPrice', label: 'Voraussichtlicher Übernahmepreis nach 36 Monaten', value: takeoverPrice, formattedValue: formatCurrency(takeoverPrice), helpText: 'Typisches Kaufangebot nach Vertragsende (ca. 18 % UVP)' },
           { id: 'savingsVsDirectPurchase', label: 'Geschätzte Gesamtersparnis ggü. Privatkauf', value: savingsVsDirectPurchase, formattedValue: formatCurrency(savingsVsDirectPurchase) },
           { id: 'pctSaved', label: 'Ersparnis gegenüber privatem Sofortkauf', value: savingsPct, formattedValue: formatPercent(savingsPct, 1) },
         ],
         details: [
           { id: 'leaseTerm', label: 'Vertragslaufzeit', value: 36, formattedValue: '36 Monate' },
           { id: 'total36', label: 'Summe der 36 Netto-Monatsraten', value: totalNetPaid36, formattedValue: formatCurrency(totalNetPaid36) },
-          { id: 'privateRef', label: 'Referenzkosten privater Neukauf inkl. Service', value: privatePurchaseEquivalent, formattedValue: formatCurrency(privatePurchaseEquivalent) },
+          { id: 'privateRef', label: 'Referenzkosten privater Kauf inkl. Service', value: privatePurchaseEquivalent, formattedValue: formatCurrency(privatePurchaseEquivalent) },
         ],
         qualifications: [
-          'Unverbindliche Orientierungsrechnung (Rechtsstand 2026): Das individuelle Nettoergebnis auf der Gehaltsabrechnung hängt von Ihren individuellen Steuermerkmalen, Kirchensteuer, Krankenversicherungssatz und den konkreten Vertragsbedingungen des Arbeitgebers ab.',
-          'Geldwerter Vorteil nach § 6 Abs. 1 Nr. 4 Satz 6 EStG: 0,25 % des geviertelten Bruttolistenpreises monatlich.',
-          'Dienstrad-Leasing per Gehaltsumwandlung unterscheidet sich grundlegend vom Privatkauf: Die Raten mindern das Bruttoentgelt, das Rad gehört während der 36 Monate dem Arbeitgeber/Leasinggeber.',
+          'Amtliche Berechnungsmethode (Rechtsstand 2026): 1 % eines auf volle 100 Euro abgerundeten Viertels der Brutto-UVP (§ 6 Abs. 1 Nr. 4 Satz 6 EStG i. V. m. BMF LStH 2025 Anhang 24 IV Nr. 4).',
+          'Gilt für Fahrräder und Pedelecs (Tretunterstützung bis 25 km/h). Schnelle S-Pedelecs (bis 45 km/h) gelten als Kraftfahrzeuge und werden nach der 0,5-%-Kfz-Regelung besteuert.',
+          'Unverbindliche Orientierungsrechnung: Die tatsächliche Gehaltsabrechnung hängt von individuellen Steuermerkmalen, Kirchensteuer, Krankenversicherung und betrieblichen Vereinbarungen ab. Keine Steuerberatung.',
+          'Unabhängigkeitshinweis: RechenHafen ist unabhängig und steht in keinem geschäftlichen Verhältnis zur JobRad GmbH oder anderen Anbietern.',
         ],
         basisSummary: [
           { label: 'Fahrrad- / E-Bike-Kaufpreis (UVP)', value: formatCurrency(price) },
@@ -1189,20 +1196,20 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { label: 'Monatliche Inspektions- & Versicherungskosten', value: formatCurrency(service) },
           { label: 'Leasinglaufzeit', value: '36 Monate' },
         ],
-        directAnswer: `Bei einem UVP von ${formatCurrency(price)} beträgt die geschätzte monatliche Netto-Belastung ca. ${formatCurrency(actualNetDeduction)}. Über die 36 Monate Laufzeit belaufen sich die Gesamtkosten inklusive Übernahme auf ca. ${formatCurrency(totalLeaseCost)}. Gegenüber dem privaten Neukauf sparen Sie voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}).`,
-        summaryText: `Bei einem Fahrradpreis von ${formatCurrency(price)} zahlen Sie bei 36 Monaten Laufzeit effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Zusammen mit dem voraussichtlichen Übernahmepreis von ca. ${formatCurrency(takeoverPrice)} sparen Sie gegenüber dem privaten Sofortkauf voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}). Hinweis: Unverbindliche Modellrechnung; keine Steuerberatung.`,
+        directAnswer: `Bei einem UVP von ${formatCurrency(price)} beträgt der monatlich zu versteuernde geldwerte Vorteil ${formatCurrency(taxableBenefit)} (1 % des auf 100 € abgerundeten Viertels). Die geschätzte monatliche Netto-Belastung liegt bei ca. ${formatCurrency(actualNetDeduction)}. Über die 36 Monate Laufzeit belaufen sich die Gesamtkosten inklusive Übernahme auf ca. ${formatCurrency(totalLeaseCost)}. Gegenüber dem privaten Kauf sparen Sie voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}).`,
+        summaryText: `Bei einem Fahrradpreis von ${formatCurrency(price)} zahlen Sie bei 36 Monaten Laufzeit effektiv nur ca. ${formatCurrency(actualNetDeduction)} netto pro Monat. Der monatliche geldwerte Vorteil beträgt exakt ${formatCurrency(taxableBenefit)}. Zusammen mit dem voraussichtlichen Übernahmepreis von ca. ${formatCurrency(takeoverPrice)} sparen Sie gegenüber dem privaten Sofortkauf voraussichtlich ca. ${formatCurrency(savingsVsDirectPurchase)} (${formatPercent(savingsPct, 1)}). Hinweis: Unverbindliche Modellrechnung; keine Steuer- oder Rechtsberatung.`,
       };
     },
-    formula: 'Netto-Belastung ≈ Bruttoabzug - (Bruttoabzug × Grenzbelastung) + (0,25 % UVP × Grenzsteuersatz)',
-    formulaExplanation: 'Die Leasingrate wird vor Steuern und Sozialabgaben vom Bruttogehalt abgezogen (Gehaltsumwandlung). Versteuert werden muss monatlich lediglich der geldwerte Vorteil für die Privatnutzung nach der 0,25-%-Regel (§ 6 Abs. 1 Nr. 4 Satz 6 EStG). Dieser Rechner dient der Orientierung und ersetzt keine Steuerberatung.',
+    formula: 'Geldwerter Vorteil = 1 % × floor(UVP ÷ 4, 100); Netto-Belastung ≈ Bruttoabzug − Steuer-/SV-Ersparnis + (Geldwerter Vorteil × Grenzsteuersatz)',
+    formulaExplanation: 'Nach amtlicher BMF-Richtlinie (§ 6 Abs. 1 Nr. 4 Satz 6 EStG / LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: 1. Die unverbindliche Preisempfehlung (UVP brutto inkl. MwSt.) wird geviertelt (25 %). 2. Dieses Viertel wird auf volle 100 Euro nach unten abgerundet. 3. Davon wird 1 % monatlich als geldwerter Vorteil dem steuerpflichtigen Bruttogehalt hinzugerechnet. Beispiel: 3.500 € UVP ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil. Schnelle S-Pedelecs (bis 45 km/h) gelten kraftfahrzeugrechtlich als Kraftfahrzeuge und unterliegen gesonderten steuerlichen Vorschriften (0,5-%-Regelung). Dieser Rechner dient der Orientierung und ersetzt keine Steuerberatung.',
     workedExample: {
       title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Bruttogehalt (Steuerklasse 1)',
-      description: 'Leasingrate brutto: ca. 101,50 €/Monat zzgl. 10,00 € Versicherung. Nach Abzug von Lohnsteuer und Sozialabgaben sowie Hinzurechnung des geldwerten Vorteils (8,00 €) beträgt die tatsächliche monatliche Netto-Belastung rund 68,00 €. Nach 36 Monaten und Übernahme für ca. 630 € beträgt die Gesamtersparnis gegenüber dem privaten Direktkauf rund 420 €.',
+      description: 'Amtliche Vorteilsberechnung: 3.500 € ÷ 4 = 875 €, abgerundet auf volle 100 € = 800 €, davon 1 % = 8,00 € monatlicher geldwerter Vorteil. Leasingrate brutto: ca. 101,50 €/Monat zzgl. 10,00 € Versicherung. Nach Abzug von Lohnsteuer und Sozialabgaben sowie Hinzurechnung der Steuer auf den geldwerten Vorteil (8,00 € × Grenzsteuersatz) beträgt die tatsächliche monatliche Netto-Belastung rund 68,00 €. Nach 36 Monaten und Übernahme für ca. 630 € (18 %) beträgt die Gesamtersparnis gegenüber dem privaten Direktkauf rund 420 €.',
       inputs: { bikePriceGross: 3500, grossSalary: 3800, employerSubsidy: 0, serviceCost: 10, taxClass: '1' },
       resultSummary: 'ca. 68,00 € monatlich netto (ca. 420 € Gesamtersparnis)',
     },
     content: {
-      intro: 'Mit unserem kostenlosen JobRad- & Dienstfahrrad-Rechner ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Sofortkauf beim Dienstrad-Leasing per Gehaltsumwandlung. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 Satz 6 EStG funktioniert. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad.',
+      intro: 'Mit unserem kostenlosen Dienstrad-Rechner (oft auch als JobRad-Rechner bezeichnet) ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Kauf beim Dienstfahrrad-Leasing per Gehaltsumwandlung. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung funktioniert. Unabhängigkeitshinweis: RechenHafen ist ein unabhängiges Informationsportal und steht in keiner geschäftlichen oder gesellschaftsrechtlichen Verbindung zur JobRad GmbH oder anderen Leasinganbietern.',
       sections: [
         {
           title: 'So funktioniert das Dienstrad-Leasing per Gehaltsumwandlung',
@@ -1210,7 +1217,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         },
         {
           title: 'Die 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 EStG',
-          content: 'Im Gegensatz zum Dienstwagen (bei dem 1 % des Bruttolistenpreises versteuert werden muss) gilt für Dienstfahrräder und Pedelecs ein reduzierter Satz:\n- Der Bruttolistenpreis (UVP) wird auf volle 100 Euro abgerundet und geviertelt (25 %).\n- Von diesem geviertelten Betrag wird 1 % monatlich dem steuerpflichtigen Gehalt hinzugerechnet.\n- Dies entspricht rechnerisch exakt **0,25 % des ursprünglichen UVP** pro Monat.\n\nBei einem E-Bike für 3.500 Euro müssen Sie somit lediglich 8,00 Euro monatlich als geldwerten Vorteil versteuern – das kostet Sie netto meist weniger als 4 Euro im Monat!',
+          content: 'Für betriebliche Fahrräder und Pedelecs (bis 25 km/h) bestimmt die amtliche Steuerrichtlinie des Bundesfinanzministeriums (LStH 2025 Anhang 24 IV Nr. 4) den monatlichen geldwerten Vorteil als 1 % eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung:\n- **Schritt 1 (Vierteln)**: Die Brutto-UVP inklusive fest verbautem Zubehör wird zuerst durch 4 geteilt (25 %).\n- **Schritt 2 (Abrunden)**: Das ermittelte Viertel wird auf volle 100 Euro nach unten abgerundet.\n- **Schritt 3 (1-%-Monatsansatz)**: Von diesem abgerundeten Viertel wird 1 Prozent monatlich dem steuerpflichtigen Bruttoentgelt hinzugerechnet.\n\n**Beispiel nach amtlicher Rechenfolge**:\nBei einem E-Bike für 3.500 Euro UVP beträgt das Viertel 875 Euro. Abgerundet auf volle 100 Euro ergeben sich 800 Euro. 1 Prozent davon entspricht **8,00 Euro monatlichem geldwerten Vorteil** (effektiv 0,25 % des gerundeten Viertels). Dies kostet Sie je nach Steuerklasse netto meist nur 2,50 bis 4 Euro im Monat.\n\n**Wichtige Abgrenzungen**:\n- **S-Pedelecs (bis 45 km/h)**: Gelten verkehrsrechtlich als Kraftfahrzeuge (Kleinkraftrad). Für sie greift nicht die Fahrradregelung, sondern die Kfz-Dienstwagenbesteuerung (0,5-%-Regelung für Elektro-Kfz zzgl. 0,03 % pro Entfernungskilometer für Wege zwischen Wohnung und erster Tätigkeitsstätte).\n- **Individuelle Arbeitsverträge**: Tarifverträge, Betriebsvereinbarungen und individuelle Leasingüberlassungsverträge können abweichende Regelungen für Raten, Versicherungen und Arbeitgeberzuschüsse vorsehen.',
         },
         {
           title: 'Leasing versus Direktkauf: Wann lohnt sich das Dienstrad?',
@@ -1222,31 +1229,48 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         },
         {
           title: 'Unabhängiger Rechner für JobRad, Bikeleasing, BusinessBike und weitere Anbieter',
-          content: 'Dieser Rechner arbeitet vollständig anbieterunabhängig auf Basis des deutschen Steuerrechts (§ 6 Abs. 1 Nr. 4 Satz 6 EStG). Das Berechnungsprinzip der Gehaltsumwandlung gilt einheitlich für alle deutschen Leasinggesellschaften – darunter JobRad GmbH, Deutsche Dienstrad, Bikeleasing-Service, BusinessBike, Lease a Bike und KazenMaier. RechenHafen steht in keinem geschäftlichen oder gesellschaftsrechtlichen Verhältnis zu diesen Marken.',
+          content: 'Dieser Rechner arbeitet vollständig anbieterunabhängig auf Basis des deutschen Steuerrechts (§ 6 Abs. 1 Nr. 4 Satz 6 EStG i. V. m. amtlichen BMF-Erlassen). Das Berechnungsprinzip der Gehaltsumwandlung gilt einheitlich für alle deutschen Leasinggesellschaften – darunter JobRad GmbH, Deutsche Dienstrad, Bikeleasing-Service, BusinessBike, Lease a Bike und KazenMaier. RechenHafen steht in keinem geschäftlichen oder gesellschaftsrechtlichen Verhältnis zu diesen Marken.',
         },
       ],
-      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie gleich lautende Erlasse der obersten Finanzbehörden der Länder zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Kennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung). Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/firmenwagen-geldwerter-vorteil-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/).',
+      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie BMF LStH 2025 Anhang 24 IV Nr. 4 zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Versicherungskennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung). Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/firmenwagen-geldwerter-vorteil-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/). Unverbindliche Modellrechnung – keine Steuerberatung.',
     },
     faqs: [
-      { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 6 Abs. 1 Nr. 4 Satz 6 EStG wird für die private Nutzung eines Dienstfahrrads monatlich 1 Prozent eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung (UVP) als geldwerter Vorteil angesetzt. Das entspricht effektiv 0,25 Prozent des Bruttolistenpreises.' },
+      { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung (LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: Die Brutto-UVP wird geviertelt (25 %), dieses Viertel wird auf volle 100 Euro nach unten abgerundet und davon wird monatlich 1 Prozent als geldwerter Vorteil angesetzt. Bei 3.500 € UVP: 3.500 € ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil.' },
+      { question: 'Gilt die 0,25-%-Regelung auch für schnelle S-Pedelecs (bis 45 km/h)?', answer: 'Nein. S-Pedelecs mit Motorunterstützung bis 45 km/h gelten verkehrsrechtlich als Kraftfahrzeuge (Kleinkraftrad). Für sie gilt die Kfz-Dienstwagenregelung (0,5-%-Regelung für Elektrofahrzeuge) zuzüglich der Versteuerung der einfachen Wegstrecke zwischen Wohnung und Arbeitsstätte (0,03 % des halbierten Bruttolistenpreises je Entfernungskilometer).' },
       { question: 'Welche Auswirkung hat ein Arbeitgeberzuschuss?', answer: 'Wenn Ihr Arbeitgeber die Leasingrate oder die Inspektionskosten ganz oder teilweise bezuschusst, sinkt Ihr Bruttoabzug entsprechend. Manche Arbeitgeber übernehmen die Kosten vollständig – in diesem Fall ist das Dienstfahrrad für Sie sogar komplett steuer- und beitragsfrei (§ 3 Nr. 37 EStG).' },
       { question: 'Dienstrad-Leasing vs. Privatkauf: Was ist günstiger?', answer: 'Aufgrund der Ersparnis bei Lohnsteuer und Sozialabgaben sowie des günstigen Übernahmepreises nach 36 Monaten (typischerweise ca. 17 bis 18 Prozent des UVP) ist das Dienstrad-Leasing in den allermeisten Fällen 20 bis 35 Prozent günstiger als der private Barkauf mit Ratenkredit.' },
       { question: 'Wer kann ein Dienstfahrrad über die Gehaltsumwandlung nutzen?', answer: 'Jeder festangestellte Arbeitnehmer, dessen Arbeitgeber einen Rahmenvertrag mit einem Leasinganbieter geschlossen hat. Auch Beamte in Bund und den meisten Bundesländern sowie Selbstständige können Dienstrad-Leasingmodelle steuerlich nutzen.' },
       { question: 'Warum wird dieser Rechner auch als JobRad-Rechner bezeichnet?', answer: 'JobRad ist eine geschützte Marke der JobRad GmbH und einer der bekanntesten Pioniere des Dienstrad-Leasings in Deutschland. Der Rechner berechnet herstellerunabhängig die gesetzliche Gehaltsumwandlung, die gleichermaßen für JobRad, Deutsche Dienstrad, Bikeleasing, BusinessBike, Lease a Bike und weitere Anbieter gilt. RechenHafen steht in keiner geschäftlichen Verbindung zu JobRad.' },
       { question: 'Was geschieht am Ende der 36 Monate Leasinglaufzeit?', answer: 'Am Ende des Leasingvertrags bietet die Leasinggesellschaft das Fahrrad in der Regel zur privaten Übernahme für rund 17 bis 18 Prozent des ursprünglichen UVP an. Alternativ kann das Rad zurückgegeben und ein neues Dienstfahrrad geleast werden.' },
     ],
+    legalFootnotes: [
+      {
+        citation: 'BMF LStH 2025 Anhang 24 IV Nr. 4',
+        text: 'Amtliche Lohnsteuer-Handbücher: Überlassung von (Elektro-)Fahrrädern – 1 % eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung.',
+        url: 'https://amtliche-handbuecher.bundesfinanzministerium.de/lsth/2025/B-Anhaenge/Anhang-24/IV/IV-4/inhalt.html',
+        effectiveDate: '01.01.2025 / 2026',
+        reviewedDate: '2026-10-09',
+      },
+      {
+        citation: '§ 6 Abs. 1 Nr. 4 Satz 6 EStG',
+        text: 'Bewertung der privaten Nutzung betrieblicher Kraftfahrzeuge und Fahrräder bei Gehaltsumwandlung.',
+        url: 'https://www.gesetze-im-internet.de/estg/__6.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '2026-10-09',
+      },
+    ],
     relatedSlugs: ['brutto-netto-rechner', 'pendlerpauschale-rechner', 'fahrtkostenrechner', 'firmenwagen-geldwerter-vorteil-rechner', 'einkommensteuerrechner', 'stromkostenrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: '§ 6 Abs. 1 Nr. 4 Satz 6 EStG & BMF-Erlasse zur Dienstfahrradüberlassung',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-03-01',
+      source: 'BMF LStH 2025 Anhang 24 IV Nr. 4 & § 6 Abs. 1 Nr. 4 Satz 6 EStG',
+      sourceUrl: 'https://amtliche-handbuecher.bundesfinanzministerium.de/lsth/2025/B-Anhaenge/Anhang-24/IV/IV-4/inhalt.html',
+      lastVerified: '2026-10-09',
     },
     trustMeta: {
-      lastReviewed: '2026-10-07',
-      sourceName: 'Bundesfinanzministerium (BMF) & § 6 Abs. 1 Nr. 4 EStG',
-      legalBasis: '0,25 % Regelung bei Gehaltsumwandlung für Fahrräder und Pedelecs',
+      lastReviewed: '2026-10-09',
+      sourceName: 'Bundesfinanzministerium (BMF LStH Anhang 24)',
+      legalBasis: '1 % eines auf volle 100 Euro abgerundeten Viertels der UVP (§ 6 Abs. 1 Nr. 4 Satz 6 EStG)',
     },
   },
 
