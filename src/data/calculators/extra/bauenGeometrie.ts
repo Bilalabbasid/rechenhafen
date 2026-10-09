@@ -1266,14 +1266,39 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     ],
     inputs: [
       {
+        id: "wallType",
+        label: "Mauer-Bauform",
+        type: "select",
+        defaultValue: "straight",
+        options: [
+          { value: "straight", label: "Gerade Mauer (1 Wandseite / 2 Enden)" },
+          { value: "l_shape", label: "L-förmige Mauer (2 Schenkel / 1 Ecke)" },
+          { value: "u_shape", label: "U-förmige Mauer (3 Schenkel / 2 Ecken)" },
+          { value: "rectangle_pool", label: "Geschlossenes Rechteck / Poolwand (4 Wände / 4 Ecken)" },
+        ],
+      },
+      {
         id: "wallLength",
-        label: "Mauerlänge (m)",
+        label: "Mauerlänge / Schenkel 1 (m)",
         type: "number",
         defaultValue: 8,
         min: 0.1,
         max: 100,
         step: 0.5,
-        unit: "m"
+        unit: "m",
+        helpText: "Länge der geraden Wand bzw. des ersten Schenkels in Metern",
+      },
+      {
+        id: "wallLengthB",
+        label: "Schenkel 2 / Seitenwand (m)",
+        type: "number",
+        defaultValue: 4,
+        min: 0.1,
+        max: 100,
+        step: 0.5,
+        unit: "m",
+        helpText: "Länge des zweiten Schenkels bzw. der Seitenwand in Metern",
+        dependsOn: { field: "wallType", value: ["l_shape", "u_shape", "rectangle_pool"] },
       },
       {
         id: "wallHeight",
@@ -1283,27 +1308,51 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         min: 0.1,
         max: 5,
         step: 0.25,
-        unit: "m"
+        unit: "m",
+        helpText: "Gesamthöhe der Mauer ab Oberkante Fundament",
+      },
+      {
+        id: "openingWidth",
+        label: "Öffnungsbreite (optional in m)",
+        type: "number",
+        defaultValue: 0,
+        min: 0,
+        max: 20,
+        step: 0.1,
+        unit: "m",
+        helpText: "Breite von Toren, Türen oder Durchbrüchen (0 falls keine)",
+      },
+      {
+        id: "openingHeight",
+        label: "Öffnungshöhe (optional in m)",
+        type: "number",
+        defaultValue: 0,
+        min: 0,
+        max: 5,
+        step: 0.1,
+        unit: "m",
+        helpText: "Höhe der Tor- oder Türöffnung (0 falls keine)",
       },
       {
         id: "openingsArea",
-        label: "Abzüge für Öffnungen (Tore, Treppen in m²)",
+        label: "Oder: Pauschale Abzugsfläche für Öffnungen (m²)",
         type: "number",
         defaultValue: 0,
         min: 0,
         max: 50,
         step: 0.1,
         unit: "m²",
-        helpText: "Fläche von Durchbrüchen oder Toren, die nicht aufgemauert werden"
+        helpText: "Wird genutzt, falls oben keine konkreten Breiten/Höhen eingegeben wurden",
       },
       {
         id: "stoneFormat",
-        label: "Steinformat & Grundbedarf",
+        label: "Steinformat & Grundbedarf (Standardannahme)",
         type: "select",
         defaultValue: "8",
         options: [
-          { value: "8", label: "Standardformat 50 × 25 cm (exakt 8 Steine je m² Wandfläche)" }
-        ]
+          { value: "8", label: "Standardformat 50 × 25 cm (Rastermaß: 8 Steine je m² Wandfläche)" },
+        ],
+        helpText: "Standard-Rastermaß 50 cm Länge × 25 cm Schichthöhe",
       },
       {
         id: "fillMode",
@@ -1316,8 +1365,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { value: "preset_beyhl24", label: "Beyhl 24 cm (Herstellerwert: ca. 18 l/Stein ≈ 144 l/m² bei 8 Stk./m²)" },
           { value: "preset_beyhl175", label: "Beyhl 17,5 cm (Herstellerwert: ca. 12 l/Stein ≈ 96 l/m² bei 8 Stk./m²)" },
           { value: "customM2", label: "Eigener Herstellerwert in Liter je m² Wandfläche" },
-          { value: "customStone", label: "Eigener Herstellerwert in Liter je Stein" }
-        ]
+          { value: "customStone", label: "Eigener Herstellerwert in Liter je Stein" },
+        ],
       },
       {
         id: "customFillValue",
@@ -1328,7 +1377,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         max: 500,
         step: 1,
         unit: "Liter",
-        helpText: "Wird verwendet, wenn oben ein eigener Herstellerwert gewählt wurde"
+        helpText: "Wird verwendet, wenn oben ein eigener Herstellerwert gewählt wurde",
+        dependsOn: { field: "fillMode", value: ["customM2", "customStone"] },
       },
       {
         id: "stoneReserve",
@@ -1338,7 +1388,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         min: 0,
         max: 25,
         step: 1,
-        unit: "%"
+        unit: "%",
+        helpText: "Empfohlen: mind. 5 % für Passstücke und Eckschnitte (getrennt ausgewiesen)",
       },
       {
         id: "concreteReserve",
@@ -1348,10 +1399,12 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         min: 0,
         max: 25,
         step: 1,
-        unit: "%"
-      }
+        unit: "%",
+        helpText: "Empfohlen: 0 bis 5 % für Einbauverlust und Lieferreserve (getrennt ausgewiesen)",
+      },
     ],
     calculate: (inputs: Record<string, any>) => {
+      const wallType = inputs.wallType || 'straight';
       if (inputs.wallLength === undefined || inputs.wallLength === null || String(inputs.wallLength).trim() === '') {
         return {
           primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
@@ -1364,6 +1417,55 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
           error: 'Bitte geben Sie eine gültige Mauerlänge größer als 0 m ein.',
         };
+      }
+
+      let totalLength = l;
+      let cornersCount = 0;
+      let openEndsCount = 2;
+      let wallTypeDescription = 'Gerade Mauer (1 Wandseite)';
+
+      if (wallType === 'l_shape') {
+        const lB = inputs.wallLengthB !== undefined && inputs.wallLengthB !== null && String(inputs.wallLengthB).trim() !== ''
+          ? parseFloat(inputs.wallLengthB)
+          : 4;
+        if (isNaN(lB) || lB <= 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie eine gültige Länge für Schenkel 2 größer als 0 m ein.',
+          };
+        }
+        totalLength = l + lB;
+        cornersCount = 1;
+        openEndsCount = 2;
+        wallTypeDescription = `L-Form: Schenkel 1 (${formatNumber(l, 2)} m) + Schenkel 2 (${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m`;
+      } else if (wallType === 'u_shape') {
+        const lB = inputs.wallLengthB !== undefined && inputs.wallLengthB !== null && String(inputs.wallLengthB).trim() !== ''
+          ? parseFloat(inputs.wallLengthB)
+          : 4;
+        if (isNaN(lB) || lB <= 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie eine gültige Länge für die Seitenschenkel größer als 0 m ein.',
+          };
+        }
+        totalLength = l + 2 * lB;
+        cornersCount = 2;
+        openEndsCount = 2;
+        wallTypeDescription = `U-Form: Hauptwand (${formatNumber(l, 2)} m) + 2 × Schenkel (${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m`;
+      } else if (wallType === 'rectangle_pool') {
+        const lB = inputs.wallLengthB !== undefined && inputs.wallLengthB !== null && String(inputs.wallLengthB).trim() !== ''
+          ? parseFloat(inputs.wallLengthB)
+          : 4;
+        if (isNaN(lB) || lB <= 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie eine gültige Breite für das Rechteck größer als 0 m ein.',
+          };
+        }
+        totalLength = 2 * (l + lB);
+        cornersCount = 4;
+        openEndsCount = 0;
+        wallTypeDescription = `Rechteck / Pool: 2 × (${formatNumber(l, 2)} m + ${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m Umfang`;
       }
 
       if (inputs.wallHeight === undefined || inputs.wallHeight === null || String(inputs.wallHeight).trim() === '') {
@@ -1380,17 +1482,28 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         };
       }
 
-      const rawOpenings = inputs.openingsArea !== undefined && inputs.openingsArea !== null && String(inputs.openingsArea).trim() !== ''
-        ? parseFloat(inputs.openingsArea)
+      let openings = 0;
+      const rawOpeningWidth = inputs.openingWidth !== undefined && inputs.openingWidth !== null && String(inputs.openingWidth).trim() !== ''
+        ? parseFloat(inputs.openingWidth)
         : 0;
-      if (isNaN(rawOpenings) || rawOpenings < 0) {
-        return {
-          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
-          error: 'Die Abzugsfläche für Öffnungen darf nicht negativ sein.',
-        };
+      const rawOpeningHeight = inputs.openingHeight !== undefined && inputs.openingHeight !== null && String(inputs.openingHeight).trim() !== ''
+        ? parseFloat(inputs.openingHeight)
+        : 0;
+
+      if (rawOpeningWidth > 0 && rawOpeningHeight > 0) {
+        openings = rawOpeningWidth * rawOpeningHeight;
+      } else if (inputs.openingsArea !== undefined && inputs.openingsArea !== null && String(inputs.openingsArea).trim() !== '') {
+        const parsedOpeningsArea = parseFloat(inputs.openingsArea);
+        if (isNaN(parsedOpeningsArea) || parsedOpeningsArea < 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            error: 'Die Abzugsfläche für Öffnungen darf nicht negativ sein.',
+          };
+        }
+        openings = parsedOpeningsArea;
       }
-      const openings = rawOpenings;
-      const grossArea = l * h;
+
+      const grossArea = totalLength * h;
       if (openings > grossArea) {
         return {
           primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
@@ -1434,7 +1547,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             { id: 'concreteBaseM3', label: 'Füllbeton Netto-Volumen', value: 0, formattedValue: '0,00 m³' },
             { id: 'wallArea', label: 'Netto-Ansichtsfläche der Mauer', value: 0, formattedValue: '0,00 m²' },
           ],
-          summaryText: 'Materialabschätzung: Bei einer Netto-Wandfläche von 0,00 m² (die Öffnungen entsprechen der gesamten Wandfläche) wird kein Wandbaustoff benötigt.',
+          summaryText: 'Materialabschätzung: Bei einer Netto-Wandfläche von 0,00 m² wird kein Wandbaustoff benötigt. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.',
         };
       }
 
@@ -1442,6 +1555,16 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const stonesPerM2 = 8;
       const baseStones = Math.ceil(wallArea * stonesPerM2);
       const stonesWithReserve = Math.ceil(wallArea * stonesPerM2 * stoneReserveFactor);
+      const reserveStonesCount = Math.max(0, stonesWithReserve - baseStones);
+
+      // Lagen / Schichten berechnen (25 cm Schichthöhe)
+      const courses = Math.max(1, Math.ceil(h / 0.25));
+
+      // Trennung in Normalsteine und Eck- / Endsteine
+      const cornerBlocks = cornersCount * courses;
+      const endBlocks = openEndsCount * courses;
+      const cornerEndBlocks = cornerBlocks + endBlocks;
+      const standardBlocks = Math.max(0, baseStones - cornerEndBlocks);
 
       // Füllmenge in Liter je m² ermitteln
       let litersPerM2 = 130; // Standardbeispiel: Delfing DP 24
@@ -1461,7 +1584,6 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       } else if (fillMode === 'customStone') {
         litersPerM2 = customVal * stonesPerM2;
       } else if (inputs.stoneWidth) {
-        // Fallback for legacy parameters
         if (inputs.stoneWidth === '17.5') litersPerM2 = 80;
         else if (inputs.stoneWidth === '30') litersPerM2 = 195;
         else if (inputs.stoneWidth === '36.5') litersPerM2 = 240;
@@ -1472,7 +1594,6 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const concreteBaseM3 = wallArea * (litersPerM2 / 1000);
       // Bestellmenge mit separater Betonreserve
       const concreteTotalM3 = concreteBaseM3 * concreteReserveFactor;
-
       const concreteReserveSecValue = Number((concreteTotalM3 - concreteBaseM3).toFixed(3));
 
       return {
@@ -1482,7 +1603,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           value: stonesWithReserve,
           formattedValue: `${stonesWithReserve} Stück`,
           highlight: true,
-          helpText: `${baseStones} Stück Netto + ${stonesWithReserve - baseStones} Stück Reserve (${stoneReservePercent} % für Zuschnitt & Bruch)`,
+          helpText: `${baseStones} Stück Netto (${standardBlocks} Normalsteine + ${cornerEndBlocks} Eck-/Endsteine) + ${reserveStonesCount} Stück Reserve (${stoneReservePercent} %)`,
         },
         secondary: [
           {
@@ -1501,22 +1622,43 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             helpText: `Geometrisches Füllvolumen der Hohlkammern laut Herstellerangabe (${formatNumber(litersPerM2, 1)} l/m²)`,
           },
           {
-            id: 'concreteReserveAmount',
-            label: 'Betonreserve / Bestellzuschlag',
-            value: concreteReservePercent,
-            formattedValue: `${concreteReservePercent} % (+${formatNumber(concreteReserveSecValue, 2)} m³)`,
-          },
-          {
             id: 'baseStones',
             label: 'Schalungssteine Netto-Bedarf',
             value: baseStones,
             formattedValue: `${baseStones} Stück (ohne Reserve)`,
           },
           {
+            id: 'standardBlocks',
+            label: 'Davon Normalsteine (Regelsteine)',
+            value: standardBlocks,
+            formattedValue: `${standardBlocks} Stück`,
+            helpText: 'Normale Hohlkammer-Schalungssteine für die laufende Wandstrecke',
+          },
+          {
+            id: 'cornerEndBlocks',
+            label: 'Davon Eck- / Endsteine',
+            value: cornerEndBlocks,
+            formattedValue: `${cornerEndBlocks} Stück (${cornerBlocks} Ecksteine + ${endBlocks} Endsteine)`,
+            helpText: `${cornersCount} Ecken und ${openEndsCount} Wandenden über ${courses} Steinlagen`,
+          },
+          {
+            id: 'courses',
+            label: 'Steinlagen / Schichten',
+            value: courses,
+            formattedValue: `${courses} Lagen (bei 25 cm Steinhöhe)`,
+            helpText: `${formatNumber(h, 2)} m Mauerhöhe ÷ 0,25 m Schichthöhe`,
+          },
+          {
             id: 'stoneReserveAmount',
             label: 'Steinreserve (Zuschnitt & Bruch)',
             value: stoneReservePercent,
-            formattedValue: `${stoneReservePercent} % (+${stonesWithReserve - baseStones} Steine)`,
+            formattedValue: `${stoneReservePercent} % (+${reserveStonesCount} Steine)`,
+          },
+          {
+            id: 'concreteReserveAmount',
+            label: 'Betonreserve / Bestellzuschlag',
+            value: concreteReservePercent,
+            formattedValue: `${concreteReservePercent} % (+${formatNumber(concreteReserveSecValue, 2)} m³)`,
           },
           {
             id: 'wallArea',
@@ -1526,46 +1668,40 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             helpText: `Brutto ${formatNumber(grossArea, 2)} m² minus ${formatNumber(openings, 2)} m² Öffnungen`,
           },
           {
-            id: 'wallDimensions',
-            label: 'Mauerabmessungen',
-            value: `${formatNumber(l, 2)} × ${formatNumber(h, 2)} m`,
-            formattedValue: `${formatNumber(l, 2)} m Länge × ${formatNumber(h, 2)} m Höhe`,
-          },
-          {
-            id: 'stoneDimensions',
-            label: 'Ausgewählte Steinmaße',
-            value: '50 × 25 cm',
-            formattedValue: '50 × 25 cm (exakt 8 Steine je m²)',
-            helpText: 'Handelsübliches Standard-Rastermaß nach DIN EN 771-3',
+            id: 'wallTypeInfo',
+            label: 'Mauer-Bauform',
+            value: wallTypeDescription,
+            formattedValue: wallTypeDescription,
           },
         ],
-        directAnswer: `Für Ihre Mauer (${formatNumber(l, 2)} m × ${formatNumber(h, 2)} m = ${formatNumber(wallArea, 2)} m² Nettofläche) benötigen Sie ${baseStones} Schalungssteine (${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Reserve) sowie ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton (Netto-Füllvolumen: ${formatNumber(concreteBaseM3, 2)} m³).`,
+        directAnswer: `Für Ihre Mauer (${wallTypeDescription}, Höhe ${formatNumber(h, 2)} m = ${formatNumber(wallArea, 2)} m² Nettofläche in ${courses} Lagen) benötigen Sie ${baseStones} Schalungssteine Netto (${standardBlocks} Normalsteine und ${cornerEndBlocks} Eck-/Endsteine; insgesamt ${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Reserve) sowie ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton (Netto: ${formatNumber(concreteBaseM3, 2)} m³).`,
         qualifications: [
-          'Reine Materialermittlung: Die Berechnung ersetzt keinen statischen Standsicherheitsnachweis und keine individuelle Bewehrungsbemessung.',
+          'Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.',
           'Herstellerangaben beachten: Hohlraumvolumen variieren je nach Hersteller und Wandstärke (z. B. Delfing DP 24 ca. 130 l/m², Beyhl 24er ca. 144 l/m²).',
           'Fundament getrennt bemessen: Der Fundamentbeton für das Streifenfundament ist eine separate Position und nicht im Füllvolumen der Steine enthalten.',
         ],
         calculationSteps: [
-          `Netto-Wandfläche = ${formatNumber(l, 2)} m Länge × ${formatNumber(h, 2)} m Höhe − ${formatNumber(openings, 2)} m² Öffnungen = ${formatNumber(wallArea, 2)} m²`,
-          `Grundbedarf Steine = ${formatNumber(wallArea, 2)} m² × 8 Steine/m² = ${baseStones} Schalungssteine`,
-          `Steine inkl. ${stoneReservePercent} % Reserve = ${baseStones} × ${formatNumber(stoneReserveFactor, 2)} = ${stonesWithReserve} Stück`,
+          `Wandabmessungen: ${wallTypeDescription}, Höhe: ${formatNumber(h, 2)} m (${courses} Lagen à 25 cm)`,
+          `Netto-Wandfläche = ${formatNumber(totalLength, 2)} m Gesamtlänge × ${formatNumber(h, 2)} m Höhe − ${formatNumber(openings, 2)} m² Öffnungen = ${formatNumber(wallArea, 2)} m²`,
+          `Grundbedarf Steine = ${formatNumber(wallArea, 2)} m² × 8 Steine/m² = ${baseStones} Schalungssteine (${standardBlocks} Normalsteine + ${cornerEndBlocks} Eck-/Endsteine)`,
+          `Steine inkl. ${stoneReservePercent} % Reserve = ${baseStones} + ${reserveStonesCount} = ${stonesWithReserve} Stück`,
           `Netto-Füllbeton = ${formatNumber(wallArea, 2)} m² × ${formatNumber(litersPerM2, 1)} l/m² ÷ 1.000 = ${formatNumber(concreteBaseM3, 2)} m³ (${formatNumber(concreteBaseM3 * 1000, 0)} Liter)`,
           `Finaler Betonbedarf inkl. ${concreteReservePercent} % Bestellzuschlag = ${formatNumber(concreteBaseM3, 2)} m³ × ${formatNumber(concreteReserveFactor, 2)} = ${formatNumber(concreteTotalM3, 2)} m³`,
         ],
         basisSummary: [
-          { label: 'Mauerlänge', value: `${formatNumber(l, 2)} m` },
-          { label: 'Mauerhöhe', value: `${formatNumber(h, 2)} m` },
+          { label: 'Mauer-Bauform', value: wallTypeDescription },
+          { label: 'Mauerhöhe & Schichten', value: `${formatNumber(h, 2)} m (${courses} Steinlagen)` },
           { label: 'Netto-Wandfläche', value: `${formatNumber(wallArea, 2)} m²` },
-          { label: 'Steinformat', value: '50 × 25 cm (8 Steine/m²)' },
+          { label: 'Steinformat', value: '50 × 25 cm (8 Steine/m² Standard-Raster)' },
           { label: 'Hersteller-Füllmenge', value: `${formatNumber(litersPerM2, 1)} Liter je m²` },
-          { label: 'Steinreserve', value: `${stoneReservePercent} %` },
+          { label: 'Steinreserve', value: `${stoneReservePercent} % (+${reserveStonesCount} Steine)` },
           { label: 'Betonbestellzuschlag', value: `${concreteReservePercent} %` },
         ],
-        summaryText: `Materialabschätzung: Für ${formatNumber(wallArea, 2)} m² Netto-Wandfläche benötigen Sie ${baseStones} Schalungssteine (${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Steinreserve). Das geometrische Füllvolumen beträgt ${formatNumber(concreteBaseM3, 2)} m³ (bei ${litersPerM2} l/m² Herstellerangabe). Mit ${concreteReservePercent} % Betonbestellzuschlag ergibt sich eine empfohlene Liefermenge von ca. ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton. Hinweis: Reine Materialermittlung – ersetzt keinen statischen Standsicherheitsnachweis und keine individuelle Bewehrungsbemessung.`,
+        summaryText: `Materialabschätzung: Für ${formatNumber(wallArea, 2)} m² Netto-Wandfläche (${courses} Lagen) benötigen Sie ${baseStones} Schalungssteine Netto (${standardBlocks} Normalsteine, ${cornerEndBlocks} Eck-/Endsteine bzw. ${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Steinreserve). Das geometrische Füllvolumen beträgt ${formatNumber(concreteBaseM3, 2)} m³ (bei ${litersPerM2} l/m² Herstellerangabe). Mit ${concreteReservePercent} % Betonbestellzuschlag ergibt sich eine Bestellmenge von ca. ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.`,
       };
     },
     formula: "Steine = Netto-Wandfläche × 8 Stk./m² × (1 + Steinreserve/100); Füllbeton = Netto-Wandfläche × Hersteller-Füllmenge (l/m²) × (1 + Betonzuschlag/100) ÷ 1.000",
-    formulaExplanation: "Schalungssteine (Standardformat 50 × 25 cm) decken je Stein 0,125 m² Wandfläche ab, woraus sich exakt 8 Steine je m² Nettofläche ergeben. Das erforderliche Betonvolumen richtet sich nach dem herstellerspezifischen Hohlraumvolumen des gewählten Steins (z. B. 130 l/m² bei Delfing DP 24). Steinreserve (für Bruch und Zuschnitt) und Betonbestellzuschlag werden als getrennte Reserven kalkuliert. Die Berechnung liefert eine reine Materialabschätzung und ersetzt keine statische Tragwerksplanung.",
+    formulaExplanation: "Schalungssteine im Standardformat (50 × 25 cm) decken 0,125 m² Ansichtsfläche je Stein ab (exakt 8 Steine je m² Nettofläche). Die Anzahl der Steinlagen ergibt sich aus Mauerhöhe geteilt durch das Schichthöhenmaß (25 cm). Je nach Wandtyp (gerade Wand, L-Form, U-Form, Rechteck) werden Normalsteine und Eck-/Endsteine separat aufgeschlüsselt. Das Füllvolumen richtet sich nach den herstellerspezifischen Hohlraumwerten (z. B. 130 l/m² bei Delfing DP 24). Steinreserve (Verschnitt) und Betonbestellzuschlag werden als getrennte Reserven ausgewiesen. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.",
     workedExample: {
       title: "Beispiel: 8 m × 1,5 m Mauer mit 24er Schalungssteinen (Herstellerangabe 130 l/m²)",
       description: "Für eine Mauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen (130 l/m² Herstellerangabe, z. B. Delfing DP 24) und 5 % Steinreserve werden rechnerisch 96 Steine Netto bzw. 101 Schalungssteine inkl. Reserve benötigt. Das Netto-Betonvolumen beträgt 1,56 m³ (bei 5 % Bestellzuschlag ca. 1,64 m³).",
@@ -1602,16 +1738,16 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       intro: 'Schalungssteine (Betonschalungssteine oder Hohlkammersteine) werden trocken im Verband aufgeschichtet und mit Füllbeton vergossen. Eine detaillierte Anleitung zur Mengenermittlung nach Herstellerdaten und getrennten Reserven bietet unser Ratgeber [Schalungssteine: Betonbedarf berechnen mit Beispiel](/ratgeber/schalungssteine-betonbedarf-berechnen/).',
       sections: [
         {
-          title: 'Schalungssteine berechnen – Wandfläche und Steinbedarf',
-          content: 'Die Bedarfsrechnung für Schalungssteine basiert auf der Netto-Ansichtsfläche Ihrer Mauer:\n- **Standardformat**: Die meisten Beton-Schalungssteine messen 50 cm Länge und 25 cm Höhe (Ansichtsfläche je Stein: 0,125 m²).\n- **Steine pro Quadratmeter**: Daraus ergibt sich die feste Grundregel von **exakt 8 Schalungssteinen je 1 m² Wandfläche**.\n- **Steinreserve getrennt planen**: Planen Sie mindestens 5 Prozent Reserve für Passstücke, Eckschnitte und unvermeidbaren Bruch ein. Diese Reservesteine erhöhen nicht das geometrische Füllvolumen der fertigen Wand.',
+          title: 'Schalungssteine berechnen – Wandformen, Lagen und Steinbedarf',
+          content: 'Die Bedarfsrechnung für Schalungssteine basiert auf der Netto-Ansichtsfläche und der gewählten Wandform Ihrer Mauer:\n- **Standardformat**: Handelsübliche Schalungssteine messen meist 50 cm Länge und 25 cm Höhe (Ansichtsfläche: 0,125 m² je Stein).\n- **Steine pro Quadratmeter**: Daraus ergibt sich die feste Grundregel von **exakt 8 Schalungssteinen je 1 m² Wandfläche**.\n- **Steinlagen & Verband**: Die Anzahl der Steinlagen ergibt sich aus Mauerhöhe geteilt durch 25 cm Schichthöhe. Je nach Grundriss (gerade Mauer, L-Form, U-Form oder geschlossener Pool) teilen sich die Steine in Normalsteine und Eck- bzw. Endsteine für die Lagenabfolge auf.\n- **Steinreserve getrennt planen**: Planen Sie mindestens 5 Prozent Reserve für Passstücke, Eckschnitte und unvermeidbaren Bruch ein. Diese Reservesteine erhöhen nicht das geometrische Füllvolumen der fertigen Wand.',
         },
         {
           title: 'Füllbetonbedarf nach Herstellerdatenblatt bestimmen',
           content: 'Die Wandstärke allein reicht für die Betonberechnung nicht aus, da Steggeometrie und Hohlraumanteil je nach Hersteller und Serie variieren:\n- **Delfing DP 17,5 cm**: ca. 80 Liter Beton je m² Wandfläche\n- **Delfing DP 24 cm**: ca. 130 Liter Beton je m² Wandfläche\n- **Beyhl 17,5 cm**: ca. 12 Liter je Stein (entspricht ca. 96 l/m² bei 8 Steinen/m²)\n- **Beyhl 24 cm**: ca. 18 Liter je Stein (entspricht ca. 144 l/m² bei 8 Steinen/m²)\n\nPrüfen Sie stets das technische Datenblatt Ihres konkreten Steins. Für die Betonbestellung empfiehlt sich ein separat kalkulierter Zuschlag von 3 bis 8 Prozent. Größere Mengen berechnen Sie direkt im [Betonrechner](/rechner/betonrechner/).',
         },
         {
-          title: 'Wichtiger Hinweis zu Fundament, Bewehrung und Statik',
-          content: 'Dieser Rechner liefert eine reine Materialabschätzung für Steine und Füllbeton. Er ersetzt keine statische Tragwerksplanung:\n- **Bewehrungsstahl**: Durchmesser, Anzahl, Lage und Verankerung der Bewehrungseisen hängen von Erddruck, Windlast, Mauerhöhe und Belastung ab und müssen statisch bemessen werden.\n- **Fundament**: Fundamentbeton ist eine getrennte Position und darf nicht aus der Schalungsstein-Füllmenge abgeleitet werden.\n- **Herstellerrichtlinien**: Beachten Sie die Verarbeitungsrichtlinien des Herstellers bezüglich maximaler Füllhöhe je Betoniertag und Frischbetonkonsistenz.',
+          title: 'Wichtiger Sicherheitshinweis zu Statik und Bewehrung',
+          content: 'Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben:\n- **Bewehrungsstahl**: Durchmesser, Anzahl, Lage und Verankerung der Bewehrungseisen hängen von Erddruck, Windlast, Mauerhöhe und Belastung ab und müssen statisch bemessen werden.\n- **Fundament**: Fundamentbeton ist eine getrennte Position und darf nicht aus der Schalungsstein-Füllmenge abgeleitet werden.\n- **Herstellerrichtlinien**: Beachten Sie die Verarbeitungsrichtlinien des Herstellers bezüglich maximaler Füllhöhe je Betoniertag und Frischbetonkonsistenz.',
         },
       ],
       details: 'Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden genau 8 Steine je Quadratmeter Nettofläche benötigt. Füllbeton und Fundamentbeton müssen getrennt berechnet werden. Weiterführende Werkzeuge: [Betonrechner](/rechner/betonrechner/) und [Beton-Mischungsverhältnis Rechner](/rechner/beton-mischungsverhaeltnis-rechner/).',
