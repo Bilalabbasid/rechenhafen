@@ -79,7 +79,7 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     expect(resAgave.primary.value).toBe(75);
   });
 
-  it('handles 0 and empty inputs gracefully without NaN or errors', () => {
+  it('ensures zero stays zero for sugar and erythrit directions', () => {
     const resZero = calc.calculate({
       direction: 'sugar_to_sub',
       sugarGrams: 0,
@@ -87,6 +87,7 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     });
     expect(resZero.error).toBeUndefined();
     expect(resZero.primary.value).toBe(0);
+    expect(resZero.primary.formattedValue).toBe('0 g');
 
     const resReverseZero = calc.calculate({
       direction: 'erythrit_to_sugar',
@@ -94,6 +95,40 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     });
     expect(resReverseZero.error).toBeUndefined();
     expect(resReverseZero.primary.value).toBe(0);
+    expect(resReverseZero.primary.formattedValue).toBe('0 g Zucker');
+  });
+
+  it('rejects empty and negative inputs with clear error explanations', () => {
+    // Empty sugar grams
+    const resEmptySugar = calc.calculate({
+      direction: 'sugar_to_sub',
+      sugarGrams: '',
+      substitute: 'erythrit',
+    });
+    expect(resEmptySugar.error).toBe('Bitte geben Sie die Zuckermenge im Rezept in Gramm ein.');
+    expect(resEmptySugar.primary.formattedValue).toBe('-');
+
+    // Empty erythrit grams
+    const resEmptyEry = calc.calculate({
+      direction: 'erythrit_to_sugar',
+      erythritGrams: '',
+    });
+    expect(resEmptyEry.error).toBe('Bitte geben Sie die Erythritmenge in Gramm ein.');
+    expect(resEmptyEry.primary.formattedValue).toBe('-');
+
+    // Negative values
+    const resNegSugar = calc.calculate({
+      direction: 'sugar_to_sub',
+      sugarGrams: -50,
+      substitute: 'erythrit',
+    });
+    expect(resNegSugar.error).toBe('Die Zuckermenge darf nicht negativ sein.');
+
+    const resNegEry = calc.calculate({
+      direction: 'erythrit_to_sugar',
+      erythritGrams: -30,
+    });
+    expect(resNegEry.error).toBe('Die Erythritmenge darf nicht negativ sein.');
   });
 
   it('has corrected typos and accurate animal-safety FAQ', () => {

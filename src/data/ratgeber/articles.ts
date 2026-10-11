@@ -2596,6 +2596,378 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     ],
     relatedArticleSlugs: ['gaszaehler-m3-in-kwh-umrechnen', 'schalungssteine-betonbedarf-berechnen', 'stromverbrauch-geraete-berechnen'],
   },
+  {
+    slug: 'erythrit-statt-zucker-backen',
+    title: 'Erythrit beim Backen: Wie viel brauchst du statt Zucker?',
+    metaTitle: 'Erythrit beim Backen: Wie viel statt Zucker? Mengen & Tipps',
+    metaDescription: 'Wie viel Erythrit ersetzt Zucker beim Backen? 70-%-Süßkraft-Formel, Umrechnung für 100 g und 150 g Zucker, Backeigenschaften und Unterschied zu Xylit.',
+    h1: 'Erythrit beim Backen: Wie viel brauchst du statt Zucker?',
+    category: 'kochen-backen',
+    categoryName: 'Kochen & Backen',
+    publishedAt: '2026-10-12',
+    updatedAt: '2026-10-12',
+    readingTimeMin: 5,
+    coverIllustration: {
+      src: '/images/ratgeber/erythrit-zucker-umrechnung-backen.svg',
+      alt: 'Infografik: Umrechnung von 100 g Haushaltszucker in ca. 143 g reines Erythrit bei angenommener Süßkraft von 70 %',
+      caption: 'Süßkraftvergleich: 100 g Zucker entsprechen rechnerisch ca. 143 g reinem Erythrit bei angenommener Süßkraft von 70 Prozent. Die Umrechnung vergleicht die Süße, nicht die Teigeigenschaften.',
+      width: 800,
+      height: 360,
+    },
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Ernährung & Küchenmaße',
+    },
+    reviewer: {
+      name: 'Qualitätsprüfung Küche',
+      role: 'Rezeptur & Backpraxis',
+    },
+    summary:
+      'Im Rezept stehen 100 Gramm Zucker, auf der Packung Erythrit: Kann man einfach dieselbe Menge verwenden? Bei reinem Erythrit rechnen wir mit einer Süßkraft von rund 70 Prozent gegenüber Haushaltszucker. 100 Gramm Zucker entsprechen damit rechnerisch etwa 143 Gramm Erythrit. Warum die richtige Süße beim Backen allein jedoch nicht ausreicht und was bei Mischprodukten zu beachten ist, zeigt dieser Leitfaden.',
+    keyTakeaways: [
+      'Reines Erythrit besitzt rund 70 % der Süßkraft von Haushaltszucker: 100 g Zucker entsprechen rechnerisch ca. 143 g Erythrit.',
+      'Umrechnungsformel: Erythrit = Zucker ÷ 0,70. Für 150 g Zucker benötigt man rund 214 g Erythrit.',
+      'Rückrechnung: Zucker-Süßkraft = Erythrit × 0,70. 80 g Erythrit entsprechen ca. 56 g Zucker-Süße (nicht erneut durch 0,70 teilen).',
+      'Gleiche Süße garantiert kein identisches Backergebnis: Mehr Erythrit verändert Teigvolumen, Bindung und Feuchtigkeit.',
+      'Prüfen Sie vor dem Backen stets, ob Ihr Produkt reines Erythrit oder eine 1:1-Mischung ist.',
+    ],
+    primaryCalculator: {
+      slug: 'zucker-ersatz-rechner',
+      title: 'Zuckerersatz-Rechner',
+      ctaText: 'Zucker in Erythrit & Xylit umrechnen',
+      description: 'Rechnen Sie beliebige Zuckermengen für Ihr Rezept kostenlos in Erythrit oder Xylit um – mit einstellbarer Süßkraft und Kalorienvergleich.',
+      badge: 'Direkt berechnen',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'cups-in-gramm-rechner',
+        title: 'Cups in Gramm Rechner',
+        ctaText: 'US-Cups umrechnen',
+        description: 'Wandelt amerikanische Cup-Angaben für Mehl, Zucker und Butter in Gramm um.',
+      },
+      {
+        slug: 'backzeit-temperatur-umluft-oberhitze-rechner',
+        title: 'Backofen-Umrechner',
+        ctaText: 'Backtemperatur anpassen',
+        description: 'Rechnet Backofentemperaturen zwischen Umluft und Ober-/Unterhitze um.',
+      },
+    ],
+    sections: [
+      {
+        id: 'erst-auf-die-packung-schauen',
+        title: 'Erst auf die Packung schauen',
+        paragraphs: [
+          'Prüfen Sie vor der Zubereitung die Zutatenliste und die Dosierungsempfehlung des Herstellers. Reines Erythrit und Fertigmischungen aus Erythrit mit weiteren Süßungsmitteln (wie Stevia oder Mönchsfrucht) verhalten sich unterschiedlich.',
+          'Steht auf der Verpackung ausdrücklich der Hinweis „Zucker 1:1 ersetzen“, handelt es sich um ein Streusüße-Mischprodukt. Eine zusätzliche Umrechnung mit dem Faktor 0,70 wäre für dieses Produkt unpassend und würde den Kuchen übersüßen.',
+        ],
+      },
+      {
+        id: 'so-funktioniert-die-umrechnung',
+        title: 'So funktioniert die Umrechnung',
+        illustration: {
+          src: '/images/ratgeber/erythrit-zucker-umrechnung-backen.svg',
+          alt: 'Infografik: Umrechnung von 100 g Haushaltszucker in ca. 143 g reines Erythrit bei angenommener Süßkraft von 70 %',
+          caption: 'Formel und Richtwert: 100 g Zucker entsprechen rechnerisch rund 143 g reinem Erythrit (bei 70 % Süßkraft).',
+          width: 800,
+          height: 360,
+        },
+        paragraphs: [
+          'Unter der praxisnahen Annahme von 70 Prozent Süßkraft gegenüber herkömmlicher Saccharose gilt folgende Grundformel:',
+          'Erythrit in Gramm = Zucker in Gramm ÷ 0,70',
+          'Für ein Rührkuchenrezept mit 150 Gramm Zucker ergibt das rechnerisch:',
+          '150 ÷ 0,70 = 214,3 Gramm Erythrit (gerundet ca. 214 g).',
+          'Die Rückrechnung von einer vorhandenen Erythritmenge auf die entsprechende Zucker-Süße funktioniert mit einer Multiplikation:',
+          'Zucker-Süßkraft in Gramm = Erythrit in Gramm × 0,70',
+          'So entsprechen 80 Gramm Erythrit rechnerisch der Süße von rund 56 Gramm Zucker (80 × 0,70 = 56). Teilen Sie bei dieser Rückrechnung nicht noch einmal durch 0,70.',
+          'Ihre individuelle Rezeptmenge können Sie bequem in unserem [Zuckerersatz-Rechner](/rechner/zucker-ersatz-rechner/) berechnen.',
+        ],
+        table: {
+          headers: ['Zucker im Rezept', 'Reines Erythrit (70 % Süße)', 'Rechnerische Süßkraft', 'Hinweis'],
+          rows: [
+            ['50 g', '71 g', 'Entspricht 50 g Zucker', 'Für kleine Gebäcke / Muffins'],
+            ['100 g', '143 g', 'Entspricht 100 g Zucker', 'Standard-Vergleichswert'],
+            ['150 g', '214 g', 'Entspricht 150 g Zucker', 'Klassischer Rührkuchen'],
+            ['200 g', '286 g', 'Entspricht 200 g Zucker', 'Trockengehalt im Teig beachten'],
+            ['250 g', '357 g', 'Entspricht 250 g Zucker', 'Probemenge empfohlen'],
+          ],
+        },
+      },
+      {
+        id: 'warum-die-richtige-suesse-allein-nicht-reicht',
+        title: 'Warum die richtige Süße allein nicht reicht',
+        paragraphs: [
+          'Erythrit kann das Backergebnis spürbar verändern und Teige trockener wirken lassen. Eine größere Menge gleicht zwar die Süße aus, stellt aber nicht automatisch die physikalischen Eigenschaften des ursprünglichen Rezepts wieder her.',
+          'Das verdeutlicht bereits die Beispielrechnung: Aus 150 Gramm Zucker werden rund 214 Gramm Erythrit. Damit erhöht sich die Trockenmasse im Teig um über 60 Gramm. Der Rechner gleicht die Süßkraft an; er passt jedoch nicht gleichzeitig Flüssigkeit, Fett, Mehl und Backzeit an.',
+          'Zudem schmilzt und karamellisiert Erythrit beim Erhitzen anders als Haushaltszucker und neigt beim Erkalten zum Rekristallisieren. Für den ersten Versuch empfiehlt sich ein Rezept, das speziell für Zuckeralternativen entwickelt wurde. Bei einem bewährten Lieblingsrezept hilft eine kleine Probemenge, bevor ein ganzer Festtagskuchen gebacken wird.',
+        ],
+        callout: {
+          type: 'warning',
+          title: 'Wichtiger Backhinweis',
+          text: 'Erythrit karamellisiert nicht wie Haushaltszucker. In Mürbeteigen oder Biskuitböden kann zu viel Erythrit zu einer bröseligen Struktur und einem kühlenden Geschmackseffekt auf der Zunge führen.',
+        },
+      },
+      {
+        id: 'drei-dinge-vor-dem-backen-pruefen',
+        title: 'Drei Dinge, die Sie vor dem Backen prüfen sollten',
+        paragraphs: [
+          'Achten Sie vor dem Backen auf diese drei praxisrelevanten Punkte:',
+          '1. Produktart: Handelt es sich um reines Erythrit (Faktor 0,70) oder eine 1:1-Mischung mit Stevia oder anderen Süßungsmitteln?',
+          '2. Gewünschte Süße: Möchten Sie die volle gewohnte Süße erzielen oder bewusst weniger süß backen? Wer weniger Süße bevorzugt, muss die Zuckermenge nicht auf den vollen rechnerischen Erythritwert anheben.',
+          '3. Rezepteignung: Ist das Rezept für feuchtigkeitsarme Zuckeralkohole geeignet? Notieren Sie die verwendete Grammzahl, um das Ergebnis beim nächsten Mal gezielt feinjustieren zu können.',
+        ],
+      },
+      {
+        id: 'kann-ich-xylit-genauso-umrechnen',
+        title: 'Kann ich Xylit genauso umrechnen?',
+        paragraphs: [
+          'Xylit (Birkenzucker) besitzt nahezu dieselbe Süßkraft wie normaler Haushaltszucker (ca. 100 Prozent). Für einen reinen Süßkraftvergleich kann deshalb in den meisten Fällen mit einem einfachen Verhältnis von ungefähr 1:1 gerechnet werden: 100 Gramm Zucker entsprechen rund 100 Gramm Xylit.',
+          'Das ist eine grundlegend andere Annahme als bei reinem Erythrit mit 70 Prozent. Prüfen Sie dennoch auch bei Xylit die Rezeptanleitung, da Xylit im Gegensatz zu Erythrit Nährwerte aufweist (ca. 2,4 kcal pro Gramm) und Feuchtigkeit im Teig anders bindet.',
+        ],
+        callout: {
+          type: 'warning',
+          title: 'Lebensgefahr für Hunde bei Xylit',
+          text: 'Xylit (Birkenzucker) ist für Hunde hochgradig giftig und kann bereits in kleinen Mengen lebensbedrohliche Unterzuckerung und Leberschäden auslösen. Xylithaltiges Gebäck stets streng unzugänglich für Haustiere aufbewahren.',
+        },
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: Kuchen mit 150 g Zucker auf Erythrit umstellen',
+      scenario: 'Ein Backrezept verlangt 150 Gramm Haushaltszucker. Sie möchten diesen durch reines Erythrit mit 70 Prozent Süßkraft ersetzen.',
+      formula: 'Erythritmenge = Zuckermenge ÷ 0,70',
+      steps: [
+        { label: 'Ausgangsmenge Zucker', calculation: '150 g' },
+        { label: 'Divisor für 70 % Süßkraft', calculation: '150 ÷ 0,70 = 214,29 g' },
+        { label: 'Gerundeter Richtwert', calculation: 'ca. 214 g Erythrit', note: 'Zusätzliche Trockenmasse im Teig berücksichtigen' },
+      ],
+      resultSummary: '150 Gramm Zucker entsprechen rechnerisch rund 214 Gramm reinem Erythrit bei angenommener Süßkraft von 70 %.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Fertige 1:1-Mischungen zusätzlich durch 0,70 teilen',
+        correction: 'Wenn auf der Packung „1:1 wie Zucker“ steht, keine Umrechnung mit 0,70 anwenden, sonst wird der Teig viel zu süß.',
+      },
+      {
+        mistake: 'Bei der Rückrechnung erneut dividieren',
+        correction: 'Erythrit in Zucker-Süße wird multipliziert: 80 g Erythrit × 0,70 = 56 g Zucker-Äquivalent.',
+      },
+      {
+        mistake: 'Annehmen, gleiche Süße erzeuge identischen Teig',
+        correction: 'Erythrit bindet anders als Zucker und karamellisiert nicht. Probemenge backen oder teilspezifische Rezepte nutzen.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Erythrit ersetzt 100 g Zucker beim Backen?',
+        answer: 'Bei reinem Erythrit mit angenommener Süßkraft von 70 Prozent entsprechen 100 Gramm Zucker rechnerisch rund 143 Gramm Erythrit (100 ÷ 0,70).',
+      },
+      {
+        question: 'Warum karamellisiert Erythrit beim Backen nicht?',
+        answer: 'Erythrit ist ein Zuckeralkohol (Polyol) und chemisch keine Saccharose. Es schmilzt erst bei höheren Temperaturen und bildet keine typische Karamellkruste.',
+      },
+      {
+        question: 'Kann man Zucker beim Backen komplett durch Erythrit ersetzen?',
+        answer: 'Bei manchen Kuchen gelingt der vollständige Austausch gut, bei zuckerintensiven Rezepten empfiehlt es sich jedoch, zunächst nur 30 bis 50 Prozent des Zuckers zu ersetzen, um Konsistenz und Feuchtigkeit zu bewahren.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Xucker FAQ: Welches Süßungsmittel eignet sich zum Backen?',
+        citation: 'Empfehlungen und Eigenschaften von Erythrit und Xylit beim Backen',
+        url: 'https://xucker.de/faq/ich-moechte-backen.-welchen-xucker-soll-ich-nehmen',
+      },
+    ],
+    relatedArticleSlugs: ['1-cup-milch-in-gramm', 'heizoelverbrauch-aus-tankstand-berechnen'],
+  },
+  {
+    slug: 'heizoelverbrauch-aus-tankstand-berechnen',
+    title: 'Heizölverbrauch berechnen: Tankstände statt Liefermenge',
+    metaTitle: 'Heizölverbrauch berechnen: Tankstände statt Liefermenge',
+    metaDescription: 'Tatsächlichen Heizölverbrauch aus Tankständen berechnen: Formel mit Anfangsbestand, Lieferungen und Endbestand. Rechenbeispiel und Verbrauch pro m².',
+    h1: 'Heizölverbrauch berechnen: Tankstände statt Liefermenge',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-12',
+    updatedAt: '2026-10-12',
+    readingTimeMin: 6,
+    coverIllustration: {
+      src: '/images/ratgeber/heizoelverbrauch-tankstand-bilanz-berechnung.svg',
+      alt: 'Infografik: Heizölverbrauch aus Anfangsbestand, Lieferungen und Endbestand berechnen',
+      caption: 'Mengenbilanz für 12 Monate: 800 Liter Anfangsbestand plus 2.000 Liter Lieferungen minus 600 Liter Endbestand ergibt 2.200 Liter Jahresverbrauch.',
+      width: 800,
+      height: 360,
+    },
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Haustechnik',
+    },
+    reviewer: {
+      name: 'Fachprüfung Heizung & Gebäude',
+      role: 'Gebäudeenergie & Abrechnungspraxis',
+    },
+    summary:
+      'Eine Heizöllieferung von 2.000 Litern bedeutet nicht automatisch, dass im selben Jahr 2.000 Liter verbraucht wurden. Entscheidend für den tatsächlichen Jahresverbrauch ist die Mengenbilanz aus Anfangsbestand, Lieferungen und Endbestand. Wie die Tankbilanz funktioniert, wie der Verbrauch pro Quadratmeter berechnet wird und wie Sie widersprüchliche Messergebnisse erkennen, erklärt dieser Ratgeber.',
+    keyTakeaways: [
+      'Jahresverbrauch ist nicht gleich Bestellmenge: Der tatsächliche Verbrauch hängt von den Restmengen im Tank zu Beginn und am Ende des Zeitraums ab.',
+      'Tankbilanz-Formel: Verbrauch = Anfangsbestand + Lieferungen − Endbestand (alle Werte in Litern für denselben Zeitraum).',
+      'Beispiel: 800 l Anfangsbestand + 2.000 l Lieferung − 600 l Endbestand = 2.200 Liter realer Jahresverbrauch.',
+      'Flächenbezogener Verbrauch: Jahresverbrauch geteilt durch beheizte Wohnfläche (z. B. 2.200 l ÷ 150 m² = ca. 14,7 l/m²a).',
+      'Ein negatives Rechenergebnis weist auf lückenhafte Lieferbelege oder vertauschte Ablesedaten hin – nicht einfach auf null setzen.',
+    ],
+    primaryCalculator: {
+      slug: 'oelheizung-verbrauch-rechner',
+      title: 'Heizölverbrauch-Rechner',
+      ctaText: 'Heizölbedarf nach Wohnfläche schätzen',
+      description: 'Schätzen Sie Ihren modellhaften Jahresbedarf an Heizöl und ungefähre Brennstoffkosten anhand von Wohnfläche und Dämmzustand.',
+      badge: 'Direkt berechnen',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'gaskostenrechner',
+        title: 'Gaskostenrechner',
+        ctaText: 'Gaskosten berechnen',
+        description: 'Vergleichen Sie die Kosten fossiler Heizsysteme mit Erdgas nach Arbeitspreis und Grundpreis.',
+      },
+      {
+        slug: 'gasverbrauch-kwh-m3-rechner',
+        title: 'Gasverbrauch Rechner',
+        ctaText: 'm³ in kWh umrechnen',
+        description: 'Rechnet Zählerstände mit Brennwert und Zustandszahl in abrechenbare thermische Kilowattstunden um.',
+      },
+    ],
+    sections: [
+      {
+        id: 'beispiel-wie-aus-einer-lieferung-2200-liter-werden',
+        title: 'Beispiel: Wie aus einer Lieferung 2.200 Liter Verbrauch werden',
+        illustration: {
+          src: '/images/ratgeber/heizoelverbrauch-tankstand-bilanz-berechnung.svg',
+          alt: 'Infografik: Heizölverbrauch aus Anfangsbestand, Lieferungen und Endbestand berechnen',
+          caption: 'Mengenberechnung: 800 l Anfangsbestand + 2.000 l Lieferung − 600 l Endbestand = 2.200 Liter tatsächlicher Verbrauch.',
+          width: 800,
+          height: 360,
+        },
+        paragraphs: [
+          'Sie betrachten einen Zeitraum von zwölf Monaten (beispielsweise vom 1. Januar bis 31. Dezember oder zwischen zwei regulären Heizkostenablesungen):',
+          'Zu Beginn des Zeitraums befinden sich noch 800 Liter im Öltank. Im Herbst werden 2.000 Liter nachgetankt. Am Ende des Zeitraums zeigt die Füllstandsanzeige noch 600 Liter Restbestand.',
+          'Die Bilanzrechnung lautet:',
+          '800 + 2.000 − 600 = 2.200 Liter',
+          'Sie haben in diesen zwölf Monaten also 2.200 Liter Heizöl verbraucht, obwohl Sie nur 2.000 Liter neu gekauft haben. Die zusätzlichen 200 Liter stammen aus Ihrem vorhandenen Anfangsbestand.',
+          'Gab es im betrachteten Zeitraum mehrere Tanklieferungen, addieren Sie deren Literangaben. Lieferungen außerhalb des Zeitfensters dürfen nicht eingerechnet werden.',
+        ],
+        table: {
+          headers: ['Bilanzposten', 'Menge in Litern', 'Bedeutung für die Berechnung'],
+          rows: [
+            ['Tankinhalt zu Beginn', '800 l', 'Verfügbarer Startbestand'],
+            ['Lieferung(en) im Zeitraum', '+ 2.000 l', 'Tatsächliche Zuflüsse laut Lieferschein'],
+            ['Tankinhalt am Ende', '− 600 l', 'Nicht verbrauchter Restbestand'],
+            ['Tatsächlicher Verbrauch', '= 2.200 l', 'Reale Verbrauchsmenge im Zeitraum'],
+          ],
+        },
+      },
+      {
+        id: 'diese-angaben-solltest-du-festhalten',
+        title: 'Diese Angaben solltest du festhalten',
+        paragraphs: [
+          'Für eine verlässliche Verbrauchsermittlung sollten Sie zu jedem Tankbestand das genaue Ablesedatum und die Menge in Litern dokumentieren. Bewahren Sie sämtliche Lieferbelege mit Datum und exakter Liefermenge sorgfältig auf.',
+          'Eine Füllstandshöhe in Zentimetern ist noch keine Literangabe. Verwende dafür die zum jeweiligen Tankmodell passende Peiltabelle oder den kalibrierten Inhaltsanzeiger. Auch das maximale Nennvolumen des Tanks sagt noch nichts darüber aus, wie viel Öl sich aktuell im Tank befindet.',
+          'Wenn Anfangs- oder Endbestand nur geschätzt sind, bleibt auch der daraus berechnete Jahresverbrauch eine bloße Näherung.',
+        ],
+      },
+      {
+        id: 'heizoelverbrauch-pro-quadratmeter-berechnen',
+        title: 'Heizölverbrauch pro Quadratmeter berechnen',
+        paragraphs: [
+          'Um Ihren Heizölverbrauch mit typischen Gebäudestandards vergleichen zu können, teilen Sie den ermittelten Jahresverbrauch durch die zugehörige beheizte Wohnfläche.',
+          'Bei 2.200 Litern und 150 Quadratmetern beheizter Fläche ergibt das:',
+          '2.200 ÷ 150 = rund 14,7 Liter je Quadratmeter und Jahr.',
+          'Versorgt die Ölheizung auch die Warmwasserbereitung im Haus, steckt dieser Energiebedarf ebenfalls in den 2.200 Litern. Beschriften Sie das Ergebnis entsprechend: Es wäre irreführend, den gesamten Kennwert als reinen Raumheizungsverbrauch auszugeben.',
+        ],
+        table: {
+          headers: ['Energetischer Dämmzustand', 'Typischer Richtwert', 'Beispiel 150 m² Fläche'],
+          rows: [
+            ['Gut gedämmt / Neubau', 'ca. 8 Liter / m²a', 'ca. 1.200 Liter / Jahr'],
+            ['Teilsaniert / Standard 90er', 'ca. 14 Liter / m²a', 'ca. 2.100 Liter / Jahr'],
+            ['Altbau unsaniert vor 1980', 'ca. 22 Liter / m²a', 'ca. 3.300 Liter / Jahr'],
+          ],
+        },
+      },
+      {
+        id: 'warum-ein-einzelner-wert-noch-keine-bewertung-ist',
+        title: 'Warum ein einzelner Wert noch keine Bewertung ist',
+        paragraphs: [
+          'Ein höherer Verbrauch als im Vorjahr kann vielfältige Ursachen haben. Dazu gehören insbesondere strengere Witterungsbedingungen (mehr Heizgradtage), höhere gewählte Raumtemperaturen oder eine veränderte Personenzahl im Haushalt.',
+          'Vergleichen Sie stets möglichst gleich lange Zeiträume von jeweils zwölf Monaten und dieselbe beheizte Fläche. Ein einzelner kalter Wintermonat lässt sich nicht einfach mit zwölf multiplizieren, um einen verlässlichen Jahresverbrauch hochzurechnen.',
+          'Für eine überschlägige Orientierung anhand von Wohnfläche und Dämmstandard finden Sie hier unseren [Ölheizungs-Verbrauchsrechner](/rechner/oelheizung-verbrauch-rechner/). Prüfen Sie dort, welche Annahmen zugrunde liegen – eine Schätzung ersetzt Ihre dokumentierten Tankbestände nicht.',
+        ],
+      },
+      {
+        id: 'was-tun-wenn-ein-negativer-verbrauch-herauskommt',
+        title: 'Was tun, wenn ein negativer Verbrauch herauskommt?',
+        paragraphs: [
+          'Ergibt die Formel einen negativen Wert, prüfen Sie zuerst fehlende Lieferbelege, vertauschte Ablesedaten und die Maßeinheiten.',
+          'Ein Beispiel: 500 Liter Anfangsbestand plus 1.000 Liter Lieferung können ohne weitere Zugänge keinen Endbestand von 1.800 Litern erklären (500 + 1.000 − 1.800 = −300 l).',
+          'Ein negatives Ergebnis ist ein klarer Hinweis auf widersprüchliche oder unvollständige Ausgangsdaten. Setzen Sie den Wert in Ihrer Aufstellung nicht einfach stillschweigend auf null, sondern prüfen Sie die Tankablesungen und Lieferscheine.',
+        ],
+        callout: {
+          type: 'warning',
+          title: 'Widersprüchliche Daten aufklären',
+          text: 'Ein rechnerisch negativer Verbrauch deutet meist auf eine übersehene Zwischenlieferung oder einen Ablesefehler am Pegelmesser hin. Setzen Sie ihn keinesfalls ohne Prüfung auf null.',
+        },
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: Tankbilanz über 12 Monate mit 2.000 l Lieferung',
+      scenario: 'Ein Hausbesitzer liest am 1. Januar 800 Liter im Tank ab. Im Oktober werden 2.000 Liter getankt. Am 31. Dezember stehen 600 Liter im Tank.',
+      formula: 'Verbrauch = Anfangsbestand + Lieferungen − Endbestand',
+      steps: [
+        { label: 'Anfangsbestand (1. Januar)', calculation: '800 Liter' },
+        { label: 'Getankte Menge im Zeitraum', calculation: '+ 2.000 Liter', note: 'Lieferschein prüfen' },
+        { label: 'Verfügbare Gesamtmenge', calculation: '= 2.800 Liter' },
+        { label: 'Abzug Endbestand (31. Dezember)', calculation: '− 600 Liter' },
+      ],
+      resultSummary: 'Tatsächlicher Verbrauch: 2.200 Liter Heizöl (200 Liter Differenz aus dem Anfangsbestand).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Bestellmenge direkt als Jahresverbrauch ansetzen',
+        correction: 'Ohne Berücksichtigung von Anfangs- und Endbestand verfälscht die getankte Menge den realen Jahresverbrauch.',
+      },
+      {
+        mistake: 'Füllhöhe in Zentimetern direkt mit Litern gleichsetzen',
+        correction: 'Zentimeter müssen über die spezifische Peiltabelle oder den Herstelleranzeiger des Tanks in Liter umgerechnet werden.',
+      },
+      {
+        mistake: 'Wintermonate einfach mit 12 multiplizieren',
+        correction: 'Der Heizbedarf ist im Winter ungleich höher als im Sommer. Nur vollständige 12-Monats-Zeiträume vergleichen.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie ermittle ich den Heizölverbrauch aus Tankständen?',
+        answer: 'Mit der Formel: Verbrauch = Anfangsbestand + Lieferungen − Endbestand. Alle Mengen müssen in Litern für denselben Zeitraum vorliegen.',
+      },
+      {
+        question: 'Warum stimmt meine getankte Menge nicht mit dem Verbrauch überein?',
+        answer: 'Weil der Tankfüllstand am Jahresanfang und am Jahresende selten identisch ist. Verbleibt am Jahresende weniger Öl im Tank als zu Beginn, war der reale Verbrauch höher als die Lieferung.',
+      },
+      {
+        question: 'Wie viel Heizöl verbraucht ein Einfamilienhaus im Schnitt?',
+        answer: 'Ein typisches teilsaniertes Einfamilienhaus mit 140 m² Wohnfläche benötigt als Orientierungswert ca. 1.960 Liter Heizöl im Jahr (rund 14 Liter je m²a).',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'eddi24: Verbrauch aus Anfangsbestand, Zukäufen und Endbestand',
+        citation: 'Methodik zur Mengenbilanz bei fossilen Energieträgern',
+        url: 'https://hilfe.eddi24.de/hilfe.asp?h=ls_gesamt1&hd=menge_ende',
+      },
+      {
+        title: 'WOLF: Einflussfaktoren beim Heizölverbrauch',
+        citation: 'Ratgeber zu Heiztechnik, Gebäudedämmung und Witterungseinflüssen',
+        url: 'https://www.wolf.eu/de-de/ratgeber/heizoelverbrauch-deutschland',
+      },
+    ],
+    relatedArticleSlugs: ['gaskosten-berechnen', 'gaszaehler-m3-in-kwh-umrechnen', 'erythrit-statt-zucker-backen'],
+  },
 ];
 
 // O(1) Lookup Maps

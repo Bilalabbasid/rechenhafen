@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { CATEGORIES, getCategoryBySlug } from '@/data/categories';
 import { getCalculatorsByCategory } from '@/data/calculators';
+import { getArticlesByCategory } from '@/data/ratgeber/articles';
 import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import CategoryIcon from '@/components/common/CategoryIcon';
 import CategoryCard from '@/components/common/CategoryCard';
@@ -151,6 +152,72 @@ export default async function CategoryPage({ params }: PageProps) {
       <div style={{ margin: 'var(--space-8) 0' }}>
         <AdSlot format="top-banner" slotId={`cat-${cat.slug}-bottom`} />
       </div>
+
+      {/* Passende Fachartikel & Ratgeber zur Kategorie */}
+      {(() => {
+        const catArticles = getArticlesByCategory(cat.slug);
+        if (catArticles.length === 0) return null;
+        return (
+          <section
+            style={{
+              margin: 'var(--space-8) 0 var(--space-6)',
+              padding: 'var(--space-6)',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-lg)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '8px' }}>
+              <div>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
+                  Passende Ratgeber & Fachartikel zu {cat.name}
+                </h2>
+                <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                  Hintergründe, Praxistipps und Rechenanleitungen unserer Fachredaktion
+                </p>
+              </div>
+              <Link href="/ratgeber/" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+                Alle Ratgeber anzeigen →
+              </Link>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: 'var(--space-4)',
+              }}
+            >
+              {catArticles.map((art) => (
+                <Link
+                  key={art.slug}
+                  href={`/ratgeber/${art.slug}/`}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: 'var(--space-4)',
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-md)',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                  }}
+                >
+                  <strong style={{ fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '6px', lineHeight: 1.35 }}>
+                    {art.title}
+                  </strong>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', margin: 0, lineHeight: 1.5, flex: 1 }}>
+                    {art.summary.slice(0, 130)}...
+                  </p>
+                  <span style={{ marginTop: 'var(--space-3)', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+                    Artikel lesen →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Related Categories */}
       <section style={{

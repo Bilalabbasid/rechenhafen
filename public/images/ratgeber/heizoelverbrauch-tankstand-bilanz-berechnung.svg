@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="800" height="360" role="img" aria-labelledby="heizoelTitle heizoelDesc">
+  <title id="heizoelTitle">Infografik: Heizölverbrauch aus der Tankbilanz berechnen</title>
+  <desc id="heizoelDesc">Mengenberechnung des tatsächlichen Heizölverbrauchs: 800 Liter Anfangsbestand plus 2.000 Liter Lieferungen minus 600 Liter Endbestand ergibt 2.200 Liter Jahresverbrauch.</desc>
+  <defs>
+    <style>
+      .canvas { fill: #ffffff; }
+      .frame { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 2; rx: 16; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 10; }
+      .box-active { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; rx: 10; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 18px; }
+      .text-sub { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .text-label { fill: #475569; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; font-weight: 600; }
+      .text-val { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 22px; }
+      .text-val-res { fill: #1d4ed8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 22px; }
+      .op { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 26px; text-anchor: middle; }
+      .formula-bar { fill: #e2e8f0; rx: 6; }
+      .formula-text { fill: #1e293b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 14px; text-anchor: middle; }
+      .note-box { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1; rx: 8; }
+      .note-text { fill: #475569; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="360" class="canvas" />
+
+  <!-- Outer Card Frame -->
+  <rect x="20" y="20" width="760" height="320" class="frame" />
+
+  <!-- Header -->
+  <g transform="translate(45, 50)">
+    <text class="text-title">Tankbilanz: Tatsächlichen Heizölverbrauch ermitteln</text>
+    <text class="text-sub" y="22">Beispielrechnung für einen 12-Monats-Zeitraum: Tankstände statt reiner Liefermenge</text>
+  </g>
+
+  <!-- Formula Sub-header -->
+  <g transform="translate(45, 96)">
+    <rect width="710" height="32" class="formula-bar" />
+    <text x="355" y="21" class="formula-text">Formel: Verbrauch = Anfangsbestand + Lieferungen − Endbestand</text>
+  </g>
+
+  <!-- Calculation Boxes: 800 l + 2.000 l - 600 l = 2.200 l -->
+  <g transform="translate(45, 145)">
+    <!-- Box 1: Anfangsbestand -->
+    <rect x="0" y="0" width="145" height="90" class="box" />
+    <text x="12" y="26" class="text-label">Anfangsbestand</text>
+    <text x="12" y="56" class="text-val">800 l</text>
+    <text x="12" y="76" class="text-sub">Tank zu Beginn</text>
+
+    <!-- Plus Symbol -->
+    <text x="163" y="52" class="op">+</text>
+
+    <!-- Box 2: Lieferungen -->
+    <rect x="180" y="0" width="145" height="90" class="box" />
+    <text x="12" y="26" class="text-label">Lieferungen</text>
+    <text x="12" y="56" class="text-val">2.000 l</text>
+    <text x="12" y="76" class="text-sub">Im Zeitraum getankt</text>
+
+    <!-- Minus Symbol -->
+    <text x="343" y="52" class="op">−</text>
+
+    <!-- Box 3: Endbestand -->
+    <rect x="360" y="0" width="145" height="90" class="box" />
+    <text x="12" y="26" class="text-label">Endbestand</text>
+    <text x="12" y="56" class="text-val">600 l</text>
+    <text x="12" y="76" class="text-sub">Tank am Ende</text>
+
+    <!-- Equals Symbol -->
+    <text x="523" y="52" class="op">=</text>
+
+    <!-- Box 4: Tatsächlicher Verbrauch -->
+    <rect x="540" y="0" width="170" height="90" class="box-active" />
+    <text x="14" y="26" class="text-label" fill="#1d4ed8">Tatsächlicher Verbrauch</text>
+    <text x="14" y="56" class="text-val-res">2.200 l</text>
+    <text x="14" y="76" class="text-sub" fill="#2563eb">Jahresverbrauch Öl</text>
+  </g>
+
+  <!-- Explanation Footer -->
+  <g transform="translate(45, 255)">
+    <rect x="0" y="0" width="710" height="60" class="note-box" />
+    <text x="16" y="24" class="note-text" font-weight="700">Wichtig für den Vergleich:</text>
+    <text x="16" y="44" class="note-text">Obwohl nur 2.000 Liter geliefert wurden, lag der reale Verbrauch bei 2.200 Litern (200 Liter Differenz aus dem Altbestand).</text>
+  </g>
+</svg>

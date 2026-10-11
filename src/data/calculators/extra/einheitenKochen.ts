@@ -3178,12 +3178,33 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const direction = inputs.direction || 'sugar_to_sub';
 
       if (direction === 'erythrit_to_sugar') {
-        const rawEry = inputs.erythritGrams !== undefined && inputs.erythritGrams !== ''
+        if (inputs.erythritGrams === '' || inputs.erythritGrams === null) {
+          return {
+            primary: { id: 'sugarEquivalent', label: 'Entsprechende Süßkraft in Zucker', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie die Erythritmenge in Gramm ein.',
+          };
+        }
+
+        const rawEry = inputs.erythritGrams !== undefined
           ? inputs.erythritGrams
           : (inputs.sugarGrams !== undefined && inputs.sugarGrams !== '' ? inputs.sugarGrams : 100);
-        const erythritG = Math.max(0, parseFloat(rawEry) || 0);
-        // Modellannahme 70 %: Zucker-Süßkraft = Erythrit × 0,70
-        const sugarEquivalent = Math.round(erythritG * 0.70);
+        const erythritG = typeof rawEry === 'number' ? rawEry : parseFloat(String(rawEry).replace(',', '.'));
+
+        if (isNaN(erythritG)) {
+          return {
+            primary: { id: 'sugarEquivalent', label: 'Entsprechende Süßkraft in Zucker', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie eine gültige Zahl für die Erythritmenge ein.',
+          };
+        }
+        if (erythritG < 0) {
+          return {
+            primary: { id: 'sugarEquivalent', label: 'Entsprechende Süßkraft in Zucker', value: 0, formattedValue: '-' },
+            error: 'Die Erythritmenge darf nicht negativ sein.',
+          };
+        }
+
+        // Modellannahme 70 %: Zucker-Süßkraft = Erythrit × 0,70 (Zero stays zero)
+        const sugarEquivalent = erythritG === 0 ? 0 : Math.round(erythritG * 0.70);
 
         return {
           primary: {
@@ -3218,10 +3239,28 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
 
       // direction === 'sugar_to_sub'
-      const rawSugar = inputs.sugarGrams !== undefined && inputs.sugarGrams !== ''
-        ? inputs.sugarGrams
-        : 100;
-      const sugarG = Math.max(0, parseFloat(rawSugar) || 0);
+      if (inputs.sugarGrams === '' || inputs.sugarGrams === null) {
+        return {
+          primary: { id: 'subGrams', label: 'Benötigte Menge', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Zuckermenge im Rezept in Gramm ein.',
+        };
+      }
+
+      const rawSugar = inputs.sugarGrams !== undefined ? inputs.sugarGrams : 100;
+      const sugarG = typeof rawSugar === 'number' ? rawSugar : parseFloat(String(rawSugar).replace(',', '.'));
+
+      if (isNaN(sugarG)) {
+        return {
+          primary: { id: 'subGrams', label: 'Benötigte Menge', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Zahl für die Zuckermenge ein.',
+        };
+      }
+      if (sugarG < 0) {
+        return {
+          primary: { id: 'subGrams', label: 'Benötigte Menge', value: 0, formattedValue: '-' },
+          error: 'Die Zuckermenge darf nicht negativ sein.',
+        };
+      }
       const sub = inputs.substitute || 'erythrit';
 
       let subGrams = 0;
@@ -3329,6 +3368,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         {
           title: 'Lässt sich Zucker durch Xylit ersetzen?',
           content: 'Xylit hat ungefähr die gleiche Süßkraft wie Zucker. Für einen Vergleich der Süße können Sie deshalb meist mit einem Verhältnis von 1:1 rechnen: 100 g Zucker entsprechen etwa 100 g Xylit. Prüfen Sie trotzdem, ob das Rezept für diesen Austausch geeignet ist.',
+        },
+        {
+          title: 'Erythrit beim Backen: Warum Süße allein nicht reicht',
+          content: 'Reines Erythrit gleicht zwar die Süßkraft von Zucker rechnerisch aus, verändert aber Teigvolumen, Feuchtigkeit und Backverhalten. Ausführliche Praxistipps, Teighinweise und Dosierungsempfehlungen finden Sie in unserem Ratgeber [Erythrit beim Backen: Wie viel brauchst du statt Zucker?](/ratgeber/erythrit-statt-zucker-backen/).',
         },
       ],
       details: 'Süßkraftannahmen im Vergleich zu Haushaltszucker (100 %): Xylit ca. 100 % (1:1), reines Erythrit ca. 70 % (Zucker ÷ 0,70). Honig ca. 120 % Süßkraft (ca. 80 g Honig je 100 g Zucker, Flüssigkeit im Teig leicht reduzieren).',

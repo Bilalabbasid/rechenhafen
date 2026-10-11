@@ -2689,7 +2689,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand von Wohnfläche und typischen Modellwerten für den Dämmzustand.',
     searchKeywords: ['heizoelverbrauch rechner', 'wie viel heizoel pro qm', 'heizoelverbrauch berechnen', 'heizoelbedarf einfamilienhaus'],
     inputs: [
-      { id: 'livingArea', label: 'Beheizte Wohnfläche in m²', type: 'number', defaultValue: 140, min: 40, max: 600, step: 10, unit: 'm²' },
+      { id: 'livingArea', label: 'Beheizte Wohnfläche in m²', type: 'number', defaultValue: 140, min: 0, max: 600, step: 10, unit: 'm²' },
       {
         id: 'insulationStandard',
         label: 'Energetischer Zustand / Dämmung (Modellannahme)',
@@ -2701,17 +2701,63 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { value: 'unrenovated', label: 'Altbau unsaniert vor 1980 (Modellannahme: ca. 22 Liter Öl/m²a)' },
         ],
       },
-      { id: 'oilPricePerLiter', label: 'Heizölpreis in Euro pro Liter', type: 'number', defaultValue: 1.05, min: 0.5, max: 2.5, step: 0.05, unit: '€/l' },
+      { id: 'oilPricePerLiter', label: 'Heizölpreis in Euro pro Liter', type: 'number', defaultValue: 1.05, min: 0, max: 2.5, step: 0.05, unit: '€/l' },
     ],
     calculate: (inputs) => {
-      const area = parseFloat(inputs.livingArea) || 140;
+      if (inputs.livingArea === '' || inputs.livingArea === null) {
+        return {
+          primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die beheizte Wohnfläche in Quadratmetern ein.',
+        };
+      }
+      if (inputs.oilPricePerLiter === '' || inputs.oilPricePerLiter === null) {
+        return {
+          primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den Heizölpreis in Euro pro Liter ein.',
+        };
+      }
+
+      const rawArea = inputs.livingArea !== undefined ? inputs.livingArea : 140;
+      const area = typeof rawArea === 'number' ? rawArea : parseFloat(String(rawArea).replace(',', '.'));
+
+      if (isNaN(area)) {
+        return {
+          primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine gültige Zahl für die Wohnfläche ein.',
+        };
+      }
+      if (area < 0) {
+        return {
+          primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: 0, formattedValue: '-' },
+          error: 'Die beheizte Wohnfläche darf nicht negativ sein.',
+        };
+      }
+
+      const rawPrice = inputs.oilPricePerLiter !== undefined ? inputs.oilPricePerLiter : 1.05;
+      const price = typeof rawPrice === 'number' ? rawPrice : parseFloat(String(rawPrice).replace(',', '.'));
+
+      if (isNaN(price)) {
+        return {
+          primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie einen gültigen Heizölpreis als Zahl ein.',
+        };
+      }
+      if (price < 0) {
+        return {
+          primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: 0, formattedValue: '-' },
+          error: 'Der Heizölpreis darf nicht negativ sein.',
+        };
+      }
+
       const type = inputs.insulationStandard || 'standard';
-      const price = parseFloat(inputs.oilPricePerLiter) || 1.05;
       let litersPerSqm = 14;
       if (type === 'modern') litersPerSqm = 8;
       if (type === 'unrenovated') litersPerSqm = 22;
-      const totalLiters = area * litersPerSqm;
-      const totalCost = totalLiters * price;
+
+      // Zero stays zero
+      const totalLiters = area === 0 ? 0 : area * litersPerSqm;
+      const totalCost = (area === 0 || price === 0) ? 0 : Math.round(totalLiters * price * 100) / 100;
+
       return {
         primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: totalCost, formattedValue: formatCurrency(totalCost), highlight: true },
         secondary: [
@@ -2744,6 +2790,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         {
           title: 'Warum kann der tatsächliche Verbrauch abweichen?',
           content: 'Witterung, Raumtemperatur, Dämmung, Heizungszustand und Warmwasserbereitung beeinflussen den Verbrauch. Vergleichen Sie möglichst vollständige Jahre. Ein kalter Wintermonat lässt sich nicht einfach auf zwölf Monate hochrechnen.',
+        },
+        {
+          title: 'Tatsächlichen Verbrauch über Tankstände berechnen',
+          content: 'Dieser Rechner liefert eine flächenbasierte Modellschätzung. Wie Sie Ihren realen Jahresverbrauch aus Tankbeständen und Lieferbelegen exakt ermitteln, erfahren Sie in unserem Ratgeber [Heizölverbrauch berechnen: Tankstände statt Liefermenge](/ratgeber/heizoelverbrauch-aus-tankstand-berechnen/).',
         },
       ],
       details: '1 Liter leichtes Heizöl (EL) besitzt einen Brennwert von rund 10,0 kWh. Die im Rechner hinterlegten Faktoren (8, 14 und 22 Liter je m² und Jahr) sind unverbindliche Modellannahmen und keine Messwerte eines konkreten Gebäudes.',
