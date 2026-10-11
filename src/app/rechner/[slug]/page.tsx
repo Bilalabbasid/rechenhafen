@@ -12,6 +12,8 @@ import MethodologyBox from '@/components/calculator/MethodologyBox';
 import FaqAccordion from '@/components/calculator/FaqAccordion';
 import RelatedCalculators from '@/components/calculator/RelatedCalculators';
 import PopularDateCalculators from '@/components/calculator/PopularDateCalculators';
+import GasClusterLinks from '@/components/calculator/GasClusterLinks';
+import DateClusterLinks from '@/components/calculator/DateClusterLinks';
 import TaxBracketVisualizer from '@/components/calculator/TaxBracketVisualizer';
 import AdSlot from '@/components/common/AdSlot';
 import FormattedContent, { renderInlineMarkdown } from '@/components/common/FormattedContent';
@@ -344,18 +346,27 @@ export default async function CalculatorPage({ params }: PageProps) {
       {/* Bottom Leaderboard Werbefläche mit fest reserviertem Platz (Zero CLS) */}
       <AdSlot format="top-banner" slotId="calc-bottom" />
 
-      {/* Beliebte Datumsrechner (Fokus-Navigation im Datumsrechner-Cluster) */}
-      {(calc.slug === 'tage-zwischen-zwei-daten' || calc.slug === 'tage-bis-weihnachten') && (
-        <PopularDateCalculators currentSlug={calc.slug} />
+      {/* Passende Rechner & Ratgeber (Gas-Cluster) */}
+      {['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'heizkostenvergleich-rechner', 'stromkostenrechner', 'oelheizung-verbrauch-rechner'].includes(calc.slug) && (
+        <GasClusterLinks currentSlug={calc.slug} />
       )}
 
-      {/* Related Calculators */}
-      <RelatedCalculators
-        calculators={relatedCalculators}
-        categoryName={category?.name}
-        categorySlug={category?.slug}
-        fromSlug={calc.slug}
-      />
+      {/* Weitere Datumsrechner (Datums-Cluster) */}
+      {['dienstjubilaeum-rechner', 'alter-in-tagen', 'datum-plus-tage', 'tage-zwischen-zwei-daten'].includes(calc.slug) ? (
+        <DateClusterLinks currentSlug={calc.slug} />
+      ) : calc.slug === 'tage-bis-weihnachten' ? (
+        <PopularDateCalculators currentSlug={calc.slug} />
+      ) : null}
+
+      {/* Related Calculators (für alle Rechner außerhalb der spezialisierten Navigations-Cluster) */}
+      {!['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'heizkostenvergleich-rechner', 'stromkostenrechner', 'oelheizung-verbrauch-rechner', 'dienstjubilaeum-rechner', 'alter-in-tagen', 'datum-plus-tage', 'tage-zwischen-zwei-daten'].includes(calc.slug) && (
+        <RelatedCalculators
+          calculators={relatedCalculators}
+          categoryName={category?.name}
+          categorySlug={category?.slug}
+          fromSlug={calc.slug}
+        />
+      )}
     </div>
   );
 }

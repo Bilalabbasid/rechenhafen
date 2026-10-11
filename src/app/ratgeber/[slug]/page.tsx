@@ -8,6 +8,7 @@ import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import CalculatorCta from '@/components/ratgeber/CalculatorCta';
 import ArticleFaqAccordion from '@/components/ratgeber/ArticleFaqAccordion';
 import TableOfContents from '@/components/ratgeber/TableOfContents';
+import GasClusterLinks from '@/components/calculator/GasClusterLinks';
 import styles from '@/styles/ratgeber.module.css';
 import {
   Calendar,
@@ -328,18 +329,22 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
                   </section>
                 )}
 
-                {/* Secondary Calculator CTA */}
-                {article.secondaryCalculators && article.secondaryCalculators.length > 0 && (
-                  <section style={{ margin: 'var(--space-8) 0' }}>
-                    <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-4)' }}>
-                      Verwandte Rechner für dieses Thema
-                    </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
-                      {article.secondaryCalculators.map((secCalc) => (
-                        <CalculatorCta key={secCalc.slug} calc={secCalc} variant="sidebar" />
-                      ))}
-                    </div>
-                  </section>
+                {/* Passende Rechner & Ratgeber (Gas-Cluster) oder allgemeine Secondary Calculators */}
+                {['gaszaehler-m3-in-kwh-umrechnen', 'gaskosten-berechnen'].includes(article.slug) ? (
+                  <GasClusterLinks currentSlug={article.slug} isRatgeber={true} />
+                ) : (
+                  article.secondaryCalculators && article.secondaryCalculators.length > 0 && (
+                    <section style={{ margin: 'var(--space-8) 0' }}>
+                      <h3 style={{ fontSize: '1.25rem', marginBottom: 'var(--space-4)' }}>
+                        Verwandte Rechner für dieses Thema
+                      </h3>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+                        {article.secondaryCalculators.map((secCalc) => (
+                          <CalculatorCta key={secCalc.slug} calc={secCalc} variant="sidebar" />
+                        ))}
+                      </div>
+                    </section>
+                  )
                 )}
 
                 {/* FAQs */}

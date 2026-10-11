@@ -114,7 +114,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Werden Schalttage bei der Tageszählung vollständig berücksichtigt?', answer: 'Ja, alle 29. Februare, die zwischen dem Geburtsdatum und dem Stichtag liegen, werden voll als Einzeltage mitgezählt.' },
       { question: 'Wird der Geburtstag selbst als ganzer Tag mitgezählt?', answer: 'In der Zeitrechnung zählt der Geburtstag als Tag 0; nach Vollendung von 24 Stunden ist der erste Lebenstag abgeschlossen.' },
     ],
-    relatedSlugs: ['altersrechner', 'geburtstagsrechner', 'datumsdifferenz', 'alter-in-wochen', 'alter-in-monaten'],
+    relatedSlugs: ['tage-zwischen-zwei-daten', 'datum-plus-tage', 'dienstjubilaeum-rechner', 'altersrechner', 'geburtstagsrechner'],
   },
   {
     id: 'lebenszeit-in-stunden',
@@ -755,10 +755,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     relatedSlugs: [
+      'datum-plus-tage',
+      'dienstjubilaeum-rechner',
+      'alter-in-tagen',
       'tage-bis-weihnachten',
       'arbeitstage-rechner',
       'werktage-rechner',
-      'datum-plus-tage',
       'datum-minus-tage',
       'altersrechner',
       'tage-bis-geburtstag',
@@ -1020,7 +1022,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie berechnet man eine 14-tägige Frist nach BGB?', answer: 'Nach § 187 Abs. 1 BGB zählt der Tag des Zugangs nicht mit; die Frist beginnt am darauffolgenden Tag und endet mit Ablauf des 14. Tages.' },
       { question: 'Fällt das Ergebnis bei Addition von Vielfachen von 7 immer auf denselben Wochentag?', answer: 'Ja, jede Addition von 7, 14, 21, 28 etc. Tagen landet exakt auf demselben Wochentag wie das Startdatum.' },
     ],
-    relatedSlugs: ['datum-minus-tage', 'datumsdifferenz', 'arbeitstage-rechner'],
+    relatedSlugs: ['tage-zwischen-zwei-daten', 'dienstjubilaeum-rechner', 'alter-in-tagen', 'datum-minus-tage', 'arbeitstage-rechner'],
   },
   {
     id: 'datum-minus-tage',

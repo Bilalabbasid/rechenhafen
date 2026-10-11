@@ -516,6 +516,59 @@ export default function CalculatorRunner({
             </div>
           )}
 
+          {/* Decision aid for Gaskostenrechner near inputs */}
+          {slug === 'gaskostenrechner' && (
+            <div
+              style={{
+                marginBottom: 'var(--space-4)',
+                padding: '12px 14px',
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.875rem',
+                lineHeight: 1.5,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 600,
+                  color: 'var(--color-text-primary)',
+                  marginBottom: '6px',
+                }}
+              >
+                <Info size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+                <span>Entscheidungshilfe für Ihre Eingabe:</span>
+              </div>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: '1.25rem',
+                  color: 'var(--color-text-secondary)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                }}
+              >
+                <li>
+                  <strong style={{ color: 'var(--color-text-primary)' }}>kWh auf Ihrer Rechnung vorhanden?</strong> Direkt hier im Gaskostenrechner (Modus A) den Jahresverbrauch in kWh eingeben, um Gesamtkosten und rechnerischen Monatsdurchschnitt zu ermitteln.
+                </li>
+                <li>
+                  <strong style={{ color: 'var(--color-text-primary)' }}>Nur m³ am Zähler vorhanden?</strong> Wählen Sie unten „Modus B“ oder nutzen Sie zuerst unseren spezialisierten{' '}
+                  <Link
+                    href="/rechner/gasverbrauch-kwh-m3-rechner/"
+                    style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}
+                  >
+                    Gasverbrauch Rechner (m³ in kWh)
+                  </Link>
+                  , um Zählerstände mit Brennwert und Zustandszahl exakt umzurechnen.
+                </li>
+              </ul>
+            </div>
+          )}
+
           <div className={styles.inputGrid}>
             {inputDefs.map((field) => {
               // Special case: for arbeitszeitrechner, pauseMinutes is handled dynamically below

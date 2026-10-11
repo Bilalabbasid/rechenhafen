@@ -165,7 +165,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { question: 'Welche Jubiläumszuwendungen sind im öffentlichen Dienst tariflich vorgesehen?', answer: 'Nach dem TVöD erhalten Beschäftigte bei Vollendung einer 25-jährigen Dienstzeit ein Jubiläumsgeld von 350 Euro, bei 40 Jahren 500 Euro sowie einen freien Tag.' },
       { question: 'Zählt die Ausbildungszeit zur Dienstzeit für das Jubiläum?', answer: 'Im öffentlichen Dienst zählt die Ausbildung beim selben Dienstherrn voll zur Dienstzeit; in der Privatwirtschaft hängt dies von der jeweiligen Betriebsvereinbarung ab.' },
     ],
-    relatedSlugs: ['arbeitstage-rechner', 'altersrechner', 'werktage-rechner', 'dienstjubilaeum-steuerfrei-rechner'],
+    relatedSlugs: ['tage-zwischen-zwei-daten', 'datum-plus-tage', 'alter-in-tagen', 'arbeitstage-rechner', 'werktage-rechner'],
   },
 
   // ==================== MATHEMATIK (13) ====================

@@ -51,7 +51,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie viel Strom verbraucht ein 1-Personen-Haushalt durchschnittlich?', answer: 'Ein Single-Haushalt verbraucht im Mehrfamilienhaus ca. 1.300 bis 1.500 kWh pro Jahr; erfolgt die Warmwasserbereitung elektrisch (Durchlauferhitzer), steigt der Bedarf auf ca. 1.800 bis 2.000 kWh.' },
       { question: 'Wo berechne ich die Kosten einzelner Elektrogeräte?', answer: 'Für einzelne Haushaltsgeräte wie Heizlüfter, Gaming-PCs, Kühlschränke oder Waschmaschinen nutzen Sie unseren dedizierten [Stromkosten-Rechner für Elektrogeräte](/rechner/stromkosten-geraete-rechner/).' },
     ],
-    relatedSlugs: ['stromkosten-geraete-rechner', 'gaskostenrechner', 'standby-kosten-rechner', 'led-ersparnis-rechner', 'balkonkraftwerk-ertrag-rechner'],
+    relatedSlugs: ['stromkosten-geraete-rechner', 'gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'heizkostenvergleich-rechner', 'balkonkraftwerk-ertrag-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: GERMAN_DATA_2026.strompreis_durchschnitt.year,

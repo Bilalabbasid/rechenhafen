@@ -1929,7 +1929,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wo findet man Brennwert und Zustandszahl?', answer: 'Beide Werte stehen verbindlich auf jeder jährlichen Gasabrechnung Ihres Energieversorgers und können zudem auf der Website des örtlichen Gasnetzbetreibers eingesehen werden.' },
       { question: 'Was ist der Unterschied zwischen H-Gas und L-Gas?', answer: 'H-Gas (High calorific gas) hat einen höheren Methangehalt und Brennwert (ca. 10,0 bis 11,5 kWh/m³), während L-Gas (Low calorific gas) einen geringeren Brennwert (ca. 8,2 bis 10,0 kWh/m³) besitzt. Deutschland stellt aktuell im Rahmen der Marktraumumstellung schrittweise alle Gebiete auf H-Gas um.' },
     ],
-    relatedSlugs: ['energieeffizienzklasse-rechner', 'co2-abgabe-vermieter-mieter-rechner', 'stromkosten-geraete-rechner', 'waermepumpe-stromkosten-rechner', 'heizkostenvergleich-rechner'],
+    relatedSlugs: ['gaskostenrechner', 'heizkostenvergleich-rechner', 'oelheizung-verbrauch-rechner', 'stromkostenrechner', 'waermepumpe-stromkosten-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -2207,7 +2207,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Warum steigen die Heizkosten für fossile Brennstoffe in Zukunft weiter?', answer: 'Durch den gesetzlich steigenden nationalen CO₂-Preis (BEHG) und die künftige Einbindung in das europäische Emissionshandelssystem ETS-2 ab 2027 verteuern sich Gas und Heizöl kontinuierlich.' },
       { question: 'Wie viel Prozent Förderung gibt es für den Heizungstausch?', answer: 'Über die Bundesförderung für effiziente Gebäude (KfW-Programm 458) erhalten selbstnutzende Eigentümer eine Grundförderung von 30 % plus Geschwindigkeitsbonus und Einkommensbonus bis zu maximal 70 % der förderfähigen Kosten.' },
     ],
-    relatedSlugs: ['brennholz-raummeter-rechner', 'pelletheizung-verbrauch-rechner', 'waermepumpe-stromkosten-rechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner'],
+    relatedSlugs: ['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'pelletheizung-verbrauch-rechner', 'waermepumpe-stromkosten-rechner'],
   },
 
   {
@@ -2738,7 +2738,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wie hoch ist die CO₂-Abgabe pro Liter Heizöl?', answer: 'Auf Heizöl fällt nach dem BEHG eine CO₂-Abgabe an, die den Literpreis um derzeit rund 10 bis 13 Cent verteuert.' },
       { question: 'Wann dürfen alte Ölheizungen nach dem GEG noch betrieben werden?', answer: 'Bestehende Ölheizungen dürfen weiter betrieben und repariert werden; Standard-Heizkessel (keine Brennwert- oder Niedertemperaturtechnik) müssen jedoch nach 30 Jahren Betrieb stillgelegt werden (§ 72 GEG).' },
     ],
-    relatedSlugs: ['pelletheizung-verbrauch-rechner', 'heizkostenvergleich-rechner', 'gasverbrauch-kwh-m3-rechner', 'waermepumpe-stromkosten-rechner'],
+    relatedSlugs: ['heizkostenvergleich-rechner', 'gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'waermepumpe-stromkosten-rechner'],
   },
 
   {

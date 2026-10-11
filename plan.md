@@ -94,3 +94,78 @@
   - `/rechner/kapitalertragsteuer-rechner/` (Status: 200, 0 raw markdown, valid internal link to dividendenrendite-rechner)
   - `/rechner/dividendenrendite-rechner/` (Status: 200, target link valid)
 
+## 7. SEO & User-Value Internal-Link Clusters (Gas & Date Clusters)
+- **Goal:** Build two genuinely useful internal-link clusters based on Google Search Console signals to clarify user journeys, support dual-intent queries (kWh vs. m³), and strengthen topical relationships without site redesigns or slug changes.
+- **Affected URLs & Components:**
+  - **Gas Cluster (7 pages):**
+    1. `/rechner/gaskostenrechner/`
+    2. `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/`
+    3. `/rechner/gasverbrauch-kwh-m3-rechner/`
+    4. `/ratgeber/gaskosten-berechnen/`
+    5. `/rechner/heizkostenvergleich-rechner/`
+    6. `/rechner/stromkostenrechner/`
+    7. `/rechner/oelheizung-verbrauch-rechner/`
+  - **Date Cluster (4 pages):**
+    1. `/rechner/dienstjubilaeum-rechner/`
+    2. `/rechner/alter-in-tagen/`
+    3. `/rechner/datum-plus-tage/`
+    4. `/rechner/tage-zwischen-zwei-daten/`
+  - **Components Created & Updated:**
+    - `src/components/calculator/GasClusterLinks.tsx`: Context-specific "Passende Rechner & Ratgeber" section with custom intent badges (`m3`, `kwh`, `compare`, `guide`), natural anchor texts, and clear user reasons.
+    - `src/components/calculator/DateClusterLinks.tsx`: Compact "Weitere Datumsrechner" section maintaining distinct intents (employment anniversary, age in days, future/past date, date difference).
+    - `src/components/calculator/CalculatorRunner.tsx`: Decision aid banner directly above inputs on `gaskostenrechner` ("kWh auf Ihrer Rechnung vorhanden?" vs. "Nur m³ am Zähler vorhanden?").
+    - `src/app/rechner/[slug]/page.tsx` & `src/app/ratgeber/[slug]/page.tsx`: Integrated cluster navigation sections, deduplicating generic cards.
+    - `src/data/calculators/haushalt.ts`, `src/data/calculators/extra/wohnenHaushalt.ts`, `src/data/calculators/extra/datumMath.ts`, `src/data/calculators/datumZeit.ts`: Updated `relatedSlugs` with bidirectional relationships.
+- **Links Added & Justifications:**
+  - **From `/rechner/gaskostenrechner/`:**
+    - `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/` (Zählerstände in m³ -> Step-by-step thermal conversion guide)
+    - `/rechner/gasverbrauch-kwh-m3-rechner/` (Zählerstände in m³ -> Direct calculator tool)
+    - `/ratgeber/gaskosten-berechnen/` (kWh bekannt -> Cost breakdown & formula guide)
+    - `/rechner/heizkostenvergleich-rechner/` (Vergleich -> Heating system cost comparison)
+    - `/rechner/oelheizung-verbrauch-rechner/` (Vergleich -> Oil heating consumption estimator)
+    - `/rechner/stromkostenrechner/` (Haushaltsenergie -> Household electricity cost calculator)
+  - **From `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/`:**
+    - `/rechner/gasverbrauch-kwh-m3-rechner/` (Direkt online rechnen -> Tool for instant conversion)
+    - `/rechner/gaskostenrechner/` (Kosten berechnen -> Gaskostenrechner once kWh is known)
+    - `/ratgeber/gaskosten-berechnen/` (Ratgeber -> In-depth billing & formula guide)
+    - `/rechner/heizkostenvergleich-rechner/` (Heizsysteme -> Compare gas costs with alternatives)
+  - **From `/rechner/gasverbrauch-kwh-m3-rechner/`:**
+    - `/rechner/gaskostenrechner/` (Gaskosten ermitteln -> Full cost calculation once kWh is derived)
+    - `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/` (Brennwert & Z-Zahl Ratgeber -> Detailed explanations of parameters)
+    - `/ratgeber/gaskosten-berechnen/` (Gasrechnung verstehen -> Understanding supplier billing)
+    - `/rechner/heizkostenvergleich-rechner/` (Vergleich -> Alternative heating options)
+    - `/rechner/oelheizung-verbrauch-rechner/` (Ölheizung -> Oil heating comparison)
+  - **From `/ratgeber/gaskosten-berechnen/`:**
+    - `/rechner/gaskostenrechner/` (Online-Rechner -> Direct cost calculator)
+    - `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/` (Zählerstand umrechnen -> Thermal calculation guide)
+    - `/rechner/gasverbrauch-kwh-m3-rechner/` (m³ in kWh Rechner -> Direct gas consumption calculator)
+    - `/rechner/heizkostenvergleich-rechner/` (Heizkosten vergleichen -> System comparison tool)
+  - **From `/rechner/heizkostenvergleich-rechner/`:**
+    - `/rechner/gaskostenrechner/` (Gas detailliert -> Detailed gas cost calculation)
+    - `/rechner/gasverbrauch-kwh-m3-rechner/` (m³ in kWh -> Gas meter reading conversion)
+    - `/rechner/oelheizung-verbrauch-rechner/` (Ölheizung -> Oil heating calculation)
+    - `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/` (Ratgeber -> Meter reading guide)
+    - `/rechner/stromkostenrechner/` (Strom & Wärmepumpe -> Electricity tariff calculation)
+  - **From `/rechner/stromkostenrechner/`:**
+    - `/rechner/gaskostenrechner/` (Heizenergie Gas -> Gas cost calculation)
+    - `/rechner/gasverbrauch-kwh-m3-rechner/` (Zählerstände in m³ -> Gas meter conversion)
+    - `/rechner/heizkostenvergleich-rechner/` (Heizkosten vergleichen -> Alternative comparison)
+    - `/rechner/stromkosten-geraete-rechner/` (Gerätekosten -> Appliance breakdown)
+  - **From `/rechner/oelheizung-verbrauch-rechner/`:**
+    - `/rechner/heizkostenvergleich-rechner/` (Alternativen vergleichen -> Compare oil vs heat pump vs gas)
+    - `/rechner/gaskostenrechner/` (Gas-Alternative -> Gas heating calculation)
+    - `/ratgeber/gaszaehler-m3-in-kwh-umrechnen/` (Ratgeber Erdgas -> Gas meter guide)
+    - `/rechner/stromkostenrechner/` (Stromkosten -> Electricity costs)
+  - **From Date Cluster pages (`/rechner/dienstjubilaeum-rechner/`, `/rechner/alter-in-tagen/`, `/rechner/datum-plus-tage/`, `/rechner/tage-zwischen-zwei-daten/`):**
+    - Interlinked with distinct search intent badges ("Betriebszugehörigkeit & Jubiläum", "Lebensdauer & Biografie", "Zukunfts- & Fristenrechnung", "Kalender- & Fristdifferenz") and natural anchors.
+- **Copy Safeguards Maintained:**
+  - Strictly retained "rechnerischer Monatsdurchschnitt" across all references (never promise as supplier "Abschlag").
+  - Zero unsupported gas price claims or invented statistics.
+  - Calculators stay above the fold with zero layout shift (CLS).
+- **Quality Gates & Test Results:**
+  - Automated tests: `src/__tests__/seo-cluster-navigation.test.ts` (13 tests verifying 200 HTTP targets, trailing slashes, zero self-links, zero duplicates, zero raw markdown).
+  - All unit tests: `npm test` -> 19 test files, 264 tests passing (100% pass).
+  - Linter: `npm run lint` -> 0 errors / 0 warnings.
+  - TypeScript type check: `npx tsc --noEmit` -> 0 errors.
+  - Production build: `npm run build` -> 467/467 static pages built cleanly.
+
