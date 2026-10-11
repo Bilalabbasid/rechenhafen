@@ -526,6 +526,15 @@ export function calculateTageBisWeihnachten(inputs: Record<string, any>): Calcul
   const totalWeeks = Math.floor(daysRemaining / 7);
   const remDays = daysRemaining % 7;
 
+  // Samstage nach heute bis einschließlich des gewählten Zieldatums
+  let saturdaysRemaining = 0;
+  for (let dn = todayDayNum + 1; dn <= targetDayNum; dn++) {
+    const d = new Date(dn * 86400000);
+    if (d.getUTCDay() === 6) {
+      saturdaysRemaining++;
+    }
+  }
+
   const weekday = getGermanWeekday(targetParts.year, targetParts.month, targetParts.day);
   const targetDateFormatted = `${targetDay < 10 ? '0' + targetDay : targetDay}.12.${targetYear}`;
 
@@ -533,9 +542,9 @@ export function calculateTageBisWeihnachten(inputs: Record<string, any>): Calcul
   if (isTodayChristmas) {
     summaryText = `Heute ist ${targetType === 'weihnachten' ? 'der 1. Weihnachtstag' : 'Heiligabend'}! Das Fest ist da – wir wünschen besinnliche und frohe Feiertage!`;
   } else if (isChristmasPassed) {
-    summaryText = `${targetLabel} ${heute.year} ist bereits vorüber. Der Countdown schaltet automatisch auf das nächste Fest am ${weekday}, den ${targetDateFormatted} um. Es verbleiben ${formatNumber(daysRemaining, 0)} Tage.`;
+    summaryText = `${targetLabel} ${heute.year} ist bereits vorüber. Der Countdown schaltet automatisch auf das nächste Fest am ${weekday}, den ${targetDateFormatted} um. Es verbleiben ${formatNumber(daysRemaining, 0)} Tage (${formatNumber(saturdaysRemaining, 0)} Samstage).`;
   } else {
-    summaryText = `Bis zu ${targetLabel} am ${weekday}, den ${targetDateFormatted}, sind es genau ${formatNumber(daysRemaining, 0)} Tage. Das entspricht ${formatNumber(totalWeeks, 0)} vollen Wochen und ${remDays} Tagen.`;
+    summaryText = `Bis zu ${targetLabel} am ${weekday}, den ${targetDateFormatted}, sind es genau ${formatNumber(daysRemaining, 0)} Tage. Das entspricht ${formatNumber(totalWeeks, 0)} vollen Wochen und ${remDays} Tagen (${formatNumber(saturdaysRemaining, 0)} verbleibende Samstage).`;
   }
 
   return {
@@ -558,6 +567,13 @@ export function calculateTageBisWeihnachten(inputs: Record<string, any>): Calcul
         label: 'Wochen & Tage',
         value: totalWeeks,
         formattedValue: `${formatNumber(totalWeeks, 0)} ${totalWeeks === 1 ? 'Woche' : 'Wochen'} und ${remDays} ${remDays === 1 ? 'Tag' : 'Tage'}`,
+      },
+      {
+        id: 'saturdaysRemaining',
+        label: 'Verbleibende Samstage',
+        value: saturdaysRemaining,
+        formattedValue: `${formatNumber(saturdaysRemaining, 0)} ${saturdaysRemaining === 1 ? 'Samstag' : 'Samstage'}`,
+        helpText: 'Gezählt werden Samstage nach heute bis einschließlich des gewählten Zieldatums.',
       },
       {
         id: 'targetChoice',

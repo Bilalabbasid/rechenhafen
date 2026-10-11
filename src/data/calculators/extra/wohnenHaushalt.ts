@@ -2683,22 +2683,22 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'Heizölverbrauch berechnen',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'Heizölverbrauch Rechner – Heizölbedarf in Litern & Tankfüllung',
-    metaDescription: 'Berechnen Sie den jährlichen Heizölverbrauch in Litern anhand von Wohnfläche, Dämmzustand und Heizölpreis. Ermitteln Sie die Kosten für den Heizöltank.',
-    h1: 'Heizölverbrauch Rechner – Heizölbedarf & Tankkosten berechnen',
-    shortDescription: 'Schätzt den jährlichen Heizölbedarf nach Quadratmetern und energetischem Zustand mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['heizoelverbrauch rechner', 'wie viel heizoel pro qm', 'heizoel tankkosten berechnen liter', 'heizoelbedarf einfamilienhaus'],
+    metaTitle: 'Heizölverbrauch berechnen: Liter & Kosten pro Jahr',
+    metaDescription: 'Heizölbedarf anhand von Wohnfläche und Dämmzustand schätzen. Liter pro Jahr und Kosten mit Ihrem eigenen Heizölpreis kostenlos berechnen.',
+    h1: 'Heizölverbrauch berechnen: Liter & Kosten pro Jahr',
+    shortDescription: 'Schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand von Wohnfläche und typischen Modellwerten für den Dämmzustand.',
+    searchKeywords: ['heizoelverbrauch rechner', 'wie viel heizoel pro qm', 'heizoelverbrauch berechnen', 'heizoelbedarf einfamilienhaus'],
     inputs: [
       { id: 'livingArea', label: 'Beheizte Wohnfläche in m²', type: 'number', defaultValue: 140, min: 40, max: 600, step: 10, unit: 'm²' },
       {
         id: 'insulationStandard',
-        label: 'Energetischer Zustand / Dämmung',
+        label: 'Energetischer Zustand / Dämmung (Modellannahme)',
         type: 'select',
         defaultValue: 'standard',
         options: [
-          { value: 'modern', label: 'Gut gedämmt / Neubau (ca. 8 Liter Öl/m²a)' },
-          { value: 'standard', label: 'Teilsaniert / Standard 90er (ca. 14 Liter Öl/m²a)' },
-          { value: 'unrenovated', label: 'Altbau unsaniert vor 1980 (ca. 22 Liter Öl/m²a)' },
+          { value: 'modern', label: 'Gut gedämmt / Neubau (Modellannahme: ca. 8 Liter Öl/m²a)' },
+          { value: 'standard', label: 'Teilsaniert / Standard 90er (Modellannahme: ca. 14 Liter Öl/m²a)' },
+          { value: 'unrenovated', label: 'Altbau unsaniert vor 1980 (Modellannahme: ca. 22 Liter Öl/m²a)' },
         ],
       },
       { id: 'oilPricePerLiter', label: 'Heizölpreis in Euro pro Liter', type: 'number', defaultValue: 1.05, min: 0.5, max: 2.5, step: 0.05, unit: '€/l' },
@@ -2713,17 +2713,17 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const totalLiters = area * litersPerSqm;
       const totalCost = totalLiters * price;
       return {
-        primary: { id: 'totalCost', label: 'Jährliche Heizölkosten', value: totalCost, formattedValue: formatCurrency(totalCost), highlight: true },
+        primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: totalCost, formattedValue: formatCurrency(totalCost), highlight: true },
         secondary: [
-          { id: 'totalLiters', label: 'Heizölbedarf pro Jahr', value: totalLiters, formattedValue: `ca. ${formatNumber(totalLiters, 0)} Liter` },
-          { id: 'monthlyCost', label: 'Monatliche Kosten', value: totalCost / 12, formattedValue: formatCurrency(totalCost / 12) },
-          { id: 'kwhEquivalent', label: 'Energiegehalt in kWh', value: totalLiters * 10, formattedValue: `ca. ${formatNumber(totalLiters * 10, 0)} kWh` },
+          { id: 'totalLiters', label: 'Geschätzter Heizölbedarf pro Jahr', value: totalLiters, formattedValue: `ca. ${formatNumber(totalLiters, 0)} Liter` },
+          { id: 'monthlyCost', label: 'Monatlicher Richtwert (Kosten ÷ 12)', value: totalCost / 12, formattedValue: formatCurrency(totalCost / 12) },
+          { id: 'kwhEquivalent', label: 'Rechnerischer Energiegehalt in kWh', value: totalLiters * 10, formattedValue: `ca. ${formatNumber(totalLiters * 10, 0)} kWh` },
         ],
-        summaryText: `Für ${area} m² Wohnfläche benötigen Sie ca. ${formatNumber(totalLiters, 0)} Liter Heizöl im Jahr. Bei ${formatCurrency(price)}/Liter entspricht das ${formatCurrency(totalCost)}.`,
+        summaryText: `Für ${area} m² Wohnfläche schätzt das Modell ca. ${formatNumber(totalLiters, 0)} Liter Heizöl im Jahr. Bei einem Preis von ${formatCurrency(price)}/Liter entspricht das rechnerisch ${formatCurrency(totalCost)}.`,
       };
     },
     formula: 'Heizölverbrauch = Wohnfläche × Literbedarf pro m²; Kosten = Liter × Literpreis',
-    formulaExplanation: 'Ein Liter leichtes Heizöl (EL) besitzt einen Energiegehalt von etwa 10 Kilowattstunden (kWh).',
+    formulaExplanation: 'Ein Liter leichtes Heizöl (EL) besitzt einen Energiegehalt von etwa 10 Kilowattstunden (kWh). Die Faktoren von 8, 14 und 22 Litern je m² und Jahr sind vereinfachte Modellannahmen zur Orientierung.',
     workedExample: {
       title: 'Beispiel: 140 m² Wohnfläche bei 14 Liter/m²a und 1,05 €/Liter',
       inputValues: [{ label: 'Wohnfläche', value: '140 m²' }, { label: 'Bedarf/m²', value: '14 Liter' }, { label: 'Ölpreis', value: '1,05 €/l' }],
@@ -2731,11 +2731,25 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       result: '2.058,00 € jährliche Heizölkosten',
     },
     content: {
-      intro: 'Dieser Rechner kalkuliert den jährlichen Heizölverbrauch, Füllstandskosten und die anfallende CO₂-Abgabe für ölbeheizte Wohngebäude.',
-      details: '1 Liter leichtes Heizöl (EL) besitzt einen Brennwert von rund 10,0 kWh. Bei einem jährlichen Wärmebedarf von 20.000 kWh werden im Schnitt etwa 2.000 bis 2.200 Liter Heizöl verbraucht.',
+      intro: 'Dieser Rechner schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand der Wohnfläche und modellhafter Verbrauchswerte für verschiedene Dämmzustände.',
+      sections: [
+        {
+          title: 'Wie wird der Heizölverbrauch geschätzt?',
+          content: 'Der Rechner multipliziert die beheizte Wohnfläche mit dem gewählten Verbrauchswert in Litern je Quadratmeter und Jahr. Das Ergebnis ist eine grobe Schätzung, keine Messung Ihres tatsächlichen Verbrauchs.\n\nRechenbeispiel: Bei 140 m² und einem angenommenen Verbrauch von 14 Litern je m² ergeben sich 1.960 Liter pro Jahr. Mit einem selbst eingetragenen Preis von 1,05 € je Liter wären das 2.058 € im Jahr. Beide Werte sind Beispielannahmen, keine aktuellen Preis- oder Verbrauchsempfehlungen.',
+        },
+        {
+          title: 'Wie ermittle ich meinen tatsächlichen Heizölverbrauch?',
+          content: 'Wenn Anfangsbestand, Liefermengen und Endbestand für denselben Zeitraum bekannt sind, lässt sich der Verbrauch aus der Tankbilanz bestimmen:\n\n`Verbrauch = Anfangsbestand + Liefermengen − Endbestand`\n\nBeispiel: 1.500 Liter Anfangsbestand + 2.000 Liter Lieferung − 1.200 Liter Endbestand = 2.300 Liter Verbrauch. Wie genau das Ergebnis ist, hängt auch davon ab, wie zuverlässig die Tankstände gemessen wurden.',
+        },
+        {
+          title: 'Warum kann der tatsächliche Verbrauch abweichen?',
+          content: 'Witterung, Raumtemperatur, Dämmung, Heizungszustand und Warmwasserbereitung beeinflussen den Verbrauch. Vergleichen Sie möglichst vollständige Jahre. Ein kalter Wintermonat lässt sich nicht einfach auf zwölf Monate hochrechnen.',
+        },
+      ],
+      details: '1 Liter leichtes Heizöl (EL) besitzt einen Brennwert von rund 10,0 kWh. Die im Rechner hinterlegten Faktoren (8, 14 und 22 Liter je m² und Jahr) sind unverbindliche Modellannahmen und keine Messwerte eines konkreten Gebäudes.',
     },
     faqs: [
-      { question: 'Wie hoch ist die CO₂-Abgabe pro Liter Heizöl?', answer: 'Auf Heizöl fällt nach dem BEHG eine CO₂-Abgabe an, die den Literpreis um derzeit rund 10 bis 13 Cent verteuert.' },
+      { question: 'Wie wirkt sich die CO₂-Abgabe auf den Heizölpreis aus?', answer: 'Auf Heizöl fällt nach dem BEHG eine CO₂-Abgabe an, die im Literpreis des Brennstoffhändlers bereits enthalten ist.' },
       { question: 'Wann dürfen alte Ölheizungen nach dem GEG noch betrieben werden?', answer: 'Bestehende Ölheizungen dürfen weiter betrieben und repariert werden; Standard-Heizkessel (keine Brennwert- oder Niedertemperaturtechnik) müssen jedoch nach 30 Jahren Betrieb stillgelegt werden (§ 72 GEG).' },
     ],
     relatedSlugs: ['heizkostenvergleich-rechner', 'gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'waermepumpe-stromkosten-rechner'],

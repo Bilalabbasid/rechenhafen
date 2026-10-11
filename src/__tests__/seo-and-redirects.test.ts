@@ -191,7 +191,7 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 8. Schalungssteine
     const stein = getCalculatorBySlug('schalungssteine-rechner');
-    expect(stein?.metaTitle).toBe('Schalungssteine Rechner: Menge für Ihre Mauer berechnen');
+    expect(stein?.metaTitle).toBe('Schalungssteine-Rechner: Steinmenge & Füllbeton');
     expect(stein?.h1).toBe('Schalungssteine berechnen: Menge für Ihre Mauer');
     expect(stein?.workedExample.description).toBeDefined();
     expect(stein?.faqs.length).toBeGreaterThanOrEqual(4);

@@ -65,6 +65,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       modifiedTime: article.updatedAt,
       authors: [article.author.name],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: cleanTitle,
+      description: article.metaDescription,
+    },
   };
 }
 

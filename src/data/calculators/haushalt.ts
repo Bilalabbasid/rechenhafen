@@ -110,8 +110,8 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Gaskosten berechnen',
     category: 'haushalt-energie',
     subcategory: 'Gas & Heizung',
-    metaTitle: 'Gaskostenrechner: Gasverbrauch und Kosten berechnen',
-    metaDescription: 'Gaskosten & Gasverbrauch präzise berechnen: Kubikmeter (m³) in kWh umrechnen, rechnerischen Monatsdurchschnitt ermitteln und Kosten aus Arbeitspreis & Grundpreis aufschlüsseln.',
+    metaTitle: 'Gaskostenrechner: m³ oder kWh in Euro berechnen',
+    metaDescription: 'Gaskosten kostenlos aus kWh oder m³ berechnen: mit Arbeitspreis, Grundpreis, Jahreskosten und rechnerischem Monatsdurchschnitt.',
     h1: 'Gaskosten berechnen: Gasverbrauch und Kosten im Überblick',
     shortDescription: 'Berechnet die jährlichen Gaskosten, den rechnerischen Monatsdurchschnitt und rechnet Zählerstände in Kubikmetern (m³) zuverlässig in Kilowattstunden (kWh) um.',
     searchKeywords: [
@@ -263,6 +263,10 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         {
           title: 'Gasverbrauch von m³ in kWh umrechnen',
           content: 'Am heimischen Gaszähler wird nicht in Energieeinheiten, sondern im reinen Gasvolumen gemessen – also in **Kubikmetern (m³)**. Da Gas je nach Temperatur, Höhenlage und Gaszusammensetzung unterschiedlich viel Energie enthält, erfolgt die Abrechnung über die physikalische Formel:\n\n`kWh = m³ × Brennwert (Hs) × Zustandszahl (z)`\n\n- **Brennwert (Hs)**: Gibt an, wie viel thermische Energie in einem Normkubikmeter Gas steckt. Bei L-Gas (niedriger Methangehalt) liegt der Wert typischerweise zwischen 9,5 und 10,5 kWh/m³, bei energiereichem H-Gas zwischen 11,0 und 11,7 kWh/m³.\n- **Zustandszahl (z)**: Berücksichtigt den Einfluss der Ortshöhe über Normalnull und des effektiven Gasdrucks am Zähler auf das Gasvolumen (üblicherweise ca. 0,90 bis 0,96).\n\nAls grobe Faustregel für schnelle Überschläge gilt: **1 m³ Gas entspricht rund 10 kWh Wärmeenergie**.',
+        },
+        {
+          title: 'Was kostet 1 m³ Gas?',
+          content: 'Für einen Kubikmeter Erdgas gibt es keinen einheitlichen Europreis. Entscheidend sind der Brennwert, die Zustandszahl und der Arbeitspreis Ihres Tarifs. Die reinen Verbrauchskosten lassen sich so berechnen:\n\n`Kosten je m³ = Brennwert × Zustandszahl × Arbeitspreis je kWh`\n\nEin Rechenbeispiel mit frei gewählten Werten: Bei einem Brennwert von 10,8 kWh/m³ und einer Zustandszahl von 0,95 enthält ein Kubikmeter rechnerisch 10,26 kWh. Bei 0,11 € je kWh kostet diese Menge rund 1,13 €.\n\nDas ist kein aktueller Marktpreis. Setzen Sie die Werte Ihrer eigenen Abrechnung ein. Der feste Grundpreis kommt zusätzlich hinzu und ist in diesem Betrag noch nicht enthalten.',
         },
         {
           title: 'Was kostet Gas pro Monat?',

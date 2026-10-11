@@ -774,10 +774,10 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Tage bis Weihnachten',
     category: 'datum-zeit',
     subcategory: 'Datumsdifferenz',
-    metaTitle: 'Tage bis Weihnachten: Countdown bis Heiligabend',
-    metaDescription: 'Wie viele Tage sind es bis Weihnachten? Berechne den Countdown bis Heiligabend oder zum ersten Weihnachtstag.',
+    metaTitle: 'Wie viele Tage bis Weihnachten? Countdown & Wochen',
+    metaDescription: 'Wie lange noch bis Weihnachten? Tage und Wochen bis Heiligabend oder zum 25. Dezember berechnen – mit Datum und Wochentag.',
     h1: 'Wie viele Tage sind es bis Weihnachten?',
-    shortDescription: 'Ermittelt sekundengenau die verbleibenden Kalendertage, vollen Wochen und den Wochentag bis zum nächsten Heiligabend oder ersten Weihnachtstag.',
+    shortDescription: 'Ermittelt tagesgenau die verbleibenden Kalendertage, vollen Wochen und den Wochentag bis zum nächsten Heiligabend oder ersten Weihnachtstag.',
     searchKeywords: [
       'tage bis weihnachten',
       'wie viele tage bis weihnachten',
@@ -824,6 +824,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     ],
     content: {
       intro: 'Wie viele Tage sind es noch bis Weihnachten? Unser Weihnachts-Countdown ermittelt für Sie tagesaktuell, wie viele Kalendertage und volle Wochen noch bis Heiligabend (24. Dezember) oder dem ersten Weihnachtstag (25. Dezember) verbleiben.',
+      sections: [
+        {
+          title: 'Wie viele Samstage sind es noch bis Weihnachten?',
+          content: 'Wer Geschenke oder gemeinsame Termine plant, möchte oft die verbleibenden Wochenenden kennen. Die Zahl der Samstage ist nicht immer gleich der Zahl voller Wochen: Entscheidend ist, auf welchen Wochentag Start- und Zieldatum fallen.\n\nGezählt werden Samstage nach heute bis einschließlich des gewählten Zieldatums.\n\nFür die Planung von arbeitsfreien Tagen und Brückentagen im Büro oder Betrieb beachten Sie bitte den Unterschied zwischen Kalendertagen und regulären Arbeitswochen: Nutzen Sie dafür unseren spezialisierten [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/) oder den [Werktage-Rechner](/rechner/werktage-rechner/).',
+        },
+      ],
       details: '### Wann sind Heiligabend und die Weihnachtsfeiertage?\n\nIm deutschsprachigen Raum beginnt das Weihnachtsfest traditionell am Abend des **24. Dezembers (Heiligabend)** mit der Bescherung. Gesetzliche Feiertage nach den Feiertagsgesetzen aller 16 Bundesländer sind der **1. Weihnachtstag (25. Dezember)** und der **2. Weihnachtstag (26. Dezember)**.\n\nHeiligabend selbst ist in Deutschland kein gesetzlicher Feiertag, sondern ein regulärer Werktag (oft als Bankfeiertag oder tariflicher halber Arbeitstag geregelt).\n\n### Wie wird der Countdown berechnet?\n\nDie Berechnung erfolgt tagesgenau unter Berücksichtigung der mitteleuropäischen Zeitzone (*Europe/Berlin*). Der Rechner zieht das heutige Datum vom Zieldatum ab und schlüsselt das Ergebnis in Kalendertage, ganze Wochen und verbleibende Einzeltage auf. Zudem erfahren Sie direkt, auf welchen Wochentag das nächste Weihnachtsfest fällt.\n\n### Warum schaltet der Rechner nach Weihnachten automatisch um?\n\nSobald der 24. bzw. 25. Dezember des aktuellen Kalenderjahres verstrichen ist, blickt der Rechner automatisch nach vorne: Er kalkuliert nahtlos den Countdown für das Weihnachtsfest des kommenden Kalenderjahres. So bleibt die Seite das ganze Jahr über aktuell und verlässlich.\n\nWenn Sie wissen möchten, wie viele Arbeitstage bis zum Jahresende verbleiben, nutzen Sie unseren [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/). Für beliebige andere Zeitspannen steht Ihnen der allgemeine [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung. Weitere Zeitzähler und Hilfen finden Sie in unserer Themenwelt [Datum & Zeit](/datum-zeit/) sowie im [Countdown-Rechner](/rechner/countdown-rechner/) und beim [Tage bis Geburtstag](/rechner/tage-bis-geburtstag/).',
     },
     faqs: [

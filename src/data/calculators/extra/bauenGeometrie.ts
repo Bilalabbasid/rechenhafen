@@ -1250,8 +1250,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Schalungsstein-Rechner",
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
-    metaTitle: 'Schalungssteine Rechner: Menge für Ihre Mauer berechnen',
-    metaDescription: 'Schalungssteine berechnen: Exakte Steinanzahl und Füllbeton-Volumen (m³) nach Wandfläche und Herstellerangaben für Garten- und Stützmauern ermitteln.',
+    metaTitle: 'Schalungssteine-Rechner: Steinmenge & Füllbeton',
+    metaDescription: 'Schalungssteine und Füllbeton aus Wandmaßen berechnen. Mit Öffnungen, Hersteller-Füllmengen und getrennten Reserven für Steine und Beton.',
     h1: 'Schalungssteine berechnen: Menge für Ihre Mauer',
     shortDescription: 'Ermittelt die Stückzahl an Schalungssteinen und den Füllbetonbedarf in m³ basierend auf Wandmaßen, Herstellerwerten und getrennten Reserven.',
     searchKeywords: [

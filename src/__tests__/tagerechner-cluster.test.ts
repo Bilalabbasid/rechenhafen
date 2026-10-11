@@ -171,6 +171,11 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
       expect(resHeiligabend.primary.value).toBeDefined();
       expect(typeof resHeiligabend.primary.value).toBe('number');
 
+      const satItem = resHeiligabend.secondary?.find((s) => s.id === 'saturdaysRemaining');
+      expect(satItem).toBeDefined();
+      expect(typeof satItem?.value).toBe('number');
+      expect(satItem?.helpText).toBe('Gezählt werden Samstage nach heute bis einschließlich des gewählten Zieldatums.');
+
       const resWeihnachten = calculateTageBisWeihnachten({ christmasTarget: 'weihnachten' });
       expect(resWeihnachten.primary.value).toBeDefined();
       expect(typeof resWeihnachten.primary.value).toBe('number');
@@ -192,9 +197,9 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
       const calc = getCalculatorBySlug('tage-bis-weihnachten');
       expect(calc).toBeDefined();
       expect(calc?.h1).toBe('Wie viele Tage sind es bis Weihnachten?');
-      expect(calc?.metaTitle).toBe('Tage bis Weihnachten: Countdown bis Heiligabend');
+      expect(calc?.metaTitle).toBe('Wie viele Tage bis Weihnachten? Countdown & Wochen');
       expect(calc?.metaDescription).toBe(
-        'Wie viele Tage sind es bis Weihnachten? Berechne den Countdown bis Heiligabend oder zum ersten Weihnachtstag.'
+        'Wie lange noch bis Weihnachten? Tage und Wochen bis Heiligabend oder zum 25. Dezember berechnen – mit Datum und Wochentag.'
       );
       // No static year in title or metaDescription
       expect(calc?.metaTitle).not.toMatch(/\b20\d\d\b/);
@@ -272,7 +277,7 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
 
       const metaXmas = await generateCalcMetadata({ params: Promise.resolve({ slug: 'tage-bis-weihnachten' }) });
       const renderedXmas = template.replace('%s', metaXmas.title as string);
-      expect(renderedXmas).toBe('Tage bis Weihnachten: Countdown bis Heiligabend | RechenHafen');
+      expect(renderedXmas).toBe('Wie viele Tage bis Weihnachten? Countdown & Wochen | RechenHafen');
       expect(renderedXmas).not.toContain('RechenHafen | RechenHafen');
     });
 

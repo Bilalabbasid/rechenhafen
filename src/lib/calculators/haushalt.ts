@@ -505,7 +505,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       value: totalAnnualCost,
       formattedValue: formatCurrency(totalAnnualCost),
       highlight: true,
-      helpText: 'Gesamtsumme aus verbrauchsabhängigem Arbeitspreis und verbrauchsunabhängigem Jahresgrundpreis (inkl. 19 % MwSt.). Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.',
+      helpText: 'Gesamtsumme aus verbrauchsabhängigem Arbeitspreis und verbrauchsunabhängigem Jahresgrundpreis (inkl. 19 % MwSt.).',
     },
     secondary,
     breakdown: {
@@ -515,8 +515,8 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       ],
       rows: breakdownRows,
     },
-    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Monatsdurchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag). Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.`,
-    directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat; Ihr tatsächlicher Versorgerabschlag kann abweichen).`,
+    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Monatsdurchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag).`,
+    directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
     qualifications: [
       'Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen (z. B. bei 11 statt 12 Abschlägen im Abrechnungsjahr, individuellen Sicherheitszuschlägen oder kaufmännischen Rundungen).',
       'Gesamtkosten inklusive Arbeitspreis, Grundpreis und aller gesetzlichen Steuern (19 % Mehrwertsteuer, CO₂-Preis, Erdgassteuer, Konzessionsabgabe).',

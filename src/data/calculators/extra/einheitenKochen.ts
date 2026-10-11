@@ -3094,120 +3094,254 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "zucker-ersatz-rechner",
     slug: "zucker-ersatz-rechner",
-    name: "Zuckerersatz-Rechner (Erythrit, Xylit, Stevia & Honig)",
-    shortName: "Zuckerersatz-Rechner",
+    name: "Zucker in Erythrit umrechnen (Rechner & Tabelle)",
+    shortName: "Zucker in Erythrit",
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
-    metaTitle: 'Zuckerersatz Rechner – Zucker in Erythrit, Xylit',
-    metaDescription: 'Rechnen Sie Haushaltszucker um in Erythrit (70 % Süßkraft), Birkenzucker/Xylit (100 %), Honig, Stevia und Agavendicksaft inklusive Kalorieneinsparung.',
-    h1: 'Zuckerersatz Rechner – Süßkraft & Kalorieneinsparung berechnen',
-    shortDescription: 'Ermittelt die Menge von Erythrit, Xylit, Honig und Stevia als Zuckerersatz.',
-    searchKeywords: ["zuckerersatz rechner erythrit xylit","zucker in birkenzucker umrechnen 1 zu 1","erythrit suesskraft 70 prozent berechnen","zucker durch honig ersetzen backen"],
+    metaTitle: 'Zucker in Erythrit umrechnen: Rechner & Tabelle',
+    metaDescription: 'Wie viel Erythrit statt Zucker? Mengen kostenlos umrechnen, Beispiele nachschlagen und Süßkraft mit Xylit vergleichen. Hinweise fürs Backen inklusive.',
+    h1: 'Zucker in Erythrit umrechnen: Rechner & Tabelle',
+    shortDescription: 'Rechnet Haushaltszucker und Erythrit anhand einer 70-%-Süßkraft-Annahme um – inklusive Tabelle und Vergleich mit Xylit.',
+    searchKeywords: [
+      "zucker in erythrit umrechnen",
+      "zuckerersatz rechner",
+      "erythrit tabelle",
+      "erythrit statt zucker",
+      "wie viel erythrit ersetzt 100g zucker",
+      "zucker durch erythrit ersetzen",
+      "xylit zucker umrechnen",
+    ],
     inputs: [
+      {
+        id: "direction",
+        label: "Berechnungsrichtung",
+        type: "select",
+        defaultValue: "sugar_to_sub",
+        options: [
+          { value: "sugar_to_sub", label: "Zucker durch Erythrit ersetzen (Zucker → Alternative)" },
+          { value: "erythrit_to_sugar", label: "Erythrit in Zucker-Süßkraft umrechnen (Erythrit → Zucker)" },
+        ],
+      },
+      {
+        id: "sugarGrams",
+        label: "Zuckermenge im Rezept in Gramm",
+        type: "number",
+        defaultValue: 100,
+        min: 0,
+        max: 5000,
+        step: 10,
+        unit: "g Zucker",
+        dependsOn: { field: "direction", value: "sugar_to_sub" },
+      },
+      {
+        id: "substitute",
+        label: "Gewünschte Zuckeralternative",
+        type: "select",
+        defaultValue: "erythrit",
+        options: [
           {
-                "id": "sugarGrams",
-                "label": "Zuckermenge im Originalrezept",
-                "type": "number",
-                "defaultValue": 100,
-                "min": 1,
-                "max": 2000,
-                "step": 10,
-                "unit": "g Zucker"
+            value: "erythrit",
+            label: "Reines Erythrit (ca. 70 % Süßkraft, 0 kcal)",
           },
           {
-                "id": "substitute",
-                "label": "Gewünschte Zuckeralternative",
-                "type": "select",
-                "defaultValue": "erythrit",
-                "options": [
-                      {
-                            "value": "erythrit",
-                            "label": "Erythrit (ca. 70 % Süßkraft, 0 kcal – Faktor 1,3 bis 1,4)"
-                      },
-                      {
-                            "value": "xylit",
-                            "label": "Xylit / Birkenzucker (100 % Süßkraft, 40 % weniger kcal – 1:1)"
-                      },
-                      {
-                            "value": "honey",
-                            "label": "Honig (ca. 120 % Süßkraft, feucht – ca. 80 g je 100 g Zucker)"
-                      },
-                      {
-                            "value": "agave",
-                            "label": "Agavendicksaft (ca. 125 % Süßkraft – ca. 75 g je 100 g Zucker)"
-                      },
-                      {
-                            "value": "stevia",
-                            "label": "Stevia Pulver/Streusüße 1:1 (kalorienfrei)"
-                      }
-                ]
-          }
+            value: "xylit",
+            label: "Xylit / Birkenzucker (ca. 100 % Süßkraft – 1:1)",
+          },
+          {
+            value: "honey",
+            label: "Honig (ca. 120 % Süßkraft – ca. 80 g je 100 g Zucker)",
+          },
+          {
+            value: "agave",
+            label: "Agavendicksaft (ca. 125 % Süßkraft – ca. 75 g je 100 g Zucker)",
+          },
+          {
+            value: "stevia",
+            label: "Stevia Streusüße 1:1 (kalorienfrei)",
+          },
+        ],
+        dependsOn: { field: "direction", value: "sugar_to_sub" },
+      },
+      {
+        id: "erythritGrams",
+        label: "Erythritmenge in Gramm",
+        type: "number",
+        defaultValue: 100,
+        min: 0,
+        max: 5000,
+        step: 10,
+        unit: "g Erythrit",
+        dependsOn: { field: "direction", value: "erythrit_to_sugar" },
+      },
     ],
     calculate: (inputs: Record<string, any>) => {
-      const sugarG = Number(inputs.sugarGrams) || 0;
-      const sub = inputs.substitute;
-      
-      let factor = 1.35; // Erythrit
-      let calPerG = 0; // Erythrit 0 kcal
+      const direction = inputs.direction || 'sugar_to_sub';
+
+      if (direction === 'erythrit_to_sugar') {
+        const rawEry = inputs.erythritGrams !== undefined && inputs.erythritGrams !== ''
+          ? inputs.erythritGrams
+          : (inputs.sugarGrams !== undefined && inputs.sugarGrams !== '' ? inputs.sugarGrams : 100);
+        const erythritG = Math.max(0, parseFloat(rawEry) || 0);
+        // Modellannahme 70 %: Zucker-Süßkraft = Erythrit × 0,70
+        const sugarEquivalent = Math.round(erythritG * 0.70);
+
+        return {
+          primary: {
+            id: 'sugarEquivalent',
+            label: 'Entsprechende Süßkraft in Zucker',
+            value: sugarEquivalent,
+            formattedValue: `${formatNumber(sugarEquivalent, 0)} g Zucker`,
+            highlight: true,
+          },
+          secondary: [
+            {
+              id: 'erythritInput',
+              label: 'Ausgangsmenge Erythrit',
+              value: erythritG,
+              formattedValue: `${formatNumber(erythritG, 0)} g`,
+            },
+            {
+              id: 'sweetnessFactor',
+              label: 'Angenommene Süßkraft',
+              value: 70,
+              formattedValue: 'ca. 70 % von Haushaltszucker',
+            },
+            {
+              id: 'caloricComparison',
+              label: 'Rechnerischer Brennwert',
+              value: 0,
+              formattedValue: `${formatNumber(erythritG, 0)} g Erythrit (0 kcal) vs. ca. ${formatNumber(sugarEquivalent * 4, 0)} kcal bei Zucker`,
+            },
+          ],
+          summaryText: `Bei einer angenommenen Süßkraft von 70 % entsprechen ${formatNumber(erythritG, 0)} g reinem Erythrit rechnerisch etwa ${formatNumber(sugarEquivalent, 0)} g Haushaltszucker. Die Umrechnung vergleicht die Süße – sie garantiert nicht identische Back- oder Volumeneigenschaften.`,
+        };
+      }
+
+      // direction === 'sugar_to_sub'
+      const rawSugar = inputs.sugarGrams !== undefined && inputs.sugarGrams !== ''
+        ? inputs.sugarGrams
+        : 100;
+      const sugarG = Math.max(0, parseFloat(rawSugar) || 0);
+      const sub = inputs.substitute || 'erythrit';
+
+      let subGrams = 0;
+      let calPerG = 0;
       let liquidReductionMl = 0;
-      
-      if (sub === 'xylit') {
-        factor = 1.0;
-        calPerG = 2.4; // 240 kcal / 100g
+      let subName = 'Erythrit';
+
+      if (sub === 'erythrit') {
+        // Modellannahme 70 %: Erythrit = Zucker / 0,70
+        subGrams = Math.round(sugarG / 0.70);
+        calPerG = 0;
+        subName = 'Erythrit';
+      } else if (sub === 'xylit') {
+        subGrams = Math.round(sugarG * 1.0);
+        calPerG = 2.4;
+        subName = 'Xylit';
       } else if (sub === 'honey') {
-        factor = 0.80;
+        subGrams = Math.round(sugarG * 0.80);
         calPerG = 3.04;
-        liquidReductionMl = sugarG * 0.20; // Flüssigkeit im Rezept um 20% reduzieren
+        liquidReductionMl = sugarG * 0.20;
+        subName = 'Honig';
       } else if (sub === 'agave') {
-        factor = 0.75;
+        subGrams = Math.round(sugarG * 0.75);
         calPerG = 3.10;
         liquidReductionMl = sugarG * 0.25;
+        subName = 'Agavendicksaft';
       } else if (sub === 'stevia') {
-        factor = 1.0;
+        subGrams = Math.round(sugarG * 1.0);
         calPerG = 0;
+        subName = 'Stevia Streusüße 1:1';
       }
-      
-      const subGrams = Math.round(sugarG * factor);
-      const sugarKcal = sugarG * 4.0; // Haushaltszucker 400 kcal / 100g
+
+      const sugarKcal = sugarG * 4.0;
       const subKcal = subGrams * calPerG;
       const savedKcal = Math.max(0, sugarKcal - subKcal);
-      
+
       return {
-        primary: { id: 'subGrams', label: 'Benötigte Menge Ersatzstoff', value: subGrams, formattedValue: subGrams + ' g', highlight: true },
+        primary: {
+          id: 'subGrams',
+          label: `Benötigte Menge ${subName}`,
+          value: subGrams,
+          formattedValue: `${formatNumber(subGrams, 0)} g`,
+          highlight: true,
+        },
         secondary: [
-          { id: 'savedCalories', label: 'Eingesparte Kalorien', value: savedKcal, formattedValue: 'ca. ' + Math.round(savedKcal) + ' kcal weniger' },
-          { id: 'liquidTip', label: 'Flüssigkeitsanpassung', value: liquidReductionMl, formattedValue: liquidReductionMl > 0 ? 'Flüssigkeit im Teig um ca. ' + Math.round(liquidReductionMl) + ' ml reduzieren' : 'Keine Flüssigkeitsanpassung nötig' },
+          {
+            id: 'originalSugar',
+            label: 'Ausgangszucker im Rezept',
+            value: sugarG,
+            formattedValue: `${formatNumber(sugarG, 0)} g`,
+          },
+          {
+            id: 'savedCalories',
+            label: 'Kaloriendifferenz',
+            value: savedKcal,
+            formattedValue: `ca. ${formatNumber(Math.round(savedKcal), 0)} kcal Differenz`,
+          },
+          {
+            id: 'liquidTip',
+            label: 'Flüssigkeitsanpassung',
+            value: liquidReductionMl,
+            formattedValue: liquidReductionMl > 0 ? `Flüssigkeit im Teig um ca. ${formatNumber(Math.round(liquidReductionMl), 0)} ml reduzieren` : 'Keine Flüssigkeitsanpassung nötig',
+          },
         ],
-        summaryText: 'Für ' + sugarG + ' g Haushaltszucker benötigen Sie ' + subGrams + ' g ' + (String(sub || '').toUpperCase()) + '. Dadurch sparen Sie rund ' + Math.round(savedKcal) + ' kcal ein!',
+        summaryText: `Für ${formatNumber(sugarG, 0)} g Haushaltszucker benötigen Sie rechnerisch ca. ${formatNumber(subGrams, 0)} g ${subName}. Bei Mischprodukten stets die Herstellerangaben auf der Packung beachten.`,
       };
     },
-    formula: "Erythrit = Zucker × 1,35; Xylit = Zucker × 1,0; Honig = Zucker × 0,80; Eingesparte kcal = (Zucker × 4) - (Ersatz × kcal)",
-    formulaExplanation: "Da Erythrit nur etwa 70 % der Süßkraft von Kristallzucker besitzt, muss man ca. 130 bis 140 g Erythrit verwenden, um 100 g Zucker geschmacklich zu ersetzen.",
+    formula: "Erythrit = Zucker ÷ 0,70; Zucker-Äquivalent = Erythrit × 0,70; Xylit = Zucker × 1,0",
+    formulaExplanation: "Reines Erythrit besitzt rund 70 % der Süßkraft von Haushaltszucker. Für die Umrechnung wird daher mit dem Divisor 0,70 gerechnet (100 g Zucker entsprechen gerundet rund 143 g Erythrit). Xylit entspricht der Süße von Zucker im Verhältnis 1:1. Beachten Sie, dass es sich um Modellannahmen für die Süßkraft handelt; Backeigenschaften und Teigkonsistenz können abweichen.",
     workedExample: {
-          "title": "Beispiel: Kuchen mit 150 g Zucker auf Erythrit umstellen",
-          "inputValues": [
-                {
-                      "label": "Zucker",
-                      "value": "150 g"
-                },
-                {
-                      "label": "Ersatz",
-                      "value": "Erythrit"
-                }
-          ],
-          "steps": [
-                "Erythrit = 150 × 1,35 = 202,5 g ≈ 200 g",
-                "Eingespart: 150 g Zucker = 600 kcal -> 0 kcal mit Erythrit"
-          ],
-          "result": "200 g Erythrit (600 kcal gespart)"
+      title: 'Beispiel: Kuchen mit 150 g Zucker auf Erythrit umstellen',
+      description: 'Reines Erythrit besitzt rund 70 % Süßkraft: 150 g Zucker ÷ 0,70 = 214,29 g ≈ 214 g Erythrit.',
+      inputs: { direction: 'sugar_to_sub', sugarGrams: 150, substitute: 'erythrit' },
+      resultSummary: '214 g Erythrit (ca. 600 kcal Differenz)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: 150 g Zucker durch Erythrit ersetzen',
+        description: 'Reines Erythrit besitzt rund 70 % Süßkraft: 150 g Zucker ÷ 0,70 = 214,29 g ≈ 214 g Erythrit.',
+        inputs: { direction: 'sugar_to_sub', sugarGrams: 150, substitute: 'erythrit' },
+        resultSummary: '214 g Erythrit (ca. 600 kcal Differenz)',
+      },
+      {
+        title: 'Beispiel 2: 100 g Erythrit in Zucker-Süßkraft umrechnen',
+        description: 'Umgekehrte Richtung: 100 g Erythrit × 0,70 = 70 g Zucker-Süßkraft.',
+        inputs: { direction: 'erythrit_to_sugar', erythritGrams: 100 },
+        resultSummary: '70 g Zucker-Äquivalent',
+      },
+    ],
     content: {
-      intro: 'Dieser Süßungsrechner konvertiert Haushaltszucker (Saccharose) in kalorienarme Alternativen wie Erythrit, Xylit (Birkenzucker), Stevia, Agavendicksaft und Honig.',
-      details: 'Süßkraftfaktoren bezogen auf Haushaltszucker (100 %): Xylit 100 % (1:1 Austausch), Erythrit ca. 70 % (benötigt ca. 130 bis 140 g Erythrit für 100 g Zucker), Honig ca. 120 % Süßkraft (80 g Honig ersetzen 100 g Zucker, Flüssigkeit im Teig leicht reduzieren).',
+      intro: 'Dieser Rechner vergleicht die Süßkraft von Haushaltszucker (Saccharose) und reinem Erythrit sowie Xylit für Rezepte und Backvorhaben.',
+      sections: [
+        {
+          title: 'Wie viel Erythrit ersetzt 100 g Zucker?',
+          content: 'Reines Erythrit besitzt ungefähr 70 Prozent der Süßkraft von Haushaltszucker. Mit dieser Annahme entsprechen 100 g Zucker rechnerisch rund 143 g Erythrit. Die Umrechnung vergleicht die Süße – sie garantiert nicht, dass ein Rezept mit der größeren Menge genauso gelingt. Beachten Sie bei Mischprodukten die Angaben auf der Verpackung.',
+        },
+        {
+          title: 'Zucker in Erythrit: Umrechnungstabelle',
+          content: '| Zucker (Haushaltszucker) | Erythrit (ca. 70 % Süßkraft) |\n| --- | --- |\n| 50 g | 71 g |\n| 100 g | 143 g |\n| 150 g | 214 g |\n| 200 g | 286 g |\n| 250 g | 357 g |\n\nGerundete Richtwerte bei angenommener Süßkraft von 70 %.',
+        },
+        {
+          title: 'Wie viel Zucker entspricht Erythrit?',
+          content: 'Für die umgekehrte Richtung multiplizieren Sie die Erythritmenge mit 0,70. So entsprechen 50 g Erythrit etwa der Süße von 35 g Zucker, 80 g etwa 56 g und 100 g etwa 70 g. Auch hier geht es um die Süßkraft, nicht um identische Backeigenschaften.',
+        },
+        {
+          title: 'Lässt sich Zucker durch Xylit ersetzen?',
+          content: 'Xylit hat ungefähr die gleiche Süßkraft wie Zucker. Für einen Vergleich der Süße können Sie deshalb meist mit einem Verhältnis von 1:1 rechnen: 100 g Zucker entsprechen etwa 100 g Xylit. Prüfen Sie trotzdem, ob das Rezept für diesen Austausch geeignet ist.',
+        },
+      ],
+      details: 'Süßkraftannahmen im Vergleich zu Haushaltszucker (100 %): Xylit ca. 100 % (1:1), reines Erythrit ca. 70 % (Zucker ÷ 0,70). Honig ca. 120 % Süßkraft (ca. 80 g Honig je 100 g Zucker, Flüssigkeit im Teig leicht reduzieren).',
     },
     faqs: [
-      { question: 'Welche Nebenwirkungen können Erythrit und Xylit haben?', answer: 'Zuckeralkohole können bei übermäßigem Verzehr abführend wirken; Xylit ist zudem für Hunde und Katzen hochgradig lebensgefährlich giftig.' },
-      { question: 'Karadellisiert Erythrit beim Backen wie normaler Zucker?', answer: 'Nein, Erythrit karamellisiert nicht und neigt beim Abkühlen zum Auskristallisieren ("kühler Schmelzeffekt" auf der Zunge).' },
+      {
+        question: 'Welche Verträglichkeits- und Sicherheitshinweise gelten für Haustiere?',
+        answer: 'Zuckeralkohole können beim Menschen bei übermäßigem Verzehr abführend wirken. Für Hunde ist Xylit (Birkenzucker) lebensgefährlich giftig, da es eine massive Insulinausschüttung und akutes Leberversagen auslösen kann. Halten Sie xylithaltige Lebensmittel strikt von Hunden fern. Auch bei anderen Haustieren sollte der Verzehr vermieden werden.',
+      },
+      {
+        question: 'Karamellisiert Erythrit beim Backen wie normaler Zucker?',
+        answer: 'Nein, Erythrit karamellisiert nicht und schmilzt erst bei höheren Temperaturen. Zudem neigt es beim Abkühlen zum Auskristallisieren und kann einen leicht kühlen Geschmackseffekt auf der Zunge hervorrufen.',
+      },
     ],
     relatedSlugs: ['eiweiss-eigelb-ersatz-rechner', 'kalorien-rezept-rechner', 'cups-in-gramm-rechner', 'portionsrechner'],
   },

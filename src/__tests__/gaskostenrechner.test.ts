@@ -47,7 +47,21 @@ describe('Gaskostenrechner (calculateGasCost)', () => {
     expect(monthly?.label).toBe('Rechnerischer Monatsdurchschnitt (Orientierungswert)');
     expect(monthly?.helpText).toBe('Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.');
 
+    expect(result.primary.helpText).not.toContain('Jahreskosten ÷ 12');
     expect(result.qualifications?.[0]).toContain('Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen');
+  });
+
+  it('tests 1 m³ gas cost: 10.8 * 0.95 = 10.26 kWh; 10.26 * 0.11 = 1.1286 -> 1.13 €', () => {
+    const calorificValue = 10.8;
+    const stateFactor = 0.95;
+    const pricePerKwh = 0.11;
+    const kwhPerM3 = calorificValue * stateFactor; // 10.26
+    expect(kwhPerM3).toBeCloseTo(10.26, 4);
+
+    const costPerM3 = kwhPerM3 * pricePerKwh; // 1.1286
+    expect(costPerM3).toBeCloseTo(1.1286, 4);
+    const displayedCost = Math.round(costPerM3 * 100) / 100;
+    expect(displayedCost).toBe(1.13);
   });
 
   it('uses physical m³ conversion: kWh = m³ × Brennwert × Zustandszahl', () => {
