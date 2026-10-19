@@ -478,6 +478,15 @@ describe('SEO & 301 Redirects Verification', () => {
       expect(metaMatches?.length).toBe(1);
     }
   });
+
+  it('serves valid Google AdSense ads.txt in public/ads.txt with correct publisher entry', () => {
+    const adsTxtPath = path.resolve(__dirname, '../../public/ads.txt');
+    expect(fs.existsSync(adsTxtPath), 'public/ads.txt should exist').toBe(true);
+
+    const content = fs.readFileSync(adsTxtPath, 'utf8').trim();
+    expect(content).toBe('google.com, pub-4789347477675358, DIRECT, f08c47fec0942fa0');
+  });
 });
+
 
 
