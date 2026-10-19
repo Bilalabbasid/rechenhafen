@@ -1,20 +1,26 @@
 import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
+function parseInputNumber(val: any, fallback: number): number {
+  if (val === undefined || val === null || String(val).trim() === '') return fallback;
+  const n = parseFloat(val);
+  return isNaN(n) ? fallback : n;
+}
+
 export function calculatePaintAmount(inputs: Record<string, any>): CalculationResult {
-  const length = parseFloat(inputs.roomLength) || 5;
-  const width = parseFloat(inputs.roomWidth) || 4;
-  const height = parseFloat(inputs.roomHeight) || 2.5;
-  const coats = parseInt(inputs.coats || '2', 10);
-  const coveragePerLiter = parseFloat(inputs.coveragePerLiter) || 7.0; // 7 m² pro Liter
+  const length = parseInputNumber(inputs.roomLength, 5);
+  const width = parseInputNumber(inputs.roomWidth, 4);
+  const height = parseInputNumber(inputs.roomHeight, 2.5);
+  const coats = Math.max(1, parseInt(inputs.coats ?? '2', 10) || 1);
+  const coveragePerLiter = parseInputNumber(inputs.coveragePerLiter, 7.0); // 7 m² pro Liter
   const deductOpenings = inputs.deductOpenings !== 'no' && inputs.deductOpenings !== false;
-  const openingDeductionSqm = deductOpenings ? (parseFloat(inputs.openingDeductionSqm) || 5.0) : 0;
+  const openingDeductionSqm = deductOpenings ? Math.max(0, parseInputNumber(inputs.openingDeductionSqm, 5.0)) : 0;
   const includeCeiling = inputs.includeCeiling === 'yes' || inputs.includeCeiling === true;
-  const wastePercent = parseFloat(inputs.wasteReservePercent || '10'); // 0%, 5%, 10%, 15%
+  const wastePercent = Math.max(0, parseInputNumber(inputs.wasteReservePercent, 10)); // 0%, 5%, 10%, 15%
 
   if (length <= 0 || width <= 0 || height <= 0 || coveragePerLiter <= 0) {
     return {
-      primary: { id: 'liters', label: 'Farbe', value: 0, formattedValue: '0 Liter' },
+      primary: { id: 'paintLiters', label: 'Benötigte Wandfarbe', value: 0, formattedValue: '0,0 Liter', highlight: true },
       error: 'Bitte positive Raummaße und Deckkraft angeben.',
     };
   }
@@ -53,14 +59,14 @@ export function calculatePaintAmount(inputs: Record<string, any>): CalculationRe
 }
 
 export function calculateFlooring(inputs: Record<string, any>): CalculationResult {
-  const length = parseFloat(inputs.length) || 5;
-  const width = parseFloat(inputs.width) || 4;
-  const wastePercent = parseFloat(inputs.wastePercent) || 10; // 5-10% Verschnitt
-  const packSizeSqm = parseFloat(inputs.packSizeSqm) || 2.22; // m² pro Laminatpaket
+  const length = parseInputNumber(inputs.length, 5);
+  const width = parseInputNumber(inputs.width, 4);
+  const wastePercent = Math.max(0, parseInputNumber(inputs.wastePercent, 10)); // 0% is valid
+  const packSizeSqm = parseInputNumber(inputs.packSizeSqm, 2.22); // m² pro Laminatpaket
 
   if (length <= 0 || width <= 0) {
     return {
-      primary: { id: 'totalSqm', label: 'Bodenfläche', value: 0, formattedValue: '0 m²' },
+      primary: { id: 'totalSqm', label: 'Bodenbelag inkl. Verschnitt', value: 0, formattedValue: '0,00 m²', highlight: true },
       error: 'Raumlänge und -breite müssen größer als null sein.',
     };
   }
@@ -89,14 +95,14 @@ export function calculateFlooring(inputs: Record<string, any>): CalculationResul
 }
 
 export function calculateConcreteVolume(inputs: Record<string, any>): CalculationResult {
-  const lengthM = parseFloat(inputs.lengthM) || 4;
-  const widthM = parseFloat(inputs.widthM) || 3;
-  const depthCm = parseFloat(inputs.depthCm) || 15; // Dicke in Zentimeter
-  const bagWeightKg = parseFloat(inputs.bagWeightKg) || 25; // 25kg Sack Fertigbeton
+  const lengthM = parseInputNumber(inputs.lengthM, 4);
+  const widthM = parseInputNumber(inputs.widthM, 3);
+  const depthCm = parseInputNumber(inputs.depthCm, 15); // Dicke in Zentimeter
+  const bagWeightKg = parseInputNumber(inputs.bagWeightKg, 25); // 25kg Sack Fertigbeton
 
   if (lengthM <= 0 || widthM <= 0 || depthCm <= 0) {
     return {
-      primary: { id: 'volume', label: 'Betonvolumen', value: 0, formattedValue: '0 m³' },
+      primary: { id: 'volume', label: 'Benötigtes Betonvolumen', value: 0, formattedValue: '0,00 m³ (0 Liter)', highlight: true },
       error: 'Bitte positive Maße eingeben.',
     };
   }
@@ -106,7 +112,7 @@ export function calculateConcreteVolume(inputs: Record<string, any>): Calculatio
 
   // Richtwert für Trockenfertigbeton: ca. 2.000 kg bis 2.200 kg pro m³ fertiger Beton (Durchschnitt 2.100 kg)
   const totalWeightKg = volumeM3 * 2100;
-  const bags = Math.ceil(totalWeightKg / bagWeightKg);
+  const bags = bagWeightKg > 0 ? Math.ceil(totalWeightKg / bagWeightKg) : 0;
 
   return {
     primary: {

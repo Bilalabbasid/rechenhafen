@@ -204,7 +204,20 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const tMm = Number(inputs.thickness) || 0;
+      if (inputs.thickness === undefined || inputs.thickness === null || String(inputs.thickness).trim() === '') {
+        return {
+          primary: { id: 'uWert', label: 'Erreichter U-Wert der Dämmung', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Dämmstoffdicke in mm an.',
+        };
+      }
+      const rawTMm = Number(inputs.thickness);
+      if (isNaN(rawTMm) || rawTMm <= 0) {
+        return {
+          primary: { id: 'uWert', label: 'Erreichter U-Wert der Dämmung', value: 0, formattedValue: '-' },
+          error: 'Die Dämmstoffdicke muss größer als 0 mm sein.',
+        };
+      }
+      const tMm = rawTMm;
       const tM = tMm / 1000;
       const lambda = (Number(inputs.wlg) || 35) / 1000;
       // R_se + R_si ca. 0.17 (Wand), R_daemm = d / lambda
@@ -344,8 +357,21 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const l = Number(inputs.houseLength) || 0;
       const w = Number(inputs.houseWidth) || 0;
       const pitch = Number(inputs.roofPitchDeg) || 0;
-      const over = Number(inputs.overhang) || 0;
+      const over = Math.max(0, Number(inputs.overhang) || 0);
       const isSaddle = inputs.roofType === 'saddle';
+
+      if (l <= 0 || w <= 0 || pitch < 0 || pitch >= 89) {
+        return {
+          primary: { id: 'roofArea', label: 'Gesamte Dachfläche', value: 0, formattedValue: '0,00 m²', highlight: true },
+          secondary: [
+            { id: 'rafterLength', label: 'Länge der Dachsparren (Traufe bis First)', value: 0, formattedValue: '0,00 m' },
+            { id: 'tilesCount', label: 'Dachziegel-Bedarf ca. (12 Stk./m²)', value: 0, formattedValue: '0 Stück' },
+            { id: 'groundArea', label: 'Überdachte Grundfläche', value: 0, formattedValue: '0,00 m²' },
+          ],
+          summaryText: 'Bitte positive Hausmaße und eine Dachneigung unter 89° eingeben.',
+          error: 'Hauslänge und Hausbreite müssen größer als 0 sein und die Dachneigung muss unter 89° liegen.',
+        };
+      }
       
       const effectiveLength = l + (2 * over);
       const effectiveWidth = w + (2 * over);
@@ -452,7 +478,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
                 "min": 0,
                 "max": 50,
                 "step": 0.5,
-                "unit": "m²"
+                "unit": "m²",
+                "helpText": "Beispielwert. 0 m² eingeben, wenn die Wand keine Fenster oder Türen enthält."
           },
           {
                 "id": "stoneFormat",
@@ -492,7 +519,21 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     calculate: (inputs: Record<string, any>) => {
       const l = Number(inputs.wallLength) || 0;
       const h = Number(inputs.wallHeight) || 0;
-      const open = Number(inputs.openingsArea) || 0;
+      const rawOpen = inputs.openingsArea !== undefined && inputs.openingsArea !== null && String(inputs.openingsArea).trim() !== '' ? Number(inputs.openingsArea) : 3;
+      const open = isNaN(rawOpen) ? 3 : Math.max(0, rawOpen);
+
+      if (l <= 0 || h <= 0) {
+        return {
+          primary: { id: "stones", label: "Benötigte Mauersteine", value: 0, formattedValue: "0 Stück", highlight: true },
+          secondary: [
+            { id: "netArea", label: "Netto-Wandfläche", value: 0, formattedValue: "0,00 m²" },
+            { id: "mortar", label: "Mörtelbedarf ca.", value: 0, formattedValue: "0 kg (0 Säcke à 25 kg)" },
+          ],
+          summaryText: "Bitte geben Sie positive Wandmaße (Länge und Höhe) ein.",
+          error: "Wandlänge und Wandhöhe müssen größer als 0 sein.",
+        };
+      }
+
       const gross = l * h;
       const netArea = Math.max(0, gross - open);
       const waste = 1 + ((Number(inputs.waste) || 0) / 100);
@@ -2046,15 +2087,28 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     calculate: (inputs: Record<string, any>) => {
       const l = Number(inputs.roomLength) || 0;
       const w = Number(inputs.roomWidth) || 0;
+
+      if (l <= 0 || w <= 0) {
+        return {
+          primary: { id: 'packs', label: 'Benötigte Pakete Bodenbelag', value: 0, formattedValue: '0 Pakete (0,00 m²)', highlight: true },
+          secondary: [
+            { id: 'netArea', label: 'Reine Bodenfläche (Netto)', value: 0, formattedValue: '0,00 m²' },
+            { id: 'orderArea', label: 'Mindest-Bedarfsfläche inkl. Verschnitt', value: 0, formattedValue: '0,00 m²' },
+            { id: 'skirting', label: 'Sockelleisten (inkl. Gehrungsverschnitt)', value: 0, formattedValue: '0,0 lfd. Meter' },
+          ],
+          summaryText: 'Bitte positive Raummaße (Länge und Breite) eingeben.',
+          error: 'Raumlänge und Raumbreite müssen größer als 0 sein.',
+        };
+      }
+
       const netArea = l * w;
-      
       let wastePercent = 7;
       if (inputs.layingPattern === 'diagonal') wastePercent = 12;
       else if (inputs.layingPattern === 'herringbone') wastePercent = 15;
       
       const orderArea = netArea * (1 + wastePercent / 100);
       const packM2 = Number(inputs.packSizeM2) || 2.22;
-      const packs = Math.ceil(orderArea / packM2);
+      const packs = packM2 > 0 ? Math.ceil(orderArea / packM2) : 0;
       const actualBoughtArea = packs * packM2;
       
       // Sockelleisten: Umfang abzüglich ca. 0.9 m je Tür
@@ -2164,14 +2218,28 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
                 "min": 0,
                 "max": 15,
                 "step": 1,
-                "unit": "Bahnen"
+                "unit": "Bahnen",
+                "helpText": "Beispielwert. 0 eintragen, wenn keine Bahnen für Fenster oder Türen abgezogen werden sollen."
           }
     ],
     calculate: (inputs: Record<string, any>) => {
       const p = Number(inputs.perimeter) || 0;
       const h = Number(inputs.roomHeight) || 0;
       const rapport = (Number(inputs.patternRepeat) || 0) / 100;
-      const openBahnen = Number(inputs.openingsCount) || 0;
+      const openBahnen = inputs.openingsCount !== undefined && inputs.openingsCount !== null && String(inputs.openingsCount).trim() !== '' ? Math.max(0, Number(inputs.openingsCount)) : 3;
+
+      if (p <= 0 || h <= 0) {
+        return {
+          primary: { id: 'rolls', label: 'Benötigte Tapetenrollen (Euro-Rolle)', value: 0, formattedValue: '0 Rollen (10,05 × 0,53 m)', highlight: true },
+          secondary: [
+            { id: 'netBahnen', label: 'Anzahl zu klebender Bahnen', value: 0, formattedValue: '0 Bahnen' },
+            { id: 'bahnenPerRoll', label: 'Verwertbare Bahnen pro Rolle', value: 0, formattedValue: '0 Bahnen/Rolle' },
+            { id: 'pasteBoxes', label: 'Tapetenkleister (Pakete)', value: 0, formattedValue: '0 Packung(en)' },
+          ],
+          summaryText: 'Bitte geben Sie einen positiven Raumumfang und eine positive Deckenhöhe ein.',
+          error: 'Raumumfang und Deckenhöhe müssen größer als 0 sein.',
+        };
+      }
       
       // Standard Euro-Rolle: 10,05 m lang, 0,53 m breit
       const rollLength = 10.05;
@@ -2184,7 +2252,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       // Schnitthöhe je Bahn (Deckenhöhe + 10 cm Puffer + Rapport)
       const cutLength = h + 0.10 + rapport;
       // Bahnen pro Rolle:
-      const bahnenPerRoll = Math.floor(rollLength / cutLength) || 1;
+      const bahnenPerRoll = Math.max(1, Math.floor(rollLength / cutLength) || 1);
       const rolls = Math.ceil(netBahnen / bahnenPerRoll);
       
       return {
@@ -2297,7 +2365,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const qty = Number(inputs.amount) || 0;
+      const rawQty = inputs.amount !== undefined && inputs.amount !== null && String(inputs.amount).trim() !== ''
+        ? Number(inputs.amount)
+        : 5;
+      const qty = !isNaN(rawQty) && rawQty >= 0 ? rawQty : 0;
       const unit = inputs.inputUnit;
       
       // Basis-Umrechnungsfaktoren auf Raummeter (RM):
@@ -2721,9 +2792,22 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const roof = Number(inputs.roofArea) || 0;
-      const rain = Number(inputs.annualRain) || 750;
-      const garden = Number(inputs.gardenArea) || 0;
+      if (inputs.roofArea === undefined || inputs.roofArea === null || String(inputs.roofArea).trim() === '') {
+        return {
+          primary: { id: 'tankSize', label: 'Empfohlenes Zisternenvolumen', value: 0, formattedValue: '0 Liter' },
+          error: 'Bitte geben Sie die Dachfläche an.',
+        };
+      }
+      const rawRoof = Number(inputs.roofArea);
+      if (isNaN(rawRoof) || rawRoof <= 0) {
+        return {
+          primary: { id: 'tankSize', label: 'Empfohlenes Zisternenvolumen', value: 0, formattedValue: '0 Liter' },
+          error: 'Die Dachfläche muss größer als 0 m² sein.',
+        };
+      }
+      const roof = rawRoof;
+      const rain = Math.max(0, Number(inputs.annualRain) || 750);
+      const garden = Math.max(0, Number(inputs.gardenArea) || 0);
       
       let runOff = 0.85;
       if (inputs.roofCovering === 'metal') runOff = 0.90;
@@ -2842,16 +2926,30 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const idealS = Number(inputs.idealStepHeight) || 17.5;
       const stepConst = Number(inputs.stepFormulaConstant) || 63;
       
+      if (h <= 0 || idealS <= 0) {
+        return {
+          primary: { id: 'stepsCount', label: 'Anzahl der Steigungen (Stufen)', value: 0, formattedValue: '0 Steigungen (0 Trittstufen)', highlight: true },
+          secondary: [
+            { id: 'stepHeight', label: 'Exakte Stufenhöhe (Steigung s)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'treadDepth', label: 'Stufenauftritt (Tiefe a)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'runLength', label: 'Treppen-Lauflänge Grundriss', value: 0, formattedValue: '0,00 m' },
+            { id: 'pitchAngle', label: 'Treppen-Neigungswinkel', value: 0, formattedValue: '0,0°' },
+          ],
+          summaryText: 'Bitte geben Sie eine positive Geschosshöhe ein.',
+          error: 'Geschosshöhe und ideale Stufenhöhe müssen größer als 0 cm sein.',
+        };
+      }
+
       // Stufenanzahl (Steigungen):
-      const stepsCount = Math.round(h / idealS);
+      const stepsCount = Math.max(1, Math.round(h / idealS));
       const actualStepHeight = h / stepsCount;
       // Schrittmaßregel: 2 * s + a = 63 cm => a = 63 - 2 * s
-      const actualTreadDepth = stepConst - (2 * actualStepHeight);
+      const actualTreadDepth = Math.max(0, stepConst - (2 * actualStepHeight));
       
       // Lauflänge (ohne obersten Austritt): (stepsCount - 1) * a
       const runLength = (stepsCount - 1) * actualTreadDepth;
       // Steigungswinkel: tan(alpha) = h / runLength
-      const angleRad = Math.atan(h / runLength);
+      const angleRad = runLength > 0 ? Math.atan(h / runLength) : Math.PI / 2;
       const angleDeg = (angleRad * 180) / Math.PI;
       
       const isComfortable = actualStepHeight >= 16 && actualStepHeight <= 18.5 && actualTreadDepth >= 26 && actualTreadDepth <= 30;
@@ -3398,17 +3496,36 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const dist = Number(inputs.distance) || 0;
-      const mode = inputs.calcMode;
+      if (inputs.distance === undefined || inputs.distance === null || String(inputs.distance).trim() === '') {
+        return {
+          primary: { id: 'heightDiff', label: 'Höhenunterschied (Gefällehöhe)', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die horizontale Strecke in Metern an.',
+        };
+      }
+      const rawDist = Number(inputs.distance);
+      if (isNaN(rawDist) || rawDist <= 0) {
+        return {
+          primary: { id: 'heightDiff', label: 'Höhenunterschied (Gefällehöhe)', value: 0, formattedValue: '-' },
+          error: 'Die horizontale Strecke muss größer als 0 m sein.',
+        };
+      }
+      const dist = rawDist;
+      const mode = inputs.calcMode || 'fromPercent';
       
-      let slopePct = Number(inputs.slopePercent) || 2;
-      let hCm = Number(inputs.heightDiffCm) || 20;
+      let slopePct = 0;
+      let hCm = 0;
       
       if (mode === 'fromPercent') {
-        // h = dist (m) * (slopePct / 100) in Metern -> in cm:
+        const rawSlope = inputs.slopePercent !== undefined && inputs.slopePercent !== null && String(inputs.slopePercent).trim() !== ''
+          ? Number(inputs.slopePercent)
+          : 2;
+        slopePct = !isNaN(rawSlope) && rawSlope >= 0 ? rawSlope : 0;
         hCm = dist * slopePct;
       } else {
-        // slopePct = (hCm / 100) / dist * 100 = hCm / dist
+        const rawH = inputs.heightDiffCm !== undefined && inputs.heightDiffCm !== null && String(inputs.heightDiffCm).trim() !== ''
+          ? Number(inputs.heightDiffCm)
+          : 20;
+        hCm = !isNaN(rawH) && rawH >= 0 ? rawH : 0;
         slopePct = hCm / dist;
       }
       
@@ -3524,13 +3641,39 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const fKn = Number(inputs.loadKn) || 0;
-      const l = Number(inputs.fundamentLength) || 0;
-      const w = Number(inputs.fundamentWidth) || 0;
+      if (inputs.fundamentLength === undefined || inputs.fundamentLength === null || String(inputs.fundamentLength).trim() === '') {
+        return {
+          primary: { id: 'sigma', label: 'Vorhandene Bodenpressung σ', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Fundamentlänge an.',
+        };
+      }
+      const l = Number(inputs.fundamentLength);
+      if (isNaN(l) || l <= 0) {
+        return {
+          primary: { id: 'sigma', label: 'Vorhandene Bodenpressung σ', value: 0, formattedValue: '-' },
+          error: 'Die Fundamentlänge muss größer als 0 m sein.',
+        };
+      }
+
+      if (inputs.fundamentWidth === undefined || inputs.fundamentWidth === null || String(inputs.fundamentWidth).trim() === '') {
+        return {
+          primary: { id: 'sigma', label: 'Vorhandene Bodenpressung σ', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie die Fundamentbreite an.',
+        };
+      }
+      const w = Number(inputs.fundamentWidth);
+      if (isNaN(w) || w <= 0) {
+        return {
+          primary: { id: 'sigma', label: 'Vorhandene Bodenpressung σ', value: 0, formattedValue: '-' },
+          error: 'Die Fundamentbreite muss größer als 0 m sein.',
+        };
+      }
+
+      const fKn = Math.max(0, Number(inputs.loadKn) || 0);
       const area = l * w;
       
       // Bodenpressung sigma = F / A
-      const sigma = area > 0 ? fKn / area : 0;
+      const sigma = fKn / area;
       
       let sigmaMax = 300;
       if (inputs.soilClass === 'mediumSand') sigmaMax = 200;
@@ -3654,6 +3797,19 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const hCm = Number(inputs.beamHeightCm) || 0;
       const eM = Number(inputs.beamSpacingM) || 0.65;
       const qM2 = Number(inputs.totalLoadKnM2) || 2.5;
+
+      if (lM <= 0 || bCm <= 0 || hCm <= 0) {
+        return {
+          primary: { id: 'deflection', label: 'Berechnete Durchbiegung f', value: 0, formattedValue: '0,0 mm', highlight: true },
+          secondary: [
+            { id: 'limit', label: 'Zulässiger Grenzwert (L / 300)', value: 0, formattedValue: '0,0 mm' },
+            { id: 'ratio', label: 'Verhältnis f / L', value: 0, formattedValue: '0,0 % des Limits' },
+            { id: 'iMoment', label: 'Flächenträgheitsmoment I', value: 0, formattedValue: '0 cm⁴' },
+          ],
+          summaryText: 'Bitte positive Werte für Spannweite, Balkenbreite und Balkenhöhe eingeben.',
+          error: 'Spannweite, Balkenbreite und Balkenhöhe müssen größer als 0 sein.',
+        };
+      }
       
       // Linienlast q in N/mm: q = qM2 (kN/m²) * eM (m) = kN/m = N/mm
       const qNmm = qM2 * eM;
@@ -3667,12 +3823,13 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const fMm = (iMoment > 0) ? ((5 * qNmm * Math.pow(lMm, 4)) / (384 * eModul * iMoment)) : 0;
       const limitMm = lMm / 300;
       const isCompliant = fMm <= limitMm;
+      const ratioPct = limitMm > 0 ? (fMm / limitMm) * 100 : 0;
       
       return {
         primary: { id: 'deflection', label: 'Berechnete Durchbiegung f', value: fMm, formattedValue: formatNumber(fMm, 1) + ' mm', highlight: true },
         secondary: [
           { id: 'limit', label: 'Zulässiger Grenzwert (L / 300)', value: limitMm, formattedValue: formatNumber(limitMm, 1) + ' mm (' + (isCompliant ? 'eingehalten' : 'zu stark!') + ')' },
-          { id: 'ratio', label: 'Verhältnis f / L', value: limitMm > 0 ? (fMm / limitMm) * 100 : 0, formattedValue: formatNumber((fMm / limitMm) * 100, 1) + ' % des Limits' },
+          { id: 'ratio', label: 'Verhältnis f / L', value: ratioPct, formattedValue: formatNumber(ratioPct, 1) + ' % des Limits' },
           { id: 'iMoment', label: 'Flächenträgheitsmoment I', value: iMoment / 10000, formattedValue: formatNumber(iMoment / 10000, 0) + ' cm⁴' },
         ],
         summaryText: 'Unter Last biegt sich der Balken um ' + formatNumber(fMm, 1) + ' mm durch. Grenzwert nach Eurocode 5 (L/300 = ' + formatNumber(limitMm, 1) + ' mm) ist ' + (isCompliant ? 'vollständig erfüllt.' : 'überschritten! Bitte Balkenhöhe vergrößern.'),
@@ -5113,16 +5270,30 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     calculate: (inputs: Record<string, any>) => {
       const a = Math.max(Number(inputs.axisA) || 0, Number(inputs.axisB) || 0);
       const b = Math.min(Number(inputs.axisA) || 0, Number(inputs.axisB) || 0);
+
+      if (a <= 0 || b <= 0) {
+        return {
+          primary: { id: 'area', label: 'Ellipsenfläche (A = π · a · b)', value: 0, formattedValue: '0,00 cm²', highlight: true },
+          secondary: [
+            { id: 'perimeter', label: 'Präziser Umfang (Ramanujan II)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'focalDist', label: 'Lineare Exzentrizität e (Brennpunkte)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'numExz', label: 'Numerische Exzentrizität ε', value: 0, formattedValue: '0,000' },
+          ],
+          summaryText: 'Bitte positive Halbachsen eingeben.',
+          error: 'Beide Halbachsen müssen größer als 0 sein.',
+        };
+      }
       
       // Fläche A = pi * a * b
       const area = Math.PI * a * b;
       
-      // Umfang nach Ramanujan I: U ≈ pi * [3(a + b) - sqrt((3a + b)(a + 3b))]
-      const hR = Math.pow(a - b, 2) / Math.pow(a + b, 2);
-      const uRamanujan = Math.PI * (a + b) * (1 + (3 * hR) / (10 + Math.sqrt(4 - 3 * hR)));
+      // Umfang nach Ramanujan II
+      const sumAb = a + b;
+      const hR = sumAb > 0 ? Math.pow(a - b, 2) / Math.pow(sumAb, 2) : 0;
+      const uRamanujan = Math.PI * sumAb * (1 + (3 * hR) / (10 + Math.sqrt(Math.max(0, 4 - 3 * hR))));
       
       // Lineare Exzentrizität (Brennpunktsabstand vom Zentrum): e = sqrt(a^2 - b^2)
-      const linExz = Math.sqrt(Math.pow(a, 2) - Math.pow(b, 2));
+      const linExz = Math.sqrt(Math.max(0, Math.pow(a, 2) - Math.pow(b, 2)));
       // Numerische Exzentrizität epsilon = e / a (0 = Kreis, 1 = Parabel)
       const numExz = a > 0 ? linExz / a : 0;
       
@@ -5413,6 +5584,32 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const mode = inputs.calcMode;
       const v1 = Number(inputs.val1) || 0;
       const v2 = Number(inputs.val2) || 0;
+
+      if (v1 <= 0 || v2 <= 0) {
+        return {
+          primary: { id: 'resultSide', label: mode === 'c' ? 'Hypotenuse c' : mode === 'a' ? 'Kathete a' : 'Kathete b', value: 0, formattedValue: '0,00 cm', highlight: true },
+          secondary: [
+            { id: 'area', label: 'Dreiecksfläche (A = 1/2 · a · b)', value: 0, formattedValue: '0,00 cm²' },
+            { id: 'perimeter', label: 'Umfang (U = a + b + c)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'heightC', label: 'Höhe auf Hypotenuse (h_c)', value: 0, formattedValue: '0,00 cm' },
+          ],
+          summaryText: 'Bitte positive Seitenlängen eingeben.',
+          error: 'Die Seitenlängen müssen größer als 0 sein.',
+        };
+      }
+
+      if ((mode === 'a' || mode === 'b') && v2 <= v1) {
+        return {
+          primary: { id: 'resultSide', label: mode === 'a' ? 'Kathete a' : 'Kathete b', value: 0, formattedValue: '0,00 cm', highlight: true },
+          secondary: [
+            { id: 'area', label: 'Dreiecksfläche (A = 1/2 · a · b)', value: 0, formattedValue: '0,00 cm²' },
+            { id: 'perimeter', label: 'Umfang (U = a + b + c)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'heightC', label: 'Höhe auf Hypotenuse (h_c)', value: 0, formattedValue: '0,00 cm' },
+          ],
+          summaryText: 'Die Hypotenuse c muss länger als die gegebene Kathete sein.',
+          error: 'Die Hypotenuse c muss größer als die Kathete sein.',
+        };
+      }
       
       let a = 0;
       let b = 0;
@@ -5525,17 +5722,33 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const a = Number(inputs.sideA) || 0;
       const b = Number(inputs.sideB) || 0;
       const gammaDeg = Number(inputs.angleGamma) || 0;
+
+      if (a <= 0 || b <= 0 || gammaDeg <= 0 || gammaDeg >= 180) {
+        return {
+          primary: { id: 'sideC', label: 'Dritte Seite c (Kosinussatz)', value: 0, formattedValue: '0,00 cm', highlight: true },
+          secondary: [
+            { id: 'angleAlpha', label: 'Winkel Alpha (α)', value: 0, formattedValue: '0,0°' },
+            { id: 'angleBeta', label: 'Winkel Beta (β)', value: 0, formattedValue: '0,0°' },
+            { id: 'area', label: 'Dreiecksfläche (A)', value: 0, formattedValue: '0,00 cm²' },
+            { id: 'perimeter', label: 'Umfang (U)', value: 0, formattedValue: '0,00 cm' },
+          ],
+          summaryText: 'Bitte geben Sie positive Seitenlängen und einen Winkel zwischen 0° und 180° ein.',
+          error: 'Die Seiten müssen größer als 0 sein und der Winkel muss zwischen 0° und 180° liegen.',
+        };
+      }
+
       const gammaRad = (gammaDeg * Math.PI) / 180;
       
       // Kosinussatz: c = sqrt(a^2 + b^2 - 2ab * cos(gamma))
-      const c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) - (2 * a * b * Math.cos(gammaRad)));
+      const c = Math.sqrt(Math.max(0, Math.pow(a, 2) + Math.pow(b, 2) - (2 * a * b * Math.cos(gammaRad))));
       
       // Winkel Alpha nach Kosinussatz: cos(alpha) = (b^2 + c^2 - a^2) / (2bc)
-      const cosAlpha = (Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / (2 * b * c);
+      const denom = 2 * b * c;
+      const cosAlpha = denom > 0 ? (Math.pow(b, 2) + Math.pow(c, 2) - Math.pow(a, 2)) / denom : 0;
       const alphaRad = Math.acos(Math.max(-1, Math.min(1, cosAlpha)));
       const alphaDeg = (alphaRad * 180) / Math.PI;
       
-      const betaDeg = 180 - gammaDeg - alphaDeg;
+      const betaDeg = Math.max(0, 180 - gammaDeg - alphaDeg);
       
       // Fläche A = 0.5 * a * b * sin(gamma)
       const area = 0.5 * a * b * Math.sin(gammaRad);
@@ -5967,6 +6180,20 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const a = Number(inputs.sideA) || 0;
       const b = Number(inputs.sideB) || 0;
       const c = Number(inputs.sideC) || 0;
+
+      if (a <= 0 || b <= 0 || c <= 0 || (a + b <= c) || (a + c <= b) || (b + c <= a)) {
+        return {
+          primary: { id: 'heights', label: 'Höhe auf Seite c (h_c)', value: 0, formattedValue: '0,00 cm', highlight: true },
+          secondary: [
+            { id: 'ha', label: 'Höhe auf Seite a (h_a)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'hb', label: 'Höhe auf Seite b (h_b)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'inradius', label: 'Inkreisradius (r = A/s)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'circumradius', label: 'Umkreisradius (R = abc/4A)', value: 0, formattedValue: '0,00 cm' },
+          ],
+          summaryText: 'Bitte drei Seitenlängen eingeben, die ein echtes Dreieck bilden.',
+          error: 'Die angegebenen Seitenlängen erfüllen nicht die Dreiecksungleichung.',
+        };
+      }
       
       // Halber Umfang s
       const s = (a + b + c) / 2;
@@ -5991,7 +6218,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { id: 'inradius', label: 'Inkreisradius (r = A/s)', value: inRadius, formattedValue: formatNumber(inRadius, 2) + ' cm' },
           { id: 'circumradius', label: 'Umkreisradius (R = abc/4A)', value: circumRadius, formattedValue: formatNumber(circumRadius, 2) + ' cm' },
         ],
-        summaryText: 'Für das Dreieck (6, 8, 10 cm) betragen die Höhen: h_a = ' + formatNumber(ha, 2) + ' cm, h_b = ' + formatNumber(hb, 2) + ' cm, h_c = ' + formatNumber(hc, 2) + ' cm (Inkreis r = ' + formatNumber(inRadius, 2) + ' cm).',
+        summaryText: 'Für das Dreieck (' + a + ', ' + b + ', ' + c + ' cm) betragen die Höhen: h_a = ' + formatNumber(ha, 2) + ' cm, h_b = ' + formatNumber(hb, 2) + ' cm, h_c = ' + formatNumber(hc, 2) + ' cm (Inkreis r = ' + formatNumber(inRadius, 2) + ' cm).',
       };
     },
     formula: "h_a = 2A / a; h_b = 2A / b; h_c = 2A / c; r_In = A / s; R_Um = abc / (4A)",

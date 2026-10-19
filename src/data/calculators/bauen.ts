@@ -43,7 +43,7 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
           { value: 'no', label: 'Nein, gesamte Wandfläche voll berechnen' },
         ],
       },
-      { id: 'openingDeductionSqm', label: 'Abzuziehende Fenster- & Türfläche', type: 'number', defaultValue: 5.0, min: 0, step: 0.5, unit: 'm²' },
+      { id: 'openingDeductionSqm', label: 'Abzuziehende Fenster- & Türfläche', type: 'number', defaultValue: 5.0, min: 0, step: 0.5, unit: 'm²', helpText: 'Beispielwert. 0 m² eingeben, falls keine Fenster oder Türen abgezogen werden sollen.' },
       { id: 'coats', label: 'Anzahl der Anstriche', type: 'number', defaultValue: 2, min: 1, max: 4, step: 1 },
       { id: 'coveragePerLiter', label: 'Ergiebigkeit der Farbe', type: 'number', defaultValue: 7.0, min: 4, max: 15, step: 0.5, unit: 'm²/Liter', helpText: 'Angabe auf dem Farbeimer, meist 6 bis 8 m²/l' },
       {

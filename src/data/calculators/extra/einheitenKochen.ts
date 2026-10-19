@@ -2439,7 +2439,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     calculate: (inputs: Record<string, any>) => {
       const fmt = inputs.dinFormat;
       const gM2 = Number(inputs.grammage) || 80;
-      const sheets = Number(inputs.sheetCount) || 1;
+      const sheets = inputs.sheetCount !== undefined && inputs.sheetCount !== null && String(inputs.sheetCount).trim() !== '' ? Math.max(0, Number(inputs.sheetCount)) : 1;
       
       let wMm = 210;
       let hMm = 297;

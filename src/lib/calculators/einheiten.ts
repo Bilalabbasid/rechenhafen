@@ -2,7 +2,8 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
 export function calculateLengthConversion(inputs: Record<string, any>): CalculationResult {
-  const value = parseFloat(inputs.value) || 1;
+  const rawVal = inputs.value !== undefined && inputs.value !== null && String(inputs.value).trim() !== '' ? parseFloat(inputs.value) : 1;
+  const value = isNaN(rawVal) ? 1 : rawVal;
   const fromUnit = inputs.fromUnit || 'm';
   const toUnit = inputs.toUnit || 'ft';
 
