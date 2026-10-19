@@ -193,10 +193,10 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       { id: 'c', label: 'Wert C', type: 'number', defaultValue: 1920 },
     ],
     calculate: (inputs) => {
-      const a = parseFloat(inputs.a) || 16;
-      const b = parseFloat(inputs.b) || 9;
-      const c = parseFloat(inputs.c) || 1920;
-      if (a === 0) return { primary: { id: 'd', label: 'Wert X', value: 0, formattedValue: '0' }, error: 'A darf nicht 0 sein.' };
+      const a = inputs.a !== undefined && inputs.a !== '' ? parseFloat(inputs.a) : 16;
+      const b = inputs.b !== undefined && inputs.b !== '' ? parseFloat(inputs.b) : 9;
+      const c = inputs.c !== undefined && inputs.c !== '' ? parseFloat(inputs.c) : 1920;
+      if (a === 0 || isNaN(a)) return { primary: { id: 'd', label: 'Wert X', value: 0, formattedValue: '0' }, error: 'A darf nicht 0 sein.' };
       const d = (b * c) / a;
       return {
         primary: { id: 'd', label: 'Berechneter Wert X (D)', value: d, formattedValue: formatNumber(d, 2), highlight: true },
@@ -256,10 +256,10 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       { id: 'den2', label: 'Nenner Bruch 2', type: 'number', defaultValue: 5, step: 1 },
     ],
     calculate: (inputs) => {
-      const n1 = parseInt(inputs.num1 || '3', 10);
-      const d1 = parseInt(inputs.den1 || '4', 10);
-      const n2 = parseInt(inputs.num2 || '2', 10);
-      const d2 = parseInt(inputs.den2 || '5', 10);
+      const n1 = parseInt(inputs.num1 !== undefined && inputs.num1 !== '' ? inputs.num1 : '3', 10);
+      const d1 = parseInt(inputs.den1 !== undefined && inputs.den1 !== '' ? inputs.den1 : '4', 10);
+      const n2 = parseInt(inputs.num2 !== undefined && inputs.num2 !== '' ? inputs.num2 : '2', 10);
+      const d2 = parseInt(inputs.den2 !== undefined && inputs.den2 !== '' ? inputs.den2 : '5', 10);
       const op = inputs.op || '+';
 
       if (d1 === 0 || d2 === 0) {
@@ -335,9 +335,9 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       { id: 'heightH', label: 'Höhe (h) in cm', type: 'number', defaultValue: 6, min: 0.1, step: 0.1, unit: 'cm' },
     ],
     calculate: (inputs) => {
-      const g = parseFloat(inputs.baseG) || 10;
-      const h = parseFloat(inputs.heightH) || 6;
-      if (g <= 0 || h <= 0) return { primary: { id: 'area', label: 'Fläche', value: 0, formattedValue: '0 cm²' }, error: 'Werte müssen positiv sein.' };
+      const g = inputs.baseG !== undefined && inputs.baseG !== '' ? parseFloat(inputs.baseG) : 10;
+      const h = inputs.heightH !== undefined && inputs.heightH !== '' ? parseFloat(inputs.heightH) : 6;
+      if (g <= 0 || h <= 0 || isNaN(g) || isNaN(h)) return { primary: { id: 'area', label: 'Fläche', value: 0, formattedValue: '0 cm²' }, error: 'Werte müssen positiv sein.' };
       const area = (g * h) / 2;
       return {
         primary: { id: 'area', label: 'Flächeninhalt (A)', value: area, formattedValue: `${formatNumber(area, 2)} cm²`, highlight: true },

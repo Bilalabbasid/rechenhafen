@@ -75,7 +75,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     for (const slug of BATCH_7_SLUGS) {
       const calc = getCalculatorBySlug(slug);
       expect(calc, `Calculator with slug ${slug} must be registered`).toBeDefined();
-      expect(calc!.title || calc!.name, `Calculator ${slug} must have a title or name`).toBeTruthy();
+      expect(calc!.name, `Calculator ${slug} must have a name`).toBeTruthy();
       expect(calc!.shortDescription || calc!.metaDescription, `Calculator ${slug} must have description`).toBeTruthy();
       expect(calc!.inputs.length, `Calculator ${slug} must define inputs`).toBeGreaterThan(0);
       expect(typeof calc!.calculate, `Calculator ${slug} must have a calculate function`).toBe('function');

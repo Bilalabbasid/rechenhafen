@@ -157,9 +157,9 @@ export function calculateBaseValue(inputs: Record<string, any>): CalculationResu
 }
 
 export function calculateRuleOfThree(inputs: Record<string, any>): CalculationResult {
-  const a1 = parseFloat(inputs.a1) || 1;
-  const b1 = parseFloat(inputs.b1) || 1;
-  const a2 = parseFloat(inputs.a2) || 1;
+  const a1 = inputs.a1 !== undefined && inputs.a1 !== '' ? parseFloat(inputs.a1) : 1;
+  const b1 = inputs.b1 !== undefined && inputs.b1 !== '' ? parseFloat(inputs.b1) : 1;
+  const a2 = inputs.a2 !== undefined && inputs.a2 !== '' ? parseFloat(inputs.a2) : 1;
   const isIndirect = inputs.type === 'indirect'; // antiproportional
 
   if (a1 === 0) {
@@ -291,8 +291,8 @@ export function calculatePythagoras(inputs: Record<string, any>): CalculationRes
 }
 
 export function calculateGcdLcm(inputs: Record<string, any>): CalculationResult {
-  const a = Math.abs(parseInt(inputs.num1 || '12', 10));
-  const b = Math.abs(parseInt(inputs.num2 || '18', 10));
+  const a = Math.abs(parseInt(inputs.num1 !== undefined && inputs.num1 !== '' ? inputs.num1 : '12', 10));
+  const b = Math.abs(parseInt(inputs.num2 !== undefined && inputs.num2 !== '' ? inputs.num2 : '18', 10));
 
   if (!Number.isFinite(a) || !Number.isFinite(b) || a === 0 || b === 0) {
     return {
@@ -323,8 +323,15 @@ export function calculateGcdLcm(inputs: Record<string, any>): CalculationResult 
 }
 
 export function calculateRoot(inputs: Record<string, any>): CalculationResult {
-  const radikand = parseFloat(inputs.value) || 0;
-  const degree = parseInt(inputs.degree || '2', 10);
+  const radikand = inputs.value !== undefined && inputs.value !== '' ? parseFloat(inputs.value) : 0;
+  const degree = parseInt(inputs.degree !== undefined && inputs.degree !== '' ? inputs.degree : '2', 10);
+
+  if (degree <= 0 || isNaN(degree)) {
+    return {
+      primary: { id: 'root', label: 'Wurzel', value: 0, formattedValue: 'Nicht definiert' },
+      error: 'Der Wurzelexponent muss eine positive ganze Zahl größer als 0 sein.',
+    };
+  }
 
   if (radikand < 0 && degree % 2 === 0) {
     return {

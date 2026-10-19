@@ -186,8 +186,8 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'valB', label: 'Zweiter Wert (B)', type: 'number', defaultValue: 100, step: 1 },
     ],
     calculate: (inputs) => {
-      const a = parseFloat(inputs.valA) || 0;
-      const b = parseFloat(inputs.valB) || 0;
+      const a = inputs.valA !== undefined && inputs.valA !== '' ? parseFloat(inputs.valA) : 80;
+      const b = inputs.valB !== undefined && inputs.valB !== '' ? parseFloat(inputs.valB) : 100;
       const diff = Math.abs(a - b);
       const avg = (a + b) / 2;
       if (avg === 0) return { primary: { id: 'diff', label: 'Unterschied', value: 0, formattedValue: '0 %' }, error: 'Beide Werte dürfen nicht gleichzeitig null sein.' };
@@ -238,9 +238,9 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'baseAmount', label: 'Optionaler Bezugswert (Basisbetrag)', type: 'number', defaultValue: 1000, step: 10, unit: '€' },
     ],
     calculate: (inputs) => {
-      const p1 = parseFloat(inputs.pct1) || 0;
-      const p2 = parseFloat(inputs.pct2) || 0;
-      const base = parseFloat(inputs.baseAmount) || 0;
+      const p1 = inputs.pct1 !== undefined && inputs.pct1 !== '' ? parseFloat(inputs.pct1) : 20;
+      const p2 = inputs.pct2 !== undefined && inputs.pct2 !== '' ? parseFloat(inputs.pct2) : 50;
+      const base = inputs.baseAmount !== undefined && inputs.baseAmount !== '' ? parseFloat(inputs.baseAmount) : 1000;
       const combinedPct = (p1 * p2) / 100;
       const amount = (combinedPct / 100) * base;
       return {
@@ -287,8 +287,8 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'baseVal', label: 'Grundwert', type: 'number', defaultValue: 10000, step: 100 },
     ],
     calculate: (inputs) => {
-      const p = parseFloat(inputs.promille) || 0;
-      const base = parseFloat(inputs.baseVal) || 0;
+      const p = inputs.promille !== undefined && inputs.promille !== '' ? parseFloat(inputs.promille) : 5;
+      const base = inputs.baseVal !== undefined && inputs.baseVal !== '' ? parseFloat(inputs.baseVal) : 10000;
       const part = (p / 1000) * base;
       const inPct = p / 10;
       return {
@@ -336,10 +336,10 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'a2', label: 'Neue Ausgangsgröße 2 (z. B. 8 Arbeiter)', type: 'number', defaultValue: 8, min: 0.1, step: 1 },
     ],
     calculate: (inputs) => {
-      const a1 = parseFloat(inputs.a1) || 1;
-      const b1 = parseFloat(inputs.b1) || 1;
-      const a2 = parseFloat(inputs.a2) || 1;
-      if (a2 <= 0) return { primary: { id: 'res', label: 'Ergebnis', value: 0, formattedValue: '0' }, error: 'Neue Größe muss größer als 0 sein.' };
+      const a1 = inputs.a1 !== undefined && inputs.a1 !== '' ? parseFloat(inputs.a1) : 4;
+      const b1 = inputs.b1 !== undefined && inputs.b1 !== '' ? parseFloat(inputs.b1) : 6;
+      const a2 = inputs.a2 !== undefined && inputs.a2 !== '' ? parseFloat(inputs.a2) : 8;
+      if (a2 <= 0 || isNaN(a2)) return { primary: { id: 'res', label: 'Ergebnis', value: 0, formattedValue: '0' }, error: 'Neue Größe muss größer als 0 sein.' };
       const product = a1 * b1;
       const b2 = product / a2;
       return {
@@ -545,9 +545,9 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'n', label: 'Wurzelexponent (n)', type: 'number', defaultValue: 4, min: 1, step: 1 },
     ],
     calculate: (inputs) => {
-      const x = parseFloat(inputs.radicand) || 0;
-      const n = parseFloat(inputs.n) || 1;
-      if (n === 0) return { primary: { id: 'res', label: 'Ergebnis', value: 0, formattedValue: '0' }, error: 'Der Wurzelexponent darf nicht 0 sein.' };
+      const x = inputs.radicand !== undefined && inputs.radicand !== '' ? parseFloat(inputs.radicand) : 16;
+      const n = inputs.n !== undefined && inputs.n !== '' ? parseFloat(inputs.n) : 4;
+      if (n === 0 || isNaN(n)) return { primary: { id: 'res', label: 'Ergebnis', value: 0, formattedValue: 'Nicht definiert' }, error: 'Der Wurzelexponent darf nicht 0 sein.' };
       if (x < 0 && n % 2 === 0) return { primary: { id: 'res', label: 'Ergebnis', value: 0, formattedValue: 'Nicht definiert' }, error: 'Aus negativen Zahlen kann keine gerade Wurzel gezogen werden.' };
       const res = Math.pow(x, 1 / n);
       return {
@@ -593,7 +593,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'numberVal', label: 'Zahl zur Umwandlung', type: 'number', defaultValue: 2500000, step: 1000 },
     ],
     calculate: (inputs) => {
-      const val = parseFloat(inputs.numberVal) || 0;
+      const val = inputs.numberVal !== undefined && inputs.numberVal !== '' ? parseFloat(inputs.numberVal) : 2500000;
       if (val === 0) return { primary: { id: 'sci', label: 'Notation', value: 0, formattedValue: '0 × 10⁰', highlight: true }, summaryText: 'Die Zahl Null ist 0 × 10⁰.' };
       const exp = Math.floor(Math.log10(Math.abs(val)));
       const mantissa = val / Math.pow(10, exp);
@@ -641,9 +641,9 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'divisor', label: 'Divisor / Modul (Zahl b)', type: 'number', defaultValue: 7, min: 1, step: 1 },
     ],
     calculate: (inputs) => {
-      const a = parseInt(inputs.dividend, 10) || 0;
-      const b = parseInt(inputs.divisor, 10) || 1;
-      if (b === 0) return { primary: { id: 'rem', label: 'Rest', value: 0, formattedValue: '0' }, error: 'Division durch Null ist nicht definiert.' };
+      const a = inputs.dividend !== undefined && inputs.dividend !== '' ? parseInt(inputs.dividend, 10) : 29;
+      const b = inputs.divisor !== undefined && inputs.divisor !== '' ? parseInt(inputs.divisor, 10) : 7;
+      if (b === 0 || isNaN(b)) return { primary: { id: 'rem', label: 'Rest', value: 0, formattedValue: 'Nicht definiert' }, error: 'Division durch Null ist nicht definiert.' };
       const rem = ((a % b) + b) % b;
       const q = Math.floor(a / b);
       return {
@@ -689,7 +689,8 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'num', label: 'Ganze Zahl', type: 'text', defaultValue: '9475' },
     ],
     calculate: (inputs) => {
-      const cleanStr = (inputs.num || '9475').toString().replace(/[^0-9]/g, '');
+      const rawNum = inputs.num !== undefined && inputs.num !== '' ? inputs.num : '9475';
+      const cleanStr = rawNum.toString().replace(/[^0-9]/g, '');
       if (!cleanStr) return { primary: { id: 'sum', label: 'Quersumme', value: 0, formattedValue: '0' }, error: 'Bitte Ziffern eingeben.' };
       let sum = 0;
       for (let i = 0; i < cleanStr.length; i++) sum += parseInt(cleanStr[i], 10);
@@ -743,8 +744,9 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'hexVal', label: 'Hexadezimalwert (z. B. FF oder 1A3)', type: 'text', defaultValue: 'FF' },
     ],
     calculate: (inputs) => {
-      const hexStr = (inputs.hexVal || 'FF').toString().trim().toUpperCase().replace(/^0X/, '');
-      if (!/^[0-9A-F]+$/.test(hexStr)) return { primary: { id: 'dec', label: 'Dezimalwert', value: 0, formattedValue: '0' }, error: 'Ungültige Hexadezimalzahl (0-9, A-F).' };
+      const rawHex = inputs.hexVal !== undefined && inputs.hexVal !== '' ? inputs.hexVal : 'FF';
+      const hexStr = rawHex.toString().trim().toUpperCase().replace(/^0X/, '');
+      if (!hexStr || !/^[0-9A-F]+$/.test(hexStr)) return { primary: { id: 'dec', label: 'Dezimalwert', value: 0, formattedValue: '0' }, error: 'Ungültige Hexadezimalzahl (0-9, A-F).' };
       const dec = parseInt(hexStr, 16);
       return {
         primary: { id: 'dec', label: 'Dezimalzahl (Basis 10)', value: dec, formattedValue: formatNumber(dec, 0), highlight: true },
@@ -789,7 +791,14 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { id: 'num', label: 'Ganze Zahl (1 - 100.000)', type: 'number', defaultValue: 60, min: 1, max: 100000, step: 1 },
     ],
     calculate: (inputs) => {
-      const n = Math.abs(parseInt(inputs.num, 10)) || 60;
+      const rawN = inputs.num !== undefined && inputs.num !== '' ? parseInt(inputs.num, 10) : 60;
+      if (isNaN(rawN) || rawN <= 0) {
+        return {
+          primary: { id: 'count', label: 'Anzahl der Teiler', value: 0, formattedValue: '0' },
+          error: 'Bitte eine positive ganze Zahl größer als 0 eingeben.',
+        };
+      }
+      const n = Math.abs(rawN);
       const divisors: number[] = [];
       for (let i = 1; i <= Math.sqrt(n); i++) {
         if (n % i === 0) {
