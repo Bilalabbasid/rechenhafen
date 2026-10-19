@@ -222,6 +222,7 @@ export default async function CalculatorPage({ params }: PageProps) {
       {/* Methodology, Assumptions & Verifiability */}
       <MethodologyBox
         category={calc.category}
+        slug={calc.slug}
         timeSensitiveMeta={calc.timeSensitiveMeta}
         trustMeta={calc.trustMeta}
         legalFootnotes={calc.legalFootnotes}

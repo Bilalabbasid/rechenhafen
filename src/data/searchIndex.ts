@@ -3246,7 +3246,7 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "oelheizung-verbrauch-rechner",
     "slug": "oelheizung-verbrauch-rechner",
-    "name": "Heizölverbrauch-Rechner (Liter nach Wohnfläche & Baujahr)",
+    "name": "Heizölverbrauch schätzen: Wohnfläche und Dämmzustand",
     "category": "haushalt-energie",
     "keywords": [
       "oelheizung-verbrauch-rechner",

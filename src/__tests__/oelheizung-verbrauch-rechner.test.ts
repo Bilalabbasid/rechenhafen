@@ -8,6 +8,7 @@ describe('Heizölverbrauch-Rechner (oelheizung-verbrauch-rechner)', () => {
   it('exists with correct slug and metadata', () => {
     expect(calc).toBeDefined();
     expect(calc.slug).toBe('oelheizung-verbrauch-rechner');
+    expect(calc.name).toBe('Heizölverbrauch schätzen: Wohnfläche und Dämmzustand');
     expect(calc.metaTitle).toBe('Heizölverbrauch berechnen: Liter & Kosten pro Jahr');
     expect(calc.h1).toBe('Heizölverbrauch berechnen: Liter & Kosten pro Jahr');
     expect(calc.metaDescription).toBe(
@@ -121,5 +122,22 @@ describe('Heizölverbrauch-Rechner (oelheizung-verbrauch-rechner)', () => {
       oilPricePerLiter: -0.8,
     });
     expect(resNegPrice.error).toBe('Der Heizölpreis darf nicht negativ sein.');
+  });
+
+  it('consistently distinguishes fuel energy (Heizwert Hi) from useful heat and avoids false exact promises', () => {
+    const res = calc.calculate({
+      livingArea: 140,
+      insulationStandard: 'standard',
+      oilPricePerLiter: 1.05,
+    });
+    const kwhItem = res.secondary?.find((s) => s.id === 'kwhEquivalent');
+    expect(kwhItem?.label).toContain('Heizwert Hi');
+
+    expect(calc.formulaExplanation).toContain('Brennstoff-Energiegehalt (Heizwert Hi)');
+    expect(calc.formulaExplanation).toContain('ohne Kesselwirkungsgrad');
+
+    const tankstandSection = calc.content?.sections?.find((s) => s.title.includes('Tankstände'));
+    expect(tankstandSection?.content).not.toContain('exakt ermitteln');
+    expect(tankstandSection?.content).toContain('präzisen Ablesung');
   });
 });

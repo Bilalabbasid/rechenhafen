@@ -2616,11 +2616,11 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     },
     author: {
       name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Ernährung & Küchenmaße',
+      role: 'Redaktion und Recherche',
     },
     reviewer: {
-      name: 'Qualitätsprüfung Küche',
-      role: 'Rezeptur & Backpraxis',
+      name: 'Redaktion RechenHafen',
+      role: 'Interne Qualitätssicherung & Plausibilitätsprüfung',
     },
     summary:
       'Im Rezept stehen 100 Gramm Zucker, auf der Packung Erythrit: Kann man einfach dieselbe Menge verwenden? Bei reinem Erythrit rechnen wir mit einer Süßkraft von rund 70 Prozent gegenüber Haushaltszucker. 100 Gramm Zucker entsprechen damit rechnerisch etwa 143 Gramm Erythrit. Warum die richtige Süße beim Backen allein jedoch nicht ausreicht und was bei Mischprodukten zu beachten ist, zeigt dieser Leitfaden.',
@@ -2635,7 +2635,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       slug: 'zucker-ersatz-rechner',
       title: 'Zuckerersatz-Rechner',
       ctaText: 'Zucker in Erythrit & Xylit umrechnen',
-      description: 'Rechnen Sie beliebige Zuckermengen für Ihr Rezept kostenlos in Erythrit oder Xylit um – mit einstellbarer Süßkraft und Kalorienvergleich.',
+      description: 'Rechnen Sie beliebige Zuckermengen für Ihr Rezept kostenlos in Erythrit oder Xylit um – mit transparenten Süßkraft-Annahmen und Kalorienvergleich.',
       badge: 'Direkt berechnen',
     },
     secondaryCalculators: [
@@ -2658,7 +2658,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         title: 'Erst auf die Packung schauen',
         paragraphs: [
           'Prüfen Sie vor der Zubereitung die Zutatenliste und die Dosierungsempfehlung des Herstellers. Reines Erythrit und Fertigmischungen aus Erythrit mit weiteren Süßungsmitteln (wie Stevia oder Mönchsfrucht) verhalten sich unterschiedlich.',
-          'Steht auf der Verpackung ausdrücklich der Hinweis „Zucker 1:1 ersetzen“, handelt es sich um ein Streusüße-Mischprodukt. Eine zusätzliche Umrechnung mit dem Faktor 0,70 wäre für dieses Produkt unpassend und würde den Kuchen übersüßen.',
+          'Steht auf der Verpackung der Hinweis „Zucker 1:1 ersetzen“, prüfen Sie vorab die Zutatenliste und die Herstellerangaben: Oft handelt es sich um Mischungen (z. B. mit Stevia) oder speziell verarbeitete Produkte. Wenden Sie in solchen Fällen nicht zusätzlich den Umrechnungsfaktor 0,70 für reines Erythrit an, sondern folgen Sie der spezifischen Dosierungsanleitung des Herstellers.',
         ],
       },
       {
@@ -2798,11 +2798,11 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     },
     author: {
       name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Haustechnik',
+      role: 'Redaktion und Recherche',
     },
     reviewer: {
-      name: 'Fachprüfung Heizung & Gebäude',
-      role: 'Gebäudeenergie & Abrechnungspraxis',
+      name: 'Redaktion RechenHafen',
+      role: 'Interne Qualitätssicherung & Datenabgleich',
     },
     summary:
       'Eine Heizöllieferung von 2.000 Litern bedeutet nicht automatisch, dass im selben Jahr 2.000 Liter verbraucht wurden. Entscheidend für den tatsächlichen Jahresverbrauch ist die Mengenbilanz aus Anfangsbestand, Lieferungen und Endbestand. Wie die Tankbilanz funktioniert, wie der Verbrauch pro Quadratmeter berechnet wird und wie Sie widersprüchliche Messergebnisse erkennen, erklärt dieser Ratgeber.',
@@ -2967,6 +2967,366 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       },
     ],
     relatedArticleSlugs: ['gaskosten-berechnen', 'gaszaehler-m3-in-kwh-umrechnen', 'erythrit-statt-zucker-backen'],
+  },
+  {
+    slug: 'splitt-2-5-gewicht-schuettdichte',
+    title: 'Splitt 2/5: Gewicht, Schüttdichte und m³ in Tonnen umrechnen',
+    metaTitle: 'Splitt 2/5 Gewicht pro m³ – Schüttdichte & Tonnen berechnen',
+    metaDescription: 'Wie viel wiegt 1 m³ Splitt 2/5? Formeln für m³ in Tonnen, Schüttdichte vs. Rohdichte, Praxisbeispiele für Terrassen und Big-Bag-Gewichte verständlich erklärt.',
+    h1: 'Splitt 2/5: Gewicht pro m³, Schüttdichte und Tonnen umrechnen',
+    category: 'bauen-renovieren',
+    categoryName: 'Bauen & Renovieren',
+    publishedAt: '2026-10-18',
+    updatedAt: '2026-10-18',
+    readingTimeMin: 6,
+    coverIllustration: {
+      src: '/images/ratgeber/splitt-2-5-volumen-gewicht-berechnung.svg',
+      alt: 'Infografik: Umrechnung von Fläche und Schütthöhe über Schüttdichte in Gewicht (Tonnen) für Splitt 2/5',
+      caption: 'Schüttgut-Rechenweg: Fläche (m²) × Einbauhöhe (m) = Volumen (m³); Volumen × Schüttdichte (ca. 1,50 t/m³) = Liefergewicht in Tonnen.',
+      width: 800,
+      height: 360,
+    },
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Redaktion und Recherche',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Interne Qualitätssicherung & Plausibilitätsprüfung',
+    },
+    summary:
+      'Beim Bau von Terrassen, Pflasterflächen und Gartenwegen ist Splitt der Körnung 2/5 mm das Standardmaterial für das Bettungsmaterial. Doch wie rechnet man Kubikmeter in Tonnen um, warum wiegt ein Big Bag nicht immer eine Tonne und welcher Unterschied besteht zwischen Festgesteinsdichte und Schüttdichte? Dieser Fachbeitrag liefert praxiserprobte Formeln, Richtwerte und Rechenbeispiele.',
+    keyTakeaways: [
+      '1 m³ loser Splitt 2/5 mm wiegt im Mittel ca. 1,50 Tonnen (1.500 kg); je nach Gestein (Basalt, Granit, Kalkstein) schwankt die Schüttdichte zwischen 1,45 und 1,55 t/m³.',
+      'Schüttdichte ist nicht Rohdichte: Festgestein hat eine Dichte von 2,6–2,8 t/m³, gebrochener Splitt besitzt jedoch 40–45 % Lufthohlräume (Haufwerksporen).',
+      'Grundformel: Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³). 2 m³ Splitt wiegen bei 1,50 t/m³ genau 3,0 Tonnen.',
+      'Umkehrformel: Volumen (m³) = Gewicht (t) ÷ Schüttdichte (t/m³). 3 Tonnen Splitt entsprechen 2,0 m³.',
+      'Reiner Splitt 2/5 ohne Feinanteile verdichtet sich im Pflasterbett kaum (0 bis 5 %); ein pauschaler 15-%-Zuschlag führt zu teuren Überbestellungen.',
+      'Big Bags werden teils nach Gewicht (1.000 kg), teils nach Volumen (1 m³ ≈ 1,5 t) befüllt – vor der Bestellung stets die Lieferdefinition prüfen.',
+    ],
+    primaryCalculator: {
+      slug: 'kies-splitt-rechner',
+      title: 'Kies- & Splitt-Rechner',
+      ctaText: 'Splitt 2/5 in Tonnen & m³ berechnen',
+      description: 'Berechnen Sie das genaue Materialgewicht und Schüttvolumen für Splitt 2/5, Kies, Schotter oder Sand direkt nach Fläche, m³ oder Tonnen.',
+      badge: 'Direkt berechnen',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'pflastersteine-rechner',
+        title: 'Pflastersteine-Rechner',
+        ctaText: 'Pflasterbedarf berechnen',
+        description: 'Ermittelt Steine und Fugenmaterial für Pflasterflächen.',
+      },
+      {
+        slug: 'estrich-rechner',
+        title: 'Estrich-Rechner',
+        ctaText: 'Estrich & Sand berechnen',
+        description: 'Berechnet Bindemittel und Zuschlagstoffe für Bodenaufbauten.',
+      },
+    ],
+    sections: [
+      {
+        id: 'bedeutung-koernung-2-5',
+        title: 'Was bedeutet die Körnung 2/5 mm bei Edelsplitt?',
+        paragraphs: [
+          'Die Angabe 2/5 bezeichnet die Sieblinie nach DIN EN 13043 bzw. DIN EN 13242: Die kleinsten Gesteinskörner haben einen Durchmesser von 2 Millimetern, die größten von 5 Millimetern. Es handelt sich um eine sogenannte „enge Gesteinskörnung“ ohne Nullanteil (ohne feinen Steinmehl- oder Sandanteil).',
+          'Weil Feinanteile fehlen, verkeilen sich die scharfkantigen Gesteinssplitter im Pflasterbett optimal ineinander. Gleichzeitig bleibt die Schicht wasserdurchlässig (dränfähig), sodass Niederschlagswasser rasch in den darunterliegenden Schotterunterbau abfließen kann.',
+        ],
+      },
+      {
+        id: 'schuettdichte-vs-rohdichte',
+        title: 'Schüttdichte versus Rohdichte: Der häufigste Rechenfehler',
+        illustration: {
+          src: '/images/ratgeber/splitt-2-5-volumen-gewicht-berechnung.svg',
+          alt: 'Infografik: Umrechnung von Fläche und Schütthöhe über Schüttdichte in Gewicht (Tonnen) für Splitt 2/5',
+          caption: 'Schüttdichte vs. Rohdichte: Das lose Schüttgewicht berücksichtigt die 40–45 % Lufthohlräume zwischen den Gesteinskörnern.',
+          width: 800,
+          height: 360,
+        },
+        paragraphs: [
+          'Ein häufiger Fehler bei Baustoffberechnungen ist das Ansetzen der Festgesteinsdichte (Rohdichte). Granit, Basalt oder Quarzit weisen im massiven Felsblock eine Dichte von 2,60 bis 2,85 t/m³ auf. Würde man mit diesem Wert rechnen, würde man für 1 m³ Splitt fast 2,7 Tonnen Material annehmen.',
+          'Wird das Gestein im Steinbruch jedoch zu Splitt gebrochen und lose aufgeschüttet, entstehen zwischen den unregelmäßigen Bruchkanten Lufthohlräume (Haufwerksporen). Bei Splitt 2/5 machen diese Hohlräume rund **40 bis 45 Prozent des Gesamtvolumens** aus.',
+          'Das tatsächliche Gewicht pro Kubikmeter Schüttgut – die sogenannte **Schüttdichte (lose)** – liegt bei trockenem bis erdfeuchtem Splitt 2/5 mm daher im Bereich von **1,45 bis 1,55 t/m³**. Als bewährter Mittelwert im GaLaBau gilt 1,50 t/m³.',
+        ],
+      },
+      {
+        id: 'umrechnungsformeln-und-beispiele',
+        title: 'Formeln: m³ in Tonnen und Tonnen in m³ umrechnen',
+        paragraphs: [
+          'Für die Materialbedarfsrechnung gelten zwei einfache Grundformeln:',
+          '1. **Volumen in Gewicht (Tonnen):**\n`Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³)`\nBeispiel: 2 m³ Splitt 2/5 bei angenommener Schüttdichte von 1,50 t/m³ ergeben: `2 m³ × 1,50 t/m³ = 3,0 Tonnen`.',
+          '2. **Gewicht in Volumen (Kubikmeter):**\n`Volumen (m³) = Gewicht (t) ÷ Schüttdichte (t/m³)`\nBeispiel: Sie erhalten ein Lieferangebot über 3,0 Tonnen Splitt 2/5. Bei 1,50 t/m³ ergibt dies: `3,0 t ÷ 1,50 t/m³ = 2,0 m³` Schüttvolumen.',
+        ],
+      },
+      {
+        id: 'flaeche-und-einbaudicke',
+        title: 'Praxisrechnung: Von der Terrassenfläche zur Tonnenbestellung',
+        paragraphs: [
+          'Für ein Splittbett unter Terrassenplatten oder Pflastersteinen schreibt die DIN 18318 eine gleichmäßige Einbauschichtdicke von **3 bis 5 cm** (im Mittel 4 cm bzw. 0,04 m) vor.',
+          'Rechenweg für eine 30 m² große Terrasse mit 5 cm (0,05 m) Schütthöhe:\n- **Reines Einbauvolumen:** `30 m² × 0,05 m = 1,50 m³`\n- **Liefergewicht (bei 1,50 t/m³):** `1,50 m³ × 1,50 t/m³ = 2,25 Tonnen`\n- **Bestellmenge:** Da Baustoffhändler Splitt meist in vollen Tonnen oder Big Bags liefern, bestellen Sie in der Praxis 2,5 Tonnen oder 3 Big Bags à 1 t.',
+        ],
+      },
+      {
+        id: 'big-bags-und-lieferung',
+        title: 'Warum ein Big Bag nicht automatisch eine Tonne wiegt',
+        paragraphs: [
+          'Privatkunden bestellen Splitt häufig in Big Bags (FIBC). Hier ist Vorsicht bei der Preis- und Mengenprüfung geboten:',
+          '- Manche Baustoffhändler und Baumärkte füllen Big Bags nach **Volumen** ab (z. B. 1-m³-Big-Bag). Ein solcher Big Bag mit Splitt 2/5 wiegt rund 1,5 Tonnen.',
+          '- Andere Händler wiegen Big Bags exakt auf **1.000 kg (1 Tonne)** ab. Ein 1-Tonnen-Bag enthält somit nur ca. 0,67 m³ Splitt.',
+          '- Kleinere Gebinde enthalten oft 500 kg oder 750 kg. Prüfen Sie im Angebotstext daher immer, ob der Preis pro Tonne oder pro Big Bag ausgewiesen ist.',
+        ],
+      },
+      {
+        id: 'verdichtung-und-zuschlag',
+        title: 'Verdichtungszuschlag: Warum Splitt 2/5 keinen 15-%-Aufschlag braucht',
+        paragraphs: [
+          'In vielen Ratgebern wird pauschal ein Setzungs- oder Rüttelzuschlag von 10 bis 15 Prozent empfohlen. Diese Faustregel gilt jedoch für **Mineralbeton und Schottertragschichten (z. B. 0/32 mm)**, die durch ihren Feinanteil beim Einrütteln stark zusammensacken.',
+          'Reiner Edelsplitt 2/5 besitzt als Einkornmaterial keinen Feinanteil, der Hohlräume füllen könnte. Er wird im Pflasterbett lose abgezogen. Beim anschließenden Einrütteln der verlegten Pflastersteine setzt sich das Splittbett in der Regel nur um **0 bis höchstens 5 Prozent**. Ein überhöhter Zuschlag von 15 Prozent führt dazu, dass nach Fertigstellung mehrere hundert Kilogramm ungenutzter Splitt im Garten lagern.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Vollständiges Rechenbeispiel: 30 m² Terrassenbettung mit Splitt 2/5',
+      scenario: 'Ein Heimwerker plant eine 30 m² große Terrasse mit Betonplatten. Als Bettung soll Edelsplitt 2/5 in 5 cm Dicke eingebaut werden (Schüttdichte ca. 1,50 t/m³, ohne Setzungsaufschlag).',
+      formula: 'Volumen (m³) = Fläche (m²) × Schütthöhe (m); Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³)',
+      steps: [
+        {
+          label: '1. Einbauvolumen berechnen',
+          calculation: '30 m² × 0,05 m = 1,50 m³',
+          note: 'Schütthöhe 5 cm = 0,05 Meter.',
+        },
+        {
+          label: '2. Liefergewicht in Tonnen ermitteln',
+          calculation: '1,50 m³ × 1,50 t/m³ = 2,25 Tonnen',
+          note: 'Mittlere Schüttdichte für Edelsplitt 2/5.',
+        },
+        {
+          label: '3. Lieferform und Gebinde wählen',
+          calculation: '2,25 t ÷ 1,0 t/Big Bag ≈ 2,25 -> 3 Big Bags à 1 t',
+          note: 'Bei loser Schüttgutlieferung per LKW: 2,5 Tonnen bestellen.',
+        },
+      ],
+      resultSummary: 'Bedarf: 1,50 m³ Einbauvolumen bzw. 2,25 Tonnen Splitt 2/5 (ca. 3 Big Bags à 1 t).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Rechnen mit der Rohdichte des Festgesteins (2,7 t/m³) statt der Schüttdichte (1,5 t/m³).',
+        correction: 'Verwenden Sie für Schüttgüter stets die Schüttdichte, da 40–45 % des Volumens aus Lufthohlräumen bestehen.',
+      },
+      {
+        mistake: 'Pauschaler 15-%-Verdichtungsaufschlag für Splitt 2/5 wie bei Tragschotter 0/32.',
+        correction: 'Einkorn-Splitt 2/5 verdichtet sich kaum (nur 0 bis 5 %); bestellen Sie nur minimale Reserven für Unebenheiten.',
+      },
+      {
+        mistake: 'Verwechslung von 1-m³-Big-Bags mit 1-Tonnen-Big-Bags beim Preisvergleich.',
+        correction: '1 m³ Splitt wiegt 1,5 Tonnen – ein 1-m³-Big-Bag enthält 50 % mehr Material als ein 1-Tonnen-Bag.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel wiegt 1 m³ Splitt 2/5?',
+        answer: 'Ein Kubikmeter loser Splitt 2/5 wiegt im Mittel ca. 1,50 Tonnen (1.500 kg). Je nach Gesteinsart schwankt der Wert: Kalksteinsplitt wiegt ca. 1,45 bis 1,50 t/m³, Basaltsplitt ca. 1,55 bis 1,60 t/m³.',
+      },
+      {
+        question: 'Wie rechnet man 2 m³ Splitt in Tonnen um?',
+        answer: 'Multiplizieren Sie das Volumen mit 1,50: 2 m³ × 1,50 t/m³ = 3,0 Tonnen (3.000 kg).',
+      },
+      {
+        question: 'Wie viel m³ sind 3 Tonnen Splitt 2/5?',
+        answer: 'Teilen Sie das Gewicht durch 1,50: 3,0 t ÷ 1,50 t/m³ = 2,0 m³ Schüttvolumen.',
+      },
+      {
+        question: 'Warum verwendet man für Terrassenplatten Splitt 2/5 statt Sand?',
+        answer: 'Splitt 2/5 ist frostbeständig und dränfähig; Ameisen tragen ihn im Gegensatz zu Sand nicht heraus und Wasser kann ungehindert versickern.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'DIN 18318: Verkehrswegebauarbeiten – Pflasterdecken und Plattenbeläge',
+        citation: 'Vorgaben für Bettungsmaterialien, Schichtdicken (3–5 cm) und Sieblinien im Straßen- und Wegebau',
+      },
+      {
+        title: 'DIN EN 13043 / DIN EN 13242',
+        citation: 'Europäische Normen für Gesteinskörnungen für Asphalt, ungebundene und hydraulisch gebundene Baustoffe',
+      },
+    ],
+    relatedArticleSlugs: ['heizoelverbrauch-aus-tankstand-berechnen', 'gaskosten-berechnen', 'gaszaehler-m3-in-kwh-umrechnen'],
+  },
+  {
+    slug: 'lebensmonate-berechnen',
+    title: 'Lebensmonate berechnen: Vollendete Monate und laufender Lebensmonat',
+    metaTitle: 'Lebensmonate berechnen: Vollendete Monate & laufender Monat',
+    metaDescription: 'Was unterscheidet vollendete Lebensmonate vom laufenden Lebensmonat? Kalendergenaue Berechnung, Monatsende-Regel nach BGB und Praxisbeispiele erklärt.',
+    h1: 'Lebensmonate berechnen: Vollendete Monate und laufender Lebensmonat',
+    category: 'datum-zeit',
+    categoryName: 'Datum & Zeit',
+    publishedAt: '2026-10-18',
+    updatedAt: '2026-10-18',
+    readingTimeMin: 6,
+    coverIllustration: {
+      src: '/images/ratgeber/lebensmonate-zeitstrahl-berechnung.svg',
+      alt: 'Zeitstrahl: Vollendete Lebensmonate im Vergleich zum aktuell laufenden Lebensmonat nach BGB-Kalenderfristen',
+      caption: 'Lebensmonate-Zeitstrahl: Ein Kind vollendet jeden Monat am Geburtstagstag einen Lebensmonat; ab diesem Tag beginnt der nächste laufende Lebensmonat.',
+      width: 800,
+      height: 360,
+    },
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Redaktion und Recherche',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Interne Qualitätssicherung & Plausibilitätsprüfung',
+    },
+    summary:
+      'Ob bei U-Untersuchungen beim Kinderarzt, bei der Beikosteinführung oder beim Elterngeld: Ständig ist von „Lebensmonaten“ die Rede. Doch was bedeutet „im 6. Lebensmonat“ – ist das Baby dann 5 oder 6 Monate alt? Und warum unterscheidet sich ein Kalendermonat deutlich von 4 Wochen? Dieser Leitfaden erklärt die Zählweise nach Kalenderrecht und Bürgerlichem Gesetzbuch (BGB) mit anschaulichen Beispielen.',
+    keyTakeaways: [
+      'Vollendete Lebensmonate beschreiben das abgeschlossene Alter: Ein am 15. Januar geborenes Kind hat am 15. März genau 2 vollendete Lebensmonate erreicht.',
+      'Laufender Lebensmonat beschreibt den aktuellen Zählmonat: Mit Erreichen des 2. vollendeten Monats am 15. März beginnt sofort der 3. Lebensmonat.',
+      '4 Wochen sind kein Kalendermonat: 4 Wochen haben genau 28 Tage; ein durchschnittlicher Kalendermonat hat 30,44 Tage. 12 Wochen entsprechen nicht 3 Monaten, sondern erst knapp 2,8 Monaten.',
+      'Monatsende-Regel nach § 188 Abs. 3 BGB: Wurde jemand am 31. Januar geboren, endet der Lebensmonat im Februar am letzten Tag des Monats (28. oder im Schaltjahr 29. Februar).',
+      'Keine Division durch 30: Da Monate zwischen 28 und 31 Tagen schwanken, muss die Zählung von Stichtag zu Stichtag kalendarisch erfolgen.',
+    ],
+    primaryCalculator: {
+      slug: 'alter-in-monaten',
+      title: 'Alter-in-Monaten-Rechner',
+      ctaText: 'Lebensmonate jetzt berechnen',
+      description: 'Ermittelt vollendete Lebensmonate, verbleibende Resttage und den laufenden Lebensmonat zwischen Geburtsdatum und Stichtag kalendergenau.',
+      badge: 'Direkt berechnen',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'altersrechner',
+        title: 'Altersrechner',
+        ctaText: 'Exaktes Alter berechnen',
+        description: 'Berechnet das Lebensalter in Jahren, Monaten, Wochen und Tagen.',
+      },
+      {
+        slug: 'geburtstermin-rechner',
+        title: 'Geburtstermin-Rechner',
+        ctaText: 'Schwangerschaftswochen berechnen',
+        description: 'Ermittelt SSW, Entwicklungsschritte und voraussichtlichen Entbindungstermin.',
+      },
+    ],
+    sections: [
+      {
+        id: 'vollendet-vs-laufend',
+        title: 'Vollendete Monate versus laufender Lebensmonat: Das Grundprinzip',
+        illustration: {
+          src: '/images/ratgeber/lebensmonate-zeitstrahl-berechnung.svg',
+          alt: 'Zeitstrahl: Vollendete Lebensmonate im Vergleich zum aktuell laufenden Lebensmonat nach BGB-Kalenderfristen',
+          caption: 'Unterscheidung: Vollendetes Alter (abgeschlossene Monate) vs. aktuell laufender Zählmonat.',
+          width: 800,
+          height: 360,
+        },
+        paragraphs: [
+          'In der Pädiatrie, in Elternratgebern und auf Gläschennahrung begegnet jungen Eltern ständig der Begriff des Lebensmonats. Der entscheidende Unterschied liegt zwischen zwei Zählweisen:',
+          '- **Vollendete Lebensmonate:** Das ist das tatsächlich abgeschlossene Lebensalter – analog zum Geburtstag bei Jahren. Ein Kind, das am 15. Januar geboren wurde, hat am 15. Februar genau 1 Monat vollendet und am 15. März genau 2 Monate vollendet.',
+          '- **Laufender Lebensmonat:** Das ist der Zeitraum, der gerade durchlebt wird. Direkt nach der Geburt befindet sich das Neugeborene im 1. Lebensmonat (vom Geburtstag bis zum Vortag des 1-Monats-Tages). Vollendet das Kind am 15. März seinen 2. Monat, tritt es ab diesem Tag in seinen **3. Lebensmonat** ein.',
+          'Steht auf Babynahrung der Hinweis „ab dem 5. Monat“, bedeutet dies in der Regel: Sobald der 4. Lebensmonat vollendet ist und das Kind den 5. Lebensmonat beginnt (nach Vollendung von 16 bis 17 Lebenswochen).',
+        ],
+      },
+      {
+        id: 'beispiele-stichtage',
+        title: 'Vor, am und nach dem Monatstag: Beispiele aus der Praxis',
+        paragraphs: [
+          'Nehmen wir ein Kind mit Geburtsdatum **15. Januar** und betrachten drei verschiedene Stichtage im März:',
+          '1. **Stichtag 14. März (am Vortag des Monatstages):**\nDas Kind hat den 2. Monat noch nicht vollendet. Es ist **1 vollendeter Monat und 27 Tage** alt. Es befindet sich noch im **2. Lebensmonat**.',
+          '2. **Stichtag 15. März (genau am Monatstag):**\nDas Kind vollendet seinen 2. Monat. Es ist exakt **2 vollendete Monate und 0 Tage** alt. An diesem Tag beginnt der **3. Lebensmonat**.',
+          '3. **Stichtag 16. März (einen Tag nach dem Monatstag):**\nDas Kind ist **2 vollendete Monate und 1 Tag** alt. Es befindet sich mitten im **3. Lebensmonat**.',
+        ],
+      },
+      {
+        id: 'wochen-vs-monate',
+        title: 'Warum 4 Wochen kein Kalendermonat sind',
+        paragraphs: [
+          'Ein weit verbreiteter Irrtum ist die Annahme, dass 4 Wochen einem Monat entsprechen. 4 Wochen haben exakt 28 Tage (4 × 7 Tage). Nur der Februar in einem Gemeinjahr hat 28 Tage.',
+          'Alle anderen Kalendermonate haben 30 oder 31 Tage. Ein durchschnittlicher Kalendermonat im gregorianischen Kalender hat `365 Tage ÷ 12 Monate ≈ 30,44 Tage`.',
+          'Das führt zu spürbaren Unterschieden:\n- Ein Kind mit **12 Lebenswochen** hat erst `12 × 7 = 84 Tage` gelebt.\n- **3 Kalendermonate** (z. B. Januar bis April) umfassen jedoch 90 bis 92 Tage.\n- Ein Baby mit 12 Wochen ist somit noch keine 3 Monate alt, sondern erst rund 2 Monate und 3 Wochen.',
+        ],
+      },
+      {
+        id: 'monatsende-regelung-bgb',
+        title: 'Was gilt bei Geburt am 29., 30. oder 31. eines Monats?',
+        paragraphs: [
+          'Schwieriger wird die Zählung, wenn das Geburtsdatum auf einen Tag fällt, den der Folgemonat gar nicht besitzt. Typisches Beispiel: Ein Kind wird am **31. Januar** geboren. Der Februar hat aber nur 28 (bzw. 29) Tage.',
+          'Im deutschen Zivilrecht ist dieser Fall in **§ 188 Abs. 3 BGB** geregelt: Fehlt bei einer nach Monaten bestimmten Frist im letzten Monat der für den Ablauf maßgebende Tag, so endet die Frist mit dem Ablauf des **letzten Tages dieses Monats**.',
+          'Daraus folgt für Lebensmonate:\n- Bei Geburt am 31. Januar ist der 1. Lebensmonat am **28. Februar** (im Schaltjahr am 29. Februar) vollendet.\n- Am 1. März ist das Kind 1 vollendeten Monat und 1 Tag alt und befindet sich im 2. Lebensmonat.\n- Bei Geburt am 31. März vollendet sich der Monat am **30. April**.',
+        ],
+      },
+      {
+        id: 'elterngeld-und-u-untersuchungen',
+        title: 'Bedeutung für Elterngeld und Vorsorgeuntersuchungen',
+        paragraphs: [
+          'Die Unterscheidung nach echten Lebensmonaten ist in Deutschland gesetzlich verankert:',
+          '- **Elterngeld nach BEEG:** Elterngeld wird nicht nach Kalendermonaten (z. B. April, Mai), sondern nach **Lebensmonaten des Kindes** gezahlt (§ 4 Abs. 1 BEEG). Wird das Kind am 12. Juli geboren, läuft der erste Elterngeldmonat vom 12. Juli bis zum 11. August.',
+          '- **U-Untersuchungen (U1 bis U9):** Auch die Vorsorgefristen beim Kinderarzt basieren auf Lebensmonaten (z. B. U4 im 3. bis 4. Lebensmonat, also im Alter von 3 bis 4 Monaten). Prüfen Sie für verbindliche Fristen stets das gelbe Kinderuntersuchungsheft.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Ausführliches Beispiel: Lebensmonate für ein Baby (Geburt: 15. Januar)',
+      scenario: 'Ein Baby wurde am 15. Januar geboren. Die Eltern möchten am 25. März wissen, wie viele Monate das Kind alt ist und in welchem Lebensmonat es sich befindet.',
+      formula: 'Vollendete Monate = Anzahl vollständiger Monatssprünge (15. Jan -> 15. Feb -> 15. März); Resttage = Tage vom 15. März bis 25. März; Laufender Monat = Vollendete Monate + 1',
+      steps: [
+        {
+          label: '1. Vollendete Monate ermitteln',
+          calculation: '15. Jan bis 15. März = 2 volle Monatssprünge',
+          note: 'Am 15. Februar: 1. Monat vollendet; am 15. März: 2. Monat vollendet.',
+        },
+        {
+          label: '2. Resttage nach dem letzten Monatstag zählen',
+          calculation: '25. März - 15. März = 10 Tage',
+          note: 'Verbleibende Tage im laufenden Kalendermonat.',
+        },
+        {
+          label: '3. Laufenden Lebensmonat bestimmen',
+          calculation: '2 vollendete Monate + 1 = 3. Lebensmonat',
+          note: 'Mit dem 15. März hat der 3. Lebensmonat begonnen.',
+        },
+      ],
+      resultSummary: 'Alter am 25. März: 2 vollendete Monate und 10 Tage (Kind befindet sich im 3. Lebensmonat).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Pauschales Teilen der Lebenstage durch 30.',
+        correction: 'Kalendermonate haben 28 bis 31 Tage; zählen Sie stets von Monatstag zu Monatstag, um Datumsverschiebungen zu vermeiden.',
+      },
+      {
+        mistake: 'Gleichsetzung von 4 Lebenswochen mit einem Lebensmonat.',
+        correction: '4 Wochen = 28 Tage; 1 Kalendermonat = ca. 30,44 Tage. Nach 12 Wochen ist ein Baby noch keine 3 Monate alt.',
+      },
+      {
+        mistake: 'Verwechslung von „im 6. Monat“ mit „6 Monate alt“.',
+        correction: 'Wer sich im 6. Lebensmonat befindet, hat erst 5 Monate vollendet (Alter: 5 Monate und x Tage).',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was bedeutet „im 6. Lebensmonat“?',
+        answer: 'Es bedeutet, dass das Kind 5 Monate vollendet hat und nun den 6. Lebensmonat durchlebt (Alter: 5 Monate und x Tage). Erst wenn der 6. Monat vollendet ist, ist das Kind „6 Monate alt“.',
+      },
+      {
+        question: 'Wann endet ein Lebensmonat bei Geburt am 31. eines Monats?',
+        answer: 'Hat der Folgemonat keinen 31. Tag (wie Februar, April, Juni, September, November), endet der Lebensmonat am letzten Tag dieses Monats (z. B. am 28. Februar bzw. 30. April nach § 188 Abs. 3 BGB).',
+      },
+      {
+        question: 'Werden Elterngeldmonate nach Kalendermonaten oder Lebensmonaten berechnet?',
+        answer: 'Elterngeld wird in Deutschland nach den Lebensmonaten des Kindes berechnet. Wurde das Kind am 10. Mai geboren, geht der erste Lebensmonat vom 10. Mai bis zum 9. Juni.',
+      },
+    ],
+    officialSources: [
+      {
+        title: '§ 187, § 188 BGB: Fristbeginn und Fristende bei Monatsfristen',
+        citation: 'Gesetzliche Bestimmungen des Bürgerlichen Gesetzbuches zur kalendarischen Fristberechnung',
+      },
+      {
+        title: '§ 4 BEEG: Bundeselterngeld- und Elternzeitgesetz',
+        citation: 'Gesetzliche Regelung zur Auszahlung des Elterngeldes nach Lebensmonaten des Kindes',
+      },
+    ],
+    relatedArticleSlugs: ['werktage-arbeitstage-unterschied', 'erythrit-statt-zucker-backen', 'heizoelverbrauch-aus-tankstand-berechnen'],
   },
 ];
 

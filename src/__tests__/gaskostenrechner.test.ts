@@ -17,7 +17,7 @@ describe('Gaskostenrechner (calculateGasCost)', () => {
 
     const monthlyPayment = result.secondary?.find((s) => s.id === 'monthlyPayment');
     expect(monthlyPayment?.value).toBe(0);
-    expect(monthlyPayment?.helpText).toContain('Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.');
+    expect(monthlyPayment?.helpText).toBe('Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.');
 
     const workCost = result.secondary?.find((s) => s.id === 'workCost');
     expect(workCost?.value).toBe(0);
@@ -45,10 +45,11 @@ describe('Gaskostenrechner (calculateGasCost)', () => {
     const monthly = result.secondary?.find((s) => s.id === 'monthlyPayment');
     expect(monthly?.value).toBeCloseTo(1614 / 12, 2); // 134.50 €
     expect(monthly?.label).toBe('Rechnerischer Monatsdurchschnitt (Orientierungswert)');
-    expect(monthly?.helpText).toBe('Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.');
+    expect(monthly?.helpText).toBe('Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.');
 
-    expect(result.primary.helpText).not.toContain('Jahreskosten ÷ 12');
-    expect(result.qualifications?.[0]).toContain('Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen');
+    expect(result.primary.helpText).toBe('Verbrauchskosten plus Grundpreis für ein Jahr.');
+    expect(result.qualifications?.[0]).toContain('Berechnung basiert auf den eingegebenen Bruttopreisen');
+    expect(result.qualifications?.[1]).toContain('Der rechnerische Monatsdurchschnitt (Jahreskosten ÷ 12) dient als Orientierungswert');
   });
 
   it('tests 1 m³ gas cost: 10.8 * 0.95 = 10.26 kWh; 10.26 * 0.11 = 1.1286 -> 1.13 €', () => {

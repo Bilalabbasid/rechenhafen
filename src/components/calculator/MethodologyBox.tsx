@@ -13,12 +13,16 @@ interface Props {
   };
   trustMeta?: TrustMetadata;
   legalFootnotes?: LegalFootnote[];
+  slug?: string;
 }
 
-export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta, legalFootnotes }: Props) {
+export default function MethodologyBox({ category, slug, timeSensitiveMeta, trustMeta, legalFootnotes }: Props) {
   const isHealth = category === 'gesundheit-fitness';
   const isLegalOrTax = ['arbeit-gehalt', 'recht-steuern', 'finanzen', 'kredit-schulden'].includes(category);
-  const isEnvironmental = ['haushalt-energie', 'energie-umwelt', 'haus-garten'].includes(category);
+  // Only show electricity emission boilerplate if electricity or carbon calculation is actually performed on this page
+  const isElectricityEmissionCalc = slug
+    ? ['stromkostenrechner', 'stromkosten-geraete-rechner', 'balkonkraftwerk-ertrag-rechner', 'led-ersparnis-rechner', 'co2-rechner', 'co2-ausstoss-auto-rechner'].includes(slug)
+    : false;
   const isFinance = ['finanzen', 'kredit-schulden'].includes(category);
   const hasFootnotes = Boolean(legalFootnotes && legalFootnotes.length > 0);
 
@@ -137,7 +141,7 @@ export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta,
         </div>
       )}
 
-      {isEnvironmental && (
+      {isElectricityEmissionCalc && (
         <div style={{
           display: 'flex',
           gap: '10px',
@@ -151,7 +155,7 @@ export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta,
         }}>
           <Leaf size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
-            <strong>Emissions- & Energiedaten:</strong> Berechnungen zu CO₂-Einsparungen und Energieverbräuchen orientieren sich an den offiziellen Kennzahlen des Umweltbundesamtes (UBA, z. B. bundesweiter Strommix ca. 380 g CO₂/kWh) und bundesweiten Branchendurchschnitten des BDEW.
+            <strong>Emissions- & Energiedaten:</strong> Berechnungen zu CO₂-Einsparungen und Energieverbräuchen orientieren sich an den offiziellen Kennzahlen des Umweltbundesamtes (UBA, z. B. bundesweiter Strommix ca. 380 g CO₂/kWh).
           </div>
         </div>
       )}
@@ -198,7 +202,14 @@ export default function MethodologyBox({ category, timeSensitiveMeta, trustMeta,
 
       {timeSensitiveMeta && (
         <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 'var(--space-2) 0' }}>
-          <strong>Amtliche Datenquelle:</strong>{' '}
+          <strong>
+            {timeSensitiveMeta.source.includes('BGB') ||
+            timeSensitiveMeta.source.includes('EStG') ||
+            timeSensitiveMeta.source.includes('Bundesministerium') ||
+            timeSensitiveMeta.source.includes('Statistisches Bundesamt')
+              ? 'Amtliche Datenquelle:'
+              : 'Verifizierte Referenzquelle:'}
+          </strong>{' '}
           {timeSensitiveMeta.sourceUrl ? (
             <a href={timeSensitiveMeta.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
               {timeSensitiveMeta.source} <ExternalLink size={12} style={{ display: 'inline', verticalAlign: 'middle' }} />

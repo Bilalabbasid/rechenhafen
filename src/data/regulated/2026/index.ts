@@ -100,8 +100,8 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     description: 'Durchschnittlicher Haushaltsgaspreis in Deutschland',
     year: 2026,
     effectiveFrom: '2026-01-01',
-    source: 'BDEW Bundesverband der Energie- und Wasserwirtschaft',
-    sourceUrl: 'https://www.bdew.de',
+    source: 'BDEW Bundesverband der Energie- und Wasserwirtschaft (BDEW-Gaspreisanalyse)',
+    sourceUrl: 'https://www.bdew.de/service/daten-und-grafiken/bdew-gaspreisanalyse/',
     lastVerified: '2026-01-20',
   },
   co2_faktor_benzin: {

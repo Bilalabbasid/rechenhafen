@@ -6,7 +6,7 @@ import { CalculatorInput, CalculationResult } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
 import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
-import { formatDateDe } from '@/lib/formatters';
+import { formatDateDe, formatNumber } from '@/lib/formatters';
 import { getUpcomingEasterDateString, parseDateParts } from '@/lib/calculators/dateMath';
 import {
   trackCalculatorView,
@@ -904,22 +904,69 @@ export default function CalculatorRunner({
                     <span className={styles.basisSummaryTitle}>Ihre Eingaben</span>
                   </div>
                   <div className={styles.basisGrid}>
-                    {(result.basisSummary && result.basisSummary.length > 0
-                      ? result.basisSummary
-                      : inputDefs
-                          .filter((def) => !def.dependsOn || (inputs[def.dependsOn.field] === def.dependsOn.value))
-                          .map((def) => ({
-                            label: def.label,
-                            value: inputs[def.id] !== undefined && inputs[def.id] !== ''
-                              ? `${inputs[def.id]}${def.unit ? ' ' + def.unit : ''}`
-                              : '–',
-                          }))
-                    ).map((bItem: { label: string; value: string }, bIdx: number) => (
-                      <div key={bIdx} className={styles.basisItem}>
-                        <span className={styles.basisLabel}>{bItem.label}</span>
-                        <span className={styles.basisValue}>{bItem.value}</span>
-                      </div>
-                    ))}
+                    {(() => {
+                      const isFieldVisible = (def: CalculatorInput) => {
+                        if (slug === 'arbeitszeitrechner' && def.id === 'pauseMinutes') return false;
+                        if (slug === 'tage-zwischen-zwei-daten' && def.id === 'mode') return false;
+                        if (!def.dependsOn) return true;
+                        const currentVal = inputs[def.dependsOn.field];
+                        const targetVal = def.dependsOn.value;
+                        if (Array.isArray(targetVal)) {
+                          return targetVal.includes(currentVal);
+                        }
+                        return currentVal === targetVal;
+                      };
+
+                      const formatVal = (def: CalculatorInput, rawVal: any): string => {
+                        if (rawVal === undefined || rawVal === null || rawVal === '') {
+                          return '–';
+                        }
+                        if (def.type === 'select') {
+                          const matchedOption = def.options?.find((opt) => String(opt.value) === String(rawVal));
+                          return matchedOption ? matchedOption.label : String(rawVal);
+                        }
+                        if (def.type === 'boolean') {
+                          return rawVal ? 'Ja' : 'Nein';
+                        }
+                        if (def.type === 'date') {
+                          return formatDateDe(rawVal);
+                        }
+                        if (def.type === 'number') {
+                          const num = typeof rawVal === 'number' ? rawVal : parseFloat(String(rawVal).replace(',', '.'));
+                          if (!isNaN(num)) {
+                            return `${formatNumber(num)}${def.unit ? ' ' + def.unit : ''}`;
+                          }
+                          return `${rawVal}${def.unit ? ' ' + def.unit : ''}`;
+                        }
+                        return `${rawVal}${def.unit ? ' ' + def.unit : ''}`;
+                      };
+
+                      const items = result.basisSummary && result.basisSummary.length > 0
+                        ? result.basisSummary.map((bItem: { label: string; value: string }) => {
+                            for (const def of inputDefs) {
+                              if (def.type === 'select' && def.options) {
+                                const match = def.options.find((opt) => String(opt.value) === String(bItem.value));
+                                if (match) {
+                                  return { ...bItem, value: match.label };
+                                }
+                              }
+                            }
+                            return bItem;
+                          })
+                        : inputDefs
+                            .filter(isFieldVisible)
+                            .map((def) => ({
+                              label: def.label,
+                              value: formatVal(def, inputs[def.id]),
+                            }));
+
+                      return items.map((bItem: { label: string; value: string }, bIdx: number) => (
+                        <div key={bIdx} className={styles.basisItem}>
+                          <span className={styles.basisLabel}>{bItem.label}</span>
+                          <span className={styles.basisValue}>{bItem.value}</span>
+                        </div>
+                      ));
+                    })()}
                   </div>
 
                   {result.calculationSteps && result.calculationSteps.length > 0 && (

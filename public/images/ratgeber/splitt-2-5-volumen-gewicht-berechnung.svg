@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="primaryGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-2%" y="-4%" width="104%" height="112%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="360" rx="16" fill="url(#bgGrad)" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Title / Badge -->
+  <rect x="36" y="24" width="220" height="28" rx="6" fill="#e0f2fe"/>
+  <text x="48" y="43" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#0369a1" letter-spacing="0.5">SCHÜTTGUT-BERECHNUNG</text>
+  <text x="36" y="78" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="800" fill="#0f172a">Splitt 2/5: Von der Fläche zum Gewicht in Tonnen</text>
+
+  <!-- Step 1: Area & Depth -->
+  <g transform="translate(36, 105)">
+    <rect width="210" height="180" rx="12" fill="url(#cardGrad)" stroke="#cbd5e1" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect x="16" y="16" width="36" height="24" rx="4" fill="#dbeafe"/>
+    <text x="34" y="32" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#1d4ed8" text-anchor="middle">1</text>
+    <text x="60" y="33" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Einbauvolumen</text>
+
+    <!-- Formula Box -->
+    <rect x="16" y="52" width="178" height="42" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="26" y="72" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#64748b">Formel:</text>
+    <text x="26" y="86" font-family="system-ui, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Fläche (m²) × Höhe (m)</text>
+
+    <!-- Example -->
+    <text x="16" y="116" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#64748b">Praxisbeispiel:</text>
+    <text x="16" y="134" font-family="system-ui, sans-serif" font-size="13" font-weight="600" fill="#334155">30 m² Terrasse × 0,05 m</text>
+    <rect x="16" y="144" width="178" height="28" rx="6" fill="#eff6ff"/>
+    <text x="26" y="163" font-family="system-ui, sans-serif" font-size="14" font-weight="800" fill="#1d4ed8">= 1,50 m³ Volumen</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <g transform="translate(254, 185)">
+    <circle cx="16" cy="10" r="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <path d="M12 10 L19 10 M16 6 L20 10 L16 14" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Step 2: Bulk Density (Schüttdichte) -->
+  <g transform="translate(294, 105)">
+    <rect width="210" height="180" rx="12" fill="url(#cardGrad)" stroke="#cbd5e1" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect x="16" y="16" width="36" height="24" rx="4" fill="#fef3c7"/>
+    <text x="34" y="32" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#b45309" text-anchor="middle">2</text>
+    <text x="60" y="33" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Schüttdichte (lose)</text>
+
+    <!-- Density distinction -->
+    <rect x="16" y="52" width="178" height="42" rx="6" fill="#fffbeb" stroke="#fde68a"/>
+    <text x="26" y="70" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#92400e">Splitt 2/5 Richtwert:</text>
+    <text x="26" y="86" font-family="system-ui, sans-serif" font-size="13" font-weight="800" fill="#b45309">ca. 1,50 t/m³ (1.500 kg)</text>
+
+    <!-- Physics Note -->
+    <text x="16" y="116" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#64748b">Haufwerksporen beachten:</text>
+    <text x="16" y="132" font-family="system-ui, sans-serif" font-size="12" font-weight="500" fill="#475569">40–45 % Lufthohlräume</text>
+    <text x="16" y="148" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="#94a3b8">Rohdichte Gestein: 2,7 t/m³</text>
+    <text x="16" y="164" font-family="system-ui, sans-serif" font-size="12" font-weight="700" fill="#0f172a">Keine Rohdichte ansetzen!</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <g transform="translate(512, 185)">
+    <circle cx="16" cy="10" r="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <path d="M12 10 L19 10 M16 6 L20 10 L16 14" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Step 3: Material Weight in Tonnes -->
+  <g transform="translate(552, 105)">
+    <rect width="212" height="180" rx="12" fill="url(#cardGrad)" stroke="#a7f3d0" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <rect x="16" y="16" width="36" height="24" rx="4" fill="#d1fae5"/>
+    <text x="34" y="32" font-family="system-ui, sans-serif" font-size="12" font-weight="800" fill="#047857" text-anchor="middle">3</text>
+    <text x="60" y="33" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Liefergewicht (Tonnen)</text>
+
+    <!-- Formula Box -->
+    <rect x="16" y="52" width="180" height="42" rx="6" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="26" y="70" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#166534">Berechnung:</text>
+    <text x="26" y="86" font-family="system-ui, sans-serif" font-size="13" font-weight="800" fill="#047857">1,50 m³ × 1,50 t/m³</text>
+
+    <!-- Result Banner -->
+    <rect x="16" y="104" width="180" height="68" rx="8" fill="url(#accentGrad)"/>
+    <text x="26" y="126" font-family="system-ui, sans-serif" font-size="11" font-weight="700" fill="#ffffff" opacity="0.9">BESTELLMENGE:</text>
+    <text x="26" y="148" font-family="system-ui, sans-serif" font-size="20" font-weight="800" fill="#ffffff">2,25 Tonnen</text>
+    <text x="26" y="164" font-family="system-ui, sans-serif" font-size="11" font-weight="600" fill="#d1fae5">entspricht ca. 3 Big Bags (à 1 t)</text>
+  </g>
+
+  <!-- Bottom Info / Standards Footer -->
+  <text x="400" y="325" font-family="system-ui, sans-serif" font-size="12" font-weight="500" fill="#64748b" text-anchor="middle">
+    RechenHafen.de • DIN 18318 Pflasterdecken &amp; Schüttgüter • Dichte variiert nach Gestein (Basalt, Granit, Kalkstein)
+  </text>
+</svg>

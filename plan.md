@@ -169,3 +169,220 @@
   - TypeScript type check: `npx tsc --noEmit` -> 0 errors.
   - Production build: `npm run build` -> 467/467 static pages built cleanly.
 
+## 8. October 2026 Live Observations & Quality Audit Fixes
+
+### 8.1 Sugar-Substitute Consistency (`/rechner/zucker-ersatz-rechner/`)
+- **Evidence & Confirmed Mismatch:**
+  - Agavendicksaft option previously stated "ca. 125 % Süßkraft – ca. 75 g je 100 g Zucker", but entering 100 g sugar returned 75 g agave. Under an assumed relative sweetness of 1.25, the correct calculation is 100 / 1.25 = 80 g, not 75 g.
+  - Honig option previously stated "ca. 120 % Süßkraft – ca. 80 g je 100 g Zucker", but entering 100 g sugar returned 80 g honey. Under an assumed relative sweetness of 1.20, the correct calculation is 100 / 1.20 = 83 g, not 80 g.
+  - Calculation direction dropdown label was hardcoded to "Zucker durch Erythrit ersetzen", which was misleading when selecting agave, honey, birch sugar, or stevia.
+  - Liquid guidance previously offered a blanket "Keine Flüssigkeitsanpassung nötig" for Erythrit, which overpromised on recipe outcome.
+- **Exact Changes (`src/data/calculators/extra/einheitenKochen.ts`):**
+  - Unified all sugar substitutes under a documented relative sweetness model: g_sub = Math.round(g_sugar / S), with calorie calculation g_sub * kcalPerGram.
+  - Agavendicksaft: updated relative sweetness to 1.25, ratio to 0.80 (80 g per 100 g sugar), option label to "Agavendicksaft (ca. 125 % Süßkraft – ca. 80 g je 100 g Zucker)".
+  - Honig: updated relative sweetness to 1.20, ratio to 0.83 (83 g per 100 g sugar), option label to "Honig (ca. 120 % Süßkraft – ca. 83 g je 100 g Zucker)".
+  - Direction label updated to: "Zucker durch eine Alternative ersetzen (Zucker → Alternative)" (forward) and "Erythrit durch Zucker ersetzen (Erythrit → Zucker)" (reverse, explicitly restricted to Erythrit).
+  - Replaced blanket liquid recommendation for Erythrit/dry substitutes with: "Der Rechner berechnet keine Anpassung der Teigflüssigkeit. Beachten Sie die Hinweise Ihres Rezepts.". For liquid sweeteners (honey, agave, maple syrup), preserved explicit note: "Richtwert: Teigflüssigkeit um ca. X ml je 100 g Zucker reduzieren (rezeptabhängig)".
+  - Preserved working behaviors: 100 g sugar -> ~143 g Erythrit; 80 g Erythrit -> 56 g sugar equivalent; zero stays zero; empty input triggers validation error.
+
+### 8.2 Human-Readable Result Summaries in CalculatorRunner
+- **Evidence & Confirmed Mismatch:**
+  - Under "Ihre Eingaben" (basisGrid), raw select keys were rendered directly to visitors, e.g. sugar_to_sub, erythrit_to_sugar, erythrit, agave, and standard on the heating-oil calculator.
+  - Zero inputs could risk being formatted as empty dashes or omitted.
+  - Dependent fields (e.g. dependsOn arrays) could show inactive inputs in summary.
+- **Exact Changes (`src/components/calculator/CalculatorRunner.tsx`):**
+  - Updated basisGrid renderer to inspect inputDef.options for any select field and map raw values to their human-readable German option labels (preserving internal identifiers in code while showing clean German UI text).
+  - Formatted numerical values using formatNumber(val, { decimals: ... }) with German locale, explicitly preserving meaningful 0 as "0" instead of falling back to dashes.
+  - Added support for array dependsOn.value checks so inactive conditional inputs are cleanly hidden from the summary.
+
+### 8.3 Article Promises & Authorship Integrity (`/ratgeber/`)
+- **Evidence & Confirmed Mismatch:**
+  - CTA in `/ratgeber/erythrit-statt-zucker-backen/` promised "mit einstellbarer Süßkraft und Kalorienvergleich", but the calculator has fixed transparent sweetness assumptions rather than a custom sweetness slider/input.
+  - Article claimed that every product labelled "1:1" must be a mixture with other sweeteners.
+  - Editorial review tags claimed external review bodies: "Fachredaktion Ernährung & Gesundheit", "Qualitätsprüfung Küche", "Fachredaktion Energie & Haustechnik", and "Fachprüfung Heizung & Gebäude".
+- **Exact Changes (`src/data/ratgeber/articles.ts`):**
+  - Updated CTA text to accurately describe the existing tool: "Rechnen Sie beliebige Zuckermengen für Ihr Rezept kostenlos in Erythrit oder Xylit um – mit transparenten Süßkraft-Annahmen und Kalorienvergleich.".
+  - Revised 1:1 mixture paragraph: users are advised to verify the ingredient list and the specific manufacturer substitution instructions, avoiding blanket assertions.
+  - Replaced fabricated review credentials with transparent internal editorial attributions:
+    - Erythrit: Author: Redaktion RechenHafen (Redaktion und Recherche); Reviewer: Redaktion RechenHafen (Interne Qualitätssicherung & Plausibilitätsprüfung).
+    - Heizöl: Author: Redaktion RechenHafen (Redaktion und Recherche); Reviewer: Redaktion RechenHafen (Interne Qualitätssicherung & Datenabgleich).
+
+### 8.4 Heating-Oil Copy & Physics Alignment (`/rechner/oelheizung-verbrauch-rechner/`)
+- **Evidence & Confirmed Mismatch:**
+  - Calculator name/heading mentioned "Wohnfläche & Baujahr", but the actual inputs only use living area and an insulation condition model (insulationStandard).
+  - Prose promised that tank balances allow users to calculate annual consumption "exakt".
+  - Used "Brennwert" for the 10 kWh/litre assumption. In fuel physics, 10 kWh/l corresponds to the lower heating value (Heizwert Hi) of heating oil EL; the gross calorific value (Brennwert Hs) is approximately 10.6 kWh/l.
+- **Exact Changes (`src/data/calculators/extra/wohnenHaushalt.ts`, `GasClusterLinks.tsx`, `searchIndex.ts`, `seo-map.json`):**
+  - Aligned calculator name to: "Heizölverbrauch schätzen: Wohnfläche und Dämmzustand", while preserving the high-ranking target metaTitle and H1: "Heizölverbrauch berechnen: Liter & Kosten pro Jahr".
+  - Replaced "exakt ermitteln" with clear guidance that accuracy depends on precise tank readings and delivery records.
+  - Updated kwhEquivalent secondary result label to: "Rechnerischer Brennstoff-Energiegehalt (Heizwert Hi)" and clarified in formula explanation and methodology that 10 kWh/l is Hi, Hs is approx 10.6 kWh/l, and boiler conversion efficiency (Nutzungsgrad) is not modeled.
+  - Preserved distinction between model-based floor area estimate and actual consumption from tank readings.
+
+### 8.5 Gas Cost Result Labels, Pricing Scope & Methodology (`/rechner/gaskostenrechner/`)
+- **Evidence & Confirmed Mismatch:**
+  - Annual result card displayed "Der Wert ist Jahreskosten ÷ 12", which belongs to the monthly average result, not the annual total.
+  - "Was kostet Gas pro Monat?" and FAQ provided euro ranges by dwelling size without stating underlying price assumptions.
+  - Input label for pricePerKwh suggested "0 € bei mietvertraglicher Pauschale", which misleadingly implied gas is free under a warm rent package.
+  - BDEW homepage was broadly referenced as "Amtliche Datenquelle" instead of the specific BDEW Gaspreisanalyse.
+  - Methodology box included irrelevant German electricity mix emission factors on gas and oil calculator pages.
+- **Exact Changes (`src/lib/calculators/haushalt.ts`, `src/data/calculators/haushalt.ts`, `MethodologyBox.tsx`, `page.tsx`):**
+  - Attached correct explanations to results:
+    - Annual total: "Verbrauchskosten plus Grundpreis für ein Jahr."
+    - Monthly average: "Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen."
+  - Removed duplicate "Jahreskosten ÷ 12" statements from generic card footers.
+  - Converted dwelling size cost tables in article prose and FAQ into explicit worked examples with stated gross assumptions (0,11 €/kWh, 12 €/Monat Grundpreis) and disclaimed them as illustrative examples, not current market promises.
+  - Clarified that entered prices are gross prices and taxes/levies are already included, not added again.
+  - Replaced misleading 0 € flat rental instruction with scope guidance: "Für Mietverhältnisse mit pauschaler Warmmiete ohne eigene Gasrechnung ist dieser Rechner nicht ausgelegt.".
+  - Updated data source link to the exact BDEW publication: https://www.bdew.de/service/daten-und-grafiken/bdew-gaspreisanalyse/, accurately categorized as a verified reference source (Verifizierte Referenzquelle).
+  - Scoped electricity emissions methodology box in MethodologyBox.tsx so it only displays for calculators that actually compute electricity/CO2 metrics.
+
+### 8.6 Targeted SEO, Structured Data & Technical Investigation
+- **Title Preservation:**
+  - Strictly preserved target titles:
+    - Zucker in Erythrit umrechnen: Rechner & Tabelle
+    - Heizölverbrauch berechnen: Liter & Kosten pro Jahr
+    - Gaskostenrechner: m³ oder kWh in Euro berechnen
+- **Structured Data Audit (691 Product Impressions in GSC):**
+  - Inspected src/app/rechner/[slug]/page.tsx and shared JSON-LD schemas. Commit 264182f (Oct 5) already removed invalid Offer / Product structures and replaced them with isAccessibleForFree: true under WebApplication schema. No Product or fabricated review/rating markup exists in the current codebase. The GSC export reflects Google's historical indexation window prior to the schema cleanup.
+- **Gas Guide Investigation (`/ratgeber/gaszaehler-m3-in-kwh-umrechnen/`):**
+  - Reported impressions declined from 255 to 8 between the provided periods.
+  - Technical audit confirmed:
+    - HTTP status: 200 OK.
+    - Robots directive: index, follow.
+    - Canonical URL: https://rechenhafen.de/ratgeber/gaszaehler-m3-in-kwh-umrechnen/ (self-referencing).
+    - Sitemap inclusion: verified in sitemap.ts.
+    - Internal linking: strongly linked from /rechner/gaskostenrechner/, /rechner/gasverbrauch-kwh-m3-rechner/, /ratgeber/gaskosten-berechnen/, /rechner/heizkostenvergleich-rechner/, and /rechner/oelheizung-verbrauch-rechner/.
+    - Conclusion: The decline is not caused by technical de-indexing, canonical conflicts, or broken links. Any further causal diagnosis requires query-level Search Console performance data (SERP volatility, seasonal search volume shift, or ranking fluctuations).
+
+### 8.7 Quality Gates & Test Suite
+- **Unit Tests:** `npm test` -> 21 test files, 282 tests passing (100% pass).
+- **TypeScript Typecheck:** `npx tsc --noEmit` -> 0 errors.
+- **Linter:** `npm run lint` -> 0 errors / 0 warnings.
+- **Build:** `npm run build` -> 469/469 static pages built cleanly.
+
+## 9. Query-Led Content & Functionality Update (October 2026)
+
+### 9.1 Priority 1 — Correct Maut Accuracy & Scope (`/rechner/autobahn-maut-rechner-vignette/`)
+- **Evidence & Identified Issues:**
+  - Live page previously displayed outdated Austrian vignette prices (1-day: 8,60 €, 10-day: 11,50 €).
+  - Official ASFINAG 2026 car-vignette table lists 9,60 € (1-day) and 12,80 € (10-day).
+  - Page promised a European route planner including France, whereas the interface only offered preset route choices.
+- **Exact Changes (`src/data/calculators/extra/autoArbeit.ts`):**
+  - Updated Austrian car presets to official ASFINAG 2026 rates:
+    - 1-Tages-Vignette: 9,60 € (ASFINAG Tarif 2026, 00:00 bis 23:59 Uhr)
+    - 10-Tages-Vignette: 12,80 € (ASFINAG Tarif 2026, 10 Kalendertage)
+    - 10-Tages-Vignette + Brennermaut (A13) Hin- & Rückfahrt: 12,80 € + (2 × 12,00 €) = 36,80 €
+    - 10-Tages-Vignette + Tauernautobahn (A10) Hin- & Rückfahrt: 12,80 € + (2 × 14,50 €) = 41,80 €
+  - Switzerland: Swiss statutory fee of 40,00 CHF (BAZG) with transparent euro guidance (~42,00 €).
+  - Italy: A22 Brenner - Rovereto/Affi (Gardasee Süd) roundtrip: ~33,60 € route toll (Klasse A PKW).
+  - Separated secondary outputs into:
+    - `vignettePart`: Reine Vignettengebühr
+    - `routeTollPart`: Reine Strecken- / Sondermaut
+    - `validity`: Gültigkeitsdauer
+    - `operator`: Zuständiger Mautbetreiber (ASFINAG, BAZG, Autostrada del Brennero)
+  - Aligned titles and copy: removed all misleading mentions of France or European routing engine. Scope is explicitly defined as preset choices for Austria, Switzerland, and the Brenner corridor to Italy.
+  - Linked official sources and verified single source of truth in `timeSensitiveMeta` with lastVerified `2026-10-15`.
+  - Added test suite: `src/__tests__/maut-rechner.test.ts` (7 tests passing).
+
+### 9.2 Priority 2 — Upgraded Splitt Calculator (`/rechner/kies-splitt-rechner/`)
+- **Evidence & Identified Issues:**
+  - Only supported area × thickness inputs with no direct volume in m³ or weight in tonnes mode.
+  - "Material & Rohdichte" label confused solid rock density with bulk density (Schüttdichte).
+  - Fixed 10% allowance was blended into reported volume without separation.
+  - Blanket 10–15% compaction claim contradicted single-size grit physics (Splitt 2/5 has no fines and compacts 0–5%, while graded crushed gravel 0/32 compacts 10–20%).
+- **Exact Changes (`src/data/calculators/extra/bauenGeometrie.ts`):**
+  - Added 3 clearly separated modes:
+    1. `area_depth`: Fläche & Schütthöhe → Volumen (m³) & Gewicht (t)
+    2. `volume_to_weight`: Bekanntes Volumen (m³) → Gewicht (t)
+    3. `weight_to_volume`: Bekanntes Gewicht (t) → Volumen (m³)
+  - Added product-specific bulk density choices:
+    - Splitt 2/5 (1,50 t/m³)
+    - Rollkies 16/32 (1,60 t/m³)
+    - Schotter / Frostschutz 0/32 (1,80 t/m³)
+    - Sand 0/2 (1,60 t/m³)
+    - Rindenmulch (0,40 t/m³)
+    - Custom density input (`customDensity` in t/m³)
+  - In area mode: cleanly separated `baseVolume` (Reines Einbauvolumen), `allowanceVol` (Zuschlag), and `totalVolume` (Gesamtvolumen für Bestellung).
+  - Preserved valid zero allowance (0% allowance gives 0,00 m³ extra).
+  - Added test suite: `src/__tests__/kies-splitt-rechner.test.ts` (6 tests passing).
+
+### 9.3 Priority 2 — New Ratgeber Article: Splitt 2/5 (`/ratgeber/splitt-2-5-gewicht-schuettdichte/`)
+- **Publication Details (`src/data/ratgeber/articles.ts`):**
+  - Title: `Splitt 2/5: Gewicht, Schüttdichte und m³ in Tonnen umrechnen`
+  - Slug: `splitt-2-5-gewicht-schuettdichte`
+  - Category: `bauen-renovieren` (Bauen & Renovieren)
+  - Dates: `publishedAt: '2026-10-18'`, `updatedAt: '2026-10-18'`
+  - Authorship: Author: `Redaktion RechenHafen` (Redaktion und Recherche), Reviewer: `Redaktion RechenHafen` (Interne Qualitätssicherung & Plausibilitätsprüfung)
+  - Cover illustration: `/images/ratgeber/splitt-2-5-volumen-gewicht-berechnung.svg`
+  - Topics covered:
+    - Meaning of grain size 2/5 mm (DIN EN 13043 / DIN EN 13242)
+    - Schüttdichte vs. Rohdichte (40–45% air voids in loose material)
+    - Formulas: tonnes = m³ × Schüttdichte; m³ = tonnes ÷ Schüttdichte
+    - Worked examples (2 m³ × 1,5 t/m³ = 3 t; 3 t ÷ 1,5 t/m³ = 2 m³; 30 m² × 0,05 m = 1,5 m³ = 2,25 t)
+    - Why Big Bags are not universally 1 tonne (volume bags vs weight bags)
+    - Compaction realities: why Splitt 2/5 needs no 15% allowance
+  - Contextual bidirectional linking to `kies-splitt-rechner`.
+
+### 9.4 Priority 3 — Upgraded Lebensmonate Calculator (`/rechner/alter-in-monaten/`)
+- **Evidence & Scope:**
+  - Preserved canonical URL `/rechner/alter-in-monaten/`.
+  - Needed to distinguish completed months from the running month of life and handle date boundaries.
+- **Exact Changes (`src/data/calculators/datumZeit.ts`):**
+  - Primary result: `completedMonths` (Vollendete Lebensmonate, e.g. "2 Monate, 0 Tage").
+  - Secondary results:
+    - `runningMonth`: Laufender Lebensmonat (e.g. "3. Lebensmonat")
+    - `restDays`: Verbleibende Resttage
+    - `totalWeeks`: Alter in Wochen und Tagen
+    - `totalDays`: Gesamte Lebenstage
+  - Strict calendar anniversary logic without dividing by 30:
+    - Example 15 Jan to 15 March: exactly 2 completed months, 0 days, 3. Lebensmonat.
+    - Example 15 Jan to 14 March: 1 completed month, 27 days, 2. Lebensmonat.
+  - Month-end convention for 29th, 30th, 31st: Geburt 31. Jan vollendet sich am 28. Feb (bzw. 29. Feb im Schaltjahr) nach BGB § 188 Abs. 3 analog.
+  - Future dates rejected with clean validation error.
+  - German date formatting in summary text (`15.01.2026`).
+  - Removed irrelevant holiday-law boilerplate.
+  - Added test suite: `src/__tests__/alter-in-monaten.test.ts` (7 tests passing).
+
+### 9.5 Priority 3 — New Ratgeber Article: Lebensmonate (`/ratgeber/lebensmonate-berechnen/`)
+- **Publication Details (`src/data/ratgeber/articles.ts`):**
+  - Title: `Lebensmonate berechnen: Vollendete Monate und laufender Lebensmonat`
+  - Slug: `lebensmonate-berechnen`
+  - Category: `datum-zeit` (Datum & Zeit)
+  - Dates: `publishedAt: '2026-10-18'`, `updatedAt: '2026-10-18'`
+  - Authorship: Author: `Redaktion RechenHafen` (Redaktion und Recherche), Reviewer: `Redaktion RechenHafen` (Interne Qualitätssicherung & Plausibilitätsprüfung)
+  - Cover illustration: `/images/ratgeber/lebensmonate-zeitstrahl-berechnung.svg`
+  - Topics covered:
+    - Distinction between completed months and current month of life
+    - Worked examples: before, on, and after anniversary
+    - Why 4 weeks (28 days) are not a calendar month (30,44 days)
+    - Month-end rules under BGB § 188 Abs. 3
+    - Legal relevance for Elterngeld (BEEG § 4) and pediatric U-checkups
+  - Contextual bidirectional linking to `alter-in-monaten`.
+
+### 9.6 Priority 4 — Improved Existing Erythrit Content (`/rechner/zucker-ersatz-rechner/`)
+- **Exact Changes (`src/data/calculators/extra/einheitenKochen.ts`):**
+  - Added dedicated section and table for reverse conversion:
+    - 60 g Erythrit -> 42 g Zucker
+    - 80 g Erythrit -> 56 g Zucker
+    - 100 g Erythrit -> 70 g Zucker
+    - 120 g Erythrit -> 84 g Zucker
+    - 125 g Erythrit -> 87,5 g Zucker (gerundet ca. 88 g)
+    - 150 g Erythrit -> 105 g Zucker
+  - Added dedicated section on tablespoon searches explaining the volume/weight distinction:
+    - Level tablespoon crystalline Erythrit: ~10–12 g
+    - Heaped tablespoon crystalline Erythrit: ~15–18 g
+    - Powdered Erythrit: ~8–10 g
+    - Explains why no universal grams-per-tablespoon factor exists and advises using a kitchen scale.
+  - Added test suite assertions in `src/__tests__/zucker-ersatz-rechner.test.ts` (9 tests passing).
+
+### 9.7 Responsive SVG Illustrations
+- Created `public/images/ratgeber/splitt-2-5-volumen-gewicht-berechnung.svg`: Clean responsive infographic showing Fläche × Höhe = Volumen → Haufwerksporen & Schüttdichte → Gewicht in Tonnen.
+- Created `public/images/ratgeber/lebensmonate-zeitstrahl-berechnung.svg`: Clean calendar timeline illustrating Geburtsdatum → Monatstage → Vollendetes Alter vs. Laufender Lebensmonat.
+
+### 9.8 Quality Gates & Test Suite
+- **Unit Tests:** `npm test` -> 25 test files, 306 tests passing (100% pass).
+- **TypeScript Typecheck:** `npx tsc --noEmit` -> 0 errors.
+- **Linter:** `npm run lint` -> 0 errors / 0 warnings.
+- **Build:** `npm run build` -> 471/471 static pages built cleanly.
+
+

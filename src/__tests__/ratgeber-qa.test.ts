@@ -93,4 +93,22 @@ describe('RechenHafen Ratgeber / Blog QA Verification', () => {
       expect(urls.has(`https://rechenhafen.de/ratgeber/${a.slug}/`)).toBe(true);
     }
   });
+
+  it('verifies that published article CTAs and authorship accurately describe reality', () => {
+    const erythritArticle = getArticleBySlug('erythrit-statt-zucker-backen')!;
+    expect(erythritArticle).toBeDefined();
+    expect(erythritArticle.primaryCalculator.description).not.toContain('einstellbarer Süßkraft');
+    expect(erythritArticle.primaryCalculator.description).toContain('transparenten Süßkraft-Annahmen');
+
+    const heizoelArticle = getArticleBySlug('heizoelverbrauch-aus-tankstand-berechnen')!;
+    expect(heizoelArticle).toBeDefined();
+
+    // Verify neither article uses fabricated reviewer bodies
+    for (const art of [erythritArticle, heizoelArticle]) {
+      expect(JSON.stringify(art.reviewer)).not.toContain('Qualitätsprüfung Küche');
+      expect(JSON.stringify(art.reviewer)).not.toContain('Fachprüfung Heizung & Gebäude');
+      expect(JSON.stringify(art.author)).not.toContain('Fachredaktion');
+      expect(art.author.name).toBe('Redaktion RechenHafen');
+    }
+  });
 });

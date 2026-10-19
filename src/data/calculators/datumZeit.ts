@@ -220,61 +220,194 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'alter-in-monaten',
     slug: 'alter-in-monaten',
-    name: 'Alter-in-Monaten-Rechner',
+    name: 'Alter-in-Monaten-Rechner (Vollendete & laufende Monate)',
     shortName: 'Alter in Monaten',
     category: 'datum-zeit',
     subcategory: 'Alter & Geburtstag',
     metaTitle: 'Alter in Monaten Rechner – Lebensmonate exakt berechnen',
-    metaDescription: 'Wie viele Monate alt sind Sie oder Ihr Kind? Berechnen Sie volle Monate und verbleibende Tage schnell und unkompliziert.',
-    h1: 'Alter in Monaten berechnen',
-    shortDescription: 'Berechnet die vollendeten Lebensmonate zwischen Geburtsdatum und Stichtag mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['alter in monaten', 'lebensmonate berechnen', 'wie viele monate alt'],
+    metaDescription: 'Wie viele Monate alt ist Ihr Kind oder ein Vertrag? Berechnen Sie vollendete Lebensmonate, Resttage und den laufenden Lebensmonat kalendergenau nach BGB.',
+    h1: 'Alter in Monaten & Lebensmonate berechnen',
+    shortDescription: 'Ermittelt die vollendeten Lebensmonate, verbleibende Resttage und den laufenden Lebensmonat zwischen Geburtsdatum und Stichtag kalendergenau.',
+    searchKeywords: [
+      'alter in monaten',
+      'lebensmonate berechnen',
+      'laufender lebensmonat rechner',
+      'vollendete lebensmonate baby',
+      'wie viele monate alt',
+      'monate zwischen zwei daten berechnen',
+    ],
     inputs: [
-      { id: 'birthDate', label: 'Geburtsdatum', type: 'date', defaultValue: '2024-03-10' },
-      { id: 'targetDate', label: 'Stichtag', type: 'date', defaultValue: '2026-01-10' },
+      { id: 'birthDate', label: 'Geburtsdatum', type: 'date', defaultValue: '2024-03-15' },
+      { id: 'targetDate', label: 'Stichtag', type: 'date', defaultValue: '2026-03-15' },
     ],
     calculate: (inputs) => {
-      const b = new Date(inputs.birthDate || '2024-03-10');
-      const t = new Date(inputs.targetDate || '2026-01-10');
-      let years = t.getFullYear() - b.getFullYear();
-      let months = t.getMonth() - b.getMonth();
-      let days = t.getDate() - b.getDate();
-      if (days < 0) {
-        months--;
-        const prevMonth = new Date(t.getFullYear(), t.getMonth(), 0).getDate();
-        days += prevMonth;
+      const bStr = String(inputs.birthDate || '2024-03-15');
+      const tStr = String(inputs.targetDate || '2026-03-15');
+
+      const bParts = bStr.split('-').map(Number);
+      const tParts = tStr.split('-').map(Number);
+
+      if (bParts.length !== 3 || tParts.length !== 3 || bParts.some(isNaN) || tParts.some(isNaN)) {
+        return {
+          primary: { id: 'completedMonths', label: 'Vollendete Lebensmonate', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie ein gültiges Geburtsdatum und einen Stichtag ein.',
+        };
       }
-      if (months < 0) {
-        years--;
-        months += 12;
+
+      const [bY, bM, bD] = bParts;
+      const [tY, tM, tD] = tParts;
+
+      const birthUtc = Date.UTC(bY, bM - 1, bD);
+      const targetUtc = Date.UTC(tY, tM - 1, tD);
+
+      if (targetUtc < birthUtc) {
+        return {
+          primary: { id: 'completedMonths', label: 'Vollendete Lebensmonate', value: 0, formattedValue: '-' },
+          error: 'Das Geburtsdatum darf nicht nach dem Stichtag liegen.',
+        };
       }
-      const totalMonths = Math.max(0, years * 12 + months);
+
+      // Kalendermonate schrittweise vorwärts zählen
+      let completedMonths = 0;
+      let curY = bY;
+      let curM = bM - 1; // 0-indexed
+
+      while (true) {
+        let nextM = curM + 1;
+        let nextY = curY;
+        if (nextM > 11) {
+          nextM = 0;
+          nextY++;
+        }
+
+        // Monatsende-Regel nach § 188 Abs. 2/3 BGB (z. B. 31. Januar -> 28./29. Februar)
+        const daysInNextM = new Date(nextY, nextM + 1, 0).getDate();
+        const annD = Math.min(bD, daysInNextM);
+        const annUtc = Date.UTC(nextY, nextM, annD);
+
+        if (targetUtc >= annUtc) {
+          completedMonths++;
+          curY = nextY;
+          curM = nextM;
+        } else {
+          break;
+        }
+      }
+
+      const daysInCurM = new Date(curY, curM + 1, 0).getDate();
+      const lastAnnD = Math.min(bD, daysInCurM);
+      const lastAnnUtc = Date.UTC(curY, curM, lastAnnD);
+
+      const restDays = Math.round((targetUtc - lastAnnUtc) / 86400000);
+      const totalDays = Math.round((targetUtc - birthUtc) / 86400000);
+      const runningMonth = completedMonths + 1;
+      const totalWeeks = Math.floor(totalDays / 7);
+      const restWeekDays = totalDays % 7;
+
+      const formatD = (y: number, m: number, d: number) =>
+        `${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`;
+
+      const bFormatted = formatD(bY, bM, bD);
+      const tFormatted = formatD(tY, tM, tD);
+
       return {
-        primary: { id: 'months', label: 'Alter in Monaten', value: totalMonths, formattedValue: `${totalMonths} Monate, ${days} Tage`, highlight: true },
+        primary: {
+          id: 'completedMonths',
+          label: 'Vollendete Lebensmonate',
+          value: completedMonths,
+          formattedValue: `${completedMonths} Monate, ${restDays} Tage`,
+          highlight: true,
+        },
         secondary: [
-          { id: 'years', label: 'In Jahren', value: totalMonths / 12, formattedValue: `${formatNumber(totalMonths / 12, 1)} Jahre` },
-          { id: 'totalDays', label: 'Gesamttage', value: Math.floor((t.getTime() - b.getTime()) / 86400000), formattedValue: `${formatNumber(Math.floor((t.getTime() - b.getTime()) / 86400000), 0)} Tage` },
+          {
+            id: 'runningMonth',
+            label: 'Laufender Lebensmonat',
+            value: runningMonth,
+            formattedValue: `${runningMonth}. Lebensmonat`,
+          },
+          {
+            id: 'restDays',
+            label: 'Verbleibende Resttage',
+            value: restDays,
+            formattedValue: `${restDays} ${restDays === 1 ? 'Tag' : 'Tage'}`,
+          },
+          {
+            id: 'totalWeeks',
+            label: 'Alter in Wochen',
+            value: totalWeeks,
+            formattedValue: `${totalWeeks} Wochen, ${restWeekDays} Tage`,
+          },
+          {
+            id: 'totalDays',
+            label: 'Gesamte Lebenstage',
+            value: totalDays,
+            formattedValue: `${formatNumber(totalDays, 0)} Tage`,
+          },
         ],
-        summaryText: `Das Alter beläuft sich auf ${totalMonths} vollendete Monate und ${days} Tage.`,
+        summaryText: `Vom ${bFormatted} bis zum ${tFormatted} sind ${completedMonths} volle Lebensmonate und ${restDays} Tage vergangen. Die Person befindet sich im ${runningMonth}. Lebensmonat.`,
       };
     },
-    formula: 'Monate = (Jahre × 12) + Monatsdifferenz',
-    formulaExplanation: 'Zunächst wird die Anzahl ganzer Jahre mit 12 multipliziert und um die überzähligen Monate ergänzt.',
+    formula: 'Vollendete Monate = Anzahl voller Monatssprünge (anniversary days); Laufender Lebensmonat = Vollendete Monate + 1',
+    formulaExplanation: 'Ein Lebensmonat ist jeweils mit Erreichen des gleichen Monatstages im Folgemonat vollendet (z. B. Geburt 15. Januar -> 15. Februar = 1 vollendeter Monat). Existiert der Tag im Zielmonat nicht (z. B. 31. Januar auf Februar), endet der Lebensmonat am letzten Kalendertag dieses Monats (28. bzw. 29. Februar). Division durch 30 wird vermieden, da Kalendermonate unterschiedlich lang sind.',
     workedExample: {
-      title: 'Beispiel: 22 Monate',
-      description: 'Zwischen März 2024 und Januar 2026 liegen genau 22 Monate.',
-      inputs: { birthDate: '2024-03-10', targetDate: '2026-01-10' },
-      resultSummary: '22 Monate',
+      title: 'Beispiel: Geburt am 15. Januar, Stichtag 15. März',
+      description: 'Genau 2 Kalendersprünge: 15. Feb (1. Monat vollendet), 15. März (2. Monat vollendet).',
+      inputs: { birthDate: '2026-01-15', targetDate: '2026-03-15' },
+      resultSummary: '2 vollendete Lebensmonate, 0 Tage (Beginn des 3. Lebensmonats)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Stichtag genau am Monatstag (15. Jan bis 15. März)',
+        description: 'Exakt 2 vollendete Monate, 0 Resttage; Beginn des 3. Lebensmonats.',
+        inputs: { birthDate: '2026-01-15', targetDate: '2026-03-15' },
+        resultSummary: '2 Monate, 0 Tage (3. Lebensmonat)',
+      },
+      {
+        title: 'Beispiel 2: Stichtag vor dem Monatstag (15. Jan bis 14. März)',
+        description: '1 vollendeter Monat und 27 Resttage; die Person ist noch im 2. Lebensmonat.',
+        inputs: { birthDate: '2026-01-15', targetDate: '2026-03-14' },
+        resultSummary: '1 Monat, 27 Tage (2. Lebensmonat)',
+      },
+      {
+        title: 'Beispiel 3: Monatsende-Regel (31. Jan bis 28. Feb)',
+        description: 'Da der Februar keinen 31. Tag hat, vollendet sich der Monat am 28. Februar (bzw. 29. Feb im Schaltjahr).',
+        inputs: { birthDate: '2025-01-31', targetDate: '2025-02-28' },
+        resultSummary: '1 Monat, 0 Tage (2. Lebensmonat)',
+      },
+    ],
     content: {
-      intro: 'Für Verträge, Kündigungsfristen, Garantielaufzeiten sowie entwicklungspsychologische Stufen ist das Alter in vollen Monaten plus Resttagen eine wichtige Zeiteinheit.',
-      details: 'Da Kalendermonate zwischen 28 und 31 Tagen schwanken, basiert die Monatszählung auf dem kalendarischen Monatssprung vom Ausgangstag zum gleichen Tag des Folgemonats.',
+      intro: 'Dieser Rechner ermittelt das kalendarische Alter in vollendeten Monaten, Resttagen und dem aktuell laufenden Lebensmonat – unverzichtbar für Elternzeit, U-Untersuchungen, Beikost und Entwicklungsstufen.',
+      sections: [
+        {
+          title: 'Vollendete Lebensmonate vs. laufender Lebensmonat: Der Unterschied',
+          content: 'Im Alltag kommt es häufig zu Missverständnissen:\n\n- **Vollendete Lebensmonate:** Beschreibt das bereits abgeschlossene Alter. Ein Baby, das am 15. Januar geboren wurde, vollendet am 15. März seinen 2. Lebensmonat (Alter: genau 2 Monate).\n- **Laufender Lebensmonat:** Beschreibt den Zählmonat, in dem sich das Kind gerade befindet. Bereits ab dem Tag nach der Geburt (16. Januar) befindet sich das Neugeborene im 1. Lebensmonat. Ab dem 15. März beginnt somit der **3. Lebensmonat**.\n\nAusführliche Beispiele, Vergleichstabellen und rechtliche Hintergründe finden Sie in unserem Ratgeber [Lebensmonate berechnen: Vollendete Monate und laufender Lebensmonat](/ratgeber/lebensmonate-berechnen/).',
+        },
+        {
+          title: 'Warum 4 Wochen kein Kalendermonat sind',
+          content: 'Vier Wochen haben exakt 28 Tage (4 × 7 Tage). Ein durchschnittlicher Kalendermonat hat jedoch **30,44 Tage** (365 Tage ÷ 12 Monate). Ein Kind mit 12 Wochen ist somit noch nicht 3 Monate alt, sondern erst rund 2 Monate und 3 Wochen (84 Tage vs. ca. 91–92 Tage bei 3 Kalendermonaten). Berechnen Sie Lebensmonate deshalb nie durch Division der Tage durch 30 oder 28.',
+        },
+        {
+          title: 'Monatsende-Konvention bei Geburt am 29., 30. oder 31.',
+          content: 'Wurde eine Person an einem Tag geboren, der im Folgemonat nicht existiert (z. B. 31. Januar), greift die bürgerlich-rechtliche Monatsende-Regel (§ 188 Abs. 3 BGB analog): Der Lebensmonat vollendet sich mit Ablauf des letzten Kalendertages dieses Monats (also am 28. Februar, im Schaltjahr am 29. Februar).',
+        },
+      ],
+      details: 'Dieser Rechner führt eine reine kalendarische Frist- und Datumsarithmetik durch. Er ersetzt keine individuelle medizinische Terminplanung (z. B. für kinderärztliche Früherkennungsuntersuchungen U1 bis U9) oder behördliche Fristbescheide bei Elterngeld und Elternzeit.',
     },
     faqs: [
-      { question: 'Wie wird gerechnet, wenn der Ausgangstag im Zielmonat nicht existiert (z. B. 31. Januar auf Februar)?', answer: 'Nach § 188 Abs. 3 BGB endet die Monatsfrist in solchen Fällen mit dem Ablauf des letzten Tages des Monats (also am 28. bzw. 29. Februar).' },
-      { question: 'Wie viele Monate hat ein Kleinkind mit 2,5 Jahren?', answer: 'Zweieinhalb Lebensjahre entsprechen exakt 30 Kalendermonaten (2 × 12 + 6).' },
+      {
+        question: 'Wann beginnt der 1. Lebensmonat und wann ist er vollendet?',
+        answer: 'Der 1. Lebensmonat beginnt am Tag der Geburt. Er ist genau an dem Tag des Folgemonats vollendet, der dem Geburtstag entspricht (z. B. Geburt am 10. Mai -> 1. Lebensmonat vollendet am 10. Juni).',
+      },
+      {
+        question: 'Warum rechnet dieser Rechner nicht einfach Tage ÷ 30?',
+        answer: 'Weil Kalendermonate zwischen 28 und 31 Tagen schwanken. Eine pauschale 30-Tage-Division würde bei Geburtstagen im Februar, Juli oder August zu Verschiebungen von mehreren Tagen führen. Unser Rechner zählt echte Monatstage.',
+      },
+      {
+        question: 'Ist ein 6 Monate altes Baby im 6. oder im 7. Lebensmonat?',
+        answer: 'Hat das Baby seinen 6-Monats-Geburtstag erreicht, hat es 6 Monate vollendet und befindet sich ab diesem Tag im laufenden 7. Lebensmonat.',
+      },
     ],
-    relatedSlugs: ['altersrechner', 'alter-in-wochen', 'alter-in-tagen'],
+    relatedSlugs: ['altersrechner', 'alter-in-wochen', 'alter-in-tagen', 'geburtstermin-rechner'],
   },
   {
     id: 'altersunterschied',

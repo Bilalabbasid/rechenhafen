@@ -62,21 +62,47 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     });
     expect(resXylit.primary.value).toBe(100);
 
-    // Honig ca. 80 g
+    // Honig at 120 % sweetness: 100 / 1.20 = 83.33 -> 83 g
     const resHoney = calc.calculate({
       direction: 'sugar_to_sub',
       sugarGrams: 100,
       substitute: 'honey',
     });
-    expect(resHoney.primary.value).toBe(80);
+    expect(resHoney.primary.value).toBe(83);
+    const honeyLiquid = resHoney.secondary?.find((s) => s.id === 'liquidTip');
+    expect(honeyLiquid?.formattedValue).toContain('Richtwert: Teigflüssigkeit um ca.');
 
-    // Agave ca. 75 g
+    // Agave at 125 % sweetness: 100 / 1.25 = 80 g
     const resAgave = calc.calculate({
       direction: 'sugar_to_sub',
       sugarGrams: 100,
       substitute: 'agave',
     });
-    expect(resAgave.primary.value).toBe(75);
+    expect(resAgave.primary.value).toBe(80);
+    const agaveLiquid = resAgave.secondary?.find((s) => s.id === 'liquidTip');
+    expect(agaveLiquid?.formattedValue).toContain('Richtwert: Teigflüssigkeit um ca.');
+
+    // Reines Erythrit liquid limitation
+    const resErythrit = calc.calculate({
+      direction: 'sugar_to_sub',
+      sugarGrams: 100,
+      substitute: 'erythrit',
+    });
+    const eryLiquid = resErythrit.secondary?.find((s) => s.id === 'liquidTip');
+    expect(eryLiquid?.formattedValue).toBe('Der Rechner berechnet keine Anpassung der Teigflüssigkeit. Beachten Sie die Hinweise Ihres Rezepts.');
+  });
+
+  it('provides consistent and transparent option labels without misleading names', () => {
+    const dirInput = calc.inputs.find((i) => i.id === 'direction');
+    expect(dirInput?.options?.[0].label).toBe('Zucker durch eine Alternative ersetzen (Zucker → Alternative)');
+    expect(dirInput?.options?.[1].label).toBe('Erythrit in Zucker-Süßkraft umrechnen (Erythrit → Zucker)');
+
+    const subInput = calc.inputs.find((i) => i.id === 'substitute');
+    const agaveOpt = subInput?.options?.find((o) => o.value === 'agave');
+    expect(agaveOpt?.label).toBe('Agavendicksaft (ca. 125 % Süßkraft – ca. 80 g je 100 g Zucker)');
+
+    const honeyOpt = subInput?.options?.find((o) => o.value === 'honey');
+    expect(honeyOpt?.label).toBe('Honig (ca. 120 % Süßkraft – ca. 83 g je 100 g Zucker)');
   });
 
   it('ensures zero stays zero for sugar and erythrit directions', () => {
@@ -143,4 +169,37 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     expect(petFaq?.answer).toContain('Hunde');
     expect(petFaq?.answer).not.toContain('Gewichtsverlust garantiert');
   });
+
+  it('provides reverse-conversion table for 60, 80, 100, 120, 125 and 150 g Erythrit and explains tablespoon volume distinction', () => {
+    // 60 g -> 42 g
+    expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 60 }).primary.value).toBe(42);
+    // 80 g -> 56 g
+    expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 80 }).primary.value).toBe(56);
+    // 100 g -> 70 g
+    expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 100 }).primary.value).toBe(70);
+    // 120 g -> 84 g
+    expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 120 }).primary.value).toBe(84);
+    // 125 g -> 88 g (Math.round(125 * 0.70))
+    expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 125 }).primary.value).toBe(88);
+    // 150 g -> 105 g
+    expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 150 }).primary.value).toBe(105);
+
+    // Section table check
+    const reverseSection = calc.content?.sections?.find((s) => s.title.includes('Rückrechnung & Tabelle'));
+    expect(reverseSection).toBeDefined();
+    expect(reverseSection?.content).toContain('| 60 g | 42 g Zucker |');
+    expect(reverseSection?.content).toContain('| 80 g | 56 g Zucker |');
+    expect(reverseSection?.content).toContain('| 100 g | 70 g Zucker |');
+    expect(reverseSection?.content).toContain('| 120 g | 84 g Zucker |');
+    expect(reverseSection?.content).toContain('| 125 g | 87,5 g Zucker');
+    expect(reverseSection?.content).toContain('| 150 g | 105 g Zucker |');
+
+    // Tablespoon volume/weight distinction check
+    const tbSection = calc.content?.sections?.find((s) => s.title.includes('Esslöffel'));
+    expect(tbSection).toBeDefined();
+    expect(tbSection?.content).toContain('Hohlmaß für das Volumen');
+    expect(tbSection?.content).toContain('keine universelle Gramm-pro-Esslöffel-Umrechnung');
+    expect(tbSection?.content).toContain('Küchenwaage');
+  });
 });
+

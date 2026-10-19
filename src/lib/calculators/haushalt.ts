@@ -387,7 +387,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       value: monthlyAdvancePayment,
       formattedValue: formatCurrency(monthlyAdvancePayment),
       highlight: true,
-      helpText: 'Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.',
+      helpText: 'Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen.',
     },
     {
       id: 'workCost',
@@ -505,7 +505,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       value: totalAnnualCost,
       formattedValue: formatCurrency(totalAnnualCost),
       highlight: true,
-      helpText: 'Gesamtsumme aus verbrauchsabhängigem Arbeitspreis und verbrauchsunabhängigem Jahresgrundpreis (inkl. 19 % MwSt.).',
+      helpText: 'Verbrauchskosten plus Grundpreis für ein Jahr.',
     },
     secondary,
     breakdown: {
@@ -518,10 +518,10 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
     summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Monatsdurchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag).`,
     directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
     qualifications: [
-      'Der Wert ist Jahreskosten ÷ 12. Ihr tatsächlicher Versorgerabschlag kann abweichen (z. B. bei 11 statt 12 Abschlägen im Abrechnungsjahr, individuellen Sicherheitszuschlägen oder kaufmännischen Rundungen).',
-      'Gesamtkosten inklusive Arbeitspreis, Grundpreis und aller gesetzlichen Steuern (19 % Mehrwertsteuer, CO₂-Preis, Erdgassteuer, Konzessionsabgabe).',
+      'Berechnung basiert auf den eingegebenen Bruttopreisen. Gesetzliche Steuern, Umlagen und Mehrwertsteuer sind in diesen Preisen bereits enthalten und werden nicht separat erhoben.',
+      'Der rechnerische Monatsdurchschnitt (Jahreskosten ÷ 12) dient als Orientierungswert. Ihr tatsächlicher Versorgerabschlag kann abweichen (z. B. bei 11 Abschlagsmonaten oder saisonalen Anpassungen).',
       inputType === 'm3'
-        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh. Für eine exakte Abrechnung sind die Werte Ihrer Jahresrechnung maßgeblich.`
+        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh. Für Ihre Jahresrechnung sind die messtechnischen Werte Ihres Versorgers maßgeblich.`
         : 'Berechnung basiert direkt auf der thermischen Energiemenge in Kilowattstunden (kWh).',
     ],
     calculationSteps: [

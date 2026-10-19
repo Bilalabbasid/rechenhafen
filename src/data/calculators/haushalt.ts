@@ -206,7 +206,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         max: 100,
         step: 0.005,
         unit: '€/kWh',
-        helpText: 'Ihr vertraglicher Bruttopreis je kWh (z. B. 0,105 €/kWh oder 10,5 ct/kWh). 0 € bei mietvertraglicher Pauschale.',
+        helpText: 'Ihr vertraglicher Bruttopreis je kWh laut Gasrechnung (z. B. 0,105 €/kWh oder 10,5 ct/kWh). Für Mietverhältnisse mit pauschaler Warmmiete ohne eigene Gasrechnung ist dieser Rechner nicht ausgelegt.',
       },
       {
         id: 'basePricePeriod',
@@ -270,7 +270,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         },
         {
           title: 'Was kostet Gas pro Monat?',
-          content: 'Die monatlichen Kosten variieren nach Haushaltsgröße, Wohnfläche und Dämmstandard des Gebäudes:\n- **Kleine Wohnung (ca. 50 m²)**: Jahresverbrauch ca. 5.000 bis 7.000 kWh → monatlich ca. 55 bis 80 Euro.\n- **Mittlere Wohnung (ca. 100 m²)**: Jahresverbrauch ca. 10.000 bis 14.000 kWh → monatlich ca. 105 bis 145 Euro.\n- **Reihenhaus (ca. 120 m²)**: Jahresverbrauch ca. 13.000 bis 17.000 kWh → monatlich ca. 135 bis 180 Euro.\n- **Freistehendes Einfamilienhaus (ca. 150 m²)**: Jahresverbrauch ca. 16.000 bis 22.000 kWh → monatlich ca. 165 bis 235 Euro.\n\nVergleichen Sie Ihre Heizkosten auch mit alternativen Systemen wie Wärmepumpen oder Pellets im [Heizkostenvergleich Rechner](/rechner/heizkostenvergleich-rechner/) oder berechnen Sie den Aufwand für Ölheizungen mit dem [Ölheizung Verbrauch Rechner](/rechner/oelheizung-verbrauch-rechner/).',
+          content: 'Die monatlichen Kosten hängen unmittelbar vom tatsächlichen Verbrauch und den vereinbarten Tarifkonditionen (Arbeitspreis und Grundpreis) ab. Die folgenden Modellbeispiele basieren auf einer beispielhaften Annahme von 0,11 €/kWh brutto Arbeitspreis und 12,00 € brutto Grundpreis pro Monat (keine Marktpreisgarantie):\n- **Kleine Wohnung (ca. 50 m²)**: Bei ca. 6.000 kWh Jahresverbrauch ergeben sich rechnerisch ca. 804 € pro Jahr bzw. rund 67 € monatlicher Durchschnitt (Verbrauchskosten 660 € + Grundpreis 144 €).\n- **Mittlere Wohnung (ca. 100 m²)**: Bei ca. 12.000 kWh Jahresverbrauch ergeben sich rechnerisch ca. 1.464 € pro Jahr bzw. rund 122 € monatlicher Durchschnitt (Verbrauchskosten 1.320 € + Grundpreis 144 €).\n- **Reihenhaus (ca. 120 m²)**: Bei ca. 15.000 kWh Jahresverbrauch ergeben sich rechnerisch ca. 1.794 € pro Jahr bzw. rund 149,50 € monatlicher Durchschnitt (Verbrauchskosten 1.650 € + Grundpreis 144 €).\n- **Freistehendes Einfamilienhaus (ca. 150 m²)**: Bei ca. 19.000 kWh Jahresverbrauch ergeben sich rechnerisch ca. 2.234 € pro Jahr bzw. rund 186 € monatlicher Durchschnitt (Verbrauchskosten 2.090 € + Grundpreis 144 €).\n\nTragen Sie Ihre eigenen Vertragspreise und Zählerdaten oben in den Rechner ein, um Ihr individuelles Ergebnis zu erhalten. Vergleichen Sie Ihre Heizkosten auch mit alternativen Systemen wie Wärmepumpen oder Pellets im [Heizkostenvergleich Rechner](/rechner/heizkostenvergleich-rechner/) oder berechnen Sie den Aufwand für Ölheizungen mit dem [Ölheizung Verbrauch Rechner](/rechner/oelheizung-verbrauch-rechner/).',
         },
         {
           title: 'Welche Werte stehen auf der Gasrechnung?',
@@ -299,7 +299,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie rechne ich Kubikmeter Gas (m³) in Kilowattstunden (kWh) um?', answer: 'Multiplizieren Sie die Kubikmeter mit dem Brennwert (ca. 10,2 bis 11,5 kWh/m³) und der Zustandszahl Ihres Netzgebiets (ca. 0,90 bis 0,96): kWh = m³ × Brennwert × Zustandszahl. Beide Werte finden Sie auf Ihrer letzten Gasabrechnung. Als grobe Orientierung entspricht 1 m³ Gas etwa 10 kWh.' },
       { question: 'Welche Rolle spielt der monatliche Grundpreis bei den Gaskosten?', answer: 'Der Grundpreis deckt feste Bereitstellungs-, Mess- und Netzkosten des Versorgers ab. Er fällt auch dann an, wenn im Sommer wenig oder gar kein Gas geheizt wird. In der Jahresrechnung werden 12 Monatsgrundpreise zu den verbrauchten Kilowattstunden addiert.' },
       { question: 'Ist der errechnete Monatsdurchschnitt mein garantierter Versorgerabschlag?', answer: 'Nein. Der rechnerische Monatsdurchschnitt (Jahreskosten ÷ 12) dient Ihnen als Orientierung. Tatsächliche Versorgerabschläge können abweichen, weil manche Anbieter nur 11 Monatsabschläge im Jahr einziehen (der 12. Monat ist die Endabrechnung), Sicherheitszuschläge für kalte Winter erheben oder auf runde Eurobeträge aufrunden.' },
-      { question: 'Was kostet Gas pro Monat für eine Wohnung oder ein Haus?', answer: 'Eine Wohnung mit 50 m² benötigt ca. 5.000 bis 7.000 kWh (ca. 55 bis 80 €/Monat), eine 100-m²-Wohnung ca. 10.000 bis 14.000 kWh (ca. 105 bis 145 €/Monat) und ein Einfamilienhaus ca. 16.000 bis 22.000 kWh (ca. 165 bis 235 €/Monat).' },
+      { question: 'Was kostet Gas pro Monat für eine Wohnung oder ein Haus?', answer: 'Die Kosten hängen vom Verbrauch und Ihrem Tarif ab. Bei einer beispielhaften Modellannahme von 0,11 €/kWh Arbeitspreis und 12 €/Monat Grundpreis (keine Marktpreisgarantie) ergeben sich rechnerisch: ca. 67 €/Monat für eine 50-m²-Wohnung (ca. 6.000 kWh/a), ca. 122 €/Monat für eine 100-m²-Wohnung (ca. 12.000 kWh/a) und ca. 186 €/Monat für ein Einfamilienhaus mit 150 m² (ca. 19.000 kWh/a). Nutzen Sie den Rechner oben für Ihre exakten Vertragswerte.' },
       { question: 'Wie prüfe ich meine Gasabrechnung auf Richtigkeit?', answer: 'Vergleichen Sie den abgerechneten Zählerstand mit Ihrem tatsächlichen Zähler im Keller. Multiplizieren Sie die verbrauchten kWh mit dem im Vertrag vereinbarten Arbeitspreis und addieren Sie 12 Monate Grundgebühr. Teilen Sie das Ergebnis durch 12, um einen rechnerischen Monatsdurchschnitt als Orientierungswert für Ihren Abschlag zu ermitteln.' },
       { question: 'Wann nutze ich den Gaskostenrechner und wann den Gasverbrauch Rechner?', answer: 'Nutzen Sie diesen Gaskostenrechner, wenn Sie Gesamtkosten und monatliche Richtwerte in Euro berechnen möchten. Nutzen Sie unseren [Gasverbrauch Rechner](/rechner/gasverbrauch-kwh-m3-rechner/), wenn Sie zwei Zählerstände vergleichen und den reinen Verbrauch in m³ und kWh analysieren möchten.' },
       { question: 'Welche Werte stehen auf der Gasrechnung?', answer: 'Auf Ihrer Gasabrechnung finden Sie den Zählerstand (in m³), den Abrechnungsbrennwert (in kWh/m³), die Zustandszahl z, die daraus errechneten Kilowattstunden (kWh) sowie den Netto- und Brutto-Arbeitspreis (ct/kWh) und monatlichen Grundpreis.' },
@@ -307,10 +307,10 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     relatedSlugs: ['gasverbrauch-kwh-m3-rechner', 'heizkostenvergleich-rechner', 'stromkostenrechner', 'oelheizung-verbrauch-rechner', 'balkonkraftwerk-ertrag-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
-      year: GERMAN_DATA_2026.gaspreis_durchschnitt.year,
-      source: GERMAN_DATA_2026.gaspreis_durchschnitt.source,
-      sourceUrl: GERMAN_DATA_2026.gaspreis_durchschnitt.sourceUrl,
-      lastVerified: GERMAN_DATA_2026.gaspreis_durchschnitt.lastVerified,
+      year: 2026,
+      source: 'BDEW Bundesverband der Energie- und Wasserwirtschaft (BDEW-Gaspreisanalyse)',
+      sourceUrl: 'https://www.bdew.de/service/daten-und-grafiken/bdew-gaspreisanalyse/',
+      lastVerified: '2026-01-20',
     },
   },
   {

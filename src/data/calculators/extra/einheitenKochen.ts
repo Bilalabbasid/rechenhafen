@@ -3118,7 +3118,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         type: "select",
         defaultValue: "sugar_to_sub",
         options: [
-          { value: "sugar_to_sub", label: "Zucker durch Erythrit ersetzen (Zucker → Alternative)" },
+          { value: "sugar_to_sub", label: "Zucker durch eine Alternative ersetzen (Zucker → Alternative)" },
           { value: "erythrit_to_sugar", label: "Erythrit in Zucker-Süßkraft umrechnen (Erythrit → Zucker)" },
         ],
       },
@@ -3149,11 +3149,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           },
           {
             value: "honey",
-            label: "Honig (ca. 120 % Süßkraft – ca. 80 g je 100 g Zucker)",
+            label: "Honig (ca. 120 % Süßkraft – ca. 83 g je 100 g Zucker)",
           },
           {
             value: "agave",
-            label: "Agavendicksaft (ca. 125 % Süßkraft – ca. 75 g je 100 g Zucker)",
+            label: "Agavendicksaft (ca. 125 % Süßkraft – ca. 80 g je 100 g Zucker)",
           },
           {
             value: "stevia",
@@ -3278,14 +3278,16 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         calPerG = 2.4;
         subName = 'Xylit';
       } else if (sub === 'honey') {
-        subGrams = Math.round(sugarG * 0.80);
+        // Modellannahme 120 %: Honig = Zucker / 1,20 (ca. 83 g je 100 g Zucker)
+        subGrams = Math.round(sugarG / 1.20);
         calPerG = 3.04;
         liquidReductionMl = sugarG * 0.20;
         subName = 'Honig';
       } else if (sub === 'agave') {
-        subGrams = Math.round(sugarG * 0.75);
+        // Modellannahme 125 %: Agavendicksaft = Zucker / 1,25 (80 g je 100 g Zucker)
+        subGrams = Math.round(sugarG / 1.25);
         calPerG = 3.10;
-        liquidReductionMl = sugarG * 0.25;
+        liquidReductionMl = sugarG * 0.20;
         subName = 'Agavendicksaft';
       } else if (sub === 'stevia') {
         subGrams = Math.round(sugarG * 1.0);
@@ -3322,14 +3324,16 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'liquidTip',
             label: 'Flüssigkeitsanpassung',
             value: liquidReductionMl,
-            formattedValue: liquidReductionMl > 0 ? `Flüssigkeit im Teig um ca. ${formatNumber(Math.round(liquidReductionMl), 0)} ml reduzieren` : 'Keine Flüssigkeitsanpassung nötig',
+            formattedValue: liquidReductionMl > 0
+              ? `Richtwert: Teigflüssigkeit um ca. ${formatNumber(Math.round(liquidReductionMl), 0)} ml je 100 g Zucker reduzieren (rezeptabhängig)`
+              : 'Der Rechner berechnet keine Anpassung der Teigflüssigkeit. Beachten Sie die Hinweise Ihres Rezepts.',
           },
         ],
-        summaryText: `Für ${formatNumber(sugarG, 0)} g Haushaltszucker benötigen Sie rechnerisch ca. ${formatNumber(subGrams, 0)} g ${subName}. Bei Mischprodukten stets die Herstellerangaben auf der Packung beachten.`,
+        summaryText: `Für ${formatNumber(sugarG, 0)} g Haushaltszucker benötigen Sie rechnerisch ca. ${formatNumber(subGrams, 0)} g ${subName}. Die Süßkraftangabe ist eine Modellannahme; bei Mischprodukten und Fertigsüßen stets die Herstellerangaben auf der Packung beachten.`,
       };
     },
-    formula: "Erythrit = Zucker ÷ 0,70; Zucker-Äquivalent = Erythrit × 0,70; Xylit = Zucker × 1,0",
-    formulaExplanation: "Reines Erythrit besitzt rund 70 % der Süßkraft von Haushaltszucker. Für die Umrechnung wird daher mit dem Divisor 0,70 gerechnet (100 g Zucker entsprechen gerundet rund 143 g Erythrit). Xylit entspricht der Süße von Zucker im Verhältnis 1:1. Beachten Sie, dass es sich um Modellannahmen für die Süßkraft handelt; Backeigenschaften und Teigkonsistenz können abweichen.",
+    formula: "Erythrit = Zucker ÷ 0,70; Agavendicksaft = Zucker ÷ 1,25; Honig = Zucker ÷ 1,20; Xylit = Zucker × 1,0; Zucker-Äquivalent = Erythrit × 0,70",
+    formulaExplanation: "Die Umrechnung basiert auf standardisierten Süßkraftannahmen gegenüber Haushaltszucker (Saccharose = 100 %): Reines Erythrit ca. 70 % (Divisor 0,70; 100 g Zucker ≈ 143 g Erythrit), Agavendicksaft ca. 125 % (Divisor 1,25; 100 g Zucker ≈ 80 g Agave), Honig ca. 120 % (Divisor 1,20; 100 g Zucker ≈ 83 g Honig), Xylit 100 % (1:1). Da Süßkraft und Konsistenz je nach Produkt und Ernte variieren, dienen diese Faktoren als Orientierungsmodell; Herstellerhinweise auf der Verpackung haben Vorrang.",
     workedExample: {
       title: 'Beispiel: Kuchen mit 150 g Zucker auf Erythrit umstellen',
       description: 'Reines Erythrit besitzt rund 70 % Süßkraft: 150 g Zucker ÷ 0,70 = 214,29 g ≈ 214 g Erythrit.',
@@ -3362,8 +3366,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           content: '| Zucker (Haushaltszucker) | Erythrit (ca. 70 % Süßkraft) |\n| --- | --- |\n| 50 g | 71 g |\n| 100 g | 143 g |\n| 150 g | 214 g |\n| 200 g | 286 g |\n| 250 g | 357 g |\n\nGerundete Richtwerte bei angenommener Süßkraft von 70 %.',
         },
         {
-          title: 'Wie viel Zucker entspricht Erythrit?',
-          content: 'Für die umgekehrte Richtung multiplizieren Sie die Erythritmenge mit 0,70. So entsprechen 50 g Erythrit etwa der Süße von 35 g Zucker, 80 g etwa 56 g und 100 g etwa 70 g. Auch hier geht es um die Süßkraft, nicht um identische Backeigenschaften.',
+          title: 'Wie viel Zucker entspricht Erythrit? (Rückrechnung & Tabelle)',
+          content: 'Für die umgekehrte Richtung multiplizieren Sie das vorhandene Erythritgewicht mit 0,70 (Formel: `Zucker-Süße = Erythrit × 0,70`):\n\n| Reines Erythrit | Entsprechende Süßkraft in Haushaltszucker (70 %) |\n| --- | --- |\n| 60 g | 42 g Zucker |\n| 80 g | 56 g Zucker |\n| 100 g | 70 g Zucker |\n| 120 g | 84 g Zucker |\n| 125 g | 87,5 g Zucker (gerundet ca. 88 g) |\n| 150 g | 105 g Zucker |\n\n*Wichtig: Diese Tabelle vergleicht ausschließlich die Süßkraft nach Modellannahme. Backtechnische Eigenschaften wie Teigvolumen, Schmelzpunkt und Bindung müssen rezeptabhängig geprüft werden.*',
+        },
+        {
+          title: 'Wie viel Gramm wiegt ein Esslöffel Erythrit? (Volumen vs. Gewicht)',
+          content: 'Ein Esslöffel (EL) ist ein Hohlmaß für das Volumen (ca. 15 ml). Das tatsächliche Gewicht in Gramm hängt entscheidend von der Häufung und der Beschaffenheit des Erythrits ab:\n\n- **Gestrichener Esslöffel kristallines Erythrit:** ca. 10 bis 12 Gramm\n- **Gehäufter Esslöffel kristallines Erythrit:** ca. 15 bis 18 Gramm\n- **Puder-Erythrit:** durch das geringere Schüttgewicht oft nur ca. 8 bis 10 Gramm je gestrichenem EL\n\nWeil Löffelformen, Füllhöhen und Schüttdichten variieren, existiert keine universelle Gramm-pro-Esslöffel-Umrechnung. Beim Backen entscheidet das exakte Masseverhältnis – wiegen Sie Erythrit daher stets mit einer Küchenwaage ab.',
         },
         {
           title: 'Lässt sich Zucker durch Xylit ersetzen?',
@@ -3374,7 +3382,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           content: 'Reines Erythrit gleicht zwar die Süßkraft von Zucker rechnerisch aus, verändert aber Teigvolumen, Feuchtigkeit und Backverhalten. Ausführliche Praxistipps, Teighinweise und Dosierungsempfehlungen finden Sie in unserem Ratgeber [Erythrit beim Backen: Wie viel brauchst du statt Zucker?](/ratgeber/erythrit-statt-zucker-backen/).',
         },
       ],
-      details: 'Süßkraftannahmen im Vergleich zu Haushaltszucker (100 %): Xylit ca. 100 % (1:1), reines Erythrit ca. 70 % (Zucker ÷ 0,70). Honig ca. 120 % Süßkraft (ca. 80 g Honig je 100 g Zucker, Flüssigkeit im Teig leicht reduzieren).',
+      details: 'Süßkraftannahmen im Vergleich zu Haushaltszucker (100 %): Xylit ca. 100 % (1:1), reines Erythrit ca. 70 % (Zucker ÷ 0,70; Rückrechnung Erythrit × 0,70), Agavendicksaft ca. 125 % (Zucker ÷ 1,25), Honig ca. 120 % (Zucker ÷ 1,20). Alle Faktoren sind Modellannahmen; produktspezifische Herstellerangaben und Rezeptanforderungen sind vorrangig zu beachten.',
     },
     faqs: [
       {

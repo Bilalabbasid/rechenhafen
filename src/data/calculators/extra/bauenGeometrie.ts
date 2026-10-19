@@ -2843,125 +2843,331 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     shortName: "Kies & Splitt",
     category: "bauen-renovieren",
     subcategory: "Garten & Außenanlagen",
-    metaTitle: 'Kies & Splitt Rechner – Bedarf in Tonnen',
-    metaDescription: 'Berechnen Sie das Gewicht in Tonnen und Volumen in m³ für Kies, Splitt, Schotter oder Rindenmulch nach Fläche in m² und Einbauhöhe.',
-    h1: 'Kies & Splitt Rechner – Tonnen & Schüttvolumen berechnen',
-    shortDescription: 'Ermittelt das Gewicht und Schüttvolumen von Kies, Splitt und Schotter.',
-    searchKeywords: ["kies rechner tonnen m3","splitt bedarf berechnen terrasse","schotter gewicht volumen dichte","zierkies menge quadratmeter"],
+    metaTitle: 'Kies & Splitt Rechner – Bedarf in Tonnen & m³ berechnen',
+    metaDescription: 'Berechnen Sie Gewicht in Tonnen und Volumen in m³ für Splitt 2/5, Kies, Schotter oder Sand. Mit 3 Modi: Fläche & Schütthöhe, m³ in Tonnen oder Tonnen in m³.',
+    h1: 'Kies- & Splitt-Rechner: Tonnen, m³ & Schüttdichte berechnen',
+    shortDescription: 'Ermittelt das Gewicht und Schüttvolumen von Splitt, Kies, Schotter und Sand – wahlweise aus Fläche und Einbauhöhe, direkt aus m³ oder aus Tonnen.',
+    searchKeywords: [
+      "kies rechner tonnen m3",
+      "splitt 2 5 gewicht m3",
+      "splitt bedarf berechnen terrasse",
+      "schotter gewicht volumen dichte",
+      "m3 in tonnen splitt umrechnen",
+      "schuettdichte splitt berechnen",
+    ],
     inputs: [
-          {
-                "id": "area",
-                "label": "Fläche",
-                "type": "number",
-                "defaultValue": 30,
-                "min": 1,
-                "max": 1000,
-                "step": 1,
-                "unit": "m²"
-          },
-          {
-                "id": "depth",
-                "label": "Schütthöhe / Schichtdicke",
-                "type": "number",
-                "defaultValue": 5,
-                "min": 2,
-                "max": 50,
-                "step": 0.5,
-                "unit": "cm"
-          },
-          {
-                "id": "materialType",
-                "label": "Material & Rohdichte",
-                "type": "select",
-                "defaultValue": "grit",
-                "options": [
-                      {
-                            "value": "gravel",
-                            "label": "Kies / Rollkies 16/32 (Dichte ca. 1,60 t/m³)"
-                      },
-                      {
-                            "value": "grit",
-                            "label": "Splitt / Edelsplitt 2/5 (Dichte ca. 1,55 t/m³)"
-                      },
-                      {
-                            "value": "crushed",
-                            "label": "Schotter / Frostschutz 0/32 verdichtet (Dichte ca. 1,85 t/m³)"
-                      },
-                      {
-                            "value": "bark",
-                            "label": "Rindenmulch (Dichte ca. 0,40 t/m³)"
-                      }
-                ]
-          },
-          {
-                "id": "compaction",
-                "label": "Verdichtungs- / Setzungszuschlag",
-                "type": "number",
-                "defaultValue": 10,
-                "min": 0,
-                "max": 25,
-                "step": 1,
-                "unit": "%"
-          }
+      {
+        id: "calcMode",
+        label: "Berechnungsmodus",
+        type: "select",
+        defaultValue: "area_depth",
+        options: [
+          { value: "area_depth", label: "1. Fläche & Schütthöhe → Volumen (m³) & Gewicht (t)" },
+          { value: "volume_to_weight", label: "2. Bekanntes Volumen (m³) → Gewicht (t)" },
+          { value: "weight_to_volume", label: "3. Bekanntes Gewicht (t) → Volumen (m³)" },
+        ],
+      },
+      {
+        id: "area",
+        label: "Fläche",
+        type: "number",
+        defaultValue: 30,
+        min: 0.1,
+        max: 5000,
+        step: 1,
+        unit: "m²",
+        dependsOn: { field: "calcMode", value: "area_depth" },
+      },
+      {
+        id: "depth",
+        label: "Schütthöhe / Schichtdicke",
+        type: "number",
+        defaultValue: 5,
+        min: 0.5,
+        max: 100,
+        step: 0.5,
+        unit: "cm",
+        dependsOn: { field: "calcMode", value: "area_depth" },
+      },
+      {
+        id: "knownVolumeM3",
+        label: "Vorhandenes Volumen",
+        type: "number",
+        defaultValue: 2.0,
+        min: 0.01,
+        max: 2000,
+        step: 0.1,
+        unit: "m³",
+        dependsOn: { field: "calcMode", value: "volume_to_weight" },
+      },
+      {
+        id: "knownWeightTonnes",
+        label: "Vorhandenes Gewicht",
+        type: "number",
+        defaultValue: 3.0,
+        min: 0.01,
+        max: 5000,
+        step: 0.1,
+        unit: "t",
+        dependsOn: { field: "calcMode", value: "weight_to_volume" },
+      },
+      {
+        id: "materialType",
+        label: "Material & Richtwert Schüttdichte",
+        type: "select",
+        defaultValue: "grit_2_5",
+        options: [
+          { value: "grit_2_5", label: "Splitt / Edelsplitt 2/5 (Richtwert ca. 1,50 t/m³)" },
+          { value: "gravel_16_32", label: "Kies / Rollkies 16/32 (Richtwert ca. 1,60 t/m³)" },
+          { value: "crushed_0_32", label: "Schotter / Frostschutz 0/32 verdichtet (Richtwert ca. 1,80 t/m³)" },
+          { value: "sand_0_2", label: "Bausand / Estrichsand 0/2 (Richtwert ca. 1,60 t/m³)" },
+          { value: "bark", label: "Rindenmulch (Richtwert ca. 0,40 t/m³)" },
+          { value: "custom", label: "Eigene Schüttdichte eingeben (t/m³)" },
+        ],
+      },
+      {
+        id: "customDensity",
+        label: "Individuelle Schüttdichte laut Lieferant",
+        type: "number",
+        defaultValue: 1.50,
+        min: 0.1,
+        max: 3.5,
+        step: 0.05,
+        unit: "t/m³",
+        dependsOn: { field: "materialType", value: "custom" },
+      },
+      {
+        id: "compaction",
+        label: "Optionaler Setzungs- & Einbauzuschlag",
+        type: "number",
+        defaultValue: 0,
+        min: 0,
+        max: 30,
+        step: 1,
+        unit: "%",
+        dependsOn: { field: "calcMode", value: "area_depth" },
+      },
     ],
     calculate: (inputs: Record<string, any>) => {
-      const a = Number(inputs.area) || 0;
-      const dM = (Number(inputs.depth) || 0) / 100;
-      const comp = 1 + ((Number(inputs.compaction) || 0) / 100);
-      
-      const volumeM3 = a * dM * comp;
-      
-      let density = 1.55;
-      if (inputs.materialType === 'gravel') density = 1.60;
-      else if (inputs.materialType === 'crushed') density = 1.85;
-      else if (inputs.materialType === 'bark') density = 0.40;
-      
-      const totalTonnes = volumeM3 * density;
-      const bigBags = Math.ceil(totalTonnes / 1.0); // 1-Tonnen-Big-Bag
-      
+      const mode = inputs.calcMode || 'area_depth';
+
+      // 1. Schüttdichte bestimmen
+      let density = 1.50;
+      const mat = inputs.materialType || 'grit_2_5';
+      if (mat === 'grit_2_5' || mat === 'grit') density = 1.50;
+      else if (mat === 'gravel_16_32' || mat === 'gravel') density = 1.60;
+      else if (mat === 'crushed_0_32' || mat === 'crushed') density = 1.80;
+      else if (mat === 'sand_0_2') density = 1.60;
+      else if (mat === 'bark') density = 0.40;
+      else if (mat === 'custom') {
+        const cd = Number(inputs.customDensity);
+        density = !isNaN(cd) && cd > 0 ? cd : 1.50;
+      }
+
+      // MODUS 1: Fläche & Schütthöhe
+      if (mode === 'area_depth') {
+        const a = Number(inputs.area) || 0;
+        const dM = (Number(inputs.depth) || 0) / 100;
+        const compPercent = Math.max(0, Number(inputs.compaction) || 0);
+
+        const baseVolumeM3 = Math.round(a * dM * 1000) / 1000;
+        const allowanceM3 = Math.round(baseVolumeM3 * (compPercent / 100) * 1000) / 1000;
+        const totalVolumeM3 = Math.round((baseVolumeM3 + allowanceM3) * 1000) / 1000;
+        const totalTonnes = Math.round(totalVolumeM3 * density * 1000) / 1000;
+        const bigBags = Math.ceil(totalTonnes);
+
+        return {
+          primary: {
+            id: 'tonnes',
+            label: 'Benötigtes Materialgewicht',
+            value: totalTonnes,
+            formattedValue: formatNumber(totalTonnes, 2) + ' Tonnen',
+            highlight: true,
+          },
+          secondary: [
+            {
+              id: 'baseVolume',
+              label: 'Reines Einbauvolumen (ohne Zuschlag)',
+              value: baseVolumeM3,
+              formattedValue: formatNumber(baseVolumeM3, 2) + ' m³',
+            },
+            {
+              id: 'allowanceVol',
+              label: `Zuschlag (${compPercent} %)`,
+              value: allowanceM3,
+              formattedValue: formatNumber(allowanceM3, 2) + ' m³',
+            },
+            {
+              id: 'totalVolume',
+              label: 'Gesamtvolumen für Bestellung',
+              value: totalVolumeM3,
+              formattedValue: formatNumber(totalVolumeM3, 2) + ' m³',
+            },
+            {
+              id: 'densityUsed',
+              label: 'Angesetzte Schüttdichte',
+              value: density,
+              formattedValue: formatNumber(density, 2) + ' t/m³',
+            },
+            {
+              id: 'bigbags',
+              label: 'Lieferung in Big Bags (à 1.000 kg Richtwert)',
+              value: bigBags,
+              formattedValue: bigBags + ' Big Bag(s)',
+            },
+          ],
+          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${inputs.depth} cm Einbauhöhe ergibt sich ein Basisvolumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Zuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${bigBags} Big Bag(s) à 1 t).`,
+        };
+      }
+
+      // MODUS 2: Bekanntes Volumen (m³) → Gewicht (t)
+      if (mode === 'volume_to_weight') {
+        const vol = Number(inputs.knownVolumeM3) || 0;
+        const totalTonnes = vol * density;
+        const bigBags = Math.ceil(totalTonnes);
+
+        return {
+          primary: {
+            id: 'tonnes',
+            label: 'Materialgewicht in Tonnen',
+            value: totalTonnes,
+            formattedValue: formatNumber(totalTonnes, 2) + ' Tonnen',
+            highlight: true,
+          },
+          secondary: [
+            {
+              id: 'volume',
+              label: 'Ausgangsvolumen',
+              value: vol,
+              formattedValue: formatNumber(vol, 2) + ' m³',
+            },
+            {
+              id: 'densityUsed',
+              label: 'Angesetzte Schüttdichte',
+              value: density,
+              formattedValue: formatNumber(density, 2) + ' t/m³',
+            },
+            {
+              id: 'bigbags',
+              label: 'Lieferung in Big Bags (à 1.000 kg Richtwert)',
+              value: bigBags,
+              formattedValue: bigBags + ' Big Bag(s)',
+            },
+          ],
+          summaryText: `${formatNumber(vol, 2)} m³ Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ wiegen rechnerisch ca. ${formatNumber(totalTonnes, 2)} Tonnen (ca. ${bigBags} Big Bag(s)).`,
+        };
+      }
+
+      // MODUS 3: Bekanntes Gewicht (t) → Volumen (m³)
+      const tonnes = Number(inputs.knownWeightTonnes) || 0;
+      const vol = density > 0 ? tonnes / density : 0;
+      const bigBags = Math.ceil(tonnes);
+
       return {
-        primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: totalTonnes, formattedValue: formatNumber(totalTonnes, 2) + ' Tonnen', highlight: true },
+        primary: {
+          id: 'volume',
+          label: 'Volumen in Kubikmetern (m³)',
+          value: vol,
+          formattedValue: formatNumber(vol, 2) + ' m³',
+          highlight: true,
+        },
         secondary: [
-          { id: 'volume', label: 'Einbauvolumen inkl. Setzung', value: volumeM3, formattedValue: formatNumber(volumeM3, 2) + ' m³' },
-          { id: 'bigbags', label: 'Lieferung in Big Bags (à 1.000 kg)', value: bigBags, formattedValue: bigBags + ' Big Bag(s)' },
-          { id: 'sacks25', label: 'Alternativ: 25-kg-Säcke', value: Math.ceil((totalTonnes * 1000) / 25), formattedValue: Math.ceil((totalTonnes * 1000) / 25) + ' Säcke' },
+          {
+            id: 'tonnesInput',
+            label: 'Ausgangsgewicht',
+            value: tonnes,
+            formattedValue: formatNumber(tonnes, 2) + ' Tonnen',
+          },
+          {
+            id: 'densityUsed',
+            label: 'Angesetzte Schüttdichte',
+            value: density,
+            formattedValue: formatNumber(density, 2) + ' t/m³',
+          },
+          {
+            id: 'bigbags',
+            label: 'Lieferung in Big Bags (à 1.000 kg Richtwert)',
+            value: bigBags,
+            formattedValue: bigBags + ' Big Bag(s)',
+          },
         ],
-        summaryText: 'Für ' + a + ' m² Fläche bei ' + inputs.depth + ' cm Schütthöhe benötigen Sie ca. ' + formatNumber(volumeM3, 2) + ' m³ Material (' + formatNumber(totalTonnes, 2) + ' Tonnen).',
+        summaryText: `${formatNumber(tonnes, 2)} Tonnen Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ ergeben ein Schüttvolumen von ca. ${formatNumber(vol, 2)} m³ (ca. ${bigBags} Big Bag(s)).`,
       };
     },
-    formula: "Gewicht (t) = Fläche (m²) × Schütthöhe (m) × Verdichtungsfaktor × Schüttdichte (t/m³)",
-    formulaExplanation: "Beim Rütteln oder natürlichen Setzen durch Regen verdichtet sich Schotter und Splitt um 10 % bis 15 %, was bei der Bestellmenge berücksichtigt werden muss.",
+    formula: "Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³); Volumen (m³) = Fläche (m²) × Schütthöhe (m)",
+    formulaExplanation: "Die Schüttdichte berücksichtigt im Gegensatz zur Festgesteins-Rohdichte die Haufwerksporen (Lufthohlräume) zwischen den Körnern. Bei reinem Edelsplitt 2/5 (enger Kornbereich) beträgt die lose Schüttdichte ca. 1,45 bis 1,55 t/m³. Breit gestufte Gemische mit Feinanteil (z. B. Mineralbeton/Schotter 0/32) verdichten sich beim Einbau stark und erreichen im Rüttelzustand bis zu 1,80–2,00 t/m³.",
     workedExample: {
-          "title": "Beispiel: 30 m² Gartenweg mit 5 cm Edelsplitt (10 % Setzung)",
-          "inputValues": [
-                {
-                      "label": "Fläche",
-                      "value": "30 m²"
-                },
-                {
-                      "label": "Höhe",
-                      "value": "5 cm"
-                },
-                {
-                      "label": "Material",
-                      "value": "Splitt (1,55 t/m³)"
-                }
-          ],
-          "steps": [
-                "Volumen = 30 × 0,05 × 1,10 = 1,65 m³",
-                "Gewicht = 1,65 m³ × 1,55 t/m³ = 2,56 Tonnen"
-          ],
-          "result": "2,56 Tonnen Splitt (3 Big Bags)"
+      title: "Beispiel: 30 m² Pflasterbettung mit 5 cm Splitt 2/5 (ohne Setzung)",
+      inputValues: [
+        { label: "Fläche", value: "30 m²" },
+        { label: "Einbauhöhe", value: "5 cm" },
+        { label: "Material", value: "Splitt 2/5 (1,50 t/m³)" },
+        { label: "Zuschlag", value: "0 %" },
+      ],
+      steps: [
+        "Reines Einbauvolumen = 30 m² × 0,05 m = 1,50 m³",
+        "Gewicht = 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
+        "Bestellmenge = ca. 2,25 Tonnen (bzw. 3 Big Bags à 1 t)",
+      ],
+      result: "2,25 Tonnen Splitt (1,50 m³)",
     },
+    workedExamples: [
+      {
+        title: "Beispiel 1: Fläche & Höhe (30 m², 5 cm)",
+        description: "30 m² × 0,05 m = 1,50 m³ Einbauvolumen; bei 1,50 t/m³ Schüttdichte = 2,25 Tonnen.",
+        inputs: { calcMode: "area_depth", area: 30, depth: 5, materialType: "grit_2_5", compaction: 0 },
+        resultSummary: "2,25 t (1,50 m³)",
+      },
+      {
+        title: "Beispiel 2: 2 m³ Splitt in Tonnen",
+        description: "2 m³ × 1,50 t/m³ = 3,00 Tonnen.",
+        inputs: { calcMode: "volume_to_weight", knownVolumeM3: 2.0, materialType: "grit_2_5" },
+        resultSummary: "3,00 t",
+      },
+      {
+        title: "Beispiel 3: 3 t Splitt in Kubikmeter (m³)",
+        description: "3 t ÷ 1,50 t/m³ = 2,00 m³.",
+        inputs: { calcMode: "weight_to_volume", knownWeightTonnes: 3.0, materialType: "grit_2_5" },
+        resultSummary: "2,00 m³",
+      },
+    ],
     content: {
-      intro: 'Dieser Schüttgutrechner transformiert Flächenmaße und Schütthöhen in benötigte Kubikmeter und das Transportgewicht in Tonnen.',
-      details: 'Gewicht in Tonnen = Fläche in m² · Schütthöhe in Metern · Schüttdichte (ca. 1,5 bis 1,8 t/m³ je nach Körnung und Feuchte). Für Gartenwege und Zierbeete reicht eine Schütthöhe von 5 cm (ca. 80 kg/m²).',
+      intro: 'Dieser Baustoffrechner ermittelt Schüttvolumen in m³ und Transportgewicht in Tonnen für Splitt, Kies, Schotter, Sand und Rindenmulch nach drei flexiblen Methoden.',
+      sections: [
+        {
+          title: 'Schüttdichte vs. Rohdichte: Der entscheidende Unterschied',
+          content: 'Oft wird die Rohdichte des Festgesteins (z. B. Granit oder Basalt mit 2,6 bis 2,8 t/m³) mit dem tatsächlichen Liefergewicht verwechselt. Werden Steine zu Splitt gebrochen, entstehen zwischen den Körnern Haufwerksporen (Lufthohlräume von rund 40 bis 45 Prozent des Gesamtvolumens). Das lose Schüttgewicht – die **Schüttdichte** – liegt daher bei Edelsplitt 2/5 nur bei circa **1,45 bis 1,55 t/m³**. Rechnen Sie bei Schüttgütern stets mit der Schüttdichte Ihres Baustoffhändlers.',
+        },
+        {
+          title: 'Wie viel wiegt 1 m³ Splitt 2/5?',
+          content: 'Ein Kubikmeter loser Splitt der Körnung 2/5 mm wiegt im Mittel rund **1,50 Tonnen** (1.500 kg). Das genaue Gewicht variiert je nach Gesteinsart (Basalt ist schwerer als Kalkstein) und Feuchtegehalt. Ausführliche Richtwerte, Kornanalysen und Bezugsquellen finden Sie in unserem Ratgeber [Splitt 2/5: Gewicht, Schüttdichte und m³ in Tonnen umrechnen](/ratgeber/splitt-2-5-gewicht-schuettdichte/).',
+        },
+        {
+          title: 'Muss Splitt verdichtet werden?',
+          content: 'Einheitliche Körnungen ohne Feinanteile wie Splitt 2/5 werden im Pflasterbett lose abgezogen und verdichten sich beim Einrütteln des Pflasters kaum (nur 0 bis maximal 5 %). Gestufte Schottertragschichten (z. B. Frostschutz 0/32 mit Sand- und Staubanteil) verdichten sich hingegen stark (10 bis 20 %). Verwenden Sie für reinen Splitt daher keinen pauschalen 15-%-Aufschlag.',
+        },
+        {
+          title: 'Warum wiegt ein Big Bag nicht immer genau eine Tonne?',
+          content: 'Big Bags sind flexible Schüttgutbehälter (FIBC). Manche Lieferanten befüllen Big Bags nach Volumen (z. B. 1-m³-Bag, der bei Splitt ca. 1,5 Tonnen wiegt, bei Rindenmulch aber nur 400 kg), während andere Lieferanten 500-kg-, 750-kg- oder 1.000-kg-Säcke auf Waagen abfüllen. Prüfen Sie beim Baustoffkauf stets, ob das Angebot nach Gewicht (pro Tonne) oder nach Schüttvolumen (pro m³ oder pro Bag) kalkuliert ist.',
+        },
+      ],
+      details: 'Die hinterlegten Richtwerte für Schüttdichten sind Modellannahmen: Splitt 2/5 ca. 1,50 t/m³, Rollkies 16/32 ca. 1,60 t/m³, Schotter 0/32 verdichtet ca. 1,80 t/m³, Sand ca. 1,60 t/m³, Rindenmulch ca. 0,40 t/m³. Da Feuchte und Gesteinsart schwanken, können Sie im Modus "Eigene Schüttdichte" die exakte Angabe des Steinbruchs oder Baustoffwerks eingeben.',
     },
     faqs: [
-      { question: 'Welcher Unterschied besteht zwischen Kies und Splitt?', answer: 'Kies besteht aus rund gewaschenen Flusskiesen; Splitt besteht aus scharfkantig gebrochenem Naturstein, der sich unter Belastung verkeilt und kaum rollt.' },
-      { question: 'Warum sollte man unter Zierkies ein Unkrautvlies verlegen?', answer: 'Das Geotextil-Vlies verhindert, dass sich Steine mit dem feuchten Erdreich vermischen, und hemmt das Durchwachsen von Wurzelunkräutern.' },
+      {
+        question: 'Wie rechnet man m³ Splitt in Tonnen um?',
+        answer: 'Multiplizieren Sie das Volumen in m³ mit der Schüttdichte des Splitts: Tonnen = m³ × Schüttdichte (t/m³). Beispiel: 2 m³ Splitt 2/5 mit einer Schüttdichte von 1,50 t/m³ entsprechen genau 3,0 Tonnen (2 × 1,5 = 3,0 t).',
+      },
+      {
+        question: 'Wie rechnet man Tonnen Splitt in m³ um?',
+        answer: 'Teilen Sie das Gewicht in Tonnen durch die Schüttdichte: m³ = Tonnen ÷ Schüttdichte (t/m³). Beispiel: 3,0 Tonnen Splitt 2/5 mit 1,50 t/m³ ergeben 2,0 m³ Schüttvolumen (3 ÷ 1,5 = 2,0 m³).',
+      },
+      {
+        question: 'Welche Schichthöhe empfiehlt sich für ein Pflasterbett aus Splitt 2/5?',
+        answer: 'Nach DIN 18318 gilt für das Pflasterbett eine Einbaudicke im verdichteten Zustand von 3 bis 5 cm (empfohlen: 4 cm gleichmäßig). Ein zu dickes Splittbett führt zu Spurrillen und Unebenheiten.',
+      },
     ],
-    relatedSlugs: ['pflastersteine-rechner', 'aushub-erdarbeiten-rechner', 'fundament-rechner'],
+    relatedSlugs: ['pflastersteine-rechner', 'aushub-erdarbeiten-rechner', 'fundament-rechner', 'estrich-rechner'],
   },
   {
     id: "drainage-gefaelle-rechner",

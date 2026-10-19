@@ -2679,7 +2679,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
   {
     id: 'oelheizung-verbrauch-rechner',
     slug: 'oelheizung-verbrauch-rechner',
-    name: 'Heizölverbrauch-Rechner (Liter nach Wohnfläche & Baujahr)',
+    name: 'Heizölverbrauch schätzen: Wohnfläche und Dämmzustand',
     shortName: 'Heizölverbrauch berechnen',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
@@ -2763,13 +2763,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         secondary: [
           { id: 'totalLiters', label: 'Geschätzter Heizölbedarf pro Jahr', value: totalLiters, formattedValue: `ca. ${formatNumber(totalLiters, 0)} Liter` },
           { id: 'monthlyCost', label: 'Monatlicher Richtwert (Kosten ÷ 12)', value: totalCost / 12, formattedValue: formatCurrency(totalCost / 12) },
-          { id: 'kwhEquivalent', label: 'Rechnerischer Energiegehalt in kWh', value: totalLiters * 10, formattedValue: `ca. ${formatNumber(totalLiters * 10, 0)} kWh` },
+          { id: 'kwhEquivalent', label: 'Rechnerischer Brennstoff-Energiegehalt (Heizwert Hi)', value: totalLiters * 10, formattedValue: `ca. ${formatNumber(totalLiters * 10, 0)} kWh` },
         ],
         summaryText: `Für ${area} m² Wohnfläche schätzt das Modell ca. ${formatNumber(totalLiters, 0)} Liter Heizöl im Jahr. Bei einem Preis von ${formatCurrency(price)}/Liter entspricht das rechnerisch ${formatCurrency(totalCost)}.`,
       };
     },
     formula: 'Heizölverbrauch = Wohnfläche × Literbedarf pro m²; Kosten = Liter × Literpreis',
-    formulaExplanation: 'Ein Liter leichtes Heizöl (EL) besitzt einen Energiegehalt von etwa 10 Kilowattstunden (kWh). Die Faktoren von 8, 14 und 22 Litern je m² und Jahr sind vereinfachte Modellannahmen zur Orientierung.',
+    formulaExplanation: 'Ein Liter leichtes Heizöl (EL) besitzt einen Brennstoff-Energiegehalt (Heizwert Hi) von etwa 10 Kilowattstunden (kWh); der Brennwert Hs inklusive Kondensationswärme liegt bei ca. 10,6 kWh/l. Die Faktoren von 8, 14 und 22 Litern je m² und Jahr sind vereinfachte Modellannahmen zur Orientierung für den Brennstoffbedarf (ohne Kesselwirkungsgrad- und Leitungsverluste).',
     workedExample: {
       title: 'Beispiel: 140 m² Wohnfläche bei 14 Liter/m²a und 1,05 €/Liter',
       inputValues: [{ label: 'Wohnfläche', value: '140 m²' }, { label: 'Bedarf/m²', value: '14 Liter' }, { label: 'Ölpreis', value: '1,05 €/l' }],
@@ -2793,10 +2793,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         },
         {
           title: 'Tatsächlichen Verbrauch über Tankstände berechnen',
-          content: 'Dieser Rechner liefert eine flächenbasierte Modellschätzung. Wie Sie Ihren realen Jahresverbrauch aus Tankbeständen und Lieferbelegen exakt ermitteln, erfahren Sie in unserem Ratgeber [Heizölverbrauch berechnen: Tankstände statt Liefermenge](/ratgeber/heizoelverbrauch-aus-tankstand-berechnen/).',
+          content: 'Dieser Rechner liefert eine flächenbasierte Modellschätzung. Wie Sie Ihren realen Jahresverbrauch aus Tankbeständen und Lieferbelegen nachvollziehen, erfahren Sie in unserem Ratgeber [Heizölverbrauch berechnen: Tankstände statt Liefermenge](/ratgeber/heizoelverbrauch-aus-tankstand-berechnen/). Die Genauigkeit hängt von der präzisen Ablesung der Tankfüllstände und lückenlosen Liefernachweisen ab.',
         },
       ],
-      details: '1 Liter leichtes Heizöl (EL) besitzt einen Brennwert von rund 10,0 kWh. Die im Rechner hinterlegten Faktoren (8, 14 und 22 Liter je m² und Jahr) sind unverbindliche Modellannahmen und keine Messwerte eines konkreten Gebäudes.',
+      details: '1 Liter leichtes Heizöl (EL) besitzt einen Energiegehalt (Heizwert Hi) von rund 10,0 kWh (Brennwert Hs ca. 10,6 kWh/l). Die im Rechner hinterlegten Faktoren (8, 14 und 22 Liter je m² und Jahr) sind unverbindliche Modellannahmen für den Brennstoffbedarf und keine Messwerte eines konkreten Gebäudes. Der Rechner ermittelt den Brennstoffeinsatz, nicht die nutzbare thermische Raumwärme.',
     },
     faqs: [
       { question: 'Wie wirkt sich die CO₂-Abgabe auf den Heizölpreis aus?', answer: 'Auf Heizöl fällt nach dem BEHG eine CO₂-Abgabe an, die im Literpreis des Brennstoffhändlers bereits enthalten ist.' },

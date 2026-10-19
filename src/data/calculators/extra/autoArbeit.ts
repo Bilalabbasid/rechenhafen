@@ -1407,67 +1407,187 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'autobahn-maut-rechner-vignette',
     slug: 'autobahn-maut-rechner-vignette',
-    name: 'Mautrechner Österreich & Schweiz (Vignette & Streckenmaut)',
+    name: 'Mautrechner Österreich, Schweiz & Brenner (Vignetten & Streckenmaut)',
     shortName: 'Mautrechner Alpen',
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
-    metaTitle: 'Mautrechner Österreich, Schweiz & Italien – Vignettenkosten',
-    metaDescription: 'Berechnen Sie die anfallenden Maut- und Vignettenkosten für Ihre Fahrt nach Österreich (1-Tages-, 10-Tages-Vignette, Brenner)',
-    h1: 'Mautrechner – Vignetten & Mautgebühren in Europa berechnen',
-    shortDescription: 'Kalkuliert die Gebühren für Autobahn-Vignetten und Sondermauten auf beliebten Reiserouten.',
-    searchKeywords: ['mautrechner oesterreich', 'vignette schweiz kosten 2026', 'brennermaut kosten pkw', '10 tages vignette oesterreich preis'],
+    metaTitle: 'Mautrechner Österreich & Schweiz – Vignettenkosten 2026',
+    metaDescription: 'Berechnen Sie die offiziellen Vignetten- und Streckenmaut-Kosten für PKW in Österreich (1-Tages-, 10-Tages-Vignette, Brenner A13), der Schweiz und auf der Brennerroute.',
+    h1: 'Mautrechner – Vignetten & Streckenmaut für Österreich, Schweiz & Brenner',
+    shortDescription: 'Kalkuliert die offiziellen Gebühren für Autobahn-Vignetten und Streckenmauten (PKW bis 3,5 t zGG) für Österreich, die Schweiz und die Brennerautobahn nach Italien.',
+    searchKeywords: [
+      'mautrechner oesterreich',
+      'vignette oesterreich 2026 preis',
+      '10 tages vignette oesterreich kosten',
+      '1 tages vignette oesterreich pkw',
+      'vignette schweiz kosten 2026',
+      'brennermaut kosten pkw',
+    ],
     inputs: [
       {
         id: 'countryRoute',
-        label: 'Reiseziel / Hauptroute',
+        label: 'Vignette / Reiseroute auswählen (PKW bis 3,5 t)',
         type: 'select',
         defaultValue: 'at_10days',
         options: [
-          { value: 'at_1day', label: 'Österreich: 1-Tages-Vignette (ca. 8,60 €)' },
-          { value: 'at_10days', label: 'Österreich: 10-Tages-Vignette (ca. 11,50 €)' },
-          { value: 'at_brenner', label: 'Österreich: 10-Tages-Vignette + Brennermaut hin & zurück (ca. 34,50 €)' },
-          { value: 'ch_year', label: 'Schweiz: Jahresvignette (40 CHF ≈ ca. 42,00 €)' },
-          { value: 'it_roundtrip', label: 'Italien: Brenner bis Gardasee hin & zurück (ca. 48,00 € Streckenmaut)' },
+          { value: 'at_1day', label: 'Österreich: 1-Tages-Vignette (9,60 € – ASFINAG Tarif 2026)' },
+          { value: 'at_10days', label: 'Österreich: 10-Tages-Vignette (12,80 € – ASFINAG Tarif 2026)' },
+          { value: 'at_brenner', label: 'Österreich: 10-Tages-Vignette + Brennermaut A13 hin & zurück (36,80 €)' },
+          { value: 'at_tauern', label: 'Österreich: 10-Tages-Vignette + Tauernautobahn A10 hin & zurück (41,80 €)' },
+          { value: 'ch_year', label: 'Schweiz: Nationalstrassen-Jahresvignette (40,00 CHF gesetzlicher Tarif ≈ ca. 42,00 €)' },
+          { value: 'it_brenner_gardasee', label: 'Italien: Streckenmaut Brenner (A22) bis Gardasee Süd hin & zurück (ca. 33,60 €)' },
         ],
       },
     ],
     calculate: (inputs) => {
       const route = inputs.countryRoute || 'at_10days';
-      let cost = 11.50;
-      let label = 'Österreich 10-Tages-Vignette';
-      let validity = '10 Kalendertage';
+      let cost = 12.80;
+      let vignettePart = 12.80;
+      let routeTollPart = 0.00;
+      let label = 'Österreich: 10-Tages-Vignette';
+      let validity = '10 aufeinanderfolgende Kalendertage';
+      let operator = 'ASFINAG (Österreich)';
 
-      if (route === 'at_1day') { cost = 8.60; label = 'Österreich 1-Tages-Vignette'; validity = '1 Tag (ideal für Transit)'; }
-      if (route === 'at_brenner') { cost = 34.50; label = 'Österreich 10-Tages-Vignette + Brenner (A13) hin & zurück'; validity = '10 Tage Vignette + 2 Einzelfahrten Brenner'; }
-      if (route === 'ch_year') { cost = 42.00; label = 'Schweiz Jahresvignette (E-Vignette)'; validity = 'Bis zu 14 Monate (1. Dez Vorjahr bis 31. Jan Folgejahr)'; }
-      if (route === 'it_roundtrip') { cost = 48.00; label = 'Italien Streckenmaut Brenner - Rovereto/Affi (Hin & Zurück)'; validity = 'Entfernungsabhängige Maut'; }
+      if (route === 'at_1day') {
+        cost = 9.60;
+        vignettePart = 9.60;
+        routeTollPart = 0.00;
+        label = 'Österreich: 1-Tages-Vignette';
+        validity = '1 Kalendertag (00:00 bis 23:59 Uhr des gewählten Tages)';
+        operator = 'ASFINAG (Österreich)';
+      } else if (route === 'at_10days') {
+        cost = 12.80;
+        vignettePart = 12.80;
+        routeTollPart = 0.00;
+        label = 'Österreich: 10-Tages-Vignette';
+        validity = '10 Kalendertage (inkl. Lochungstag/Gültigkeitsbeginn)';
+        operator = 'ASFINAG (Österreich)';
+      } else if (route === 'at_brenner') {
+        // ASFINAG 2026: 10-Tages-Vignette 12,80 € + 2x Brenner-Einzelfahrt à 12,00 € = 24,00 €
+        vignettePart = 12.80;
+        routeTollPart = 24.00;
+        cost = vignettePart + routeTollPart;
+        label = 'Österreich: 10-Tages-Vignette + Brennermaut (A13) Hin- & Rückfahrt';
+        validity = 'Vignette: 10 Tage; Streckenmaut: 2 Einzelfahrten (1 Jahr gültig)';
+        operator = 'ASFINAG (Österreich)';
+      } else if (route === 'at_tauern') {
+        // ASFINAG 2026: 10-Tages-Vignette 12,80 € + 2x Tauern/Katschberg Einzelfahrt à 14,50 € = 29,00 €
+        vignettePart = 12.80;
+        routeTollPart = 29.00;
+        cost = vignettePart + routeTollPart;
+        label = 'Österreich: 10-Tages-Vignette + Tauernautobahn (A10) Hin- & Rückfahrt';
+        validity = 'Vignette: 10 Tage; Streckenmaut: 2 Einzelfahrten Tauern/Katschberg';
+        operator = 'ASFINAG (Österreich)';
+      } else if (route === 'ch_year') {
+        // Schweiz BAZG: 40 CHF gesetzlich Festbetrag
+        cost = 42.00;
+        vignettePart = 42.00;
+        routeTollPart = 0.00;
+        label = 'Schweiz: Jahresvignette (40,00 CHF)';
+        validity = 'Bis zu 14 Monate (1. Dezember Vorjahr bis 31. Januar Folgejahr)';
+        operator = 'Bundesamt für Zoll und Grenzsicherheit (BAZG)';
+      } else if (route === 'it_brenner_gardasee') {
+        // Autostrada del Brennero A22: Brennero bis Affi/Lago di Garda Sud (ca. 180 km): ca. 16,80 € einfache Fahrt = 33,60 € hin & zurück
+        cost = 33.60;
+        vignettePart = 0.00;
+        routeTollPart = 33.60;
+        label = 'Italien: Streckenmaut A22 Brenner – Rovereto/Affi (Hin & Zurück)';
+        validity = 'Entfernungsabhängige streckenbezogene Autobahnmaut';
+        operator = 'Autostrada del Brennero SpA (A22) / Autostrade per l’Italia';
+      }
 
       return {
-        primary: { id: 'cost', label: 'Gesamte Maut- & Vignettenkosten', value: cost, formattedValue: formatCurrency(cost), highlight: true },
+        primary: {
+          id: 'cost',
+          label: 'Gesamte Maut- & Vignettenkosten',
+          value: cost,
+          formattedValue: formatCurrency(cost),
+          highlight: true,
+        },
         secondary: [
-          { id: 'validity', label: 'Gültigkeitsdauer', value: 0, formattedValue: validity },
-          { id: 'label', label: 'Mautart', value: 0, formattedValue: label },
+          {
+            id: 'vignettePart',
+            label: 'Reine Vignettengebühr',
+            value: vignettePart,
+            formattedValue: formatCurrency(vignettePart),
+          },
+          {
+            id: 'routeTollPart',
+            label: 'Reine Strecken- / Sondermaut',
+            value: routeTollPart,
+            formattedValue: formatCurrency(routeTollPart),
+          },
+          {
+            id: 'validity',
+            label: 'Gültigkeitsdauer',
+            value: 0,
+            formattedValue: validity,
+          },
+          {
+            id: 'operator',
+            label: 'Zuständiger Mautbetreiber',
+            value: 0,
+            formattedValue: operator,
+          },
         ],
-        summaryText: `Für die gewählte Route (${label}) fallen Gebühren von ca. ${formatCurrency(cost)} an (${validity}).`,
+        summaryText: `Für die gewählte Vignetten- und Streckenoption (${label}) fallen Gesamtkosten von ${formatCurrency(cost)} an (${validity}). Die Abrechnung erfolgt über ${operator}.`,
       };
     },
-    formula: 'Maut = Vignettengebühr + Sonderstreckenmaut (Brenner, Tauern, etc.)',
-    formulaExplanation: 'In Österreich und der Schweiz können Vignetten digital als E-Vignette an das Autokennzeichen gekoppelt werden.',
+    formula: 'Gesamtkosten = Vignettenpreis (zeitbasiert) + Sonderstreckenmaut (einzeln oder Hin- & Rückfahrt)',
+    formulaExplanation: 'In Österreich und der Schweiz gilt für PKW bis 3,5 t das zeitbasierte Vignettenprinzip (E-Vignette oder Klebevignette). Bestimmte Alpenpassagen wie die Brennerautobahn (A13) oder die Tauernautobahn (A10) sind streckenmautpflichtig und kosten unabhängig von der Vignette eine gesonderte Mautgebühr.',
     workedExample: {
-      title: 'Beispiel: Urlaub in Österreich (10 Tage)',
-      inputValues: [{ label: 'Route', value: '10-Tages-Vignette' }],
-      steps: ['Digitale 10-Tages-Vignette der ASFINAG = 11,50 €'],
-      result: '11,50 € Vignettenkosten',
+      title: 'Beispiel: 10 Tage Urlaub in Österreich mit Brennerpassage',
+      inputValues: [{ label: 'Auswahl', value: '10-Tages-Vignette + Brenner Hin- & Rückfahrt' }],
+      steps: [
+        'ASFINAG 10-Tages-Vignette (Tarif 2026) = 12,80 €',
+        'ASFINAG Brenner Streckenmaut A13 (2 × 12,00 €) = 24,00 €',
+        'Gesamtkosten = 12,80 € + 24,00 € = 36,80 €',
+      ],
+      result: '36,80 € Gesamtkosten',
     },
     content: {
-      intro: 'Dieser Reiseplaner kalkuliert die Kosten für Vignetten, Streckenmauten und Tunnelgebühren in den beliebtesten Reiseländern (Österreich, Schweiz, Italien, Frankreich).',
-      details: 'In Österreich und der Schweiz gilt das zeitbasierte Vignettenprinzip (z. B. 1-Tages-, 10-Tages-, 2-Monats- oder Jahresvignette); in Frankreich und Italien wird die Maut streckenbezogen an Mautstationen pro Kilometer abgerechnet.',
+      intro: 'Dieser Rechner ermittelt die offiziellen Vignetten- und Streckenmaut-Tarife für gängige Reiserouten durch Österreich, die Schweiz und über den Brennerpass nach Norditalien (PKW bis 3,5 t zGG).',
+      sections: [
+        {
+          title: 'Offizielle Vignettenpreise Österreich 2026 (ASFINAG)',
+          content: 'Für mehrspurige Kraftfahrzeuge bis 3,5 t höchstzulässigem Gesamtgewicht (hzG) gelten bei der ASFINAG folgende Tarife:\n\n- **1-Tages-Vignette:** 9,60 € (ausschließlich digital als E-Vignette erhältlich; gilt an einem Kalendertag)\n- **10-Tages-Vignette:** 12,80 € (digital oder als Klebevignette; gilt für 10 aufeinanderfolgende Kalendertage)\n- **2-Monats-Vignette:** 32,00 €\n- **Jahresvignette:** 107,00 €\n\n*Quelle: Offizielle Tariftabelle der ASFINAG (gültig für 2026).*',
+        },
+        {
+          title: 'Streckenmaut (Sondermaut) in Österreich',
+          content: 'Bestimmte baulich aufwendige Alpenquerungen kosten in Österreich extra und sind **nicht** durch die Vignette abgedeckt:\n\n- **A13 Brennerautobahn:** 12,00 € Einzelfahrt (Hin- und Rückfahrt: 24,00 €)\n- **A10 Tauernautobahn (Tauern- & Katschbergtunnel):** 14,50 € Einzelfahrt (Hin- und Rückfahrt: 29,00 €)\n- **S16 Arlberg-Straßentunnel:** 12,50 € Einzelfahrt\n\nAuf Streckenmautabschnitten besteht keine Vignettenpflicht; fahren Sie jedoch über mautpflichtige Autobahnzubringer (z. B. A12 Inntalautobahn), benötigen Sie zusätzlich eine Vignette.',
+        },
+        {
+          title: 'Schweiz: Nationalstrassen-Vignette (40 CHF)',
+          content: 'In der Schweiz gibt es für PKW bis 3,5 t keine Tages- oder Zehn-Tages-Vignetten, sondern ausschließlich die gesetzliche Jahresvignette für **40,00 CHF** (erhältlich als digitale E-Vignette oder Klebevignette über das Bundesamt für Zoll und Grenzsicherheit BAZG). Bei aktuellem Wechselkurs entspricht dies circa 42,00 €.',
+        },
+        {
+          title: 'Italien: Entfernungsabhängige Streckenmaut',
+          content: 'In Italien wird auf den meisten Autobahnen keine Vignette verlangt, sondern an den Mautstationen streckenabhängig pro gefahrenem Kilometer abgerechnet. Auf der Brennerautobahn A22 (Brennero bis Rovereto Sud / Affi am Gardasee) beträgt die Maut für einen Standard-PKW (Klasse A) rund 16,80 € einfache Fahrt bzw. circa 33,60 € für Hin- und Rückfahrt.',
+        },
+      ],
+      details: 'Der Rechner bietet offizielle Tarife für vordefinierte Routen in Österreich, der Schweiz und Norditalien. Er ist kein europaweiter Routenplaner für beliebige Einzelfahrten in Frankreich oder Spanien. Alle Angaben basieren auf den amtlichen Betreibertarifen für Personenkraftwagen bis 3,5 t zGG.',
     },
     faqs: [
-      { question: 'Was ist die Streckenmaut (Sondermaut) in Österreich?', answer: 'Bestimmte Alpenübergänge wie Brennerautobahn (A13), Tauernautobahn (A10) oder Arlbergtunnel kosten extra und sind nicht durch die reguläre Autobahnvignette abgedeckt.' },
-      { question: 'Was droht beim Befahren von Schweizer Autobahnen ohne Vignette?', answer: 'In der Schweiz wird das Fahren ohne gültige E-Vignette oder Klebevignette mit einer Buße von 200 Schweizer Franken plus den Kosten für eine reguläre Jahresvignette geahndet.' },
+      {
+        question: 'Gilt die österreichische 10-Tages-Vignette auch für die Brennerautobahn?',
+        answer: 'Nein. Die Brennerautobahn (A13 ab Innsbruck-Süd bis zur italienischen Grenze) ist ein Streckenmautabschnitt der ASFINAG. Hier fällt pro Einzelfahrt eine separate Sondermaut von 12,00 € an (24,00 € für Hin- und Rückfahrt), unabhängig vom Besitz einer Autobahnvignette.',
+      },
+      {
+        question: 'Gibt es für die Schweiz auch Kurzzeit-Vignetten für Urlauber?',
+        answer: 'Nein. Nach dem Schweizer Nationalstrassenabgabegesetz (NSAG) gibt es für PKW ausschließlich die Jahresvignette zum Festpreis von 40,00 CHF. Diese gilt vom 1. Dezember des Vorjahres bis zum 31. Januar des Folgejahres (maximal 14 Monate).',
+      },
+      {
+        question: 'Was ist bei der digitalen E-Vignette der ASFINAG für Konsumenten zu beachten?',
+        answer: 'Beim Online-Kauf der E-Vignette durch private Konsumenten galt früher eine 18-tägige Wartefrist wegen des EU-Rücktrittsrechts. Die 1-Tages- und 10-Tages-Vignetten sind bei der ASFINAG inzwischen jedoch sofort ab Kauf gültig.',
+      },
     ],
-    relatedSlugs: ['fahrtkostenrechner', 'spritkostenrechner', 'kraftstoffverbrauch-rechner', 'auto-gesamtkosten-rechner', 'fahrzeit-rechner', 'lkw-maut-deutschland-rechner'],
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'ASFINAG Mautordnung & Tarife 2026 / BAZG Schweiz',
+      sourceUrl: 'https://www.asfinag.at/maut-vignette/vignette/',
+      lastVerified: '2026-10-15',
+    },
+    relatedSlugs: ['fahrtkostenrechner', 'spritkostenrechner', 'kraftstoffverbrauch-rechner', 'auto-gesamtkosten-rechner', 'lkw-maut-deutschland-rechner'],
   },
 
   {

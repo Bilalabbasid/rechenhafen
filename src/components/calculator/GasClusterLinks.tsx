@@ -238,7 +238,7 @@ export const GAS_CLUSTER_CONFIG: Record<string, { introNote: string; links: Clus
         anchorText: 'Heizölverbrauch schätzen',
         intentBadge: 'Öl im Detail',
         badgeType: 'compare',
-        reason: 'Kalkuliert den Jahresbedarf in Litern und Tankkosten für Ölheizungen nach Gebäudefläche und Baujahr.',
+        reason: 'Kalkuliert den Jahresbedarf in Litern und Tankkosten für Ölheizungen nach Wohnfläche und Dämmzustand.',
         icon: 'flame',
       },
       {
