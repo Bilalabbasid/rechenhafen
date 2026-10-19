@@ -126,9 +126,9 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       'gewinnschwelle stückzahl umsatz',
     ],
     inputs: [
-      { id: 'fixedCosts', label: 'Gesamte monatliche Fixkosten (Miete, Gehälter, Software)', type: 'number', defaultValue: 6000, step: 250, unit: '€' },
-      { id: 'pricePerUnit', label: 'Verkaufspreis pro Stück (netto)', type: 'number', defaultValue: 80, step: 1, unit: '€' },
-      { id: 'variableCostPerUnit', label: 'Variable Kosten pro Stück (Material, Versand)', type: 'number', defaultValue: 30, step: 1, unit: '€' },
+      { id: 'fixedCosts', label: 'Gesamte monatliche Fixkosten (Miete, Gehälter, Software)', type: 'number', defaultValue: 6000, min: 0, step: 250, unit: '€', helpText: 'Fixkosten im Betrachtungszeitraum (0 € bei rein variablen Geschäftsmodellen).' },
+      { id: 'pricePerUnit', label: 'Verkaufspreis pro Stück (netto)', type: 'number', defaultValue: 80, min: 0.01, step: 1, unit: '€' },
+      { id: 'variableCostPerUnit', label: 'Variable Kosten pro Stück (Material, Versand)', type: 'number', defaultValue: 30, min: 0, step: 1, unit: '€', helpText: 'Variable Stückkosten (0 € bei reinen Digital- oder Dienstleistungsprodukten).' },
     ],
     calculate: calculateBreakEven,
     formula: 'Break-Even-Absatzmenge = Fixkosten / (Verkaufspreis - Variable Stückkosten) | Mindestumsatz = Menge × Preis',

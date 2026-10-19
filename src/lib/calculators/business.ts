@@ -91,14 +91,60 @@ export function calculateVat(inputs: Record<string, any>): CalculationResult {
 }
 
 export function calculateBreakEven(inputs: Record<string, any>): CalculationResult {
-  const fixedCosts = parseFloat(inputs.fixedCosts) || 5000;
-  const pricePerUnit = parseFloat(inputs.pricePerUnit) || 50;
-  const variableCostPerUnit = parseFloat(inputs.variableCostPerUnit) || 20;
-
-  if (fixedCosts <= 0 || pricePerUnit <= 0) {
+  const rawFixed = inputs.fixedCosts !== undefined && inputs.fixedCosts !== null && String(inputs.fixedCosts).trim() !== ''
+    ? parseFloat(inputs.fixedCosts)
+    : 6000;
+  if (isNaN(rawFixed) || rawFixed < 0) {
     return {
       primary: { id: 'breakEvenUnits', label: 'Gewinnschwelle', value: 0, formattedValue: '0 Stück' },
-      error: 'Fixkosten und Verkaufspreis müssen positiv sein.',
+      error: 'Fixkosten dürfen nicht negativ sein.',
+    };
+  }
+  const fixedCosts = rawFixed;
+
+  if (inputs.pricePerUnit === undefined || inputs.pricePerUnit === null || String(inputs.pricePerUnit).trim() === '') {
+    return {
+      primary: { id: 'breakEvenUnits', label: 'Gewinnschwelle', value: 0, formattedValue: '0 Stück' },
+      error: 'Bitte geben Sie den Verkaufspreis pro Stück an.',
+    };
+  }
+  const rawPrice = parseFloat(inputs.pricePerUnit);
+  if (isNaN(rawPrice) || rawPrice <= 0) {
+    return {
+      primary: { id: 'breakEvenUnits', label: 'Gewinnschwelle', value: 0, formattedValue: '0 Stück' },
+      error: 'Der Verkaufspreis pro Stück muss größer als 0 € sein.',
+    };
+  }
+  const pricePerUnit = rawPrice;
+
+  const rawVar = inputs.variableCostPerUnit !== undefined && inputs.variableCostPerUnit !== null && String(inputs.variableCostPerUnit).trim() !== ''
+    ? parseFloat(inputs.variableCostPerUnit)
+    : 30;
+  if (isNaN(rawVar) || rawVar < 0) {
+    return {
+      primary: { id: 'breakEvenUnits', label: 'Gewinnschwelle', value: 0, formattedValue: '0 Stück' },
+      error: 'Variable Stückkosten dürfen nicht negativ sein.',
+    };
+  }
+  const variableCostPerUnit = rawVar;
+
+  if (fixedCosts === 0) {
+    const cm = pricePerUnit - variableCostPerUnit;
+    const cmRatio = (cm / pricePerUnit) * 100;
+    return {
+      primary: {
+        id: 'breakEvenUnits',
+        label: 'Gewinnschwelle (Break-Even-Absatz)',
+        value: 0,
+        formattedValue: '0 Stück',
+        highlight: true,
+      },
+      secondary: [
+        { id: 'breakEvenRevenue', label: 'Mindestumsatz zur Kostendeckung', value: 0, formattedValue: '0,00 €' },
+        { id: 'cm', label: 'Deckungsbeitrag pro Stück', value: cm, formattedValue: formatCurrency(cm) },
+        { id: 'cmRatio', label: 'Deckungsbeitragsquote', value: cmRatio, formattedValue: formatPercent(cmRatio, 1) },
+      ],
+      summaryText: `Da keine Fixkosten anfallen (0,00 €), ist die Gewinnschwelle ab dem ersten Verkauf gedeckt.`,
     };
   }
 

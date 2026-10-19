@@ -2,15 +2,27 @@ import { CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent, formatDateDe } from '@/lib/formatters';
 
 export function calculateRentBurden(inputs: Record<string, any>): CalculationResult {
-  const netIncome = parseFloat(inputs.netIncome) || 3000;
-  const warmRent = parseFloat(inputs.warmRent) || 900;
-
-  if (netIncome <= 0) {
+  const rawIncome = inputs.netIncome !== undefined && inputs.netIncome !== null && String(inputs.netIncome).trim() !== ''
+    ? parseFloat(inputs.netIncome)
+    : 3200;
+  if (isNaN(rawIncome) || rawIncome <= 0) {
     return {
       primary: { id: 'ratio', label: 'Mietbelastungsquote', value: 0, formattedValue: '0 %' },
       error: 'Das monatliche Haushaltsnettoeinkommen muss positiv sein.',
     };
   }
+  const netIncome = rawIncome;
+
+  const rawWarm = inputs.warmRent !== undefined && inputs.warmRent !== null && String(inputs.warmRent).trim() !== ''
+    ? parseFloat(inputs.warmRent)
+    : 950;
+  if (isNaN(rawWarm) || rawWarm < 0) {
+    return {
+      primary: { id: 'ratio', label: 'Mietbelastungsquote', value: 0, formattedValue: '0 %' },
+      error: 'Die monatliche Warmmiete darf nicht negativ sein.',
+    };
+  }
+  const warmRent = rawWarm;
 
   const ratio = (warmRent / netIncome) * 100;
   const remaining = netIncome - warmRent;
@@ -20,6 +32,8 @@ export function calculateRentBurden(inputs: Record<string, any>): CalculationRes
     assessment = 'Kritisch hoch (über 40 % des Einkommens)';
   } else if (ratio > 30) {
     assessment = 'Erhöht (zwischen 30 % und 40 %)';
+  } else if (ratio === 0) {
+    assessment = 'Keine Mietbelastung (0 % / mietfrei)';
   }
 
   return {
@@ -83,31 +97,46 @@ const STATE_NAMES: Record<string, string> = {
 };
 
 export function calculatePropertyPurchaseFees(inputs: Record<string, any>): CalculationResult {
-  const purchasePrice = parseFloat(inputs.purchasePrice) || 350000;
-  const stateCode = inputs.federalState as string;
-  let stateRate = 5.0;
-  if (stateCode && STATE_TRANSFER_TAX[stateCode] !== undefined) {
-    stateRate = STATE_TRANSFER_TAX[stateCode];
-  } else if (inputs.transferTaxRate !== undefined) {
-    stateRate = parseFloat(inputs.transferTaxRate) || 5.0;
+  if (inputs.purchasePrice === undefined || inputs.purchasePrice === null || String(inputs.purchasePrice).trim() === '') {
+    return {
+      primary: { id: 'totalFees', label: 'Kaufnebenkosten', value: 0, formattedValue: '0,00 €' },
+      error: 'Bitte geben Sie einen Kaufpreis an.',
+    };
   }
-
-  const notaryRate = parseFloat(inputs.notaryRate) || 1.5; // Notar ca. 1.5%
-  const landRegistryRate = parseFloat(inputs.landRegistryRate) || 0.5; // Grundbuchamt ca. 0.5%
-  
-  let realtorRate = 3.57;
-  if (inputs.realtorOption === 'none') {
-    realtorRate = 0;
-  } else if (inputs.realtorRate !== undefined) {
-    realtorRate = parseFloat(inputs.realtorRate);
-    if (isNaN(realtorRate)) realtorRate = 3.57;
-  }
-
-  if (purchasePrice <= 0) {
+  const rawPrice = parseFloat(inputs.purchasePrice);
+  if (isNaN(rawPrice) || rawPrice <= 0) {
     return {
       primary: { id: 'totalFees', label: 'Kaufnebenkosten', value: 0, formattedValue: '0,00 €' },
       error: 'Bitte geben Sie einen positiven Kaufpreis an.',
     };
+  }
+  const purchasePrice = rawPrice;
+
+  const stateCode = inputs.federalState as string;
+  let stateRate = 5.0;
+  if (stateCode && STATE_TRANSFER_TAX[stateCode] !== undefined) {
+    stateRate = STATE_TRANSFER_TAX[stateCode];
+  } else if (inputs.transferTaxRate !== undefined && inputs.transferTaxRate !== null && String(inputs.transferTaxRate).trim() !== '') {
+    const rawState = parseFloat(inputs.transferTaxRate);
+    stateRate = !isNaN(rawState) && rawState >= 0 ? rawState : 5.0;
+  }
+
+  const rawNotary = inputs.notaryRate !== undefined && inputs.notaryRate !== null && String(inputs.notaryRate).trim() !== ''
+    ? parseFloat(inputs.notaryRate)
+    : 1.5;
+  const notaryRate = !isNaN(rawNotary) && rawNotary >= 0 ? rawNotary : 1.5;
+
+  const rawLand = inputs.landRegistryRate !== undefined && inputs.landRegistryRate !== null && String(inputs.landRegistryRate).trim() !== ''
+    ? parseFloat(inputs.landRegistryRate)
+    : 0.5;
+  const landRegistryRate = !isNaN(rawLand) && rawLand >= 0 ? rawLand : 0.5;
+  
+  let realtorRate = 3.57;
+  if (inputs.realtorOption === 'none') {
+    realtorRate = 0;
+  } else if (inputs.realtorRate !== undefined && inputs.realtorRate !== null && String(inputs.realtorRate).trim() !== '') {
+    const rawRealtor = parseFloat(inputs.realtorRate);
+    realtorRate = !isNaN(rawRealtor) && rawRealtor >= 0 ? rawRealtor : 3.57;
   }
 
   const transferTax = purchasePrice * (stateRate / 100);
@@ -225,12 +254,27 @@ export function calculateRentalYield(inputs: Record<string, any>): CalculationRe
 }
 
 export function calculatePricePerSquareMeter(inputs: Record<string, any>): CalculationResult {
-  const totalPrice = parseFloat(inputs.totalPrice) || 320000;
-  const livingArea = parseFloat(inputs.livingArea) || 85;
-
-  if (livingArea <= 0) {
+  const rawPrice = inputs.totalPrice !== undefined && inputs.totalPrice !== null && String(inputs.totalPrice).trim() !== ''
+    ? parseFloat(inputs.totalPrice)
+    : 360000;
+  if (isNaN(rawPrice) || rawPrice < 0) {
     return {
-      primary: { id: 'priceSqm', label: 'Quadratmeterpreis', value: 0, formattedValue: '0,00 €/m²' },
+      primary: { id: 'pricePerSqm', label: 'Preis pro Quadratmeter', value: 0, formattedValue: '0,00 € / m²' },
+      error: 'Bitte geben Sie einen gültigen Gesamtpreis ab 0 € an.',
+    };
+  }
+  const totalPrice = rawPrice;
+
+  if (inputs.livingArea === undefined || inputs.livingArea === null || String(inputs.livingArea).trim() === '') {
+    return {
+      primary: { id: 'pricePerSqm', label: 'Preis pro Quadratmeter', value: 0, formattedValue: '0,00 € / m²' },
+      error: 'Bitte geben Sie die Wohnfläche in m² an.',
+    };
+  }
+  const livingArea = parseFloat(inputs.livingArea);
+  if (isNaN(livingArea) || livingArea <= 0) {
+    return {
+      primary: { id: 'pricePerSqm', label: 'Preis pro Quadratmeter', value: 0, formattedValue: '0,00 € / m²' },
       error: 'Die Wohnfläche muss größer als 0 m² sein.',
     };
   }
@@ -254,15 +298,17 @@ export function calculatePricePerSquareMeter(inputs: Record<string, any>): Calcu
 }
 
 export function calculateRentBudget(inputs: Record<string, any>): CalculationResult {
-  const netIncome = parseFloat(inputs.netIncome) || 3000;
-  const targetPercent = parseFloat(inputs.targetPercent) || 30;
-
-  if (netIncome <= 0) {
+  const rawIncome = inputs.netIncome !== undefined && inputs.netIncome !== null && String(inputs.netIncome).trim() !== ''
+    ? parseFloat(inputs.netIncome)
+    : 3000;
+  if (isNaN(rawIncome) || rawIncome <= 0) {
     return {
       primary: { id: 'maxRent', label: 'Maximal empfohlene Warmmiete', value: 0, formattedValue: '0,00 €' },
       error: 'Bitte geben Sie ein positives Nettoeinkommen an.',
     };
   }
+  const netIncome = rawIncome;
+  const targetPercent = parseFloat(inputs.targetPercent) || 30;
 
   const maxWarmRent = netIncome * (targetPercent / 100);
   const remaining = netIncome - maxWarmRent;

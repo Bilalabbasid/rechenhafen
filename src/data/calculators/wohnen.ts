@@ -30,7 +30,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
     ],
     inputs: [
       { id: 'netIncome', label: 'Monatliches Haushaltsnettoeinkommen', type: 'number', defaultValue: 3200, min: 100, step: 50, unit: '€' },
-      { id: 'warmRent', label: 'Monatliche Warmmiete (Wohnkosten)', type: 'number', defaultValue: 950, min: 50, step: 25, unit: '€', helpText: 'Kaltmiete zuzüglich Betriebskosten und Heizung. Nutzen Sie bei Bedarf den Warmmiete-Rechner.' },
+      { id: 'warmRent', label: 'Monatliche Warmmiete (Wohnkosten)', type: 'number', defaultValue: 950, min: 0, step: 25, unit: '€', helpText: 'Kaltmiete zuzüglich Betriebskosten und Heizung (0 € bei mietfreiem Wohnen). Nutzen Sie bei Bedarf den Warmmiete-Rechner.' },
     ],
     calculate: calculateRentBurden,
     formula: 'Mietbelastungsquote (%) = (Warmmiete / Nettoeinkommen) × 100',
@@ -177,7 +177,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den Preis pro Quadratmeter Wohnfläche für Kauf- oder Mietobjekte.',
     searchKeywords: ['quadratmeterpreis rechner', 'preis pro quadratmeter berechnen', 'miete pro qm rechner', 'qm preis wohnung'],
     inputs: [
-      { id: 'totalPrice', label: 'Gesamtsumme (Kaufpreis oder Monatsmiete)', type: 'number', defaultValue: 360000, unit: '€' },
+      { id: 'totalPrice', label: 'Gesamtsumme (Kaufpreis oder Monatsmiete)', type: 'number', defaultValue: 360000, min: 0, unit: '€', helpText: 'Gesamtkaufpreis oder monatliche Kaltmiete (0 € bei unentgeltlicher oder mietfreier Nutzung).' },
       { id: 'livingArea', label: 'Wohnfläche nach WoFlV in m²', type: 'number', defaultValue: 82.5, min: 1, step: 0.5, unit: 'm²' },
     ],
     calculate: calculatePricePerSquareMeter,

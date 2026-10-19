@@ -119,16 +119,21 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Simuliert den vertraglich vereinbarten Verlauf von Staffelungsmieten über die Vertragslaufzeit.',
     searchKeywords: ['staffelmiete rechner', 'staffelmietvertrag mieterhoehung', 'staffelmiete prozent oder betrag', 'paragraph 557a bgb'],
     inputs: [
-      { id: 'startRent', label: 'Anfangs-Kaltmiete', type: 'number', defaultValue: 750, min: 0, step: 25, unit: '€' },
+      { id: 'startRent', label: 'Anfangs-Kaltmiete', type: 'number', defaultValue: 750, min: 0, step: 25, unit: '€', helpText: 'Anfangs-Kaltmiete in Euro (z. B. 0 € bei mietfreier Anfangsüberlassung).' },
       { id: 'increaseAmount', label: 'Mieterhöhung je Staffel (Betrag in Euro)', type: 'number', defaultValue: 35, min: 0, step: 5, unit: '€', helpText: 'Vereinbarter Erhöhungsbetrag je Staffel in Euro. Bei 0 € bleibt die Miete unverändert.' },
       { id: 'intervalMonths', label: 'Staffelabstand in Monaten (mindestens 12 Monate)', type: 'number', defaultValue: 12, min: 12, max: 60, step: 12, unit: 'Monate' },
       { id: 'totalYears', label: 'Betrachtungszeitraum in Jahren', type: 'number', defaultValue: 5, min: 1, max: 15, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const startStr = String(inputs.startRent ?? '').trim();
-      const incStr = String(inputs.increaseAmount ?? '').trim();
-      const intervalStr = String(inputs.intervalMonths ?? '').trim();
-      const yearsStr = String(inputs.totalYears ?? inputs.years ?? '').trim();
+      const startRaw = inputs.startRent;
+      const incRaw = inputs.increaseAmount;
+      const intervalRaw = inputs.intervalMonths;
+      const yearsRaw = inputs.totalYears ?? inputs.years;
+
+      const startStr = startRaw !== undefined && startRaw !== null ? String(startRaw).trim() : '';
+      const incStr = incRaw !== undefined && incRaw !== null ? String(incRaw).trim() : '';
+      const intervalStr = intervalRaw !== undefined && intervalRaw !== null ? String(intervalRaw).trim() : '';
+      const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
 
       const start = startStr !== '' ? parseFloat(startStr.replace(',', '.')) : 750;
       const inc = incStr !== '' ? parseFloat(incStr.replace(',', '.')) : 35;
@@ -145,7 +150,6 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
 
       const stepsCount = Math.floor((years * 12) / interval);
       const endRent = start + (stepsCount * inc);
-      const totalPaid = start * years * 12 + (stepsCount * (stepsCount + 1) / 2) * inc * (interval / 12) * 12;
       const pctIncrease = start > 0 ? ((endRent - start) / start) * 100 : 0;
 
       const breakdownRows = [];
@@ -225,14 +229,31 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die Anpassung der Nettokaltmiete an die Inflation gemäß Indexmietvertrag.',
     searchKeywords: ['indexmiete rechner', 'verbraucherpreisindex miete erhoehung', 'vpi indexmiete formel', 'paragraph 557b bgb rechner'],
     inputs: [
-      { id: 'currentRent', label: 'Aktuelle monatliche Kaltmiete', type: 'number', defaultValue: 850, min: 100, step: 25, unit: '€' },
-      { id: 'oldVpi', label: 'Alter Indexstand (bei Vertragsbeginn / letzter Erhöhung)', type: 'number', defaultValue: 105.8, min: 50, max: 200, step: 0.1 },
-      { id: 'newVpi', label: 'Neuer Indexstand (aktueller VPI Destatis)', type: 'number', defaultValue: 118.5, min: 50, max: 200, step: 0.1 },
+      { id: 'currentRent', label: 'Aktuelle monatliche Kaltmiete', type: 'number', defaultValue: 850, min: 0, step: 25, unit: '€', helpText: 'Bisherige Nettokaltmiete in Euro.' },
+      { id: 'oldVpi', label: 'Alter Indexstand (bei Vertragsbeginn / letzter Erhöhung)', type: 'number', defaultValue: 105.8, min: 1, max: 300, step: 0.1, helpText: 'Basis-Indexwert des Statistischen Bundesamtes (Destatis).' },
+      { id: 'newVpi', label: 'Neuer Indexstand (aktueller VPI Destatis)', type: 'number', defaultValue: 118.5, min: 1, max: 300, step: 0.1, helpText: 'Aktueller VPI-Stand zum Anpassungszeitpunkt.' },
     ],
     calculate: (inputs) => {
-      const rent = parseFloat(inputs.currentRent) || 850;
-      const oldI = parseFloat(inputs.oldVpi) || 105.8;
-      const newI = parseFloat(inputs.newVpi) || 118.5;
+      const rentRaw = inputs.currentRent;
+      const oldRaw = inputs.oldVpi;
+      const newRaw = inputs.newVpi;
+
+      const rentStr = rentRaw !== undefined && rentRaw !== null ? String(rentRaw).trim() : '';
+      const oldStr = oldRaw !== undefined && oldRaw !== null ? String(oldRaw).trim() : '';
+      const newStr = newRaw !== undefined && newRaw !== null ? String(newRaw).trim() : '';
+
+      const rent = rentStr !== '' ? parseFloat(rentStr.replace(',', '.')) : 850;
+      const oldI = oldStr !== '' ? parseFloat(oldStr.replace(',', '.')) : 105.8;
+      const newI = newStr !== '' ? parseFloat(newStr.replace(',', '.')) : 118.5;
+
+      if (isNaN(rent) || isNaN(oldI) || isNaN(newI) || rent < 0 || oldI <= 0 || newI <= 0) {
+        return {
+          primary: { id: 'newRent', label: 'Neue zulässige Kaltmiete', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Alter und neuer VPI müssen größer als 0 sein).',
+        };
+      }
+
       const pctChange = ((newI / oldI) - 1) * 100;
       const newRent = rent * (newI / oldI);
       const diff = newRent - rent;
@@ -244,6 +265,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'yearlyDiff', label: 'Mehrkosten pro Jahr', value: diff * 12, formattedValue: formatCurrency(diff * 12) },
         ],
         summaryText: `Durch den Anstieg des VPI um ${formatPercent(pctChange, 2)} erhöht sich die Monatskaltmiete um ${formatCurrency(diff)} von ${formatCurrency(rent)} auf ${formatCurrency(newRent)}.`,
+        directAnswer: `Bei einem VPI-Anstieg von ${formatNumber(oldI, 1)} auf ${formatNumber(newI, 1)} (${formatPercent(pctChange, 2)}) ändert sich die Kaltmiete von ${formatCurrency(rent)} um ${formatCurrency(diff)} auf ${formatCurrency(newRent)} monatlich.`,
+        basisSummary: [
+          { label: 'Bisherige Kaltmiete', value: formatCurrency(rent) },
+          { label: 'Alter VPI-Stand', value: formatNumber(oldI, 1) },
+          { label: 'Neuer VPI-Stand', value: formatNumber(newI, 1) },
+          { label: 'Veränderung', value: formatPercent(pctChange, 2) },
+        ],
       };
     },
     formula: 'Neue Miete = Alte Miete × (Neuer Index / Alter Index)',
@@ -278,14 +306,31 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die anrechenbare Wohnfläche nach den rechtlichen Vorgaben der WoFlV.',
     searchKeywords: ['wohnflaechenrechner woflv', 'wohnflaeche berechnen dachschraege', 'balkon flaeche 25 prozent wohnflaeche', 'din 277 wohnflaechenverordnung'],
     inputs: [
-      { id: 'fullArea', label: 'Voll anrechenbare Grundfläche (über 2 Meter Höhe)', type: 'number', defaultValue: 65, min: 1, step: 1, unit: 'm²' },
-      { id: 'slopedArea', label: 'Fläche mit lichter Höhe zwischen 1 m und 2 m (50 % Anrechnung)', type: 'number', defaultValue: 14, min: 0, step: 1, unit: 'm²' },
-      { id: 'balconyArea', label: 'Balkon- / Terrassengrundfläche (üblicherweise 25 % Anrechnung)', type: 'number', defaultValue: 8, min: 0, step: 0.5, unit: 'm²' },
+      { id: 'fullArea', label: 'Voll anrechenbare Grundfläche (über 2 Meter Höhe)', type: 'number', defaultValue: 65, min: 0, step: 1, unit: 'm²', helpText: 'Räume mit lichter Raumhöhe ab 2,00 m (100 % Anrechnung).' },
+      { id: 'slopedArea', label: 'Fläche mit lichter Höhe zwischen 1 m und 2 m (50 % Anrechnung)', type: 'number', defaultValue: 14, min: 0, step: 1, unit: 'm²', helpText: 'Dachschrägenbereiche zwischen 1,00 m und 1,99 m lichter Höhe.' },
+      { id: 'balconyArea', label: 'Balkon- / Terrassengrundfläche (üblicherweise 25 % Anrechnung)', type: 'number', defaultValue: 8, min: 0, step: 0.5, unit: 'm²', helpText: 'Grundfläche von Balkonen, Loggien, Dachgärten und Terrassen.' },
     ],
     calculate: (inputs) => {
-      const full = parseFloat(inputs.fullArea) || 65;
-      const sloped = parseFloat(inputs.slopedArea) || 14;
-      const balcony = parseFloat(inputs.balconyArea) || 8;
+      const fullRaw = inputs.fullArea;
+      const slopedRaw = inputs.slopedArea;
+      const balconyRaw = inputs.balconyArea;
+
+      const fullStr = fullRaw !== undefined && fullRaw !== null ? String(fullRaw).trim() : '';
+      const slopedStr = slopedRaw !== undefined && slopedRaw !== null ? String(slopedRaw).trim() : '';
+      const balconyStr = balconyRaw !== undefined && balconyRaw !== null ? String(balconyRaw).trim() : '';
+
+      const full = fullStr !== '' ? parseFloat(fullStr.replace(',', '.')) : 65;
+      const sloped = slopedStr !== '' ? parseFloat(slopedStr.replace(',', '.')) : 14;
+      const balcony = balconyStr !== '' ? parseFloat(balconyStr.replace(',', '.')) : 8;
+
+      if (isNaN(full) || isNaN(sloped) || isNaN(balcony) || full < 0 || sloped < 0 || balcony < 0) {
+        return {
+          primary: { id: 'totalWohnflaeche', label: 'Rechtssichere Wohnfläche nach WoFlV', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Flächenwerte ein (Flächen dürfen nicht negativ sein).',
+        };
+      }
+
       const countedSloped = sloped * 0.5;
       const countedBalcony = balcony * 0.25;
       const totalWohnflaeche = full + countedSloped + countedBalcony;
@@ -298,6 +343,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'balconyDeduction', label: 'Balkon-Anrechnung (25 %)', value: countedBalcony, formattedValue: `${formatNumber(countedBalcony, 2)} m²` },
         ],
         summaryText: `Aus einer Bruttogrundfläche von ${formatNumber(totalGroundArea, 2)} m² ergibt sich nach WoFlV eine Wohnfläche von ${formatNumber(totalWohnflaeche, 2)} m².`,
+        directAnswer: `Aus ${formatNumber(full, 2)} m² Vollfläche, ${formatNumber(sloped, 2)} m² Schrägen (zu 50 %) und ${formatNumber(balcony, 2)} m² Balkon (zu 25 %) ergibt sich eine anrechenbare Wohnfläche von ${formatNumber(totalWohnflaeche, 2)} m².`,
+        basisSummary: [
+          { label: 'Vollfläche (> 2 m)', value: `${formatNumber(full, 2)} m²` },
+          { label: 'Dachschräge (1-2 m)', value: `${formatNumber(sloped, 2)} m² (angerechnet: ${formatNumber(countedSloped, 2)} m²)` },
+          { label: 'Balkon / Terrasse', value: `${formatNumber(balcony, 2)} m² (angerechnet: ${formatNumber(countedBalcony, 2)} m²)` },
+          { label: 'Grundfläche gesamt', value: `${formatNumber(totalGroundArea, 2)} m²` },
+        ],
       };
     },
     formula: 'Wohnfläche = Vollfläche + (Schrägen 1-2m × 0,5) + (Balkon × 0,25)',
@@ -332,14 +384,31 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die neue Grundsteuer nach dem 3-Stufen-Verfahren für Wohngrundstücke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['grundsteuer rechner', 'grundsteuer reform 2025 2026', 'grundsteuer hebesatz rechner', 'steuermesszahl grundsteuer b'],
     inputs: [
-      { id: 'propertyValue', label: 'Festgestellter Grundsteuerwert (Finanzamt-Bescheid)', type: 'number', defaultValue: 280000, min: 10000, step: 5000, unit: '€' },
-      { id: 'measureRate', label: 'Steuermesszahl (z. B. 0,031 % = 0,31 ‰ für Wohnen)', type: 'number', defaultValue: 0.031, min: 0.01, max: 0.1, step: 0.001, unit: '%' },
-      { id: 'hebesatz', label: 'Hebesatz der Gemeinde (Grundsteuer B)', type: 'number', defaultValue: 480, min: 100, max: 1200, step: 10, unit: '%' },
+      { id: 'propertyValue', label: 'Festgestellter Grundsteuerwert (Finanzamt-Bescheid)', type: 'number', defaultValue: 280000, min: 0, step: 5000, unit: '€', helpText: 'Vom Finanzamt im Grundsteuerwertbescheid festgestellter Wert.' },
+      { id: 'measureRate', label: 'Steuermesszahl (z. B. 0,031 % = 0,31 ‰ für Wohnen)', type: 'number', defaultValue: 0.031, min: 0, max: 0.1, step: 0.001, unit: '%', helpText: 'Gesetzliche Steuermesszahl in % (z. B. 0,031 % für Wohnimmobilien im Bundesmodell).' },
+      { id: 'hebesatz', label: 'Hebesatz der Gemeinde (Grundsteuer B)', type: 'number', defaultValue: 480, min: 0, max: 1500, step: 10, unit: '%', helpText: 'Kommunaler Hebesatz der zuständigen Stadt oder Gemeinde in %.' },
     ],
     calculate: (inputs) => {
-      const val = parseFloat(inputs.propertyValue) || 280000;
-      const mess = (parseFloat(inputs.measureRate) || 0.031) / 100;
-      const hebe = (parseFloat(inputs.hebesatz) || 480) / 100;
+      const valRaw = inputs.propertyValue;
+      const messRaw = inputs.measureRate;
+      const hebeRaw = inputs.hebesatz;
+
+      const valStr = valRaw !== undefined && valRaw !== null ? String(valRaw).trim() : '';
+      const messStr = messRaw !== undefined && messRaw !== null ? String(messRaw).trim() : '';
+      const hebeStr = hebeRaw !== undefined && hebeRaw !== null ? String(hebeRaw).trim() : '';
+
+      const val = valStr !== '' ? parseFloat(valStr.replace(',', '.')) : 280000;
+      const mess = (messStr !== '' ? parseFloat(messStr.replace(',', '.')) : 0.031) / 100;
+      const hebe = (hebeStr !== '' ? parseFloat(hebeStr.replace(',', '.')) : 480) / 100;
+
+      if (isNaN(val) || isNaN(mess) || isNaN(hebe) || val < 0 || mess < 0 || hebe < 0) {
+        return {
+          primary: { id: 'grundsteuerYear', label: 'Jährliche Grundsteuer', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Grundsteuerwert, Messzahl und Hebesatz dürfen nicht negativ sein).',
+        };
+      }
+
       const messbetrag = val * mess;
       const grundsteuerYear = messbetrag * hebe;
       const grundsteuerQuarter = grundsteuerYear / 4;
@@ -350,7 +419,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'messbetrag', label: 'Grundsteuermessbetrag', value: messbetrag, formattedValue: formatCurrency(messbetrag) },
           { id: 'monthlyEff', label: 'Monatliche Belastung', value: grundsteuerYear / 12, formattedValue: formatCurrency(grundsteuerYear / 12) },
         ],
-        summaryText: `Bei einem Grundsteuerwert von ${formatCurrency(val)} und einem Hebesatz von ${inputs.hebesatz} % beträgt die Grundsteuer ${formatCurrency(grundsteuerYear)} im Jahr (${formatCurrency(grundsteuerQuarter)} pro Quartal).`,
+        summaryText: `Bei einem Grundsteuerwert von ${formatCurrency(val)} und einem Hebesatz von ${formatPercent(hebe * 100, 0)} beträgt die Grundsteuer ${formatCurrency(grundsteuerYear)} im Jahr (${formatCurrency(grundsteuerQuarter)} pro Quartal).`,
+        directAnswer: `Bei einem Grundsteuerwert von ${formatCurrency(val)}, Steuermesszahl ${formatPercent(mess * 100, 3)} und Hebesatz ${formatPercent(hebe * 100, 0)} beträgt die jährliche Grundsteuer ${formatCurrency(grundsteuerYear)} (${formatCurrency(grundsteuerQuarter)} pro Quartal).`,
+        basisSummary: [
+          { label: 'Grundsteuerwert', value: formatCurrency(val) },
+          { label: 'Steuermessbetrag', value: formatCurrency(messbetrag) },
+          { label: 'Hebesatz', value: formatPercent(hebe * 100, 0) },
+        ],
       };
     },
     formula: 'Grundsteuer = Grundsteuerwert × Steuermesszahl × Hebesatz',
@@ -392,16 +467,35 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt den steuerpflichtigen Veräußerungsgewinn und die Einkommensteuer bei Verkauf vor Ablauf von 10 Jahren.',
     searchKeywords: ['spekulationssteuer immobilien rechner', 'paragraph 23 estg immobilienverkauf', '10 jahres frist hausverkauf steuer', 'spekulationsfrist rechner'],
     inputs: [
-      { id: 'salePrice', label: 'Erzielter Verkaufspreis', type: 'number', defaultValue: 420000, min: 10000, step: 10000, unit: '€' },
-      { id: 'purchaseCost', label: 'Ursprüngliche Anschaffungs-/Herstellungskosten inkl. Nebenkosten', type: 'number', defaultValue: 310000, min: 10000, step: 10000, unit: '€' },
-      { id: 'claimedDepreciation', label: 'In Vorjahren steuerlich geltend gemachte AfA', type: 'number', defaultValue: 25000, min: 0, step: 1000, unit: '€' },
-      { id: 'taxRate', label: 'Persönlicher Grenzsteuersatz', type: 'number', defaultValue: 42, min: 0, max: 45, step: 1, unit: '%' },
+      { id: 'salePrice', label: 'Erzielter Verkaufspreis', type: 'number', defaultValue: 420000, min: 0, step: 10000, unit: '€', helpText: 'Tatsächlich erzielter Veräußerungserlös der Immobilie.' },
+      { id: 'purchaseCost', label: 'Ursprüngliche Anschaffungs-/Herstellungskosten inkl. Nebenkosten', type: 'number', defaultValue: 310000, min: 0, step: 10000, unit: '€', helpText: 'Ursprünglicher Kaufpreis zuzüglich Anschaffungsnebenkosten und nachträglicher Herstellungskosten.' },
+      { id: 'claimedDepreciation', label: 'In Vorjahren steuerlich geltend gemachte AfA', type: 'number', defaultValue: 25000, min: 0, step: 1000, unit: '€', helpText: 'In Vorjahren steuerlich geltend gemachte AfA (0 € falls keine AfA in Anspruch genommen wurde).' },
+      { id: 'taxRate', label: 'Persönlicher Grenzsteuersatz', type: 'number', defaultValue: 42, min: 0, max: 45, step: 1, unit: '%', helpText: 'Persönlicher Grenzsteuersatz in Prozent (0 % bei Grundfreibetrag/steuerfreiem Einkommen).' },
     ],
     calculate: (inputs) => {
-      const sale = parseFloat(inputs.salePrice) || 420000;
-      const buy = parseFloat(inputs.purchaseCost) || 310000;
-      const afa = parseFloat(inputs.claimedDepreciation) || 25000;
-      const rate = (parseFloat(inputs.taxRate) || 42) / 100;
+      const saleRaw = inputs.salePrice;
+      const buyRaw = inputs.purchaseCost;
+      const afaRaw = inputs.claimedDepreciation;
+      const rateRaw = inputs.taxRate;
+
+      const saleStr = saleRaw !== undefined && saleRaw !== null ? String(saleRaw).trim() : '';
+      const buyStr = buyRaw !== undefined && buyRaw !== null ? String(buyRaw).trim() : '';
+      const afaStr = afaRaw !== undefined && afaRaw !== null ? String(afaRaw).trim() : '';
+      const rateStr = rateRaw !== undefined && rateRaw !== null ? String(rateRaw).trim() : '';
+
+      const sale = saleStr !== '' ? parseFloat(saleStr.replace(',', '.')) : 420000;
+      const buy = buyStr !== '' ? parseFloat(buyStr.replace(',', '.')) : 310000;
+      const afa = afaStr !== '' ? parseFloat(afaStr.replace(',', '.')) : 25000;
+      const rate = (rateStr !== '' ? parseFloat(rateStr.replace(',', '.')) : 42) / 100;
+
+      if (isNaN(sale) || isNaN(buy) || isNaN(afa) || isNaN(rate) || sale < 0 || buy < 0 || afa < 0 || rate < 0) {
+        return {
+          primary: { id: 'taxAmount', label: 'Voraussichtliche Spekulationssteuer', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Beträge und Steuersatz dürfen nicht negativ sein).',
+        };
+      }
+
       // Gewinn = Verkaufspreis - (Anschaffungskosten - AfA)
       const bookValue = Math.max(0, buy - afa);
       const taxableProfit = Math.max(0, sale - bookValue);
@@ -415,6 +509,16 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'netProfit', label: 'Reingewinn nach Steuern', value: netProfit, formattedValue: formatCurrency(netProfit) },
         ],
         summaryText: `Bei einem Veräußerungsgewinn von ${formatCurrency(taxableProfit)} fällt bei ${formatPercent(rate * 100, 0)} Steuersatz ca. ${formatCurrency(taxAmount)} Spekulationssteuer an.`,
+        directAnswer: taxableProfit === 0
+          ? `Bei einem Verkaufspreis von ${formatCurrency(sale)} und einem steuerlichen Buchwert von ${formatCurrency(bookValue)} entsteht kein steuerpflichtiger Gewinn. Es fällt keine Spekulationssteuer an.`
+          : `Bei ${formatCurrency(sale)} Verkaufspreis und ${formatCurrency(bookValue)} Restbuchwert (Kosten ${formatCurrency(buy)} abzüglich ${formatCurrency(afa)} AfA) beträgt der steuerpflichtige Gewinn ${formatCurrency(taxableProfit)}. Bei ${formatPercent(rate * 100, 0)} Steuersatz fallen ${formatCurrency(taxAmount)} Spekulationssteuer an.`,
+        basisSummary: [
+          { label: 'Verkaufspreis', value: formatCurrency(sale) },
+          { label: 'Anschaffungskosten', value: formatCurrency(buy) },
+          { label: 'Geltend gemachte AfA', value: formatCurrency(afa) },
+          { label: 'Restbuchwert', value: formatCurrency(bookValue) },
+          { label: 'Grenzsteuersatz', value: formatPercent(rate * 100, 0) },
+        ],
       };
     },
     formula: 'Gewinn = Verkaufserlös - (Anschaffungskosten - AfA); Steuer = Gewinn × persönlicher Steuersatz',
@@ -449,12 +553,27 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die Maklercourtage inklusive 19 % Mehrwertsteuer für Käufer und Verkäufer.',
     searchKeywords: ['maklerprovision rechner', 'maklercourtage 3 57 prozent', 'halbteilungsgrundsatz paragraph 656c bgb', 'maklergebuehren hausverkauf'],
     inputs: [
-      { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 350000, min: 10000, step: 10000, unit: '€' },
-      { id: 'totalBrokerPct', label: 'Gesamtprovision inkl. MwSt. (üblich 7,14 % bzw. 3,57 % je Partei)', type: 'number', defaultValue: 7.14, min: 1, max: 10, step: 0.01, unit: '%' },
+      { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 350000, min: 0, step: 10000, unit: '€', helpText: 'Beurkundeter Kaufpreis der Immobilie in Euro.' },
+      { id: 'totalBrokerPct', label: 'Gesamtprovision inkl. MwSt. (üblich 7,14 % bzw. 3,57 % je Partei)', type: 'number', defaultValue: 7.14, min: 0, max: 15, step: 0.01, unit: '%', helpText: 'Gesamte Maklerprovision in Prozent (0 % bei provisionsfreiem Kauf).' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 350000;
-      const totalPct = parseFloat(inputs.totalBrokerPct) || 7.14;
+      const priceRaw = inputs.purchasePrice;
+      const pctRaw = inputs.totalBrokerPct;
+
+      const priceStr = priceRaw !== undefined && priceRaw !== null ? String(priceRaw).trim() : '';
+      const pctStr = pctRaw !== undefined && pctRaw !== null ? String(pctRaw).trim() : '';
+
+      const price = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 350000;
+      const totalPct = pctStr !== '' ? parseFloat(pctStr.replace(',', '.')) : 7.14;
+
+      if (isNaN(price) || isNaN(totalPct) || price < 0 || totalPct < 0) {
+        return {
+          primary: { id: 'buyerShare', label: 'Anteil Käufer (inkl. 19 % MwSt.)', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Kaufpreis und Provision dürfen nicht negativ sein).',
+        };
+      }
+
       const totalCost = price * (totalPct / 100);
       const buyerShare = totalCost / 2;
       const sellerShare = totalCost / 2;
@@ -468,6 +587,14 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'vat', label: 'Darin enthaltene Mehrwertsteuer', value: vat, formattedValue: formatCurrency(vat) },
         ],
         summaryText: `Bei einem Kaufpreis von ${formatCurrency(price)} zahlen Käufer und Verkäufer jeweils ${formatCurrency(buyerShare)} Maklerprovision (Gesamthonorar: ${formatCurrency(totalCost)}).`,
+        directAnswer: totalCost === 0
+          ? `Bei einem Provisionssatz von 0 % fällt keine Maklercourtage an.`
+          : `Bei einem Kaufpreis von ${formatCurrency(price)} und ${formatPercent(totalPct, 2)} Gesamtprovision betragen die Maklerkosten für Käufer und Verkäufer jeweils ${formatCurrency(buyerShare)} (Gesamt: ${formatCurrency(totalCost)}).`,
+        basisSummary: [
+          { label: 'Kaufpreis', value: formatCurrency(price) },
+          { label: 'Gesamtprovisionssatz', value: formatPercent(totalPct, 2) },
+          { label: 'Halbteilung je Partei', value: formatPercent(totalPct / 2, 2) },
+        ],
       };
     },
     formula: 'Courtage je Partei = (Kaufpreis × Gesamtprovision in %) / 2',
@@ -502,7 +629,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die exakte Grunderwerbsteuer für Ihren Immobilien- oder Grundstückskauf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['grunderwerbsteuer rechner', 'grunderwerbsteuersatz bundeslaender 2026', 'grunderwerbsteuer bayern 3 5', 'grunderwerbsteuer sparen'],
     inputs: [
-      { id: 'purchasePrice', label: 'Beurkundeter Immobilienkaufpreis', type: 'number', defaultValue: 320000, min: 5000, step: 5000, unit: '€' },
+      { id: 'purchasePrice', label: 'Beurkundeter Immobilienkaufpreis', type: 'number', defaultValue: 320000, min: 0, step: 5000, unit: '€', helpText: 'Beurkundeter Kaufpreis der Immobilie in Euro.' },
       {
         id: 'state',
         label: 'Bundesland der Immobilie',
@@ -529,7 +656,18 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 320000;
+      const priceRaw = inputs.purchasePrice;
+      const priceStr = priceRaw !== undefined && priceRaw !== null ? String(priceRaw).trim() : '';
+      const price = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 320000;
+
+      if (isNaN(price) || price < 0) {
+        return {
+          primary: { id: 'tax', label: 'Zu zahlende Grunderwerbsteuer', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie einen gültigen Kaufpreis ein.',
+        };
+      }
+
       const stateRates: Record<string, number> = {
         by: 0.035, hb: 0.05, hh: 0.055, bw: 0.05, he: 0.06, ni: 0.05,
         rp: 0.05, be: 0.06, bb: 0.065, nrw: 0.065, sh: 0.065, sl: 0.065,
@@ -545,6 +683,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'totalWithTax', label: 'Kaufpreis inkl. Grunderwerbsteuer', value: price + tax, formattedValue: formatCurrency(price + tax) },
         ],
         summaryText: `Bei einem Kaufpreis von ${formatCurrency(price)} beträgt die Grunderwerbsteuer bei einem Steuersatz von ${formatPercent(rate * 100, 1)} exakt ${formatCurrency(tax)}.`,
+        directAnswer: `Bei einem Kaufpreis von ${formatCurrency(price)} beträgt die Grunderwerbsteuer im ausgewählten Bundesland (${formatPercent(rate * 100, 1)}) genau ${formatCurrency(tax)}. Der Gesamtbetrag inklusive Steuer beläuft sich auf ${formatCurrency(price + tax)}.`,
+        basisSummary: [
+          { label: 'Kaufpreis', value: formatCurrency(price) },
+          { label: 'Grunderwerbsteuersatz', value: formatPercent(rate * 100, 1) },
+          { label: 'Gesamtsumme inkl. Steuer', value: formatCurrency(price + tax) },
+        ],
       };
     },
     formula: 'Grunderwerbsteuer = Kaufpreis × Bundesland-Steuersatz (3,5 % bis 6,5 %)',
@@ -586,12 +730,27 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert die gesetzlichen Gebühren für Notarbeurkundung und Grundbucheintragung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['notarkosten rechner immobilienkauf', 'grundbuchkosten rechner gnotkg', 'notargebuehren grundschuldbestellung', 'nebenkosten hausnotar'],
     inputs: [
-      { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 300000, min: 10000, step: 10000, unit: '€' },
-      { id: 'mortgageAmount', label: 'Eingetragene Grundschuld für Bankdarlehen', type: 'number', defaultValue: 250000, min: 0, step: 10000, unit: '€' },
+      { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 300000, min: 0, step: 10000, unit: '€', helpText: 'Beurkundeter Immobilienkaufpreis in Euro.' },
+      { id: 'mortgageAmount', label: 'Eingetragene Grundschuld für Bankdarlehen', type: 'number', defaultValue: 250000, min: 0, step: 10000, unit: '€', helpText: 'Eingetragene Grundschuld in Euro (0 € für Barzahler / Barkauf ohne Darlehensabsicherung).' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 300000;
-      const mortgage = parseFloat(inputs.mortgageAmount) || 250000;
+      const priceRaw = inputs.purchasePrice;
+      const mortgageRaw = inputs.mortgageAmount;
+
+      const priceStr = priceRaw !== undefined && priceRaw !== null ? String(priceRaw).trim() : '';
+      const mortgageStr = mortgageRaw !== undefined && mortgageRaw !== null ? String(mortgageRaw).trim() : '';
+
+      const price = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 300000;
+      const mortgage = mortgageStr !== '' ? parseFloat(mortgageStr.replace(',', '.')) : 250000;
+
+      if (isNaN(price) || isNaN(mortgage) || price < 0 || mortgage < 0) {
+        return {
+          primary: { id: 'totalCost', label: 'Gesamte Notar- & Grundbuchkosten', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Beträge ein (Kaufpreis und Grundschuld dürfen nicht negativ sein).',
+        };
+      }
+
       // Notargebühren Kaufvertrag ca. 1,0 % - 1,2 %
       const notaryDeed = price * 0.0105;
       // Grundbuchgebühren Kauf (Auflassung + Eigentumsumschreibung) ca. 0,5 %
@@ -599,14 +758,23 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       // Grundschuldbestellung Notar + Grundbuch ca. 0,4 % der Grundschuld
       const mortgageCost = mortgage * 0.004;
       const totalCost = notaryDeed + landRegistryDeed + mortgageCost;
+      const pctOfPrice = price > 0 ? (totalCost / price) * 100 : 0;
       return {
         primary: { id: 'totalCost', label: 'Gesamte Notar- & Grundbuchkosten', value: totalCost, formattedValue: formatCurrency(totalCost), highlight: true },
         secondary: [
           { id: 'notaryShare', label: 'Notargebühren (Beurkundung & Betreuung)', value: notaryDeed + (mortgageCost * 0.6), formattedValue: formatCurrency(notaryDeed + (mortgageCost * 0.6)) },
           { id: 'registryShare', label: 'Grundbuchamtsgebühren (Eigentum & Grundschuld)', value: landRegistryDeed + (mortgageCost * 0.4), formattedValue: formatCurrency(landRegistryDeed + (mortgageCost * 0.4)) },
-          { id: 'pctOfPrice', label: 'Anteil am Kaufpreis', value: (totalCost / price) * 100, formattedValue: formatPercent((totalCost / price) * 100, 2) },
+          { id: 'pctOfPrice', label: 'Anteil am Kaufpreis', value: pctOfPrice, formattedValue: formatPercent(pctOfPrice, 2) },
         ],
-        summaryText: `Für Notar und Grundbuchamt fallen ca. ${formatCurrency(totalCost)} an (ca. ${formatPercent((totalCost / price) * 100, 2)} des Kaufpreises).`,
+        summaryText: `Für Notar und Grundbuchamt fallen ca. ${formatCurrency(totalCost)} an (ca. ${formatPercent(pctOfPrice, 2)} des Kaufpreises).`,
+        directAnswer: mortgage === 0
+          ? `Bei einem Kaufpreis von ${formatCurrency(price)} ohne Grundschuldeintragung (Barkauf) fallen für Notar und Grundbuch ca. ${formatCurrency(totalCost)} an (ca. ${formatPercent(pctOfPrice, 2)} des Kaufpreises).`
+          : `Bei einem Kaufpreis von ${formatCurrency(price)} und ${formatCurrency(mortgage)} Grundschuld fallen für Notar und Grundbuch ca. ${formatCurrency(totalCost)} an (${formatCurrency(notaryDeed + (mortgageCost * 0.6))} Notar, ${formatCurrency(landRegistryDeed + (mortgageCost * 0.4))} Grundbuch).`,
+        basisSummary: [
+          { label: 'Kaufpreis', value: formatCurrency(price) },
+          { label: 'Eingetragene Grundschuld', value: formatCurrency(mortgage) },
+          { label: 'Anteil am Kaufpreis', value: formatPercent(pctOfPrice, 2) },
+        ],
       };
     },
     formula: 'Gebühren nach Gerichts- und Notarkostengesetz (GNotKG)',
@@ -648,28 +816,52 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die optimale finanzielle Rücklage für Reparaturen und Modernisierungen von Immobilien.',
     searchKeywords: ['instandhaltungsruecklage rechner', 'peterssche formel immobilien', 'instandhaltungsruecklage weg pro qm', 'instandhaltungsruecklage berechnen'],
     inputs: [
-      { id: 'livingArea', label: 'Wohnfläche in m²', type: 'number', defaultValue: 90, min: 20, max: 1000, step: 5, unit: 'm²' },
-      { id: 'reconstructionCost', label: 'Herstellungskosten pro m² Wohnfläche', type: 'number', defaultValue: 2400, min: 1000, max: 6000, step: 100, unit: '€/m²' },
-      { id: 'buildingAgeYears', label: 'Alter der Immobilie (Jahre)', type: 'number', defaultValue: 25, min: 0, max: 120, step: 5, unit: 'Jahre' },
+      { id: 'livingArea', label: 'Wohnfläche in m²', type: 'number', defaultValue: 90, min: 0, max: 1000, step: 5, unit: 'm²', helpText: 'Wohnfläche des Objekts in m².' },
+      { id: 'reconstructionCost', label: 'Herstellungskosten pro m² Wohnfläche', type: 'number', defaultValue: 2400, min: 0, max: 10000, step: 100, unit: '€/m²', helpText: 'Geschätzte Neubau- bzw. Erstellungskosten pro m².' },
+      { id: 'buildingAgeYears', label: 'Alter der Immobilie (Jahre)', type: 'number', defaultValue: 25, min: 0, max: 150, step: 5, unit: 'Jahre', helpText: 'Gebäudealter in Jahren seit Fertigstellung.' },
     ],
     calculate: (inputs) => {
-      const area = parseFloat(inputs.livingArea) || 90;
-      const cost = parseFloat(inputs.reconstructionCost) || 2400;
-      const age = parseInt(inputs.buildingAgeYears, 10) || 25;
+      const areaRaw = inputs.livingArea;
+      const costRaw = inputs.reconstructionCost;
+      const ageRaw = inputs.buildingAgeYears;
+
+      const areaStr = areaRaw !== undefined && areaRaw !== null ? String(areaRaw).trim() : '';
+      const costStr = costRaw !== undefined && costRaw !== null ? String(costRaw).trim() : '';
+      const ageStr = ageRaw !== undefined && ageRaw !== null ? String(ageRaw).trim() : '';
+
+      const area = areaStr !== '' ? parseFloat(areaStr.replace(',', '.')) : 90;
+      const cost = costStr !== '' ? parseFloat(costStr.replace(',', '.')) : 2400;
+      const age = ageStr !== '' ? parseInt(ageStr, 10) : 25;
+
+      if (isNaN(area) || isNaN(cost) || isNaN(age) || area < 0 || cost < 0 || age < 0) {
+        return {
+          primary: { id: 'yearlyTotal', label: 'Empfohlene Rücklage pro Jahr', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Wohnfläche, Kosten und Alter dürfen nicht negativ sein).',
+        };
+      }
+
       // Peterssche Formel: Innerhalb von 80 Jahren fallen das 1,5-fache der Herstellungskosten für Instandhaltung an.
       // Davon entfallen ca. 70 % auf das Gemeinschaftseigentum.
       // Jährlich = (Herstellungskosten × 1,5 × 0,7) / 80 Jahre
       const yearlyPerSqm = (cost * 1.5 * 0.70) / 80;
       const yearlyTotal = yearlyPerSqm * area;
       const monthlyTotal = yearlyTotal / 12;
+      const monthlyPerSqm = area > 0 ? monthlyTotal / area : 0;
       return {
         primary: { id: 'yearlyTotal', label: 'Empfohlene Rücklage pro Jahr', value: yearlyTotal, formattedValue: formatCurrency(yearlyTotal), highlight: true },
         secondary: [
           { id: 'monthlyTotal', label: 'Monatliche Rücklage', value: monthlyTotal, formattedValue: formatCurrency(monthlyTotal) },
-          { id: 'monthlyPerSqm', label: 'Monatlich pro m² Wohnfläche', value: monthlyTotal / area, formattedValue: `${formatNumber(monthlyTotal / area, 2)} €/m²` },
+          { id: 'monthlyPerSqm', label: 'Monatlich pro m² Wohnfläche', value: monthlyPerSqm, formattedValue: `${formatNumber(monthlyPerSqm, 2)} €/m²` },
           { id: 'yearlyPerSqm', label: 'Jährlich pro m²', value: yearlyPerSqm, formattedValue: `${formatNumber(yearlyPerSqm, 2)} €/m²` },
         ],
-        summaryText: `Nach der Petersschen Formel sollten Sie für ${area} m² monatlich ${formatCurrency(monthlyTotal)} (${formatNumber(monthlyTotal / area, 2)} €/m²) als Instandhaltungsrücklage ansparen.`,
+        summaryText: `Nach der Petersschen Formel sollten Sie für ${area} m² monatlich ${formatCurrency(monthlyTotal)} (${formatNumber(monthlyPerSqm, 2)} €/m²) als Instandhaltungsrücklage ansparen.`,
+        directAnswer: `Für ein ${age} Jahre altes Objekt mit ${area} m² und ${formatCurrency(cost)}/m² Herstellungskosten empfiehlt die Peterssche Formel eine Rücklage von ${formatCurrency(yearlyTotal)} pro Jahr (${formatCurrency(monthlyTotal)} monatlich bzw. ${formatNumber(monthlyPerSqm, 2)} €/m²).`,
+        basisSummary: [
+          { label: 'Wohnfläche', value: `${area} m²` },
+          { label: 'Herstellungskosten/m²', value: formatCurrency(cost) },
+          { label: 'Jährliche Rate pro m²', value: `${formatNumber(yearlyPerSqm, 2)} €/m²` },
+        ],
       };
     },
     formula: 'Jährliche Rücklage = (Herstellungskosten × 1,5 × 0,7) / 80 × Wohnfläche',
@@ -704,16 +896,35 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die gesetzlich zulässige Mieterhöhung nach § 559 BGB unter Beachtung der Kappungsgrenzen.',
     searchKeywords: ['modernisierungsumlage rechner', 'paragraph 559 bgb mieterhoehung', 'kappungsgrenze modernisierung 3 euro', 'instandhaltung abziehen modernisierung'],
     inputs: [
-      { id: 'modernizationCosts', label: 'Gesamte Modernisierungskosten der Wohnung', type: 'number', defaultValue: 25000, min: 500, step: 500, unit: '€' },
-      { id: 'maintenanceShare', label: 'Darin enthaltener ersparter Erhaltungsaufwand (Instandhaltung)', type: 'number', defaultValue: 6000, min: 0, step: 500, unit: '€' },
-      { id: 'livingArea', label: 'Wohnfläche der Wohnung in m²', type: 'number', defaultValue: 75, min: 15, step: 5, unit: 'm²' },
-      { id: 'currentRentSqm', label: 'Bisherige Miete pro m²', type: 'number', defaultValue: 8.50, min: 3, max: 35, step: 0.5, unit: '€/m²' },
+      { id: 'modernizationCosts', label: 'Gesamte Modernisierungskosten der Wohnung', type: 'number', defaultValue: 25000, min: 0, step: 500, unit: '€', helpText: 'Gesamtaufwand der Modernisierungsmaßnahme in Euro.' },
+      { id: 'maintenanceShare', label: 'Darin enthaltener ersparter Erhaltungsaufwand (Instandhaltung)', type: 'number', defaultValue: 6000, min: 0, step: 500, unit: '€', helpText: 'Ersparter Erhaltungsaufwand in Euro (0 € bei reiner Modernisierungsmaßnahme ohne Instandhaltungsanteil).' },
+      { id: 'livingArea', label: 'Wohnfläche der Wohnung in m²', type: 'number', defaultValue: 75, min: 1, step: 5, unit: 'm²', helpText: 'Wohnfläche der betroffenen Mietwohnung.' },
+      { id: 'currentRentSqm', label: 'Bisherige Miete pro m²', type: 'number', defaultValue: 8.50, min: 0, max: 50, step: 0.5, unit: '€/m²', helpText: 'Bisherige Nettokaltmiete pro Quadratmeter.' },
     ],
     calculate: (inputs) => {
-      const grossCost = parseFloat(inputs.modernizationCosts) || 25000;
-      const maint = parseFloat(inputs.maintenanceShare) || 6000;
-      const area = parseFloat(inputs.livingArea) || 75;
-      const currentRentSqm = parseFloat(inputs.currentRentSqm) || 8.50;
+      const grossRaw = inputs.modernizationCosts;
+      const maintRaw = inputs.maintenanceShare;
+      const areaRaw = inputs.livingArea;
+      const rentSqmRaw = inputs.currentRentSqm;
+
+      const grossStr = grossRaw !== undefined && grossRaw !== null ? String(grossRaw).trim() : '';
+      const maintStr = maintRaw !== undefined && maintRaw !== null ? String(maintRaw).trim() : '';
+      const areaStr = areaRaw !== undefined && areaRaw !== null ? String(areaRaw).trim() : '';
+      const rentSqmStr = rentSqmRaw !== undefined && rentSqmRaw !== null ? String(rentSqmRaw).trim() : '';
+
+      const grossCost = grossStr !== '' ? parseFloat(grossStr.replace(',', '.')) : 25000;
+      const maint = maintStr !== '' ? parseFloat(maintStr.replace(',', '.')) : 6000;
+      const area = areaStr !== '' ? parseFloat(areaStr.replace(',', '.')) : 75;
+      const currentRentSqm = rentSqmStr !== '' ? parseFloat(rentSqmStr.replace(',', '.')) : 8.50;
+
+      if (isNaN(grossCost) || isNaN(maint) || isNaN(area) || isNaN(currentRentSqm) || grossCost < 0 || maint < 0 || area <= 0 || currentRentSqm < 0) {
+        return {
+          primary: { id: 'actualMonthlyIncrease', label: 'Zulässige monatliche Mieterhöhung', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Wohnfläche muss größer als 0 sein).',
+        };
+      }
+
       const eligibleCosts = Math.max(0, grossCost - maint);
       // Gesetzlich max 8 % p.a.
       const yearlyUmlage = eligibleCosts * 0.08;
@@ -731,6 +942,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'uncappedMonthly', label: 'Theoretische Erhöhung ohne Kappungsgrenze', value: monthlyUmlage, formattedValue: formatCurrency(monthlyUmlage) },
         ],
         summaryText: `Von ${formatCurrency(grossCost)} Kosten sind nach Abzug von ${formatCurrency(maint)} Instandhaltung ${formatCurrency(eligibleCosts)} umlagefähig. Die Miete steigt um ${formatCurrency(actualMonthlyIncrease)}/Monat (${formatNumber(actualIncreasePerSqm, 2)} €/m²).`,
+        directAnswer: `Von ${formatCurrency(grossCost)} Modernisierungskosten sind nach Abzug von ${formatCurrency(maint)} Erhaltungsaufwand netto ${formatCurrency(eligibleCosts)} umlagefähig. Die zulässige Mieterhöhung beträgt ${formatCurrency(actualMonthlyIncrease)} monatlich (${formatNumber(actualIncreasePerSqm, 2)} €/m², Kappung: max. ${formatNumber(maxCapPerSqm, 2)} €/m²).`,
+        basisSummary: [
+          { label: 'Gesamtkosten', value: formatCurrency(grossCost) },
+          { label: 'Instandhaltungsanteil', value: formatCurrency(maint) },
+          { label: 'Umlagefähige Kosten', value: formatCurrency(eligibleCosts) },
+          { label: 'Kappungsgrenze', value: `${formatNumber(maxCapPerSqm, 2)} €/m²` },
+        ],
       };
     },
     formula: 'Umlage = (Modernisierungskosten - Instandhaltung) × 8 % / 12 (Kappung: max. 3 €/m²)',
@@ -765,14 +983,31 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt Zinsertrag und Gesamtrückzahlung der Mietkaution nach § 551 BGB.',
     searchKeywords: ['mietkaution rechner', 'mietkaution zinsen berechnen', 'paragraph 551 bgb kautionszinsen', 'auszahlung mietkaution zinsen'],
     inputs: [
-      { id: 'depositAmount', label: 'Eingezahlte Mietkaution (max. 3 Kaltmieten)', type: 'number', defaultValue: 1800, min: 100, step: 50, unit: '€' },
-      { id: 'rentalYears', label: 'Mietdauer in Jahren', type: 'number', defaultValue: 6, min: 1, max: 50, step: 1, unit: 'Jahre' },
-      { id: 'avgInterestRate', label: 'Durchschnittlicher Sparzins p.a.', type: 'number', defaultValue: 1.2, min: 0.01, max: 10, step: 0.1, unit: '%' },
+      { id: 'depositAmount', label: 'Eingezahlte Mietkaution (max. 3 Kaltmieten)', type: 'number', defaultValue: 1800, min: 0, step: 50, unit: '€', helpText: 'Ursprünglich geleisteter Kautionsbetrag in Euro.' },
+      { id: 'rentalYears', label: 'Mietdauer in Jahren', type: 'number', defaultValue: 6, min: 0, max: 60, step: 1, unit: 'Jahre', helpText: 'Dauer des Mietverhältnisses in vollen oder angebrochenen Jahren.' },
+      { id: 'avgInterestRate', label: 'Durchschnittlicher Sparzins p.a.', type: 'number', defaultValue: 1.2, min: 0, max: 15, step: 0.1, unit: '%', helpText: 'Durchschnittlicher Sparzins p.a. (0 % bei Nullzinsphasen).' },
     ],
     calculate: (inputs) => {
-      const dep = parseFloat(inputs.depositAmount) || 1800;
-      const years = parseInt(inputs.rentalYears, 10) || 6;
-      const rate = (parseFloat(inputs.avgInterestRate) || 1.2) / 100;
+      const depRaw = inputs.depositAmount;
+      const yearsRaw = inputs.rentalYears;
+      const rateRaw = inputs.avgInterestRate;
+
+      const depStr = depRaw !== undefined && depRaw !== null ? String(depRaw).trim() : '';
+      const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
+      const rateStr = rateRaw !== undefined && rateRaw !== null ? String(rateRaw).trim() : '';
+
+      const dep = depStr !== '' ? parseFloat(depStr.replace(',', '.')) : 1800;
+      const years = yearsStr !== '' ? parseInt(yearsStr, 10) : 6;
+      const rate = (rateStr !== '' ? parseFloat(rateStr.replace(',', '.')) : 1.2) / 100;
+
+      if (isNaN(dep) || isNaN(years) || isNaN(rate) || dep < 0 || years < 0 || rate < 0) {
+        return {
+          primary: { id: 'totalAmount', label: 'Gesamtrückzahlung bei Auszug', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Kaution, Laufzeit und Zinssatz dürfen nicht negativ sein).',
+        };
+      }
+
       const totalAmount = dep * Math.pow(1 + rate, years);
       const totalInterest = totalAmount - dep;
       return {
@@ -782,6 +1017,14 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'depInitial', label: 'Ursprüngliche Kaution', value: dep, formattedValue: formatCurrency(dep) },
         ],
         summaryText: `Nach ${years} Jahren Mietzeit erhalten Sie Ihre Kaution von ${formatCurrency(dep)} plus ${formatCurrency(totalInterest)} Zinsen zurück (Summe: ${formatCurrency(totalAmount)}).`,
+        directAnswer: totalInterest === 0
+          ? `Bei ${years} Jahren Mietzeit und 0,00 % Zinsen beläuft sich der Auszahlungsbetrag unverändert auf ${formatCurrency(dep)}.`
+          : `Nach ${years} Jahren Mietzeit zu durchschnittlich ${formatPercent(rate * 100, 2)} Zinsen beträgt der Kautionsanspruch ${formatCurrency(totalAmount)} (ursprüngliche Kaution ${formatCurrency(dep)} zzgl. ${formatCurrency(totalInterest)} Zinseszins).`,
+        basisSummary: [
+          { label: 'Eingezahlte Kaution', value: formatCurrency(dep) },
+          { label: 'Mietdauer', value: `${years} Jahre` },
+          { label: 'Zinssatz p.a.', value: formatPercent(rate * 100, 2) },
+        ],
       };
     },
     formula: 'Endbetrag = Kaution × (1 + Zinssatz)^Jahre',
@@ -816,14 +1059,31 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert die monatliche Hausgeldzahlung und trennt Vermieterkosten von Mieterkosten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['hausgeld rechner', 'wohngeld eigentumswohnung rechner', 'hausgeld pro qm durchschnitt', 'umlagefaehiges hausgeld'],
     inputs: [
-      { id: 'livingArea', label: 'Wohnungsgröße in m²', type: 'number', defaultValue: 80, min: 15, max: 400, step: 5, unit: 'm²' },
-      { id: 'avgHausgeldPerSqm', label: 'Durchschnittliches Hausgeld pro m² (üblich 3,50 € - 5,50 €)', type: 'number', defaultValue: 4.20, min: 1.5, max: 10, step: 0.1, unit: '€/m²' },
-      { id: 'apportionablePct', label: 'Auf Mieter umlagefähiger Anteil (Heizung, Müll etc.)', type: 'number', defaultValue: 65, min: 30, max: 90, step: 5, unit: '%' },
+      { id: 'livingArea', label: 'Wohnungsgröße in m²', type: 'number', defaultValue: 80, min: 0, max: 400, step: 5, unit: 'm²', helpText: 'Wohnfläche der Eigentumswohnung in m².' },
+      { id: 'avgHausgeldPerSqm', label: 'Durchschnittliches Hausgeld pro m² (üblich 3,50 € - 5,50 €)', type: 'number', defaultValue: 4.20, min: 0, max: 15, step: 0.1, unit: '€/m²', helpText: 'Gesamthausgeld je m² Wohnfläche laut Wirtschaftsplan.' },
+      { id: 'apportionablePct', label: 'Auf Mieter umlagefähiger Anteil (Heizung, Müll etc.)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 5, unit: '%', helpText: 'Auf Mieter umlagefähiger Anteil in Prozent (0 % bei reinen Eigentümerkosten oder Leerstand).' },
     ],
     calculate: (inputs) => {
-      const area = parseFloat(inputs.livingArea) || 80;
-      const rate = parseFloat(inputs.avgHausgeldPerSqm) || 4.20;
-      const appPct = (parseFloat(inputs.apportionablePct) || 65) / 100;
+      const areaRaw = inputs.livingArea;
+      const rateRaw = inputs.avgHausgeldPerSqm;
+      const appPctRaw = inputs.apportionablePct;
+
+      const areaStr = areaRaw !== undefined && areaRaw !== null ? String(areaRaw).trim() : '';
+      const rateStr = rateRaw !== undefined && rateRaw !== null ? String(rateRaw).trim() : '';
+      const appPctStr = appPctRaw !== undefined && appPctRaw !== null ? String(appPctRaw).trim() : '';
+
+      const area = areaStr !== '' ? parseFloat(areaStr.replace(',', '.')) : 80;
+      const rate = rateStr !== '' ? parseFloat(rateStr.replace(',', '.')) : 4.20;
+      const appPct = (appPctStr !== '' ? parseFloat(appPctStr.replace(',', '.')) : 65) / 100;
+
+      if (isNaN(area) || isNaN(rate) || isNaN(appPct) || area < 0 || rate < 0 || appPct < 0) {
+        return {
+          primary: { id: 'totalMonthly', label: 'Monatliches Gesamthausgeld', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Werte dürfen nicht negativ sein).',
+        };
+      }
+
       const totalMonthly = area * rate;
       const apportionable = totalMonthly * appPct;
       const ownerShare = totalMonthly - apportionable;
@@ -835,6 +1095,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'yearlyTotal', label: 'Gesamthausgeld pro Jahr', value: totalMonthly * 12, formattedValue: formatCurrency(totalMonthly * 12) },
         ],
         summaryText: `Für Ihre ${area} m² Eigentumswohnung beträgt das Hausgeld monatlich ${formatCurrency(totalMonthly)}. Davon können ca. ${formatCurrency(apportionable)} auf den Mieter umgelegt werden.`,
+        directAnswer: `Bei ${area} m² Wohnfläche und ${formatCurrency(rate)}/m² Hausgeld beträgt die monatliche Vorauszahlung ${formatCurrency(totalMonthly)} (${formatCurrency(totalMonthly * 12)} p.a.). Davon sind ${formatCurrency(apportionable)} (${formatPercent(appPct * 100, 0)}) auf den Mieter umlagefähig und ${formatCurrency(ownerShare)} vom Eigentümer zu tragen.`,
+        basisSummary: [
+          { label: 'Wohnfläche', value: `${area} m²` },
+          { label: 'Hausgeld-Satz', value: `${formatCurrency(rate)}/m²` },
+          { label: 'Umlagefähiger Anteil', value: formatPercent(appPct * 100, 0) },
+        ],
       };
     },
     formula: 'Hausgeld = Wohnfläche × Satz pro m²; Umlagefähig = Hausgeld × Umlagequote',
@@ -869,8 +1135,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die jährliche Steuerersparnis durch Gebäude-AfA für Vermieter und Kapitalanleger.',
     searchKeywords: ['afa rechner immobilien', 'gebaeudeabschreibung 3 prozent neubau', 'gebaeude afa berechnen steuer', 'paragraph 7 absatz 4 estg'],
     inputs: [
-      { id: 'totalCost', label: 'Gesamtkaufpreis inkl. Erwerbsnebenkosten', type: 'number', defaultValue: 380000, min: 20000, step: 10000, unit: '€' },
-      { id: 'landSharePct', label: 'Grundstücksanteil (nicht abschreibbar, üblich 20 % - 30 %)', type: 'number', defaultValue: 25, min: 5, max: 70, step: 5, unit: '%' },
+      { id: 'totalCost', label: 'Gesamtkaufpreis inkl. Erwerbsnebenkosten', type: 'number', defaultValue: 380000, min: 0, step: 10000, unit: '€', helpText: 'Kaufpreis zuzüglich aller Anschaffungsnebenkosten in Euro.' },
+      { id: 'landSharePct', label: 'Grundstücksanteil (nicht abschreibbar, üblich 20 % - 30 %)', type: 'number', defaultValue: 25, min: 0, max: 80, step: 1, unit: '%', helpText: 'Grundstücksanteil in % (0 % bei Erbbaurecht / reinem Gebäudekauf).' },
       {
         id: 'afaType',
         label: 'Baujahr / AfA-Satz nach § 7 Abs. 4 EStG',
@@ -882,12 +1148,29 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { value: 'before1925', label: 'Altbau bis 1924 (2,5 % p.a.)' },
         ],
       },
-      { id: 'taxRate', label: 'Persönlicher Grenzsteuersatz', type: 'number', defaultValue: 42, min: 14, max: 45, step: 1, unit: '%' },
+      { id: 'taxRate', label: 'Persönlicher Grenzsteuersatz', type: 'number', defaultValue: 42, min: 0, max: 45, step: 1, unit: '%', helpText: 'Persönlicher Grenzsteuersatz in % (0 % bei steuerfreiem Einkommen).' },
     ],
     calculate: (inputs) => {
-      const total = parseFloat(inputs.totalCost) || 380000;
-      const landPct = (parseFloat(inputs.landSharePct) || 25) / 100;
-      const taxRate = (parseFloat(inputs.taxRate) || 42) / 100;
+      const totalRaw = inputs.totalCost;
+      const landRaw = inputs.landSharePct;
+      const taxRateRaw = inputs.taxRate;
+
+      const totalStr = totalRaw !== undefined && totalRaw !== null ? String(totalRaw).trim() : '';
+      const landStr = landRaw !== undefined && landRaw !== null ? String(landRaw).trim() : '';
+      const taxRateStr = taxRateRaw !== undefined && taxRateRaw !== null ? String(taxRateRaw).trim() : '';
+
+      const total = totalStr !== '' ? parseFloat(totalStr.replace(',', '.')) : 380000;
+      const landPct = (landStr !== '' ? parseFloat(landStr.replace(',', '.')) : 25) / 100;
+      const taxRate = (taxRateStr !== '' ? parseFloat(taxRateStr.replace(',', '.')) : 42) / 100;
+
+      if (isNaN(total) || isNaN(landPct) || isNaN(taxRate) || total < 0 || landPct < 0 || landPct > 1 || taxRate < 0) {
+        return {
+          primary: { id: 'yearlyTaxSaving', label: 'Jährliche Steuerersparnis durch AfA', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Grundstücksanteil darf maximal 100 % betragen).',
+        };
+      }
+
       const buildingValue = total * (1 - landPct);
       let rate = 0.02;
       if (inputs.afaType === 'newBuild') rate = 0.03;
@@ -903,6 +1186,14 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'monthlyTaxSaving', label: 'Monatliche Steuerersparnis', value: monthlyTaxSaving, formattedValue: formatCurrency(monthlyTaxSaving) },
         ],
         summaryText: `Bei einem Gebäudewert von ${formatCurrency(buildingValue)} beträgt die AfA ${formatCurrency(yearlyAfa)}/Jahr (${formatPercent(rate * 100, 1)}). Sie sparen jährlich ca. ${formatCurrency(yearlyTaxSaving)} Einkommensteuer.`,
+        directAnswer: `Bei einem Gesamtkaufpreis von ${formatCurrency(total)} und ${formatPercent(landPct * 100, 0)} Grundstücksanteil beträgt der abschreibbare Gebäudewert ${formatCurrency(buildingValue)}. Bei ${formatPercent(rate * 100, 1)} AfA und ${formatPercent(taxRate * 100, 0)} Grenzsteuersatz ergibt sich eine jährliche Steuerersparnis von ca. ${formatCurrency(yearlyTaxSaving)} (${formatCurrency(yearlyAfa)} AfA pro Jahr).`,
+        basisSummary: [
+          { label: 'Gesamtkaufpreis', value: formatCurrency(total) },
+          { label: 'Grundstücksanteil', value: formatPercent(landPct * 100, 0) },
+          { label: 'Gebäudeanteil', value: formatCurrency(buildingValue) },
+          { label: 'AfA-Satz p.a.', value: formatPercent(rate * 100, 1) },
+          { label: 'Grenzsteuersatz', value: formatPercent(taxRate * 100, 0) },
+        ],
       };
     },
     formula: 'AfA = Gebäudewert × AfA-Satz (2 %, 2,5 % oder 3 %); Steuerersparnis = AfA × Grenzsteuersatz',
@@ -937,30 +1228,56 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Vergleicht Brutto- und Nettomietrendite zur objektiven Bewertung von Kapitalanlage-Immobilien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['mietrendite rechner', 'bruttomietrendite formel', 'nettomietrendite berechnen', 'immobilie rendite kapitalanlage'],
     inputs: [
-      { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 250000, min: 10000, step: 5000, unit: '€' },
-      { id: 'closingCosts', label: 'Kaufnebenkosten (Grunderwerbsteuer, Notar, Makler)', type: 'number', defaultValue: 25000, min: 0, step: 1000, unit: '€' },
-      { id: 'monthlyColdRent', label: 'Monatliche Kaltmiete', type: 'number', defaultValue: 950, min: 50, step: 25, unit: '€' },
-      { id: 'yearlyNonApportionable', label: 'Jährliche nicht umlegbare Kosten (Verwaltung & Rücklage)', type: 'number', defaultValue: 1400, min: 0, step: 100, unit: '€' },
+      { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 250000, min: 0, step: 5000, unit: '€', helpText: 'Reiner Immobilienkaufpreis ohne Erwerbsnebenkosten.' },
+      { id: 'closingCosts', label: 'Kaufnebenkosten (Grunderwerbsteuer, Notar, Makler)', type: 'number', defaultValue: 25000, min: 0, step: 1000, unit: '€', helpText: 'Kaufnebenkosten in Euro (0 € bei provisions- und gebührenfreiem Erwerb).' },
+      { id: 'monthlyColdRent', label: 'Monatliche Kaltmiete', type: 'number', defaultValue: 950, min: 0, step: 25, unit: '€', helpText: 'Monatlich erzielbare Nettokaltmiete.' },
+      { id: 'yearlyNonApportionable', label: 'Jährliche nicht umlegbare Kosten (Verwaltung & Rücklage)', type: 'number', defaultValue: 1400, min: 0, step: 100, unit: '€', helpText: 'Nicht umlagefähige Kosten pro Jahr in Euro (0 € falls keine Verwaltung/Rücklage).' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 250000;
-      const closing = parseFloat(inputs.closingCosts) || 25000;
-      const rent = parseFloat(inputs.monthlyColdRent) || 950;
-      const nonApp = parseFloat(inputs.yearlyNonApportionable) || 1400;
+      const priceRaw = inputs.purchasePrice;
+      const closingRaw = inputs.closingCosts;
+      const rentRaw = inputs.monthlyColdRent;
+      const nonAppRaw = inputs.yearlyNonApportionable;
+
+      const priceStr = priceRaw !== undefined && priceRaw !== null ? String(priceRaw).trim() : '';
+      const closingStr = closingRaw !== undefined && closingRaw !== null ? String(closingRaw).trim() : '';
+      const rentStr = rentRaw !== undefined && rentRaw !== null ? String(rentRaw).trim() : '';
+      const nonAppStr = nonAppRaw !== undefined && nonAppRaw !== null ? String(nonAppRaw).trim() : '';
+
+      const price = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 250000;
+      const closing = closingStr !== '' ? parseFloat(closingStr.replace(',', '.')) : 25000;
+      const rent = rentStr !== '' ? parseFloat(rentStr.replace(',', '.')) : 950;
+      const nonApp = nonAppStr !== '' ? parseFloat(nonAppStr.replace(',', '.')) : 1400;
+
+      if (isNaN(price) || isNaN(closing) || isNaN(rent) || isNaN(nonApp) || price < 0 || closing < 0 || rent < 0 || nonApp < 0) {
+        return {
+          primary: { id: 'netYield', label: 'Nettomietrendite', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Beträge dürfen nicht negativ sein).',
+        };
+      }
+
       const totalInvestment = price + closing;
       const yearlyGrossRent = rent * 12;
       const yearlyNetRent = yearlyGrossRent - nonApp;
-      const grossYield = (yearlyGrossRent / price) * 100;
-      const netYield = (yearlyNetRent / totalInvestment) * 100;
-      const multiplier = price / yearlyGrossRent;
+      const grossYield = price > 0 ? (yearlyGrossRent / price) * 100 : 0;
+      const netYield = totalInvestment > 0 ? (yearlyNetRent / totalInvestment) * 100 : 0;
+      const multiplier = yearlyGrossRent > 0 ? price / yearlyGrossRent : 0;
       return {
         primary: { id: 'netYield', label: 'Nettomietrendite', value: netYield, formattedValue: formatPercent(netYield, 2), highlight: true },
         secondary: [
           { id: 'grossYield', label: 'Bruttomietrendite', value: grossYield, formattedValue: formatPercent(grossYield, 2) },
-          { id: 'multiplier', label: 'Kaufpreisfaktor (Vervielfältiger)', value: multiplier, formattedValue: `${formatNumber(multiplier, 1)}x` },
+          { id: 'multiplier', label: 'Kaufpreisfaktor (Vervielfältiger)', value: multiplier, formattedValue: multiplier > 0 ? `${formatNumber(multiplier, 1)}x` : '–' },
           { id: 'yearlyNetRent', label: 'Netto-Mieteinnahmen pro Jahr', value: yearlyNetRent, formattedValue: formatCurrency(yearlyNetRent) },
         ],
         summaryText: `Die Immobilie erzielt eine Bruttomietrendite von ${formatPercent(grossYield, 2)} und eine realistische Nettomietrendite von ${formatPercent(netYield, 2)} nach allen Nebenkosten.`,
+        directAnswer: `Bei ${formatCurrency(price)} Kaufpreis und ${formatCurrency(closing)} Nebenkosten beträgt die Gesamtinvestition ${formatCurrency(totalInvestment)}. Bei ${formatCurrency(rent)} Monatsmiete beläuft sich die Bruttomietrendite auf ${formatPercent(grossYield, 2)} und die Nettomietrendite (nach ${formatCurrency(nonApp)} nicht umlagefähigen Kosten) auf ${formatPercent(netYield, 2)}.`,
+        basisSummary: [
+          { label: 'Gesamtinvestition', value: formatCurrency(totalInvestment) },
+          { label: 'Jahreskaltmiete', value: formatCurrency(yearlyGrossRent) },
+          { label: 'Reinertrag netto', value: formatCurrency(yearlyNetRent) },
+          { label: 'Bruttomietrendite', value: formatPercent(grossYield, 2) },
+        ],
       };
     },
     formula: 'Nettomietrendite = (Jahresnettokaltmiete - nicht umlegbare Kosten) / Gesamtkosten × 100',
@@ -995,27 +1312,55 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Schätzt die Bankenentschädigung bei vorzeitiger Kündigung eines Immobilienkredits nach der anerkannten Aktiv-Passiv-Methode.',
     searchKeywords: ['vorfaelligkeitsentschaedigung baufinanzierung', 'vorfaelligkeitsentschaedigung rechner', 'baufinanzierung vorzeitig kuendigen kosten', 'aktiv passiv methode bgh', 'schadensersatz bank zinsverlust'],
     inputs: [
-      { id: 'remainingDebt', label: 'Aktuelle Restschuld des Darlehens', type: 'number', defaultValue: 180000, min: 10000, step: 5000, unit: '€' },
-      { id: 'contractRate', label: 'Vereinbarter Darlehenszins p.a.', type: 'number', defaultValue: 4.2, min: 0.5, step: 0.1, unit: '%' },
-      { id: 'reinvestmentRate', label: 'Aktuelle Wiederanlage-Rendite (z. B. Bundesanleihen)', type: 'number', defaultValue: 2.4, min: 0, step: 0.1, unit: '%' },
-      { id: 'remainingYears', label: 'Restliche Zinsbindungszeit in Jahren (max. 10 Jahre)', type: 'number', defaultValue: 4, min: 0.5, max: 10, step: 0.5, unit: 'Jahre' },
+      { id: 'remainingDebt', label: 'Aktuelle Restschuld des Darlehens', type: 'number', defaultValue: 180000, min: 0, step: 5000, unit: '€', helpText: 'Noch offene Darlehens-Restschuld zum Kündigungstermin.' },
+      { id: 'contractRate', label: 'Vereinbarter Darlehenszins p.a.', type: 'number', defaultValue: 4.2, min: 0, step: 0.1, unit: '%', helpText: 'Im Darlehensvertrag fest vereinbarter Sollzins.' },
+      { id: 'reinvestmentRate', label: 'Aktuelle Wiederanlage-Rendite (z. B. Bundesanleihen)', type: 'number', defaultValue: 2.4, min: 0, step: 0.1, unit: '%', helpText: 'Aktuelle Wiederanlage-Rendite (0 % bei Null- oder Negativzinsphasen).' },
+      { id: 'remainingYears', label: 'Restliche Zinsbindungszeit in Jahren (max. 10 Jahre)', type: 'number', defaultValue: 4, min: 0, max: 10, step: 0.5, unit: 'Jahre', helpText: 'Verbleibende Jahre bis zum Ende der Zinsbindung (höchstens 10 Jahre nach § 489 BGB).' },
     ],
     calculate: (inputs) => {
-      const debt = parseFloat(inputs.remainingDebt) || 180000;
-      const contract = parseFloat(inputs.contractRate) || 4.2;
-      const reinvest = parseFloat(inputs.reinvestmentRate) || 2.4;
-      const years = parseFloat(inputs.remainingYears) || 4;
+      const debtRaw = inputs.remainingDebt;
+      const contractRaw = inputs.contractRate;
+      const reinvestRaw = inputs.reinvestmentRate;
+      const yearsRaw = inputs.remainingYears;
+
+      const debtStr = debtRaw !== undefined && debtRaw !== null ? String(debtRaw).trim() : '';
+      const contractStr = contractRaw !== undefined && contractRaw !== null ? String(contractRaw).trim() : '';
+      const reinvestStr = reinvestRaw !== undefined && reinvestRaw !== null ? String(reinvestRaw).trim() : '';
+      const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
+
+      const debt = debtStr !== '' ? parseFloat(debtStr.replace(',', '.')) : 180000;
+      const contract = contractStr !== '' ? parseFloat(contractStr.replace(',', '.')) : 4.2;
+      const reinvest = reinvestStr !== '' ? parseFloat(reinvestStr.replace(',', '.')) : 2.4;
+      const years = yearsStr !== '' ? parseFloat(yearsStr.replace(',', '.')) : 4;
+
+      if (isNaN(debt) || isNaN(contract) || isNaN(reinvest) || isNaN(years) || debt < 0 || contract < 0 || reinvest < 0 || years < 0) {
+        return {
+          primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Werte dürfen nicht negativ sein).',
+        };
+      }
+
       const interestDiff = Math.max(0, contract - reinvest);
       // Zinsverschlechterungsschaden grob geschätzt (unter Berücksichtigung ersparter Risiko- und Verwaltungskosten ca. 0,15 %)
       const netDiff = Math.max(0, interestDiff - 0.15);
       const compensation = debt * (netDiff / 100) * years * 0.90; // Barwert-Abzinsung ca. 90%
+      const pctOfDebt = debt > 0 ? (compensation / debt) * 100 : 0;
       return {
         primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: compensation, formattedValue: formatCurrency(compensation), highlight: true },
         secondary: [
           { id: 'interestDiff', label: 'Zinsdifferenz p.a.', value: interestDiff, formattedValue: formatPercent(interestDiff, 2) },
-          { id: 'pctOfDebt', label: 'Anteil an der Restschuld', value: (compensation / debt) * 100, formattedValue: formatPercent((compensation / debt) * 100, 2) },
+          { id: 'pctOfDebt', label: 'Anteil an der Restschuld', value: pctOfDebt, formattedValue: formatPercent(pctOfDebt, 2) },
         ],
         summaryText: `Bei einer Zinsdifferenz von ${formatPercent(interestDiff, 2)} und ${years} Jahren Restlaufzeit verlangt die Bank voraussichtlich ca. ${formatCurrency(compensation)} Entschädigung.`,
+        directAnswer: compensation === 0
+          ? `Bei einer Zinsdifferenz von 0,00 % (oder Marktzins über Vertragszins) entsteht der Bank kein Zinsschaden. Es fällt voraussichtlich keine Vorfälligkeitsentschädigung an.`
+          : `Bei ${formatCurrency(debt)} Restschuld, ${formatPercent(interestDiff, 2)} Zinsdifferenz und ${years} Jahren Restzinsbindung beträgt die geschätzte Bankentschädigung ca. ${formatCurrency(compensation)} (${formatPercent(pctOfDebt, 2)} der Restschuld).`,
+        basisSummary: [
+          { label: 'Restschuld', value: formatCurrency(debt) },
+          { label: 'Vertragszins vs. Wiederanlage', value: `${formatPercent(contract, 2)} vs. ${formatPercent(reinvest, 2)}` },
+          { label: 'Restzinsbindung', value: `${years} Jahre` },
+        ],
       };
     },
     formula: 'Entschädigung ≈ Restschuld × Zinsdifferenz × Restjahre (Barwertberechnung)',
@@ -1057,31 +1402,60 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den realistischen Zeitwert für Möbel und Küchen bei Wohnungsübernahme.',
     searchKeywords: ['abstandszahlung rechner', 'zeitwert einbaukueche berechnen', 'koelner tabelle moebel zeitwert', 'paragraph 4a woblauwg abstand'],
     inputs: [
-      { id: 'originalPrice', label: 'Neupreis der Einbauküche / Möbel (Rechnung)', type: 'number', defaultValue: 6000, min: 100, step: 100, unit: '€' },
-      { id: 'ageYears', label: 'Alter in Jahren', type: 'number', defaultValue: 4, min: 0, max: 30, step: 0.5, unit: 'Jahre' },
-      { id: 'totalLifespan', label: 'Angenommene Gesamtnutzungsdauer (Küche üblich 15-20 Jahre)', type: 'number', defaultValue: 15, min: 3, max: 30, step: 1, unit: 'Jahre' },
+      { id: 'originalPrice', label: 'Neupreis der Einbauküche / Möbel (Rechnung)', type: 'number', defaultValue: 6000, min: 0, step: 100, unit: '€', helpText: 'Ursprünglicher Anschaffungspreis laut Beleg in Euro.' },
+      { id: 'ageYears', label: 'Alter in Jahren', type: 'number', defaultValue: 4, min: 0, max: 40, step: 0.5, unit: 'Jahre', helpText: 'Alter in Jahren (0 Jahre bei sofort übernommener Neuausstattung).' },
+      { id: 'totalLifespan', label: 'Angenommene Gesamtnutzungsdauer (Küche üblich 15-20 Jahre)', type: 'number', defaultValue: 15, min: 1, max: 40, step: 1, unit: 'Jahre', helpText: 'Angenommene wirtschaftliche Nutzungsdauer laut AfA-Tabelle.' },
     ],
     calculate: (inputs) => {
-      const orig = parseFloat(inputs.originalPrice) || 6000;
-      const age = parseFloat(inputs.ageYears) || 4;
-      const life = parseFloat(inputs.totalLifespan) || 15;
+      const origRaw = inputs.originalPrice;
+      const ageRaw = inputs.ageYears;
+      const lifeRaw = inputs.totalLifespan;
+
+      const origStr = origRaw !== undefined && origRaw !== null ? String(origRaw).trim() : '';
+      const ageStr = ageRaw !== undefined && ageRaw !== null ? String(ageRaw).trim() : '';
+      const lifeStr = lifeRaw !== undefined && lifeRaw !== null ? String(lifeRaw).trim() : '';
+
+      const orig = origStr !== '' ? parseFloat(origStr.replace(',', '.')) : 6000;
+      const age = ageStr !== '' ? parseFloat(ageStr.replace(',', '.')) : 4;
+      const life = lifeStr !== '' ? parseFloat(lifeStr.replace(',', '.')) : 15;
+
+      if (isNaN(orig) || isNaN(age) || isNaN(life) || orig < 0 || age < 0 || life <= 0) {
+        return {
+          primary: { id: 'zeitwert', label: 'Empfohlener Zeitwert (Faire Abstandszahlung)', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Nutzungsdauer muss größer als 0 sein).',
+        };
+      }
+
       // Nach gängiger Rechtsprechung: Im ersten Jahr Wertverlust ca. 24 %, danach lineare Abschreibung des Restwerts
       let zeitwert = 0;
-      if (age <= 1) {
+      if (age === 0) {
+        zeitwert = orig;
+      } else if (age <= 1) {
         zeitwert = orig * (1 - (age * 0.24));
       } else {
         const valAfterYear1 = orig * 0.76;
-        const remainingYears = life - 1;
+        const remainingYears = Math.max(1, life - 1);
         const yearlyDep = valAfterYear1 / remainingYears;
         zeitwert = Math.max(0, valAfterYear1 - ((age - 1) * yearlyDep));
       }
+
+      const depTotal = orig - zeitwert;
+      const pctRemaining = orig > 0 ? (zeitwert / orig) * 100 : 0;
       return {
         primary: { id: 'zeitwert', label: 'Empfohlener Zeitwert (Faire Abstandszahlung)', value: zeitwert, formattedValue: formatCurrency(zeitwert), highlight: true },
         secondary: [
-          { id: 'depreciationTotal', label: 'Bisheriger Wertverlust', value: orig - zeitwert, formattedValue: formatCurrency(orig - zeitwert) },
-          { id: 'pctRemaining', label: 'Verbleibender Restwert', value: (zeitwert / orig) * 100, formattedValue: formatPercent((zeitwert / orig) * 100, 1) },
+          { id: 'depreciationTotal', label: 'Bisheriger Wertverlust', value: depTotal, formattedValue: formatCurrency(depTotal) },
+          { id: 'pctRemaining', label: 'Verbleibender Restwert', value: pctRemaining, formattedValue: formatPercent(pctRemaining, 1) },
         ],
-        summaryText: `Nach ${age} Jahren beträgt der faire Zeitwert der ursprünglich ${formatCurrency(orig)} teuren Anschaffung noch ${formatCurrency(zeitwert)} (${formatPercent((zeitwert / orig) * 100, 1)} des Neupreises).`,
+        summaryText: `Nach ${age} Jahren beträgt der faire Zeitwert der ursprünglich ${formatCurrency(orig)} teuren Anschaffung noch ${formatCurrency(zeitwert)} (${formatPercent(pctRemaining, 1)} des Neupreises).`,
+        directAnswer: `Bei einem Neupreis von ${formatCurrency(orig)} und einer Gesamtnutzungsdauer von ${life} Jahren beläuft sich der faire Zeitwert nach ${age} Jahren auf ${formatCurrency(zeitwert)} (Wertverlust: ${formatCurrency(depTotal)} bzw. ${formatPercent(100 - pctRemaining, 1)}).`,
+        basisSummary: [
+          { label: 'Neupreis', value: formatCurrency(orig) },
+          { label: 'Alter des Objekts', value: `${age} Jahre` },
+          { label: 'Nutzungsdauer', value: `${life} Jahre` },
+          { label: 'Restwertanteil', value: formatPercent(pctRemaining, 1) },
+        ],
       };
     },
     formula: 'Zeitwert = Neupreis abzüglich altersüblicher Wertminderung nach Rechtsprechung',
@@ -1443,19 +1817,38 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert die Untermiete für WG-Zimmer inklusive Gemeinschaftsflächen und Möblierungszuschlag mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['untermiete rechner', 'untermietzuschlag berechnen', 'wg zimmer untermiete qm anteil', 'paragraph 553 bgb untervermietung'],
     inputs: [
-      { id: 'totalWarmRent', label: 'Gesamte Warmmiete der Wohnung', type: 'number', defaultValue: 1200, min: 200, step: 25, unit: '€' },
-      { id: 'totalApartmentArea', label: 'Gesamtwohnfläche der Wohnung in m²', type: 'number', defaultValue: 80, min: 20, step: 5, unit: 'm²' },
-      { id: 'subletRoomArea', label: 'Größe des untervermieteten Zimmers in m²', type: 'number', defaultValue: 20, min: 5, step: 1, unit: 'm²' },
-      { id: 'furnishingSurcharge', label: 'Monatlicher Möblierungs- & WLAN-Zuschlag', type: 'number', defaultValue: 40, min: 0, step: 5, unit: '€' },
+      { id: 'totalWarmRent', label: 'Gesamte Warmmiete der Wohnung', type: 'number', defaultValue: 1200, min: 0, step: 25, unit: '€', helpText: 'Vollständige Warmmiete der Wohnung in Euro.' },
+      { id: 'totalApartmentArea', label: 'Gesamtwohnfläche der Wohnung in m²', type: 'number', defaultValue: 80, min: 1, step: 5, unit: 'm²', helpText: 'Gesamtwohnfläche der gesamten Wohnung laut Mietvertrag.' },
+      { id: 'subletRoomArea', label: 'Größe des untervermieteten Zimmers in m²', type: 'number', defaultValue: 20, min: 0, step: 1, unit: 'm²', helpText: 'Exklusiv vom Untermieter genutzte Zimmerfläche in m².' },
+      { id: 'furnishingSurcharge', label: 'Monatlicher Möblierungs- & WLAN-Zuschlag', type: 'number', defaultValue: 40, min: 0, step: 5, unit: '€', helpText: 'Monatlicher Möblierungs- & Pauschalzuschlag in Euro (0 € bei unmöblierter Vermietung).' },
     ],
     calculate: (inputs) => {
-      const totalRent = parseFloat(inputs.totalWarmRent) || 1200;
-      const totalArea = parseFloat(inputs.totalApartmentArea) || 80;
-      const roomArea = parseFloat(inputs.subletRoomArea) || 20;
-      const surcharge = parseFloat(inputs.furnishingSurcharge) || 40;
+      const rentRaw = inputs.totalWarmRent;
+      const totalAreaRaw = inputs.totalApartmentArea;
+      const roomAreaRaw = inputs.subletRoomArea;
+      const surchargeRaw = inputs.furnishingSurcharge;
+
+      const rentStr = rentRaw !== undefined && rentRaw !== null ? String(rentRaw).trim() : '';
+      const totalAreaStr = totalAreaRaw !== undefined && totalAreaRaw !== null ? String(totalAreaRaw).trim() : '';
+      const roomAreaStr = roomAreaRaw !== undefined && roomAreaRaw !== null ? String(roomAreaRaw).trim() : '';
+      const surchargeStr = surchargeRaw !== undefined && surchargeRaw !== null ? String(surchargeRaw).trim() : '';
+
+      const totalRent = rentStr !== '' ? parseFloat(rentStr.replace(',', '.')) : 1200;
+      const totalArea = totalAreaStr !== '' ? parseFloat(totalAreaStr.replace(',', '.')) : 80;
+      const roomArea = roomAreaStr !== '' ? parseFloat(roomAreaStr.replace(',', '.')) : 20;
+      const surcharge = surchargeStr !== '' ? parseFloat(surchargeStr.replace(',', '.')) : 40;
+
+      if (isNaN(totalRent) || isNaN(totalArea) || isNaN(roomArea) || isNaN(surcharge) || totalRent < 0 || totalArea <= 0 || roomArea < 0 || surcharge < 0) {
+        return {
+          primary: { id: 'totalSubRent', label: 'Empfohlene Warm-Untermiete', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Gesamtwohnfläche muss größer als 0 sein).',
+        };
+      }
+
       // Modell: Untermieter nutzt Zimmer exklusiv + halben Anteil an Restfläche (Küche, Bad, Flur)
       const commonArea = Math.max(0, totalArea - (roomArea * 2));
-      const subRatio = (roomArea + (commonArea / 2)) / totalArea;
+      const subRatio = Math.min(1, (roomArea + (commonArea / 2)) / totalArea);
       const baseSubRent = totalRent * subRatio;
       const totalSubRent = baseSubRent + surcharge;
       return {
@@ -1466,6 +1859,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'surcharge', label: 'Möblierungs- & Pauschalzuschlag', value: surcharge, formattedValue: formatCurrency(surcharge) },
         ],
         summaryText: `Für das ${roomArea} m² große Zimmer ergibt sich inklusive Gemeinschaftsnutzung und Zuschlägen eine angemessene Untermiete von ${formatCurrency(totalSubRent)} monatlich.`,
+        directAnswer: `Für das ${roomArea} m² große Zimmer in einer ${totalArea} m² Wohnung (Warmmiete ${formatCurrency(totalRent)}) beträgt der flächenanteilige Mietanteil ${formatCurrency(baseSubRent)} (${formatPercent(subRatio * 100, 1)} Flächennutzung). Zuzüglich ${formatCurrency(surcharge)} Zuschlag ergibt sich eine empfohlene Gesamt-Untermiete von ${formatCurrency(totalSubRent)} monatlich.`,
+        basisSummary: [
+          { label: 'Gesamtwohnfläche', value: `${totalArea} m²` },
+          { label: 'Zimmerfläche', value: `${roomArea} m²` },
+          { label: 'Gesamtmiete der Wohnung', value: formatCurrency(totalRent) },
+          { label: 'Zuschläge', value: formatCurrency(surcharge) },
+        ],
       };
     },
     formula: 'Untermiete = Warmmiete × Nutzungsflächenanteil + Zuschläge',
@@ -1500,14 +1900,31 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den Erbbauzins auf Basis des Bodenrichtwerts für Erbpacht-Grundstücke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['erbbauzins rechner', 'erbbaurecht kosten pro jahr', 'erbpacht zins berechnen bodenwert', 'erbbaurechtsgesetz rechner'],
     inputs: [
-      { id: 'landValue', label: 'Bodenwert des Baugrundstücks', type: 'number', defaultValue: 180000, min: 10000, step: 5000, unit: '€' },
-      { id: 'interestRate', label: 'Erbbauzins-Satz p.a. (üblich 3 % bis 5 %)', type: 'number', defaultValue: 4.0, min: 1.0, max: 8.0, step: 0.1, unit: '%' },
-      { id: 'leaseYears', label: 'Laufzeit des Erbbaurechts in Jahren', type: 'number', defaultValue: 99, min: 20, max: 99, step: 1, unit: 'Jahre' },
+      { id: 'landValue', label: 'Bodenwert des Baugrundstücks', type: 'number', defaultValue: 180000, min: 0, step: 5000, unit: '€', helpText: 'Bodenrichtwert bzw. Verkehrswert des Grundstücks in Euro.' },
+      { id: 'interestRate', label: 'Erbbauzins-Satz p.a. (üblich 3 % bis 5 %)', type: 'number', defaultValue: 4.0, min: 0, max: 15.0, step: 0.1, unit: '%', helpText: 'Vereinbarter jährlicher Zinssatz in Prozent.' },
+      { id: 'leaseYears', label: 'Laufzeit des Erbbaurechts in Jahren', type: 'number', defaultValue: 99, min: 1, max: 199, step: 1, unit: 'Jahre', helpText: 'Gesamtlaufzeit des Erbbaurechtsvertrags.' },
     ],
     calculate: (inputs) => {
-      const land = parseFloat(inputs.landValue) || 180000;
-      const rate = (parseFloat(inputs.interestRate) || 4.0) / 100;
-      const years = parseInt(inputs.leaseYears, 10) || 99;
+      const landRaw = inputs.landValue;
+      const rateRaw = inputs.interestRate;
+      const yearsRaw = inputs.leaseYears;
+
+      const landStr = landRaw !== undefined && landRaw !== null ? String(landRaw).trim() : '';
+      const rateStr = rateRaw !== undefined && rateRaw !== null ? String(rateRaw).trim() : '';
+      const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
+
+      const land = landStr !== '' ? parseFloat(landStr.replace(',', '.')) : 180000;
+      const rate = (rateStr !== '' ? parseFloat(rateStr.replace(',', '.')) : 4.0) / 100;
+      const years = yearsStr !== '' ? parseInt(yearsStr, 10) : 99;
+
+      if (isNaN(land) || isNaN(rate) || isNaN(years) || land < 0 || rate < 0 || years < 1) {
+        return {
+          primary: { id: 'yearly', label: 'Jährlicher Erbbauzins', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Werte ein (Laufzeit muss mindestens 1 Jahr betragen).',
+        };
+      }
+
       const yearly = land * rate;
       const monthly = yearly / 12;
       const totalOverTerm = yearly * years;
@@ -1518,6 +1935,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'totalOverTerm', label: `Gesamtzins über ${years} Jahre`, value: totalOverTerm, formattedValue: formatCurrency(totalOverTerm) },
         ],
         summaryText: `Bei einem Bodenwert von ${formatCurrency(land)} und ${formatPercent(rate * 100, 1)} Zinssatz zahlen Sie jährlich ${formatCurrency(yearly)} (${formatCurrency(monthly)} pro Monat).`,
+        directAnswer: `Bei einem Grundstücksbodenwert von ${formatCurrency(land)} und einem Erbbauzinssatz von ${formatPercent(rate * 100, 1)} beläuft sich der Erbbauzins auf ${formatCurrency(yearly)} im Jahr bzw. ${formatCurrency(monthly)} monatlich (Summe über ${years} Jahre: ${formatCurrency(totalOverTerm)}).`,
+        basisSummary: [
+          { label: 'Bodenwert', value: formatCurrency(land) },
+          { label: 'Zinssatz p.a.', value: formatPercent(rate * 100, 1) },
+          { label: 'Vertragslaufzeit', value: `${years} Jahre` },
+        ],
       };
     },
     formula: 'Jährlicher Erbbauzins = Bodenwert × Erbbauzinssatz',
@@ -1552,26 +1975,53 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet das Verhältnis von Kaufpreis zu Jahresnettokaltmiete mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['kaufpreisfaktor rechner', 'vervielfaeltiger immobilie berechnen', 'maklerfaktor jahresnettokaltmiete', 'faktor 20 oder 25 immobilie'],
     inputs: [
-      { id: 'purchasePrice', label: 'Kaufpreis der Immobilie (ohne Nebenkosten)', type: 'number', defaultValue: 280000, min: 10000, step: 5000, unit: '€' },
-      { id: 'yearlyRent', label: 'Jahres-Nettokaltmiete', type: 'number', defaultValue: 11200, min: 500, step: 100, unit: '€' },
+      { id: 'purchasePrice', label: 'Kaufpreis der Immobilie (ohne Nebenkosten)', type: 'number', defaultValue: 280000, min: 0, step: 5000, unit: '€', helpText: 'Kaufpreis der Immobilie ohne Kaufnebenkosten.' },
+      { id: 'yearlyRent', label: 'Jahres-Nettokaltmiete', type: 'number', defaultValue: 11200, min: 0, step: 100, unit: '€', helpText: 'Gesamte Netto-Kaltmieteinnahmen pro Kalenderjahr.' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 280000;
-      const rent = parseFloat(inputs.yearlyRent) || 11200;
-      const factor = price / rent;
-      const yieldPct = (rent / price) * 100;
+      const priceRaw = inputs.purchasePrice;
+      const rentRaw = inputs.yearlyRent;
+
+      const priceStr = priceRaw !== undefined && priceRaw !== null ? String(priceRaw).trim() : '';
+      const rentStr = rentRaw !== undefined && rentRaw !== null ? String(rentRaw).trim() : '';
+
+      const price = priceStr !== '' ? parseFloat(priceStr.replace(',', '.')) : 280000;
+      const rent = rentStr !== '' ? parseFloat(rentStr.replace(',', '.')) : 11200;
+
+      if (isNaN(price) || isNaN(rent) || price < 0 || rent < 0) {
+        return {
+          primary: { id: 'factor', label: 'Kaufpreisfaktor (Vervielfältiger)', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Bitte geben Sie gültige Zahlenwerte ein (Kaufpreis und Jahresmiete dürfen nicht negativ sein).',
+        };
+      }
+
+      const factor = rent > 0 ? price / rent : 0;
+      const yieldPct = price > 0 ? (rent / price) * 100 : 0;
       let rating = 'Sehr günstig / Hohe Rendite';
-      if (factor > 30) rating = 'Teuer / Niedrige Mietrendite';
+      if (rent === 0) rating = 'Keine Mieteinnahmen / Leerstand';
+      else if (factor > 30) rating = 'Teuer / Niedrige Mietrendite';
       else if (factor > 24) rating = 'Marktüblich in guten Lagen';
       else if (factor > 18) rating = 'Solide Rentabilität';
       return {
-        primary: { id: 'factor', label: 'Kaufpreisfaktor (Vervielfältiger)', value: factor, formattedValue: `${formatNumber(factor, 1)}x`, highlight: true },
+        primary: { id: 'factor', label: 'Kaufpreisfaktor (Vervielfältiger)', value: factor, formattedValue: factor > 0 ? `${formatNumber(factor, 1)}x` : '–', highlight: true },
         secondary: [
           { id: 'yieldPct', label: 'Bruttomietrendite', value: yieldPct, formattedValue: formatPercent(yieldPct, 2) },
           { id: 'monthlyRent', label: 'Monatliche Kaltmiete', value: rent / 12, formattedValue: formatCurrency(rent / 12) },
           { id: 'rating', label: 'Marktbewertung', value: 0, formattedValue: rating },
         ],
-        summaryText: `Ein Faktor von ${formatNumber(factor, 1)} bedeutet, dass der Kaufpreis ${formatNumber(factor, 1)} Jahreskaltmieten entspricht (entspricht ${formatPercent(yieldPct, 2)} Bruttorendite).`,
+        summaryText: rent > 0
+          ? `Ein Faktor von ${formatNumber(factor, 1)} bedeutet, dass der Kaufpreis ${formatNumber(factor, 1)} Jahreskaltmieten entspricht (entspricht ${formatPercent(yieldPct, 2)} Bruttorendite).`
+          : `Bei einer Jahreskaltmiete von 0,00 € kann kein Kaufpreisfaktor ermittelt werden.`,
+        directAnswer: rent > 0
+          ? `Bei einem Kaufpreis von ${formatCurrency(price)} und einer Jahresnettokaltmiete von ${formatCurrency(rent)} (${formatCurrency(rent / 12)}/Monat) beträgt der Kaufpreisfaktor ${formatNumber(factor, 1)}x. Die rechnerische Bruttomietrendite liegt bei ${formatPercent(yieldPct, 2)} (${rating}).`
+          : `Bei 0,00 € Jahreskaltmiete erzielt die Immobilie aktuell keine Mietrendite.`,
+        basisSummary: [
+          { label: 'Kaufpreis', value: formatCurrency(price) },
+          { label: 'Jahresnettokaltmiete', value: formatCurrency(rent) },
+          { label: 'Kaufpreisfaktor', value: factor > 0 ? `${formatNumber(factor, 1)}x` : '–' },
+          { label: 'Bruttomietrendite', value: formatPercent(yieldPct, 2) },
+        ],
       };
     },
     formula: 'Kaufpreisfaktor = Kaufpreis / Jahresnettokaltmiete; Rendite = 100 / Faktor',
@@ -1966,23 +2416,32 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Ihr aktueller Haushaltsstrompreis', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const wp = parseFloat(inputs.modulePowerWp) || 850;
-      const cost = parseFloat(inputs.systemCost) || 450;
-      const ownPct = (parseFloat(inputs.ownConsumptionPct) || 75) / 100;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
+      const wp = inputs.modulePowerWp !== undefined && inputs.modulePowerWp !== '' ? Math.max(0, parseFloat(inputs.modulePowerWp) || 0) : 850;
+      const cost = inputs.systemCost !== undefined && inputs.systemCost !== '' ? Math.max(0, parseFloat(inputs.systemCost) || 0) : 450;
+      const ownPct = inputs.ownConsumptionPct !== undefined && inputs.ownConsumptionPct !== '' ? Math.max(0, Math.min(100, parseFloat(inputs.ownConsumptionPct) || 0)) / 100 : 0.75;
+      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       // In Deutschland ca. 850 bis 1000 kWh Ertrag pro kWp je nach Ausrichtung
       const yearlyGenerationKwh = (wp / 1000) * 880;
       const usedKwh = yearlyGenerationKwh * ownPct;
       const yearlySaving = (usedKwh * priceCent) / 100;
-      const amortYears = cost / yearlySaving;
+      const amortYears = yearlySaving > 0 ? cost / yearlySaving : 0;
       return {
         primary: { id: 'yearlySaving', label: 'Jährliche Stromkostenersparnis', value: yearlySaving, formattedValue: formatCurrency(yearlySaving), highlight: true },
         secondary: [
-          { id: 'amortYears', label: 'Amortisationszeit', value: amortYears, formattedValue: `ca. ${formatNumber(amortYears, 1)} Jahre` },
+          { id: 'amortYears', label: 'Amortisationszeit', value: amortYears, formattedValue: yearlySaving > 0 ? `ca. ${formatNumber(amortYears, 1)} Jahre` : 'Nicht amortisierbar' },
           { id: 'yearlyGenerationKwh', label: 'Solarstrom-Erzeugung pro Jahr', value: yearlyGenerationKwh, formattedValue: `${formatNumber(yearlyGenerationKwh, 0)} kWh` },
           { id: 'usedKwh', label: 'Selbst genutzter Strom', value: usedKwh, formattedValue: `${formatNumber(usedKwh, 0)} kWh` },
         ],
-        summaryText: `Ihr Balkonkraftwerk erzeugt ca. ${formatNumber(yearlyGenerationKwh, 0)} kWh Strom. Bei ${formatPercent(ownPct * 100, 0)} Eigenverbrauch sparen Sie jährlich ${formatCurrency(yearlySaving)} – bezahlt in ${formatNumber(amortYears, 1)} Jahren.`,
+        summaryText: `Ihr Balkonkraftwerk erzeugt ca. ${formatNumber(yearlyGenerationKwh, 0)} kWh Strom. Bei ${formatPercent(ownPct * 100, 0)} Eigenverbrauch sparen Sie jährlich ${formatCurrency(yearlySaving)}${yearlySaving > 0 ? ` – bezahlt in ${formatNumber(amortYears, 1)} Jahren.` : '.'}`,
+        directAnswer: yearlySaving > 0
+          ? `Ein Balkonkraftwerk mit ${formatNumber(wp, 0)} Wp Modulleistung spart jährlich ca. ${formatCurrency(yearlySaving)} bei einer Amortisationszeit von rund ${formatNumber(amortYears, 1)} Jahren.`
+          : 'Bei den gewählten Parametern ergibt sich keine jährliche Stromkostenersparnis.',
+        basisSummary: [
+          { label: 'Modulleistung', value: `${formatNumber(wp, 0)} Wp` },
+          { label: 'Anschaffungspreis', value: formatCurrency(cost) },
+          { label: 'Eigenverbrauch', value: formatPercent(ownPct * 100, 0) },
+          { label: 'Strompreis', value: `${formatNumber(priceCent, 1)} ct/kWh` },
+        ],
       };
     },
     formula: 'Ersparnis/Jahr = Solarstrom (kWh) × Eigenverbrauchsquote × Strompreis; Amortisation = Kosten / Ersparnis',
@@ -2032,28 +2491,39 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'gridPriceCent', label: 'Bezugsstrompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const kwp = parseFloat(inputs.peakPowerKwp) || 10;
-      const cost = parseFloat(inputs.totalCost) || 15500;
-      const demand = parseFloat(inputs.householdDemandKwh) || 4500;
-      const selfPct = (parseFloat(inputs.selfConsumptionPct) || 35) / 100;
-      const feedInPrice = (parseFloat(inputs.feedInTariffCent) || 8.03) / 100;
-      const gridPrice = (parseFloat(inputs.gridPriceCent) || 36) / 100;
+      const kwp = inputs.peakPowerKwp !== undefined && inputs.peakPowerKwp !== '' ? Math.max(0, parseFloat(inputs.peakPowerKwp) || 0) : 10;
+      const cost = inputs.totalCost !== undefined && inputs.totalCost !== '' ? Math.max(0, parseFloat(inputs.totalCost) || 0) : 15500;
+      const demand = inputs.householdDemandKwh !== undefined && inputs.householdDemandKwh !== '' ? Math.max(0, parseFloat(inputs.householdDemandKwh) || 0) : 4500;
+      const selfPct = inputs.selfConsumptionPct !== undefined && inputs.selfConsumptionPct !== '' ? Math.max(0, Math.min(100, parseFloat(inputs.selfConsumptionPct) || 0)) / 100 : 0.35;
+      const feedInPrice = (inputs.feedInTariffCent !== undefined && inputs.feedInTariffCent !== '' ? Math.max(0, parseFloat(inputs.feedInTariffCent) || 0) : 8.03) / 100;
+      const gridPrice = (inputs.gridPriceCent !== undefined && inputs.gridPriceCent !== '' ? Math.max(0, parseFloat(inputs.gridPriceCent) || 0) : 36) / 100;
       const totalGen = kwp * 950; // ca. 950 kWh pro kWp im D-Schnitt
       const selfConsumed = totalGen * selfPct;
-      const fedIn = totalGen - selfConsumed;
+      const fedIn = Math.max(0, totalGen - selfConsumed);
       const savedGridCost = selfConsumed * gridPrice;
       const feedInRevenue = fedIn * feedInPrice;
       const totalYearlyBenefit = savedGridCost + feedInRevenue;
-      const amortYears = cost / totalYearlyBenefit;
+      const amortYears = totalYearlyBenefit > 0 ? cost / totalYearlyBenefit : 0;
+      const autarkyPct = demand > 0 ? Math.min(100, (selfConsumed / demand) * 100) : 0;
       return {
         primary: { id: 'totalYearlyBenefit', label: 'Jährlicher finanzieller Ertrag (Ersparnis + Einspeisung)', value: totalYearlyBenefit, formattedValue: formatCurrency(totalYearlyBenefit), highlight: true },
         secondary: [
-          { id: 'amortYears', label: 'Amortisationszeit', value: amortYears, formattedValue: `ca. ${formatNumber(amortYears, 1)} Jahre` },
+          { id: 'amortYears', label: 'Amortisationszeit', value: amortYears, formattedValue: totalYearlyBenefit > 0 ? `ca. ${formatNumber(amortYears, 1)} Jahre` : 'Nicht amortisierbar' },
           { id: 'savedGridCost', label: 'Eingesparte Stromkosten', value: savedGridCost, formattedValue: formatCurrency(savedGridCost) },
           { id: 'feedInRevenue', label: 'Einspeisevergütung Netzbetreiber', value: feedInRevenue, formattedValue: formatCurrency(feedInRevenue) },
-          { id: 'autarkyPct', label: 'Autarkiegrad im Haushalt', value: Math.min(100, (selfConsumed / demand) * 100), formattedValue: formatPercent(Math.min(100, (selfConsumed / demand) * 100), 1) },
+          { id: 'autarkyPct', label: 'Autarkiegrad im Haushalt', value: autarkyPct, formattedValue: formatPercent(autarkyPct, 1) },
         ],
-        summaryText: `Ihre ${kwp} kWp Anlage erwirtschaftet jährlich ca. ${formatCurrency(totalYearlyBenefit)} (${formatCurrency(savedGridCost)} Ersparnis + ${formatCurrency(feedInRevenue)} Einspeisevergütung). Die Anlage amortisiert sich in ca. ${formatNumber(amortYears, 1)} Jahren.`,
+        summaryText: `Ihre ${formatNumber(kwp, 1)} kWp Anlage erwirtschaftet jährlich ca. ${formatCurrency(totalYearlyBenefit)} (${formatCurrency(savedGridCost)} Ersparnis + ${formatCurrency(feedInRevenue)} Einspeisevergütung). Die Anlage amortisiert sich in ca. ${totalYearlyBenefit > 0 ? `${formatNumber(amortYears, 1)} Jahren` : 'n/a'}.`,
+        directAnswer: totalYearlyBenefit > 0
+          ? `Ihre ${formatNumber(kwp, 1)} kWp PV-Anlage erzielt einen finanziellen Gesamtnutzen von ca. ${formatCurrency(totalYearlyBenefit)} pro Jahr (Amortisation in rund ${formatNumber(amortYears, 1)} Jahren).`
+          : 'Bei den gewählten Parametern ergibt sich kein messbarer Jahresnutzen.',
+        basisSummary: [
+          { label: 'Anlagengröße', value: `${formatNumber(kwp, 1)} kWp` },
+          { label: 'Investition', value: formatCurrency(cost) },
+          { label: 'Eigenverbrauch', value: formatPercent(selfPct * 100, 0) },
+          { label: 'Bezugsstrompreis', value: `${formatNumber(gridPrice * 100, 1)} ct/kWh` },
+          { label: 'Einspeisevergütung', value: `${formatNumber(feedInPrice * 100, 2)} ct/kWh` },
+        ],
       };
     },
     formula: 'Jahresnutzen = (Eigenverbrauch × Strompreis) + (Einspeisung × Einspeisevergütung)',
@@ -2100,9 +2570,9 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'heatElectricityPriceCent', label: 'Wärmepumpenstrom-Tarif in Cent pro kWh', type: 'number', defaultValue: 28, min: 15, max: 50, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const heat = parseFloat(inputs.heatDemandKwh) || 16000;
-      const jaz = parseFloat(inputs.jaz) || 3.5;
-      const price = parseFloat(inputs.heatElectricityPriceCent) || 28;
+      const heat = inputs.heatDemandKwh !== undefined && inputs.heatDemandKwh !== '' ? Math.max(0, parseFloat(inputs.heatDemandKwh) || 0) : 16000;
+      const jaz = inputs.jaz !== undefined && inputs.jaz !== '' ? Math.max(0.1, parseFloat(inputs.jaz) || 0.1) : 3.5;
+      const price = inputs.heatElectricityPriceCent !== undefined && inputs.heatElectricityPriceCent !== '' ? Math.max(0, parseFloat(inputs.heatElectricityPriceCent) || 0) : 28;
       const electricityKwh = heat / jaz;
       const yearlyCost = (electricityKwh * price) / 100;
       const monthlyCost = yearlyCost / 12;
@@ -2113,7 +2583,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'monthlyCost', label: 'Monatliche Kosten', value: monthlyCost, formattedValue: formatCurrency(monthlyCost) },
           { id: 'costPerKwhHeat', label: 'Effektive Wärmekosten', value: (price / jaz), formattedValue: `${formatNumber(price / jaz, 2)} ct/kWh Wärme` },
         ],
-        summaryText: `Für ${formatNumber(heat, 0)} kWh Wärme benötigt die Wärmepumpe bei JAZ ${jaz} ca. ${formatNumber(electricityKwh, 0)} kWh Strom. Das ergibt jährliche Heizkosten von ${formatCurrency(yearlyCost)}.`,
+        summaryText: `Für ${formatNumber(heat, 0)} kWh Wärme benötigt die Wärmepumpe bei JAZ ${formatNumber(jaz, 1)} ca. ${formatNumber(electricityKwh, 0)} kWh Strom. Das ergibt jährliche Heizkosten von ${formatCurrency(yearlyCost)}.`,
+        directAnswer: `Für ${formatNumber(heat, 0)} kWh Nutzwärme entstehen jährliche Heizstromkosten von ca. ${formatCurrency(yearlyCost)} (${formatCurrency(monthlyCost)} pro Monat) bei einer JAZ von ${formatNumber(jaz, 1)}.`,
+        basisSummary: [
+          { label: 'Wärmebedarf', value: `${formatNumber(heat, 0)} kWh` },
+          { label: 'Jahresarbeitszahl (JAZ)', value: formatNumber(jaz, 2) },
+          { label: 'Heizstrompreis', value: `${formatNumber(price, 1)} ct/kWh` },
+        ],
       };
     },
     formula: 'Strombedarf (kWh) = Wärmebedarf / JAZ; Heizkosten = Strombedarf × Strompreis',
@@ -2163,12 +2639,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'heatPumpPowerPrice', label: 'Wärmepumpenstrom-Tarif in Cent pro kWh', type: 'number', defaultValue: 28, min: 15, max: 45, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const demand = parseFloat(inputs.heatDemandKwh) || 18000;
-      const gasCent = parseFloat(inputs.gasPriceCent) || 11.0;
-      const oilLiter = parseFloat(inputs.oilPricePerLiter) || 1.05;
-      const pelletTon = parseFloat(inputs.pelletPricePerTon) || 320;
-      const jaz = parseFloat(inputs.heatPumpJaz) || 3.6;
-      const wpCent = parseFloat(inputs.heatPumpPowerPrice) || 28;
+      const demand = inputs.heatDemandKwh !== undefined && inputs.heatDemandKwh !== '' ? Math.max(0, parseFloat(inputs.heatDemandKwh) || 0) : 18000;
+      const gasCent = inputs.gasPriceCent !== undefined && inputs.gasPriceCent !== '' ? Math.max(0, parseFloat(inputs.gasPriceCent) || 0) : 11.0;
+      const oilLiter = inputs.oilPricePerLiter !== undefined && inputs.oilPricePerLiter !== '' ? Math.max(0, parseFloat(inputs.oilPricePerLiter) || 0) : 1.05;
+      const pelletTon = inputs.pelletPricePerTon !== undefined && inputs.pelletPricePerTon !== '' ? Math.max(0, parseFloat(inputs.pelletPricePerTon) || 0) : 320;
+      const jaz = inputs.heatPumpJaz !== undefined && inputs.heatPumpJaz !== '' ? Math.max(0.1, parseFloat(inputs.heatPumpJaz) || 0.1) : 3.6;
+      const wpCent = inputs.heatPumpPowerPrice !== undefined && inputs.heatPumpPowerPrice !== '' ? Math.max(0, parseFloat(inputs.heatPumpPowerPrice) || 0) : 28;
 
       // 1. Gas (Nutzungsgrad ca. 92%)
       const gasCost = ((demand / 0.92) * gasCent) / 100;
@@ -2189,6 +2665,14 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'pelletCost', label: 'Kosten Pelletheizung', value: pelletCost, formattedValue: formatCurrency(pelletCost) },
         ],
         summaryText: `Bei ${formatNumber(demand, 0)} kWh Wärmebedarf liegen die jährlichen Kosten bei ca. ${formatCurrency(wpCost)} (Wärmepumpe), ${formatCurrency(pelletCost)} (Pellets), ${formatCurrency(gasCost)} (Gas) und ${formatCurrency(oilCost)} (Öl).`,
+        directAnswer: `Bei einem Heizbedarf von ${formatNumber(demand, 0)} kWh verursacht die Wärmepumpe ca. ${formatCurrency(wpCost)}/Jahr, verglichen mit ${formatCurrency(pelletCost)} (Pellets), ${formatCurrency(gasCost)} (Gas) und ${formatCurrency(oilCost)} (Öl).`,
+        basisSummary: [
+          { label: 'Wärmebedarf', value: `${formatNumber(demand, 0)} kWh` },
+          { label: 'Gaspreis', value: `${formatNumber(gasCent, 1)} ct/kWh` },
+          { label: 'Heizölpreis', value: `${formatCurrency(oilLiter)}/l` },
+          { label: 'Pelletpreis', value: `${formatCurrency(pelletTon)}/t` },
+          { label: 'Wärmepumpenstrom', value: `${formatNumber(wpCent, 1)} ct/kWh (JAZ ${formatNumber(jaz, 1)})` },
+        ],
       };
     },
     formula: 'Brennstoffkosten = (Wärmebedarf / Wirkungsgrad) × Brennstoffpreis',
@@ -2229,10 +2713,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const p = parseInt(inputs.persons, 10) || 3;
-      const mins = parseFloat(inputs.showerMinutesPerPerson) || 7;
-      const kw = parseFloat(inputs.powerKw) || 21;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
+      const p = inputs.persons !== undefined && inputs.persons !== '' ? Math.max(0, parseInt(inputs.persons, 10) || 0) : 3;
+      const mins = inputs.showerMinutesPerPerson !== undefined && inputs.showerMinutesPerPerson !== '' ? Math.max(0, parseFloat(inputs.showerMinutesPerPerson) || 0) : 7;
+      const kw = inputs.powerKw !== undefined && inputs.powerKw !== '' ? Math.max(0, parseFloat(inputs.powerKw) || 0) : 21;
+      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       const dailyMinutes = p * mins;
       const dailyHours = dailyMinutes / 60;
       const dailyKwh = dailyHours * kw;
@@ -2246,6 +2730,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'yearlyKwh', label: 'Stromverbrauch Warmwasser pro Jahr', value: dailyKwh * 365, formattedValue: `${formatNumber(dailyKwh * 365, 0)} kWh` },
         ],
         summaryText: `Ein 21-kW-Durchlauferhitzer kostet für ${p} Personen bei ${mins} Min. Duschzeit ca. ${formatCurrency(yearlyCost)} Strom im Jahr (${formatCurrency(costPerShower)} pro Duschgang).`,
+        directAnswer: `Die jährlichen Warmwasserkosten für ${p} ${p === 1 ? 'Person' : 'Personen'} betragen ca. ${formatCurrency(yearlyCost)} (${formatCurrency(costPerShower)} pro Duschgang).`,
+        basisSummary: [
+          { label: 'Personen', value: `${p}` },
+          { label: 'Duschdauer pro Tag', value: `${formatNumber(mins, 1)} Min.` },
+          { label: 'Leistung Durchlauferhitzer', value: `${formatNumber(kw, 0)} kW` },
+          { label: 'Strompreis', value: `${formatNumber(priceCent, 1)} ct/kWh` },
+        ],
       };
     },
     formula: 'Kosten = (Duschminuten / 60) × kW-Leistung × Strompreis',
@@ -3045,8 +3536,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'pelletPricePerTon', label: 'Pelletpreis pro Tonne (lose Ware inkl. Anlieferung)', type: 'number', defaultValue: 320, min: 180, max: 600, step: 10, unit: '€/t' },
     ],
     calculate: (inputs) => {
-      const demand = parseFloat(inputs.heatDemandKwh) || 18000;
-      const pricePerTon = parseFloat(inputs.pelletPricePerTon) || 320;
+      const demand = inputs.heatDemandKwh !== undefined && inputs.heatDemandKwh !== '' ? Math.max(0, parseFloat(inputs.heatDemandKwh) || 0) : 18000;
+      const pricePerTon = inputs.pelletPricePerTon !== undefined && inputs.pelletPricePerTon !== '' ? Math.max(0, parseFloat(inputs.pelletPricePerTon) || 0) : 320;
       // 1 kg Pellets = ca. 4,9 kWh Energie. Bei ca. 90 % Wirkungsgrad = ca. 4,4 kWh Nutzwärme je kg.
       const kgNeeded = demand / 4.4;
       const tonsNeeded = kgNeeded / 1000;
@@ -3060,6 +3551,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'storageVolumeM3', label: 'Benötigtes Pelletlager-Volumen', value: storageVolumeM3, formattedValue: `ca. ${formatNumber(storageVolumeM3, 1)} m³` },
         ],
         summaryText: `Für ${formatNumber(demand, 0)} kWh Wärme benötigen Sie ca. ${formatNumber(tonsNeeded, 2)} Tonnen Holzpellets. Bei ${formatCurrency(pricePerTon)}/t betragen die Kosten ${formatCurrency(totalCost)}.`,
+        directAnswer: `Für ${formatNumber(demand, 0)} kWh Heizenergie werden ca. ${formatNumber(tonsNeeded, 2)} Tonnen Holzpellets mit jährlichen Brennstoffkosten von ${formatCurrency(totalCost)} benötigt.`,
+        basisSummary: [
+          { label: 'Wärmebedarf', value: `${formatNumber(demand, 0)} kWh` },
+          { label: 'Pelletpreis', value: `${formatCurrency(pricePerTon)}/t` },
+          { label: 'Nutzwärme pro kg', value: '4,4 kWh (90 % Wirkungsgrad)' },
+        ],
       };
     },
     formula: 'Pellets (kg) = Wärmebedarf (kWh) / (4,9 kWh/kg × Wirkungsgrad 0,90)',
@@ -3221,9 +3718,9 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'co2EmissionKgPerSqm', label: 'CO2-Ausstoß in kg pro m² Wohnfläche im Jahr (z. B. 28 kg/m²a)', type: 'number', defaultValue: 28, min: 5, max: 70, step: 1, unit: 'kg/m²a' },
     ],
     calculate: (inputs) => {
-      const area = parseFloat(inputs.livingArea) || 80;
-      const total = parseFloat(inputs.co2CostTotal) || 140;
-      const kg = parseFloat(inputs.co2EmissionKgPerSqm) || 28;
+      const area = inputs.livingArea !== undefined && inputs.livingArea !== '' ? Math.max(0, parseFloat(inputs.livingArea) || 0) : 80;
+      const total = inputs.co2CostTotal !== undefined && inputs.co2CostTotal !== '' ? Math.max(0, parseFloat(inputs.co2CostTotal) || 0) : 140;
+      const kg = inputs.co2EmissionKgPerSqm !== undefined && inputs.co2EmissionKgPerSqm !== '' ? Math.max(0, parseFloat(inputs.co2EmissionKgPerSqm) || 0) : 28;
 
       // 10-Stufenmodell nach Anlage zu § 5 CO2KostAufG:
       // < 12 kg: 0% Vermieter / 100% Mieter
@@ -3259,7 +3756,13 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'landlordPct', label: 'Vermieter-Anteil nach Stufe', value: landlordPct * 100, formattedValue: formatPercent(landlordPct * 100, 0) },
           { id: 'tenantPct', label: 'Mieter-Anteil nach Stufe', value: tenantPct * 100, formattedValue: formatPercent(tenantPct * 100, 0) },
         ],
-        summaryText: `Bei ${kg} kg CO2/m²a greift Stufe 5: Der Vermieter übernimmt ${formatPercent(landlordPct * 100, 0)} (${formatCurrency(landlordShare)}) und der Mieter ${formatPercent(tenantPct * 100, 0)} (${formatCurrency(tenantShare)}) der CO2-Kosten.`,
+        summaryText: `Bei ${formatNumber(kg, 1)} kg CO2/m²a übernimmt der Vermieter ${formatPercent(landlordPct * 100, 0)} (${formatCurrency(landlordShare)}) und der Mieter ${formatPercent(tenantPct * 100, 0)} (${formatCurrency(tenantShare)}) der CO2-Kosten nach CO2KostAufG.`,
+        directAnswer: `Von den ${formatCurrency(total)} CO₂-Kosten übernimmt der Vermieter ${formatCurrency(landlordShare)} (${formatPercent(landlordPct * 100, 0)}) und der Mieter ${formatCurrency(tenantShare)} (${formatPercent(tenantPct * 100, 0)}).`,
+        basisSummary: [
+          { label: 'Wohnfläche', value: `${formatNumber(area, 0)} m²` },
+          { label: 'CO2-Kosten gesamt', value: formatCurrency(total) },
+          { label: 'Spezifischer CO2-Ausstoß', value: `${formatNumber(kg, 1)} kg/m²a` },
+        ],
       };
     },
     formula: 'Aufteilung nach 10-Stufenmodell des CO2KostAufG gemäß CO2-Ausstoß pro m²',
@@ -3371,7 +3874,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'endenergieKwh', label: 'Endenergiebedarf / Endenergieverbrauch in kWh/(m²·a)', type: 'number', defaultValue: 115, min: 10, max: 400, step: 5, unit: 'kWh/(m²·a)' },
     ],
     calculate: (inputs) => {
-      const val = parseFloat(inputs.endenergieKwh) || 115;
+      const val = inputs.endenergieKwh !== undefined && inputs.endenergieKwh !== '' ? Math.max(0, parseFloat(inputs.endenergieKwh) || 0) : 115;
       let klasse = 'D';
       let description = 'Durchschnittlich gedämmtes Mehrfamilienhaus / teilsaniert';
       if (val < 30) { klasse = 'A+'; description = 'Passivhaus / KfW 40 / Höchster Effizienzstandard'; }
@@ -3391,6 +3894,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'description', label: 'Gebäudebewertung', value: 0, formattedValue: description },
         ],
         summaryText: `Mit einem Endenergiebedarf von ${formatNumber(val, 1)} kWh/(m²·a) erreicht das Gebäude die Energieeffizienzklasse ${klasse} (${description}).`,
+        directAnswer: `Das Gebäude erreicht mit einem Endenergiekennwert von ${formatNumber(val, 1)} kWh/(m²·a) die Energieeffizienzklasse ${klasse}.`,
+        basisSummary: [
+          { label: 'Endenergie-Kennwert', value: `${formatNumber(val, 1)} kWh/(m²·a)` },
+          { label: 'Einstufungsgrundlage', value: 'Gebäudeenergiegesetz (GEG) Anlage 10' },
+        ],
       };
     },
     formula: 'Einstufung nach Anlage 10 des Gebäudeenergiegesetzes (GEG)',

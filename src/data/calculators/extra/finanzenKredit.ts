@@ -1580,10 +1580,32 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'fixedYears', label: 'Sollzinsbindung in Jahren', type: 'number', defaultValue: 15, min: 5, max: 30, step: 5, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loanAmount) || 300000;
-      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 3.6;
-      const t = parseFloat(inputs.initialRepayment) || 2.0;
-      const years = parseInt(inputs.fixedYears, 10) || 15;
+      if (inputs.loanAmount === undefined || inputs.loanAmount === null || String(inputs.loanAmount).trim() === '') {
+        return { primary: { id: 'rate', label: 'Monatliche Kreditrate', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie den Darlehensbetrag ein.' };
+      }
+      const rawLoan = parseFloat(inputs.loanAmount);
+      if (isNaN(rawLoan) || rawLoan <= 0) {
+        return { primary: { id: 'rate', label: 'Monatliche Kreditrate', value: 0, formattedValue: '-' }, error: 'Der Darlehensbetrag muss größer als 0 € sein.' };
+      }
+      const loan = rawLoan;
+
+      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 3.6;
+      if (isNaN(rawZ) || rawZ < 0) {
+        return { primary: { id: 'rate', label: 'Monatliche Kreditrate', value: 0, formattedValue: '-' }, error: 'Der Zinssatz darf nicht negativ sein.' };
+      }
+      const z = rawZ;
+
+      const rawT = inputs.initialRepayment !== undefined && inputs.initialRepayment !== null && String(inputs.initialRepayment).trim() !== ''
+        ? parseFloat(inputs.initialRepayment)
+        : 2.0;
+      if (isNaN(rawT) || rawT <= 0) {
+        return { primary: { id: 'rate', label: 'Monatliche Kreditrate', value: 0, formattedValue: '-' }, error: 'Die anfängliche Tilgung muss größer als 0 % sein.' };
+      }
+      const t = rawT;
+
+      const years = Math.max(1, parseInt(inputs.fixedYears, 10) || 15);
       const annualAnnuity = loan * ((z + t) / 100);
       const monthlyRate = annualAnnuity / 12;
       let balance = loan;
@@ -2164,10 +2186,24 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'initialRepay', label: 'Anfängliche Tilgung', type: 'number', defaultValue: 2.5, min: 1, step: 0.5, unit: '%' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loan) || 250000;
-      const z10 = parseFloat(inputs.rate10) || 3.4;
-      const z15 = parseFloat(inputs.rate15) || 3.7;
-      const t = parseFloat(inputs.initialRepay) || 2.5;
+      if (inputs.loan === undefined || inputs.loan === null || String(inputs.loan).trim() === '') {
+        return { primary: { id: 'diff', label: 'Aufpreis für 15 Jahre Bindung', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie die Darlehenssumme ein.' };
+      }
+      const rawLoan = parseFloat(inputs.loan);
+      if (isNaN(rawLoan) || rawLoan <= 0) {
+        return { primary: { id: 'diff', label: 'Aufpreis für 15 Jahre Bindung', value: 0, formattedValue: '-' }, error: 'Die Darlehenssumme muss größer als 0 € sein.' };
+      }
+      const loan = rawLoan;
+
+      const rawZ10 = inputs.rate10 !== undefined && inputs.rate10 !== null && String(inputs.rate10).trim() !== '' ? parseFloat(inputs.rate10) : 3.4;
+      const z10 = !isNaN(rawZ10) && rawZ10 >= 0 ? rawZ10 : 3.4;
+
+      const rawZ15 = inputs.rate15 !== undefined && inputs.rate15 !== null && String(inputs.rate15).trim() !== '' ? parseFloat(inputs.rate15) : 3.7;
+      const z15 = !isNaN(rawZ15) && rawZ15 >= 0 ? rawZ15 : 3.7;
+
+      const rawT = inputs.initialRepay !== undefined && inputs.initialRepay !== null && String(inputs.initialRepay).trim() !== '' ? parseFloat(inputs.initialRepay) : 2.5;
+      const t = !isNaN(rawT) && rawT > 0 ? rawT : 2.5;
+
       const monthly10 = loan * ((z10 + t) / 1200);
       const monthly15 = loan * ((z15 + t) / 1200);
       let b10 = loan;
@@ -2221,9 +2257,26 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'years', label: 'Wunschlaufzeit bis Schuldenfreiheit', type: 'number', defaultValue: 20, min: 5, max: 35, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loanAmount) || 200000;
-      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 3.5;
-      const years = parseInt(inputs.years, 10) || 20;
+      if (inputs.loanAmount === undefined || inputs.loanAmount === null || String(inputs.loanAmount).trim() === '') {
+        return { primary: { id: 'rate', label: 'Monatliche Volltilger-Rate', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie den Darlehensbetrag ein.' };
+      }
+      const rawLoan = parseFloat(inputs.loanAmount);
+      if (isNaN(rawLoan) || rawLoan <= 0) {
+        return { primary: { id: 'rate', label: 'Monatliche Volltilger-Rate', value: 0, formattedValue: '-' }, error: 'Der Darlehensbetrag muss größer als 0 € sein.' };
+      }
+      const loan = rawLoan;
+
+      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 3.5;
+      if (isNaN(rawZ) || rawZ < 0) {
+        return { primary: { id: 'rate', label: 'Monatliche Volltilger-Rate', value: 0, formattedValue: '-' }, error: 'Der Zinssatz darf nicht negativ sein.' };
+      }
+      const z = rawZ;
+
+      const rawYears = parseInt(inputs.years, 10);
+      const years = !isNaN(rawYears) && rawYears >= 1 ? rawYears : 20;
+
       const r = (z / 100) / 12;
       const m = years * 12;
       const monthlyRate = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
@@ -2823,10 +2876,30 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'riskMarkup', label: 'Risikoaufschlag für Vollfinanzierung', type: 'number', defaultValue: 0.6, min: 0.2, max: 1.5, step: 0.1, unit: '%' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 300000;
-      const feesPct = parseFloat(inputs.incidentalFeesPct) || 10.0;
-      const base = parseFloat(inputs.baseRate) || 3.5;
-      const markup = parseFloat(inputs.riskMarkup) || 0.6;
+      if (inputs.purchasePrice === undefined || inputs.purchasePrice === null || String(inputs.purchasePrice).trim() === '') {
+        return { primary: { id: 'rate', label: 'Monatliche Kreditrate', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie den Immobilienkaufpreis ein.' };
+      }
+      const rawPrice = parseFloat(inputs.purchasePrice);
+      if (isNaN(rawPrice) || rawPrice <= 0) {
+        return { primary: { id: 'rate', label: 'Monatliche Kreditrate', value: 0, formattedValue: '-' }, error: 'Der Immobilienkaufpreis muss größer als 0 € sein.' };
+      }
+      const price = rawPrice;
+
+      const rawFees = inputs.incidentalFeesPct !== undefined && inputs.incidentalFeesPct !== null && String(inputs.incidentalFeesPct).trim() !== ''
+        ? parseFloat(inputs.incidentalFeesPct)
+        : 10.0;
+      const feesPct = !isNaN(rawFees) && rawFees >= 0 ? rawFees : 0;
+
+      const rawBase = inputs.baseRate !== undefined && inputs.baseRate !== null && String(inputs.baseRate).trim() !== ''
+        ? parseFloat(inputs.baseRate)
+        : 3.5;
+      const base = !isNaN(rawBase) && rawBase >= 0 ? rawBase : 3.5;
+
+      const rawMarkup = inputs.riskMarkup !== undefined && inputs.riskMarkup !== null && String(inputs.riskMarkup).trim() !== ''
+        ? parseFloat(inputs.riskMarkup)
+        : 0.6;
+      const markup = !isNaN(rawMarkup) && rawMarkup >= 0 ? rawMarkup : 0;
+
       const totalCost = price * (1 + feesPct / 100);
       const rate = base + markup;
       const monthlyRate = totalCost * ((rate + 2.0) / 1200);
@@ -3011,9 +3084,21 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'months', label: 'Überbrückungsdauer in Monaten', type: 'number', defaultValue: 12, min: 1, max: 36, step: 1, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loan) || 120000;
-      const z = parseFloat(inputs.rate) || 5.2;
-      const m = parseInt(inputs.months, 10) || 12;
+      if (inputs.loan === undefined || inputs.loan === null || String(inputs.loan).trim() === '') {
+        return { primary: { id: 'totalInterest', label: 'Gesamte Zinskosten für die Überbrückung', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie den Darlehensbetrag ein.' };
+      }
+      const rawLoan = parseFloat(inputs.loan);
+      if (isNaN(rawLoan) || rawLoan <= 0) {
+        return { primary: { id: 'totalInterest', label: 'Gesamte Zinskosten für die Überbrückung', value: 0, formattedValue: '-' }, error: 'Der Darlehensbetrag muss größer als 0 € sein.' };
+      }
+      const loan = rawLoan;
+
+      const rawZ = inputs.rate !== undefined && inputs.rate !== null && String(inputs.rate).trim() !== '' ? parseFloat(inputs.rate) : 5.2;
+      const z = !isNaN(rawZ) && rawZ >= 0 ? rawZ : 0;
+
+      const rawM = parseInt(inputs.months, 10);
+      const m = !isNaN(rawM) && rawM >= 1 ? rawM : 12;
+
       const monthlyInterest = (loan * (z / 100)) / 12;
       const totalInterest = monthlyInterest * m;
       return {

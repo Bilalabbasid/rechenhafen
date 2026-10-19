@@ -57,10 +57,23 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const p = Number(inputs.pricePerUnit) || 0;
-      const kv = Number(inputs.variableCostPerUnit) || 0;
-      const qty = Number(inputs.unitsSold) || 0;
-      const kf = Number(inputs.fixedCostsTotal) || 0;
+      const rawPrice = Number(inputs.pricePerUnit);
+      if (isNaN(rawPrice) || rawPrice <= 0) {
+        return {
+          primary: { id: 'totalDb', label: 'Gesamtdeckungsbeitrag (DB I)', value: 0, formattedValue: '0,00 €' },
+          error: 'Der Verkaufspreis pro Stück muss größer als 0 € sein.',
+        };
+      }
+      const p = rawPrice;
+      const rawKv = inputs.variableCostPerUnit !== undefined && inputs.variableCostPerUnit !== null && String(inputs.variableCostPerUnit).trim() !== ''
+        ? Number(inputs.variableCostPerUnit)
+        : 20;
+      const kv = !isNaN(rawKv) && rawKv >= 0 ? rawKv : 0;
+      const qty = Math.max(0, Number(inputs.unitsSold) || 0);
+      const rawKf = inputs.fixedCostsTotal !== undefined && inputs.fixedCostsTotal !== null && String(inputs.fixedCostsTotal).trim() !== ''
+        ? Number(inputs.fixedCostsTotal)
+        : 20000;
+      const kf = !isNaN(rawKf) && rawKf >= 0 ? rawKf : 0;
       
       // Stückdeckungsbeitrag db = p - k_v
       const unitDb = p - kv;
@@ -171,16 +184,34 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const rev = Number(inputs.adRevenue) || 0;
-      const spend = Number(inputs.adSpend) || 1;
-      const marginPct = Number(inputs.productMarginPct) || 50;
+      const rawSpend = Number(inputs.adSpend);
+      if (isNaN(rawSpend) || rawSpend <= 0) {
+        return {
+          primary: { id: 'roasFactor', label: 'ROAS-Faktor', value: 0, formattedValue: '0,00x (0 %)' },
+          error: 'Die Werbeausgaben (Ad Spend) müssen größer als 0 € sein.',
+        };
+      }
+      const spend = rawSpend;
+
+      const rawMargin = Number(inputs.productMarginPct);
+      if (isNaN(rawMargin) || rawMargin <= 0 || rawMargin > 100) {
+        return {
+          primary: { id: 'roasFactor', label: 'ROAS-Faktor', value: 0, formattedValue: '0,00x (0 %)' },
+          error: 'Die Produktmarge muss zwischen 0 % und 100 % liegen.',
+        };
+      }
+      const marginPct = rawMargin;
+
+      const rawRev = inputs.adRevenue !== undefined && inputs.adRevenue !== null && String(inputs.adRevenue).trim() !== ''
+        ? Number(inputs.adRevenue)
+        : 10000;
+      const rev = !isNaN(rawRev) && rawRev >= 0 ? rawRev : 0;
       
       // ROAS als Faktor: Umsatz / Werbeausgaben
       const roasFactor = rev / spend;
       const roasPercent = roasFactor * 100;
       
       // Break-Even ROAS: 1 / (Marge in %)
-      // Beispiel: 50% Marge -> Break Even ROAS = 1 / 0.5 = 2.0 (200%)
       const breakEvenRoas = 1 / (marginPct / 100);
       const isProfitable = roasFactor >= breakEvenRoas;
       
@@ -279,9 +310,20 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const inv = Number(inputs.investmentCost) || 1;
-      const annualGain = Number(inputs.annualNetGain) || 0;
-      const years = Number(inputs.holdingYears) || 5;
+      const rawInv = Number(inputs.investmentCost);
+      if (isNaN(rawInv) || rawInv <= 0) {
+        return {
+          primary: { id: 'roi', label: 'Gesamter ROI', value: 0, formattedValue: '0 %' },
+          error: 'Die Investitionskosten müssen größer als 0 € sein.',
+        };
+      }
+      const inv = rawInv;
+
+      const rawGain = inputs.annualNetGain !== undefined && inputs.annualNetGain !== null && String(inputs.annualNetGain).trim() !== ''
+        ? Number(inputs.annualNetGain)
+        : 15000;
+      const annualGain = !isNaN(rawGain) && rawGain >= 0 ? rawGain : 0;
+      const years = Math.max(1, Number(inputs.holdingYears) || 5);
       
       const totalGainOverPeriod = annualGain * years;
       const netProfitTotal = totalGainOverPeriod - inv;
@@ -296,15 +338,20 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       const paybackMonths = Math.round(paybackYears * 12);
       const pbY = Math.floor(paybackMonths / 12);
       const pbM = paybackMonths % 12;
+      const paybackFormatted = annualGain > 0
+        ? `${pbY} Jahre, ${pbM} Monate`
+        : 'Nicht amortisierbar (0 € Jahresertrag)';
       
       return {
         primary: { id: 'roi', label: 'Gesamter ROI über ' + years + ' Jahre', value: totalRoiPct, formattedValue: formatPercent(totalRoiPct), highlight: true },
         secondary: [
-          { id: 'paybackTime', label: 'Amortisationszeit (Break-Even)', value: paybackYears, formattedValue: pbY + ' Jahre, ' + pbM + ' Monate' },
+          { id: 'paybackTime', label: 'Amortisationszeit (Break-Even)', value: paybackYears, formattedValue: paybackFormatted },
           { id: 'netProfit', label: 'Nettogewinn nach Investition', value: netProfitTotal, formattedValue: formatCurrency(netProfitTotal) },
           { id: 'annualRoi', label: 'Jährliche Rendite (p.a.)', value: annualRoiPct, formattedValue: formatPercent(annualRoiPct) + ' p.a.' },
         ],
-        summaryText: 'Bei ' + formatCurrency(inv) + ' Investition und ' + formatCurrency(annualGain) + ' jährlichem Ertrag amortisiert sich das Projekt in ca. ' + pbY + ' Jahren und ' + pbM + ' Monaten. Der Gesamt-ROI nach ' + years + ' Jahren beträgt ' + formatPercent(totalRoiPct) + ' (' + formatCurrency(netProfitTotal) + ' Reingewinn).',
+        summaryText: annualGain > 0
+          ? 'Bei ' + formatCurrency(inv) + ' Investition und ' + formatCurrency(annualGain) + ' jährlichem Ertrag amortisiert sich das Projekt in ca. ' + pbY + ' Jahren und ' + pbM + ' Monaten. Der Gesamt-ROI nach ' + years + ' Jahren beträgt ' + formatPercent(totalRoiPct) + ' (' + formatCurrency(netProfitTotal) + ' Reingewinn).'
+          : 'Bei 0 € jährlichem Ertrag kann die Investition von ' + formatCurrency(inv) + ' nicht amortisiert werden.',
       };
     },
     formula: "ROI = ((Gesamtertrag - Investitionskosten) / Investitionskosten) × 100; Amortisation = Investition / Jahresertrag",
@@ -1149,10 +1196,26 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const mkt = Number(inputs.marketingCosts) || 0;
-      const sales = Number(inputs.salesCosts) || 0;
-      const customers = Number(inputs.newCustomers) || 1;
-      const monthlyRev = Number(inputs.avgMonthlyRevenue) || 50;
+      const rawCustomers = Number(inputs.newCustomers);
+      if (isNaN(rawCustomers) || rawCustomers <= 0) {
+        return {
+          primary: { id: 'cac', label: 'Kundengewinnungskosten (CAC)', value: 0, formattedValue: '0,00 €' },
+          error: 'Die Anzahl gewonnener Neukunden muss größer als 0 sein.',
+        };
+      }
+      const customers = rawCustomers;
+
+      const rawMkt = inputs.marketingCosts !== undefined && inputs.marketingCosts !== null && String(inputs.marketingCosts).trim() !== ''
+        ? Number(inputs.marketingCosts)
+        : 15000;
+      const mkt = !isNaN(rawMkt) && rawMkt >= 0 ? rawMkt : 0;
+
+      const rawSales = inputs.salesCosts !== undefined && inputs.salesCosts !== null && String(inputs.salesCosts).trim() !== ''
+        ? Number(inputs.salesCosts)
+        : 10000;
+      const sales = !isNaN(rawSales) && rawSales >= 0 ? rawSales : 0;
+
+      const monthlyRev = Math.max(0, Number(inputs.avgMonthlyRevenue) || 0);
       
       const totalAcquisitionCosts = mkt + sales;
       const cac = totalAcquisitionCosts / customers;
