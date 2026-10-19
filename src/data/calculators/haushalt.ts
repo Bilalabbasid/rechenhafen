@@ -31,7 +31,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     inputs: [
       { id: 'annualKwh', label: 'Jährlicher Stromverbrauch in kWh', type: 'number', defaultValue: 2500, min: 0, step: 50, unit: 'kWh/Jahr', helpText: 'Typisch: 1.500 kWh (1 Person), 2.500 kWh (2 Personen), 3.500 kWh (3–4 Personen)' },
       { id: 'pricePerKwh', label: 'Arbeitspreis in € pro kWh', type: 'number', defaultValue: 0.35, min: 0.05, step: 0.01, unit: '€/kWh', helpText: 'z. B. 0,35 €/kWh bzw. 35 ct/kWh laut Stromrechnung' },
-      { id: 'basePricePerMonth', label: 'Monatlicher Grundpreis in €', type: 'number', defaultValue: 12.00, min: 0, step: 0.50, unit: '€/Monat', helpText: 'Feste monatliche Zähler- und Bereitstellungsgebühr (üblich 10 bis 15 €/Monat)' },
+      { id: 'basePricePerMonth', label: 'Monatlicher Grundpreis in €', type: 'number', defaultValue: 12.00, min: 0, step: 0.50, unit: '€/Monat', helpText: 'Feste monatliche Zähler- und Bereitstellungsgebühr (üblich 10 bis 15 €/Monat, 0 € bei reinen Arbeitspreistarifen ohne Grundgebühr)' },
     ],
     calculate: calculateElectricityCost,
     formula: 'Gesamtkosten/Jahr = (Jahresverbrauch in kWh × Arbeitspreis) + (Grundpreis/Monat × 12)',

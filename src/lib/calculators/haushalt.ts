@@ -202,14 +202,24 @@ export function calculateElectricityCost(inputs: Record<string, any>): Calculati
 }
 
 export function calculateStandbyCost(inputs: Record<string, any>): CalculationResult {
-  const standbyWatts = parseFloat(inputs.standbyWatts) || 25; // Gesamte Standby-Leistung aller Geräte
-  const hoursPerDay = parseFloat(inputs.hoursPerDay) || 20;
-  const pricePerKwh = parseFloat(inputs.pricePerKwh) || GERMAN_DATA_2026.strompreis_durchschnitt.value;
+  const standbyWatts = inputs.standbyWatts !== undefined && inputs.standbyWatts !== '' && inputs.standbyWatts !== null
+    ? parseFloat(inputs.standbyWatts)
+    : 35;
+  const hoursPerDay = inputs.hoursPerDay !== undefined && inputs.hoursPerDay !== '' && inputs.hoursPerDay !== null
+    ? parseFloat(inputs.hoursPerDay)
+    : 20;
+  const pricePerKwh = inputs.pricePerKwh !== undefined && inputs.pricePerKwh !== '' && inputs.pricePerKwh !== null
+    ? parseFloat(inputs.pricePerKwh)
+    : GERMAN_DATA_2026.strompreis_durchschnitt.value;
 
-  if (standbyWatts <= 0) {
+  if (isNaN(standbyWatts) || standbyWatts <= 0 || isNaN(hoursPerDay) || hoursPerDay <= 0) {
     return {
-      primary: { id: 'standbyCost', label: 'Standby-Kosten pro Jahr', value: 0, formattedValue: '0,00 €' },
-      summaryText: 'Kein Standby-Verbrauch eingegeben.',
+      primary: { id: 'annualCost', label: 'Unnötige Standby-Kosten pro Jahr', value: 0, formattedValue: '0,00 €' },
+      secondary: [
+        { id: 'monthlyCost', label: 'Standby-Kosten monatlich', value: 0, formattedValue: '0,00 €' },
+        { id: 'wastedKwh', label: 'Verschwendeter Jahresstrom', value: 0, formattedValue: '0,0 kWh' },
+      ],
+      summaryText: 'Kein Standby-Verbrauch eingegeben oder Standby-Dauer beträgt 0 Stunden.',
     };
   }
 
@@ -540,11 +550,33 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
 }
 
 export function calculateLedSavings(inputs: Record<string, any>): CalculationResult {
-  const oldWatts = parseFloat(inputs.oldWatts) || 60; // z.B. 60W Glühbirne
-  const ledWatts = parseFloat(inputs.ledWatts) || 7;  // z.B. 7W LED
-  const bulbCount = parseInt(inputs.bulbCount || '10', 10);
-  const hoursPerDay = parseFloat(inputs.hoursPerDay) || 4;
-  const pricePerKwh = parseFloat(inputs.pricePerKwh) || GERMAN_DATA_2026.strompreis_durchschnitt.value;
+  const oldWatts = inputs.oldWatts !== undefined && inputs.oldWatts !== '' && inputs.oldWatts !== null
+    ? parseFloat(inputs.oldWatts)
+    : 60; // z.B. 60W Glühbirne
+  const ledWatts = inputs.ledWatts !== undefined && inputs.ledWatts !== '' && inputs.ledWatts !== null
+    ? parseFloat(inputs.ledWatts)
+    : 7;  // z.B. 7W LED
+  const bulbCount = inputs.bulbCount !== undefined && inputs.bulbCount !== '' && inputs.bulbCount !== null
+    ? parseInt(String(inputs.bulbCount), 10)
+    : 10;
+  const hoursPerDay = inputs.hoursPerDay !== undefined && inputs.hoursPerDay !== '' && inputs.hoursPerDay !== null
+    ? parseFloat(inputs.hoursPerDay)
+    : 4;
+  const pricePerKwh = inputs.pricePerKwh !== undefined && inputs.pricePerKwh !== '' && inputs.pricePerKwh !== null
+    ? parseFloat(inputs.pricePerKwh)
+    : GERMAN_DATA_2026.strompreis_durchschnitt.value;
+
+  if (isNaN(bulbCount) || bulbCount <= 0 || isNaN(hoursPerDay) || hoursPerDay <= 0 || isNaN(oldWatts) || oldWatts <= 0) {
+    return {
+      primary: { id: 'annualSaved', label: 'Jährliche Stromkosten-Ersparnis', value: 0, formattedValue: '0,00 €', highlight: true },
+      secondary: [
+        { id: 'kwhSaved', label: 'Eingesparter Strom pro Jahr', value: 0, formattedValue: '0 kWh' },
+        { id: 'co2Saved', label: 'CO2-Vermeidung pro Jahr', value: 0, formattedValue: '0,0 kg CO2' },
+        { id: 'fiveYearSavings', label: 'Ersparnis über 5 Jahre', value: 0, formattedValue: '0,00 €' },
+      ],
+      summaryText: 'Keine Lampenanzahl, Nutzungsdauer oder Watt-Leistung angegeben.',
+    };
+  }
 
   const savedWattsPerBulb = Math.max(0, oldWatts - ledWatts);
   const totalSavedKwhYear = (savedWattsPerBulb * bulbCount * hoursPerDay * 365) / 1000;

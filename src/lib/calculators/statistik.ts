@@ -199,9 +199,9 @@ export function calculateStandardDeviation(inputs: Record<string, any>): Calcula
 
 export function calculateOhmsLaw(inputs: Record<string, any>): CalculationResult {
   const target = inputs.target || 'voltage'; // 'voltage' (U), 'current' (I), 'resistance' (R), 'power' (P)
-  const u = parseFloat(inputs.voltage) || 230; // Volt
-  const i = parseFloat(inputs.current) || 10;  // Ampere
-  const r = parseFloat(inputs.resistance) || 23; // Ohm
+  const u = inputs.voltage !== undefined && inputs.voltage !== '' ? Math.max(0, parseFloat(inputs.voltage) || 0) : 230; // Volt
+  const i = inputs.current !== undefined && inputs.current !== '' ? Math.max(0, parseFloat(inputs.current) || 0) : 10;  // Ampere
+  const r = inputs.resistance !== undefined && inputs.resistance !== '' ? Math.max(0, parseFloat(inputs.resistance) || 0) : 23; // Ohm
 
   let voltage = u;
   let current = i;

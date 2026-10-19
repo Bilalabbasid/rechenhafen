@@ -1243,19 +1243,32 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const val = Number(inputs.inputValue) || 0;
-      const unit = inputs.inputUnit;
-      
+      const rawVal = inputs.inputValue !== undefined && inputs.inputValue !== '' ? Number(inputs.inputValue) : 6.5;
+      const unit = inputs.inputUnit || 'l100km';
+
+      if (isNaN(rawVal) || rawVal <= 0) {
+        return {
+          primary: { id: 'l100km', label: 'Verbrauch in Liter pro 100 km', value: 0, formattedValue: '0,00 l/100km' },
+          secondary: [
+            { id: 'usmpg', label: 'US Miles per Gallon (MPG)', value: 0, formattedValue: '0,0 MPG (US)' },
+            { id: 'ukmpg', label: 'UK Miles per Gallon (MPG)', value: 0, formattedValue: '0,0 MPG (UK)' },
+            { id: 'kml', label: 'Reichweite pro Liter', value: 0, formattedValue: '0,00 km/l' },
+          ],
+          error: 'Bitte geben Sie einen positiven Verbrauchswert größer als 0 ein.',
+        };
+      }
+
+      const val = rawVal;
       // Basis l/100km:
       let l100km = val;
       if (unit === 'usmpg') l100km = 235.214583 / val;
       else if (unit === 'ukmpg') l100km = 282.4809363 / val;
       else if (unit === 'kml') l100km = 100 / val;
-      
-      const usmpg = 235.214583 / l100km;
-      const ukmpg = 282.4809363 / l100km;
-      const kml = 100 / l100km;
-      
+
+      const usmpg = l100km > 0 ? 235.214583 / l100km : 0;
+      const ukmpg = l100km > 0 ? 282.4809363 / l100km : 0;
+      const kml = l100km > 0 ? 100 / l100km : 0;
+
       return {
         primary: { id: 'l100km', label: 'Verbrauch in Liter pro 100 km', value: l100km, formattedValue: formatNumber(l100km, 2) + ' l/100km', highlight: true },
         secondary: [
@@ -1775,9 +1788,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const dMm = Number(inputs.diameterMm) || 0;
-      const n = Number(inputs.rpm) || 0;
-      
+      const dMm = inputs.diameterMm !== undefined && inputs.diameterMm !== '' ? Math.max(0, Number(inputs.diameterMm) || 0) : 125;
+      const n = inputs.rpm !== undefined && inputs.rpm !== '' ? Math.max(0, Number(inputs.rpm) || 0) : 6000;
+
       // Schnittgeschwindigkeit v_c in m/min: v = (pi * d * n) / 1000
       const vMMin = (Math.PI * dMm * n) / 1000;
       // In m/s: v / 60
@@ -1786,7 +1799,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const vKmh = vMS * 3.6;
       // Winkelgeschwindigkeit omega in rad/s: omega = 2 * pi * (n / 60)
       const omega = (2 * Math.PI * n) / 60;
-      
+
       return {
         primary: { id: 'vc', label: 'Schnittgeschwindigkeit (v_c)', value: vMMin, formattedValue: formatNumber(vMMin, 1) + ' m/min', highlight: true },
         secondary: [
@@ -1886,20 +1899,20 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const a = Number(inputs.roomAreaM2) || 0;
-      const lmW = Number(inputs.efficiencyLmW) || 100;
-      
+      const a = inputs.roomAreaM2 !== undefined && inputs.roomAreaM2 !== '' ? Math.max(0, Number(inputs.roomAreaM2) || 0) : 20;
+      const lmW = inputs.efficiencyLmW !== undefined && inputs.efficiencyLmW !== '' ? Math.max(1, Number(inputs.efficiencyLmW) || 1) : 100;
+
       let luxReq = 100;
       if (inputs.roomType === 'kitchen') luxReq = 300;
       else if (inputs.roomType === 'office') luxReq = 500;
       else if (inputs.roomType === 'workshop') luxReq = 800;
-      
+
       // Bei diffuser Raumbeleuchtung rechnet man mit einem Nutzungsgrad von ca. 0.65 (Wandreflexion etc.)
       const utilizationFactor = 0.65;
       const totalLumenReq = Math.round((a * luxReq) / utilizationFactor);
-      const ledWatts = Math.round(totalLumenReq / lmW);
+      const ledWatts = lmW > 0 ? Math.round(totalLumenReq / lmW) : 0;
       const lampsCount800lm = Math.ceil(totalLumenReq / 806); // 806 lm ≈ klassische 60W Glühbirne
-      
+
       return {
         primary: { id: 'lumen', label: 'Empfohlener Gesamt-Lichtstrom', value: totalLumenReq, formattedValue: formatNumber(totalLumenReq, 0) + ' Lumen (lm)', highlight: true },
         secondary: [

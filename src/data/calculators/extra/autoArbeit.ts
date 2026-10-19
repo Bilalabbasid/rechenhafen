@@ -468,16 +468,16 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'transferCosts', label: 'Überführungs- & Zulassungskosten', type: 'number', defaultValue: 990, min: 0, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
-      const rate = parseFloat(inputs.monthlyLeasingRate) || 320;
-      const blp = parseFloat(inputs.grossListPrice) || 42000;
-      const down = parseFloat(inputs.downPayment) || 0;
-      const months = parseInt(inputs.contractMonths, 10) || 36;
-      const transfer = parseFloat(inputs.transferCosts) || 990;
+      const rate = inputs.monthlyLeasingRate !== undefined && inputs.monthlyLeasingRate !== '' ? Math.max(0, parseFloat(inputs.monthlyLeasingRate) || 0) : 320;
+      const blp = inputs.grossListPrice !== undefined && inputs.grossListPrice !== '' ? Math.max(0, parseFloat(inputs.grossListPrice) || 0) : 42000;
+      const down = inputs.downPayment !== undefined && inputs.downPayment !== '' ? Math.max(0, parseFloat(inputs.downPayment) || 0) : 0;
+      const months = inputs.contractMonths !== undefined && inputs.contractMonths !== '' ? Math.max(1, parseInt(inputs.contractMonths, 10) || 1) : 36;
+      const transfer = inputs.transferCosts !== undefined && inputs.transferCosts !== '' ? Math.max(0, parseFloat(inputs.transferCosts) || 0) : 990;
 
-      const leasingFactor = (rate / blp) * 100;
+      const leasingFactor = blp > 0 ? (rate / blp) * 100 : 0;
       // Gesamtleasingfaktor inkl. Anzahlung & Überführung
       const effectiveMonthlyRate = rate + (down / months) + (transfer / months);
-      const totalLeasingFactor = (effectiveMonthlyRate / blp) * 100;
+      const totalLeasingFactor = blp > 0 ? (effectiveMonthlyRate / blp) * 100 : 0;
       const totalCostOverTerm = (rate * months) + down + transfer;
 
       let rating = 'Solides Angebot';
@@ -532,23 +532,23 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'yearlyMileageKm', label: 'Jährliche Fahrleistung in km', type: 'number', defaultValue: 15000, min: 2000, step: 1000, unit: 'km' },
       { id: 'fuelCostPer100Km', label: 'Kraftstoff-/Stromkosten auf 100 km', type: 'number', defaultValue: 11.50, min: 3, max: 30, step: 0.5, unit: '€' },
       { id: 'insuranceYearly', label: 'KFZ-Versicherung pro Jahr (Haftpflicht + Kasko)', type: 'number', defaultValue: 650, min: 100, step: 50, unit: '€' },
-      { id: 'taxYearly', label: 'KFZ-Steuer pro Jahr', type: 'number', defaultValue: 140, min: 0, step: 10, unit: '€' },
+      { id: 'taxYearly', label: 'KFZ-Steuer pro Jahr', type: 'number', defaultValue: 140, min: 0, step: 10, unit: '€', helpText: '0 € bei steuerbefreiten Elektrofahrzeugen (§ 3d KraftStG)' },
       { id: 'maintenanceYearly', label: 'Wartung, Reparaturen, TÜV & Reifen pro Jahr', type: 'number', defaultValue: 600, min: 100, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.purchasePrice) || 30000;
-      const km = parseFloat(inputs.yearlyMileageKm) || 15000;
-      const fuelPer100 = parseFloat(inputs.fuelCostPer100Km) || 11.50;
-      const insurance = parseFloat(inputs.insuranceYearly) || 650;
-      const tax = parseFloat(inputs.taxYearly) || 140;
-      const maint = parseFloat(inputs.maintenanceYearly) || 600;
+      const price = inputs.purchasePrice !== undefined && inputs.purchasePrice !== '' ? Math.max(0, parseFloat(inputs.purchasePrice) || 0) : 30000;
+      const km = inputs.yearlyMileageKm !== undefined && inputs.yearlyMileageKm !== '' ? Math.max(0, parseFloat(inputs.yearlyMileageKm) || 0) : 15000;
+      const fuelPer100 = inputs.fuelCostPer100Km !== undefined && inputs.fuelCostPer100Km !== '' ? Math.max(0, parseFloat(inputs.fuelCostPer100Km) || 0) : 11.50;
+      const insurance = inputs.insuranceYearly !== undefined && inputs.insuranceYearly !== '' ? Math.max(0, parseFloat(inputs.insuranceYearly) || 0) : 650;
+      const tax = inputs.taxYearly !== undefined && inputs.taxYearly !== '' ? Math.max(0, parseFloat(inputs.taxYearly) || 0) : 140;
+      const maint = inputs.maintenanceYearly !== undefined && inputs.maintenanceYearly !== '' ? Math.max(0, parseFloat(inputs.maintenanceYearly) || 0) : 600;
 
       // Realistischer durchschnittlicher Wertverlust ca. 10 % des Kaufpreises pro Jahr
       const depreciationYearly = price * 0.10;
       const fuelYearly = (km / 100) * fuelPer100;
       const totalYearly = depreciationYearly + fuelYearly + insurance + tax + maint;
       const costPerMonth = totalYearly / 12;
-      const costPerKm = totalYearly / km;
+      const costPerKm = km > 0 ? totalYearly / km : 0;
 
       return {
         primary: { id: 'costPerMonth', label: 'Tatsächliche Gesamtkosten pro Monat', value: costPerMonth, formattedValue: formatCurrency(costPerMonth), highlight: true },
@@ -596,8 +596,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'ageYears', label: 'Haltedauer in Jahren', type: 'number', defaultValue: 4, min: 1, max: 15, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const orig = parseFloat(inputs.originalPrice) || 35000;
-      const years = parseInt(inputs.ageYears, 10) || 4;
+      const orig = inputs.originalPrice !== undefined && inputs.originalPrice !== '' ? Math.max(0, parseFloat(inputs.originalPrice) || 0) : 35000;
+      const years = inputs.ageYears !== undefined && inputs.ageYears !== '' ? Math.max(1, parseInt(inputs.ageYears, 10) || 1) : 4;
 
       // Typische Schwacke-Kurve:
       // Jahr 1: -25% (Restwert 75%)
@@ -668,7 +668,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const v = parseFloat(inputs.speedKmh) || 100;
+      const v = inputs.speedKmh !== undefined && inputs.speedKmh !== '' ? Math.max(0, parseFloat(inputs.speedKmh) || 0) : 100;
       const isEmergency = inputs.brakingType === 'emergency';
 
       // Fahrschulformeln:
@@ -1357,15 +1357,15 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'carConsumptionPer100Km', label: 'Verbrauch in Litern pro 100 km', type: 'number', defaultValue: 6.8, min: 3, max: 18, step: 0.1, unit: 'l/100km' },
       { id: 'fuelPricePerLiter', label: 'Kraftstoffpreis in Euro pro Liter', type: 'number', defaultValue: 1.80, min: 1.0, max: 2.5, step: 0.05, unit: '€/l' },
       { id: 'passengersCount', label: 'Gesamtzahl Insassen (Fahrer + Mitfahrer)', type: 'number', defaultValue: 3, min: 2, max: 8, step: 1, unit: 'Personen' },
-      { id: 'wearSurchargePerKm', label: 'Verschleiß- & Abnutzungspauschale in Cent/km (üblich 5 - 10 ct/km)', type: 'number', defaultValue: 6, min: 0, max: 25, step: 1, unit: 'ct/km' },
+      { id: 'wearSurchargePerKm', label: 'Verschleiß- & Abnutzungspauschale in Cent/km (üblich 5 - 10 ct/km)', type: 'number', defaultValue: 6, min: 0, max: 25, step: 1, unit: 'ct/km', helpText: '0 ct/km bei reiner Spritkosten-Aufteilung ohne Verschleißzuschlag (üblich 5 - 10 ct/km)' },
     ],
     calculate: (inputs) => {
-      const dist = parseFloat(inputs.distanceOneWayKm) || 35;
-      const days = parseInt(inputs.workDaysPerMonth, 10) || 19;
-      const consumption = parseFloat(inputs.carConsumptionPer100Km) || 6.8;
-      const price = parseFloat(inputs.fuelPricePerLiter) || 1.80;
-      const people = parseInt(inputs.passengersCount, 10) || 3;
-      const wearCent = parseFloat(inputs.wearSurchargePerKm) || 6;
+      const dist = inputs.distanceOneWayKm !== undefined && inputs.distanceOneWayKm !== '' ? Math.max(0, parseFloat(inputs.distanceOneWayKm) || 0) : 35;
+      const days = inputs.workDaysPerMonth !== undefined && inputs.workDaysPerMonth !== '' ? Math.max(0, parseInt(inputs.workDaysPerMonth, 10) || 0) : 19;
+      const consumption = inputs.carConsumptionPer100Km !== undefined && inputs.carConsumptionPer100Km !== '' ? Math.max(0, parseFloat(inputs.carConsumptionPer100Km) || 0) : 6.8;
+      const price = inputs.fuelPricePerLiter !== undefined && inputs.fuelPricePerLiter !== '' ? Math.max(0, parseFloat(inputs.fuelPricePerLiter) || 0) : 1.80;
+      const people = inputs.passengersCount !== undefined && inputs.passengersCount !== '' ? Math.max(1, parseInt(inputs.passengersCount, 10) || 1) : 3;
+      const wearCent = inputs.wearSurchargePerKm !== undefined && inputs.wearSurchargePerKm !== '' ? Math.max(0, parseFloat(inputs.wearSurchargePerKm) || 0) : 6;
 
       const dailyKm = dist * 2;
       const monthlyKm = dailyKm * days;
@@ -1611,12 +1611,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'maintenanceYearly', label: 'Wartung, Reifen & TÜV pro Saison', type: 'number', defaultValue: 350, min: 50, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
-      const cc = parseInt(inputs.displacementCc, 10) || 650;
-      const months = parseInt(inputs.seasonMonths, 10) || 8;
-      const km = parseFloat(inputs.yearlyMileageKm) || 5000;
-      const insFull = parseFloat(inputs.insuranceYearlyFull) || 240;
-      const l100 = parseFloat(inputs.fuelConsumptionL100) || 4.8;
-      const maint = parseFloat(inputs.maintenanceYearly) || 350;
+      const cc = inputs.displacementCc !== undefined && inputs.displacementCc !== '' ? Math.max(0, parseInt(inputs.displacementCc, 10) || 0) : 650;
+      const months = inputs.seasonMonths !== undefined && inputs.seasonMonths !== '' ? Math.max(1, parseInt(inputs.seasonMonths, 10) || 1) : 8;
+      const km = inputs.yearlyMileageKm !== undefined && inputs.yearlyMileageKm !== '' ? Math.max(0, parseFloat(inputs.yearlyMileageKm) || 0) : 5000;
+      const insFull = inputs.insuranceYearlyFull !== undefined && inputs.insuranceYearlyFull !== '' ? Math.max(0, parseFloat(inputs.insuranceYearlyFull) || 0) : 240;
+      const l100 = inputs.fuelConsumptionL100 !== undefined && inputs.fuelConsumptionL100 !== '' ? Math.max(0, parseFloat(inputs.fuelConsumptionL100) || 0) : 4.8;
+      const maint = inputs.maintenanceYearly !== undefined && inputs.maintenanceYearly !== '' ? Math.max(0, parseFloat(inputs.maintenanceYearly) || 0) : 350;
 
       // Motorradsteuer: 1,84 € je angefangene 25 cm³ Hubraum p.a.
       const fullTax = Math.ceil(cc / 25) * 1.84;
@@ -1624,7 +1624,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const seasonInsurance = insFull * (months / 12);
       const fuelCost = (km / 100) * l100 * 1.80; // ca. 1,80 €/l Super
       const totalCostSeason = seasonTax + seasonInsurance + fuelCost + maint;
-      const costPerMonthSeason = totalCostSeason / months;
+      const costPerMonthSeason = months > 0 ? totalCostSeason / months : 0;
 
       return {
         primary: { id: 'totalCostSeason', label: 'Gesamtkosten pro Motorrad-Saison', value: totalCostSeason, formattedValue: formatCurrency(totalCostSeason), highlight: true },

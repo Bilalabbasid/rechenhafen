@@ -2777,22 +2777,22 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const oldKwh = parseFloat(inputs.oldConsumptionKwh) || 320;
-      const newKwh = parseFloat(inputs.newConsumptionKwh) || 115;
-      const price = parseFloat(inputs.newAppliancePrice) || 650;
-      const electricityCent = parseFloat(inputs.electricityPrice) || 36;
+      const oldKwh = inputs.oldConsumptionKwh !== undefined && inputs.oldConsumptionKwh !== '' ? Math.max(0, parseFloat(inputs.oldConsumptionKwh) || 0) : 320;
+      const newKwh = inputs.newConsumptionKwh !== undefined && inputs.newConsumptionKwh !== '' ? Math.max(0, parseFloat(inputs.newConsumptionKwh) || 0) : 115;
+      const price = inputs.newAppliancePrice !== undefined && inputs.newAppliancePrice !== '' ? Math.max(0, parseFloat(inputs.newAppliancePrice) || 0) : 650;
+      const electricityCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       const oldCost = (oldKwh * electricityCent) / 100;
       const newCost = (newKwh * electricityCent) / 100;
       const yearlySaving = oldCost - newCost;
-      const amortYears = yearlySaving > 0 ? price / yearlySaving : 999;
+      const amortYears = yearlySaving > 0 ? (price > 0 ? price / yearlySaving : 0) : 999;
       return {
         primary: { id: 'yearlySaving', label: 'Jährliche Stromkostenersparnis', value: yearlySaving, formattedValue: formatCurrency(yearlySaving), highlight: true },
         secondary: [
           { id: 'oldCost', label: 'Bisherige Stromkosten pro Jahr', value: oldCost, formattedValue: formatCurrency(oldCost) },
           { id: 'newCost', label: 'Stromkosten des Neugeräts pro Jahr', value: newCost, formattedValue: formatCurrency(newCost) },
-          { id: 'amortYears', label: 'Amortisation des Neukaufs', value: amortYears, formattedValue: `ca. ${formatNumber(amortYears, 1)} Jahre` },
+          { id: 'amortYears', label: 'Amortisation des Neukaufs', value: amortYears, formattedValue: price === 0 ? 'Bereits bezahlt / 0 Jahre' : (yearlySaving > 0 ? `ca. ${formatNumber(amortYears, 1)} Jahre` : 'Keine Amortisation') },
         ],
-        summaryText: `Das Neugerät spart jährlich ${formatNumber(oldKwh - newKwh, 0)} kWh Strom ein. Sie sparen dadurch ${formatCurrency(yearlySaving)} pro Jahr und amortisieren den Kauf in ${formatNumber(amortYears, 1)} Jahren.`,
+        summaryText: `Das Neugerät spart jährlich ${formatNumber(oldKwh - newKwh, 0)} kWh Strom ein. Sie sparen dadurch ${formatCurrency(yearlySaving)} pro Jahr${price > 0 && yearlySaving > 0 ? ` und amortisieren den Kauf in ${formatNumber(amortYears, 1)} Jahren` : ''}.`,
       };
     },
     formula: 'Ersparnis/Jahr = (Verbrauch Alt - Verbrauch Neu) × Strompreis',
@@ -2835,12 +2835,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'waterPricePerM3', label: 'Wasser- & Abwasserpreis pro m³ (1.000 Liter)', type: 'number', defaultValue: 4.80, min: 2, max: 9, step: 0.2, unit: '€/m³' },
     ],
     calculate: (inputs) => {
-      const kwh = parseFloat(inputs.kwhPerWash) || 0.85;
-      const liters = parseFloat(inputs.waterPerWashLiters) || 50;
-      const weekly = parseInt(inputs.washesPerWeek, 10) || 4;
-      const detergent = parseFloat(inputs.detergentCost) || 0.22;
-      const eleCent = parseFloat(inputs.electricityPrice) || 36;
-      const waterM3 = parseFloat(inputs.waterPricePerM3) || 4.80;
+      const kwh = inputs.kwhPerWash !== undefined && inputs.kwhPerWash !== '' ? Math.max(0, parseFloat(inputs.kwhPerWash) || 0) : 0.85;
+      const liters = inputs.waterPerWashLiters !== undefined && inputs.waterPerWashLiters !== '' ? Math.max(0, parseFloat(inputs.waterPerWashLiters) || 0) : 50;
+      const weekly = inputs.washesPerWeek !== undefined && inputs.washesPerWeek !== '' ? Math.max(0, parseInt(inputs.washesPerWeek, 10) || 0) : 4;
+      const detergent = inputs.detergentCost !== undefined && inputs.detergentCost !== '' ? Math.max(0, parseFloat(inputs.detergentCost) || 0) : 0.22;
+      const eleCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
+      const waterM3 = inputs.waterPricePerM3 !== undefined && inputs.waterPricePerM3 !== '' ? Math.max(0, parseFloat(inputs.waterPricePerM3) || 0) : 4.80;
       const powerCost = kwh * (eleCent / 100);
       const waterCost = (liters / 1000) * waterM3;
       const costPerWash = powerCost + waterCost + detergent;
@@ -2898,8 +2898,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const type = inputs.dryerType || 'heatpump';
-      const weekly = parseInt(inputs.cyclesPerWeek, 10) || 3;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
+      const weekly = inputs.cyclesPerWeek !== undefined && inputs.cyclesPerWeek !== '' ? Math.max(0, parseInt(inputs.cyclesPerWeek, 10) || 0) : 3;
+      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       const kwhPerCycle = type === 'heatpump' ? 1.4 : 4.0;
       const costPerCycle = kwhPerCycle * (priceCent / 100);
       const yearlyCycles = weekly * 52;
@@ -2955,11 +2955,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const kwh = parseFloat(inputs.kwhPerCycle) || 0.82;
-      const liters = parseFloat(inputs.waterPerCycleLiters) || 10;
-      const weekly = parseInt(inputs.cyclesPerWeek, 10) || 5;
-      const tab = parseFloat(inputs.tabCost) || 0.15;
-      const eleCent = parseFloat(inputs.electricityPrice) || 36;
+      const kwh = inputs.kwhPerCycle !== undefined && inputs.kwhPerCycle !== '' ? Math.max(0, parseFloat(inputs.kwhPerCycle) || 0) : 0.82;
+      const liters = inputs.waterPerCycleLiters !== undefined && inputs.waterPerCycleLiters !== '' ? Math.max(0, parseFloat(inputs.waterPerCycleLiters) || 0) : 10;
+      const weekly = inputs.cyclesPerWeek !== undefined && inputs.cyclesPerWeek !== '' ? Math.max(0, parseInt(inputs.cyclesPerWeek, 10) || 0) : 5;
+      const tab = inputs.tabCost !== undefined && inputs.tabCost !== '' ? Math.max(0, parseFloat(inputs.tabCost) || 0) : 0.15;
+      const eleCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       const powerCost = kwh * (eleCent / 100);
       const waterCost = (liters / 1000) * 4.80; // Standard 4,80 €/m³ Wasser & Abwasser
       const costPerCycle = powerCost + waterCost + tab;
@@ -3015,10 +3015,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const pWatts = parseFloat(inputs.screenPowerWatts) || 120;
-      const hours = parseFloat(inputs.dailyHours) || 4;
-      const sWatts = parseFloat(inputs.standbyWatts) || 1.0;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
+      const pWatts = inputs.screenPowerWatts !== undefined && inputs.screenPowerWatts !== '' ? Math.max(0, parseFloat(inputs.screenPowerWatts) || 0) : 120;
+      const hours = inputs.dailyHours !== undefined && inputs.dailyHours !== '' ? Math.max(0, parseFloat(inputs.dailyHours) || 0) : 4;
+      const sWatts = inputs.standbyWatts !== undefined && inputs.standbyWatts !== '' ? Math.max(0, parseFloat(inputs.standbyWatts) || 0) : 1.0;
+      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       const activeKwh = (pWatts * hours * 365) / 1000;
       const standbyHours = Math.max(0, 24 - hours);
       const standbyKwh = (sWatts * standbyHours * 365) / 1000;
@@ -3074,22 +3074,23 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const count = parseInt(inputs.lampCount, 10) || 10;
-      const oldW = parseFloat(inputs.oldWatts) || 60;
-      const newW = parseFloat(inputs.newWatts) || 8;
-      const hours = parseFloat(inputs.burnHoursPerDay) || 3.5;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
-      const savedWattsPerLamp = oldW - newW;
+      const count = inputs.lampCount !== undefined && inputs.lampCount !== '' ? Math.max(0, parseInt(inputs.lampCount, 10) || 0) : 10;
+      const oldW = inputs.oldWatts !== undefined && inputs.oldWatts !== '' ? Math.max(0, parseFloat(inputs.oldWatts) || 0) : 60;
+      const newW = inputs.newWatts !== undefined && inputs.newWatts !== '' ? Math.max(0, parseFloat(inputs.newWatts) || 0) : 8;
+      const hours = inputs.burnHoursPerDay !== undefined && inputs.burnHoursPerDay !== '' ? Math.max(0, parseFloat(inputs.burnHoursPerDay) || 0) : 3.5;
+      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
+      const savedWattsPerLamp = Math.max(0, oldW - newW);
       const savedKwhYear = (savedWattsPerLamp * hours * 365 * count) / 1000;
       const yearlySaving = (savedKwhYear * priceCent) / 100;
+      const pctSaved = oldW > 0 ? (savedWattsPerLamp / oldW) * 100 : 0;
       return {
         primary: { id: 'yearlySaving', label: 'Jährliche Stromersparnis', value: yearlySaving, formattedValue: formatCurrency(yearlySaving), highlight: true },
         secondary: [
           { id: 'savedKwhYear', label: 'Eingesparter Strom pro Jahr', value: savedKwhYear, formattedValue: `${formatNumber(savedKwhYear, 0)} kWh` },
-          { id: 'pctSaved', label: 'Energieersparnis Beleuchtung', value: (savedWattsPerLamp / oldW) * 100, formattedValue: formatPercent((savedWattsPerLamp / oldW) * 100, 0) },
+          { id: 'pctSaved', label: 'Energieersparnis Beleuchtung', value: pctSaved, formattedValue: formatPercent(pctSaved, 0) },
           { id: 'saving5Years', label: 'Ersparnis über 5 Jahre', value: yearlySaving * 5, formattedValue: formatCurrency(yearlySaving * 5) },
         ],
-        summaryText: `Durch den Tausch von ${count} Lampen sparen Sie ${formatPercent((savedWattsPerLamp / oldW) * 100, 0)} Beleuchtungsstrom ein. Das spart jährlich ${formatCurrency(yearlySaving)} (${formatNumber(savedKwhYear, 0)} kWh).`,
+        summaryText: `Durch den Tausch von ${count} Lampen sparen Sie ${formatPercent(pctSaved, 0)} Beleuchtungsstrom ein. Das spart jährlich ${formatCurrency(yearlySaving)} (${formatNumber(savedKwhYear, 0)} kWh).`,
       };
     },
     formula: 'Ersparnis = Lampenanzahl × (Watt_alt - Watt_neu) × Stunden/Tag × 365 / 1000 × Strompreis',
@@ -3607,9 +3608,9 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const type = inputs.deviceType || 'split';
-      const hours = parseFloat(inputs.hoursPerDay) || 6;
-      const days = parseInt(inputs.summerDays, 10) || 35;
-      const priceCent = parseFloat(inputs.electricityPrice) || 36;
+      const hours = inputs.hoursPerDay !== undefined && inputs.hoursPerDay !== '' ? Math.max(0, parseFloat(inputs.hoursPerDay) || 0) : 6;
+      const days = inputs.summerDays !== undefined && inputs.summerDays !== '' ? Math.max(0, parseInt(inputs.summerDays, 10) || 0) : 35;
+      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
       const kwhPerHour = type === 'split' ? 0.6 : 1.2;
       const costPerHour = kwhPerHour * (priceCent / 100);
       const totalKwh = kwhPerHour * hours * days;
@@ -3662,10 +3663,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'publicPriceCent', label: 'Öffentlicher Schnelllade-Tarif (DC/HPC) in Cent pro kWh', type: 'number', defaultValue: 59, min: 35, max: 90, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
-      const consumption = parseFloat(inputs.consumptionKwhPer100Km) || 18.5;
-      const km = parseFloat(inputs.yearlyMileageKm) || 15000;
-      const homeCent = parseFloat(inputs.homePowerPriceCent) || 32;
-      const publicCent = parseFloat(inputs.publicPriceCent) || 59;
+      const consumption = inputs.consumptionKwhPer100Km !== undefined && inputs.consumptionKwhPer100Km !== '' ? Math.max(0, parseFloat(inputs.consumptionKwhPer100Km) || 0) : 18.5;
+      const km = inputs.yearlyMileageKm !== undefined && inputs.yearlyMileageKm !== '' ? Math.max(0, parseFloat(inputs.yearlyMileageKm) || 0) : 15000;
+      const homeCent = inputs.homePowerPriceCent !== undefined && inputs.homePowerPriceCent !== '' ? Math.max(0, parseFloat(inputs.homePowerPriceCent) || 0) : 32;
+      const publicCent = inputs.publicPriceCent !== undefined && inputs.publicPriceCent !== '' ? Math.max(0, parseFloat(inputs.publicPriceCent) || 0) : 59;
       const homeCost100 = (consumption * homeCent) / 100;
       const publicCost100 = (consumption * publicCent) / 100;
       const homeYearly = (km / 100) * homeCost100;
@@ -3819,8 +3820,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const adults = parseInt(inputs.adults, 10) || 2;
-      const kids = parseInt(inputs.children, 10) || 1;
+      const adults = inputs.adults !== undefined && inputs.adults !== '' ? Math.max(0, parseInt(inputs.adults, 10) || 0) : 2;
+      const kids = inputs.children !== undefined && inputs.children !== '' ? Math.max(0, parseInt(inputs.children, 10) || 0) : 1;
       const style = inputs.lifestyle || 'standard';
       let adultRate = 310;
       let childRate = 190;
@@ -3829,12 +3830,14 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const totalMonth = (adults * adultRate) + (kids * childRate);
       const weekly = (totalMonth * 12) / 52;
       const daily = totalMonth / 30;
+      const totalPersons = adults + kids;
+      const perPerson = totalPersons > 0 ? totalMonth / totalPersons : 0;
       return {
         primary: { id: 'totalMonth', label: 'Empfohlenes monatliches Lebensmittelbudget', value: totalMonth, formattedValue: formatCurrency(totalMonth), highlight: true },
         secondary: [
           { id: 'weekly', label: 'Budget pro Woche (Wocheneinkauf)', value: weekly, formattedValue: formatCurrency(weekly) },
           { id: 'daily', label: 'Budget pro Tag', value: daily, formattedValue: formatCurrency(daily) },
-          { id: 'perPerson', label: 'Durchschnitt pro Kopf / Monat', value: totalMonth / (adults + kids), formattedValue: formatCurrency(totalMonth / (adults + kids)) },
+          { id: 'perPerson', label: 'Durchschnitt pro Kopf / Monat', value: perPerson, formattedValue: formatCurrency(perPerson) },
         ],
         summaryText: `Für ${adults} Erwachsene und ${kids} Kinder empfehlen wir ein Haushaltsbudget von ${formatCurrency(totalMonth)} pro Monat (ca. ${formatCurrency(weekly)} pro Wocheneinkauf).`,
       };

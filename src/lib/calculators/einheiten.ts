@@ -54,9 +54,18 @@ export function calculateLengthConversion(inputs: Record<string, any>): Calculat
 }
 
 export function calculateTemperatureConversion(inputs: Record<string, any>): CalculationResult {
-  const val = parseFloat(inputs.value) || 20;
+  const val = inputs.value !== undefined && inputs.value !== '' && inputs.value !== null
+    ? parseFloat(inputs.value)
+    : 25;
   const from = inputs.fromUnit || 'C'; // 'C', 'F', 'K'
   const to = inputs.toUnit || 'F';
+
+  if (isNaN(val)) {
+    return {
+      primary: { id: 'temp', label: 'Temperatur', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen gültigen Zahlenwert für die Temperatur ein.',
+    };
+  }
 
   // Nach Celsius
   let celsius = val;
@@ -77,12 +86,16 @@ export function calculateTemperatureConversion(inputs: Record<string, any>): Cal
   const fahrenheit = celsius * (9 / 5) + 32;
   const kelvin = celsius + 273.15;
 
+  const toLabel = to === 'K' ? 'Kelvin (K)' : `Grad ${to === 'C' ? 'Celsius' : 'Fahrenheit'} (°${to})`;
+  const toFormatted = to === 'K' ? `${formatNumber(result, 2)} K` : `${formatNumber(result, 2)} °${to}`;
+  const fromFormatted = from === 'K' ? `${formatNumber(val, 1)} K` : `${formatNumber(val, 1)} °${from}`;
+
   return {
     primary: {
       id: 'temp',
-      label: `Temperatur in °${to}`,
+      label: `Temperatur in ${toLabel}`,
       value: result,
-      formattedValue: `${formatNumber(result, 2)} °${to}`,
+      formattedValue: toFormatted,
       highlight: true,
     },
     secondary: [
@@ -91,6 +104,6 @@ export function calculateTemperatureConversion(inputs: Record<string, any>): Cal
       { id: 'kelvin', label: 'In Kelvin (SI-Basiseinheit)', value: kelvin, formattedValue: `${formatNumber(kelvin, 2)} K` },
       { id: 'waterState', label: 'Aggregatzustand von Wasser bei 1 atm', value: celsius <= 0 ? 'Gefroren (Eis)' : celsius >= 100 ? 'Gasförmig (Dampf)' : 'Flüssig', formattedValue: celsius <= 0 ? 'Gefroren (Eis)' : celsius >= 100 ? 'Gasförmig (Dampf)' : 'Flüssig' },
     ],
-    summaryText: `${formatNumber(val, 1)} °${from} entsprechen ${formatNumber(result, 2)} °${to} (${formatNumber(celsius, 1)} °C / ${formatNumber(fahrenheit, 1)} °F / ${formatNumber(kelvin, 2)} K).`,
+    summaryText: `${fromFormatted} entsprechen ${toFormatted} (${formatNumber(celsius, 1)} °C / ${formatNumber(fahrenheit, 1)} °F / ${formatNumber(kelvin, 2)} K).`,
   };
 }

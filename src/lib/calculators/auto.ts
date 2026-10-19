@@ -204,15 +204,15 @@ export function calculateCommuterAllowance(inputs: Record<string, any>): Calcula
 }
 
 export function calculateEVCharging(inputs: Record<string, any>): CalculationResult {
-  const distance = parseFloat(inputs.distance) || 100;
-  const consumptionKwh = parseFloat(inputs.consumptionKwh) || 18.0; // kWh / 100km
-  const pricePerKwh = parseFloat(inputs.pricePerKwh) || GERMAN_DATA_2026.strompreis_durchschnitt.value; // default 0.38 €
-  const batterySize = parseFloat(inputs.batterySize) || 60; // kWh
+  const distance = inputs.distance !== undefined && inputs.distance !== '' ? parseFloat(inputs.distance) : 100;
+  const consumptionKwh = inputs.consumptionKwh !== undefined && inputs.consumptionKwh !== '' ? parseFloat(inputs.consumptionKwh) : 18.0; // kWh / 100km
+  const pricePerKwh = inputs.pricePerKwh !== undefined && inputs.pricePerKwh !== '' ? parseFloat(inputs.pricePerKwh) : GERMAN_DATA_2026.strompreis_durchschnitt.value; // default 0.38 €
+  const batterySize = inputs.batterySize !== undefined && inputs.batterySize !== '' ? parseFloat(inputs.batterySize) : 60; // kWh
 
-  if (distance <= 0 || consumptionKwh <= 0 || pricePerKwh <= 0) {
+  if (isNaN(distance) || distance <= 0 || isNaN(consumptionKwh) || consumptionKwh <= 0 || isNaN(pricePerKwh) || pricePerKwh < 0) {
     return {
       primary: { id: 'cost', label: 'Ladekosten', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte positive Werte angeben.',
+      error: 'Bitte positive Werte für Strecke und Verbrauch angeben (Strompreis darf nicht negativ sein).',
     };
   }
 
@@ -242,11 +242,13 @@ export function calculateEVCharging(inputs: Record<string, any>): CalculationRes
 }
 
 export function calculateTravelTime(inputs: Record<string, any>): CalculationResult {
-  const distance = parseFloat(inputs.distance) || 350;
-  const speed = parseFloat(inputs.speed) || 100; // km/h
-  const breakMinutes = parseInt(inputs.breakMinutes || '30', 10);
+  const distance = inputs.distance !== undefined && inputs.distance !== '' ? parseFloat(inputs.distance) : 350;
+  const speed = inputs.speed !== undefined && inputs.speed !== '' ? parseFloat(inputs.speed) : 100; // km/h
+  const breakMinutes = inputs.breakMinutes !== undefined && inputs.breakMinutes !== ''
+    ? Math.max(0, parseInt(String(inputs.breakMinutes), 10) || 0)
+    : 30;
 
-  if (distance <= 0 || speed <= 0) {
+  if (isNaN(distance) || distance <= 0 || isNaN(speed) || speed <= 0) {
     return {
       primary: { id: 'time', label: 'Fahrtzeit', value: 0, formattedValue: '0 Std.' },
       error: 'Distanz und Geschwindigkeit müssen größer als 0 sein.',

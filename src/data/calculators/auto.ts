@@ -83,10 +83,10 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
       { id: 'litersFueled', label: 'Nachgetankte Liter (voll)', type: 'number', defaultValue: 42.5, min: 0.1, step: 0.1, unit: 'Liter' },
     ],
     calculate: (inputs) => {
-      const dist = parseFloat(inputs.distanceKm) || 600;
-      const liters = parseFloat(inputs.litersFueled) || 40;
-      if (dist <= 0 || liters <= 0) {
-        return { primary: { id: 'cons', label: 'Verbrauch', value: 0, formattedValue: '0 l/100km' }, error: 'Ungültige Werte.' };
+      const dist = inputs.distanceKm !== undefined && inputs.distanceKm !== '' ? parseFloat(inputs.distanceKm) : 620;
+      const liters = inputs.litersFueled !== undefined && inputs.litersFueled !== '' ? parseFloat(inputs.litersFueled) : 42.5;
+      if (isNaN(dist) || dist <= 0 || isNaN(liters) || liters <= 0) {
+        return { primary: { id: 'cons', label: 'Verbrauch', value: 0, formattedValue: '0 l/100km' }, error: 'Bitte gültige Werte größer als 0 für Kilometer und getankte Liter angeben.' };
       }
       const consumption = (liters / dist) * 100;
       return {
@@ -189,14 +189,16 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const res = calculateFuelCost(inputs);
+      if (res.error) return res;
       const persons = Math.max(1, parseInt(inputs.passengers || '1', 10));
       const totalFuel = res.primary.value as number;
       const perPerson = totalFuel / persons;
+      const fuelItem = res.secondary?.find((s) => s.id === 'totalLiters');
       return {
         primary: { id: 'perPerson', label: `Kosten pro Person (${persons} Mitfahrer)`, value: perPerson, formattedValue: formatCurrency(perPerson), highlight: true },
         secondary: [
           { id: 'totalFuel', label: 'Gesamte Kraftstoffkosten der Fahrt', value: totalFuel, formattedValue: formatCurrency(totalFuel) },
-          { id: 'fuelNeeded', label: 'Benötigter Sprit', value: res.secondary?.[1]?.value || 0, formattedValue: String(res.secondary?.[1]?.formattedValue || '') },
+          { id: 'fuelNeeded', label: 'Benötigter Sprit', value: fuelItem?.value || 0, formattedValue: fuelItem?.formattedValue || '-' },
         ],
         summaryText: `Für die ${inputs.distance} km lange Fahrt entstehen Gesamtspritkosten von ${formatCurrency(totalFuel)}. Bei ${persons} Reisenden zahlt jede Person ${formatCurrency(perPerson)}.`,
       };
