@@ -70,7 +70,7 @@ export default function Footer() {
 
       <div className={`container ${styles.footerBottom}`}>
         <span>© {new Date().getFullYear()} RechenHafen.de – Alle Rechte vorbehalten.</span>
-        <span>Entwickelt und redaktionell gepflegt in Deutschland. Berechnungen erfolgen nach anerkannten Normen und Gesetzen.</span>
+        <span>Berechnungen erfolgen nach anerkannten Normen und Gesetzen.</span>
       </div>
     </footer>
   );
