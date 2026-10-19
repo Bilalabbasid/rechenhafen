@@ -1318,10 +1318,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const aov = Number(inputs.avgOrderValue) || 0;
-      const freq = Number(inputs.purchaseFrequencyPerYear) || 1;
-      const lifespan = Number(inputs.customerLifespanYears) || 1;
-      const margin = (Number(inputs.grossMarginPct) || 50) / 100;
+      const aov = inputs.avgOrderValue !== undefined && inputs.avgOrderValue !== '' ? Math.max(0, Number(inputs.avgOrderValue)) : 80;
+      const freq = inputs.purchaseFrequencyPerYear !== undefined && inputs.purchaseFrequencyPerYear !== '' ? Math.max(0, Number(inputs.purchaseFrequencyPerYear)) : 4;
+      const lifespan = inputs.customerLifespanYears !== undefined && inputs.customerLifespanYears !== '' ? Math.max(0, Number(inputs.customerLifespanYears)) : 3;
+      const margin = (inputs.grossMarginPct !== undefined && inputs.grossMarginPct !== '' ? Math.max(0, Number(inputs.grossMarginPct)) : 50) / 100;
       
       // Kundenumsatz pro Jahr = AOV * Frequenz
       const annualRevenuePerCustomer = aov * freq;
@@ -1424,9 +1424,9 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const startCust = Number(inputs.startCustomers) || 1;
-      const lostCust = Number(inputs.lostCustomers) || 0;
-      const mrr = Number(inputs.avgMrrPerCustomer) || 0;
+      const startCust = Math.max(1, inputs.startCustomers !== undefined && inputs.startCustomers !== '' ? Number(inputs.startCustomers) : 1000);
+      const lostCust = Math.max(0, inputs.lostCustomers !== undefined && inputs.lostCustomers !== '' ? Number(inputs.lostCustomers) : 30);
+      const mrr = Math.max(0, inputs.avgMrrPerCustomer !== undefined && inputs.avgMrrPerCustomer !== '' ? Number(inputs.avgMrrPerCustomer) : 49);
       
       // Monatliche Churn Rate: (Verlorene Kunden / Startkunden) * 100
       const monthlyChurnPct = (lostCust / startCust) * 100;
@@ -1524,9 +1524,9 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const visitors = Number(inputs.totalVisitors) || 1;
-      const convs = Number(inputs.conversionsCount) || 0;
-      const aov = Number(inputs.avgCartValue) || 0;
+      const visitors = Math.max(1, inputs.totalVisitors !== undefined && inputs.totalVisitors !== '' ? Number(inputs.totalVisitors) : 10000);
+      const convs = Math.max(0, inputs.conversionsCount !== undefined && inputs.conversionsCount !== '' ? Number(inputs.conversionsCount) : 250);
+      const aov = Math.max(0, inputs.avgCartValue !== undefined && inputs.avgCartValue !== '' ? Number(inputs.avgCartValue) : 65);
       
       // Conversion Rate = (Conversions / Besucher) * 100
       const cr = (convs / visitors) * 100;
@@ -3057,15 +3057,16 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     ],
     calculate: (inputs: Record<string, any>) => {
       
-            const arr = [
-              Number(inputs.w1) || 0,
-              Number(inputs.w2) || 0,
-              Number(inputs.w3) || 0,
-              Number(inputs.w4) || 0,
-              Number(inputs.w5) || 0,
-              Number(inputs.w6) || 0,
-              Number(inputs.w7) || 0,
-            ].sort((a, b) => a - b);
+      const getVal = (v: any, def: number) => (v !== undefined && v !== '' ? Number(v) : def);
+      const arr = [
+        getVal(inputs.w1, 12),
+        getVal(inputs.w2, 15),
+        getVal(inputs.w3, 18),
+        getVal(inputs.w4, 24),
+        getVal(inputs.w5, 30),
+        getVal(inputs.w6, 35),
+        getVal(inputs.w7, 42),
+      ].sort((a, b) => a - b);
             const min = arr[0];
             const max = arr[arr.length - 1];
             const q1 = arr[1]; // 25% rank in 7 items
@@ -3328,8 +3329,9 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     ],
     calculate: (inputs: Record<string, any>) => {
       
-            const n = Math.floor(Number(inputs.totalN) || 49);
-            const k = Math.min(n, Math.floor(Number(inputs.chooseK) || 6));
+      const n = Math.max(0, Math.floor(inputs.totalN !== undefined && inputs.totalN !== '' ? Number(inputs.totalN) : 49));
+      const rawK = inputs.chooseK !== undefined && inputs.chooseK !== '' ? Number(inputs.chooseK) : 6;
+      const k = Math.min(n, Math.max(0, Math.floor(rawK)));
             function nCr(nVal: number, rVal: number) {
               if (rVal < 0 || rVal > nVal) return 0;
               if (rVal === 0 || rVal === nVal) return 1;
@@ -3820,9 +3822,15 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     ],
     calculate: (inputs: Record<string, any>) => {
       
-            const v1 = Number(inputs.valA) || 60;
-            const v2 = Number(inputs.valB) || 120;
-            if (v1 <= 0 || v2 <= 0) return { primary: { label: 'Fehler', value: 'Werte müssen > 0 sein', unit: '' }, details: [] };
+      const v1 = inputs.valA !== undefined && inputs.valA !== '' ? Number(inputs.valA) : 60;
+      const v2 = inputs.valB !== undefined && inputs.valB !== '' ? Number(inputs.valB) : 120;
+      if (v1 <= 0 || v2 <= 0 || isNaN(v1) || isNaN(v2)) {
+        return {
+          primary: { label: 'Harmonisches Mittel', value: 0, formattedValue: 'Ungültig', unit: 'km/h' },
+          error: 'Beide Geschwindigkeiten müssen größer als 0 sein.',
+          details: [],
+        };
+      }
             const harmMean = (2 * v1 * v2) / (v1 + v2);
             const arithMean = (v1 + v2) / 2;
             return {
@@ -4081,15 +4089,16 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     ],
     calculate: (inputs: Record<string, any>) => {
       
-            const p = Math.max(1, Math.min(99, Number(inputs.pRank) || 90));
-            const arr = [
-              Number(inputs.d1) || 0,
-              Number(inputs.d2) || 0,
-              Number(inputs.d3) || 0,
-              Number(inputs.d4) || 0,
-              Number(inputs.d5) || 0,
-              Number(inputs.d6) || 0,
-            ].sort((a, b) => a - b);
+      const p = Math.max(0, Math.min(100, inputs.pRank !== undefined && inputs.pRank !== '' ? Number(inputs.pRank) : 90));
+      const getVal = (v: any, def: number) => (v !== undefined && v !== '' ? Number(v) : def);
+      const arr = [
+        getVal(inputs.d1, 10),
+        getVal(inputs.d2, 25),
+        getVal(inputs.d3, 40),
+        getVal(inputs.d4, 55),
+        getVal(inputs.d5, 70),
+        getVal(inputs.d6, 85),
+      ].sort((a, b) => a - b);
             const n = arr.length;
             // Linear interpolation method for percentile
             const index = (p / 100) * (n - 1);

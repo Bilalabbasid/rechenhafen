@@ -2316,8 +2316,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const eu = Number(inputs.euSize) || 42;
-      const isMen = inputs.gender === 'men';
+      const eu = inputs.euSize !== undefined && inputs.euSize !== '' ? Number(inputs.euSize) : 42;
+      const isMen = inputs.gender !== 'women';
+      
+      if (eu <= 0 || isNaN(eu)) {
+        return {
+          primary: { id: 'usSize', label: isMen ? 'US Herren Größe' : 'US Damen Größe', value: 0, formattedValue: 'Ungültig' },
+          error: 'Bitte geben Sie eine gültige Schuhgröße größer als 0 ein.',
+        };
+      }
       
       // Pariser Stich: 1 EU-Größe = 2/3 cm = 6.67 mm
       // Fußlänge in cm ≈ (EU - 2) * (2/3)
@@ -2540,9 +2547,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const circ = Number(inputs.euCircumferenceMm) || 54;
+      const circ = inputs.euCircumferenceMm !== undefined && inputs.euCircumferenceMm !== '' ? Number(inputs.euCircumferenceMm) : 54;
       
-      // Innendurchmesser d = Umfang / pi
+      if (circ <= 0 || isNaN(circ)) {
+        return {
+          primary: { id: 'diameter', label: 'Innendurchmesser des Rings', value: 0, formattedValue: 'Ungültig' },
+          error: 'Bitte geben Sie einen Ringumfang größer als 0 mm ein.',
+        };
+      }
       const diameterMm = circ / Math.PI;
       
       // US Ringgröße: US = (Umfang in mm - 36.5) / 2.55 (Näherung)
@@ -3603,9 +3615,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const meat = inputs.meatType;
-      const done = inputs.doneness;
-      const weight = Number(inputs.weightKg) || 1.5;
+      const meat = inputs.meatType || 'beefRoast';
+      const done = inputs.doneness || 'medium';
+      const weight = inputs.weightKg !== undefined && inputs.weightKg !== '' ? Math.max(0, Number(inputs.weightKg)) : 1.5;
       
       let targetTemp = 58; // °C
       let ovenTemp = 120; // °C
@@ -3743,12 +3755,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const count = Number(inputs.ballsCount) || 4;
-      const ballWeight = Number(inputs.ballWeightG) || 260;
+      const count = inputs.ballsCount !== undefined && inputs.ballsCount !== '' ? Math.max(0, Number(inputs.ballsCount)) : 4;
+      const ballWeight = inputs.ballWeightG !== undefined && inputs.ballWeightG !== '' ? Math.max(0, Number(inputs.ballWeightG)) : 260;
       const totalDoughWeight = count * ballWeight;
       
-      const hydr = (Number(inputs.hydrationPercent) || 65) / 100;
-      const saltRate = (Number(inputs.saltPercent) || 3.0) / 100;
+      const hydrVal = inputs.hydrationPercent !== undefined && inputs.hydrationPercent !== '' ? Math.max(0, Number(inputs.hydrationPercent)) : 65;
+      const saltVal = inputs.saltPercent !== undefined && inputs.saltPercent !== '' ? Math.max(0, Number(inputs.saltPercent)) : 3.0;
+      const hydr = hydrVal / 100;
+      const saltRate = saltVal / 100;
       // Frische Hefe: ca. 0.15 % bis 0.3 % bei 24h Reife
       const yeastRate = 0.002;
       
@@ -3768,7 +3782,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           { id: 'freshYeast', label: 'Frische Hefe (für 24h Gare)', value: freshYeastG, formattedValue: formatNumber(freshYeastG, 2) + ' g (trocken: ' + formatNumber(dryYeastG, 2) + ' g)' },
           { id: 'totalDough', label: 'Gesamtteiggewicht', value: totalDoughWeight, formattedValue: totalDoughWeight + ' g (' + count + ' Ballen à ' + ballWeight + ' g)' },
         ],
-        summaryText: 'Für ' + count + ' Pizzen à ' + ballWeight + ' g (Hydratation ' + inputs.hydrationPercent + ' %) benötigen Sie ' + formatNumber(flourG, 0) + ' g Mehl, ' + formatNumber(waterG, 0) + ' g Wasser, ' + formatNumber(saltG, 1) + ' g Salz und ' + formatNumber(freshYeastG, 1) + ' g frische Hefe.',
+        summaryText: 'Für ' + count + ' Pizzen à ' + ballWeight + ' g (Hydratation ' + hydrVal + ' %) benötigen Sie ' + formatNumber(flourG, 0) + ' g Mehl, ' + formatNumber(waterG, 0) + ' g Wasser, ' + formatNumber(saltG, 1) + ' g Salz und ' + formatNumber(freshYeastG, 1) + ' g frische Hefe.',
       };
     },
     formula: "Mehl = Gesamtteig / (1 + Hydratation + Salzfaktor + Hefefaktor); Wasser = Mehl × Hydratation",
@@ -3862,10 +3876,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const totalG = Number(inputs.targetLoafG) || 1000;
-      const waterPct = (Number(inputs.hydrationPercent) || 70) / 100;
-      const saltPct = (Number(inputs.saltPercent) || 2.0) / 100;
-      const sdPct = (Number(inputs.sourdoughPercent) || 20) / 100;
+      const totalG = inputs.targetLoafG !== undefined && inputs.targetLoafG !== '' ? Math.max(0, Number(inputs.targetLoafG)) : 1000;
+      const waterPct = (inputs.hydrationPercent !== undefined && inputs.hydrationPercent !== '' ? Math.max(0, Number(inputs.hydrationPercent)) : 70) / 100;
+      const saltPct = (inputs.saltPercent !== undefined && inputs.saltPercent !== '' ? Math.max(0, Number(inputs.saltPercent)) : 2.0) / 100;
+      const sdPct = (inputs.sourdoughPercent !== undefined && inputs.sourdoughPercent !== '' ? Math.max(0, Number(inputs.sourdoughPercent)) : 20) / 100;
       
       // Bäckerprozente: Mehl ist immer 100 % (1.0)
       const totalSumPct = 1.0 + waterPct + saltPct + sdPct;
@@ -4004,9 +4018,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const ml = Number(inputs.alcoholMl) || 0;
-      const vol = Number(inputs.volPercent) || 0;
-      const portions = Number(inputs.portionsCount) || 4;
+      const ml = inputs.alcoholMl !== undefined && inputs.alcoholMl !== '' ? Math.max(0, Number(inputs.alcoholMl)) : 250;
+      const vol = inputs.volPercent !== undefined && inputs.volPercent !== '' ? Math.max(0, Number(inputs.volPercent)) : 13;
+      const portions = inputs.portionsCount !== undefined && inputs.portionsCount !== '' ? Math.max(1, Number(inputs.portionsCount)) : 4;
       
       // Reines Ethanol in Gramm (Dichte Ethanol ≈ 0.789 g/ml):
       const pureAlcoholMl = ml * (vol / 100);
@@ -4931,8 +4945,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const targetG = Number(inputs.desiredSourdoughG) || 200;
-      const reserveG = Number(inputs.reserveG) || 30;
+      const targetG = inputs.desiredSourdoughG !== undefined && inputs.desiredSourdoughG !== '' ? Math.max(0, Number(inputs.desiredSourdoughG)) : 200;
+      const reserveG = inputs.reserveG !== undefined && inputs.reserveG !== '' ? Math.max(0, Number(inputs.reserveG)) : 30;
       const totalToProduceG = targetG + reserveG;
       
       let ratioParts = 3; // 1:1:1
@@ -5313,12 +5327,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const sMl = Number(inputs.spiritMl) || 0;
-      const sVol = Number(inputs.spiritVolPct) || 0;
-      const lMl = Number(inputs.liqueurMl) || 0;
-      const lVol = Number(inputs.liqueurVolPct) || 0;
-      const fMl = Number(inputs.fillerMl) || 0;
-      const iceMl = Number(inputs.iceMeltMl) || 0;
+      const sMl = inputs.spiritMl !== undefined && inputs.spiritMl !== '' ? Math.max(0, Number(inputs.spiritMl)) : 50;
+      const sVol = inputs.spiritVolPct !== undefined && inputs.spiritVolPct !== '' ? Math.max(0, Number(inputs.spiritVolPct)) : 40;
+      const lMl = inputs.liqueurMl !== undefined && inputs.liqueurMl !== '' ? Math.max(0, Number(inputs.liqueurMl)) : 0;
+      const lVol = inputs.liqueurVolPct !== undefined && inputs.liqueurVolPct !== '' ? Math.max(0, Number(inputs.liqueurVolPct)) : 20;
+      const fMl = inputs.fillerMl !== undefined && inputs.fillerMl !== '' ? Math.max(0, Number(inputs.fillerMl)) : 150;
+      const iceMl = inputs.iceMeltMl !== undefined && inputs.iceMeltMl !== '' ? Math.max(0, Number(inputs.iceMeltMl)) : 30;
       
       const pureEthanolMl = (sMl * (sVol / 100)) + (lMl * (lVol / 100));
       const totalDrinkVolumeMl = sMl + lMl + fMl + iceMl;
@@ -5437,8 +5451,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const waterL = Number(inputs.waterLiters) || 1;
-      const pct = Number(inputs.customPercent) || 6.0;
+      const waterL = inputs.waterLiters !== undefined && inputs.waterLiters !== '' ? Math.max(0, Number(inputs.waterLiters)) : 1;
+      const pct = inputs.customPercent !== undefined && inputs.customPercent !== '' ? Math.max(0, Number(inputs.customPercent)) : 6.0;
       
       // Nach Definition der Massenprozent-Lake:
       // Salz (g) = (Wassermenge in g * Prozent) / (100 - Prozent)
@@ -5549,8 +5563,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const oil = inputs.oilType;
-      const planT = Number(inputs.plannedTemp) || 180;
+      const oil = inputs.oilType || 'refinedRapeseed';
+      const planT = inputs.plannedTemp !== undefined && inputs.plannedTemp !== '' ? Math.max(0, Number(inputs.plannedTemp)) : 180;
       
       let smokePoint = 205;
       let suitability = 'Sehr gut geeignet zum scharfen Anbraten';
@@ -5921,8 +5935,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const tea = inputs.teaType;
-      const waterMl = Number(inputs.waterAmountMl) || 250;
+      const tea = inputs.teaType || 'green';
+      const waterMl = inputs.waterAmountMl !== undefined && inputs.waterAmountMl !== '' ? Math.max(0, Number(inputs.waterAmountMl)) : 250;
       
       let temp = 75;
       let brewMins = 2;
@@ -6165,8 +6179,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const totalG = Number(inputs.totalChocolateG) || 300;
-      const type = inputs.chocType;
+      const totalG = inputs.totalChocolateG !== undefined && inputs.totalChocolateG !== '' ? Math.max(0, Number(inputs.totalChocolateG)) : 300;
+      const type = inputs.chocType || 'dark';
       
       // Impfmethode: 2/3 der Schokolade schmelzen, 1/3 fein gehackt unterrühren
       const meltPortionG = Math.round((totalG * 2) / 3);

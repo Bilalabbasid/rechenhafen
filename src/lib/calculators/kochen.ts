@@ -2,12 +2,12 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
 export function calculatePortions(inputs: Record<string, any>): CalculationResult {
-  const originalPortions = parseFloat(inputs.originalPortions) || 4;
-  const targetPortions = parseFloat(inputs.targetPortions) || 6;
-  const originalAmount = parseFloat(inputs.originalAmount) || 500;
+  const originalPortions = inputs.originalPortions !== undefined && inputs.originalPortions !== '' ? parseFloat(inputs.originalPortions) : 4;
+  const targetPortions = inputs.targetPortions !== undefined && inputs.targetPortions !== '' ? parseFloat(inputs.targetPortions) : 6;
+  const originalAmount = inputs.originalAmount !== undefined && inputs.originalAmount !== '' ? Math.max(0, parseFloat(inputs.originalAmount) || 0) : 500;
   const unit = inputs.unit || 'g';
 
-  if (originalPortions <= 0 || targetPortions <= 0) {
+  if (isNaN(originalPortions) || originalPortions <= 0 || isNaN(targetPortions) || targetPortions <= 0) {
     return {
       primary: { id: 'amount', label: 'Menge', value: 0, formattedValue: '0' },
       error: 'Portionsangaben müssen größer als 0 sein.',
@@ -37,13 +37,13 @@ export function calculateBakingPan(inputs: Record<string, any>): CalculationResu
   const shapeFrom = inputs.shapeFrom || 'round';
   const shapeTo = inputs.shapeTo || 'round';
 
-  const d1 = parseFloat(inputs.diameterFrom) || 26; // 26cm Springform
-  const d2 = parseFloat(inputs.diameterTo) || 20;   // 20cm Springform
+  const d1 = inputs.diameterFrom !== undefined && inputs.diameterFrom !== '' ? parseFloat(inputs.diameterFrom) : 26; // 26cm Springform
+  const d2 = inputs.diameterTo !== undefined && inputs.diameterTo !== '' ? parseFloat(inputs.diameterTo) : 20;   // 20cm Springform
 
-  if (d1 <= 0 || d2 <= 0) {
+  if (isNaN(d1) || d1 <= 0 || isNaN(d2) || d2 <= 0) {
     return {
       primary: { id: 'factor', label: 'Faktor', value: 0, formattedValue: '0' },
-      error: 'Bitte gültige Backform-Durchmesser eingeben.',
+      error: 'Bitte gültige Backform-Durchmesser größer als 0 eingeben.',
     };
   }
 
@@ -70,7 +70,7 @@ export function calculateBakingPan(inputs: Record<string, any>): CalculationResu
 }
 
 export function calculateGramsToMl(inputs: Record<string, any>): CalculationResult {
-  const grams = parseFloat(inputs.grams) || 200;
+  const grams = inputs.grams !== undefined && inputs.grams !== '' ? Math.max(0, parseFloat(inputs.grams) || 0) : 200;
   const ingredient = inputs.ingredient || 'flour';
 
   // Dichten in g/ml (g/cm³)

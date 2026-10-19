@@ -205,7 +205,7 @@ export function calculateRuleOfThree(inputs: Record<string, any>): CalculationRe
 }
 
 export function calculateAverage(inputs: Record<string, any>): CalculationResult {
-  const rawInput = String(inputs.numbers || '10; 20; 30; 40; 50');
+  const rawInput = inputs.numbers !== undefined ? String(inputs.numbers) : '10; 20; 30; 40; 50';
   const numbers = rawInput
     .split(/[;, \n]+/)
     .map((s) => s.trim().replace(',', '.'))

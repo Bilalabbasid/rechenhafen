@@ -5,7 +5,9 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
   const mode = inputs.calculationMode || 'simple'; // 'simple' | 'weighted'
 
   if (mode === 'weighted') {
-    const rawWeighted = String(inputs.weightedGrades || inputs.grades || '1,7 * 5; 2,3 * 10; 1,3 * 6; 2,0 * 5');
+    const rawWeighted = inputs.weightedGrades !== undefined
+      ? String(inputs.weightedGrades)
+      : (inputs.grades !== undefined ? String(inputs.grades) : '1,7 * 5; 2,3 * 10; 1,3 * 6; 2,0 * 5');
     // Split entries by semicolon, comma-followed-by-number, or newline
     const entries = rawWeighted
       .split(/[;\n]+/)
@@ -100,7 +102,7 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
   }
 
   // Simple arithmetic average (default)
-  const gradesInput = String(inputs.grades || '2; 1; 3; 2; 1.5; 2.7');
+  const gradesInput = inputs.grades !== undefined ? String(inputs.grades) : '2; 1; 3; 2; 1.5; 2.7';
   const grades = gradesInput
     .split(/[;, \n]+/)
     .map((s) => s.trim().replace(',', '.'))
@@ -153,7 +155,7 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
 }
 
 export function calculateStandardDeviation(inputs: Record<string, any>): CalculationResult {
-  const rawInput = String(inputs.values || '12; 15; 18; 11; 19; 14; 16');
+  const rawInput = inputs.values !== undefined ? String(inputs.values) : '12; 15; 18; 11; 19; 14; 16';
   const vals = rawInput
     .split(/[;, \n]+/)
     .map((s) => s.trim().replace(',', '.'))
