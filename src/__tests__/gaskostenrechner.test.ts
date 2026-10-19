@@ -107,4 +107,32 @@ describe('Gaskostenrechner (calculateGasCost)', () => {
     const baseCost = result.secondary?.find((s) => s.id === 'baseCost');
     expect(baseCost?.value).toBe(120);
   });
+
+  it('explicitly requires full-year meter readings and clarifies non-suitability of monthly readings in m3 mode', () => {
+    const result = calculateGasCost({
+      inputType: 'm3',
+      meterOld: 12000,
+      meterNew: 13400, // 1400 m³
+      calorificValue: 10.3,
+      stateFactor: 0.95,
+      pricePerKwh: 0.11,
+      basePrice: 12,
+      basePricePeriod: 'monthly',
+    });
+
+    expect(result.error).toBeUndefined();
+    // Summary text must state the full year requirement
+    expect(result.summaryText).toContain('vollständiges Jahr');
+    expect(result.summaryText).toContain('Monats- oder Wochenablesungen sind für diese Jahreskostenberechnung nicht geeignet');
+
+    // Qualifications must state the annual period and seasonal winter caveat
+    const m3Qual = result.qualifications?.find((q) => q.includes('vollständiges Abrechnungsjahr'));
+    expect(m3Qual).toBeDefined();
+    expect(m3Qual).toContain('Monats- oder Wochenablesungen sind für diese Jahreskostenberechnung nicht geeignet');
+    expect(m3Qual).toContain('Winter');
+
+    // Basis summary must show Betrachtungszeitraum
+    const periodBasis = result.basisSummary?.find((b) => b.label === 'Betrachtungszeitraum');
+    expect(periodBasis?.value).toContain('1 vollständiges Abrechnungsjahr');
+  });
 });

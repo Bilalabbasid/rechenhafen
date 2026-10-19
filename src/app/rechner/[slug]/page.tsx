@@ -248,9 +248,18 @@ export default async function CalculatorPage({ params }: PageProps) {
                 {ex.title}
               </h2>
             </div>
-            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-              {renderInlineMarkdown(ex.description || '')}
-            </p>
+            {ex.description ? (
+              <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
+                {renderInlineMarkdown(ex.description)}
+              </p>
+            ) : null}
+            {Array.isArray(ex.steps) && ex.steps.length > 0 && (
+              <ul style={{ margin: '0 0 var(--space-3)', paddingLeft: '1.25rem', fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
+                {ex.steps.map((step: any, sIdx: number) => (
+                  <li key={sIdx}>{typeof step === 'string' ? renderInlineMarkdown(step) : String(step)}</li>
+                ))}
+              </ul>
+            )}
             <div
               style={{
                 display: 'inline-block',
@@ -283,9 +292,18 @@ export default async function CalculatorPage({ params }: PageProps) {
               {calc.workedExample.title}
             </h2>
           </div>
-          <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-            {renderInlineMarkdown(calc.workedExample.description || '')}
-          </p>
+          {calc.workedExample.description ? (
+            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
+              {renderInlineMarkdown(calc.workedExample.description)}
+            </p>
+          ) : null}
+          {Array.isArray(calc.workedExample.steps) && calc.workedExample.steps.length > 0 && (
+            <ul style={{ margin: '0 0 var(--space-3)', paddingLeft: '1.25rem', fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
+              {calc.workedExample.steps.map((step: any, sIdx: number) => (
+                <li key={sIdx}>{typeof step === 'string' ? renderInlineMarkdown(step) : String(step)}</li>
+              ))}
+            </ul>
+          )}
           <div
             style={{
               display: 'inline-block',

@@ -140,4 +140,29 @@ describe('Heizölverbrauch-Rechner (oelheizung-verbrauch-rechner)', () => {
     expect(tankstandSection?.content).not.toContain('exakt ermitteln');
     expect(tankstandSection?.content).toContain('präzisen Ablesung');
   });
+
+  it('renders a complete worked example with narrative description and mathematical steps', () => {
+    expect(calc.workedExample).toBeDefined();
+    expect(calc.workedExample.title).toBe('Beispiel: 140 m² Wohnfläche bei 14 Liter/m²a und 1,05 €/Liter');
+    expect(calc.workedExample.description).toBeDefined();
+    expect(calc.workedExample.description).toContain('140 m²');
+    expect(calc.workedExample.description).toContain('14 Litern');
+    expect(calc.workedExample.description).toContain('1.960 Liter');
+    expect(calc.workedExample.description).toContain('2.058,00 €');
+    expect(calc.workedExample.description).toContain('171,50 €');
+    expect(calc.workedExample.description).toContain('Modellschätzung');
+
+    expect(calc.workedExample.steps).toBeDefined();
+    expect(Array.isArray(calc.workedExample.steps)).toBe(true);
+    expect(calc.workedExample.steps).toHaveLength(3);
+    expect(calc.workedExample.steps[0]).toContain('140 m² × 14 Liter/m²/Jahr = 1.960 Liter/Jahr');
+    expect(calc.workedExample.steps[1]).toContain('1.960 Liter × 1,05 €/Liter = 2.058,00 €/Jahr');
+    expect(calc.workedExample.steps[2]).toContain('2.058,00 € ÷ 12 Monate = 171,50 €/Monat');
+
+    expect(calc.workedExample.result).toContain('2.058,00 €');
+    expect(calc.workedExample.result).toContain('171,50 €/Monat');
+
+    // Tank balance guide accessible near the calculator
+    expect(calc.content?.intro).toContain('/ratgeber/heizoelverbrauch-aus-tankstand-berechnen/');
+  });
 });

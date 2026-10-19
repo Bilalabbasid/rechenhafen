@@ -9,7 +9,7 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     expect(calc.slug).toBe('zucker-ersatz-rechner');
     expect(calc.metaTitle).toBe('Zucker in Erythrit umrechnen: Rechner & Tabelle');
     expect(calc.metaDescription).toBe(
-      'Wie viel Erythrit statt Zucker? Mengen kostenlos umrechnen, Beispiele nachschlagen und Süßkraft mit Xylit vergleichen. Hinweise fürs Backen inklusive.'
+      'Zucker in Erythrit und Erythrit in Zucker umrechnen: kostenloser Rechner mit Tabellen für beide Richtungen und Hinweisen zur Süßkraft.'
     );
     expect(calc.h1).toBe('Zucker in Erythrit umrechnen: Rechner & Tabelle');
   });
@@ -18,6 +18,7 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     const tableCases = [
       { sugar: 50, expectedErythrit: 71 },
       { sugar: 100, expectedErythrit: 143 },
+      { sugar: 120, expectedErythrit: 171 },
       { sugar: 150, expectedErythrit: 214 },
       { sugar: 200, expectedErythrit: 286 },
       { sugar: 250, expectedErythrit: 357 },
@@ -33,13 +34,20 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
       expect(res.primary.value).toBe(expectedErythrit);
       expect(res.primary.formattedValue).toBe(`${expectedErythrit} g`);
     }
+
+    // Verify forward table in content contains 120 g row
+    const forwardSection = calc.content?.sections?.find((s) => s.title.includes('Umrechnungstabelle') && !s.title.includes('Rückrechnung'));
+    expect(forwardSection?.content).toContain('| 120 g | 171 g |');
   });
 
   it('calculates the exact required reverse conversion values for erythrit -> sugar (70% sweetness assumption)', () => {
     const reverseCases = [
       { erythrit: 50, expectedSugar: 35 },
+      { erythrit: 60, expectedSugar: 42 },
       { erythrit: 80, expectedSugar: 56 },
       { erythrit: 100, expectedSugar: 70 },
+      { erythrit: 120, expectedSugar: 84 },
+      { erythrit: 150, expectedSugar: 105 },
     ];
 
     for (const { erythrit, expectedSugar } of reverseCases) {

@@ -134,7 +134,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         defaultValue: 'kwh',
         options: [
           { value: 'kwh', label: 'Modus A: Ich kenne meinen Jahresverbrauch (in kWh)' },
-          { value: 'm3', label: 'Modus B: Ich habe Zählerstände in Kubikmetern (m³)' },
+          { value: 'm3', label: 'Modus B: Gaszählerstände in m³ für ein volles Abrechnungsjahr' },
         ],
       },
       // Modus A
@@ -153,24 +153,24 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       // Modus B
       {
         id: 'meterOld',
-        label: 'Alter Zählerstand in m³ (Beispielwert)',
+        label: 'Alter Zählerstand in m³ (Jahresbeginn)',
         type: 'number',
         defaultValue: 12400,
         min: 0,
         step: 1,
         unit: 'm³',
-        helpText: 'Zählerstand zu Beginn der Periode laut Gaszähler im Keller (anpassbares Beispiel).',
+        helpText: 'Geben Sie zwei Zählerstände ein, die ein vollständiges Jahr abdecken. Der Rechner setzt einen Jahresgrundpreis an. Monats- oder Wochenablesungen sind für diese Jahreskostenberechnung nicht geeignet.',
         dependsOn: { field: 'inputType', value: 'm3' },
       },
       {
         id: 'meterNew',
-        label: 'Neuer Zählerstand in m³ (Beispielwert)',
+        label: 'Neuer Zählerstand in m³ (Jahresende)',
         type: 'number',
         defaultValue: 13800,
         min: 0,
         step: 1,
         unit: 'm³',
-        helpText: 'Aktueller Zählerstand (Differenz = 1.400 m³; anpassbares Beispiel).',
+        helpText: 'Aktueller Zählerstand nach Ablauf des vollen Jahres (Differenz = Jahresverbrauch in m³; Monats- oder Wochenablesungen nicht geeignet).',
         dependsOn: { field: 'inputType', value: 'm3' },
       },
       {
@@ -254,7 +254,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     content: {
-      intro: 'Mit unserem kostenlosen Gaskostenrechner ermitteln Sie Ihre jährlichen Heizkosten und den rechnerischen Monatsdurchschnitt für Erdgas aus Arbeitspreis und Grundpreis transparent und centgenau. Welchen Ausgangswert haben Sie zur Hand? 1. „Ich kenne meinen Verbrauch in kWh“: Tragen Sie einfach den Jahresverbrauch Ihrer letzten Abrechnung ein. 2. „Ich habe nur den Gaszählerstand in m³“: Geben Sie Zählerstände oder m³ ein – mit Brennwert und Zustandszahl Ihrer Gasabrechnung rechnet der Rechner Kubikmeter physikalisch exakt in Kilowattstunden um (andernfalls mit den gängigen Richtwerten). Vertiefende Erklärungen finden Sie in unserem Ratgeber [Gaskosten berechnen: Formel, Gasrechnung & m³-Umrechnung](/ratgeber/gaskosten-berechnen/) sowie im Ratgeber [Gas m³ in kWh umrechnen](/ratgeber/gaszaehler-m3-in-kwh-umrechnen/). Für reine Zähleranalysen steht Ihnen zudem der [Gasverbrauch Rechner (m³ in kWh)](/rechner/gasverbrauch-kwh-m3-rechner/) zur Verfügung.',
+      intro: 'Mit unserem kostenlosen Gaskostenrechner ermitteln Sie Ihre jährlichen Heizkosten und den rechnerischen Monatsdurchschnitt für Erdgas aus Arbeitspreis und Grundpreis transparent und centgenau. Welchen Ausgangswert haben Sie zur Hand? 1. „Ich kenne meinen Verbrauch in kWh“: Tragen Sie einfach den Jahresverbrauch Ihrer letzten Abrechnung ein. 2. „Ich habe nur den Gaszählerstand in m³“: Geben Sie zwei Zählerstände ein, die ein vollständiges Abrechnungsjahr abdecken (Monats- oder Wochenablesungen sind für diese Jahresberechnung nicht geeignet, da der Rechner den vollen Jahresgrundpreis ansetzt). Mit Brennwert und Zustandszahl Ihrer Gasabrechnung rechnet der Rechner Kubikmeter physikalisch exakt in Kilowattstunden um (andernfalls mit den gängigen Richtwerten). Vertiefende Erklärungen finden Sie in unserem Ratgeber [Gaskosten berechnen: Formel, Gasrechnung & m³-Umrechnung](/ratgeber/gaskosten-berechnen/) sowie im Ratgeber [Gas m³ in kWh umrechnen](/ratgeber/gaszaehler-m3-in-kwh-umrechnen/). Für reine Zähleranalysen steht Ihnen zudem der [Gasverbrauch Rechner (m³ in kWh)](/rechner/gasverbrauch-kwh-m3-rechner/) zur Verfügung.',
       sections: [
         {
           title: 'Gaskosten berechnen – so funktioniert es',
@@ -262,7 +262,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         },
         {
           title: 'Gasverbrauch von m³ in kWh umrechnen',
-          content: 'Am heimischen Gaszähler wird nicht in Energieeinheiten, sondern im reinen Gasvolumen gemessen – also in **Kubikmetern (m³)**. Da Gas je nach Temperatur, Höhenlage und Gaszusammensetzung unterschiedlich viel Energie enthält, erfolgt die Abrechnung über die physikalische Formel:\n\n`kWh = m³ × Brennwert (Hs) × Zustandszahl (z)`\n\n- **Brennwert (Hs)**: Gibt an, wie viel thermische Energie in einem Normkubikmeter Gas steckt. Bei L-Gas (niedriger Methangehalt) liegt der Wert typischerweise zwischen 9,5 und 10,5 kWh/m³, bei energiereichem H-Gas zwischen 11,0 und 11,7 kWh/m³.\n- **Zustandszahl (z)**: Berücksichtigt den Einfluss der Ortshöhe über Normalnull und des effektiven Gasdrucks am Zähler auf das Gasvolumen (üblicherweise ca. 0,90 bis 0,96).\n\nAls grobe Faustregel für schnelle Überschläge gilt: **1 m³ Gas entspricht rund 10 kWh Wärmeenergie**.',
+          content: 'Am heimischen Gaszähler wird nicht in Energieeinheiten, sondern im reinen Gasvolumen gemessen – also in **Kubikmetern (m³)**. Da Gas je nach Temperatur, Höhenlage und Gaszusammensetzung unterschiedlich viel Energie enthält, erfolgt die Abrechnung über die physikalische Formel:\n\n`kWh = m³ × Brennwert (Hs) × Zustandszahl (z)`\n\n- **Brennwert (Hs)**: Gibt an, wie viel thermische Energie in einem Normkubikmeter Gas steckt. Bei L-Gas (niedriger Methangehalt) liegt der Wert typischerweise zwischen 9,5 und 10,5 kWh/m³, bei energiereichem H-Gas zwischen 11,0 und 11,7 kWh/m³.\n- **Zustandszahl (z)**: Berücksichtigt den Einfluss der Ortshöhe über Normalnull und des effektiven Gasdrucks am Zähler auf das Gasvolumen (üblicherweise ca. 0,90 bis 0,96).\n\nAls grobe Faustregel für schnelle Überschläge gilt: **1 m³ Gas entspricht rund 10 kWh Wärmeenergie**. Bitte beachten: Dieser Rechner setzt für die Gesamtkosten stets einen vollen Jahresgrundpreis (12 Monate) an. Eingegebene Zählerstände müssen daher ein vollständiges Jahr abdecken – Monatsablesungen sind für diese Jahresberechnung nicht geeignet.',
         },
         {
           title: 'Was kostet 1 m³ Gas?',
@@ -298,6 +298,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Wie rechne ich Kubikmeter Gas (m³) in Kilowattstunden (kWh) um?', answer: 'Multiplizieren Sie die Kubikmeter mit dem Brennwert (ca. 10,2 bis 11,5 kWh/m³) und der Zustandszahl Ihres Netzgebiets (ca. 0,90 bis 0,96): kWh = m³ × Brennwert × Zustandszahl. Beide Werte finden Sie auf Ihrer letzten Gasabrechnung. Als grobe Orientierung entspricht 1 m³ Gas etwa 10 kWh.' },
       { question: 'Welche Rolle spielt der monatliche Grundpreis bei den Gaskosten?', answer: 'Der Grundpreis deckt feste Bereitstellungs-, Mess- und Netzkosten des Versorgers ab. Er fällt auch dann an, wenn im Sommer wenig oder gar kein Gas geheizt wird. In der Jahresrechnung werden 12 Monatsgrundpreise zu den verbrauchten Kilowattstunden addiert.' },
+      { question: 'Kann ich auch Monats- oder Wochenablesungen in den Gaskostenrechner eingeben?', answer: 'Nein, dieser Rechner setzt zwingend zwei Zählerstände voraus, die ein vollständiges Abrechnungsjahr abdecken. Er rechnet immer einen vollen Jahresgrundpreis (12 Monate) ein. Weil rund 70 bis 80 % des Gasverbrauchs in die kalten Wintermonate fallen, würde das einfache Multiplizieren einer Monatsablesung mit 12 zu grob verfälschten Kosten führen. Für reine Zählerdifferenzen ohne Jahreskostenfestlegung nutzen Sie unseren [Gasverbrauch Rechner (m³ in kWh)](/rechner/gasverbrauch-kwh-m3-rechner/).' },
       { question: 'Ist der errechnete Monatsdurchschnitt mein garantierter Versorgerabschlag?', answer: 'Nein. Der rechnerische Monatsdurchschnitt (Jahreskosten ÷ 12) dient Ihnen als Orientierung. Tatsächliche Versorgerabschläge können abweichen, weil manche Anbieter nur 11 Monatsabschläge im Jahr einziehen (der 12. Monat ist die Endabrechnung), Sicherheitszuschläge für kalte Winter erheben oder auf runde Eurobeträge aufrunden.' },
       { question: 'Was kostet Gas pro Monat für eine Wohnung oder ein Haus?', answer: 'Die Kosten hängen vom Verbrauch und Ihrem Tarif ab. Bei einer beispielhaften Modellannahme von 0,11 €/kWh Arbeitspreis und 12 €/Monat Grundpreis (keine Marktpreisgarantie) ergeben sich rechnerisch: ca. 67 €/Monat für eine 50-m²-Wohnung (ca. 6.000 kWh/a), ca. 122 €/Monat für eine 100-m²-Wohnung (ca. 12.000 kWh/a) und ca. 186 €/Monat für ein Einfamilienhaus mit 150 m² (ca. 19.000 kWh/a). Nutzen Sie den Rechner oben für Ihre exakten Vertragswerte.' },
       { question: 'Wie prüfe ich meine Gasabrechnung auf Richtigkeit?', answer: 'Vergleichen Sie den abgerechneten Zählerstand mit Ihrem tatsächlichen Zähler im Keller. Multiplizieren Sie die verbrauchten kWh mit dem im Vertrag vereinbarten Arbeitspreis und addieren Sie 12 Monate Grundgebühr. Teilen Sie das Ergebnis durch 12, um einen rechnerischen Monatsdurchschnitt als Orientierungswert für Ihren Abschlag zu ermitteln.' },

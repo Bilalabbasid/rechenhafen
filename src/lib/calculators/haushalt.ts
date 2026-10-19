@@ -471,7 +471,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
   ];
 
   const basisSummaryItems = [
-    { label: 'Berechnungsmodus', value: inputType === 'm3' ? 'Modus B: Zählerstände in Kubikmetern (m³)' : 'Modus A: Jahresverbrauch in kWh' },
+    { label: 'Berechnungsmodus', value: inputType === 'm3' ? 'Modus B: Gaszählerstände für ein volles Abrechnungsjahr (m³)' : 'Modus A: Jahresverbrauch in kWh' },
   ];
 
   if (inputType === 'm3') {
@@ -495,7 +495,7 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
     { label: 'Thermisches Energievolumen', value: `${formatNumber(totalKwh, 0)} kWh` },
     { label: 'Arbeitspreis', value: `${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh (${formatCurrency(pricePerKwhInEuro, 4)}/kWh)` },
     { label: 'Grundpreis', value: `${formatCurrency(basePricePerMonth)}/Monat (${formatCurrency(annualBaseCost)}/Jahr)` },
-    { label: 'Betrachtungszeitraum', value: '1 Jahr (365 Tage)' }
+    { label: 'Betrachtungszeitraum', value: '1 vollständiges Abrechnungsjahr (12 Monate Grundpreis; keine automatische Hochrechnung von Teilperioden)' }
   );
 
   return {
@@ -515,14 +515,16 @@ export function calculateGasCost(inputs: Record<string, any>): CalculationResult
       ],
       rows: breakdownRows,
     },
-    summaryText: `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Monatsdurchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag).`,
+    summaryText: inputType === 'm3'
+      ? `Aus der Zählerdifferenz von ${formatNumber(volumeM3, 1)} m³ ergeben sich rechnerisch ${formatNumber(totalKwh, 0)} kWh thermischer Gasverbrauch. Bei einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Jahresgrundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)} (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAdvancePayment)}/Monat). Voraussetzung: Die Zählerstände decken ein vollständiges Jahr ab; Monats- oder Wochenablesungen sind für diese Jahreskostenberechnung nicht geeignet.`
+      : `Bei einem Gasverbrauch von ${formatNumber(totalKwh, 0)} kWh und einem Arbeitspreis von ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh belaufen sich die reinen Verbrauchskosten auf ${formatCurrency(workCost)}. Zusammen mit dem Grundpreis von ${formatCurrency(annualBaseCost)} ergeben sich geschätzte Jahresgesamtkosten von ${formatCurrency(totalAnnualCost)}. Das entspricht einem rechnerischen Monatsdurchschnitt von ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat (${formatCurrency(dailyCost)}/Tag).`,
     directAnswer: `Bei ${formatNumber(totalKwh, 0)} kWh Gasverbrauch und ${formatNumber(pricePerKwhInEuro * 100, 2)} ct/kWh Arbeitspreis betragen Ihre jährlichen Gaskosten inklusive ${formatCurrency(annualBaseCost)} Grundpreis geschätzte ${formatCurrency(totalAnnualCost)} (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAdvancePayment)} pro Monat).`,
     qualifications: [
       'Berechnung basiert auf den eingegebenen Bruttopreisen. Gesetzliche Steuern, Umlagen und Mehrwertsteuer sind in diesen Preisen bereits enthalten und werden nicht separat erhoben.',
       'Der rechnerische Monatsdurchschnitt (Jahreskosten ÷ 12) dient als Orientierungswert. Ihr tatsächlicher Versorgerabschlag kann abweichen (z. B. bei 11 Abschlagsmonaten oder saisonalen Anpassungen).',
       inputType === 'm3'
-        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh. Für Ihre Jahresrechnung sind die messtechnischen Werte Ihres Versorgers maßgeblich.`
-        : 'Berechnung basiert direkt auf der thermischen Energiemenge in Kilowattstunden (kWh).',
+        ? `Physikalische Umrechnung nach DVGW-Arbeitsblatt G 685: ${formatNumber(volumeM3, 1)} m³ × Brennwert ${formatNumber(calorificValue, 2)} kWh/m³ × Zustandszahl ${formatNumber(stateFactor, 4)} = ${formatNumber(totalKwh, 0)} kWh. Der Rechner setzt einen Jahresgrundpreis an. Die beiden Zählerstände müssen ein vollständiges Abrechnungsjahr abdecken. Monats- oder Wochenablesungen sind für diese Jahreskostenberechnung nicht geeignet, da der Gasverbrauch im Winter witterungsbedingt um ein Vielfaches höher ist und nicht einfach linear hochgerechnet werden darf.`
+        : 'Berechnung basiert direkt auf der thermischen Jahresenergiemenge in Kilowattstunden (kWh) inklusive 12 Monaten Grundpreis.',
     ],
     calculationSteps: [
       inputType === 'm3'

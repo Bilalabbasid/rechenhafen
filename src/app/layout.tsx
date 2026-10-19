@@ -99,6 +99,11 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
         <meta name="google-adsense-account" content="ca-pub-4789347477675358" />
         <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4789347477675358"
+          crossOrigin="anonymous"
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema).replace(/</g, '\\u003c') }}
         />

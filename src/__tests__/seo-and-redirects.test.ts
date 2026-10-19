@@ -448,21 +448,26 @@ describe('SEO & 301 Redirects Verification', () => {
     }
   });
 
-  it('includes exact Google AdSense ownership verification tag in root layout <head> once and without ad scripts', () => {
+  it('includes exact Google AdSense ownership verification tag and AdSense script in root layout <head>', () => {
     const layoutPath = path.resolve(__dirname, '../app/layout.tsx');
     const layoutContent = fs.readFileSync(layoutPath, 'utf8');
 
     // Exact required meta tag
     expect(layoutContent).toContain('<meta name="google-adsense-account" content="ca-pub-4789347477675358" />');
 
-    // Exactly one instance
+    // Exactly two instances (one meta verification tag, one script tag)
     const matches = layoutContent.match(/ca-pub-4789347477675358/g);
     expect(matches).not.toBeNull();
-    expect(matches?.length).toBe(1);
+    expect(matches?.length).toBe(2);
 
-    // No advertising scripts or Auto ads
-    expect(layoutContent).not.toContain('adsbygoogle');
-    expect(layoutContent).not.toContain('pagead2.googlesyndication.com');
+    // AdSense script in <head>
+    expect(layoutContent).toContain('src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4789347477675358"');
+
+    // CSP allows googlesyndication
+    const configPath = path.resolve(__dirname, '../../next.config.ts');
+    const configContent = fs.readFileSync(configPath, 'utf8');
+    expect(configContent).toContain('https://pagead2.googlesyndication.com');
+    expect(configContent).toContain('https://*.googlesyndication.com');
 
     // If .next build output exists, verify rendered HTML
     const indexPath = path.resolve(__dirname, '../../.next/server/app/index.html');

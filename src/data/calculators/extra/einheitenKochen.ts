@@ -3099,7 +3099,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
     metaTitle: 'Zucker in Erythrit umrechnen: Rechner & Tabelle',
-    metaDescription: 'Wie viel Erythrit statt Zucker? Mengen kostenlos umrechnen, Beispiele nachschlagen und Süßkraft mit Xylit vergleichen. Hinweise fürs Backen inklusive.',
+    metaDescription: 'Zucker in Erythrit und Erythrit in Zucker umrechnen: kostenloser Rechner mit Tabellen für beide Richtungen und Hinweisen zur Süßkraft.',
     h1: 'Zucker in Erythrit umrechnen: Rechner & Tabelle',
     shortDescription: 'Rechnet Haushaltszucker und Erythrit anhand einer 70-%-Süßkraft-Annahme um – inklusive Tabelle und Vergleich mit Xylit.',
     searchKeywords: [
@@ -3363,7 +3363,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         },
         {
           title: 'Zucker in Erythrit: Umrechnungstabelle',
-          content: '| Zucker (Haushaltszucker) | Erythrit (ca. 70 % Süßkraft) |\n| --- | --- |\n| 50 g | 71 g |\n| 100 g | 143 g |\n| 150 g | 214 g |\n| 200 g | 286 g |\n| 250 g | 357 g |\n\nGerundete Richtwerte bei angenommener Süßkraft von 70 %.',
+          content: '| Zucker (Haushaltszucker) | Erythrit (ca. 70 % Süßkraft) |\n| --- | --- |\n| 50 g | 71 g |\n| 100 g | 143 g |\n| 120 g | 171 g |\n| 150 g | 214 g |\n| 200 g | 286 g |\n| 250 g | 357 g |\n\nGerundete Richtwerte bei angenommener Süßkraft von 70 %.',
         },
         {
           title: 'Wie viel Zucker entspricht Erythrit? (Rückrechnung & Tabelle)',

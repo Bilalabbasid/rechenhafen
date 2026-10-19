@@ -2772,12 +2772,17 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     formulaExplanation: 'Ein Liter leichtes Heizöl (EL) besitzt einen Brennstoff-Energiegehalt (Heizwert Hi) von etwa 10 Kilowattstunden (kWh); der Brennwert Hs inklusive Kondensationswärme liegt bei ca. 10,6 kWh/l. Die Faktoren von 8, 14 und 22 Litern je m² und Jahr sind vereinfachte Modellannahmen zur Orientierung für den Brennstoffbedarf (ohne Kesselwirkungsgrad- und Leitungsverluste).',
     workedExample: {
       title: 'Beispiel: 140 m² Wohnfläche bei 14 Liter/m²a und 1,05 €/Liter',
+      description: 'Bei 140 m² beheizter Wohnfläche und einem angenommenen Verbrauch von 14 Litern je m² und Jahr ergeben sich 1.960 Liter Heizöl. Mit einem beispielhaften Preis von 1,05 €/Liter sind das 2.058,00 € pro Jahr beziehungsweise 171,50 € im rechnerischen Monatsdurchschnitt. Der Verbrauch ist eine Modellschätzung; der Preis ist kein aktueller Marktpreis.',
       inputValues: [{ label: 'Wohnfläche', value: '140 m²' }, { label: 'Bedarf/m²', value: '14 Liter' }, { label: 'Ölpreis', value: '1,05 €/l' }],
-      steps: ['Verbrauch = 140 m² × 14 l = 1.960 Liter', 'Kosten = 1.960 l × 1,05 € = 2.058,00 € pro Jahr'],
-      result: '2.058,00 € jährliche Heizölkosten',
+      steps: [
+        '140 m² × 14 Liter/m²/Jahr = 1.960 Liter/Jahr',
+        '1.960 Liter × 1,05 €/Liter = 2.058,00 €/Jahr',
+        '2.058,00 € ÷ 12 Monate = 171,50 €/Monat',
+      ],
+      result: '2.058,00 € jährliche Heizölkosten (ca. 171,50 €/Monat)',
     },
     content: {
-      intro: 'Dieser Rechner schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand der Wohnfläche und modellhafter Verbrauchswerte für verschiedene Dämmzustände.',
+      intro: 'Dieser Rechner schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand der Wohnfläche und modellhafter Verbrauchswerte für verschiedene Dämmzustände. Wenn Sie bereits konkrete Tankfüllstände und Lieferbelege vorliegen haben, nutzen Sie für die exakte Mengenbilanz unseren Ratgeber [Heizölverbrauch berechnen: Tankstände statt Liefermenge](/ratgeber/heizoelverbrauch-aus-tankstand-berechnen/).',
       sections: [
         {
           title: 'Wie wird der Heizölverbrauch geschätzt?',
