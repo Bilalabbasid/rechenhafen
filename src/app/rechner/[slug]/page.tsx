@@ -229,10 +229,10 @@ export default async function CalculatorPage({ params }: PageProps) {
       />
 
       {/* Worked Example(s) */}
-      {calc.workedExamples && calc.workedExamples.length > 0 ? (
-        calc.workedExamples.map((ex, idx) => (
+      {(() => {
+        const renderExampleCard = (ex: any, idx?: number) => (
           <section
-            key={idx}
+            key={idx ?? 0}
             style={{
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
@@ -243,82 +243,93 @@ export default async function CalculatorPage({ params }: PageProps) {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-2)' }}>
-              <Info size={18} style={{ color: 'var(--color-primary)' }} />
+              <Info size={18} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
               <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
                 {ex.title}
               </h2>
             </div>
+
+            {/* Eingabewerte / Basis */}
+            {Array.isArray(ex.inputValues) && ex.inputValues.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', margin: 'var(--space-2) 0 var(--space-3)' }}>
+                {ex.inputValues.map((iv: any, iIdx: number) => (
+                  <span
+                    key={iIdx}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px',
+                      background: 'var(--color-surface-hover, rgba(0,0,0,0.04))',
+                      border: '1px solid var(--color-border)',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.85rem',
+                      color: 'var(--color-text-secondary)',
+                    }}
+                  >
+                    <strong style={{ color: 'var(--color-text-primary)' }}>{iv.label}:</strong> {iv.value}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Beschreibung / Szenario */}
             {ex.description ? (
               <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
                 {renderInlineMarkdown(ex.description)}
               </p>
             ) : null}
+
+            {/* Rechenweg & Zubereitungsschritte */}
             {Array.isArray(ex.steps) && ex.steps.length > 0 && (
-              <ul style={{ margin: '0 0 var(--space-3)', paddingLeft: '1.25rem', fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
-                {ex.steps.map((step: any, sIdx: number) => (
-                  <li key={sIdx}>{typeof step === 'string' ? renderInlineMarkdown(step) : String(step)}</li>
-                ))}
-              </ul>
+              <div style={{ margin: '0 0 var(--space-3)' }}>
+                <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                  Rechenweg & Einzelschritte:
+                </strong>
+                <ol style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
+                  {ex.steps.map((step: any, sIdx: number) => (
+                    <li key={sIdx} style={{ marginBottom: '4px' }}>
+                      {typeof step === 'string' ? renderInlineMarkdown(step) : String(step)}
+                    </li>
+                  ))}
+                </ol>
+              </div>
             )}
-            <div
-              style={{
-                display: 'inline-block',
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--color-primary-light)',
-                color: 'var(--color-primary)',
-                fontWeight: 600,
-                fontSize: '0.9rem',
-              }}
-            >
-              Ergebnis: {ex.resultSummary || ex.result}
-            </div>
+
+            {/* Ergebnis */}
+            {(ex.resultSummary || ex.result) && (
+              <div
+                style={{
+                  display: 'inline-block',
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--color-primary-light)',
+                  color: 'var(--color-primary)',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                }}
+              >
+                Ergebnis: {ex.resultSummary || ex.result}
+              </div>
+            )}
+
+            {/* Annahmen / Hinweise */}
+            {(ex.assumptions || ex.notes) && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)', fontStyle: 'italic', marginBottom: 0 }}>
+                Annahme: {ex.assumptions || ex.notes}
+              </p>
+            )}
           </section>
-        ))
-      ) : calc.workedExample ? (
-        <section
-          style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: 'clamp(var(--space-4), 4vw, var(--space-6))',
-            margin: 'var(--space-8) 0',
-            overflowWrap: 'break-word',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 'var(--space-2)' }}>
-            <Info size={18} style={{ color: 'var(--color-primary)' }} />
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-              {calc.workedExample.title}
-            </h2>
-          </div>
-          {calc.workedExample.description ? (
-            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)', margin: '0 0 var(--space-3)' }}>
-              {renderInlineMarkdown(calc.workedExample.description)}
-            </p>
-          ) : null}
-          {Array.isArray(calc.workedExample.steps) && calc.workedExample.steps.length > 0 && (
-            <ul style={{ margin: '0 0 var(--space-3)', paddingLeft: '1.25rem', fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-secondary)' }}>
-              {calc.workedExample.steps.map((step: any, sIdx: number) => (
-                <li key={sIdx}>{typeof step === 'string' ? renderInlineMarkdown(step) : String(step)}</li>
-              ))}
-            </ul>
-          )}
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--color-primary-light)',
-              color: 'var(--color-primary)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-            }}
-          >
-            Ergebnis: {calc.workedExample.resultSummary || calc.workedExample.result}
-          </div>
-        </section>
-      ) : null}
+        );
+
+        if (calc.workedExamples && calc.workedExamples.length > 0) {
+          return calc.workedExamples.map((ex, idx) => renderExampleCard(ex, idx));
+        }
+        if (calc.workedExample) {
+          return renderExampleCard(calc.workedExample);
+        }
+        return null;
+      })()}
 
       {/* In-Content Werbefläche mit fest reserviertem Platz (Zero CLS) */}
       <AdSlot format="in-content" slotId="calc-incontent" />

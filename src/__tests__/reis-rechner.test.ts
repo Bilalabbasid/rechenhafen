@@ -95,5 +95,28 @@ describe('Reis-Wasser-Rechner (wasser-reis-verhaeltnis-rechner)', () => {
       const saltSec = res?.secondary?.find((s) => s.id === 'saltGuidance');
       expect(saltSec?.formattedValue).toContain('optional');
     });
+
+    it('scales salt grams and teaspoon equivalents dynamically at 1,000 g rice', () => {
+      // Confirmed live defect: at 1000g rice, salt was 15g but text was hardcoded to "1/2 gestr. TL"
+      const res = riceCalc?.calculate({ riceGrams: 1000, riceType: 'basmati' });
+      const saltSec = res?.secondary?.find((s) => s.id === 'saltGuidance');
+      expect(saltSec?.value).toBe(15);
+      expect(saltSec?.formattedValue).toContain('15 g');
+      expect(saltSec?.formattedValue).toContain('3 gestr. TL'); // 15g / 5g = 3.0 gestr. TL
+      expect(saltSec?.formattedValue).not.toContain('1/2 gestr. TL');
+    });
+
+    it('handles already salted risotto broth appropriately', () => {
+      const res = riceCalc?.calculate({ riceGrams: 300, riceType: 'risotto' });
+      const saltSec = res?.secondary?.find((s) => s.id === 'saltGuidance');
+      expect(saltSec?.formattedValue).toContain('Brühe');
+      expect(saltSec?.formattedValue).toContain('gesalzen');
+    });
+
+    it('handles small rice quantities without artificially claiming a full serving', () => {
+      const res = riceCalc?.calculate({ riceGrams: 30, riceType: 'basmati' });
+      const portionSec = res?.secondary?.find((s) => s.id === 'portions');
+      expect(portionSec?.formattedValue).toContain('0,5 Portionen');
+    });
   });
 });

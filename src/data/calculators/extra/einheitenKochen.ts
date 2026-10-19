@@ -4274,13 +4274,30 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       
       const waterMl = Math.round(riceG * waterRatio);
       const cookedWeightG = Math.round(riceG * yieldFactor);
-      const portionsAsSide = Math.max(1, Math.round(riceG / 65));
-      const portionsAsMain = Math.max(1, Math.round(riceG / 115));
       
-      // Salt guidance: optional recommendation
-      const saltGuidance = type === 'risotto'
-        ? 'Brühe ist in der Regel bereits gesalzen; bei Bedarf am Ende abschmecken.'
-        : 'ca. ' + formatNumber(Math.round((riceG / 100) * 1.5), 0) + ' g (ca. 1/2 gestr. TL, optional nach persönlichem Geschmack)';
+      // Portions: do not describe tiny rice quantities (< 45 g) as full 1 portion
+      let portionsFormatted = '';
+      if (riceG < 45) {
+        const fracSide = Number((riceG / 65).toFixed(1));
+        const fracMain = Number((riceG / 115).toFixed(1));
+        portionsFormatted = `ca. ${formatNumber(fracSide, 1)} Portionen (Beilage: ca. 65 g p.P.) / ca. ${formatNumber(fracMain, 1)} Portionen (Hauptgericht: ca. 115 g p.P.)`;
+      } else {
+        const portionsAsSide = Math.round(riceG / 65);
+        const portionsAsMain = Math.max(1, Math.round(riceG / 115));
+        portionsFormatted = `ca. ${portionsAsSide} Portion(en) (Beilage, Basis 65 g p.P.) / ca. ${portionsAsMain} Portion(en) (Hauptgericht, Basis 115 g p.P.)`;
+      }
+      
+      // Salt guidance: scale grams and teaspoons dynamically (assumption: 1 level teaspoon table salt ≈ 5 g)
+      const saltGrams = Math.round((riceG / 100) * 1.5 * 10) / 10;
+      const tspEquiv = Number((saltGrams / 5).toFixed(1));
+      let saltGuidance = '';
+      if (type === 'risotto') {
+        saltGuidance = 'Brühe ist in der Regel bereits gewürzt und gesalzen; bei Bedarf erst nach dem Garen abschmecken.';
+      } else if (saltGrams < 2.5) {
+        saltGuidance = `ca. ${formatNumber(saltGrams, 1)} g (ca. 1 Prise bis 1/2 gestr. TL; Annahme: ca. 5 g je gestr. TL, optional)`;
+      } else {
+        saltGuidance = `ca. ${formatNumber(saltGrams, 0)} g (ca. ${formatNumber(tspEquiv, 1)} gestr. TL; Annahme: ca. 5 g je gestr. TL, optional nach Geschmack)`;
+      }
 
       const liquidFormatted = waterMl + ' ml ' + liquidLabel;
 
@@ -4303,18 +4320,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'cookedYield',
             label: 'Ergibt gekochten Reis',
             value: cookedWeightG,
-            formattedValue: 'ca. ' + formatNumber(cookedWeightG, 0) + ' g'
+            formattedValue: 'ca. ' + formatNumber(cookedWeightG, 0) + ' g (Richtwert)'
           },
           {
             id: 'portions',
             label: 'Portionen',
-            value: portionsAsSide,
-            formattedValue: 'ca. ' + portionsAsSide + ' Portionen (Beilage) / ' + portionsAsMain + ' Portionen (Hauptgericht)'
+            value: Math.max(1, Math.round(riceG / 65)),
+            formattedValue: portionsFormatted
           },
           {
             id: 'saltGuidance',
             label: 'Salz-Empfehlung (optional)',
-            value: 0,
+            value: saltGrams,
             formattedValue: saltGuidance
           }
         ],
@@ -4322,6 +4339,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         summaryText: 'Für ' + riceG + ' g Reis (' + (type === 'risotto' ? 'Risotto-Methode' : 'Quellmethode 1 : ' + waterRatio.toFixed(1).replace('.', ',')) + ') benötigen Sie ' + liquidFormatted + '. Nach dem Garen erhalten Sie ca. ' + formatNumber(cookedWeightG, 0) + ' g fertigen Reis.',
         qualifications: [
           methodNote,
+          'Wasseraufnahme: Die Quellmethode basiert auf dem Gewichtsverhältnis (Gramm Reis zu Milliliter Wasser; 1 g Wasser = 1 ml). Beim Abmessen mit Tassen beachten, dass 1 Tasse Reis ca. 180–200 g wiegt, 1 Tasse Wasser jedoch ca. 240 ml.',
+          'Ausbeute & Verdampfung: Die Fertigmenge ist ein Schätzwert bei vollständiger Flüssigkeitsaufnahme abzüglich geringer Verdampfung.',
           'Hinweis: Packungsangaben des Herstellers haben Vorrang, da Feuchtigkeitsgehalt und Korngröße je nach Ernte und Marke leicht variieren.'
         ]
       };
@@ -4330,6 +4349,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     formulaExplanation: "Bei der Quellmethode gart der Reis in einem fest verschlossenen Topf. Da kaum Dampf entweicht, nimmt das Reiskorn die berechnete Wassermenge vollständig auf. Risotto hingegen verdunstet im offenen Topf mehr Flüssigkeit und benötigt daher ca. das Dreifache an Brühe.",
     workedExample: {
       title: "Beispiel: 200 g Basmatireis mit der Quellmethode kochen",
+      description: "Klassische Zubereitung von 200 g Basmatireis nach der aromaschonenden Quellmethode im geschlossenen Topf auf dem Herd.",
       inputValues: [
         { label: "Reismenge", value: "200 g Basmati" },
         { label: "Wasser-Reis-Verhältnis", value: "1 : 1,5" }
@@ -4337,7 +4357,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       steps: [
         "Wassermenge berechnen: 200 g × 1,5 = 300 ml Wasser",
         "Reis in kaltem Wasser gründlich waschen, bis das Wasser klar bleibt",
-        "Reis mit 300 ml Wasser und einer Prise Salz aufkochen",
+        "Reis mit 300 ml Wasser und ca. 3 g Salz (ca. 1/2 gestr. TL) aufkochen",
         "Deckel schließen, Hitze auf kleinste Stufe reduzieren und 12–15 Minuten sanft quellen lassen",
         "Nach dem Garen kurz mit einer Gabel auflockern"
       ],
@@ -4518,6 +4538,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     calculate: (inputs: Record<string, any>) => {
       const mode = inputs.mode || 'portion_plan';
       const factorPreset = inputs.factorPreset || 'aldente';
+      const isFresh = factorPreset === 'fresh';
 
       // Resolve and strictly validate conversion factor
       let factor = 2.3;
@@ -4526,10 +4547,16 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       } else if (factorPreset === 'fresh') {
         factor = 1.5;
       } else if (factorPreset === 'custom') {
-        const parsedFactor = parseFloat(String(inputs.customFactor).replace(',', '.'));
-        if (isNaN(parsedFactor) || parsedFactor <= 0) {
+        if (inputs.customFactor === undefined || inputs.customFactor === null || String(inputs.customFactor).trim() === '') {
           return {
-            primary: { id: 'dryPasta', label: 'Ergebnis', value: 0, formattedValue: '-' },
+            primary: { id: 'pastaResult', label: 'Ergebnis', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie einen individuellen Quellfaktor ein (z. B. 2,3).'
+          };
+        }
+        const parsedFactor = parseFloat(String(inputs.customFactor).replace(',', '.'));
+        if (!Number.isFinite(parsedFactor) || parsedFactor <= 0) {
+          return {
+            primary: { id: 'pastaResult', label: 'Ergebnis', value: 0, formattedValue: '–' },
             error: 'Bitte geben Sie einen positiven Quellfaktor größer als 0 ein (z. B. 2,3).'
           };
         }
@@ -4537,57 +4564,75 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
 
       const factorLabel = 'Faktor ' + factor.toFixed(1).replace('.', ',');
+      const rawTerm = isFresh ? 'frische Pasta (ungekocht)' : 'Trockennudeln';
+      const rawTitle = isFresh ? 'Frische Pasta (ungekocht)' : 'Trockennudeln';
 
       if (mode === 'portion_plan') {
-        const persons = parseInt(String(inputs.personsCount), 10);
-        if (isNaN(persons) || persons <= 0) {
+        if (inputs.personsCount === undefined || inputs.personsCount === null || String(inputs.personsCount).trim() === '') {
           return {
-            primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: 0, formattedValue: '-' },
+            primary: { id: 'rawPasta', label: `Benötigte ${rawTitle}`, value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die Anzahl der Personen ein.'
+          };
+        }
+        const parsedPersons = parseInt(String(inputs.personsCount), 10);
+        if (isNaN(parsedPersons) || parsedPersons <= 0) {
+          return {
+            primary: { id: 'rawPasta', label: `Benötigte ${rawTitle}`, value: 0, formattedValue: '–' },
             error: 'Bitte geben Sie eine Personenzahl von mindestens 1 ein.'
           };
         }
+        const persons = parsedPersons;
 
         const meal = inputs.mealType || 'mainDish';
-        let dryPerPersonG = 110;
-        let mealLabel = 'Hauptgericht (110 g p.P.)';
+        // Distinct portion models:
+        // Dry pasta (factor ~2.3): 110 g dry yields ~253 g cooked
+        // Fresh pasta (factor 1.5): 150 g fresh yields ~225 g cooked (fresh pasta contains 25–30% native moisture)
+        let rawPerPersonG = isFresh ? 150 : 110;
+        let mealLabel = isFresh ? 'Hauptgericht (150 g frische Pasta p.P.)' : 'Hauptgericht (110 g Trockenpasta p.P.)';
 
         if (meal === 'bigHunger') {
-          dryPerPersonG = 150;
-          mealLabel = 'Großer Hunger (150 g p.P.)';
+          rawPerPersonG = isFresh ? 200 : 150;
+          mealLabel = isFresh ? 'Großer Hunger (200 g frische Pasta p.P.)' : 'Großer Hunger (150 g Trockenpasta p.P.)';
         } else if (meal === 'sideDish') {
-          dryPerPersonG = 70;
-          mealLabel = 'Beilage (70 g p.P.)';
+          rawPerPersonG = isFresh ? 100 : 70;
+          mealLabel = isFresh ? 'Beilage (100 g frische Pasta p.P.)' : 'Beilage (70 g Trockenpasta p.P.)';
         } else if (meal === 'kids') {
-          dryPerPersonG = 55;
-          mealLabel = 'Kinderportion (55 g p.P.)';
+          rawPerPersonG = isFresh ? 80 : 55;
+          mealLabel = isFresh ? 'Kinderportion (80 g frische Pasta p.P.)' : 'Kinderportion (55 g Trockenpasta p.P.)';
         } else if (meal === 'custom') {
-          const customG = parseFloat(String(inputs.customGramsPerPerson).replace(',', '.'));
-          if (isNaN(customG) || customG <= 0) {
+          if (inputs.customGramsPerPerson === undefined || inputs.customGramsPerPerson === null || String(inputs.customGramsPerPerson).trim() === '') {
             return {
-              primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: 0, formattedValue: '-' },
+              primary: { id: 'rawPasta', label: `Benötigte ${rawTitle}`, value: 0, formattedValue: '–' },
+              error: 'Bitte geben Sie eine Grammangabe pro Person ein.'
+            };
+          }
+          const customG = parseFloat(String(inputs.customGramsPerPerson).replace(',', '.'));
+          if (!Number.isFinite(customG) || customG <= 0) {
+            return {
+              primary: { id: 'rawPasta', label: `Benötigte ${rawTitle}`, value: 0, formattedValue: '–' },
               error: 'Bitte geben Sie eine gültige Grammangabe pro Person ein.'
             };
           }
-          dryPerPersonG = customG;
+          rawPerPersonG = customG;
           mealLabel = 'Individuell (' + customG + ' g p.P.)';
         }
 
-        const totalDryG = Math.round(persons * dryPerPersonG);
-        const totalCookedG = Math.round(totalDryG * factor);
+        const totalRawG = Math.round(persons * rawPerPersonG);
+        const totalCookedG = Math.round(totalRawG * factor);
         
-        // Exact water calculation: 1 liter per 100 g dry pasta
-        const waterLiters = Number(((totalDryG / 100) * 1.0).toFixed(1));
+        // Water guidance: 1 liter per 100 g raw pasta
+        const waterLiters = Number(((totalRawG / 100) * 1.0).toFixed(1));
         const saltG = Math.round(waterLiters * 10);
         const recommendedPotLiters = Math.max(2, Math.ceil(waterLiters * 1.25));
 
-        const packages500g = totalDryG >= 500 ? ' (ca. ' + formatNumber(totalDryG / 500, 1) + ' Packungen à 500 g)' : '';
+        const packages500g = (!isFresh && totalRawG >= 500) ? ' (ca. ' + formatNumber(totalRawG / 500, 1) + ' Packungen à 500 g)' : '';
 
         return {
           primary: {
-            id: 'dryPasta',
-            label: 'Benötigte Trockennudeln',
-            value: totalDryG,
-            formattedValue: totalDryG + ' g' + packages500g,
+            id: 'rawPasta',
+            label: isFresh ? 'Benötigte frische Pasta (ungekocht)' : 'Benötigte Trockennudeln',
+            value: totalRawG,
+            formattedValue: totalRawG + ' g' + (isFresh ? ' frische Pasta' : packages500g),
             highlight: true
           },
           secondary: [
@@ -4599,15 +4644,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             },
             {
               id: 'waterReq',
-              label: 'Kochwasser (1 l je 100 g)',
+              label: 'Kochwasser (Empfehlung: ca. 1 l je 100 g)',
               value: waterLiters,
               formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
             },
             {
               id: 'saltReq',
-              label: 'Salzmenge für Kochwasser',
+              label: 'Salzmenge für Kochwasser (Empfehlung)',
               value: saltG,
-              formattedValue: saltG + ' g Salz (10 g je Liter)'
+              formattedValue: saltG + ' g Salz (ca. 10 g je Liter)'
             },
             {
               id: 'appliedFactor',
@@ -4616,28 +4661,36 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               formattedValue: factorLabel
             }
           ],
-          directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalDryG + ' g Trockennudeln, was ca. ' + formatNumber(totalCookedG, 0) + ' g gekochter Pasta entspricht.',
-          summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalDryG + ' g trockene Nudeln (' + dryPerPersonG + ' g p.P.). Beim Kochen saugen sie Wasser auf und ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g fertige Pasta.',
+          directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalRawG + ' g ' + rawTerm + ', was bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertiger Pasta entspricht.',
+          summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalRawG + ' g ' + rawTerm + ' (' + rawPerPersonG + ' g p.P.). Beim Kochen saugt die Pasta Wasser auf und ergibt bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln.',
           qualifications: [
-            'Empfohlene Topfgröße: Mindestens ' + recommendedPotLiters + ' Liter Topfvolumen, damit 4,4 l Kochwasser nicht überkochen.',
-            factorPreset === 'fresh'
-              ? 'Frische Eierteig-Pasta enthält bereits Eigenfeuchtigkeit und quillt mit Faktor 1,5 deutlich weniger als getrocknete Hartweizenpasta.'
-              : 'Klassische getrocknete Hartweizenpasta al dente quillt mit Faktor 2,3 (aus 100 g werden ca. 230 g).'
+            'Empfohlene Topfgröße: Mindestens ' + recommendedPotLiters + ' Liter Topfvolumen, damit das Kochwasser nach dem Hineingeben der Pasta ausreichend Raum hat.',
+            isFresh
+              ? 'Frische Eierteig-Pasta aus dem Kühlregal enthält bereits ca. 25–30 % Eigenfeuchtigkeit und quillt mit Faktor 1,5 deutlich weniger als Hartweizen-Trockennudeln. Daher wird für die gleiche gekochte Portion ein höheres Rohgewicht benötigt (ca. 150 g p.P. für ein Hauptgericht).'
+              : 'Klassische getrocknete Hartweizenpasta al dente quillt mit Faktor 2,3 (aus 100 g werden ca. 230 g gekochte Pasta).',
+            'Kochwasser und Salz sind praktische Zubereitungsempfehlungen (10-100-1000-Regel) und stellen keine Mindestverzehrmengen dar.'
           ]
         };
       } else if (mode === 'dry_to_cooked') {
-        const dryG = parseFloat(String(inputs.dryGrams).replace(',', '.'));
-        if (isNaN(dryG) || dryG <= 0) {
+        if (inputs.dryGrams === undefined || inputs.dryGrams === null || String(inputs.dryGrams).trim() === '') {
           return {
-            primary: { id: 'cookedPasta', label: 'Gekochtes Nudelgewicht', value: 0, formattedValue: '-' },
-            error: 'Bitte geben Sie ein Trockengewicht größer als 0 Gramm ein.'
+            primary: { id: 'cookedPasta', label: 'Gekochtes Nudelgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie das ungekochte Nudelgewicht in Gramm ein.'
+          };
+        }
+        const rawG = parseFloat(String(inputs.dryGrams).replace(',', '.'));
+        if (!Number.isFinite(rawG) || rawG <= 0) {
+          return {
+            primary: { id: 'cookedPasta', label: 'Gekochtes Nudelgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie ein ungekochtes Gewicht größer als 0 Gramm ein.'
           };
         }
 
-        const totalCookedG = Math.round(dryG * factor);
-        const waterLiters = Number(((dryG / 100) * 1.0).toFixed(1));
+        const totalCookedG = Math.round(rawG * factor);
+        const waterLiters = Number(((rawG / 100) * 1.0).toFixed(1));
         const saltG = Math.round(waterLiters * 10);
-        const portions = Math.max(1, Math.round(dryG / 100));
+        const portionRef = isFresh ? 150 : 100;
+        const portions = Math.max(1, Math.round(rawG / portionRef));
 
         return {
           primary: {
@@ -4650,27 +4703,27 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           secondary: [
             {
               id: 'dryPasta',
-              label: 'Ausgangsgewicht trocken',
-              value: dryG,
-              formattedValue: dryG + ' g Trockennudeln'
+              label: `Ausgangsgewicht (${rawTitle})`,
+              value: rawG,
+              formattedValue: rawG + ' g ' + (isFresh ? 'frische Pasta' : 'Trockennudeln')
             },
             {
               id: 'estimatedPortions',
               label: 'Entspricht ca.',
               value: portions,
-              formattedValue: 'ca. ' + portions + ' Hauptgericht-Portionen (à 100 g trocken)'
+              formattedValue: `ca. ${portions} Hauptgericht-Portionen (à ${portionRef} g ${isFresh ? 'frisch' : 'trocken'})`
             },
             {
               id: 'waterReq',
-              label: 'Kochwasser (1 l je 100 g)',
+              label: 'Kochwasser (Empfehlung: ca. 1 l je 100 g)',
               value: waterLiters,
               formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
             },
             {
               id: 'saltReq',
-              label: 'Salzmenge für Kochwasser',
+              label: 'Salzmenge für Kochwasser (Empfehlung)',
               value: saltG,
-              formattedValue: saltG + ' g Salz (10 g je Liter)'
+              formattedValue: saltG + ' g Salz (ca. 10 g je Liter)'
             },
             {
               id: 'appliedFactor',
@@ -4679,39 +4732,47 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               formattedValue: factorLabel
             }
           ],
-          directAnswer: dryG + ' g Trockennudeln ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
-          summaryText: dryG + ' g ungekochte Pasta ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln. Benötigt werden ' + formatNumber(waterLiters, 1) + ' l Wasser und ' + saltG + ' g Salz.',
+          directAnswer: rawG + ' g ' + rawTerm + ' ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
+          summaryText: rawG + ' g ' + rawTerm + ' ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln. Empfohlen werden ca. ' + formatNumber(waterLiters, 1) + ' l Kochwasser und ' + saltG + ' g Salz.',
           qualifications: [
-            'Wasseraufnahme variiert je nach Nudelform und Kochzeit: Al-dente-Biss ergibt ca. Faktor 2,2 bis 2,3; weicher gekochte Nudeln bis zu 2,5.'
+            'Wasseraufnahme variiert je nach Nudelform und Kochzeit: Al-dente-Biss ergibt ca. Faktor 2,2 bis 2,3; weicher gekochte Nudeln bis zu 2,5. Frische Pasta nimmt durch Eigenfeuchte nur ca. Faktor 1,5 auf.',
+            'Herstellerhinweise auf der Verpackung haben Vorrang vor rechnerischen Richtwerten.'
           ]
         };
       } else {
         // mode === 'cooked_to_dry'
-        const cookedG = parseFloat(String(inputs.cookedGrams).replace(',', '.'));
-        if (isNaN(cookedG) || cookedG <= 0) {
+        if (inputs.cookedGrams === undefined || inputs.cookedGrams === null || String(inputs.cookedGrams).trim() === '') {
           return {
-            primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: 0, formattedValue: '-' },
+            primary: { id: 'rawPasta', label: isFresh ? 'Benötigte frische Pasta (ungekocht)' : 'Benötigte Trockennudeln', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die gekochte Wunschmenge in Gramm ein.'
+          };
+        }
+        const cookedG = parseFloat(String(inputs.cookedGrams).replace(',', '.'));
+        if (!Number.isFinite(cookedG) || cookedG <= 0) {
+          return {
+            primary: { id: 'rawPasta', label: isFresh ? 'Benötigte frische Pasta (ungekocht)' : 'Benötigte Trockennudeln', value: 0, formattedValue: '–' },
             error: 'Bitte geben Sie eine gekochte Wunschmenge größer als 0 Gramm ein.'
           };
         }
 
-        const totalDryG = Math.round(cookedG / factor);
-        const waterLiters = Number(((totalDryG / 100) * 1.0).toFixed(1));
+        const totalRawG = Math.round(cookedG / factor);
+        const waterLiters = Number(((totalRawG / 100) * 1.0).toFixed(1));
         const saltG = Math.round(waterLiters * 10);
-        const portions = Math.max(1, Math.round(totalDryG / 100));
+        const portionRef = isFresh ? 150 : 100;
+        const portions = Math.max(1, Math.round(totalRawG / portionRef));
 
         return {
           primary: {
-            id: 'dryPasta',
-            label: 'Einzuwiegende Trockennudeln',
-            value: totalDryG,
-            formattedValue: totalDryG + ' g trocken',
+            id: 'rawPasta',
+            label: isFresh ? 'Benötigte frische Pasta (ungekocht)' : 'Benötigte Trockennudeln',
+            value: totalRawG,
+            formattedValue: totalRawG + ' g ' + (isFresh ? 'frisch (ungekocht)' : 'trocken'),
             highlight: true
           },
           secondary: [
             {
               id: 'cookedPasta',
-              label: 'Gewünschte Fertigmenge',
+              label: 'Gewünschte Fertigmenge (gekocht)',
               value: cookedG,
               formattedValue: formatNumber(cookedG, 0) + ' g gekocht'
             },
@@ -4719,17 +4780,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'estimatedPortions',
               label: 'Entspricht ca.',
               value: portions,
-              formattedValue: 'ca. ' + portions + ' Hauptgericht-Portionen'
+              formattedValue: `ca. ${portions} Hauptgericht-Portionen (à ${portionRef} g ${isFresh ? 'frisch' : 'trocken'})`
             },
             {
               id: 'waterReq',
-              label: 'Kochwasser (1 l je 100 g)',
+              label: 'Kochwasser (Empfehlung: ca. 1 l je 100 g)',
               value: waterLiters,
               formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
             },
             {
               id: 'saltReq',
-              label: 'Salzmenge für Kochwasser',
+              label: 'Salzmenge für Kochwasser (Empfehlung)',
               value: saltG,
               formattedValue: saltG + ' g Salz'
             },
@@ -4740,10 +4801,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               formattedValue: factorLabel
             }
           ],
-          directAnswer: 'Für ' + formatNumber(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalDryG + ' g trockene Nudeln ab (bei ' + factorLabel + ').',
-          summaryText: 'Um ca. ' + formatNumber(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalDryG + ' g trockene Nudeln ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
+          directAnswer: 'Für ' + formatNumber(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalRawG + ' g ' + rawTerm + ' ab (bei ' + factorLabel + ').',
+          summaryText: 'Um ca. ' + formatNumber(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalRawG + ' g ' + rawTerm + ' ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
           qualifications: [
-            'Rückrechnung: Trockengewicht = Gekochtes Gewicht ÷ Quellfaktor (' + factor.toFixed(1).replace('.', ',') + ').'
+            `Rückrechnung: Rohgewicht = Gekochtes Gewicht ÷ Quellfaktor (${factor.toFixed(1).replace('.', ',')}).`,
+            'Der Quellfaktor ist ein Richtwert; Garzeit und Teigbeschaffenheit beeinflussen die tatsächliche Ausbeute.'
           ]
         };
       }
@@ -4752,6 +4814,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     formulaExplanation: "Getrocknete Hartweizen-Pasta quillt beim Kochen durch Stärkeverkleisterung und Wasseraufnahme auf etwa das 2,2- bis 2,5-fache ihres Trockengewichts an (Standardwert al dente: 2,3). Frische Pasta aus dem Kühlregal enthält bereits 25–30 % Feuchtigkeit und nimmt daher nur ca. 50 % Wasser auf (Faktor ca. 1,5).",
     workedExample: {
       title: "Beispiel: 4 Personen Hauptgericht mit Hartweizenspaghetti al dente",
+      description: "Portionsplanung für 4 Erwachsene als Hauptgericht mit getrockneten Hartweizenspaghetti bei Quellfaktor 2,3 (al dente) inklusive Kochwasser- und Salzempfehlung nach der 10-100-1000-Regel.",
       inputValues: [
         { label: "Personen", value: "4 Erwachsene" },
         { label: "Mahlzeit", value: "Hauptgericht (110 g p.P. trocken)" },

@@ -2627,53 +2627,271 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'Wasserverbrauch-Rechner',
     category: 'haushalt-energie',
     subcategory: 'Wasser & Abwasser',
-    metaTitle: 'Wasserverbrauch Rechner – Wasser- & Abwasserkosten pro Person',
-    metaDescription: 'Ermitteln Sie Ihren Wasserverbrauch in Kubikmetern (m³) und Litern sowie die jährlichen Gesamtkosten für Trink- und Abwasser nach Haushaltsgröße.',
-    h1: 'Wasserverbrauch Rechner – Trinkwasser- & Abwasserkosten ermitteln',
-    shortDescription: 'Berechnet den Wasserverbrauch und die anfallenden Gebühren für Trinkwasser und Kanalisation.',
-    searchKeywords: ['wasserverbrauch rechner haushalt', 'wasserkosten pro person durchschnitt', 'abwasserkosten kubikmeter rechner', 'wasserverbrauch m3 in liter'],
+    metaTitle: 'Wasserverbrauch Rechner – Kosten & m³ pro Person berechnen',
+    metaDescription: 'Wasserverbrauch und Kosten für Haushalte kostenlos berechnen: Kubikmeter (m³), Liter pro Tag, verbrauchsabhängige Gebühren und monatlicher Durchschnitt.',
+    h1: 'Wasserverbrauch Rechner – Kosten & Kubikmeter (m³) berechnen',
+    shortDescription: 'Schätzt den jährlichen Wasserverbrauch in m³ und Litern sowie die Gebühren für Trink- und Schmutzwasser basierend auf Haushaltsgröße und örtlichen Tarifen.',
+    searchKeywords: ['wasserverbrauch rechner haushalt', 'wasserkosten pro person durchschnitt', 'abwasserkosten kubikmeter rechner', 'wasserverbrauch m3 in liter', 'wasserverbrauch berechnen kostenlos'],
     inputs: [
-      { id: 'persons', label: 'Personen im Haushalt', type: 'number', defaultValue: 3, min: 1, max: 12, step: 1 },
-      { id: 'dailyLitersPerPerson', label: 'Täglicher Wasserverbrauch pro Kopf in Litern (D-Schnitt ca. 125 l)', type: 'number', defaultValue: 125, min: 50, max: 300, step: 5, unit: 'Liter/Tag' },
-      { id: 'freshWaterPrice', label: 'Trinkwasserpreis pro m³ (1.000 l)', type: 'number', defaultValue: 2.10, min: 1.0, max: 5.0, step: 0.1, unit: '€/m³' },
-      { id: 'wasteWaterPrice', label: 'Schmutzwassergebühr (Abwasser) pro m³', type: 'number', defaultValue: 2.70, min: 1.0, max: 6.0, step: 0.1, unit: '€/m³' },
+      {
+        id: 'persons',
+        label: 'Personen im Haushalt',
+        type: 'number',
+        defaultValue: 3,
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: 'Personen',
+        helpText: 'Positive ganze Zahl (mindestens 1 Person)',
+      },
+      {
+        id: 'dailyLitersPerPerson',
+        label: 'Täglicher Wasserverbrauch pro Person in Litern',
+        type: 'number',
+        defaultValue: 125,
+        min: 0,
+        max: 1000,
+        step: 5,
+        unit: 'Liter/Tag',
+        helpText: 'Bundesweiter Richtwert: ca. 125 bis 128 Liter pro Kopf und Tag (Quelle: BDEW 2024 / Destatis)',
+      },
+      {
+        id: 'freshWaterPrice',
+        label: 'Trinkwasserpreis pro m³ (Frischwasser in €)',
+        type: 'number',
+        defaultValue: 2.10,
+        min: 0,
+        max: 25,
+        step: 0.05,
+        unit: '€/m³',
+        helpText: 'Arbeitspreis für Trinkwasser laut Abrechnung (0,00 € z. B. bei eigenem Brunnen)',
+      },
+      {
+        id: 'wasteWaterPrice',
+        label: 'Schmutzwassergebühr / Abwasserpreis pro m³ (in €)',
+        type: 'number',
+        defaultValue: 2.70,
+        min: 0,
+        max: 25,
+        step: 0.05,
+        unit: '€/m³',
+        helpText: 'Kanalgebühr für Schmutzwasser laut Bescheid (0,00 € z. B. bei Versickerung/Klärgrube)',
+      },
+      {
+        id: 'fixedFeeYear',
+        label: 'Jährlicher Zählergrundpreis / Bereitstellungsgebühr (optional in €)',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        max: 500,
+        step: 5,
+        unit: '€/Jahr',
+        helpText: 'Feste jährliche Zählergebühr Ihres Versorgers (0 € falls unbekannt oder im Kubikmeterpreis enthalten)',
+      },
     ],
-    calculate: (inputs) => {
-      const p = parseInt(inputs.persons, 10) || 3;
-      const liters = parseFloat(inputs.dailyLitersPerPerson) || 125;
-      const freshP = parseFloat(inputs.freshWaterPrice) || 2.10;
-      const wasteP = parseFloat(inputs.wasteWaterPrice) || 2.70;
+    calculate: (inputs: Record<string, any>) => {
+      if (inputs.persons === undefined || inputs.persons === null || String(inputs.persons).trim() === '') {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie die Anzahl der Personen im Haushalt ein.',
+        };
+      }
+      const rawP = String(inputs.persons).trim().replace(',', '.');
+      const pNum = Number(rawP);
+      if (!Number.isFinite(pNum) || pNum < 1 || !Number.isInteger(pNum)) {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie die Personenzahl als positive ganze Zahl ein (z. B. 1, 2, 3 Personen; Bruchteile sind nicht zulässig).',
+        };
+      }
+      const p = pNum;
+
+      if (inputs.dailyLitersPerPerson === undefined || inputs.dailyLitersPerPerson === null || String(inputs.dailyLitersPerPerson).trim() === '') {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie den täglichen Pro-Kopf-Wasserverbrauch an (0 Liter bei Leerstand).',
+        };
+      }
+      const rawLiters = String(inputs.dailyLitersPerPerson).trim().replace(',', '.');
+      const liters = parseFloat(rawLiters);
+      if (!Number.isFinite(liters) || liters < 0) {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Der tägliche Wasserverbrauch darf nicht negativ sein.',
+        };
+      }
+
+      if (inputs.freshWaterPrice === undefined || inputs.freshWaterPrice === null || String(inputs.freshWaterPrice).trim() === '') {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie den Trinkwasserpreis pro Kubikmeter an (0,00 € falls keine Gebühr anfällt).',
+        };
+      }
+      const rawFresh = String(inputs.freshWaterPrice).trim().replace(',', '.');
+      const freshP = parseFloat(rawFresh);
+      if (!Number.isFinite(freshP) || freshP < 0) {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Der Trinkwasserpreis darf nicht negativ sein.',
+        };
+      }
+
+      if (inputs.wasteWaterPrice === undefined || inputs.wasteWaterPrice === null || String(inputs.wasteWaterPrice).trim() === '') {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie die Schmutzwassergebühr pro Kubikmeter an (0,00 € falls keine Gebühr anfällt).',
+        };
+      }
+      const rawWaste = String(inputs.wasteWaterPrice).trim().replace(',', '.');
+      const wasteP = parseFloat(rawWaste);
+      if (!Number.isFinite(wasteP) || wasteP < 0) {
+        return {
+          primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+          error: 'Die Schmutzwassergebühr darf nicht negativ sein.',
+        };
+      }
+
+      let fixedFee = 0;
+      if (inputs.fixedFeeYear !== undefined && inputs.fixedFeeYear !== null && String(inputs.fixedFeeYear).trim() !== '') {
+        const rawFixed = String(inputs.fixedFeeYear).trim().replace(',', '.');
+        const parsedFixed = parseFloat(rawFixed);
+        if (!Number.isFinite(parsedFixed) || parsedFixed < 0) {
+          return {
+            primary: { id: 'totalYearlyCost', label: 'Geschätzte jährliche Wasserkosten', value: 0, formattedValue: '–' },
+            error: 'Die feste Jahresgebühr darf nicht negativ sein.',
+          };
+        }
+        fixedFee = parsedFixed;
+      }
+
       const totalDailyLiters = p * liters;
-      const totalYearlyM3 = (totalDailyLiters * 365) / 1000;
-      const combinedPriceM3 = freshP + wasteP;
-      const totalYearlyCost = totalYearlyM3 * combinedPriceM3;
+      const totalYearlyLiters = totalDailyLiters * 365;
+      const totalYearlyM3 = totalYearlyLiters / 1000;
+      const combinedPriceM3 = Number((freshP + wasteP).toFixed(4));
+      const variableYearlyCost = Number((totalYearlyM3 * combinedPriceM3).toFixed(4));
+      const totalYearlyCost = Number((variableYearlyCost + fixedFee).toFixed(4));
+      const monthlyAverageCost = Number((totalYearlyCost / 12).toFixed(4));
+      const costPerPersonYear = Number((totalYearlyCost / p).toFixed(4));
+
       return {
-        primary: { id: 'totalYearlyCost', label: 'Jährliche Gesamtwasserkosten', value: totalYearlyCost, formattedValue: formatCurrency(totalYearlyCost), highlight: true },
+        primary: {
+          id: 'totalYearlyCost',
+          label: 'Geschätzte jährliche Wasserkosten (Frisch- & Abwasser)',
+          value: totalYearlyCost,
+          formattedValue: formatCurrency(totalYearlyCost),
+          highlight: true,
+        },
         secondary: [
-          { id: 'totalYearlyM3', label: 'Jahresverbrauch in Kubikmetern', value: totalYearlyM3, formattedValue: `${formatNumber(totalYearlyM3, 1)} m³` },
-          { id: 'monthlyCost', label: 'Monatliche Kosten', value: totalYearlyCost / 12, formattedValue: formatCurrency(totalYearlyCost / 12) },
-          { id: 'costPerPerson', label: 'Kosten pro Person im Jahr', value: totalYearlyCost / p, formattedValue: formatCurrency(totalYearlyCost / p) },
+          {
+            id: 'totalYearlyM3',
+            label: 'Jahreswasserverbrauch in m³',
+            value: totalYearlyM3,
+            formattedValue: `${formatNumber(totalYearlyM3, 2)} m³ (${formatNumber(totalYearlyLiters, 0)} Liter)`,
+          },
+          {
+            id: 'monthlyCost',
+            label: 'Rechnerischer Monatsdurchschnitt (Kosten ÷ 12)',
+            value: monthlyAverageCost,
+            formattedValue: formatCurrency(monthlyAverageCost),
+          },
+          {
+            id: 'variableCost',
+            label: 'Verbrauchsabhängige Kosten (m³)',
+            value: variableYearlyCost,
+            formattedValue: formatCurrency(variableYearlyCost),
+          },
+          {
+            id: 'fixedFeeSec',
+            label: 'Fester Jahresgrundpreis (Zählergebühr)',
+            value: fixedFee,
+            formattedValue: formatCurrency(fixedFee),
+          },
+          {
+            id: 'costPerPerson',
+            label: 'Kosten pro Person im Jahr',
+            value: costPerPersonYear,
+            formattedValue: formatCurrency(costPerPersonYear),
+          },
         ],
-        summaryText: `Ein ${p}-Personen-Haushalt verbraucht ca. ${formatNumber(totalYearlyM3, 1)} m³ Wasser im Jahr. Bei ${formatCurrency(combinedPriceM3)}/m³ (Wasser + Abwasser) betragen die Gesamtkosten ${formatCurrency(totalYearlyCost)}.`,
+        summaryText: `Ein ${p}-Personen-Haushalt mit angenommenen ${formatNumber(liters, 0)} Litern pro Kopf und Tag verbraucht ca. ${formatNumber(totalYearlyM3, 2)} m³ Wasser im Jahr. Bei ${formatCurrency(combinedPriceM3)}/m³ (Trinkwasser ${formatCurrency(freshP)} + Abwasser ${formatCurrency(wasteP)})${fixedFee > 0 ? ` und ${formatCurrency(fixedFee)} festem Grundpreis` : ''} ergeben sich geschätzte Gesamtkosten von ${formatCurrency(totalYearlyCost)} pro Jahr (rechnerischer Monatsdurchschnitt: ca. ${formatCurrency(monthlyAverageCost)}).`,
+        directAnswer: `Für ${p} Personen mit ${formatNumber(liters, 0)} l/Tag beträgt der geschätzte Jahresverbrauch ca. ${formatNumber(totalYearlyM3, 2)} m³. Die jährlichen Wasserkosten belaufen sich bei ${formatCurrency(combinedPriceM3)}/m³${fixedFee > 0 ? ` zzgl. ${formatCurrency(fixedFee)} Grundgebühr` : ''} auf ca. ${formatCurrency(totalYearlyCost)} (ca. ${formatCurrency(monthlyAverageCost)} pro Monat im rechnerischen Durchschnitt).`,
+        qualifications: [
+          'Modellschätzung: Der Rechner schätzt Ihren Verbrauch aus Haushaltsgröße und täglichem Pro-Kopf-Verbrauch. Die tatsächlichen Gebühren hängen von Ihrem örtlichen Versorger und dem echten Zählerstand ab.',
+          'Enthaltene Kosten: Berechnet werden der Frischwasserbezug (Trinkwasser), die Schmutzwassergebühr (Kanalisation) und der optional angegebene Zählergrundpreis.',
+          'Nicht enthaltene Kosten: Niederschlagswassergebühren (gesplittete Abwassergebühr nach versiegelter Grundstücksfläche) sowie Energiekosten für die Warmwasserbereitung (z. B. Strom, Gas oder Fernwärme für Boiler und Heizungsanlage) sind nicht enthalten.',
+        ],
+        calculationSteps: [
+          `Tagesverbrauch: ${p} Personen × ${formatNumber(liters, 0)} l/Tag = ${formatNumber(totalDailyLiters, 0)} Liter/Tag`,
+          `Jahresverbrauch in Kubikmetern: ${formatNumber(totalDailyLiters, 0)} l/Tag × 365 Tage ÷ 1.000 = ${formatNumber(totalYearlyM3, 3)} m³/Jahr`,
+          `Verbrauchsgebühr je m³: ${formatCurrency(freshP)} (Frischwasser) + ${formatCurrency(wasteP)} (Abwasser) = ${formatCurrency(combinedPriceM3)}/m³`,
+          `Verbrauchsabhängige Kosten: ${formatNumber(totalYearlyM3, 3)} m³ × ${formatCurrency(combinedPriceM3)} = ${formatCurrency(variableYearlyCost)}`,
+          ...(fixedFee > 0 ? [`Gesamtkosten inklusive Grundgebühr: ${formatCurrency(variableYearlyCost)} + ${formatCurrency(fixedFee)} = ${formatCurrency(totalYearlyCost)}`] : []),
+          `Rechnerischer Monatsdurchschnitt: ${formatCurrency(totalYearlyCost)} ÷ 12 Monate = ${formatCurrency(monthlyAverageCost)}/Monat`,
+        ],
       };
     },
-    formula: 'Wasserkosten = Personen × Liter/Tag × 365 / 1000 × (Frischwasserpreis + Abwasserpreis)',
-    formulaExplanation: 'Das Statistische Bundesamt beziffert den durchschnittlichen Pro-Kopf-Wasserverbrauch in Deutschland auf ca. 125 bis 128 Liter pro Tag.',
+    formula: 'Jahreswasserkosten = (Personen × Liter/Tag × 365 ÷ 1.000) × (Frischwasserpreis + Abwasserpreis) + Jahresgrundpreis',
+    formulaExplanation: 'Multipliziert den jährlichen Kubikmeterbedarf aus Personenzahl und täglichem Richtwert mit den kommunalen Frisch- und Abwassertarifen zuzüglich eventueller fester Zählergrundpreise.',
     workedExample: {
       title: 'Beispiel: 3 Personen mit 125 Liter/Tag bei 4,80 €/m³ Gesamtgebühr',
-      inputValues: [{ label: 'Personen', value: '3' }, { label: 'Verbrauch', value: '125 l/Tag' }, { label: 'Kosten/m³', value: '4,80 €' }],
-      steps: ['Verbrauch: 3 × 125 l × 365 = 136.875 l = 136,88 m³', 'Kosten: 136,88 m³ × 4,80 € ≈ 657,00 € pro Jahr'],
-      result: '657,00 € jährliche Wasserkosten',
+      description: 'Der Rechner schätzt Ihren Verbrauch aus Haushaltsgröße und täglichem Pro-Kopf-Verbrauch. Die tatsächlichen Gebühren hängen von Ihrem örtlichen Versorger ab. Kosten für die Erwärmung des Wassers sind nicht enthalten.',
+      inputValues: [
+        { label: 'Personen im Haushalt', value: '3 Personen' },
+        { label: 'Täglicher Pro-Kopf-Verbrauch', value: '125 l/Tag' },
+        { label: 'Trinkwasserpreis', value: '2,10 €/m³' },
+        { label: 'Schmutzwassergebühr', value: '2,70 €/m³' },
+        { label: 'Fester Jahresgrundpreis', value: '0,00 €' },
+      ],
+      steps: [
+        'Tagesverbrauch im Haushalt: 3 Personen × 125 Liter/Tag = 375 Liter/Tag',
+        'Jahresverbrauch in Kubikmetern: 375 Liter/Tag × 365 Tage ÷ 1.000 = 136,875 m³/Jahr',
+        'Kombinierter Kubikmeterpreis: 2,10 €/m³ + 2,70 €/m³ = 4,80 €/m³',
+        'Verbrauchsabhängige Jahreskosten: 136,875 m³ × 4,80 €/m³ = 657,00 €/Jahr',
+        'Rechnerischer Monatsdurchschnitt: 657,00 € ÷ 12 Monate = 54,75 €/Monat',
+      ],
+      result: '657,00 € jährliche Wasserkosten (rechnerischer Monatsdurchschnitt: 54,75 €)',
     },
     content: {
-      intro: 'Der durchschnittliche Wasserverbrauch liegt in Deutschland bei rund 125 Litern Trinkwasser pro Person und Tag für Duschen, Toilettenspülung, Wäsche und Kochen.',
-      details: 'Gesamtwasserkosten setzen sich aus dem Frischwasserbezug und der Abwassergebühr zusammen (bundesweiter Schnitt: ca. 4,00 bis 5,50 € pro Kubikmeter). Ein 3-Personen-Haushalt verbraucht ca. 120 bis 140 m³ Wasser pro Jahr.',
+      intro: 'Der Rechner schätzt Ihren Verbrauch aus Haushaltsgröße und täglichem Pro-Kopf-Verbrauch. Die tatsächlichen Gebühren hängen von Ihrem örtlichen Versorger ab. Kosten für die Erwärmung des Wassers sind nicht enthalten. Nach Daten der BDEW-Wasserstatistik (2024) sowie des Statistischen Bundesamtes (Destatis 2022) verbraucht eine Person in Deutschland durchschnittlich ca. 125 bis 128 Liter Trinkwasser pro Tag.',
+      details: 'Ein Kubikmeter (m³) entspricht genau 1.000 Litern Wasser. Die Jahresrechnung der Stadtwerke oder des Wasserverbands setzt sich aus zwei Teilen zusammen: dem Frischwasserbezug (Trinkwasser) und der Schmutzwassergebühr (Kanalisation). Beide Gebührenarten werden pro bezogenem Kubikmeter berechnet. Feste Zählergrundpreise und Zählermieten fallen unabhängig vom Verbrauch an. Nicht in diesem Rechner enthalten sind gesplittete Niederschlagswassergebühren für versiegelte Dach- und Hofflächen sowie die Energie für die Warmwasserbereitung.',
+      sections: [
+        {
+          title: 'Liter versus Kubikmeter (m³): Wie wird gerechnet?',
+          content: 'Im Alltag erfassen wir Wasser oft in Litern (z. B. 40 bis 60 Liter für einen Duschvorgang oder 5 Liter für einen Spülgang). Der Wasserzähler im Keller misst das Volumen jedoch in vollen Kubikmetern (m³). Die Umrechnung ist denkbar einfach: 1.000 Liter entsprechen genau 1 m³ Wasser. Verbraucht ein 3-Personen-Haushalt 125 Liter pro Kopf und Tag, sind das 375 Liter täglich bzw. 136.875 Liter im Jahr – das entspricht 136,88 m³ auf der Abrechnung.',
+        },
+        {
+          title: 'Geschätzter Modellverbrauch versus gemessener Zählerstand',
+          content: 'Dieser Rechner liefert eine Orientierung anhand von Durchschnittswerten. Ihr realer Verbrauch kann deutlich abweichen: Sparsame Duschköpfe, moderne Spartasten am WC und effiziente Waschmaschinen senken den Bedarf auf 90 bis 100 Liter pro Tag. Ausgedehnte Wannenbäder, häufiges Gießen im Garten oder Poolbefüllungen im Sommer können den Verbrauch auf über 160 Liter pro Kopf steigern. Für eine exakte Abrechnung sind stets die abgelesenen Zählerstände auf Ihrer Wasseruhr maßgeblich.',
+        },
+        {
+          title: 'Welche Gebühren sind enthalten – und welche nicht?',
+          content: 'Dieser Rechner erfasst die beiden verbrauchsabhängigen Hauptbestandteile der Wasserabrechnung: den Mengenpreis für Frischwasser und die Schmutzwassergebühr für das in die Kanalisation eingeleitete Abwasser. Optional können Sie die feste jährliche Grund- oder Zählergebühr einrechnen.\n\nNicht enthalten sind:\n- **Niederschlagswassergebühr (Regenwasser):** Wird von Kommunen nach der versiegelten Grundstücksfläche (m²) berechnet, nicht nach Kubikmetern Trinkwasser.\n- **Warmwasserkosten (Heizenergie):** Die Erwärmung von Dusch- und Badewasser erfordert erhebliche Energiemengen (Gas, Strom, Heizöl oder Fernwärme). Diese Kosten erscheinen auf der Heizkostenabrechnung oder Stromrechnung, nicht auf der Wasserabrechnung.',
+        },
+        {
+          title: 'Wo finden Sie Ihre individuellen Tarife?',
+          content: 'Die genauen Preise für Frisch- und Abwasser finden Sie auf der Jahresabrechnung Ihres regionalen Wasserversorgers bzw. im Abwassergebührenbescheid Ihrer Stadt oder Gemeinde. Typischerweise bewegen sich die Preise in Deutschland zwischen 1,50 € und 3,00 € je m³ für Trinkwasser und zwischen 1,80 € und 4,50 € je m³ für Schmutzwasser. Bei den meisten Versorgern fallen zudem 30 bis 120 € feste Zählergebühr pro Jahr an.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Welcher Bereich verbraucht im Haushalt das meiste Wasser?', answer: 'Körperpflege (Baden und Duschen) macht rund 36 % des Verbrauchs aus, dicht gefolgt von der Toilettenspülung mit etwa 27 %.' },
-      { question: 'Wie viel Wasser spart eine Spartaste an der Toilette?', answer: 'Eine moderne 2-Mengen-Spülung benötigt für das kleine Geschäft nur 3 Liter statt 6 bis 9 Liter beim Vollspülgang – das spart pro Person rund 6.000 bis 8.000 Liter Wasser jährlich.' },
+      {
+        question: 'Wie hoch ist der durchschnittliche Wasserverbrauch pro Person in Deutschland?',
+        answer: 'Nach Erhebungen des Bundesverbandes der Energie- und Wasserwirtschaft (BDEW 2024) sowie des Statistischen Bundesamtes (Destatis 2022) liegt der tägliche Trinkwasserverbrauch bei rund 125 bis 128 Litern pro Person. Auf ein volles Jahr gerechnet entspricht das ca. 45 bis 47 Kubikmetern (m³) pro Kopf.',
+      },
+      {
+        question: 'Warum ist die Abwassergebühr oft teurer als das Trinkwasser?',
+        answer: 'Der Betrieb, die Instandhaltung und die Modernisierung von Kanalnetzen, Regenrückhaltebecken und Kläranlagen mit mehrstufigen Reinigungsverfahren sind extrem kapitalintensiv. Die Kommunen müssen diese Kosten über die Schmutzwassergebühr kostendeckend auf die verbrauchten Kubikmeter umlegen.',
+      },
+      {
+        question: 'Sind Warmwasserkosten im Wasserverbrauch-Rechner enthalten?',
+        answer: 'Nein. Dieser Rechner ermittelt reine Wasser- und Abwassergebühren. Die thermische Energie zur Erwärmung des Wassers (z. B. durch Durchlauferhitzer, Gastherme oder Wärmepumpe) verursacht separate Energiekosten, die in der Heizkostenabrechnung oder Stromrechnung ausgewiesen werden.',
+      },
+      {
+        question: 'Wie kann man die Wasserkosten im Haushalt am wirksamsten senken?',
+        answer: 'Die größten Einsparpotenziale bieten Sparduschköpfe (reduzieren den Durchfluss von ca. 14–16 l/min auf 6–8 l/min), Spartasten an der Toilettenspülung (spart bis zu 5 Liter pro Spülgang) sowie die vollständige Beladung von Wasch- und Spülmaschinen mit dem Eco-Programm.',
+      },
     ],
-    relatedSlugs: ['warmwasserkosten-rechner', 'waschmaschine-kosten-rechner', 'spuelmaschine-kosten-rechner'],
+    relatedSlugs: ['warmwasserkosten-rechner', 'waschmaschine-kosten-rechner', 'spuelmaschine-kosten-rechner', 'stromkosten-geraete-rechner'],
   },
 
   {

@@ -535,5 +535,54 @@
   - Production Browser QA (`prod_search_qa` recording): Verified homepage hero search, keyboard arrow selection, Enter navigation, header typo search, empty state German text and link, and directory search.
 
 
+## 12. Five Priority Calculators & Shared Invalid-Result Audit (October 2026)
 
+### Progress Checklist & Issue Categorization
 
+#### A. Shared Invalid-Result Display (CalculatorRunner & Copy Behavior)
+- [x] **[Confirmed Live Defect]** Water calculator: entering 0 in both water-price fields triggers validation warning, but previous 657,00 € answer remains visible alongside inputs showing 0 €. Fixed: When active inputs are invalid or incomplete, the result display is cleanly replaced by an accessible validation alert with specific active error messages.
+- [x] **[Confirmed Live Defect]** Splitt calculator: selecting custom density and clearing it displays a warning, but previous 2.25 t answer remains visible alongside blank density. Fixed: Previous result is immediately hidden, replaced with validation feedback.
+- [x] **[Confirmed Source-Code Defect]** `CalculatorRunner.tsx`: `fieldErrors` displayed a notice while leaving the previous `result` active, and allowed copying stale/invalid answers. Fixed: Guarded `handleCopyResult` with `if (result.error || hasActiveErrors) return;`, replaced result container with validation alert state, and ensured valid->invalid->valid recovery.
+- [x] **[Confirmed Source-Code Defect]** Inactive conditional fields: inputs from non-selected modes (e.g. `area` when in `volume_to_weight` mode) could erroneously trigger or retain validation errors. Fixed: Implemented `isFieldActive(def, currentInputs)` helper to ignore inactive inputs in error checks and summary tables.
+- [x] **[Confirmed Source-Code Defect]** Engine fallback: calculator functions in `bauenGeometrie.ts` and `wohnenHaushalt.ts` fell back to defaults instead of returning explicit error objects. Fixed: Explicit validation for positive finite numbers, returning clear `{ error: '...' }` objects.
+
+#### B. Household Water Calculator (`/rechner/wasserverbrauch-haushalt-rechner/`)
+- [x] **[Confirmed Live Defect]** Entering 0 in price fields was rejected by field definition `min: 1.0`, blocking valid zero-tariff scenarios (e.g. private well or separate absorption). Fixed: Allowed legitimate zero variable prices and zero consumption (`min: 0`), while distinguishing blank from zero.
+- [x] **[Confirmed Source-Code Defect]** `parseInt(inputs.persons, 10) || 3` silently replaced zero and invalid values with defaults, and truncated fractions without validation. Fixed: Explicit validation requiring positive integer $\ge 1$, rejecting non-finite and fractional persons with a clear error.
+- [x] **[Confirmed Source-Code Defect]** Arbitrary tariff maximums (`max: 5.0` and `max: 6.0`) blocked valid high-cost municipal tariffs. Fixed: Adjusted realistic ranges (`max: 25.0 €/m³`).
+- [x] **[Confirmed Source-Code Defect]** Primary label claimed "Jährliche Gesamtwasserkosten", but only calculated volumetric freshwater and wastewater charges, omitting fixed meter charges. Fixed: Label clarified as "Geschätzte jährliche Wasserkosten (Frisch- & Abwasser)" and added optional `fixedFeeYear` (default 0 €).
+- [x] **[Improvement Requiring Research]** Destatis / BDEW statistics: Cited BDEW Wasserstatistik 2024 / Destatis 2022 (~125–128 liters/person/day in Germany) with date and source in help text and copy.
+- [x] **[Improvement Requiring Research]** Added optional annual fixed fee (`fixedFeeYear`, default 0 €), transparently broken down. Clarified that rainwater runoff fees (Niederschlagswassergebühr) and water heating energy are excluded.
+- [x] **[Improvement Requiring Research]** Used "rechnerischer Monatsdurchschnitt" for annual costs divided by 12.
+
+#### C. Kies / Splitt Calculator (`/rechner/kies-splitt-rechner/`)
+- [x] **[Confirmed Live Defect]** Blank custom density continued calculating with 1.50 t/m³. Fixed: Blank, zero, negative, or nonnumeric custom density now returns an explicit validation error, never falling back to a default.
+- [x] **[Confirmed Source-Code Defect]** `density = !isNaN(cd) && cd > 0 ? cd : 1.50;` in `bauenGeometrie.ts` silently substituted default density. Fixed: Strict validation for finite number > 0.
+- [x] **[Confirmed Source-Code Defect]** Premature intermediate rounding before final total calculation. Fixed: Kept full calculation precision, rounding cleanly for presentation without altering small-volume results.
+- [x] **[Improvement Requiring Research]** Clarified loose bulk density (Schüttdichte) vs. compacted material (Festgestein / verdichtet). Disclosed that `crushed_0_32` is already compacted and compaction allowance must not be applied twice.
+- [x] **[Improvement Requiring Research]** Big Bags: clarified 1,000 kg assumption and noted that bag sizes vary by supplier (kg-based vs. volume-based).
+
+#### D. Schalungssteine Calculator (`/rechner/schalungssteine-rechner/`)
+- [x] **[Confirmed Live Defect]** Opening taller than wall (e.g., 8 m wall of 1.5 m height with 1 m × 2 m opening) silently subtracted 2 m² from 12 m² to return 80 net stones. Fixed: Openings with height exceeding wall height are now explicitly rejected with an error.
+- [x] **[Confirmed Source-Code Defect]** Missing height check (`openingHeight > wallHeight`) in geometry validation. Fixed: Added check and error message.
+- [x] **[Confirmed Source-Code Defect]** Incomplete opening inputs (width without height or vice versa) not rejected. Fixed: Both width and height are required when specifying dimensions.
+- [x] **[Confirmed Source-Code Defect]** Blank `wallLengthB` in `l_shape`, `u_shape`, and `rectangle_pool` silently defaulted to 4. Fixed: Active side lengths must be explicitly provided and > 0.
+- [x] **[Improvement Requiring Research]** Documented dimension basis (nominal center-line/external lengths), equal-side U-shape assumption, corner overlaps, and structural safety disclaimer.
+
+#### E. Pasta Calculator (`/rechner/nudeln-rohmaerk-gewicht-rechner/`)
+- [x] **[Confirmed Live Defect]** Selecting fresh pasta (factor 1.5) still displayed "440 g Trockennudeln" for four people. Fixed: Uncooked fresh pasta is differentiated from dry pasta throughout labels, summaries, directAnswer, and copy output.
+- [x] **[Confirmed Source-Code Defect]** Portion planning applied dry pasta weight (110 g) and hardcoded "g Trockennudeln" in labels regardless of selected factor. Fixed: Portion planning provides dedicated portion sizes for fresh pasta (~150 g raw per person for a main course) and labels outputs "frische Pasta (ungekocht)".
+- [x] **[Improvement Requiring Research]** Consistent portion model: for fresh pasta (factor 1.5), to achieve typical cooked portion (~230–250 g), uncooked mass is ~150–160 g/person. Differentiated labels ("Frische Teigwaren" vs. "Trockennudeln").
+
+#### F. Rice Calculator (`/rechner/wasser-reis-verhaeltnis-rechner/`)
+- [x] **[Confirmed Live Defect]** At 1,000 g rice, salt guidance outputted `ca. 15 g (ca. 1/2 gestr. TL...)` where grams scaled but teaspoon text remained hardcoded. Fixed: Teaspoon equivalents now scale dynamically based on a disclosed assumption (1 level teaspoon table salt $\approx 5$ g).
+- [x] **[Confirmed Source-Code Defect]** `Math.max(1, Math.round(riceG / 65))` forced tiny quantities (e.g. 20 g rice) to display as "1 Portion". Fixed: Quantities < 45 g display decimal portion fractions or clear basis references instead of claiming a full meal serving.
+- [x] **[Improvement Requiring Research]** Verified water ratios for stovetop absorption method (Quellmethode im geschlossenen Topf) with g to ml ratios; distinguished from rice-cooker instructions; kept cooked yield as approximate.
+
+#### G. Worked Examples & Content Rendering
+- [x] **[Confirmed Live Defect]** Worked examples across calculators showed title and result, but omitted `inputValues` (inputs chips/list) and steps when multiple worked examples were defined. Fixed: Upgraded shared renderer in `src/app/rechner/[slug]/page.tsx` to display inputs chips, description, ordered calculation steps (`<ol>`), result badge, and assumptions/notes for both single and multiple worked examples.
+- [x] **[Confirmed Source-Code Defect]** `src/app/rechner/[slug]/page.tsx` only rendered `description` and `steps`, completely ignoring `inputValues` / `inputs`. Fixed: Rendered structured input chips and preparation steps across all worked examples.
+
+#### H. SEO, Metadata & Internal Links
+- [x] **[Already Fixed]** Canonical URLs and slugs preserved without changes (`/rechner/wasserverbrauch-haushalt-rechner/`, `/rechner/kies-splitt-rechner/`, `/rechner/schalungssteine-rechner/`, `/rechner/nudeln-rohmaerk-gewicht-rechner/`, `/rechner/wasser-reis-verhaeltnis-rechner/`).
+- [x] **[Already Fixed]** Titles, descriptions, and H1s match actual user tasks and include "kostenlos" naturally. Contextual guide links and backlinks verified.

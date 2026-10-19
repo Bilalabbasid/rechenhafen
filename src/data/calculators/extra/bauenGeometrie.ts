@@ -1425,78 +1425,119 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       let wallTypeDescription = 'Gerade Mauer (1 Wandseite)';
 
       if (wallType === 'l_shape') {
-        const lB = inputs.wallLengthB !== undefined && inputs.wallLengthB !== null && String(inputs.wallLengthB).trim() !== ''
-          ? parseFloat(inputs.wallLengthB)
-          : 4;
-        if (isNaN(lB) || lB <= 0) {
+        if (inputs.wallLengthB === undefined || inputs.wallLengthB === null || String(inputs.wallLengthB).trim() === '') {
           return {
-            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die Länge für Schenkel 2 ein.',
+          };
+        }
+        const lB = parseFloat(String(inputs.wallLengthB).replace(',', '.'));
+        if (!Number.isFinite(lB) || lB <= 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
             error: 'Bitte geben Sie eine gültige Länge für Schenkel 2 größer als 0 m ein.',
           };
         }
         totalLength = l + lB;
         cornersCount = 1;
         openEndsCount = 2;
-        wallTypeDescription = `L-Form: Schenkel 1 (${formatNumber(l, 2)} m) + Schenkel 2 (${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m`;
+        wallTypeDescription = `L-Form: Schenkel 1 (${formatNumber(l, 2)} m) + Schenkel 2 (${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m (Achsmaß)`;
       } else if (wallType === 'u_shape') {
-        const lB = inputs.wallLengthB !== undefined && inputs.wallLengthB !== null && String(inputs.wallLengthB).trim() !== ''
-          ? parseFloat(inputs.wallLengthB)
-          : 4;
-        if (isNaN(lB) || lB <= 0) {
+        if (inputs.wallLengthB === undefined || inputs.wallLengthB === null || String(inputs.wallLengthB).trim() === '') {
           return {
-            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die Länge der beiden Seitenschenkel ein.',
+          };
+        }
+        const lB = parseFloat(String(inputs.wallLengthB).replace(',', '.'));
+        if (!Number.isFinite(lB) || lB <= 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
             error: 'Bitte geben Sie eine gültige Länge für die Seitenschenkel größer als 0 m ein.',
           };
         }
         totalLength = l + 2 * lB;
         cornersCount = 2;
         openEndsCount = 2;
-        wallTypeDescription = `U-Form: Hauptwand (${formatNumber(l, 2)} m) + 2 × Schenkel (${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m`;
+        wallTypeDescription = `U-Form: Hauptwand (${formatNumber(l, 2)} m) + 2 × Schenkel (${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m (symmetrische Schenkel, Achsmaß)`;
       } else if (wallType === 'rectangle_pool') {
-        const lB = inputs.wallLengthB !== undefined && inputs.wallLengthB !== null && String(inputs.wallLengthB).trim() !== ''
-          ? parseFloat(inputs.wallLengthB)
-          : 4;
-        if (isNaN(lB) || lB <= 0) {
+        if (inputs.wallLengthB === undefined || inputs.wallLengthB === null || String(inputs.wallLengthB).trim() === '') {
           return {
-            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die Breite für das Rechteck bzw. den Pool ein.',
+          };
+        }
+        const lB = parseFloat(String(inputs.wallLengthB).replace(',', '.'));
+        if (!Number.isFinite(lB) || lB <= 0) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
             error: 'Bitte geben Sie eine gültige Breite für das Rechteck größer als 0 m ein.',
           };
         }
         totalLength = 2 * (l + lB);
         cornersCount = 4;
         openEndsCount = 0;
-        wallTypeDescription = `Rechteck / Pool: 2 × (${formatNumber(l, 2)} m + ${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m Umfang`;
+        wallTypeDescription = `Rechteck / Pool: 2 × (${formatNumber(l, 2)} m + ${formatNumber(lB, 2)} m) = ${formatNumber(totalLength, 2)} m Umfang (Achsmaß)`;
       }
 
       if (inputs.wallHeight === undefined || inputs.wallHeight === null || String(inputs.wallHeight).trim() === '') {
         return {
-          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
           error: 'Bitte geben Sie die Mauerhöhe ein.',
         };
       }
-      const h = parseFloat(inputs.wallHeight);
-      if (isNaN(h) || h <= 0) {
+      const h = parseFloat(String(inputs.wallHeight).replace(',', '.'));
+      if (!Number.isFinite(h) || h <= 0) {
         return {
-          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
           error: 'Bitte geben Sie eine gültige Mauerhöhe größer als 0 m ein.',
         };
       }
 
       let openings = 0;
       const rawOpeningWidth = inputs.openingWidth !== undefined && inputs.openingWidth !== null && String(inputs.openingWidth).trim() !== ''
-        ? parseFloat(inputs.openingWidth)
+        ? parseFloat(String(inputs.openingWidth).replace(',', '.'))
         : 0;
       const rawOpeningHeight = inputs.openingHeight !== undefined && inputs.openingHeight !== null && String(inputs.openingHeight).trim() !== ''
-        ? parseFloat(inputs.openingHeight)
+        ? parseFloat(String(inputs.openingHeight).replace(',', '.'))
         : 0;
 
-      if (rawOpeningWidth > 0 && rawOpeningHeight > 0) {
+      if (!Number.isFinite(rawOpeningWidth) || rawOpeningWidth < 0 || !Number.isFinite(rawOpeningHeight) || rawOpeningHeight < 0) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+          error: 'Breite und Höhe der Öffnung dürfen nicht negativ sein.',
+        };
+      }
+
+      const hasWidth = rawOpeningWidth > 0;
+      const hasHeight = rawOpeningHeight > 0;
+
+      if ((hasWidth && !hasHeight) || (!hasWidth && hasHeight)) {
+        return {
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie für die Wandöffnung sowohl die Breite als auch die Höhe an (oder nutzen Sie eine pauschale Abzugsfläche).',
+        };
+      }
+
+      if (hasWidth && hasHeight) {
+        if (rawOpeningHeight > h) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+            error: `Die Öffnungshöhe (${formatNumber(rawOpeningHeight, 2)} m) darf die Mauerhöhe (${formatNumber(h, 2)} m) nicht überschreiten.`,
+          };
+        }
+        if (rawOpeningWidth > totalLength) {
+          return {
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
+            error: `Die Öffnungsbreite (${formatNumber(rawOpeningWidth, 2)} m) darf die gesamte Mauerlänge (${formatNumber(totalLength, 2)} m) nicht überschreiten.`,
+          };
+        }
         openings = rawOpeningWidth * rawOpeningHeight;
       } else if (inputs.openingsArea !== undefined && inputs.openingsArea !== null && String(inputs.openingsArea).trim() !== '') {
-        const parsedOpeningsArea = parseFloat(inputs.openingsArea);
-        if (isNaN(parsedOpeningsArea) || parsedOpeningsArea < 0) {
+        const parsedOpeningsArea = parseFloat(String(inputs.openingsArea).replace(',', '.'));
+        if (!Number.isFinite(parsedOpeningsArea) || parsedOpeningsArea < 0) {
           return {
-            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+            primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
             error: 'Die Abzugsfläche für Öffnungen darf nicht negativ sein.',
           };
         }
@@ -1506,7 +1547,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const grossArea = totalLength * h;
       if (openings > grossArea) {
         return {
-          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '-' },
+          primary: { id: 'stones', label: 'Benötigte Schalungssteine', value: 0, formattedValue: '–' },
           error: `Die Abzugsfläche für Öffnungen (${formatNumber(openings, 2)} m²) darf nicht größer als die Brutto-Wandfläche (${formatNumber(grossArea, 2)} m²) sein.`,
         };
       }
@@ -1724,13 +1765,35 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       {
         title: "Beispiel 1: 12 m² Mauer mit 24er Steinen (Delfing DP 24, 130 l/m²)",
         description: "Für eine 8 m lange und 1,5 m hohe Wand (12 m² Ansichtsfläche) mit 24er Steinen, 5 % Steinreserve und 0 % Betonzuschlag ergeben sich 96 Steine Netto, 101 Steine inkl. Reserve und 1,56 m³ Füllbeton (bei 5 % Betonzuschlag: 1,638 m³).",
-        inputs: { wallLength: 8, wallHeight: 1.5, fillMode: 'preset_delfing24', stoneReserve: 5, concreteReserve: 0, openingsArea: 0 },
+        inputValues: [
+          { label: "Mauermaß", value: "8 m × 1,5 m (12 m²)" },
+          { label: "Steinformat", value: "50 × 25 cm (8 Stk./m²)" },
+          { label: "Füllmenge", value: "130 l/m²" },
+          { label: "Steinreserve", value: "5 %" },
+        ],
+        steps: [
+          "Netto-Wandfläche berechnen: 8 m × 1,5 m = 12 m²",
+          "Steine Netto: 12 m² × 8 Stk./m² = 96 Schalungssteine",
+          "Steine inkl. 5 % Reserve: 96 × 1,05 = 100,8 → aufgerundet 101 Steine",
+          "Füllbeton Netto: 12 m² × 130 l/m² = 1.560 Liter = 1,56 m³",
+        ],
         resultSummary: "101 Schalungssteine (inkl. 5 % Reserve), 1,56 m³ Füllbeton",
       },
       {
         title: "Beispiel 2: Kleine Gartenmauer (6 m × 0,75 m mit 17,5er Steinen, 80 l/m²)",
         description: "Für eine Gartenmauer von 6 m Länge und 0,75 m Höhe (4,5 m² Fläche) mit 17,5er Steinen (80 l/m² Füllmenge) und 5 % Steinreserve werden 36 Steine Netto (38 Steine inkl. Reserve) und 0,36 m³ Füllbeton benötigt.",
-        inputs: { wallLength: 6, wallHeight: 0.75, fillMode: 'preset_delfing175', stoneReserve: 5, concreteReserve: 0, openingsArea: 0 },
+        inputValues: [
+          { label: "Mauermaß", value: "6 m × 0,75 m (4,5 m²)" },
+          { label: "Steinformat", value: "50 × 25 cm (8 Stk./m²)" },
+          { label: "Füllmenge", value: "80 l/m² (17,5 cm Wandstärke)" },
+          { label: "Steinreserve", value: "5 %" },
+        ],
+        steps: [
+          "Netto-Wandfläche: 6 m × 0,75 m = 4,5 m²",
+          "Steine Netto: 4,5 m² × 8 Stk./m² = 36 Schalungssteine",
+          "Steine inkl. 5 % Reserve: 36 × 1,05 = 37,8 → aufgerundet 38 Steine",
+          "Füllbeton Netto: 4,5 m² × 80 l/m² = 360 Liter = 0,36 m³",
+        ],
         resultSummary: "38 Schalungssteine (inkl. 5 % Reserve), 0,36 m³ Füllbeton",
       },
     ],
@@ -2917,11 +2980,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         type: "select",
         defaultValue: "grit_2_5",
         options: [
-          { value: "grit_2_5", label: "Splitt / Edelsplitt 2/5 (Richtwert ca. 1,50 t/m³)" },
-          { value: "gravel_16_32", label: "Kies / Rollkies 16/32 (Richtwert ca. 1,60 t/m³)" },
-          { value: "crushed_0_32", label: "Schotter / Frostschutz 0/32 verdichtet (Richtwert ca. 1,80 t/m³)" },
-          { value: "sand_0_2", label: "Bausand / Estrichsand 0/2 (Richtwert ca. 1,60 t/m³)" },
-          { value: "bark", label: "Rindenmulch (Richtwert ca. 0,40 t/m³)" },
+          { value: "grit_2_5", label: "Splitt / Edelsplitt 2/5 (lose Schüttung, Richtwert ca. 1,50 t/m³)" },
+          { value: "gravel_16_32", label: "Kies / Rollkies 16/32 (lose Schüttung, Richtwert ca. 1,60 t/m³)" },
+          { value: "crushed_0_32", label: "Schotter / Frostschutz 0/32 (bereits verdichtet, Richtwert ca. 1,80 t/m³)" },
+          { value: "sand_0_2", label: "Bausand / Estrichsand 0/2 (feucht/lose, Richtwert ca. 1,60 t/m³)" },
+          { value: "bark", label: "Rindenmulch (lose Schüttung, Richtwert ca. 0,40 t/m³)" },
           { value: "custom", label: "Eigene Schüttdichte eingeben (t/m³)" },
         ],
       },
@@ -2950,30 +3013,80 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     ],
     calculate: (inputs: Record<string, any>) => {
       const mode = inputs.calcMode || 'area_depth';
-
-      // 1. Schüttdichte bestimmen
-      let density = 1.50;
       const mat = inputs.materialType || 'grit_2_5';
+
+      // 1. Schüttdichte bestimmen und validieren
+      let density = 1.50;
       if (mat === 'grit_2_5' || mat === 'grit') density = 1.50;
       else if (mat === 'gravel_16_32' || mat === 'gravel') density = 1.60;
       else if (mat === 'crushed_0_32' || mat === 'crushed') density = 1.80;
       else if (mat === 'sand_0_2') density = 1.60;
       else if (mat === 'bark') density = 0.40;
       else if (mat === 'custom') {
-        const cd = Number(inputs.customDensity);
-        density = !isNaN(cd) && cd > 0 ? cd : 1.50;
+        if (inputs.customDensity === undefined || inputs.customDensity === null || String(inputs.customDensity).trim() === '') {
+          return {
+            primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die individuelle Schüttdichte Ihres Baustoffhändlers in t/m³ ein.',
+          };
+        }
+        const cd = parseFloat(String(inputs.customDensity).replace(',', '.'));
+        if (!Number.isFinite(cd) || cd <= 0) {
+          return {
+            primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+            error: 'Die individuelle Schüttdichte muss eine positive Zahl größer als 0 t/m³ sein.',
+          };
+        }
+        density = cd;
       }
 
-      // MODUS 1: Fläche & Schütthöhe
+      // MODUS 1: Fläche & Schütthöhe → Volumen & Gewicht
       if (mode === 'area_depth') {
-        const a = Number(inputs.area) || 0;
-        const dM = (Number(inputs.depth) || 0) / 100;
-        const compPercent = Math.max(0, Number(inputs.compaction) || 0);
+        if (inputs.area === undefined || inputs.area === null || String(inputs.area).trim() === '') {
+          return {
+            primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die Fläche in m² ein.',
+          };
+        }
+        const a = parseFloat(String(inputs.area).replace(',', '.'));
+        if (!Number.isFinite(a) || a <= 0) {
+          return {
+            primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie eine gültige Fläche größer als 0 m² ein.',
+          };
+        }
 
-        const baseVolumeM3 = Math.round(a * dM * 1000) / 1000;
-        const allowanceM3 = Math.round(baseVolumeM3 * (compPercent / 100) * 1000) / 1000;
-        const totalVolumeM3 = Math.round((baseVolumeM3 + allowanceM3) * 1000) / 1000;
-        const totalTonnes = Math.round(totalVolumeM3 * density * 1000) / 1000;
+        if (inputs.depth === undefined || inputs.depth === null || String(inputs.depth).trim() === '') {
+          return {
+            primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie die Schütthöhe bzw. Einbaustärke in cm ein.',
+          };
+        }
+        const d = parseFloat(String(inputs.depth).replace(',', '.'));
+        if (!Number.isFinite(d) || d <= 0) {
+          return {
+            primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie eine gültige Schütthöhe größer als 0 cm ein.',
+          };
+        }
+
+        let compPercent = 0;
+        if (inputs.compaction !== undefined && inputs.compaction !== null && String(inputs.compaction).trim() !== '') {
+          const comp = parseFloat(String(inputs.compaction).replace(',', '.'));
+          if (!Number.isFinite(comp) || comp < 0) {
+            return {
+              primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
+              error: 'Der Setzungs- oder Einbauzuschlag darf nicht negativ sein (0 % für keinen Zuschlag).',
+            };
+          }
+          compPercent = comp;
+        }
+
+        const dM = d / 100;
+        // Calculation precision without premature intermediate rounding (6 decimals cleans IEEE-754 precision)
+        const baseVolumeM3 = Number((a * dM).toFixed(6));
+        const allowanceM3 = Number((baseVolumeM3 * (compPercent / 100)).toFixed(6));
+        const totalVolumeM3 = Number((baseVolumeM3 + allowanceM3).toFixed(6));
+        const totalTonnes = Number((totalVolumeM3 * density).toFixed(6));
         const bigBags = Math.ceil(totalTonnes);
 
         return {
@@ -3016,13 +3129,32 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
               formattedValue: bigBags + ' Big Bag(s)',
             },
           ],
-          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${inputs.depth} cm Einbauhöhe ergibt sich ein Basisvolumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Zuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${bigBags} Big Bag(s) à 1 t).`,
+          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${formatNumber(d, 1)} cm Einbauhöhe ergibt sich ein Basisvolumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Zuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${bigBags} Big Bag(s) à 1 t Richtwert).`,
+          qualifications: [
+            mat === 'crushed_0_32'
+              ? 'Hinweis: Der Richtwert für Schotter 0/32 (1,80 t/m³) bezieht sich bereits auf den verdichteten Einbauzustand. Verwenden Sie dafür keinen doppelten Setzungsaufschlag.'
+              : 'Schüttdichte: Die angegebenen Gewichte sind Richtwerte für lose Schüttung. Das tatsächliche Liefergewicht variiert je nach Gesteinsart und Restfeuchte.',
+            'Big Bags: Manche Händler liefern Big Bags nach Füllgewicht (z. B. 1.000 kg oder 500 kg), andere nach Volumen (z. B. 1 m³). Prüfen Sie das Angebot Ihres Baustoffwerks.',
+          ],
         };
       }
 
       // MODUS 2: Bekanntes Volumen (m³) → Gewicht (t)
       if (mode === 'volume_to_weight') {
-        const vol = Number(inputs.knownVolumeM3) || 0;
+        if (inputs.knownVolumeM3 === undefined || inputs.knownVolumeM3 === null || String(inputs.knownVolumeM3).trim() === '') {
+          return {
+            primary: { id: 'tonnes', label: 'Materialgewicht in Tonnen', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie das vorhandene Volumen in m³ ein.',
+          };
+        }
+        const vol = parseFloat(String(inputs.knownVolumeM3).replace(',', '.'));
+        if (!Number.isFinite(vol) || vol <= 0) {
+          return {
+            primary: { id: 'tonnes', label: 'Materialgewicht in Tonnen', value: 0, formattedValue: '–' },
+            error: 'Bitte geben Sie ein gültiges Volumen größer als 0 m³ ein.',
+          };
+        }
+
         const totalTonnes = vol * density;
         const bigBags = Math.ceil(totalTonnes);
 
@@ -3054,12 +3186,25 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
               formattedValue: bigBags + ' Big Bag(s)',
             },
           ],
-          summaryText: `${formatNumber(vol, 2)} m³ Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ wiegen rechnerisch ca. ${formatNumber(totalTonnes, 2)} Tonnen (ca. ${bigBags} Big Bag(s)).`,
+          summaryText: `${formatNumber(vol, 2)} m³ Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ wiegen rechnerisch ca. ${formatNumber(totalTonnes, 2)} Tonnen (ca. ${bigBags} Big Bag(s) à 1 t Richtwert).`,
         };
       }
 
       // MODUS 3: Bekanntes Gewicht (t) → Volumen (m³)
-      const tonnes = Number(inputs.knownWeightTonnes) || 0;
+      if (inputs.knownWeightTonnes === undefined || inputs.knownWeightTonnes === null || String(inputs.knownWeightTonnes).trim() === '') {
+        return {
+          primary: { id: 'volume', label: 'Volumen in Kubikmetern (m³)', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie das vorhandene Gewicht in Tonnen ein.',
+        };
+      }
+      const tonnes = parseFloat(String(inputs.knownWeightTonnes).replace(',', '.'));
+      if (!Number.isFinite(tonnes) || tonnes <= 0) {
+        return {
+          primary: { id: 'volume', label: 'Volumen in Kubikmetern (m³)', value: 0, formattedValue: '–' },
+          error: 'Bitte geben Sie ein gültiges Gewicht größer als 0 Tonnen ein.',
+        };
+      }
+
       const vol = density > 0 ? tonnes / density : 0;
       const bigBags = Math.ceil(tonnes);
 
@@ -3091,43 +3236,66 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             formattedValue: bigBags + ' Big Bag(s)',
           },
         ],
-        summaryText: `${formatNumber(tonnes, 2)} Tonnen Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ ergeben ein Schüttvolumen von ca. ${formatNumber(vol, 2)} m³ (ca. ${bigBags} Big Bag(s)).`,
+        summaryText: `${formatNumber(tonnes, 2)} Tonnen Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ ergeben ein Schüttvolumen von ca. ${formatNumber(vol, 2)} m³ (ca. ${bigBags} Big Bag(s) à 1 t Richtwert).`,
       };
     },
     formula: "Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³); Volumen (m³) = Fläche (m²) × Schütthöhe (m)",
     formulaExplanation: "Die Schüttdichte berücksichtigt im Gegensatz zur Festgesteins-Rohdichte die Haufwerksporen (Lufthohlräume) zwischen den Körnern. Bei reinem Edelsplitt 2/5 (enger Kornbereich) beträgt die lose Schüttdichte ca. 1,45 bis 1,55 t/m³. Breit gestufte Gemische mit Feinanteil (z. B. Mineralbeton/Schotter 0/32) verdichten sich beim Einbau stark und erreichen im Rüttelzustand bis zu 1,80–2,00 t/m³.",
     workedExample: {
       title: "Beispiel: 30 m² Pflasterbettung mit 5 cm Splitt 2/5 (ohne Setzung)",
+      description: "Berechnung des Schüttvolumens und Gewichts für eine Terrassenbettung mit Splitt 2/5 bei 1,50 t/m³ Schüttdichte.",
       inputValues: [
         { label: "Fläche", value: "30 m²" },
-        { label: "Einbauhöhe", value: "5 cm" },
+        { label: "Einbauhöhe", value: "5 cm (0,05 m)" },
         { label: "Material", value: "Splitt 2/5 (1,50 t/m³)" },
-        { label: "Zuschlag", value: "0 %" },
+        { label: "Einbauzuschlag", value: "0 %" },
       ],
       steps: [
-        "Reines Einbauvolumen = 30 m² × 0,05 m = 1,50 m³",
-        "Gewicht = 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
-        "Bestellmenge = ca. 2,25 Tonnen (bzw. 3 Big Bags à 1 t)",
+        "Reines Einbauvolumen berechnen: 30 m² × 0,05 m = 1,50 m³",
+        "Materialgewicht ermitteln: 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
+        "Bestellmenge in Big Bags: 2,25 t entsprechen aufgerundet 3 Big Bags à 1 t Richtwert",
       ],
       result: "2,25 Tonnen Splitt (1,50 m³)",
     },
     workedExamples: [
       {
-        title: "Beispiel 1: Fläche & Höhe (30 m², 5 cm)",
-        description: "30 m² × 0,05 m = 1,50 m³ Einbauvolumen; bei 1,50 t/m³ Schüttdichte = 2,25 Tonnen.",
-        inputs: { calcMode: "area_depth", area: 30, depth: 5, materialType: "grit_2_5", compaction: 0 },
+        title: "Beispiel 1: Fläche & Höhe (30 m², 5 cm Splitt 2/5)",
+        description: "Pflasterbettung für Terrasse oder Einfahrt mit Splitt 2/5 (1,50 t/m³) ohne zusätzlichen Setzungszuschlag.",
+        inputValues: [
+          { label: "Fläche", value: "30 m²" },
+          { label: "Schichthöhe", value: "5 cm" },
+          { label: "Schüttdichte", value: "1,50 t/m³" },
+        ],
+        steps: [
+          "Einbauvolumen = 30 m² × 0,05 m = 1,50 m³",
+          "Materialgewicht = 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
+        ],
         resultSummary: "2,25 t (1,50 m³)",
       },
       {
-        title: "Beispiel 2: 2 m³ Splitt in Tonnen",
-        description: "2 m³ × 1,50 t/m³ = 3,00 Tonnen.",
-        inputs: { calcMode: "volume_to_weight", knownVolumeM3: 2.0, materialType: "grit_2_5" },
-        resultSummary: "3,00 t",
+        title: "Beispiel 2: 2 m³ Kies 16/32 in Tonnen umrechnen",
+        description: "Umrechnung eines bekannten Raumvolumens bei 1,60 t/m³ Schüttdichte in das Transportgewicht.",
+        inputValues: [
+          { label: "Ausgangsvolumen", value: "2,0 m³" },
+          { label: "Schüttdichte", value: "1,60 t/m³ (Kies 16/32)" },
+        ],
+        steps: [
+          "Gewicht = Volumen × Schüttdichte",
+          "Gewicht = 2,0 m³ × 1,60 t/m³ = 3,20 Tonnen",
+        ],
+        resultSummary: "3,20 Tonnen",
       },
       {
-        title: "Beispiel 3: 3 t Splitt in Kubikmeter (m³)",
-        description: "3 t ÷ 1,50 t/m³ = 2,00 m³.",
-        inputs: { calcMode: "weight_to_volume", knownWeightTonnes: 3.0, materialType: "grit_2_5" },
+        title: "Beispiel 3: 3 Tonnen Splitt in Kubikmeter (m³)",
+        description: "Rückrechnung eines Lieferscheins mit 3 Tonnen Splitt 2/5 (1,50 t/m³) in das Schüttvolumen.",
+        inputValues: [
+          { label: "Ausgangsgewicht", value: "3,0 t" },
+          { label: "Schüttdichte", value: "1,50 t/m³" },
+        ],
+        steps: [
+          "Volumen = Gewicht ÷ Schüttdichte",
+          "Volumen = 3,0 t ÷ 1,50 t/m³ = 2,00 m³",
+        ],
         resultSummary: "2,00 m³",
       },
     ],

@@ -50,22 +50,42 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
       expect(res?.primary.formattedValue).toContain('100 g trocken');
     });
 
-    it('changing factor updates both directions consistently (e.g. fresh pasta factor 1.5)', () => {
-      // 100 g dry -> 150 g cooked
+    it('changing factor updates both directions consistently and labels fresh pasta accurately', () => {
+      // 100 g dry -> 150 g cooked (fresh pasta)
       const resDry = pastaCalc?.calculate({
         mode: 'dry_to_cooked',
         dryGrams: 100,
         factorPreset: 'fresh',
       });
       expect(resDry?.primary.value).toBe(150);
+      expect(resDry?.primary.formattedValue).toContain('150 g gekocht');
+      expect(resDry?.secondary?.find((s) => s.id === 'dryPasta')?.formattedValue).toContain('frische Pasta');
+      expect(resDry?.directAnswer).not.toContain('Trockennudeln');
 
-      // 150 g cooked -> 100 g dry
+      // 150 g cooked -> 100 g fresh pasta (ungekocht)
       const resCooked = pastaCalc?.calculate({
         mode: 'cooked_to_dry',
         cookedGrams: 150,
         factorPreset: 'fresh',
       });
       expect(resCooked?.primary.value).toBe(100);
+      expect(resCooked?.primary.label).toBe('Benötigte frische Pasta (ungekocht)');
+      expect(resCooked?.primary.formattedValue).toContain('frisch (ungekocht)');
+      expect(resCooked?.primary.formattedValue).not.toContain('Trockennudeln');
+    });
+
+    it('acceptance: 200 g uncooked fresh pasta at factor 1.5 -> 300 g cooked', () => {
+      const res = pastaCalc?.calculate({
+        mode: 'dry_to_cooked',
+        dryGrams: 200,
+        factorPreset: 'fresh',
+      });
+      expect(res?.error).toBeUndefined();
+      expect(res?.primary.value).toBe(300);
+      expect(res?.primary.formattedValue).toBe('300 g gekocht');
+      expect(res?.primary.label).not.toContain('Trockennudeln');
+      expect(res?.directAnswer).toContain('200 g frische Pasta (ungekocht)');
+      expect(res?.directAnswer).not.toContain('Trockennudeln');
     });
 
     it('rejects invalid, zero, or negative conversion factors', () => {
@@ -93,6 +113,14 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
         customFactor: 'abc',
       });
       expect(resNan?.error).toBeDefined();
+
+      const resBlank = pastaCalc?.calculate({
+        mode: 'dry_to_cooked',
+        dryGrams: 100,
+        factorPreset: 'custom',
+        customFactor: '',
+      });
+      expect(resBlank?.error).toBeDefined();
     });
 
     it('rejects invalid or zero gram inputs appropriately', () => {
@@ -127,6 +155,7 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
 
       expect(res?.error).toBeUndefined();
       expect(res?.primary.value).toBe(440); // 4 * 110 = 440 g
+      expect(res?.primary.label).toBe('Benötigte Trockennudeln');
       expect(res?.primary.formattedValue).toContain('440 g');
 
       // 440 * 2.3 = 1012 g (no weird decimals like 1003.2)
@@ -144,6 +173,29 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
 
       // Topf-Empfehlung in qualifications
       expect(res?.qualifications?.[0]).toContain('Topfvolumen');
+    });
+
+    it('calculates portion for 4 persons with fresh pasta at 150 g p.P. without displaying Trockennudeln', () => {
+      // Confirmed live bug fix: Selecting fresh pasta at factor 1.5 must not display "440 g Trockennudeln"
+      const res = pastaCalc?.calculate({
+        mode: 'portion_plan',
+        personsCount: 4,
+        mealType: 'mainDish',
+        factorPreset: 'fresh',
+      });
+
+      expect(res?.error).toBeUndefined();
+      // 4 * 150 g = 600 g raw fresh pasta
+      expect(res?.primary.value).toBe(600);
+      expect(res?.primary.label).toBe('Benötigte frische Pasta (ungekocht)');
+      expect(res?.primary.formattedValue).toContain('600 g frische Pasta');
+      expect(res?.primary.formattedValue).not.toContain('Trockennudeln');
+      expect(res?.directAnswer).toContain('600 g frische Pasta (ungekocht)');
+      expect(res?.directAnswer).not.toContain('Trockennudeln');
+
+      // 600 * 1.5 = 900 g cooked
+      const cookedSec = res?.secondary?.find((s) => s.id === 'cookedPasta');
+      expect(cookedSec?.value).toBe(900);
     });
 
     it('supports custom grams per person', () => {

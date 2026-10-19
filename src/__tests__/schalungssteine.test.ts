@@ -166,4 +166,84 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
     const standard = result.secondary?.find((s) => s.id === 'standardBlocks');
     expect(standard?.value).toBe(192);
   });
+
+  describe('Geometry validation & opening error handling', () => {
+    it('rejects an opening taller than the wall instead of silently subtracting nonexistent area', () => {
+      // Reproduced bug: 8 m wall, 1.5 m high, opening 1 m wide × 2 m high
+      const result = calc.calculate({
+        wallType: 'straight',
+        wallLength: 8,
+        wallHeight: 1.5,
+        openingWidth: 1.0,
+        openingHeight: 2.0,
+      });
+
+      expect(result.error).toBeDefined();
+      expect(result.error).toContain('Öffnungshöhe');
+      expect(result.error).toContain('darf die Mauerhöhe');
+    });
+
+    it('rejects incomplete opening dimensions (width without height or vice-versa)', () => {
+      const resWidthOnly = calc.calculate({
+        wallType: 'straight',
+        wallLength: 8,
+        wallHeight: 1.5,
+        openingWidth: 1.0,
+        openingHeight: 0,
+      });
+      expect(resWidthOnly.error).toBeDefined();
+      expect(resWidthOnly.error).toContain('sowohl die Breite als auch die Höhe');
+
+      const resHeightOnly = calc.calculate({
+        wallType: 'straight',
+        wallLength: 8,
+        wallHeight: 1.5,
+        openingWidth: 0,
+        openingHeight: 1.2,
+      });
+      expect(resHeightOnly.error).toBeDefined();
+      expect(resHeightOnly.error).toContain('sowohl die Breite als auch die Höhe');
+    });
+
+    it('rejects opening wider than wall length', () => {
+      const result = calc.calculate({
+        wallType: 'straight',
+        wallLength: 8,
+        wallHeight: 2.0,
+        openingWidth: 9.0,
+        openingHeight: 1.5,
+      });
+      expect(result.error).toBeDefined();
+      expect(result.error).toContain('Öffnungsbreite');
+    });
+
+    it('rejects blank/missing side length B when wallType is not straight', () => {
+      const resL = calc.calculate({
+        wallType: 'l_shape',
+        wallLength: 6,
+        wallLengthB: '',
+        wallHeight: 1.5,
+      });
+      expect(resL.error).toBeDefined();
+      expect(resL.error).toContain('Schenkel 2');
+
+      const resU = calc.calculate({
+        wallType: 'u_shape',
+        wallLength: 6,
+        wallLengthB: '',
+        wallHeight: 1.5,
+      });
+      expect(resU.error).toBeDefined();
+      expect(resU.error).toContain('Seitenschenkel');
+
+      const resPool = calc.calculate({
+        wallType: 'rectangle_pool',
+        wallLength: 6,
+        wallLengthB: 0,
+        wallHeight: 1.5,
+      });
+      expect(resPool.error).toBeDefined();
+      expect(resPool.error).toContain('Breite für das Rechteck');
+    });
+  });
 });

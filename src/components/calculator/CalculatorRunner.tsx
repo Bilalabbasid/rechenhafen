@@ -220,6 +220,24 @@ export default function CalculatorRunner({
     };
   }, [slug, inputDefs]);
 
+  const isFieldActive = (def: CalculatorInput, currentInputs: Record<string, any>): boolean => {
+    if (slug === 'arbeitszeitrechner' && def.id === 'pauseMinutes') return false;
+    if (slug === 'tage-zwischen-zwei-daten' && def.id === 'mode') return false;
+    if (!def.dependsOn) return true;
+    const currentVal = currentInputs[def.dependsOn.field];
+    const targetVal = def.dependsOn.value;
+    if (Array.isArray(targetVal)) {
+      return targetVal.includes(currentVal);
+    }
+    return currentVal === targetVal;
+  };
+
+  const activeFieldErrors = Object.entries(fieldErrors).filter(([id]) => {
+    const def = inputDefs.find((inp) => inp.id === id);
+    return def ? isFieldActive(def, inputs) : true;
+  });
+  const hasActiveErrors = activeFieldErrors.length > 0 || Boolean(result.error);
+
   const handleInputChange = async (id: string, value: any) => {
     // Record first interaction for privacy analytics & recent usage
     if (!hasTrackedStartRef.current) {
@@ -261,6 +279,15 @@ export default function CalculatorRunner({
     } else {
       delete newFieldErrors[id];
     }
+
+    // Clean up errors for fields that are not active in updatedInputs
+    for (const [errId] of Object.entries(newFieldErrors)) {
+      const def = inputDefs.find((inp) => inp.id === errId);
+      if (def && !isFieldActive(def, updatedInputs)) {
+        delete newFieldErrors[errId];
+      }
+    }
+
     setFieldErrors(newFieldErrors);
 
     let fn = engineRef.current;
@@ -484,7 +511,7 @@ export default function CalculatorRunner({
   };
 
   const handleCopyResult = async () => {
-    if (result.error) return;
+    if (result.error || hasActiveErrors) return;
     const primaryStr = `${result.primary.label}: ${result.primary.formattedValue ?? result.primary.value}${result.primary.unit ? ' ' + result.primary.unit : ''}`;
     let textToCopy = `${name}\n${primaryStr}`;
 
@@ -895,22 +922,33 @@ export default function CalculatorRunner({
             </span>
           </div>
 
-          {result.error ? (
-            <div className={styles.errorAlert}>
+          {hasActiveErrors ? (
+            <div className={styles.errorAlert} role="alert" aria-live="assertive">
               <AlertCircle size={20} className={styles.errorIcon} />
               <div>
-                <strong>Hinweis zur Eingabe</strong>
-                <p>{result.error}</p>
+                <strong>Berechnung pausiert – Eingabe unvollständig oder fehlerhaft</strong>
+                <p>
+                  {result.error ||
+                    (activeFieldErrors.length === 1
+                      ? activeFieldErrors[0][1]
+                      : 'Bitte korrigieren Sie die markierten Eingabefelder oben. Das Ergebnis wird automatisch berechnet, sobald alle Werte gültig sind.')}
+                </p>
+                {activeFieldErrors.length > 1 && (
+                  <ul style={{ margin: 'var(--space-2) 0 0', paddingLeft: '1.25rem', fontSize: '0.825rem', lineHeight: 1.5 }}>
+                    {activeFieldErrors.map(([fId, errMsg]) => {
+                      const fDef = inputDefs.find((inp) => inp.id === fId);
+                      return (
+                        <li key={fId}>
+                          <strong>{fDef?.label || fId}:</strong> {errMsg}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
               </div>
             </div>
           ) : (
             <>
-              {Object.keys(fieldErrors).length > 0 && (
-                <div className={styles.staleNotice} role="alert">
-                  <AlertTriangle size={15} />
-                  <span>Eingaben unvollständig oder fehlerhaft. Das Ergebnis wird aktualisiert, sobald alle Felder gültig sind.</span>
-                </div>
-              )}
 
               {result.warning && (
                 <div className={styles.warningAlert} role="status">
@@ -996,17 +1034,7 @@ export default function CalculatorRunner({
                   </div>
                   <div className={styles.basisGrid}>
                     {(() => {
-                      const isFieldVisible = (def: CalculatorInput) => {
-                        if (slug === 'arbeitszeitrechner' && def.id === 'pauseMinutes') return false;
-                        if (slug === 'tage-zwischen-zwei-daten' && def.id === 'mode') return false;
-                        if (!def.dependsOn) return true;
-                        const currentVal = inputs[def.dependsOn.field];
-                        const targetVal = def.dependsOn.value;
-                        if (Array.isArray(targetVal)) {
-                          return targetVal.includes(currentVal);
-                        }
-                        return currentVal === targetVal;
-                      };
+                      const isFieldVisible = (def: CalculatorInput) => isFieldActive(def, inputs);
 
                       const formatVal = (def: CalculatorInput, rawVal: any): string => {
                         if (rawVal === undefined || rawVal === null || rawVal === '') {
