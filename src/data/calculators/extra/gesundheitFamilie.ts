@@ -97,9 +97,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'sportKcalPerDay', label: 'Zusätzlicher Sport-Kalorienverbrauch im Schnitt pro Tag', type: 'number', defaultValue: 200, min: 0, max: 2000, step: 50, unit: 'kcal' },
     ],
     calculate: (inputs) => {
-      const bmr = parseFloat(inputs.bmrKcal) || 1450;
+      const bmr = inputs.bmrKcal !== undefined && inputs.bmrKcal !== '' ? Math.max(0, parseFloat(inputs.bmrKcal) || 0) : 1450;
       const type = inputs.palLevel || 'office';
-      const sport = parseFloat(inputs.sportKcalPerDay) || 200;
+      const sport = inputs.sportKcalPerDay !== undefined && inputs.sportKcalPerDay !== '' ? Math.max(0, parseFloat(inputs.sportKcalPerDay) || 0) : 200;
 
       const pals: Record<string, number> = {
         sedentary: 1.2,
@@ -215,7 +215,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   },
 
   {
-    id: 'ideal好gewicht-creff-rechner',
+    id: 'idealgewicht-creff-rechner',
     slug: 'idealgewicht-creff-rechner',
     name: 'Idealgewicht-Rechner (nach Creff-Formel & Broca-Index)',
     shortName: 'Idealgewicht Creff',
@@ -400,8 +400,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const isMale = inputs.gender === 'male';
-      const waist = parseFloat(inputs.waistCm) || 74;
-      const hip = parseFloat(inputs.hipCm) || 96;
+      const waist = inputs.waistCm !== undefined && inputs.waistCm !== '' ? Math.max(0, parseFloat(inputs.waistCm) || 0) : 74;
+      const hip = inputs.hipCm !== undefined && inputs.hipCm !== '' ? Math.max(1, parseFloat(inputs.hipCm) || 0) : 96;
       const whr = waist / hip;
 
       let risk = 'Normal / Geringes Risiko (Birnenform)';
@@ -459,8 +459,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'ageYears', label: 'Lebensalter in Jahren', type: 'number', defaultValue: 34, min: 15, max: 99, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const waist = parseFloat(inputs.waistCm) || 82;
-      const height = parseFloat(inputs.heightCm) || 178;
+      const waist = inputs.waistCm !== undefined && inputs.waistCm !== '' ? Math.max(0, parseFloat(inputs.waistCm) || 0) : 82;
+      const height = inputs.heightCm !== undefined && inputs.heightCm !== '' ? Math.max(1, parseFloat(inputs.heightCm) || 0) : 178;
       const age = parseInt(inputs.ageYears, 10) || 34;
       const whtr = waist / height;
 
@@ -596,7 +596,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       ]},
     ],
     calculate: (inputs) => {
-      const d = parseFloat(inputs.distanceMeters) || 2600;
+      const d = inputs.distanceMeters !== undefined && inputs.distanceMeters !== '' ? Math.max(1, parseFloat(inputs.distanceMeters) || 0) : 2600;
       // Formel nach Dr. Kenneth H. Cooper:
       // VO2max = (Distanz in Metern - 504.9) / 44.73
       const vo2max = Math.max(10, (d - 504.9) / 44.73);
@@ -654,8 +654,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'repsCount', label: 'Saubere Wiederholungen (ideal 2 bis 10)', type: 'number', defaultValue: 6, min: 1, max: 20, step: 1 },
     ],
     calculate: (inputs) => {
-      const w = parseFloat(inputs.liftedWeightKg) || 80;
-      const r = parseInt(inputs.repsCount, 10) || 6;
+      const w = inputs.liftedWeightKg !== undefined && inputs.liftedWeightKg !== '' ? Math.max(0, parseFloat(inputs.liftedWeightKg) || 0) : 80;
+      const r = inputs.repsCount !== undefined && inputs.repsCount !== '' ? Math.min(30, Math.max(1, parseInt(inputs.repsCount, 10) || 1)) : 6;
 
       if (r === 1) {
         return {
@@ -721,9 +721,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'weightKg', label: 'Körpergewicht in kg', type: 'number', defaultValue: 75, min: 40, max: 200, step: 1, unit: 'kg' },
     ],
     calculate: (inputs) => {
-      const steps = parseInt(inputs.stepsCount, 10) || 10000;
-      const h = parseFloat(inputs.heightCm) || 175;
-      const w = parseFloat(inputs.weightKg) || 75;
+      const steps = inputs.stepsCount !== undefined && inputs.stepsCount !== '' ? Math.max(0, parseInt(inputs.stepsCount, 10) || 0) : 10000;
+      const h = inputs.heightCm !== undefined && inputs.heightCm !== '' ? Math.max(50, parseFloat(inputs.heightCm) || 0) : 175;
+      const w = inputs.weightKg !== undefined && inputs.weightKg !== '' ? Math.max(20, parseFloat(inputs.weightKg) || 0) : 75;
 
       // Durchschnittliche Schrittlänge beim normalen Gehen ≈ Körpergröße × 0,42 (Frauen) bis 0,43 (Männer)
       const stepLengthMeters = (h * 0.425) / 100; // z. B. 175 cm -> 0,744 m
@@ -778,9 +778,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'fallAsleepMinutes', label: 'Durchschnittliche Einschlafdauer in Minuten (Standard: 15 Min.)', type: 'number', defaultValue: 15, min: 5, max: 60, step: 5, unit: 'Minuten' },
     ],
     calculate: (inputs) => {
-      const h = parseInt(inputs.wakeHour, 10) || 6;
-      const m = parseInt(inputs.wakeMinute, 10) || 30;
-      const fallAsleep = parseInt(inputs.fallAsleepMinutes, 10) || 15;
+      const h = inputs.wakeHour !== undefined && inputs.wakeHour !== '' ? Math.max(0, Math.min(23, parseInt(inputs.wakeHour, 10) || 0)) : 6;
+      const m = inputs.wakeMinute !== undefined && inputs.wakeMinute !== '' ? Math.max(0, Math.min(59, parseInt(inputs.wakeMinute, 10) || 0)) : 30;
+      const fallAsleep = inputs.fallAsleepMinutes !== undefined && inputs.fallAsleepMinutes !== '' ? Math.max(0, parseInt(inputs.fallAsleepMinutes, 10) || 0) : 15;
 
       const wakeTotalMins = (h * 60) + m;
 
@@ -847,9 +847,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'cigsPerPack', label: 'Zigarettenanzahl in einer Schachtel', type: 'number', defaultValue: 20, min: 10, max: 60, step: 1, unit: 'Stück' },
     ],
     calculate: (inputs) => {
-      const cigs = parseInt(inputs.cigsPerDay, 10) || 19;
-      const price = parseFloat(inputs.packPrice) || 8.50;
-      const perPack = parseInt(inputs.cigsPerPack, 10) || 20;
+      const cigs = inputs.cigsPerDay !== undefined && inputs.cigsPerDay !== '' ? Math.max(0, parseInt(inputs.cigsPerDay, 10) || 0) : 19;
+      const price = inputs.packPrice !== undefined && inputs.packPrice !== '' ? Math.max(0, parseFloat(inputs.packPrice) || 0) : 8.50;
+      const perPack = inputs.cigsPerPack !== undefined && inputs.cigsPerPack !== '' ? Math.max(1, parseInt(inputs.cigsPerPack, 10) || 1) : 20;
 
       const costPerCig = price / perPack;
       const dailyCost = cigs * costPerCig;
@@ -921,8 +921,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const type = inputs.drinkType || 'filter_coffee';
-      const count = parseInt(inputs.servingsCount, 10) || 2;
-      const hours = parseFloat(inputs.hoursUntilBed) || 6;
+      const count = inputs.servingsCount !== undefined && inputs.servingsCount !== '' ? Math.max(0, parseInt(inputs.servingsCount, 10) || 0) : 2;
+      const hours = inputs.hoursUntilBed !== undefined && inputs.hoursUntilBed !== '' ? Math.max(0, parseFloat(inputs.hoursUntilBed) || 0) : 6;
 
       const mgTable: Record<string, number> = {
         filter_coffee: 90,
@@ -997,7 +997,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const g = parseFloat(inputs.pureAlcoholGrams) || 48;
+      const g = inputs.pureAlcoholGrams !== undefined && inputs.pureAlcoholGrams !== '' ? Math.max(0, parseFloat(inputs.pureAlcoholGrams) || 0) : 48;
       const isMale = inputs.gender === 'male';
       // Abbaugeschwindigkeit: Männer ca. 9 Gramm/Std, Frauen ca. 7 Gramm/Std
       const degradationRatePerHour = isMale ? 9.0 : 7.0;
@@ -1058,7 +1058,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const startH = parseInt(inputs.firstMealHour, 10) || 12;
+      const startH = inputs.firstMealHour !== undefined && inputs.firstMealHour !== '' ? Math.max(0, Math.min(23, parseInt(inputs.firstMealHour, 10) || 0)) : 12;
       const type = inputs.fastingRatio || '16_8';
 
       let eatingHours = 8;
@@ -1470,7 +1470,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const net = parseFloat(inputs.avgNetMonthly) || 2200;
+      const net = inputs.avgNetMonthly !== undefined && inputs.avgNetMonthly !== '' ? Math.max(0, parseFloat(inputs.avgNetMonthly) || 0) : 2200;
       const hasBonus = inputs.hasSiblingsBonus === 'yes';
 
       // Ersatzrate: Bei Netto über 1.240 € sinkt die Rate von 67 % schrittweise auf 65 %
@@ -1546,8 +1546,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'taxableIncomeYearly', label: 'Gemeinsames zu versteuerndes Jahreseinkommen der Eltern', type: 'number', defaultValue: 65000, min: 10000, step: 5000, unit: '€' },
     ],
     calculate: (inputs) => {
-      const kids = parseInt(inputs.childrenCount, 10) || 2;
-      const zvE = parseFloat(inputs.taxableIncomeYearly) || 65000;
+      const kids = inputs.childrenCount !== undefined && inputs.childrenCount !== '' ? Math.max(0, parseInt(inputs.childrenCount, 10) || 0) : 2;
+      const zvE = inputs.taxableIncomeYearly !== undefined && inputs.taxableIncomeYearly !== '' ? Math.max(0, parseFloat(inputs.taxableIncomeYearly) || 0) : 65000;
 
       // Einheitliches Kindergeld: 250 € pro Kind und Monat (bzw. 255 € ab 2025/2026)
       const monthlyPerChild = 250;
@@ -1937,8 +1937,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'netIncomePartner2', label: 'Bereinigtes Nettoeinkommen des anderen Partners (z. B. Teilzeit)', type: 'number', defaultValue: 1200, min: 0, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
-      const net1 = parseFloat(inputs.netIncomePartner1) || 3200;
-      const net2 = parseFloat(inputs.netIncomePartner2) || 1200;
+      const net1 = inputs.netIncomePartner1 !== undefined && inputs.netIncomePartner1 !== '' ? Math.max(0, parseFloat(inputs.netIncomePartner1) || 0) : 3200;
+      const net2 = inputs.netIncomePartner2 !== undefined && inputs.netIncomePartner2 !== '' ? Math.max(0, parseFloat(inputs.netIncomePartner2) || 0) : 1200;
 
       // 3/7-Methode bzw. 45 % nach den Leitlinien der Oberlandesgerichte:
       // Unterhalt = (Netto1 - Netto2) × (3 / 7) bzw. × 0.45 (Erwerbstätigenbonus 10%)
@@ -2367,9 +2367,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'costPerDiaper', label: 'Durchschnittspreis pro Einwegwindel (Marke/Eigenmarke ca. 0,18 € - 0,32 €)', type: 'number', defaultValue: 0.24, min: 0.10, max: 0.60, step: 0.01, unit: '€/Stück' },
     ],
     calculate: (inputs) => {
-      const d1 = parseInt(inputs.diapersPerDayYear1, 10) || 7;
-      const d23 = parseInt(inputs.diapersPerDayYear2to3, 10) || 5;
-      const price = parseFloat(inputs.costPerDiaper) || 0.24;
+      const d1 = inputs.diapersPerDayYear1 !== undefined && inputs.diapersPerDayYear1 !== '' ? Math.max(0, parseInt(inputs.diapersPerDayYear1, 10) || 0) : 7;
+      const d23 = inputs.diapersPerDayYear2to3 !== undefined && inputs.diapersPerDayYear2to3 !== '' ? Math.max(0, parseInt(inputs.diapersPerDayYear2to3, 10) || 0) : 5;
+      const price = inputs.costPerDiaper !== undefined && inputs.costPerDiaper !== '' ? Math.max(0, parseFloat(inputs.costPerDiaper) || 0) : 0.24;
 
       const totalYear1 = d1 * 365;
       const totalYear2to3 = d23 * 365 * 2;
@@ -2434,7 +2434,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const type = inputs.equipmentStandard || 'smart_mix';
-      const gifts = parseFloat(inputs.hasPresentsBudget) || 500;
+      const gifts = inputs.hasPresentsBudget !== undefined && inputs.hasPresentsBudget !== '' ? Math.max(0, parseFloat(inputs.hasPresentsBudget) || 0) : 500;
 
       let totalGrossCost = 1650;
       if (type === 'used_thrifty') totalGrossCost = 750;
@@ -2498,10 +2498,10 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'lunchCateringMonthly', label: 'Monatliches Essensgeld (Mittagessen)', type: 'number', defaultValue: 75, min: 0, max: 150, step: 5, unit: '€/Monat' },
     ],
     calculate: (inputs) => {
-      const income = parseFloat(inputs.familyGrossIncome) || 65000;
+      const income = inputs.familyGrossIncome !== undefined && inputs.familyGrossIncome !== '' ? Math.max(0, parseFloat(inputs.familyGrossIncome) || 0) : 65000;
       const isU3 = inputs.childAgeCategory === 'krippe';
-      const hours = parseFloat(inputs.hoursPerDay) || 8;
-      const lunch = parseFloat(inputs.lunchCateringMonthly) || 75;
+      const hours = inputs.hoursPerDay !== undefined && inputs.hoursPerDay !== '' ? Math.max(0, parseFloat(inputs.hoursPerDay) || 0) : 8;
+      const lunch = inputs.lunchCateringMonthly !== undefined && inputs.lunchCateringMonthly !== '' ? Math.max(0, parseFloat(inputs.lunchCateringMonthly) || 0) : 75;
 
       // Typische kommunale Einkommensstaffel in Deutschland:
       // Krippe: ca. 4 % bis 6 % des Monatseinkommens
@@ -2562,7 +2562,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const isThirdPlus = inputs.childOrder === 'third_plus';
-      const months = parseInt(inputs.monthsClaimed, 10) || 24;
+      const months = inputs.monthsClaimed !== undefined && inputs.monthsClaimed !== '' ? Math.max(0, parseInt(inputs.monthsClaimed, 10) || 0) : 24;
 
       const monthlyRate = isThirdPlus ? 300 : 250;
       const totalPayout = monthlyRate * months;
@@ -2677,7 +2677,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'schoolKidsCount', label: 'Anzahl schulpflichtiger Kinder im Haushalt', type: 'number', defaultValue: 2, min: 1, max: 8, step: 1 },
     ],
     calculate: (inputs) => {
-      const kids = parseInt(inputs.schoolKidsCount, 10) || 2;
+      const kids = inputs.schoolKidsCount !== undefined && inputs.schoolKidsCount !== '' ? Math.max(0, parseInt(inputs.schoolKidsCount, 10) || 0) : 2;
 
       // Gesetzlicher Satz Schulbedarfspaket: 195 € pro Schuljahr je Kind
       // Aufgeteilt in: 130 € im August (1. Schulhalbjahr) + 65 € im Februar (2. Schulhalbjahr)
@@ -2752,8 +2752,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const net = parseFloat(inputs.monthlyNetIncome) || 2400;
-      const days = parseInt(inputs.sickDaysClaimed, 10) || 5;
+      const net = inputs.monthlyNetIncome !== undefined && inputs.monthlyNetIncome !== '' ? Math.max(0, parseFloat(inputs.monthlyNetIncome) || 0) : 2400;
+      const days = inputs.sickDaysClaimed !== undefined && inputs.sickDaysClaimed !== '' ? Math.max(0, parseInt(inputs.sickDaysClaimed, 10) || 0) : 5;
       const isSingle = inputs.parentStatus === 'single';
 
       // Kinderkrankengeld beträgt ca. 90 % des ausgefallenen Nettoentgelts
@@ -2890,7 +2890,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     ],
     calculate: (inputs) => {
       const isOwn = inputs.livingArrangement === 'own_household';
-      const ownIncome = parseFloat(inputs.childOwnIncome) || 0;
+      const ownIncome = inputs.childOwnIncome !== undefined && inputs.childOwnIncome !== '' ? Math.max(0, parseFloat(inputs.childOwnIncome) || 0) : 0;
 
       // Düsseldorfer Tabelle: Fester Bedarf für Studenten mit eigenem Hausstand = 930 € (inkl. 410 € Warmmiete)
       const baseNeed = isOwn ? 930 : 689;
@@ -2945,8 +2945,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'baseChildSupport', label: 'Bisheriger Tabellenunterhalt der Eltern vor Ausbildungsbeginn', type: 'number', defaultValue: 620, min: 300, max: 1200, step: 20, unit: '€' },
     ],
     calculate: (inputs) => {
-      const salary = parseFloat(inputs.netApprenticeSalary) || 750;
-      const baseSupport = parseFloat(inputs.baseChildSupport) || 620;
+      const salary = inputs.netApprenticeSalary !== undefined && inputs.netApprenticeSalary !== '' ? Math.max(0, parseFloat(inputs.netApprenticeSalary) || 0) : 750;
+      const baseSupport = inputs.baseChildSupport !== undefined && inputs.baseChildSupport !== '' ? Math.max(0, parseFloat(inputs.baseChildSupport) || 0) : 620;
 
       // Gesetzlicher Abzug: Ausbildungsbedingter Mehrbedarf (Pauschale für Fachbücher, Kleidung, Fahrt) = 100 €
       const allowance = 100;
@@ -3000,8 +3000,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { id: 'taxRatePct', label: 'Persönlicher Grenzsteuersatz der Eltern', type: 'number', defaultValue: 35, min: 14, max: 45, step: 1, unit: '%' },
     ],
     calculate: (inputs) => {
-      const costs = parseFloat(inputs.actualCareCostsYearly) || 3600;
-      const rate = (parseFloat(inputs.taxRatePct) || 35) / 100;
+      const costs = inputs.actualCareCostsYearly !== undefined && inputs.actualCareCostsYearly !== '' ? Math.max(0, parseFloat(inputs.actualCareCostsYearly) || 0) : 3600;
+      const rate = (inputs.taxRatePct !== undefined && inputs.taxRatePct !== '' ? Math.max(0, parseFloat(inputs.taxRatePct) || 0) : 35) / 100;
 
       // Nach § 10 Abs. 1 Nr. 5 EStG: Zwei Drittel der Aufwendungen, maximal 4.000 € je Kind
       const twoThirds = costs * (2 / 3);

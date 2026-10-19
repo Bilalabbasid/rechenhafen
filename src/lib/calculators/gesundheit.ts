@@ -3,8 +3,12 @@ import { formatNumber } from '@/lib/formatters';
 
 export function calculateBMI(inputs: Record<string, any>): CalculationResult {
   const unitSystem = inputs.unitSystem || 'metric'; // 'metric' (kg, cm) vs 'imperial' (lbs, inch)
-  let rawWeight = parseFloat(inputs.weight) || 75;
-  let rawHeight = parseFloat(inputs.height) || 178;
+  let rawWeight = inputs.weight !== undefined && inputs.weight !== null && String(inputs.weight).trim() !== ''
+    ? parseFloat(inputs.weight)
+    : 75;
+  let rawHeight = inputs.height !== undefined && inputs.height !== null && String(inputs.height).trim() !== ''
+    ? parseFloat(inputs.height)
+    : 178;
 
   let weightKg = rawWeight;
   let heightCm = rawHeight;
@@ -171,8 +175,12 @@ export function calculateCalorieNeeds(inputs: Record<string, any>): CalculationR
 }
 
 export function calculateWaterIntake(inputs: Record<string, any>): CalculationResult {
-  const weight = parseFloat(inputs.weight) || 75;
-  const sportsMinutes = parseFloat(inputs.sportsMinutes) || 30; // Sportminuten pro Tag
+  const weight = inputs.weight !== undefined && inputs.weight !== null && String(inputs.weight).trim() !== ''
+    ? parseFloat(inputs.weight)
+    : 75;
+  const sportsMinutes = inputs.sportsMinutes !== undefined && inputs.sportsMinutes !== null && String(inputs.sportsMinutes).trim() !== ''
+    ? Math.max(0, parseFloat(inputs.sportsMinutes) || 0)
+    : 30; // Sportminuten pro Tag
   const isHotWeather = inputs.isHotWeather === true || inputs.isHotWeather === 'true';
 
   if (weight <= 0) {
@@ -215,10 +223,18 @@ export function calculateWaterIntake(inputs: Record<string, any>): CalculationRe
 }
 
 export function calculateRunningPace(inputs: Record<string, any>): CalculationResult {
-  const distanceKm = parseFloat(inputs.distanceKm) || 10;
-  const hours = parseInt(inputs.hours || '0', 10);
-  const minutes = parseInt(inputs.minutes || '50', 10);
-  const seconds = parseInt(inputs.seconds || '0', 10);
+  const distanceKm = inputs.distanceKm !== undefined && inputs.distanceKm !== null && String(inputs.distanceKm).trim() !== ''
+    ? parseFloat(inputs.distanceKm)
+    : 10;
+  const hours = inputs.hours !== undefined && inputs.hours !== null && String(inputs.hours).trim() !== ''
+    ? Math.max(0, parseInt(String(inputs.hours), 10) || 0)
+    : 0;
+  const minutes = inputs.minutes !== undefined && inputs.minutes !== null && String(inputs.minutes).trim() !== ''
+    ? Math.max(0, parseInt(String(inputs.minutes), 10) || 0)
+    : 50;
+  const seconds = inputs.seconds !== undefined && inputs.seconds !== null && String(inputs.seconds).trim() !== ''
+    ? Math.max(0, parseInt(String(inputs.seconds), 10) || 0)
+    : 0;
 
   const totalSeconds = hours * 3600 + minutes * 60 + seconds;
 

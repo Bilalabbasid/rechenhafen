@@ -13,6 +13,13 @@ export function calculatePregnancyDueDate(inputs: Record<string, any>): Calculat
     };
   }
 
+  if (isNaN(cycleDays) || cycleDays < 20 || cycleDays > 45) {
+    return {
+      primary: { id: 'dueDate', label: 'Geburtstermin', value: '', formattedValue: '-' },
+      error: 'Bitte eine typische Zyklusdauer (20–45 Tage) angeben.',
+    };
+  }
+
   // Erweiterte Naegele-Regel:
   // ET = Erster Tag der letzten Regelblutung + 7 Tage - 3 Monate + 1 Jahr + (Zyklusdauer - 28 Tage)
   // Rechnerisch: + 280 Tage + (Zyklusdauer - 28)
