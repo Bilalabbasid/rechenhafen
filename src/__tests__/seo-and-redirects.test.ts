@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 import nextConfig from '../../next.config';
 import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
@@ -443,6 +445,32 @@ describe('SEO & 301 Redirects Verification', () => {
     ];
     for (const eu of excludedUrls) {
       expect(sitemapSet.has(eu), `Excluded redirect URL present in sitemap: ${eu}`).toBe(false);
+    }
+  });
+
+  it('includes exact Google AdSense ownership verification tag in root layout <head> once and without ad scripts', () => {
+    const layoutPath = path.resolve(__dirname, '../app/layout.tsx');
+    const layoutContent = fs.readFileSync(layoutPath, 'utf8');
+
+    // Exact required meta tag
+    expect(layoutContent).toContain('<meta name="google-adsense-account" content="ca-pub-4789347477675358" />');
+
+    // Exactly one instance
+    const matches = layoutContent.match(/ca-pub-4789347477675358/g);
+    expect(matches).not.toBeNull();
+    expect(matches?.length).toBe(1);
+
+    // No advertising scripts or Auto ads
+    expect(layoutContent).not.toContain('adsbygoogle');
+    expect(layoutContent).not.toContain('pagead2.googlesyndication.com');
+
+    // If .next build output exists, verify rendered HTML
+    const indexPath = path.resolve(__dirname, '../../.next/server/app/index.html');
+    if (fs.existsSync(indexPath)) {
+      const indexHtml = fs.readFileSync(indexPath, 'utf8');
+      expect(indexHtml).toContain('<meta name="google-adsense-account" content="ca-pub-4789347477675358"/>');
+      const metaMatches = indexHtml.match(/<meta[^>]*google-adsense-account[^>]*>/g);
+      expect(metaMatches?.length).toBe(1);
     }
   });
 });
