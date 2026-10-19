@@ -1,19 +1,11 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, X, Calculator, ArrowRight, CornerDownLeft } from 'lucide-react';
-import type { SearchItem } from '@/data/searchIndex';
+import { searchCalculators, SearchResultItem } from '@/lib/search/searchEngine';
 import styles from '@/styles/search.module.css';
-
-interface SearchResult {
-  id: string;
-  slug: string;
-  name: string;
-  category: string;
-  shortDescription?: string;
-}
 
 interface Props {
   placeholder?: string;
@@ -32,16 +24,6 @@ const POPULAR_SUGGESTIONS = [
   { name: 'BMI-Rechner', slug: 'bmi-rechner' },
 ];
 
-let searchIndexPromise: Promise<SearchItem[]> | undefined;
-
-function loadSearchIndex() {
-  if (!searchIndexPromise) {
-    searchIndexPromise = import('@/data/searchIndex').then(({ SEARCH_INDEX }) => SEARCH_INDEX);
-  }
-
-  return searchIndexPromise;
-}
-
 export default function SearchBar({
   placeholder = 'Rechner suchen, z. B. Brutto Netto, Prozent, BMI ...',
   onSelect,
@@ -51,21 +33,17 @@ export default function SearchBar({
 }: Props) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<SearchResultItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsListRef = useRef<HTMLUListElement>(null);
   const router = useRouter();
-
-  // Begin loading before the visitor types so the first search feels instant.
-  useEffect(() => {
-    void loadSearchIndex();
-  }, []);
+  const searchId = useId();
 
   // Global Shortcut Ctrl+K / Cmd+K
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         inputRef.current?.focus();
@@ -74,93 +52,26 @@ export default function SearchBar({
         }
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [query, results]);
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [query, results.length]);
 
-  // Search logic using lightweight searchIndex
+  // Search execution using deterministic local search engine
   useEffect(() => {
-    let cancelled = false;
-
     if (!query.trim()) {
       setResults([]);
       setIsOpen(false);
       setSelectedIndex(-1);
-      return () => {
-        cancelled = true;
-      };
+      return;
     }
 
-    const q = query.toLowerCase().trim();
-    const tokens = q.split(/\s+/).filter(Boolean);
-
-    // German Synonym expansions
-    const searchTerms = [...tokens];
-    if (q.includes('gehalt') || q.includes('lohn') || q.includes('brutto') || q.includes('netto')) {
-      searchTerms.push('brutto-netto', 'gehaltsrechner', 'nettolohn', 'stundenlohn', 'teilzeit');
-    }
-    if (q.includes('auto') || q.includes('kfz') || q.includes('sprit') || q.includes('diesel') || q.includes('benzin')) {
-      searchTerms.push('spritkosten', 'pendlerpauschale', 'verbrauch', 'fahrzeit');
-    }
-    if (q.includes('alter') || q.includes('geburt') || q.includes('wie alt')) {
-      searchTerms.push('altersrechner', 'alter in tagen', 'geburtstag');
-    }
-    if (q.includes('steuer') || q.includes('einkommensteuer') || q.includes('solz') || q.includes('mwst') || q.includes('ust')) {
-      searchTerms.push('einkommensteuer', 'grenzsteuersatz', 'abfindung', 'umsatzsteuer', 'mwst');
-    }
-    if (q.includes('zins') || q.includes('kredit') || q.includes('darlehen') || q.includes('sparen')) {
-      searchTerms.push('zinseszins', 'kreditrechner', 'tilgungsrechner', 'sparrechner');
-    }
-
-    void loadSearchIndex().then((SEARCH_INDEX) => {
-      if (cancelled) return;
-
-      // Score and rank matches
-      const matched = SEARCH_INDEX.map((item) => {
-        const nameLower = item.name.toLowerCase();
-        const catLower = item.category.toLowerCase();
-        const kwLower = item.keywords.join(' ').toLowerCase();
-        let score = 0;
-
-        // Exact name start matches get highest priority
-        if (nameLower.startsWith(q)) score += 50;
-        else if (nameLower.includes(q)) score += 30;
-
-        // Token matches
-        for (const token of tokens) {
-          if (nameLower.includes(token)) score += 15;
-          if (kwLower.includes(token)) score += 8;
-          if (catLower.includes(token)) score += 5;
-        }
-
-        // Synonym matches
-        for (const term of searchTerms) {
-          if (nameLower.includes(term) || kwLower.includes(term)) score += 4;
-        }
-
-        return { item, score };
-      })
-        .filter((entry) => entry.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 8)
-        .map((entry) => ({
-          id: entry.item.id,
-          slug: entry.item.slug,
-          name: entry.item.name,
-          category: entry.item.category,
-        }));
-
-      setResults(matched);
-      setIsOpen(true);
-      setSelectedIndex(-1);
-    });
-
-    return () => {
-      cancelled = true;
-    };
+    const matches = searchCalculators(query, { limit: 8, minScore: 20 });
+    setResults(matches);
+    setIsOpen(true);
+    setSelectedIndex(-1);
   }, [query]);
 
-  // Click outside listener
+  // Click outside listener to dismiss suggestions
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -187,6 +98,7 @@ export default function SearchBar({
     if (!isOpen) {
       if (e.key === 'ArrowDown' && results.length > 0) {
         setIsOpen(true);
+        e.preventDefault();
       }
       return;
     }
@@ -211,7 +123,7 @@ export default function SearchBar({
     }
   };
 
-  // Ensure active element is scrolled into view
+  // Ensure keyboard-selected element scrolls into view
   useEffect(() => {
     if (selectedIndex >= 0 && resultsListRef.current) {
       const activeEl = resultsListRef.current.children[selectedIndex] as HTMLElement;
@@ -219,14 +131,25 @@ export default function SearchBar({
     }
   }, [selectedIndex]);
 
-  // Highlight query term in result name
-  const renderHighlightedText = (text: string, highlight: string) => {
-    if (!highlight.trim()) return text;
-    const parts = text.split(new RegExp(`(${highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+  // Safely highlight matching query tokens in the result name without raw HTML injection
+  const renderHighlightedText = (text: string, queryText: string) => {
+    if (!queryText.trim()) return text;
+
+    const words = queryText
+      .trim()
+      .split(/[\s,.-]+/)
+      .filter((w) => w.length >= 2)
+      .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+
+    if (words.length === 0) return text;
+
+    const regex = new RegExp(`(${words.join('|')})`, 'gi');
+    const parts = text.split(regex);
+
     return (
       <>
         {parts.map((part, i) =>
-          part.toLowerCase() === highlight.toLowerCase() ? (
+          regex.test(part) ? (
             <mark key={i} className={styles.highlightMark}>
               {part}
             </mark>
@@ -237,6 +160,12 @@ export default function SearchBar({
       </>
     );
   };
+
+  const listboxId = `search-results-${searchId}`;
+  const activeOptionId =
+    selectedIndex >= 0 && results[selectedIndex]
+      ? `search-option-${searchId}-${results[selectedIndex].id}`
+      : undefined;
 
   return (
     <div
@@ -260,14 +189,15 @@ export default function SearchBar({
           onChange={(e) => setQuery(e.target.value.slice(0, 100))}
           onInput={(e) => setQuery((e.target as HTMLInputElement).value.slice(0, 100))}
           onFocus={() => {
-            if (query.trim() && results.length > 0) setIsOpen(true);
+            if (query.trim() && (results.length > 0 || query.trim().length > 1)) setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           aria-label="Rechner suchen"
-          aria-expanded={isOpen}
-          aria-controls="search-results-list"
+          aria-expanded={isOpen && (results.length > 0 || query.trim().length > 1)}
+          aria-controls={listboxId}
           aria-autocomplete="list"
+          aria-activedescendant={activeOptionId}
           role="combobox"
           className={styles.searchInput}
         />
@@ -278,6 +208,8 @@ export default function SearchBar({
               onClick={() => {
                 setQuery('');
                 setIsOpen(false);
+                setResults([]);
+                setSelectedIndex(-1);
                 inputRef.current?.focus();
               }}
               className={styles.clearBtn}
@@ -294,7 +226,7 @@ export default function SearchBar({
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className={styles.resultsDropdown} role="listbox">
+        <div className={styles.resultsDropdown}>
           <div className={styles.resultsHeader}>
             <span>Gefundene Rechner</span>
             <span className={styles.resultsHeaderHint}>
@@ -302,13 +234,21 @@ export default function SearchBar({
               Eingabe zum Öffnen
             </span>
           </div>
-          <ul id="search-results-list" ref={resultsListRef} className={styles.resultsList}>
+          <ul
+            id={listboxId}
+            ref={resultsListRef}
+            className={styles.resultsList}
+            role="listbox"
+            aria-label="Suchergebnisse"
+          >
             {results.map((res, index) => {
               const isSelected = index === selectedIndex;
+              const optionId = `search-option-${searchId}-${res.id}`;
               return (
-                <li key={res.id}>
-                  <button
-                    type="button"
+                <li key={res.id} role="none">
+                  <Link
+                    id={optionId}
+                    href={`/rechner/${res.slug}/`}
                     onClick={() => handleSelect(res.slug)}
                     className={`${styles.resultItem} ${isSelected ? styles.resultItemActive : ''}`}
                     role="option"
@@ -318,13 +258,18 @@ export default function SearchBar({
                     <div className={styles.resultText}>
                       <div className={styles.resultTitleRow}>
                         <span className={styles.resultName}>
-                          {renderHighlightedText(res.name, query.trim())}
+                          {renderHighlightedText(res.name, query)}
                         </span>
-                        <span className={styles.resultCategory}>{res.category}</span>
+                        <span className={styles.resultCategory}>{res.categoryName}</span>
                       </div>
+                      {res.shortDescription && (
+                        <span className={styles.resultDesc}>
+                          {res.shortDescription}
+                        </span>
+                      )}
                     </div>
                     <ArrowRight size={14} className={styles.resultArrow} aria-hidden="true" />
-                  </button>
+                  </Link>
                 </li>
               );
             })}
@@ -335,20 +280,39 @@ export default function SearchBar({
       {isOpen && query.trim().length > 1 && results.length === 0 && (
         <div className={styles.resultsDropdown}>
           <div className={styles.emptyState}>
-            <p className={styles.emptyText}>
-              Kein passender Rechner für „<strong>{query}</strong>“ gefunden.
+            <p className={styles.emptyText} style={{ marginBottom: '8px' }}>
+              Kein passender Rechner gefunden. Versuchen Sie einen kürzeren Suchbegriff oder wählen Sie eine Kategorie.
             </p>
-            <div className={styles.suggestionsTitle}>Beliebte Vorschläge:</div>
+            <div style={{ margin: '12px 0 16px' }}>
+              <Link
+                href="/rechner/"
+                onClick={() => {
+                  setIsOpen(false);
+                  if (onSelect) onSelect();
+                }}
+                className={styles.suggestionChip}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontWeight: 600,
+                  padding: '6px 14px',
+                }}
+              >
+                Zum Rechner-Verzeichnis (alle 421 Rechner) →
+              </Link>
+            </div>
+            <div className={styles.suggestionsTitle}>Beliebte Rechner:</div>
             <div className={styles.suggestionChips}>
               {POPULAR_SUGGESTIONS.map((item) => (
-                <button
+                <Link
                   key={item.slug}
-                  type="button"
+                  href={`/rechner/${item.slug}/`}
                   onClick={() => handleSelect(item.slug)}
                   className={styles.suggestionChip}
                 >
                   {item.name}
-                </button>
+                </Link>
               ))}
             </div>
           </div>

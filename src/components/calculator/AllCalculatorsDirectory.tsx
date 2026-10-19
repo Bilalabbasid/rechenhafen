@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, Filter } from 'lucide-react';
 import CalculatorCard from '@/components/common/CalculatorCard';
+import { searchCalculators } from '@/lib/search/searchEngine';
 import cardsStyles from '@/styles/cards.module.css';
 
 interface CategoryMeta {
@@ -62,15 +63,12 @@ export default function AllCalculatorsDirectory({ calculators, categories }: Pro
 
     // Filter by Search Query
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter((c) => {
-        return (
-          c.name.toLowerCase().includes(q) ||
-          (c.shortName && c.shortName.toLowerCase().includes(q)) ||
-          c.shortDescription.toLowerCase().includes(q) ||
-          c.categoryName.toLowerCase().includes(q)
-        );
-      });
+      const searchMatches = searchCalculators(searchQuery, { limit: 500, minScore: 20 });
+      const scoreMap = new Map(searchMatches.map((m) => [m.slug, m.score]));
+
+      result = result
+        .filter((c) => scoreMap.has(c.slug))
+        .sort((a, b) => (scoreMap.get(b.slug) || 0) - (scoreMap.get(a.slug) || 0));
     }
 
     return result;
@@ -103,6 +101,7 @@ export default function AllCalculatorsDirectory({ calculators, categories }: Pro
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onInput={(e) => setSearchQuery((e.target as HTMLInputElement).value)}
             placeholder="Verzeichnis durchsuchen (z. B. Gehalt, Zinsen, Alter, Sprit)..."
             aria-label="Rechner im Verzeichnis filtern"
             style={{

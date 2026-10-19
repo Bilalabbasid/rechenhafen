@@ -8,7 +8,7 @@ import styles from '@/styles/layout.module.css';
 
 export const metadata: Metadata = {
   title: 'Alle Rechner – Gesamtverzeichnis',
-  description: 'Übersicht über alle 418 kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.',
+  description: 'Übersicht über alle 421 kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.',
   alternates: {
     canonical: 'https://rechenhafen.de/rechner/',
   },

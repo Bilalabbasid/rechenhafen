@@ -484,5 +484,56 @@
 - **Production Build:** `npm run build` $\to$ 471/471 static routes compiled successfully.
 - **Live Browser QA:** Validated in local browser session (`qa_experience_check`), confirming layout, interactions, bookmark toggle, copy result, and mobile navigation.
 
+## 11. Internal Calculator Search Relevance and Usability Overhaul
+- **Root Causes of Prior Ranking & Usability Defects:**
+  1. **Manual Static Index Disconnect:** `src/data/searchIndex.ts` was a legacy 7,088-line static snapshot of 405 calculators; 16 recently published calculators (including `zucker-ersatz-rechner`) were absent from the static index file.
+  2. **Unweighted Generic Query Overlap:** Generic question words (`wie`, `viel`, `kann`, `ich`) had equal flat score weight (+15/+8) across tokens. Financial and loan tools with long title questions like *"wie viel miete kann ich mir leisten"* accumulated points for "wie" + "viel", outranking specialized calculators when users searched *"wie viel erythrit statt zucker"*.
+  3. **Lack of German Normalization:** Umlauts (`ä/ae`, `ö/oe`, `ü/ue`, `ß/ss`) were not symmetrically normalized, creating disparities for searches like `heizölverbrauch` vs `heizoelverbrauch`.
+  4. **Missing Typo Tolerance:** No fuzzy fallback existed for minor spelling variations like `erytrit`.
+  5. **Raw Category Slug Exposure:** Search dropdown rendered `{res.category}` (`kochen-backen`, `datum-zeit`) instead of readable German category names (`Kochen & Backen`, `Datum & Zeit`).
+  6. **Interactive Link Accessibility:** Search results rendered `<button>` tags instead of semantic `<Link href="...">` (`<a>`) tags, preventing native browser actions like right-click "Open in new tab" or middle-click.
+  7. **Missing Result Descriptions:** Results omitted the calculator's `shortDescription`.
+  8. **Missing Empty State Guidance:** When no matches occurred, the dropdown did not provide actionable German guidance or a direct link to the directory.
+- **Exact Changes Implemented:**
+  - `src/lib/search/searchEngine.ts`:
+    - Built dynamic in-memory search index derived directly from the canonical `ALL_CALCULATORS` registry (421 calculators) and `CATEGORIES`.
+    - Implemented `normalizeGermanText()` mapping `ä` $\to$ `ae`, `ö` $\to$ `oe`, `ü` $\to$ `ue`, `ß` $\to$ `ss`, and punctuation handling.
+    - Implemented Damerau-Levenshtein distance algorithm for controlled typo matching on non-stopwords $\ge 5$ chars.
+    - Implemented Term Specificity & Content Coverage: Discriminative content terms receive 60-150 pts while generic stopwords (`wie`, `viel`, `kann`, `ich`, etc.) receive only 2-3 pts. Calculators matching 0 content tokens are heavily penalized/filtered out.
+    - Directional sensitivity: Token sequence order and origin prefix matching prioritize intended direction (`netto in brutto` $\to$ `netto-brutto-rechner`; `brutto in netto` $\to$ `brutto-netto-rechner`).
+  - `src/components/common/SearchBar.tsx`:
+    - Integrated `searchCalculators()` from `searchEngine.ts`.
+    - Switched result rows from `<button>` to semantic `<Link href={`/rechner/${res.slug}/`}>`.
+    - Displaying resolved German category name (`res.categoryName`) and `res.shortDescription`.
+    - Multi-token safe highlighting (`<mark>`) without raw HTML injection.
+    - Full combobox ARIA pattern (`role="combobox"`, `aria-autocomplete="list"`, `aria-activedescendant`, `aria-expanded`).
+    - Standardized empty state: *"Kein passender Rechner gefunden. Versuchen Sie einen kürzeren Suchbegriff oder wählen Sie eine Kategorie."* with direct working link to `/rechner/`.
+  - `src/components/calculator/AllCalculatorsDirectory.tsx`:
+    - Integrated `searchCalculators()` into directory search filter for unified ranking across header, homepage hero, and directory.
+  - `src/data/searchIndex.ts`:
+    - Replaced static 7,088-line file with a dynamic lightweight export derived from `ALL_CALCULATORS`.
+- **Before / After Ranking Verification:**
+  | Query | Before Ranking | After Ranking | Top Result URL | Category Displayed |
+  |---|---|---|---|---|
+  | `Erythrit` | Missing from static index / unranked | #1 Zucker-Ersatz-Rechner | `/rechner/zucker-ersatz-rechner/` | Kochen & Backen |
+  | `wie viel erythrit statt zucker` | Mietbudget- / Kreditrechner (#1) | #1 Zucker-Ersatz-Rechner (Miet/Kredit filtered out) | `/rechner/zucker-ersatz-rechner/` | Kochen & Backen |
+  | `150 g zucker wieviel erythrit` | Unrelated or low rank | #1 Zucker-Ersatz-Rechner | `/rechner/zucker-ersatz-rechner/` | Kochen & Backen |
+  | `erytrit` | 0 results (no typo tolerance) | #1 Zucker-Ersatz-Rechner (fuzzy match) | `/rechner/zucker-ersatz-rechner/` | Kochen & Backen |
+  | `lebensmonate` | Altersrechner / mixed | #1 Alter-in-Monaten-Rechner | `/rechner/alter-in-monaten/` | Datum & Zeit |
+  | `heizölverbrauch` | Oil calculator | #1 Ölheizung-Verbrauch-Rechner | `/rechner/oelheizung-verbrauch-rechner/` | Haushalt & Energie |
+  | `heizoelverbrauch` | Missing or ranked lower | #1 Ölheizung-Verbrauch-Rechner (identical score to umlaut) | `/rechner/oelheizung-verbrauch-rechner/` | Haushalt & Energie |
+  | `splitt 2/5 gewicht` | Unranked / naive substring miss | #1 Kies- & Splitt-Rechner | `/rechner/kies-splitt-rechner/` | Bauen & Renovieren |
+  | `wie viel miete kann ich mir leisten` | Mietbudget-Rechner | #1 Mietbudget-Rechner | `/rechner/mietbudget-rechner/` | Wohnen & Immobilien |
+  | `wie viel kredit kann ich mir leisten` | Maximaler-Kredit-Rechner | #1 Maximaler Kredit-Rechner | `/rechner/maximaler-kredit-rechner/` | Kredit & Schulden |
+  | `netto in brutto` | Ambiguous | #1 Netto-Brutto-Rechner (Wunsch-Netto) | `/rechner/netto-brutto-rechner/` | Steuern & Gehalt |
+  | `brutto in netto` | Ambiguous | #1 Brutto-Netto-Rechner (Gehaltsrechner) | `/rechner/brutto-netto-rechner/` | Steuern & Gehalt |
+- **Quality Gates & Production Verification:**
+  - `npm test`: 29 test files, 347 tests passing (100% pass), including 18 dedicated tests in `src/__tests__/search-relevance.test.ts`.
+  - `npx tsc --noEmit`: 0 errors.
+  - `npm run lint`: 0 errors, 0 warnings.
+  - `npm run build`: 471/471 static routes generated successfully in 4.9s.
+  - Production Browser QA (`prod_search_qa` recording): Verified homepage hero search, keyboard arrow selection, Enter navigation, header typo search, empty state German text and link, and directory search.
+
+
 
 
