@@ -16,8 +16,8 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die Zinserträge für Tagesgeldanlagen unter Berücksichtigung des Zinsgutschrift-Intervalls mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['tagesgeld rechner', 'tagesgeld zinsen berechnen', 'zinsertrag tagesgeld monatlich', 'zinseszins tagesgeld'],
     inputs: [
-      { id: 'deposit', label: 'Anlagebetrag', type: 'number', defaultValue: 10000, min: 100, step: 500, unit: '€' },
-      { id: 'rate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.5, min: 0.1, step: 0.1, unit: '%' },
+      { id: 'deposit', label: 'Anlagebetrag', type: 'number', defaultValue: 10000, min: 0, step: 500, unit: '€' },
+      { id: 'rate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.5, min: 0, step: 0.1, unit: '%' },
       { id: 'months', label: 'Anlagedauer in Monaten', type: 'number', defaultValue: 12, min: 1, step: 1, unit: 'Monate' },
       {
         id: 'payout',
@@ -32,9 +32,21 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const deposit = parseFloat(inputs.deposit) || 10000;
-      const rate = parseFloat(inputs.rate) || 3.5;
-      const months = parseInt(inputs.months, 10) || 12;
+      const rawDeposit = inputs.deposit !== undefined && inputs.deposit !== null && String(inputs.deposit).trim() !== ''
+        ? parseFloat(inputs.deposit)
+        : 10000;
+      const deposit = !isNaN(rawDeposit) ? Math.max(0, rawDeposit) : 10000;
+
+      const rawRate = inputs.rate !== undefined && inputs.rate !== null && String(inputs.rate).trim() !== ''
+        ? parseFloat(inputs.rate)
+        : 3.5;
+      const rate = !isNaN(rawRate) ? Math.max(0, rawRate) : 3.5;
+
+      const rawMonths = inputs.months !== undefined && inputs.months !== null && String(inputs.months).trim() !== ''
+        ? parseInt(inputs.months, 10)
+        : 12;
+      const months = !isNaN(rawMonths) ? Math.max(0, rawMonths) : 12;
+
       const payout = inputs.payout || 'quarterly';
       let periodsPerYear = 4;
       if (payout === 'monthly') periodsPerYear = 12;
@@ -169,25 +181,42 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die exakte Spardauer in Jahren und Monaten, um mit einer regelmäßigen monatlichen Sparrate Ihr Sparziel zu erreichen.',
     searchKeywords: ['spardauer rechner', 'spardauer berechnen', 'wie lange muss ich sparen', 'dauer bis sparziel', 'sparzeit berechnen'],
     inputs: [
-      { id: 'targetAmount', label: 'Gewünschtes Sparziel', type: 'number', defaultValue: 25000, min: 1000, step: 1000, unit: '€' },
-      { id: 'monthlyContribution', label: 'Monatliche Sparrate', type: 'number', defaultValue: 350, min: 25, step: 25, unit: '€' },
-      { id: 'initialCapital', label: 'Bereits vorhandenes Startkapital', type: 'number', defaultValue: 2000, min: 0, step: 500, unit: '€' },
-      { id: 'expectedReturn', label: 'Erwartete Rendite / Zins p.a.', type: 'number', defaultValue: 4.0, min: 0, max: 15, step: 0.5, unit: '%' },
+      { id: 'targetAmount', label: 'Gewünschtes Sparziel', type: 'number', defaultValue: 25000, min: 0, step: 1000, unit: '€' },
+      { id: 'monthlyContribution', label: 'Monatliche Sparrate', type: 'number', defaultValue: 350, min: 1, step: 25, unit: '€' },
+      { id: 'initialCapital', label: 'Bereits vorhandenes Startkapital', type: 'number', defaultValue: 2000, min: 0, step: 500, unit: '€', helpText: 'Bereits vorhandenes Kapital (0 € wenn noch kein Guthaben vorhanden ist).' },
+      { id: 'expectedReturn', label: 'Erwartete Rendite / Zins p.a.', type: 'number', defaultValue: 4.0, min: 0, max: 20, step: 0.5, unit: '%' },
     ],
     calculate: (inputs) => {
-      const target = parseFloat(inputs.targetAmount) || 25000;
-      const monthly = parseFloat(inputs.monthlyContribution) || 350;
-      const start = parseFloat(inputs.initialCapital) || 0;
-      const ret = parseFloat(inputs.expectedReturn) || 0;
+      const rawTarget = inputs.targetAmount !== undefined && inputs.targetAmount !== null && String(inputs.targetAmount).trim() !== ''
+        ? parseFloat(inputs.targetAmount)
+        : 25000;
+      const target = !isNaN(rawTarget) ? Math.max(0, rawTarget) : 25000;
 
-      if (start >= target) {
+      const rawMonthly = inputs.monthlyContribution !== undefined && inputs.monthlyContribution !== null && String(inputs.monthlyContribution).trim() !== ''
+        ? parseFloat(inputs.monthlyContribution)
+        : 350;
+      const monthly = !isNaN(rawMonthly) ? Math.max(0, rawMonthly) : 350;
+
+      const rawStart = inputs.initialCapital !== undefined && inputs.initialCapital !== null && String(inputs.initialCapital).trim() !== ''
+        ? parseFloat(inputs.initialCapital)
+        : 0;
+      const start = !isNaN(rawStart) ? Math.max(0, rawStart) : 0;
+
+      const rawRet = inputs.expectedReturn !== undefined && inputs.expectedReturn !== null && String(inputs.expectedReturn).trim() !== ''
+        ? parseFloat(inputs.expectedReturn)
+        : 4.0;
+      const ret = !isNaN(rawRet) ? Math.max(0, rawRet) : 4.0;
+
+      if (target <= 0 || start >= target) {
         return {
           primary: { id: 'duration', label: 'Benötigte Spardauer', value: 0, formattedValue: '0 Monate (Ziel bereits erreicht)', highlight: true },
           secondary: [
             { id: 'totalDeposits', label: 'Eigene Einzahlungen', value: start, formattedValue: formatCurrency(start) },
             { id: 'interest', label: 'Erwirtschaftete Zinsen', value: 0, formattedValue: formatCurrency(0) },
           ],
-          summaryText: `Ihr Startkapital von ${formatCurrency(start)} deckt das gewünschte Sparziel von ${formatCurrency(target)} bereits vollständig ab.`,
+          summaryText: target === 0
+            ? 'Bei einem Sparziel von 0 € ist keine Spardauer erforderlich.'
+            : `Ihr Startkapital von ${formatCurrency(start)} deckt das gewünschte Sparziel von ${formatCurrency(target)} bereits vollständig ab.`,
         };
       }
 
@@ -265,20 +294,36 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den inflationsbereinigten Realwert Ihrer Ersparnisse und Festgelder nach Abzug der jährlichen Teuerungsrate.',
     searchKeywords: ['kaufkraftverlust ersparnisse', 'kaufkraftverlust rechner', 'was ist mein geld in zukunft wert', 'inflation vermoegensverlust berechnen', 'kaufkraft nach jahren'],
     inputs: [
-      { id: 'amount', label: 'Heutiger Geldbetrag', type: 'number', defaultValue: 50000, min: 1000, step: 1000, unit: '€' },
+      { id: 'amount', label: 'Heutiger Geldbetrag', type: 'number', defaultValue: 50000, min: 0, step: 1000, unit: '€' },
       { id: 'interestRate', label: 'Jährlicher Anlagezins (Tagesgeld/Festgeld)', type: 'number', defaultValue: 1.5, min: 0, step: 0.1, unit: '%' },
-      { id: 'inflationRate', label: 'Angenommene jährliche Inflation', type: 'number', defaultValue: 2.5, min: 0.5, step: 0.1, unit: '%' },
-      { id: 'years', label: 'Zeithorizont in Jahren', type: 'number', defaultValue: 15, min: 1, max: 50, step: 1, unit: 'Jahre' },
+      { id: 'inflationRate', label: 'Angenommene jährliche Inflation', type: 'number', defaultValue: 2.5, min: 0, step: 0.1, unit: '%' },
+      { id: 'years', label: 'Zeithorizont in Jahren', type: 'number', defaultValue: 15, min: 1, max: 60, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const a = parseFloat(inputs.amount) || 50000;
-      const rate = parseFloat(inputs.interestRate) || 0;
-      const inf = parseFloat(inputs.inflationRate) || 2.5;
-      const y = parseInt(inputs.years, 10) || 15;
+      const rawA = inputs.amount !== undefined && inputs.amount !== null && String(inputs.amount).trim() !== ''
+        ? parseFloat(inputs.amount)
+        : 50000;
+      const a = !isNaN(rawA) ? Math.max(0, rawA) : 50000;
+
+      const rawRate = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 1.5;
+      const rate = !isNaN(rawRate) ? Math.max(0, rawRate) : 0;
+
+      const rawInf = inputs.inflationRate !== undefined && inputs.inflationRate !== null && String(inputs.inflationRate).trim() !== ''
+        ? parseFloat(inputs.inflationRate)
+        : 2.5;
+      const inf = !isNaN(rawInf) ? Math.max(0, rawInf) : 2.5;
+
+      const rawY = inputs.years !== undefined && inputs.years !== null && String(inputs.years).trim() !== ''
+        ? parseInt(inputs.years, 10)
+        : 15;
+      const y = !isNaN(rawY) ? Math.max(0, rawY) : 15;
+
       const nominalEnd = a * Math.pow(1 + rate / 100, y);
       const futurePurchasingPower = nominalEnd / Math.pow(1 + inf / 100, y);
       const realLoss = a - futurePurchasingPower;
-      const lossPercent = (realLoss / a) * 100;
+      const lossPercent = a > 0 ? (realLoss / a) * 100 : 0;
       return {
         primary: { id: 'realVal', label: 'Reale Restkaufkraft nach Inflation', value: futurePurchasingPower, formattedValue: formatCurrency(futurePurchasingPower), highlight: true },
         secondary: [
@@ -324,9 +369,18 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'inflationRate', label: 'Aktuelle Inflationsrate', type: 'number', defaultValue: 2.2, min: 0, step: 0.1, unit: '%' },
     ],
     calculate: (inputs) => {
-      const nom = parseFloat(inputs.nominalRate) || 3.5;
-      const inf = parseFloat(inputs.inflationRate) || 2.2;
-      const realRate = (((1 + nom / 100) / (1 + inf / 100)) - 1) * 100;
+      const rawNom = inputs.nominalRate !== undefined && inputs.nominalRate !== null && String(inputs.nominalRate).trim() !== ''
+        ? parseFloat(inputs.nominalRate)
+        : 3.5;
+      const nom = !isNaN(rawNom) ? rawNom : 3.5;
+
+      const rawInf = inputs.inflationRate !== undefined && inputs.inflationRate !== null && String(inputs.inflationRate).trim() !== ''
+        ? parseFloat(inputs.inflationRate)
+        : 2.2;
+      const inf = !isNaN(rawInf) ? rawInf : 2.2;
+
+      const denom = 1 + inf / 100;
+      const realRate = denom !== 0 ? (((1 + nom / 100) / denom) - 1) * 100 : 0;
       const approx = nom - inf;
       return {
         primary: { id: 'real', label: 'Exakter Realzins (Fisher-Formel)', value: realRate, formattedValue: `${realRate >= 0 ? '+' : ''}${formatPercent(realRate, 2)}`, highlight: true },
@@ -368,15 +422,27 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt das Verhältnis der jährlichen Dividendenzahlung zum aktuellen Börsenkurs oder Einstiegskurs.',
     searchKeywords: ['dividendenrendite rechner', 'aktien ausschüttung berechnen', 'dividende in prozent', 'personal dividend yield'],
     inputs: [
-      { id: 'sharePrice', label: 'Aktienkurs / Anteilspreis', type: 'number', defaultValue: 120, min: 1, step: 1, unit: '€' },
-      { id: 'dividend', label: 'Jährliche Dividende pro Aktie', type: 'number', defaultValue: 4.8, min: 0, step: 0.1, unit: '€' },
+      { id: 'sharePrice', label: 'Aktienkurs / Anteilspreis', type: 'number', defaultValue: 120, min: 0.01, step: 1, unit: '€' },
+      { id: 'dividend', label: 'Jährliche Dividende pro Aktie', type: 'number', defaultValue: 4.8, min: 0, step: 0.1, unit: '€', helpText: 'Dividende je Aktie (0 € bei wachstumsorientierten Aktien ohne Ausschüttung).' },
       { id: 'sharesCount', label: 'Anzahl gehaltener Aktien', type: 'number', defaultValue: 50, min: 1, step: 1, unit: 'Stück' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.sharePrice) || 120;
-      const div = parseFloat(inputs.dividend) || 4.8;
-      const count = parseInt(inputs.sharesCount, 10) || 50;
-      if (price <= 0) return { primary: { id: 'yield', label: 'Dividendenrendite', value: 0, formattedValue: '0 %' }, error: 'Aktienkurs muss positiv sein.' };
+      const rawPrice = inputs.sharePrice !== undefined && inputs.sharePrice !== null && String(inputs.sharePrice).trim() !== ''
+        ? parseFloat(inputs.sharePrice)
+        : 120;
+      const price = !isNaN(rawPrice) ? rawPrice : 120;
+
+      const rawDiv = inputs.dividend !== undefined && inputs.dividend !== null && String(inputs.dividend).trim() !== ''
+        ? parseFloat(inputs.dividend)
+        : 4.8;
+      const div = !isNaN(rawDiv) ? Math.max(0, rawDiv) : 4.8;
+
+      const rawCount = inputs.sharesCount !== undefined && inputs.sharesCount !== null && String(inputs.sharesCount).trim() !== ''
+        ? parseInt(inputs.sharesCount, 10)
+        : 50;
+      const count = !isNaN(rawCount) && rawCount > 0 ? rawCount : 50;
+
+      if (price <= 0) return { primary: { id: 'yield', label: 'Dividendenrendite', value: 0, formattedValue: '0 %' }, error: 'Aktienkurs muss größer als 0 € sein.' };
       const yieldPct = (div / price) * 100;
       const annualPayout = div * count;
       return {
@@ -419,12 +485,20 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt das notwendige Vermögen, um einen festen Monatsbetrag rein aus Zinserträgen ohne Kapitalverzehr zu entnehmen.',
     searchKeywords: ['ewige rente rechner', 'von zinsen leben rechner', 'kapitalbedarf ewige rente', 'finanzielle freiheit kapital'],
     inputs: [
-      { id: 'monthlyIncome', label: 'Gewünschte monatliche Netto-Rente', type: 'number', defaultValue: 2500, min: 500, step: 100, unit: '€' },
-      { id: 'netReturn', label: 'Erwartete Nettorendite p.a. (nach Steuern)', type: 'number', defaultValue: 3.5, min: 0.5, step: 0.1, unit: '%' },
+      { id: 'monthlyIncome', label: 'Gewünschte monatliche Netto-Rente', type: 'number', defaultValue: 2500, min: 0, step: 100, unit: '€' },
+      { id: 'netReturn', label: 'Erwartete Nettorendite p.a. (nach Steuern)', type: 'number', defaultValue: 3.5, min: 0.1, step: 0.1, unit: '%' },
     ],
     calculate: (inputs) => {
-      const monthly = parseFloat(inputs.monthlyIncome) || 2500;
-      const rate = parseFloat(inputs.netReturn) || 3.5;
+      const rawMonthly = inputs.monthlyIncome !== undefined && inputs.monthlyIncome !== null && String(inputs.monthlyIncome).trim() !== ''
+        ? parseFloat(inputs.monthlyIncome)
+        : 2500;
+      const monthly = !isNaN(rawMonthly) ? Math.max(0, rawMonthly) : 2500;
+
+      const rawRate = inputs.netReturn !== undefined && inputs.netReturn !== null && String(inputs.netReturn).trim() !== ''
+        ? parseFloat(inputs.netReturn)
+        : 3.5;
+      const rate = !isNaN(rawRate) ? rawRate : 3.5;
+
       if (rate <= 0) return { primary: { id: 'capital', label: 'Kapitalbedarf', value: 0, formattedValue: '0 €' }, error: 'Rendite muss positiv sein.' };
       const annualNeed = monthly * 12;
       const capitalNeeded = annualNeed / (rate / 100);
@@ -468,18 +542,30 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert die erforderliche Vermögensgröße für den vorzeitigen Ruhestand basierend auf jährlichen Lebenshaltungskosten.',
     searchKeywords: ['finanzielle freiheit rechner', 'fire rechner 4 prozent regel', 'trinity study rechner', 'fruehrente vermoegen berechnen'],
     inputs: [
-      { id: 'monthlyExpenses', label: 'Monatliche Lebenshaltungskosten', type: 'number', defaultValue: 2200, min: 500, step: 50, unit: '€' },
-      { id: 'withdrawalRate', label: 'Sichere Entnahmerate (SWR)', type: 'number', defaultValue: 3.5, min: 2.5, max: 5.0, step: 0.1, unit: '%' },
-      { id: 'currentAssets', label: 'Bereits vorhandenes Vermögen', type: 'number', defaultValue: 60000, min: 0, step: 5000, unit: '€' },
+      { id: 'monthlyExpenses', label: 'Monatliche Lebenshaltungskosten', type: 'number', defaultValue: 2200, min: 0, step: 50, unit: '€' },
+      { id: 'withdrawalRate', label: 'Sichere Entnahmerate (SWR)', type: 'number', defaultValue: 3.5, min: 1.0, max: 10.0, step: 0.1, unit: '%' },
+      { id: 'currentAssets', label: 'Bereits vorhandenes Vermögen', type: 'number', defaultValue: 60000, min: 0, step: 5000, unit: '€', helpText: 'Bestehendes Vermögen oder Depotguthaben (0 € bei Start ohne Ersparnisse).' },
     ],
     calculate: (inputs) => {
-      const expenses = parseFloat(inputs.monthlyExpenses) || 2200;
-      const swr = parseFloat(inputs.withdrawalRate) || 3.5;
-      const current = parseFloat(inputs.currentAssets) || 0;
+      const rawExpenses = inputs.monthlyExpenses !== undefined && inputs.monthlyExpenses !== null && String(inputs.monthlyExpenses).trim() !== ''
+        ? parseFloat(inputs.monthlyExpenses)
+        : 2200;
+      const expenses = !isNaN(rawExpenses) ? Math.max(0, rawExpenses) : 2200;
+
+      const rawSwr = inputs.withdrawalRate !== undefined && inputs.withdrawalRate !== null && String(inputs.withdrawalRate).trim() !== ''
+        ? parseFloat(inputs.withdrawalRate)
+        : 3.5;
+      const swr = !isNaN(rawSwr) ? Math.max(0.1, rawSwr) : 3.5;
+
+      const rawCurrent = inputs.currentAssets !== undefined && inputs.currentAssets !== null && String(inputs.currentAssets).trim() !== ''
+        ? parseFloat(inputs.currentAssets)
+        : 0;
+      const current = !isNaN(rawCurrent) ? Math.max(0, rawCurrent) : 0;
+
       const annualExp = expenses * 12;
-      const fireNumber = annualExp / (swr / 100);
+      const fireNumber = expenses > 0 ? annualExp / (swr / 100) : 0;
       const gap = Math.max(0, fireNumber - current);
-      const progress = (current / fireNumber) * 100;
+      const progress = fireNumber > 0 ? (current / fireNumber) * 100 : 100;
       return {
         primary: { id: 'fire', label: 'Ihre persönliche FIRE-Zahl', value: fireNumber, formattedValue: formatCurrency(fireNumber), highlight: true },
         secondary: [
@@ -487,7 +573,9 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           { id: 'progress', label: 'Erreichter Fortschritt', value: progress, formattedValue: formatPercent(progress, 1) },
           { id: 'multiple', label: 'Faktor Ihrer Jahresausgaben', value: 100 / swr, formattedValue: `${formatNumber(100 / swr, 1)} × Jahresausgaben` },
         ],
-        summaryText: `Bei Ausgaben von ${formatCurrency(expenses)} im Monat benötigen Sie ${formatCurrency(fireNumber)} für die finanzielle Freiheit.`,
+        summaryText: expenses > 0
+          ? `Bei Ausgaben von ${formatCurrency(expenses)} im Monat benötigen Sie ${formatCurrency(fireNumber)} für die finanzielle Freiheit.`
+          : 'Bei monatlichen Ausgaben von 0 € ist kein weiteres FIRE-Kapital erforderlich.',
       };
     },
     formula: 'FIRE-Vermögen = Jahresausgaben / (Entnahmerate / 100)',
@@ -535,7 +623,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'churchTax', label: 'Kirchensteuerpflichtig?', type: 'boolean', defaultValue: false },
     ],
     calculate: (inputs) => {
-      const gains = parseFloat(inputs.annualGains) || 1500;
+      const rawGains = inputs.annualGains !== undefined && inputs.annualGains !== null && String(inputs.annualGains).trim() !== ''
+        ? parseFloat(inputs.annualGains)
+        : 1500;
+      const gains = !isNaN(rawGains) ? Math.max(0, rawGains) : 1500;
       const isMarried = inputs.status === 'married';
       const hasChurch = Boolean(inputs.churchTax);
       const allowance = isMarried ? 2000 : 1000;
@@ -551,7 +642,9 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           { id: 'taxable', label: 'Steuerpflichtige Erträge', value: taxableGains, formattedValue: formatCurrency(taxableGains) },
           { id: 'due', label: 'Abzuführende Abgeltungsteuer', value: taxesDue, formattedValue: formatCurrency(taxesDue) },
         ],
-        summaryText: `Durch Ihren Freistellungsauftrag von ${formatCurrency(allowance)} sparen Sie exakt ${formatCurrency(savedTax)} an Steuern.`,
+        summaryText: gains > 0
+          ? `Durch Ihren Freistellungsauftrag von ${formatCurrency(allowance)} sparen Sie exakt ${formatCurrency(savedTax)} an Steuern.`
+          : 'Bei keinen Kapitalerträgen fällt keine Abgeltungsteuer an.',
       };
     },
     formula: 'Steuerersparnis = Min(Kapitalertrag, Freibetrag) × 26,375 %',
@@ -1115,8 +1208,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'monthlySavings', label: 'Monatlich gesparter Betrag (ETF, Tagesgeld, Tilgung)', type: 'number', defaultValue: 640, min: 0, step: 25, unit: '€' },
     ],
     calculate: (inputs) => {
-      const inc = parseFloat(inputs.netIncome) || 3200;
-      const sav = parseFloat(inputs.monthlySavings) || 640;
+      const rawInc = inputs.netIncome !== undefined && inputs.netIncome !== null && String(inputs.netIncome).trim() !== ''
+        ? parseFloat(inputs.netIncome)
+        : 3200;
+      const inc = !isNaN(rawInc) ? rawInc : 3200;
+      const rawSav = inputs.monthlySavings !== undefined && inputs.monthlySavings !== null && String(inputs.monthlySavings).trim() !== ''
+        ? parseFloat(inputs.monthlySavings)
+        : 640;
+      const sav = !isNaN(rawSav) ? Math.max(0, rawSav) : 640;
       if (inc <= 0) return { primary: { id: 'quote', label: 'Sparquote', value: 0, formattedValue: '0 %' }, error: 'Nettoeinkommen muss positiv sein.' };
       const quote = (sav / inc) * 100;
       let rating = 'Solide (15 - 25 %)';
@@ -1177,7 +1276,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const exp = parseFloat(inputs.monthlyExpenses) || 1800;
+      const rawExp = inputs.monthlyExpenses !== undefined && inputs.monthlyExpenses !== null && String(inputs.monthlyExpenses).trim() !== ''
+        ? parseFloat(inputs.monthlyExpenses)
+        : 1800;
+      const exp = !isNaN(rawExp) ? Math.max(0, rawExp) : 1800;
       const type = inputs.jobType || 'employee';
       let mult = 3;
       if (type === 'civil') mult = 2.5;
@@ -1228,8 +1330,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'initialAmount', label: 'Optionaler Anfangsbetrag', type: 'number', defaultValue: 10000, step: 500, unit: '€' },
     ],
     calculate: (inputs) => {
-      const r = parseFloat(inputs.interestRate) || 7.0;
-      const amount = parseFloat(inputs.initialAmount) || 10000;
+      const rawR = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 7.0;
+      const r = !isNaN(rawR) ? rawR : 7.0;
+      const rawAmount = inputs.initialAmount !== undefined && inputs.initialAmount !== null && String(inputs.initialAmount).trim() !== ''
+        ? parseFloat(inputs.initialAmount)
+        : 10000;
+      const amount = !isNaN(rawAmount) ? Math.max(0, rawAmount) : 10000;
       if (r <= 0) return { primary: { id: 'years', label: 'Verdopplungszeit', value: 0, formattedValue: 'Nie' }, error: 'Rendite muss positiv sein.' };
       const exactYears = Math.log(2) / Math.log(1 + r / 100);
       const y = Math.floor(exactYears);
@@ -1280,14 +1388,29 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'dividendRate', label: 'Ausschüttungsrendite (Dividende) p.a.', type: 'number', defaultValue: 2.0, min: 0, step: 0.2, unit: '%' },
     ],
     calculate: (inputs) => {
-      const rate = parseFloat(inputs.monthlyRate) || 300;
-      const y = parseInt(inputs.years, 10) || 25;
-      const growth = parseFloat(inputs.growthRate) || 5.0;
-      const div = parseFloat(inputs.dividendRate) || 2.0;
-      const totalRate = (growth + div) / 100 / 12;
+      const rawRate = inputs.monthlyRate !== undefined && inputs.monthlyRate !== null && String(inputs.monthlyRate).trim() !== ''
+        ? parseFloat(inputs.monthlyRate)
+        : 300;
+      const rate = !isNaN(rawRate) ? Math.max(0, rawRate) : 300;
+      const rawY = inputs.years !== undefined && inputs.years !== null && String(inputs.years).trim() !== ''
+        ? parseInt(inputs.years, 10)
+        : 25;
+      const y = !isNaN(rawY) ? Math.max(1, rawY) : 25;
+      const rawGrowth = inputs.growthRate !== undefined && inputs.growthRate !== null && String(inputs.growthRate).trim() !== ''
+        ? parseFloat(inputs.growthRate)
+        : 5.0;
+      const growth = !isNaN(rawGrowth) ? Math.max(0, rawGrowth) : 5.0;
+      const rawDiv = inputs.dividendRate !== undefined && inputs.dividendRate !== null && String(inputs.dividendRate).trim() !== ''
+        ? parseFloat(inputs.dividendRate)
+        : 2.0;
+      const div = !isNaN(rawDiv) ? Math.max(0, rawDiv) : 2.0;
+      const annualRate = (growth + div) / 100;
+      const totalRate = annualRate / 12;
       const months = y * 12;
-      const fvThes = rate * ((Math.pow(1 + totalRate, months) - 1) / totalRate);
       const own = rate * months;
+      const fvThes = totalRate > 0
+        ? rate * ((Math.pow(1 + totalRate, months) - 1) / totalRate)
+        : own;
       return {
         primary: { id: 'thes', label: 'Endvermögen Thesaurierer (Acc)', value: fvThes, formattedValue: formatCurrency(fvThes), highlight: true },
         secondary: [
@@ -1332,8 +1455,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'expectedPension', label: 'Erwartete gesetzliche Bruttorente', type: 'number', defaultValue: 1600, min: 0, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
-      const target = parseFloat(inputs.desiredNet) || 2400;
-      const pensionGross = parseFloat(inputs.expectedPension) || 1600;
+      const rawTarget = inputs.desiredNet !== undefined && inputs.desiredNet !== null && String(inputs.desiredNet).trim() !== ''
+        ? parseFloat(inputs.desiredNet)
+        : 2400;
+      const target = !isNaN(rawTarget) ? Math.max(0, rawTarget) : 2400;
+      const rawPension = inputs.expectedPension !== undefined && inputs.expectedPension !== null && String(inputs.expectedPension).trim() !== ''
+        ? parseFloat(inputs.expectedPension)
+        : 1600;
+      const pensionGross = !isNaN(rawPension) ? Math.max(0, rawPension) : 1600;
       const netPensionEst = pensionGross * 0.82;
       const gap = Math.max(0, target - netPensionEst);
       return {
@@ -1381,9 +1510,24 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'currentPrice', label: 'Aktueller Goldpreis je Gramm', type: 'number', defaultValue: 75, min: 1, step: 1, unit: '€' },
     ],
     calculate: (inputs) => {
-      const g = parseFloat(inputs.weightGram) || 31.1035;
-      const buy = parseFloat(inputs.buyPrice) || 55;
-      const curr = parseFloat(inputs.currentPrice) || 75;
+      const rawG = inputs.weightGram !== undefined && inputs.weightGram !== null && String(inputs.weightGram).trim() !== ''
+        ? parseFloat(inputs.weightGram)
+        : 31.1035;
+      const g = !isNaN(rawG) ? Math.max(0, rawG) : 31.1035;
+      const rawBuy = inputs.buyPrice !== undefined && inputs.buyPrice !== null && String(inputs.buyPrice).trim() !== ''
+        ? parseFloat(inputs.buyPrice)
+        : 55;
+      const buy = !isNaN(rawBuy) ? rawBuy : 55;
+      const rawCurr = inputs.currentPrice !== undefined && inputs.currentPrice !== null && String(inputs.currentPrice).trim() !== ''
+        ? parseFloat(inputs.currentPrice)
+        : 75;
+      const curr = !isNaN(rawCurr) ? Math.max(0, rawCurr) : 75;
+      if (buy <= 0) {
+        return {
+          primary: { id: 'profit', label: 'Erzielter Wertzuwachs (Gewinn)', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Der Kaufpreis muss positiv sein.',
+        };
+      }
       const totalBuy = g * buy;
       const totalCurr = g * curr;
       const profit = totalCurr - totalBuy;
@@ -1499,11 +1643,38 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'balloonPayment', label: 'Schlussrate (0 € bei klassischem Kredit)', type: 'number', defaultValue: 8000, min: 0, step: 500, unit: '€' },
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.carPrice) || 28000;
-      const down = parseFloat(inputs.downPayment) || 5000;
-      const rate = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 5.5;
-      const m = parseInt(inputs.months, 10) || 48;
-      const balloon = parseFloat(inputs.balloonPayment) || 0;
+      const rawPrice = inputs.carPrice !== undefined && inputs.carPrice !== null && String(inputs.carPrice).trim() !== ''
+        ? parseFloat(inputs.carPrice)
+        : 28000;
+      const price = !isNaN(rawPrice) ? Math.max(0, rawPrice) : 28000;
+      const rawDown = inputs.downPayment !== undefined && inputs.downPayment !== null && String(inputs.downPayment).trim() !== ''
+        ? parseFloat(inputs.downPayment)
+        : 5000;
+      const down = !isNaN(rawDown) ? Math.max(0, rawDown) : 5000;
+      const rawRate = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 5.5;
+      const rate = !isNaN(rawRate) ? Math.max(0, rawRate) : 5.5;
+      const rawM = inputs.months !== undefined && inputs.months !== null && String(inputs.months).trim() !== ''
+        ? parseInt(inputs.months, 10)
+        : 48;
+      if (isNaN(rawM) || rawM <= 0) {
+        return {
+          primary: { id: 'rate', label: 'Monatliche Autokreditrate', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Laufzeit muss mindestens 1 Monat betragen.',
+        };
+      }
+      const m = rawM;
+      const rawBalloon = inputs.balloonPayment !== undefined && inputs.balloonPayment !== null && String(inputs.balloonPayment).trim() !== ''
+        ? parseFloat(inputs.balloonPayment)
+        : 0;
+      const balloon = !isNaN(rawBalloon) ? Math.max(0, rawBalloon) : 0;
+      if (price <= 0) {
+        return {
+          primary: { id: 'rate', label: 'Monatliche Autokreditrate', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Der Fahrzeugpreis muss positiv sein.',
+        };
+      }
       const loan = Math.max(0, price - down);
       const r = (rate / 100) / 12;
       let monthlyRate = 0;
@@ -1560,14 +1731,38 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'remainingMonths', label: 'Verbleibende Restlaufzeit in Monaten', type: 'number', defaultValue: 48, min: 6, max: 120, step: 6, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const debt = parseFloat(inputs.currentDebt) || 18000;
-      const oldR = parseFloat(inputs.oldRate) || 7.9;
-      const newR = parseFloat(inputs.newRate) || 4.5;
-      const m = parseInt(inputs.remainingMonths, 10) || 48;
+      const rawDebt = inputs.currentDebt !== undefined && inputs.currentDebt !== null && String(inputs.currentDebt).trim() !== ''
+        ? parseFloat(inputs.currentDebt)
+        : 18000;
+      const debt = !isNaN(rawDebt) ? Math.max(0, rawDebt) : 18000;
+      const rawOldR = inputs.oldRate !== undefined && inputs.oldRate !== null && String(inputs.oldRate).trim() !== ''
+        ? parseFloat(inputs.oldRate)
+        : 7.9;
+      const oldR = !isNaN(rawOldR) ? Math.max(0, rawOldR) : 7.9;
+      const rawNewR = inputs.newRate !== undefined && inputs.newRate !== null && String(inputs.newRate).trim() !== ''
+        ? parseFloat(inputs.newRate)
+        : 4.5;
+      const newR = !isNaN(rawNewR) ? Math.max(0, rawNewR) : 4.5;
+      const rawM = inputs.remainingMonths !== undefined && inputs.remainingMonths !== null && String(inputs.remainingMonths).trim() !== ''
+        ? parseInt(inputs.remainingMonths, 10)
+        : 48;
+      if (isNaN(rawM) || rawM <= 0) {
+        return {
+          primary: { id: 'savings', label: 'Ihre Netto-Zinsersparnis', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Restlaufzeit muss mindestens 1 Monat betragen.',
+        };
+      }
+      const m = rawM;
+      if (debt <= 0) {
+        return {
+          primary: { id: 'savings', label: 'Ihre Netto-Zinsersparnis', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Restschuld muss positiv sein.',
+        };
+      }
       const rOld = (oldR / 100) / 12;
       const rNew = (newR / 100) / 12;
-      const oldRate = debt * (rOld / (1 - Math.pow(1 + rOld, -m)));
-      const newRate = debt * (rNew / (1 - Math.pow(1 + rNew, -m)));
+      const oldRate = rOld > 0 ? debt * (rOld / (1 - Math.pow(1 + rOld, -m))) : debt / m;
+      const newRate = rNew > 0 ? debt * (rNew / (1 - Math.pow(1 + rNew, -m))) : debt / m;
       const penalty = m > 12 ? debt * 0.01 : debt * 0.005;
       const netSavings = ((oldRate * m) - debt) - ((newRate * m) - debt) - penalty;
       return {
@@ -1615,14 +1810,23 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'days', label: 'Überziehungsdauer in Tagen', type: 'number', defaultValue: 45, min: 1, max: 365, step: 1, unit: 'Tage' },
     ],
     calculate: (inputs) => {
-      const amount = parseFloat(inputs.overdraftAmount) || 1500;
-      const rate = parseFloat(inputs.dispoRate) || 11.5;
-      const days = parseInt(inputs.days, 10) || 45;
+      const rawAmount = inputs.overdraftAmount !== undefined && inputs.overdraftAmount !== null && String(inputs.overdraftAmount).trim() !== ''
+        ? parseFloat(inputs.overdraftAmount)
+        : 1500;
+      const amount = !isNaN(rawAmount) ? Math.max(0, rawAmount) : 1500;
+      const rawRate = inputs.dispoRate !== undefined && inputs.dispoRate !== null && String(inputs.dispoRate).trim() !== ''
+        ? parseFloat(inputs.dispoRate)
+        : 11.5;
+      const rate = !isNaN(rawRate) ? Math.max(0, rawRate) : 11.5;
+      const rawDays = inputs.days !== undefined && inputs.days !== null && String(inputs.days).trim() !== ''
+        ? parseInt(inputs.days, 10)
+        : 45;
+      const days = !isNaN(rawDays) ? Math.max(0, rawDays) : 45;
       const interest = (amount * rate * days) / 36000;
       return {
         primary: { id: 'interest', label: 'Anfallende Dispozinsen', value: interest, formattedValue: formatCurrency(interest), highlight: true },
         secondary: [
-          { id: 'perDay', label: 'Zinskosten pro Tag', value: interest / days, formattedValue: formatCurrency(interest / days) },
+          { id: 'perDay', label: 'Zinskosten pro Tag', value: days > 0 ? interest / days : 0, formattedValue: formatCurrency(days > 0 ? interest / days : 0) },
           { id: 'perYear', label: 'Zinskosten bei 1 Jahr Überziehung', value: (amount * rate) / 100, formattedValue: formatCurrency((amount * rate) / 100) },
         ],
         summaryText: `Für ${formatCurrency(amount)} über ${days} Tage bei ${formatPercent(rate)} Dispozins zahlen Sie ${formatCurrency(interest)} Zinsen.`,
@@ -1769,7 +1973,16 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       }
 
       const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 4.5;
-      const years = parseInt(inputs.termYears, 10) || 5;
+      const rawYears = inputs.termYears !== undefined && inputs.termYears !== null && String(inputs.termYears).trim() !== ''
+        ? parseInt(inputs.termYears, 10)
+        : 5;
+      if (isNaN(rawYears) || rawYears <= 0) {
+        return {
+          primary: { id: 'loan', label: 'Maximaler Kreditbetrag', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Kreditlaufzeit muss mindestens 1 Jahr betragen.',
+        };
+      }
+      const years = rawYears;
       const equity = parseFloat(inputs.equity) || 0;
 
       if (net <= 0 && inputs.monthlyBudget === undefined) {
@@ -2060,9 +2273,24 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'termYears', label: 'Laufzeit in Jahren', type: 'number', defaultValue: 8, min: 2, max: 15, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.amount) || 35000;
-      const z = inputs.interestRate !== undefined && inputs.interestRate !== '' ? parseFloat(inputs.interestRate) : 4.8;
-      const y = parseInt(inputs.termYears, 10) || 8;
+      const rawLoan = inputs.amount !== undefined && inputs.amount !== null && String(inputs.amount).trim() !== ''
+        ? parseFloat(inputs.amount)
+        : 35000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 35000;
+      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 4.8;
+      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 4.8;
+      const rawY = inputs.termYears !== undefined && inputs.termYears !== null && String(inputs.termYears).trim() !== ''
+        ? parseInt(inputs.termYears, 10)
+        : 8;
+      if (isNaN(rawY) || rawY <= 0) {
+        return {
+          primary: { id: 'rate', label: 'Monatliche Rate', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Laufzeit muss mindestens 1 Jahr betragen.',
+        };
+      }
+      const y = rawY;
       const r = (z / 100) / 12;
       const m = y * 12;
       const rate = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
@@ -2112,12 +2340,32 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'months', label: 'Laufzeit in Monaten', type: 'number', defaultValue: 60, min: 12, max: 120, step: 6, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loanAmount) || 50000;
-      const rA = parseFloat(inputs.rateA) || 5.9;
-      const rB = parseFloat(inputs.rateB) || 4.8;
-      const m = parseInt(inputs.months, 10) || 60;
-      const monthlyA = loan * (((rA / 100) / 12) / (1 - Math.pow(1 + (rA / 100) / 12, -m)));
-      const monthlyB = loan * (((rB / 100) / 12) / (1 - Math.pow(1 + (rB / 100) / 12, -m)));
+      const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
+        ? parseFloat(inputs.loanAmount)
+        : 50000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 50000;
+      const rawRa = inputs.rateA !== undefined && inputs.rateA !== null && String(inputs.rateA).trim() !== ''
+        ? parseFloat(inputs.rateA)
+        : 5.9;
+      const rA = !isNaN(rawRa) ? Math.max(0, rawRa) : 5.9;
+      const rawRb = inputs.rateB !== undefined && inputs.rateB !== null && String(inputs.rateB).trim() !== ''
+        ? parseFloat(inputs.rateB)
+        : 4.8;
+      const rB = !isNaN(rawRb) ? Math.max(0, rawRb) : 4.8;
+      const rawM = inputs.months !== undefined && inputs.months !== null && String(inputs.months).trim() !== ''
+        ? parseInt(inputs.months, 10)
+        : 60;
+      if (isNaN(rawM) || rawM <= 0) {
+        return {
+          primary: { id: 'diff', label: 'Ersparnis mit Angebot B', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Laufzeit muss mindestens 1 Monat betragen.',
+        };
+      }
+      const m = rawM;
+      const ma = (rA / 100) / 12;
+      const mb = (rB / 100) / 12;
+      const monthlyA = ma > 0 ? loan * (ma / (1 - Math.pow(1 + ma, -m))) : loan / m;
+      const monthlyB = mb > 0 ? loan * (mb / (1 - Math.pow(1 + mb, -m))) : loan / m;
       const diff = Math.abs((monthlyA * m) - (monthlyB * m));
       return {
         primary: { id: 'diff', label: 'Ersparnis mit Angebot B', value: diff, formattedValue: formatCurrency(diff), highlight: true },
@@ -2164,21 +2412,37 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'years', label: 'Laufzeit in Jahren', type: 'number', defaultValue: 10, min: 1, max: 35, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loan) || 100000;
-      const z = parseFloat(inputs.rate) || 4.0;
-      const y = parseInt(inputs.years, 10) || 10;
+      const rawLoan = inputs.loan !== undefined && inputs.loan !== null && String(inputs.loan).trim() !== ''
+        ? parseFloat(inputs.loan)
+        : 100000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 100000;
+      const rawZ = inputs.rate !== undefined && inputs.rate !== null && String(inputs.rate).trim() !== ''
+        ? parseFloat(inputs.rate)
+        : 4.0;
+      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 4.0;
+      const rawY = inputs.years !== undefined && inputs.years !== null && String(inputs.years).trim() !== ''
+        ? parseInt(inputs.years, 10)
+        : 10;
+      if (isNaN(rawY) || rawY <= 0) {
+        return {
+          primary: { id: 'interest', label: 'Gesamte Zinskosten', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Laufzeit muss mindestens 1 Jahr betragen.',
+        };
+      }
+      const y = rawY;
       const r = (z / 100) / 12;
       const m = y * 12;
-      const monthly = loan * (r / (1 - Math.pow(1 + r, -m)));
+      const monthly = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
       const totalPaid = monthly * m;
-      const totalInterest = totalPaid - loan;
+      const totalInterest = Math.max(0, totalPaid - loan);
+      const ratio = loan > 0 ? (totalInterest / loan) * 100 : 0;
       return {
         primary: { id: 'interest', label: 'Gesamte Zinskosten', value: totalInterest, formattedValue: formatCurrency(totalInterest), highlight: true },
         secondary: [
-          { id: 'ratio', label: 'Zinsanteil an Kreditsumme', value: (totalInterest / loan) * 100, formattedValue: formatPercent((totalInterest / loan) * 100, 1) },
+          { id: 'ratio', label: 'Zinsanteil an Kreditsumme', value: ratio, formattedValue: formatPercent(ratio, 1) },
           { id: 'monthly', label: 'Monatsrate', value: monthly, formattedValue: formatCurrency(monthly) },
         ],
-        summaryText: `Für ${formatCurrency(loan)} zahlen Sie in ${y} Jahren insgesamt ${formatCurrency(totalInterest)} Zinsen (${formatPercent((totalInterest / loan) * 100, 1)} der Kreditsumme).`,
+        summaryText: `Für ${formatCurrency(loan)} zahlen Sie in ${y} Jahren insgesamt ${formatCurrency(totalInterest)} Zinsen (${formatPercent(ratio, 1)} der Kreditsumme).`,
       };
     },
     formula: 'Gesamtzinsen = (Monatsrate × Monate) - Kreditsumme',
@@ -2216,8 +2480,14 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'remainingMonths', label: 'Restlaufzeit in Monaten', type: 'number', defaultValue: 24, min: 1, max: 120, step: 1, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const debt = parseFloat(inputs.remainingDebt) || 12000;
-      const m = parseInt(inputs.remainingMonths, 10) || 24;
+      const rawDebt = inputs.remainingDebt !== undefined && inputs.remainingDebt !== null && String(inputs.remainingDebt).trim() !== ''
+        ? parseFloat(inputs.remainingDebt)
+        : 12000;
+      const debt = !isNaN(rawDebt) ? Math.max(0, rawDebt) : 12000;
+      const rawM = inputs.remainingMonths !== undefined && inputs.remainingMonths !== null && String(inputs.remainingMonths).trim() !== ''
+        ? parseInt(inputs.remainingMonths, 10)
+        : 24;
+      const m = !isNaN(rawM) && rawM > 0 ? rawM : 24;
       const maxCapPct = m > 12 ? 1.0 : 0.5;
       const maxFee = debt * (maxCapPct / 100);
       return {
@@ -2265,9 +2535,34 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'interestRate', label: 'Durchschnittlicher Zinssatz p.a.', type: 'number', defaultValue: 6.5, min: 0, step: 0.1, unit: '%' },
     ],
     calculate: (inputs) => {
-      const debt = parseFloat(inputs.currentDebt) || 8000;
-      const pay = parseFloat(inputs.monthlyPayment) || 300;
-      const z = parseFloat(inputs.interestRate) || 6.5;
+      const rawDebt = inputs.currentDebt !== undefined && inputs.currentDebt !== null && String(inputs.currentDebt).trim() !== ''
+        ? parseFloat(inputs.currentDebt)
+        : 8000;
+      const debt = !isNaN(rawDebt) ? Math.max(0, rawDebt) : 8000;
+      const rawPay = inputs.monthlyPayment !== undefined && inputs.monthlyPayment !== null && String(inputs.monthlyPayment).trim() !== ''
+        ? parseFloat(inputs.monthlyPayment)
+        : 300;
+      const pay = !isNaN(rawPay) ? rawPay : 300;
+      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 6.5;
+      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 6.5;
+      if (debt <= 0) {
+        return {
+          primary: { id: 'time', label: 'Zeit bis zur Schuldenfreiheit', value: 0, formattedValue: 'Bereits schuldenfrei', highlight: true },
+          secondary: [
+            { id: 'months', label: 'Anzahl Monatsraten', value: 0, formattedValue: '0 Raten' },
+            { id: 'interest', label: 'Zinsen bis Schuldenfreiheit', value: 0, formattedValue: '0,00 €' },
+          ],
+          summaryText: 'Keine Restschulden vorhanden.',
+        };
+      }
+      if (pay <= 0) {
+        return {
+          primary: { id: 'time', label: 'Dauer', value: 0, formattedValue: 'Nie schuldenfrei' },
+          error: 'Die monatliche Rate muss positiv sein.',
+        };
+      }
       const r = (z / 100) / 12;
       if (r > 0 && pay <= debt * r) return { primary: { id: 'time', label: 'Dauer', value: 0, formattedValue: 'Nie schuldenfrei' }, error: 'Monatsrate deckt nicht einmal die Zinsen.' };
       const m = r > 0 ? Math.ceil(-Math.log(1 - (debt * r) / pay) / Math.log(1 + r)) : Math.ceil(debt / pay);
@@ -2319,10 +2614,22 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'monthlyMarkup', label: 'Forward-Aufschlag pro Monat Vorlauf', type: 'number', defaultValue: 0.02, min: 0.01, max: 0.05, step: 0.005, unit: '%' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loanAmount) || 180000;
-      const base = parseFloat(inputs.currentRate) || 3.5;
-      const m = parseInt(inputs.forwardMonths, 10) || 24;
-      const markup = parseFloat(inputs.monthlyMarkup) || 0.02;
+      const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
+        ? parseFloat(inputs.loanAmount)
+        : 180000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 180000;
+      const rawBase = inputs.currentRate !== undefined && inputs.currentRate !== null && String(inputs.currentRate).trim() !== ''
+        ? parseFloat(inputs.currentRate)
+        : 3.5;
+      const base = !isNaN(rawBase) ? Math.max(0, rawBase) : 3.5;
+      const rawM = inputs.forwardMonths !== undefined && inputs.forwardMonths !== null && String(inputs.forwardMonths).trim() !== ''
+        ? parseInt(inputs.forwardMonths, 10)
+        : 24;
+      const m = !isNaN(rawM) ? Math.max(0, rawM) : 24;
+      const rawMarkup = inputs.monthlyMarkup !== undefined && inputs.monthlyMarkup !== null && String(inputs.monthlyMarkup).trim() !== ''
+        ? parseFloat(inputs.monthlyMarkup)
+        : 0.02;
+      const markup = !isNaN(rawMarkup) ? Math.max(0, rawMarkup) : 0.02;
       const totalMarkup = m * markup;
       const forwardRate = base + totalMarkup;
       return {
@@ -2370,12 +2677,34 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'monthlyRate', label: 'Monatliche Wunschrate', type: 'number', defaultValue: 450, min: 25, step: 25, unit: '€' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loan) || 30000;
-      const z = parseFloat(inputs.interestRate) || 4.9;
-      const rate = parseFloat(inputs.monthlyRate) || 450;
+      const rawLoan = inputs.loan !== undefined && inputs.loan !== null && String(inputs.loan).trim() !== ''
+        ? parseFloat(inputs.loan)
+        : 30000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 30000;
+      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 4.9;
+      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 4.9;
+      const rawRate = inputs.monthlyRate !== undefined && inputs.monthlyRate !== null && String(inputs.monthlyRate).trim() !== ''
+        ? parseFloat(inputs.monthlyRate)
+        : 450;
+      const rate = !isNaN(rawRate) ? rawRate : 450;
+      if (loan <= 0) {
+        return {
+          primary: { id: 'time', label: 'Kreditlaufzeit', value: 0, formattedValue: '0 Monate', highlight: true },
+          secondary: [
+            { id: 'months', label: 'Anzahl Monatsraten', value: 0, formattedValue: '0 Raten' },
+            { id: 'interest', label: 'Gesamtzinskosten', value: 0, formattedValue: '0,00 €' },
+          ],
+          summaryText: 'Kein Kreditbetrag vorhanden.',
+        };
+      }
+      if (rate <= 0) {
+        return { primary: { id: 'time', label: 'Laufzeit', value: 0, formattedValue: 'Unendlich' }, error: 'Monatliche Rate muss positiv sein.' };
+      }
       const r = (z / 100) / 12;
       if (r > 0 && rate <= loan * r) return { primary: { id: 'time', label: 'Laufzeit', value: 0, formattedValue: 'Unendlich' }, error: 'Rate muss Zinsen übersteigen.' };
-      const m = Math.ceil(-Math.log(1 - (loan * r) / rate) / Math.log(1 + r));
+      const m = r > 0 ? Math.ceil(-Math.log(1 - (loan * r) / rate) / Math.log(1 + r)) : Math.ceil(loan / rate);
       const y = Math.floor(m / 12);
       const remM = m % 12;
       return {
@@ -2424,23 +2753,37 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'elapsedYears', label: 'Laufzeit bis zum Stichtag in Jahren', type: 'number', defaultValue: 10, min: 1, max: 35, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loanAmount) || 150000;
-      const z = parseFloat(inputs.interestRate) || 3.8;
-      const pay = parseFloat(inputs.monthlyPayment) || 800;
-      const y = parseInt(inputs.elapsedYears, 10) || 10;
+      const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
+        ? parseFloat(inputs.loanAmount)
+        : 150000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 150000;
+      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
+        ? parseFloat(inputs.interestRate)
+        : 3.8;
+      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 3.8;
+      const rawPay = inputs.monthlyPayment !== undefined && inputs.monthlyPayment !== null && String(inputs.monthlyPayment).trim() !== ''
+        ? parseFloat(inputs.monthlyPayment)
+        : 800;
+      const pay = !isNaN(rawPay) ? Math.max(0, rawPay) : 800;
+      const rawY = inputs.elapsedYears !== undefined && inputs.elapsedYears !== null && String(inputs.elapsedYears).trim() !== ''
+        ? parseInt(inputs.elapsedYears, 10)
+        : 10;
+      const y = !isNaN(rawY) ? Math.max(0, rawY) : 10;
       const r = (z / 100) / 12;
       let balance = loan;
       for (let i = 0; i < y * 12; i++) {
         balance -= (pay - balance * r);
         if (balance <= 0) { balance = 0; break; }
       }
+      const repaid = loan - balance;
+      const repaidPct = loan > 0 ? (repaid / loan) * 100 : 0;
       return {
         primary: { id: 'rest', label: `Restschuld nach ${y} Jahren`, value: balance, formattedValue: formatCurrency(balance), highlight: true },
         secondary: [
-          { id: 'repaid', label: 'Bisher getilgter Betrag', value: loan - balance, formattedValue: formatCurrency(loan - balance) },
-          { id: 'repaidPct', label: 'Getilgter Anteil', value: ((loan - balance) / loan) * 100, formattedValue: formatPercent(((loan - balance) / loan) * 100, 1) },
+          { id: 'repaid', label: 'Bisher getilgter Betrag', value: repaid, formattedValue: formatCurrency(repaid) },
+          { id: 'repaidPct', label: 'Getilgter Anteil', value: repaidPct, formattedValue: formatPercent(repaidPct, 1) },
         ],
-        summaryText: `Nach ${y} Jahren verbleibt eine Restschuld von ${formatCurrency(balance)} (${formatPercent(((loan - balance) / loan) * 100, 1)} getilgt).`,
+        summaryText: `Nach ${y} Jahren verbleibt eine Restschuld von ${formatCurrency(balance)} (${formatPercent(repaidPct, 1)} getilgt).`,
       };
     },
     formula: 'Restschuld nach Tilgungsplan',
@@ -2533,12 +2876,25 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'months', label: 'Laufzeit in Monaten', type: 'number', defaultValue: 48, min: 6, max: 120, step: 6, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loanAmount) || 20000;
-      const nom = parseFloat(inputs.nominalRate) || 5.0;
-      const disagio = parseFloat(inputs.disagioPct) || 0;
-      const m = parseInt(inputs.months, 10) || 48;
+      const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
+        ? parseFloat(inputs.loanAmount)
+        : 20000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 20000;
+      const rawNom = inputs.nominalRate !== undefined && inputs.nominalRate !== null && String(inputs.nominalRate).trim() !== ''
+        ? parseFloat(inputs.nominalRate)
+        : 5.0;
+      const nom = !isNaN(rawNom) ? Math.max(0, rawNom) : 5.0;
+      const rawDisagio = inputs.disagioPct !== undefined && inputs.disagioPct !== null && String(inputs.disagioPct).trim() !== ''
+        ? parseFloat(inputs.disagioPct)
+        : 0;
+      const disagio = !isNaN(rawDisagio) ? Math.max(0, rawDisagio) : 0;
+      const rawM = inputs.months !== undefined && inputs.months !== null && String(inputs.months).trim() !== ''
+        ? parseInt(inputs.months, 10)
+        : 48;
+      const m = !isNaN(rawM) && rawM > 0 ? rawM : 48;
       const netPayout = loan * (1 - disagio / 100);
-      const monthlyRate = loan * (((nom / 100) / 12) / (1 - Math.pow(1 + (nom / 100) / 12, -m)));
+      const r = (nom / 100) / 12;
+      const monthlyRate = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
       const approxEff = nom + (disagio / (m / 12));
       return {
         primary: { id: 'eff', label: 'Effektiver Jahreszins (ca.)', value: approxEff, formattedValue: formatPercent(approxEff, 2), highlight: true },
@@ -2585,9 +2941,24 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { id: 'months', label: 'Rückzahlungsdauer in Monaten', type: 'number', defaultValue: 36, min: 1, max: 120, step: 6, unit: 'Monate' },
     ],
     calculate: (inputs) => {
-      const loan = parseFloat(inputs.loan) || 10000;
-      const z = parseFloat(inputs.rate) || 2.0;
-      const m = parseInt(inputs.months, 10) || 36;
+      const rawLoan = inputs.loan !== undefined && inputs.loan !== null && String(inputs.loan).trim() !== ''
+        ? parseFloat(inputs.loan)
+        : 10000;
+      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 10000;
+      const rawZ = inputs.rate !== undefined && inputs.rate !== null && String(inputs.rate).trim() !== ''
+        ? parseFloat(inputs.rate)
+        : 2.0;
+      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 2.0;
+      const rawM = inputs.months !== undefined && inputs.months !== null && String(inputs.months).trim() !== ''
+        ? parseInt(inputs.months, 10)
+        : 36;
+      if (isNaN(rawM) || rawM <= 0) {
+        return {
+          primary: { id: 'rate', label: 'Monatliche Rückzahlungsrate', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Die Laufzeit muss mindestens 1 Monat betragen.',
+        };
+      }
+      const m = rawM;
       let monthly = loan / m;
       let totalInterest = 0;
       if (z > 0) {

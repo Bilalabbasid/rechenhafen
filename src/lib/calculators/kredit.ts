@@ -173,15 +173,37 @@ export function calculateInstallmentLoan(inputs: Record<string, any>): Calculati
 }
 
 export function calculateAnnuity(inputs: Record<string, any>): CalculationResult {
-  const loanAmount = parseFloat(inputs.loanAmount) || 200000;
-  const annualInterest = (parseFloat(inputs.annualInterest) || 3.5) / 100;
-  const initialRepayment = (parseFloat(inputs.initialRepayment) || 2.0) / 100;
-  const fixedYears = parseInt(inputs.fixedYears || '10', 10);
+  const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
+    ? parseFloat(inputs.loanAmount)
+    : 200000;
+  const loanAmount = !isNaN(rawLoan) ? rawLoan : 200000;
+
+  const rawInterest = inputs.annualInterest !== undefined && inputs.annualInterest !== null && String(inputs.annualInterest).trim() !== ''
+    ? parseFloat(inputs.annualInterest)
+    : 3.5;
+  const annualInterest = (!isNaN(rawInterest) ? Math.max(0, rawInterest) : 3.5) / 100;
+
+  const rawRepayment = inputs.initialRepayment !== undefined && inputs.initialRepayment !== null && String(inputs.initialRepayment).trim() !== ''
+    ? parseFloat(inputs.initialRepayment)
+    : 2.0;
+  const initialRepayment = (!isNaN(rawRepayment) ? Math.max(0, rawRepayment) : 2.0) / 100;
+
+  const rawYears = inputs.fixedYears !== undefined && inputs.fixedYears !== null && String(inputs.fixedYears).trim() !== ''
+    ? parseInt(inputs.fixedYears, 10)
+    : 10;
+  const fixedYears = !isNaN(rawYears) && rawYears > 0 ? rawYears : 10;
 
   if (loanAmount <= 0) {
     return {
       primary: { id: 'rate', label: 'Monatliche Annuität', value: 0, formattedValue: '0,00 €' },
-      error: 'Bitte Darlehenssumme eingeben.',
+      error: 'Bitte eine Darlehenssumme größer als 0 € eingeben.',
+    };
+  }
+
+  if (annualInterest + initialRepayment <= 0) {
+    return {
+      primary: { id: 'rate', label: 'Monatliche Annuität', value: 0, formattedValue: '0,00 €' },
+      error: 'Zinssatz und anfängliche Tilgung können nicht beide 0 % sein.',
     };
   }
 
@@ -221,15 +243,38 @@ export function calculateAnnuity(inputs: Record<string, any>): CalculationResult
 }
 
 export function calculateSpecialRepayment(inputs: Record<string, any>): CalculationResult {
-  const loanAmount = parseFloat(inputs.loanAmount) || 200000;
-  const interestRate = (parseFloat(inputs.annualInterest) || 3.5) / 100;
-  const monthlyPayment = parseFloat(inputs.monthlyPayment) || 1000;
-  const yearlySpecial = parseFloat(inputs.yearlySpecialRepayment) || 5000;
+  const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
+    ? parseFloat(inputs.loanAmount)
+    : 200000;
+  const loanAmount = !isNaN(rawLoan) ? rawLoan : 200000;
 
-  if (loanAmount <= 0 || monthlyPayment <= (loanAmount * (interestRate / 12))) {
+  const rawInterest = inputs.annualInterest !== undefined && inputs.annualInterest !== null && String(inputs.annualInterest).trim() !== ''
+    ? parseFloat(inputs.annualInterest)
+    : 3.8;
+  const interestRate = (!isNaN(rawInterest) ? Math.max(0, rawInterest) : 3.8) / 100;
+
+  const rawPayment = inputs.monthlyPayment !== undefined && inputs.monthlyPayment !== null && String(inputs.monthlyPayment).trim() !== ''
+    ? parseFloat(inputs.monthlyPayment)
+    : 1000;
+  const monthlyPayment = !isNaN(rawPayment) ? rawPayment : 1000;
+
+  const rawSpecial = inputs.yearlySpecialRepayment !== undefined && inputs.yearlySpecialRepayment !== null && String(inputs.yearlySpecialRepayment).trim() !== ''
+    ? parseFloat(inputs.yearlySpecialRepayment)
+    : 5000;
+  const yearlySpecial = !isNaN(rawSpecial) ? Math.max(0, rawSpecial) : 5000;
+
+  if (loanAmount <= 0) {
     return {
       primary: { id: 'saved', label: 'Zinsersparnis', value: 0, formattedValue: '0,00 €' },
-      error: 'Die monatliche Rate muss höher sein als die reinen Zinskosten, um zu tilgen.',
+      error: 'Bitte eine Darlehenssumme größer als 0 € eingeben.',
+    };
+  }
+
+  const monthlyInterestCost = loanAmount * (interestRate / 12);
+  if (monthlyPayment <= monthlyInterestCost) {
+    return {
+      primary: { id: 'saved', label: 'Zinsersparnis', value: 0, formattedValue: '0,00 €' },
+      error: 'Die monatliche Rate muss höher sein als die reinen Zinskosten, um das Darlehen zu tilgen.',
     };
   }
 
@@ -256,11 +301,11 @@ export function calculateSpecialRepayment(inputs: Record<string, any>): Calculat
     monthsWith++;
     const intMonth = debtWith * rMonthly;
     interestWith += intMonth;
-    let repMonth = Math.min(debtWith, monthlyPayment - intMonth);
+    const repMonth = Math.min(debtWith, monthlyPayment - intMonth);
     debtWith -= repMonth;
 
     // Einmal jährlich im 12. Monat Sondertilgung
-    if (monthsWith % 12 === 0 && debtWith > 0) {
+    if (monthsWith % 12 === 0 && debtWith > 0 && yearlySpecial > 0) {
       const special = Math.min(debtWith, yearlySpecial);
       debtWith -= special;
     }
@@ -269,6 +314,10 @@ export function calculateSpecialRepayment(inputs: Record<string, any>): Calculat
   const interestSaved = Math.max(0, interestWithout - interestWith);
   const timeSavedMonths = Math.max(0, monthsWithout - monthsWith);
   const timeSavedYears = (timeSavedMonths / 12).toFixed(1);
+
+  const summary = yearlySpecial > 0 && timeSavedMonths > 0
+    ? `Durch die jährliche Sondertilgung von ${formatCurrency(yearlySpecial)} sparen Sie insgesamt ${formatCurrency(interestSaved)} Zinskosten und sind ${timeSavedYears} Jahre früher schuldenfrei.`
+    : `Ohne jährliche Sondertilgung (0 €) beträgt die reguläre Laufzeit ca. ${(monthsWithout / 12).toFixed(1)} Jahre bei Gesamtzinskosten von ${formatCurrency(interestWithout)}.`;
 
   return {
     primary: {
@@ -283,6 +332,6 @@ export function calculateSpecialRepayment(inputs: Record<string, any>): Calculat
       { id: 'newDuration', label: 'Neue Gesamtlaufzeit', value: monthsWith, formattedValue: `${(monthsWith / 12).toFixed(1)} Jahre` },
       { id: 'oldDuration', label: 'Ursprüngliche Laufzeit', value: monthsWithout, formattedValue: `${(monthsWithout / 12).toFixed(1)} Jahre` },
     ],
-    summaryText: `Durch die jährliche Sondertilgung von ${formatCurrency(yearlySpecial)} sparen Sie insgesamt ${formatCurrency(interestSaved)} Zinskosten und sind ${timeSavedYears} Jahre früher schuldenfrei.`,
+    summaryText: summary,
   };
 }

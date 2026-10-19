@@ -408,7 +408,13 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const rev = Number(inputs.revenue) || 0;
+      const rev = Number(inputs.revenue);
+      if (isNaN(rev) || rev <= 0) {
+        return {
+          primary: { id: 'ebitda', label: 'EBITDA (vor Abschreibungen)', value: 0, formattedValue: '0,00 €' },
+          error: 'Bitte geben Sie einen Umsatzerlös größer als 0 € an.',
+        };
+      }
       const mat = Number(inputs.materialExpense) || 0;
       const pers = Number(inputs.personnelExpense) || 0;
       const other = Number(inputs.otherOperatingExpenses) || 0;
@@ -419,18 +425,17 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       // EBIT = EBITDA - Abschreibungen
       const ebit = ebitda - afa;
       
-      const ebitdaMargin = rev > 0 ? (ebitda / rev) * 100 : 0;
-      const ebitMargin = rev > 0 ? (ebit / rev) * 100 : 0;
+      const ebitdaMargin = (ebitda / rev) * 100;
+      const ebitMargin = (ebit / rev) * 100;
       
       return {
         primary: { id: 'ebitda', label: 'EBITDA (vor Abschreibungen)', value: ebitda, formattedValue: formatCurrency(ebitda), highlight: true },
         secondary: [
           { id: 'ebit', label: 'EBIT (Operatives Betriebsergebnis)', value: ebit, formattedValue: formatCurrency(ebit), highlight: true },
           { id: 'ebitdaMargin', label: 'EBITDA-Marge', value: ebitdaMargin, formattedValue: formatPercent(ebitdaMargin) },
-          { id: 'ebitMargin', label: 'EBIT-Marge', value: ebitMargin, formattedValue: formatPercent(ebitMargin) },
           { id: 'deprShare', label: 'Abschreibungen (AfA)', value: afa, formattedValue: formatCurrency(afa) },
         ],
-        summaryText: 'Bei ' + formatCurrency(rev) + ' Umsatz erzielt das Unternehmen ein EBITDA von ' + formatCurrency(ebitda) + ' (EBITDA-Marge ' + formatPercent(ebitdaMargin) + ') und ein EBIT von ' + formatCurrency(ebit) + ' (EBIT-Marge ' + formatPercent(ebitMargin) + ').',
+        summaryText: 'Bei Umsatzerlösen von ' + formatCurrency(rev) + ' beträgt das EBITDA ' + formatCurrency(ebitda) + ' (EBITDA-Marge: ' + formatPercent(ebitdaMargin) + ') und das operative EBIT ' + formatCurrency(ebit) + ' (EBIT-Marge: ' + formatPercent(ebitMargin) + ').',
       };
     },
     formula: "EBITDA = Umsatz - betriebliche Aufwendungen (ohne AfA); EBIT = EBITDA - Abschreibungen; Marge = (Kennzahl / Umsatz) × 100",
@@ -632,10 +637,17 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
+      const rawLiab = Number(inputs.shortTermLiabilities);
+      if (isNaN(rawLiab) || rawLiab <= 0) {
+        return {
+          primary: { id: 'l2', label: 'Liquidität 2. Grades (Quick Ratio)', value: 0, formattedValue: '0,0 %' },
+          error: 'Die kurzfristigen Verbindlichkeiten müssen größer als 0 € sein.',
+        };
+      }
       const cash = Number(inputs.cashAndBanks) || 0;
       const rec = Number(inputs.shortTermReceivables) || 0;
       const inv = Number(inputs.inventories) || 0;
-      const liab = Number(inputs.shortTermLiabilities) || 1;
+      const liab = rawLiab;
       
       // Liquidität 1. Grades (Cash Ratio): Barvermögen / Verbindlichkeiten * 100 (Ziel: 20-30%)
       const l1 = (cash / liab) * 100;
@@ -710,7 +722,8 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "min": 0,
                 "max": 1000000000,
                 "step": 2500,
-                "unit": "€"
+                "unit": "€",
+                "helpText": "Umlaufvermögen laut Bilanz (0 € falls kein Umlaufvermögen vorhanden ist)."
           },
           {
                 "id": "currentLiabilities",
@@ -724,8 +737,18 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const assets = Number(inputs.currentAssets) || 0;
-      const liab = Number(inputs.currentLiabilities) || 1;
+      const rawLiab = Number(inputs.currentLiabilities);
+      if (isNaN(rawLiab) || rawLiab <= 0) {
+        return {
+          primary: { id: 'wc', label: 'Working Capital (Nettoumlaufvermögen)', value: 0, formattedValue: '0,00 €' },
+          error: 'Die kurzfristigen Verbindlichkeiten müssen größer als 0 € sein.',
+        };
+      }
+      const rawAssets = inputs.currentAssets !== undefined && inputs.currentAssets !== null && String(inputs.currentAssets).trim() !== ''
+        ? Number(inputs.currentAssets)
+        : 180000;
+      const assets = !isNaN(rawAssets) ? Math.max(0, rawAssets) : 0;
+      const liab = rawLiab;
       
       // Working Capital = Umlaufvermögen - kurzfristige Verbindlichkeiten
       const wc = assets - liab;
@@ -907,7 +930,13 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const eq = Number(inputs.equity) || 1;
+      const eq = Number(inputs.equity);
+      if (isNaN(eq) || eq <= 0) {
+        return {
+          primary: { id: 'roe', label: 'Eigenkapitalrentabilität (ROE)', value: 0, formattedValue: '0,0 %' },
+          error: 'Das bilanzierte Eigenkapital muss größer als 0 € sein.',
+        };
+      }
       const profit = Number(inputs.netProfit) || 0;
       
       // ROE = (Gewinn / Eigenkapital) * 100
@@ -999,13 +1028,23 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "min": 0,
                 "max": 100000000,
                 "step": 1000,
-                "unit": "€"
+                "unit": "€",
+                "helpText": "Zinsaufwand für Fremdkapital (0 € bei schuldenfreien Unternehmen ohne Fremdkapital)."
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const cap = Number(inputs.totalCapital) || 1;
+      const cap = Number(inputs.totalCapital);
+      if (isNaN(cap) || cap <= 0) {
+        return {
+          primary: { id: 'roa', label: 'Gesamtkapitalrentabilität (ROA)', value: 0, formattedValue: '0,0 %' },
+          error: 'Das Gesamtkapital muss größer als 0 € sein.',
+        };
+      }
       const profit = Number(inputs.netProfit) || 0;
-      const interest = Number(inputs.interestExpense) || 0;
+      const rawInterest = inputs.interestExpense !== undefined && inputs.interestExpense !== null && String(inputs.interestExpense).trim() !== ''
+        ? Number(inputs.interestExpense)
+        : 20000;
+      const interest = !isNaN(rawInterest) ? Math.max(0, rawInterest) : 0;
       
       // Gesamtkapitalrendite = ((Gewinn + Zinsaufwand) / Gesamtkapital) * 100
       const totalEarnings = profit + interest;

@@ -22,8 +22,8 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet das Endkapital unter Berücksichtigung von Zinseszinsen, monatlichen Sparraten und Zinsintervallen.',
     searchKeywords: ['zinseszinsrechner', 'zinseszins berechnen', 'zinseszins formel', 'sparen zinsen rechner', 'vermögenswachstum'],
     inputs: [
-      { id: 'initialAmount', label: 'Startkapital', type: 'number', defaultValue: 10000, min: 0, step: 100, unit: '€' },
-      { id: 'monthlyContribution', label: 'Monatliche Sparrate', type: 'number', defaultValue: 150, min: 0, step: 25, unit: '€' },
+      { id: 'initialAmount', label: 'Startkapital', type: 'number', defaultValue: 10000, min: 0, step: 100, unit: '€', helpText: 'Einmaliges Startguthaben (0 € bei reinem Ratensparen ohne Anfangskapital).' },
+      { id: 'monthlyContribution', label: 'Monatliche Sparrate', type: 'number', defaultValue: 150, min: 0, step: 25, unit: '€', helpText: 'Monatliche Sparrate (0 € bei reiner Einmalanlage ohne laufende Einzahlungen).' },
       { id: 'annualRate', label: 'Zinssatz / Erwartete Rendite p.a.', type: 'number', defaultValue: 5.0, min: 0, max: 100, step: 0.1, unit: '%' },
       { id: 'years', label: 'Laufzeit in Jahren', type: 'number', defaultValue: 15, min: 1, max: 60, step: 1, unit: 'Jahre' },
       {
@@ -123,15 +123,23 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die Wertentwicklung eines ETF-Sparplans unter Abzug der laufenden Fondskosten (TER).',
     searchKeywords: ['etf sparplan rechner', 'msci world sparplan rechner', 'etf rendite berechnen', 'etf vermögensaufbau rechner'],
     inputs: [
-      { id: 'monthlyContribution', label: 'Monatliche ETF-Sparrate', type: 'number', defaultValue: 250, min: 10, step: 25, unit: '€' },
-      { id: 'initialAmount', label: 'Einmalige Anfangsinvestition', type: 'number', defaultValue: 1000, min: 0, step: 500, unit: '€' },
+      { id: 'monthlyContribution', label: 'Monatliche ETF-Sparrate', type: 'number', defaultValue: 250, min: 0, step: 25, unit: '€', helpText: 'Regelmäßige Sparrate (0 € für reine Einmalanlagen ohne monatliche Sparrate).' },
+      { id: 'initialAmount', label: 'Einmalige Anfangsinvestition', type: 'number', defaultValue: 1000, min: 0, step: 500, unit: '€', helpText: 'Einmaliges Startkapital (0 € bei reinem Ratensparen).' },
       { id: 'annualRate', label: 'Erwartete Marktrendite p.a.', type: 'number', defaultValue: 7.0, min: 0, max: 20, step: 0.5, unit: '%', helpText: 'Historischer MSCI World Durchschnitt: ca. 7–8 % p.a.' },
       { id: 'terPercent', label: 'Laufende Kosten des ETFs (TER)', type: 'number', defaultValue: 0.20, min: 0, max: 2, step: 0.05, unit: '%', helpText: 'Breit gestreute World-ETFs: ca. 0,15 % bis 0,25 %' },
       { id: 'years', label: 'Anlagehorizont in Jahren', type: 'number', defaultValue: 20, min: 1, max: 50, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const grossRate = parseFloat(inputs.annualRate) || 7.0;
-      const ter = parseFloat(inputs.terPercent) || 0.20;
+      const rawAnnualRate = inputs.annualRate !== undefined && inputs.annualRate !== null && String(inputs.annualRate).trim() !== ''
+        ? parseFloat(inputs.annualRate)
+        : 7.0;
+      const grossRate = !isNaN(rawAnnualRate) ? Math.max(0, rawAnnualRate) : 7.0;
+
+      const rawTer = inputs.terPercent !== undefined && inputs.terPercent !== null && String(inputs.terPercent).trim() !== ''
+        ? parseFloat(inputs.terPercent)
+        : 0.20;
+      const ter = !isNaN(rawTer) ? Math.max(0, rawTer) : 0.20;
+
       const netRate = Math.max(0, grossRate - ter);
       const res = calculateCompoundInterest({ ...inputs, annualRate: netRate, compoundFrequency: '12' });
       return {
@@ -171,10 +179,10 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet das zukünftige Sparguthaben bei regelmäßiger Sparrate und festem Zinssatz.',
     searchKeywords: ['sparrechner', 'sparplan rechner', 'geld sparen rechner', 'vermögen aufbauen rechner'],
     inputs: [
-      { id: 'initialAmount', label: 'Anfangsguthaben', type: 'number', defaultValue: 2500, unit: '€' },
-      { id: 'monthlyContribution', label: 'Monatlicher Sparbetrag', type: 'number', defaultValue: 200, unit: '€' },
-      { id: 'annualRate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.5, unit: '%' },
-      { id: 'years', label: 'Spardauer', type: 'number', defaultValue: 10, unit: 'Jahre' },
+      { id: 'initialAmount', label: 'Anfangsguthaben', type: 'number', defaultValue: 2500, min: 0, step: 100, unit: '€', helpText: 'Einmaliges Startkapital (0 € bei reinem Ratensparen).' },
+      { id: 'monthlyContribution', label: 'Monatlicher Sparbetrag', type: 'number', defaultValue: 200, min: 0, step: 25, unit: '€', helpText: 'Regelmäßige Sparrate (0 € bei reiner Einmalanlage).' },
+      { id: 'annualRate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.5, min: 0, max: 100, step: 0.1, unit: '%' },
+      { id: 'years', label: 'Spardauer', type: 'number', defaultValue: 10, min: 1, max: 60, step: 1, unit: 'Jahre' },
       {
         id: 'depositTiming',
         label: 'Einzahlungszeitpunkt',
@@ -220,10 +228,10 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die exakte monatliche Sparrate für Ihr persönliches finanzielles Sparziel unter Einbezug von Zins und Zinseszins.',
     searchKeywords: ['sparzielrechner', 'wie viel muss ich sparen', 'sparrate berechnen für sparziel', 'sparziel rechner'],
     inputs: [
-      { id: 'targetAmount', label: 'Wunsch-Sparziel', type: 'number', defaultValue: 50000, min: 100, step: 1000, unit: '€' },
-      { id: 'initialAmount', label: 'Bereits vorhandenes Startkapital', type: 'number', defaultValue: 5000, min: 0, step: 500, unit: '€' },
+      { id: 'targetAmount', label: 'Wunsch-Sparziel', type: 'number', defaultValue: 50000, min: 0, step: 1000, unit: '€' },
+      { id: 'initialAmount', label: 'Bereits vorhandenes Startkapital', type: 'number', defaultValue: 5000, min: 0, step: 500, unit: '€', helpText: 'Bereits vorhandenes Guthaben (0 € wenn noch kein Kapital angespart ist).' },
       { id: 'annualRate', label: 'Angenommener Zinssatz p.a.', type: 'number', defaultValue: 4.0, min: 0, step: 0.1, unit: '%' },
-      { id: 'years', label: 'Geplante Jahre bis zum Ziel', type: 'number', defaultValue: 10, min: 1, max: 50, step: 1, unit: 'Jahre' },
+      { id: 'years', label: 'Geplante Jahre bis zum Ziel', type: 'number', defaultValue: 10, min: 1, max: 60, step: 1, unit: 'Jahre' },
     ],
     calculate: calculateSavingsTarget,
     formula: 'Monatliche Rate = (Ziel - FV(Start)) × (r / ((1+r)^m - 1))',
@@ -257,9 +265,9 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den realen Kaufkraftverlust Ihres Geldes über vergangene und zukünftige Jahre anhand realistischer Inflationsraten.',
     searchKeywords: ['inflationsrechner', 'kaufkraftverlust rechner', 'geldentwertung berechnen', 'inflation berechnen zukunft'],
     inputs: [
-      { id: 'amount', label: 'Heutiger Geldbetrag', type: 'number', defaultValue: 10000, unit: '€' },
-      { id: 'inflationRate', label: 'Jährliche Inflationsrate', type: 'number', defaultValue: 2.5, min: 0.1, max: 25, step: 0.1, unit: '%' },
-      { id: 'years', label: 'Zeitraum in Jahren', type: 'number', defaultValue: 15, min: 1, max: 50, step: 1, unit: 'Jahre' },
+      { id: 'amount', label: 'Heutiger Geldbetrag', type: 'number', defaultValue: 10000, min: 0, step: 500, unit: '€' },
+      { id: 'inflationRate', label: 'Jährliche Inflationsrate', type: 'number', defaultValue: 2.5, min: 0, max: 25, step: 0.1, unit: '%' },
+      { id: 'years', label: 'Zeitraum in Jahren', type: 'number', defaultValue: 15, min: 1, max: 60, step: 1, unit: 'Jahre' },
     ],
     calculate: calculateInflation,
     formula: 'Reale Kaufkraft = Betrag / (1 + Inflationsrate)^Jahre',
@@ -293,9 +301,9 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet absolute Gewinne, Gesamtrenditen in Prozent und die jährliche Wachstumsrate (CAGR).',
     searchKeywords: ['renditerechner', 'cagr rechner', 'aktien rendite berechnen', 'jährliche rendite berechnen'],
     inputs: [
-      { id: 'initialInvestment', label: 'Eingesetztes Kapital (Kaufpreis)', type: 'number', defaultValue: 10000, unit: '€' },
-      { id: 'finalValue', label: 'Endwert (Verkaufswert inkl. Ausschüttungen)', type: 'number', defaultValue: 16500, unit: '€' },
-      { id: 'years', label: 'Haltedauer in Jahren', type: 'number', defaultValue: 5, unit: 'Jahre', step: 0.5 },
+      { id: 'initialInvestment', label: 'Eingesetztes Kapital (Kaufpreis)', type: 'number', defaultValue: 10000, min: 0.01, step: 500, unit: '€' },
+      { id: 'finalValue', label: 'Endwert (Verkaufswert inkl. Ausschüttungen)', type: 'number', defaultValue: 16500, min: 0, step: 500, unit: '€' },
+      { id: 'years', label: 'Haltedauer in Jahren', type: 'number', defaultValue: 5, min: 0.1, max: 60, unit: 'Jahre', step: 0.5 },
     ],
     calculate: calculateReturn,
     formula: 'CAGR = (Endwert / Anfangswert)^(1 / Jahre) - 1',
@@ -329,10 +337,10 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die empfohlene Höhe Ihrer eisernen Reserve basierend auf Ihren monatlichen Fixkosten und Lebenshaltungsausgaben.',
     searchKeywords: ['notgroschen rechner', 'wie viel notgroschen', 'liquiditätspuffer tagesgeld', 'notfallreserve berechnen'],
     inputs: [
-      { id: 'rent', label: 'Warmmiete / Kreditrate', type: 'number', defaultValue: 900, unit: '€' },
-      { id: 'livingExpenses', label: 'Lebensmittel & Haushalt', type: 'number', defaultValue: 450, unit: '€' },
-      { id: 'insurance', label: 'Versicherungen & Mobilität', type: 'number', defaultValue: 200, unit: '€' },
-      { id: 'other', label: 'Sonstige unvermeidbare Fixkosten', type: 'number', defaultValue: 150, unit: '€' },
+      { id: 'rent', label: 'Warmmiete / Kreditrate', type: 'number', defaultValue: 900, min: 0, step: 50, unit: '€', helpText: 'Monatliche Wohnkosten (0 € bei schuldenfreiem Wohneigentum).' },
+      { id: 'livingExpenses', label: 'Lebensmittel & Haushalt', type: 'number', defaultValue: 450, min: 0, step: 25, unit: '€' },
+      { id: 'insurance', label: 'Versicherungen & Mobilität', type: 'number', defaultValue: 200, min: 0, step: 25, unit: '€' },
+      { id: 'other', label: 'Sonstige unvermeidbare Fixkosten', type: 'number', defaultValue: 150, min: 0, step: 25, unit: '€' },
       {
         id: 'bufferMonths',
         label: 'Sicherheitspuffer',

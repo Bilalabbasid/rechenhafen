@@ -175,15 +175,34 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
 }
 
 export function calculateSavingsTarget(inputs: Record<string, any>): CalculationResult {
-  const target = parseFloat(inputs.targetAmount) || 50000;
-  const initial = parseFloat(inputs.initialAmount) || 0;
-  const rateAnnual = (parseFloat(inputs.annualRate) || 0) / 100;
+  const rawTarget = inputs.targetAmount !== undefined && inputs.targetAmount !== null && String(inputs.targetAmount).trim() !== ''
+    ? parseFloat(inputs.targetAmount)
+    : 50000;
+  const target = !isNaN(rawTarget) ? Math.max(0, rawTarget) : 50000;
+
+  const rawInitial = inputs.initialAmount !== undefined && inputs.initialAmount !== null && String(inputs.initialAmount).trim() !== ''
+    ? parseFloat(inputs.initialAmount)
+    : 0;
+  const initial = !isNaN(rawInitial) ? Math.max(0, rawInitial) : 0;
+
+  const rawRate = inputs.annualRate !== undefined && inputs.annualRate !== null && String(inputs.annualRate).trim() !== ''
+    ? parseFloat(inputs.annualRate)
+    : 0;
+  const rateAnnual = (!isNaN(rawRate) ? Math.max(0, rawRate) : 0) / 100;
+
   const years = parseInt(inputs.years || '10', 10);
 
   if (target <= initial) {
     return {
-      primary: { id: 'monthly', label: 'Monatliche Sparrate', value: 0, formattedValue: '0,00 €' },
-      summaryText: 'Das Startkapital deckt das Sparziel bereits ab.',
+      primary: { id: 'monthly', label: 'Monatliche Sparrate', value: 0, formattedValue: '0,00 €', highlight: true },
+      secondary: [
+        { id: 'target', label: 'Sparziel', value: target, formattedValue: formatCurrency(target) },
+        { id: 'totalOwn', label: 'Summe eigener Einzahlungen', value: initial, formattedValue: formatCurrency(initial) },
+        { id: 'interestGain', label: 'Zinsanteil am Sparziel', value: 0, formattedValue: formatCurrency(0) },
+      ],
+      summaryText: target === 0
+        ? 'Bei einem Sparziel von 0 € ist keine monatliche Sparrate erforderlich.'
+        : 'Das vorhandene Startkapital deckt das gewünschte Sparziel bereits vollständig ab.',
     };
   }
   if (years <= 0) {
@@ -228,21 +247,29 @@ export function calculateSavingsTarget(inputs: Record<string, any>): Calculation
 }
 
 export function calculateInflation(inputs: Record<string, any>): CalculationResult {
-  const amount = parseFloat(inputs.amount) || 10000;
-  const inflationRate = (parseFloat(inputs.inflationRate) || 2.5) / 100;
+  const rawAmount = inputs.amount !== undefined && inputs.amount !== null && String(inputs.amount).trim() !== ''
+    ? parseFloat(inputs.amount)
+    : 10000;
+  const amount = !isNaN(rawAmount) ? Math.max(0, rawAmount) : 10000;
+
+  const rawInflation = inputs.inflationRate !== undefined && inputs.inflationRate !== null && String(inputs.inflationRate).trim() !== ''
+    ? parseFloat(inputs.inflationRate)
+    : 2.5;
+  const inflationRate = (!isNaN(rawInflation) ? rawInflation : 2.5) / 100;
+
   const years = parseInt(inputs.years || '10', 10);
 
-  if (years <= 0 || amount <= 0) {
+  if (years <= 0) {
     return {
       primary: { id: 'futurePurchasingPower', label: 'Kaufkraft', value: amount, formattedValue: formatCurrency(amount) },
-      error: 'Betrag und Laufzeit müssen größer als null sein.',
+      error: 'Die Laufzeit muss größer als null sein.',
     };
   }
 
   // Zukünftige Kaufkraft des heutigen Geldes
   const futurePurchasingPower = amount / Math.pow(1 + inflationRate, years);
   const lossInEuros = amount - futurePurchasingPower;
-  const lossPercent = (lossInEuros / amount) * 100;
+  const lossPercent = amount > 0 ? (lossInEuros / amount) * 100 : 0;
 
   // Umgekehrt: Wie viel Geld bräuchte man in der Zukunft für dieselbe Kaufkraft?
   const futureNominalEquivalent = amount * Math.pow(1 + inflationRate, years);
@@ -265,23 +292,43 @@ export function calculateInflation(inputs: Record<string, any>): CalculationResu
 }
 
 export function calculateReturn(inputs: Record<string, any>): CalculationResult {
-  const initial = parseFloat(inputs.initialInvestment) || 10000;
-  const finalVal = parseFloat(inputs.finalValue) || 16000;
-  const years = parseFloat(inputs.years) || 5;
+  const rawInitial = inputs.initialInvestment !== undefined && inputs.initialInvestment !== null && String(inputs.initialInvestment).trim() !== ''
+    ? parseFloat(inputs.initialInvestment)
+    : 10000;
+  const initial = !isNaN(rawInitial) ? rawInitial : 10000;
+
+  const rawFinal = inputs.finalValue !== undefined && inputs.finalValue !== null && String(inputs.finalValue).trim() !== ''
+    ? parseFloat(inputs.finalValue)
+    : 16000;
+  const finalVal = !isNaN(rawFinal) ? rawFinal : 16000;
+
+  const rawYears = inputs.years !== undefined && inputs.years !== null && String(inputs.years).trim() !== ''
+    ? parseFloat(inputs.years)
+    : 5;
+  const years = !isNaN(rawYears) ? rawYears : 5;
 
   if (initial <= 0) {
     return {
-      primary: { id: 'totalReturn', label: 'Rendite', value: 0, formattedValue: '0 %' },
+      primary: { id: 'cagr', label: 'Jährliche Durchschnittsrendite (CAGR)', value: 0, formattedValue: '0 %' },
       error: 'Die Anfangsinvestition muss positiv sein.',
+    };
+  }
+
+  if (years <= 0) {
+    return {
+      primary: { id: 'cagr', label: 'Jährliche Durchschnittsrendite (CAGR)', value: 0, formattedValue: '0 %' },
+      error: 'Die Haltedauer muss größer als null sein.',
     };
   }
 
   const profit = finalVal - initial;
   const totalReturnPercent = (profit / initial) * 100;
-  
+
   let cagr = 0;
   if (years > 0 && finalVal > 0) {
     cagr = (Math.pow(finalVal / initial, 1 / years) - 1) * 100;
+  } else if (finalVal === 0) {
+    cagr = -100;
   }
 
   return {
@@ -302,10 +349,18 @@ export function calculateReturn(inputs: Record<string, any>): CalculationResult 
 }
 
 export function calculateEmergencyFund(inputs: Record<string, any>): CalculationResult {
-  const rent = parseFloat(inputs.rent) || 800;
-  const living = parseFloat(inputs.livingExpenses) || 400;
-  const insurance = parseFloat(inputs.insurance) || 150;
-  const other = parseFloat(inputs.other) || 150;
+  const rent = inputs.rent !== undefined && inputs.rent !== null && String(inputs.rent).trim() !== ''
+    ? Math.max(0, parseFloat(inputs.rent) || 0)
+    : 800;
+  const living = inputs.livingExpenses !== undefined && inputs.livingExpenses !== null && String(inputs.livingExpenses).trim() !== ''
+    ? Math.max(0, parseFloat(inputs.livingExpenses) || 0)
+    : 400;
+  const insurance = inputs.insurance !== undefined && inputs.insurance !== null && String(inputs.insurance).trim() !== ''
+    ? Math.max(0, parseFloat(inputs.insurance) || 0)
+    : 150;
+  const other = inputs.other !== undefined && inputs.other !== null && String(inputs.other).trim() !== ''
+    ? Math.max(0, parseFloat(inputs.other) || 0)
+    : 150;
   const monthsBuffer = parseInt(inputs.bufferMonths || '3', 10);
 
   const monthlyTotal = rent + living + insurance + other;

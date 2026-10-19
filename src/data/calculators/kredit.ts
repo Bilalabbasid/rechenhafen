@@ -67,9 +67,9 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die Kreditrate und Zinskosten für Ratenkredite mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['ratenkreditrechner', 'konsumentenkredit rechner', 'ratenkredit monatsrate'],
     inputs: [
-      { id: 'loanAmount', label: 'Kreditsumme', type: 'number', defaultValue: 10000, unit: '€' },
-      { id: 'annualInterest', label: 'Effektiver Jahreszins', type: 'number', defaultValue: 4.9, unit: '%' },
-      { id: 'termMonths', label: 'Laufzeit in Monaten', type: 'number', defaultValue: 48, unit: 'Monate' },
+      { id: 'loanAmount', label: 'Kreditsumme', type: 'number', defaultValue: 10000, min: 500, step: 500, unit: '€' },
+      { id: 'annualInterest', label: 'Effektiver Jahreszins', type: 'number', defaultValue: 4.9, min: 0, max: 25, step: 0.1, unit: '%' },
+      { id: 'termMonths', label: 'Laufzeit in Monaten', type: 'number', defaultValue: 48, min: 1, max: 120, step: 1, unit: 'Monate' },
     ],
     calculate: calculateInstallmentLoan,
     formula: 'Annuitätendarlehen-Berechnung',
@@ -103,10 +103,10 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die monatliche Kreditrate für Ihren Autokauf unter Berücksichtigung von Anzahlung und Zinsen nach deutschem Standard.',
     searchKeywords: ['autokreditrechner', 'autofinanzierung rechner', 'autokredit monatsrate', 'kfz kredit berechnen', 'autokredit ohne schlussrate'],
     inputs: [
-      { id: 'carPrice', label: 'Fahrzeugkaufpreis', type: 'number', defaultValue: 25000, unit: '€' },
-      { id: 'downPayment', label: 'Anzahlung / Inzahlungnahme Altwagen', type: 'number', defaultValue: 5000, unit: '€' },
-      { id: 'annualInterest', label: 'Effektiver Jahreszins', type: 'number', defaultValue: 5.2, unit: '%' },
-      { id: 'termMonths', label: 'Finanzierungslaufzeit', type: 'number', defaultValue: 48, unit: 'Monate' },
+      { id: 'carPrice', label: 'Fahrzeugkaufpreis', type: 'number', defaultValue: 25000, min: 500, step: 500, unit: '€' },
+      { id: 'downPayment', label: 'Anzahlung / Inzahlungnahme Altwagen', type: 'number', defaultValue: 5000, min: 0, step: 500, unit: '€', helpText: 'Anzahlung oder Eintauschwert des Altwagens (0 € bei reiner Vollfinanzierung).' },
+      { id: 'annualInterest', label: 'Effektiver Jahreszins', type: 'number', defaultValue: 5.2, min: 0, max: 25, step: 0.1, unit: '%' },
+      { id: 'termMonths', label: 'Finanzierungslaufzeit', type: 'number', defaultValue: 48, min: 1, max: 120, step: 1, unit: 'Monate' },
     ],
     calculate: (inputs) => {
       if (inputs.carPrice === undefined || inputs.carPrice === null || inputs.carPrice === '') {
@@ -213,10 +213,10 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Erstellt einen vollständigen Tilgungsplan für Annuitätendarlehen mit Anfangstilgung, Zinsbindungsdauer und Restschuld.',
     searchKeywords: ['tilgungsrechner', 'baufinanzierung rechner tilgung', 'tilgungsplan baugeld', 'anfängliche tilgung rechner'],
     inputs: [
-      { id: 'loanAmount', label: 'Darlehenssumme', type: 'number', defaultValue: 300000, min: 10000, step: 10000, unit: '€' },
-      { id: 'annualInterest', label: 'Sollzinssatz p.a.', type: 'number', defaultValue: 3.6, min: 0.1, step: 0.05, unit: '%' },
-      { id: 'initialRepayment', label: 'Anfängliche Tilgung p.a.', type: 'number', defaultValue: 2.0, min: 1.0, max: 10.0, step: 0.25, unit: '%' },
-      { id: 'fixedYears', label: 'Zinsbindungsfrist', type: 'number', defaultValue: 10, min: 5, max: 30, step: 5, unit: 'Jahre' },
+      { id: 'loanAmount', label: 'Darlehenssumme', type: 'number', defaultValue: 300000, min: 1000, step: 10000, unit: '€' },
+      { id: 'annualInterest', label: 'Sollzinssatz p.a.', type: 'number', defaultValue: 3.6, min: 0, step: 0.05, unit: '%' },
+      { id: 'initialRepayment', label: 'Anfängliche Tilgung p.a.', type: 'number', defaultValue: 2.0, min: 0.1, max: 20.0, step: 0.25, unit: '%' },
+      { id: 'fixedYears', label: 'Zinsbindungsfrist', type: 'number', defaultValue: 10, min: 1, max: 40, step: 1, unit: 'Jahre' },
     ],
     calculate: calculateAnnuity,
     formula: 'Monatsrate = Darlehensbetrag × (Sollzins + Anfangstilgung) / 12',
@@ -250,10 +250,10 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die Zinsersparnis und die Verkürzung der Kreditlaufzeit durch regelmäßige Sondertilgungen.',
     searchKeywords: ['sondertilgungsrechner', 'sondertilgung rechner', 'sondertilgung zinsersparnis', 'kredit schneller abzahlen'],
     inputs: [
-      { id: 'loanAmount', label: 'Aktuelle Kreditsumme', type: 'number', defaultValue: 250000, unit: '€' },
-      { id: 'annualInterest', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.8, unit: '%' },
-      { id: 'monthlyPayment', label: 'Bestehende Monatsrate', type: 'number', defaultValue: 1200, unit: '€' },
-      { id: 'yearlySpecialRepayment', label: 'Geplante jährliche Sondertilgung', type: 'number', defaultValue: 5000, unit: '€' },
+      { id: 'loanAmount', label: 'Aktuelle Kreditsumme', type: 'number', defaultValue: 250000, min: 1000, step: 10000, unit: '€' },
+      { id: 'annualInterest', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.8, min: 0, max: 25, step: 0.1, unit: '%' },
+      { id: 'monthlyPayment', label: 'Bestehende Monatsrate', type: 'number', defaultValue: 1200, min: 10, step: 50, unit: '€' },
+      { id: 'yearlySpecialRepayment', label: 'Geplante jährliche Sondertilgung', type: 'number', defaultValue: 5000, min: 0, step: 500, unit: '€', helpText: 'Zusätzliche jährliche Einmalzahlung (0 € wenn keine Sondertilgung geleistet wird).' },
     ],
     calculate: calculateSpecialRepayment,
     formula: 'Laufzeitsimulation mit reduzierter Restschuld',
@@ -287,10 +287,10 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die verbleibende Darlehensrestschuld zum Ende der Zinsbindung für eine fundierte Anschlussfinanzierung.',
     searchKeywords: ['restschuld rechner baufinanzierung', 'restschuld rechner', 'restdarlehen berechnen', 'restschuld nach 10 jahren', 'anschlussfinanzierung rechner'],
     inputs: [
-      { id: 'loanAmount', label: 'Ursprünglicher Darlehensbetrag', type: 'number', defaultValue: 200000, unit: '€' },
-      { id: 'annualInterest', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.5, unit: '%' },
-      { id: 'initialRepayment', label: 'Anfängliche Tilgung', type: 'number', defaultValue: 2.0, unit: '%' },
-      { id: 'fixedYears', label: 'Zinsbindung in Jahren', type: 'number', defaultValue: 10, unit: 'Jahre' },
+      { id: 'loanAmount', label: 'Ursprünglicher Darlehensbetrag', type: 'number', defaultValue: 200000, min: 1000, step: 10000, unit: '€' },
+      { id: 'annualInterest', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.5, min: 0, max: 25, step: 0.1, unit: '%' },
+      { id: 'initialRepayment', label: 'Anfängliche Tilgung', type: 'number', defaultValue: 2.0, min: 0.1, max: 20, step: 0.25, unit: '%' },
+      { id: 'fixedYears', label: 'Zinsbindung in Jahren', type: 'number', defaultValue: 10, min: 1, max: 40, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
       const res = calculateAnnuity(inputs);
