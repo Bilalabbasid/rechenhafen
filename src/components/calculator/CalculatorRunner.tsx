@@ -4,16 +4,25 @@ import React, { useState, useEffect, useRef, useId } from 'react';
 import Link from 'next/link';
 import { CalculatorInput, CalculationResult } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
-import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info, Bookmark, BookmarkCheck } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe, formatNumber } from '@/lib/formatters';
 import { getUpcomingEasterDateString, parseDateParts } from '@/lib/calculators/dateMath';
 import {
   trackCalculatorView,
   trackCalculationCompleted,
+  trackCalculatorStart,
+  trackCalculatorResult,
   trackResultCopied,
   trackValidationError,
+  trackCalculatorFavorite,
 } from '@/lib/analytics/ga4';
+import {
+  isCalculatorFavorite,
+  toggleFavoriteCalculator,
+  recordCalculatorInteraction,
+} from '@/lib/storage/favorites';
+import ContextualNextSteps from './ContextualNextSteps';
 import { renderInlineMarkdown } from '@/components/common/FormattedContent';
 
 interface Props {
@@ -61,9 +70,33 @@ export default function CalculatorRunner({
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
+  // Distinguishes initial prefilled example state from active user calculation
+  const [isUserEdited, setIsUserEdited] = useState(false);
+  const [isFav, setIsFav] = useState(false);
+
   // Reference to loaded engine function
   const engineRef = useRef<((inp: Record<string, any>) => CalculationResult) | null>(null);
   const trackTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasTrackedStartRef = useRef(false);
+
+  // Sync favorites state locally
+  useEffect(() => {
+    setIsFav(isCalculatorFavorite(slug));
+    const handleFavChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ slug?: string; isFavorited?: boolean }>;
+      if (customEvent.detail?.slug === slug) {
+        setIsFav(Boolean(customEvent.detail.isFavorited));
+      }
+    };
+    window.addEventListener('rechenhafen_favorites_changed', handleFavChange);
+    return () => window.removeEventListener('rechenhafen_favorites_changed', handleFavChange);
+  }, [slug]);
+
+  const handleToggleFavorite = () => {
+    const nextState = toggleFavoriteCalculator(slug);
+    setIsFav(nextState);
+    trackCalculatorFavorite(slug, nextState ? 'add' : 'remove');
+  };
 
   const debounceTrackCompleted = () => {
     if (trackTimerRef.current) clearTimeout(trackTimerRef.current);
@@ -188,6 +221,14 @@ export default function CalculatorRunner({
   }, [slug, inputDefs]);
 
   const handleInputChange = async (id: string, value: any) => {
+    // Record first interaction for privacy analytics & recent usage
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
     const updatedInputs = { ...inputs, [id]: value };
     setInputs(updatedInputs);
 
@@ -198,23 +239,25 @@ export default function CalculatorRunner({
       const valStr = String(value ?? '').trim().replace(',', '.');
       if (valStr === '') {
         newFieldErrors[id] = 'Bitte geben Sie einen Wert ein.';
+        trackValidationError(slug, 'empty_value', id);
       } else {
         const numVal = parseFloat(valStr);
         if (isNaN(numVal)) {
           newFieldErrors[id] = 'Bitte eine gültige Zahl eingeben.';
-          trackValidationError(slug, 'invalid_number');
+          trackValidationError(slug, 'invalid_number', id);
         } else if (fieldDef.min !== undefined && numVal < fieldDef.min) {
           newFieldErrors[id] = `Mindestwert: ${fieldDef.min}${fieldDef.unit ? ' ' + fieldDef.unit : ''}`;
-          trackValidationError(slug, 'range_underflow');
+          trackValidationError(slug, 'range_underflow', id);
         } else if (fieldDef.max !== undefined && numVal > fieldDef.max) {
           newFieldErrors[id] = `Maximalwert: ${fieldDef.max}${fieldDef.unit ? ' ' + fieldDef.unit : ''}`;
-          trackValidationError(slug, 'range_overflow');
+          trackValidationError(slug, 'range_overflow', id);
         } else {
           delete newFieldErrors[id];
         }
       }
     } else if (value === '' && fieldDef && fieldDef.type !== 'boolean') {
       newFieldErrors[id] = 'Eingabe erforderlich.';
+      trackValidationError(slug, 'required_field', id);
     } else {
       delete newFieldErrors[id];
     }
@@ -249,6 +292,13 @@ export default function CalculatorRunner({
   };
 
   const handlePresetSelect = async (presetKey: string) => {
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
     const berlinParts = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Europe/Berlin',
       year: 'numeric',
@@ -325,6 +375,13 @@ export default function CalculatorRunner({
   const [dynamicBreaks, setDynamicBreaks] = useState<number[]>([30]);
 
   const handleBreakChange = (index: number, val: number) => {
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
     const next = [...dynamicBreaks];
     next[index] = Math.max(0, val || 0);
     setDynamicBreaks(next);
@@ -346,6 +403,13 @@ export default function CalculatorRunner({
 
   const handleAddBreak = () => {
     if (dynamicBreaks.length >= 4) return;
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
     const next = [...dynamicBreaks, 15];
     setDynamicBreaks(next);
     const total = next.reduce((a, b) => a + b, 0);
@@ -366,6 +430,13 @@ export default function CalculatorRunner({
 
   const handleRemoveBreak = (index: number) => {
     if (dynamicBreaks.length <= 1) return;
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
     const next = dynamicBreaks.filter((_, i) => i !== index);
     setDynamicBreaks(next);
     const total = next.reduce((a, b) => a + b, 0);
@@ -401,15 +472,11 @@ export default function CalculatorRunner({
     setFieldErrors({});
     setDynamicBreaks([30]);
     setInputs(defaultVals);
+    setIsUserEdited(false);
     if (engineRef.current) {
       try {
         const resetRes = engineRef.current(defaultVals);
         setResult(resetRes);
-        if (resetRes.error) {
-          trackValidationError(slug, 'calculation_error');
-        } else {
-          trackCalculationCompleted(slug, category || 'allgemein');
-        }
       } catch {}
     } else {
       setResult(initialResult);
@@ -444,7 +511,19 @@ export default function CalculatorRunner({
     <div className={styles.calculatorCard} id="rechner-app">
       <div className={styles.calculatorHeader}>
         <h2 className={styles.calculatorTitle}>{name}</h2>
-        <span className={styles.clientTag}>Lokale Echtzeit-Berechnung</span>
+        <div className={styles.headerControls}>
+          <button
+            type="button"
+            className={`${styles.favoriteBtn} ${isFav ? styles.favoriteBtnActive : ''}`}
+            onClick={handleToggleFavorite}
+            title="Rechner merken (nur lokal in diesem Browser gespeichert)"
+            aria-label={isFav ? "Aus gemerkten Rechnern entfernen" : "Rechner für später merken"}
+          >
+            {isFav ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+            <span>{isFav ? 'Gemerkt' : 'Rechner merken'}</span>
+          </button>
+          <span className={styles.clientTag}>Lokale Echtzeit-Berechnung</span>
+        </div>
       </div>
 
       {shortDescription && (
@@ -456,18 +535,25 @@ export default function CalculatorRunner({
       <div className={styles.calculatorLayout}>
         {/* Eingabebereich */}
         <div className={styles.inputSection}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '8px' }}>
             <h3 className={styles.sectionHeading} style={{ margin: 0 }}>Eingabewerte</h3>
-            <button
-              type="button"
-              onClick={handleReset}
-              className={styles.actionBtn}
-              title="Auf Standardwerte zurücksetzen"
-              aria-label="Eingaben auf Standardwerte zurücksetzen"
-            >
-              <RotateCcw size={13} />
-              <span>Zurücksetzen</span>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {inputDefs.length >= 2 && (
+                <a href="#rechner-ergebnis" className={styles.jumpToResultLink}>
+                  Zum Ergebnis ↓
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={handleReset}
+                className={styles.actionBtn}
+                title="Auf Standardwerte zurücksetzen"
+                aria-label="Eingaben auf Standardwerte zurücksetzen"
+              >
+                <RotateCcw size={13} />
+                <span>Zurücksetzen</span>
+              </button>
+            </div>
           </div>
 
           {/* Dedicated Mode Selector and Presets for Tagerechner */}
@@ -801,8 +887,13 @@ export default function CalculatorRunner({
         </div>
 
         {/* Ergebnisbereich */}
-        <div className={styles.resultSection} aria-live="polite">
-          <h3 className={styles.sectionHeading}>Ergebnis</h3>
+        <div className={styles.resultSection} id="rechner-ergebnis" aria-live="polite">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: '8px' }}>
+            <h3 className={styles.sectionHeading} style={{ margin: 0, paddingBottom: 0, borderBottom: 'none' }}>Ergebnis</h3>
+            <span className={`${styles.calcStateBadge} ${isUserEdited ? styles.calcStateBadgeUser : styles.calcStateBadgeExample}`}>
+              {isUserEdited ? 'Ihre Berechnung' : 'Beispielrechnung'}
+            </span>
+          </div>
 
           {result.error ? (
             <div className={styles.errorAlert}>
@@ -1053,6 +1144,9 @@ export default function CalculatorRunner({
               </span>
             </div>
           )}
+
+          {/* Contextual Next-Step Recommendations */}
+          <ContextualNextSteps currentSlug={slug} />
         </div>
       </div>
 

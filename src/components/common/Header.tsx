@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Search, Menu, X, ChevronDown, ArrowRight } from 'lucide-react';
 import styles from '@/styles/layout.module.css';
 import SearchBar from './SearchBar';
+import SavedCalculatorsMenu from './SavedCalculatorsMenu';
 
 const PRIMARY_NAV_ITEMS = [
   { label: 'Alle Rechner', href: '/rechner/' },
@@ -153,6 +154,8 @@ export default function Header() {
           <div className={styles.headerSearchWrapper}>
             <SearchBar variant="header" placeholder="Rechner suchen..." />
           </div>
+
+          <SavedCalculatorsMenu />
 
           <button
             type="button"

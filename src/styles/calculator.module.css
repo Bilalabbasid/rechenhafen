@@ -867,5 +867,90 @@
   margin-bottom: var(--space-3);
 }
 
+/* Calculation State: Beispielrechnung vs. Ihre Berechnung */
+.calcStateBadge {
+  font-size: 0.725rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.calcStateBadgeExample {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.calcStateBadgeUser {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+}
+
+/* Rechner merken (Bookmark / Favorite) Button */
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.favoriteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.favoriteBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-surface-hover);
+}
+
+.favoriteBtnActive {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Mobile Quick Jump to Result */
+.jumpToResultLink {
+  display: none;
+}
+
+@media (max-width: 859px) {
+  .jumpToResultLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.775rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-decoration: none;
+    padding: 4px 8px;
+    background-color: var(--color-primary-subtle);
+    border-radius: var(--radius-sm);
+    transition: background-color 0.15s ease;
+  }
+
+  .jumpToResultLink:hover {
+    background-color: var(--color-primary-light);
+  }
+}
+
 
 

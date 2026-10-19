@@ -385,4 +385,104 @@
 - **Linter:** `npm run lint` -> 0 errors / 0 warnings.
 - **Build:** `npm run build` -> 471/471 static pages built cleanly.
 
+---
+
+## 10. Calculator Experience, Search-Intent Coverage & Return-Visit Features (October 2026)
+
+### 10.1 Objective & Scope
+- **Objective:**
+  - Make visitors immediately understand what question the calculator answers, which inputs are needed, what the result means, which assumptions affect it, and what useful next steps they can take.
+  - Implement full functionality for the Pasta Calculator (resolving live title vs. UI mismatch).
+  - Make the Rice Calculator internally consistent across options, formulas, FAQs, and cooked yields.
+  - Upgrade the shared calculator experience with honest initial demonstration state ("Beispielrechnung" vs. "Ihre Berechnung"), result hierarchy, and mobile accessibility.
+  - Add lightweight, purely client-side return-visit features ("Rechner merken" bookmarks, recent history based on actual user interactions, zero tracking, "Nur in diesem Browser gespeichert").
+  - Provide contextual next-step recommendations without URL parameter pollution.
+  - Enhance privacy-conscious GA4 event tracking guarded by user consent with zero PII transmission.
+
+### 10.2 Section A — Complete the Pasta Calculator (`/rechner/nudeln-rohmaerk-gewicht-rechner/`)
+- **Evidence & Confirmed Mismatch:**
+  - Search Console (10–16 Oct): 185 impressions, 1 click, avg. position 7.16.
+  - Title previously promised raw-to-cooked conversion, but interface only accepted person count and meal type.
+  - Meal option stated 100–125 g/person, while body copy cited 80–100 g without context.
+  - Default result reported excessive precision (1,003 g cooked pasta).
+  - 440 g pasta with 1 l/100 g rule yielded a displayed 5 liters without explaining pot capacity.
+  - Internal raw key `mainDish` appeared in the input summary.
+- **Implemented Changes (`src/data/calculators/extra/einheitenKochen.ts`):**
+  - Preserved canonical URL `/rechner/nudeln-rohmaerk-gewicht-rechner/`.
+  - Updated title: `Nudeln umrechnen: trocken, gekocht & Portionen`.
+  - Updated description: `Trockene und gekochte Nudeln umrechnen oder Portionen planen. Mit nachvollziehbarem Rechenweg und anpassbarem Quellfaktor.`
+  - Implemented 3 accessible calculation modes:
+    1. `portion_plan`: Persons, meal hunger type (`mainDish` 110 g, `bigHunger` 150 g, `sideDish` 70 g, `kids` 55 g, or `customGramsPerPerson`).
+    2. `dry_to_cooked`: Forward conversion from dry grams to cooked yield.
+    3. `cooked_to_dry`: Reverse conversion from cooked grams to required dry pasta.
+  - Conversion factor options:
+    - Standard Hartweizen al dente: 2,3 (100 g dry $\leftrightarrow$ 230 g cooked).
+    - Weichere Pasta / Suppennudeln: 2,5.
+    - Frische Pasta / Eierteigwaren: 1,5 (explains 25–30% residual moisture).
+    - Benutzerdefiniert (`customFactor`): strictly validated positive number, rejecting $\le 0$.
+  - Water & Salt calculations:
+    - Exact arithmetic: 440 g dry $\to$ 4,4 Liter water (10-100-1000 rule).
+    - Recommended pot size: explicitly recommends $\ge 5$–6 liter pot to avoid boiling over.
+    - Salt: 44 g (10 g / Liter).
+  - Cleaned summary: No raw `mainDish` keys.
+  - Added conversion table in content sections (50 g, 70 g, 100 g, 110 g, 125 g, 150 g, 250 g, 500 g).
+
+### 10.3 Section B — Consistent Rice Calculator (`/rechner/wasser-reis-verhaeltnis-rechner/`)
+- **Evidence & Inconsistencies Resolved:**
+  - Search Console: 172 impressions, 1 click, avg. position 13.73.
+  - Removed manual truncation ellipses in metadata (`metaTitle: 'Reis-Wasser-Rechner: Menge nach Reissorte berechnen'`).
+  - Unified all varietal ratios across options, formulas, and content:
+    - Basmati: 1 : 1,5 (150 ml water / 100 g rice), 12–15 min closed pot Quellmethode.
+    - Jasmin: 1 : 1,3 (130 ml water / 100 g rice), 12–14 min closed pot Quellmethode.
+    - Vollkorn: 1 : 2,0 (200 ml water / 100 g rice), 35–45 min closed pot Quellmethode.
+    - Sushi: 1 : 1,2 (120 ml water / 100 g rice), 15 min garzeit + 10 min rest.
+    - Risotto: 1 : 3,0 (300 ml hot broth / 100 g rice), 20–25 min in an open pot under constant stirring (explicitly distinguished from closed-pot Quellmethode).
+  - Disambiguated output unit: `300 ml Wasser` / `600 ml heiße Gemüse- oder Fleischbrühe` (never ambiguous `300 ml (g)`).
+  - Cooked yield aligned: 200 g dry Basmati + 300 ml water yields ca. 490 g cooked rice.
+  - Salt treated as optional seasoning (`ca. 1/2 bis 1 gestr. TL, optional nach Geschmack`).
+  - Added prominent qualification note: Package instructions take priority.
+
+### 10.4 Section C — Shared Calculator Experience
+- **Honest Initial State:**
+  - Initial prefilled demonstration state labeled as `Beispielrechnung`.
+  - Switches to `Ihre Berechnung` immediately upon first meaningful user interaction.
+  - Reset button restores default values and returns badge to `Beispielrechnung` without firing false calculation-completion analytics.
+- **Mobile & Accessibility:**
+  - Added accessible `Zum Ergebnis ↓` anchor link for mobile viewports.
+  - Ensured all numeric inputs use `inputMode="decimal"`.
+  - Added live polite announcement and keyboard focus states.
+
+### 10.5 Section D — Lightweight Return-Visit Features
+- **Client-Side Storage (`src/lib/storage/favorites.ts`):**
+  - "Rechner merken" button on calculator pages with active/inactive states.
+  - "Gemerkte Rechner" interactive dropdown menu in `Header.tsx` showing count badge and saved calculators with individual remove buttons.
+  - "Zuletzt verwendet" list tracking up to 6 recently used calculators based on active user interaction (not passive page views).
+  - Clear history action ("Verlauf leeren").
+  - Privacy guarantee: Only stores slugs; never persists user inputs, results, or PII. Fully functional offline and resilient if storage throws. Explicitly stated: "Nur in diesem Browser gespeichert."
+
+### 10.6 Section E — Useful Contextual Next Steps
+- **Contextual Next Steps Component (`src/components/calculator/ContextualNextSteps.tsx`):**
+  - Pasta $\to$ `portionsrechner`, `kalorien-rezept-rechner`, `wasser-reis-verhaeltnis-rechner`.
+  - Rice $\to$ `portionsrechner`, `gramm-in-ml-rechner`, `nudeln-rohmaerk-gewicht-rechner`.
+  - Splitt $\to$ `pflastersteine-rechner`, `splitt-2-5-gewicht-schuettdichte` Ratgeber, `schotter-rechner`.
+  - Alter in Monaten $\to$ `lebensmonate-berechnen` Ratgeber, `alter-in-tagen`, `altersrechner`.
+
+### 10.7 Section F — Privacy-Conscious Analytics Pipeline
+- **Enhanced Events in `src/lib/analytics/ga4.ts`:**
+  - `calculator_start`: Fired once on first meaningful user interaction.
+  - `calculator_result`: Fired when a valid result is generated after user interaction.
+  - `calculator_validation_error`: Transmits only field identifier and error category.
+  - `calculator_copy_result` / `result_copied`: Clipboard copy action without copying content.
+  - `calculator_related_click` / `related_calculator_clicked`: From and to slugs only.
+  - `calculator_favorite_add` / `calculator_favorite_remove`: Bookmark toggles.
+  - Guarded strictly by `hasAnalyticsConsent()`. Zero user input values, results, DOB, or PII transmitted.
+
+### 10.8 Quality Gates & Production Build
+- **Unit Tests:** `npm test` $\to$ 28 test files, 329 tests passing (100% pass).
+- **TypeScript:** `npx tsc --noEmit` $\to$ 0 errors.
+- **ESLint:** `npm run lint` $\to$ 0 errors, 0 warnings.
+- **Production Build:** `npm run build` $\to$ 471/471 static routes compiled successfully.
+- **Live Browser QA:** Validated in local browser session (`qa_experience_check`), confirming layout, interactions, bookmark toggle, copy result, and mobile navigation.
+
+
 

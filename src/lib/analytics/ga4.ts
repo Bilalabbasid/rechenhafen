@@ -24,6 +24,10 @@ export function getMeasurementId(): string | undefined {
  * 2. Visitor has not explicitly granted analytics consent,
  * 3. No Measurement ID is configured,
  * 4. Window.gtag is uninitialized.
+ * 
+ * Strict Privacy Contract:
+ * - Only allowlisted identifiers (slugs, field IDs, error categories) are transmitted.
+ * - NEVER sends user inputs, results, dates of birth, financial or health data, or copied content.
  */
 function sendGa4Event(eventName: string, params: Record<string, string | number | boolean>): void {
   if (typeof window === 'undefined') return;
@@ -48,8 +52,7 @@ export function trackPageView(pagePath: string, pageTitle?: string): void {
 }
 
 /**
- * Tracks calculator view event.
- * Parameters: calculator_slug, calculator_category
+ * Tracks calculator view event on mount.
  */
 export function trackCalculatorView(calculatorSlug: string, calculatorCategory: string): void {
   if (!calculatorSlug) return;
@@ -60,9 +63,28 @@ export function trackCalculatorView(calculatorSlug: string, calculatorCategory: 
 }
 
 /**
- * Tracks successful calculation completion event.
- * Parameters: calculator_slug, calculator_category
- * Note: Never includes input numbers, parameters, or calculated results.
+ * Tracks calculator_start: fired once on first meaningful user interaction.
+ * Default automatic results on load do NOT trigger this event.
+ */
+export function trackCalculatorStart(calculatorSlug: string): void {
+  if (!calculatorSlug) return;
+  sendGa4Event('calculator_start', {
+    calculator_slug: calculatorSlug,
+  });
+}
+
+/**
+ * Tracks calculator_result: fired when a valid result is produced after user interaction.
+ */
+export function trackCalculatorResult(calculatorSlug: string): void {
+  if (!calculatorSlug) return;
+  sendGa4Event('calculator_result', {
+    calculator_slug: calculatorSlug,
+  });
+}
+
+/**
+ * Tracks calculation_completed event.
  */
 export function trackCalculationCompleted(calculatorSlug: string, calculatorCategory: string): void {
   if (!calculatorSlug) return;
@@ -73,9 +95,8 @@ export function trackCalculationCompleted(calculatorSlug: string, calculatorCate
 }
 
 /**
- * Tracks when a user copies calculation results to the clipboard.
- * Parameters: calculator_slug
- * Note: Only tracks the action itself; result contents are never sent.
+ * Tracks result_copied / calculator_copy_result: successful copy action to clipboard.
+ * Note: Never includes the copied content or result values.
  */
 export function trackResultCopied(calculatorSlug: string): void {
   if (!calculatorSlug) return;
@@ -84,9 +105,15 @@ export function trackResultCopied(calculatorSlug: string): void {
   });
 }
 
+export function trackCalculatorCopyResult(calculatorSlug: string): void {
+  if (!calculatorSlug) return;
+  sendGa4Event('calculator_copy_result', {
+    calculator_slug: calculatorSlug,
+  });
+}
+
 /**
- * Tracks when a user clicks on a related calculator recommendation.
- * Parameters: from_calculator_slug, to_calculator_slug
+ * Tracks related_calculator_clicked / calculator_related_click: when user clicks a contextual next-step or related calculator.
  */
 export function trackRelatedCalculatorClicked(
   fromCalculatorSlug: string,
@@ -99,15 +126,53 @@ export function trackRelatedCalculatorClicked(
   });
 }
 
+export function trackCalculatorRelatedClick(
+  fromCalculatorSlug: string,
+  toCalculatorSlug: string
+): void {
+  if (!toCalculatorSlug) return;
+  sendGa4Event('calculator_related_click', {
+    from_calculator_slug: fromCalculatorSlug || 'unknown',
+    to_calculator_slug: toCalculatorSlug,
+  });
+}
+
+/**
+ * Tracks calculator_favorite_add or calculator_favorite_remove.
+ */
+export function trackCalculatorFavorite(calculatorSlug: string, action: 'add' | 'remove'): void {
+  if (!calculatorSlug) return;
+  sendGa4Event(`calculator_favorite_${action}`, {
+    calculator_slug: calculatorSlug,
+  });
+}
+
 /**
  * Tracks validation error encounters during input.
- * Parameters: calculator_slug, error_type
- * Note: Tracks non-personal error categories (e.g., 'range_error', 'invalid_date') without user values.
+ * Parameters: calculator_slug, error_type, field_id
  */
-export function trackValidationError(calculatorSlug: string, errorType: string): void {
+export function trackValidationError(
+  calculatorSlug: string,
+  errorType: string,
+  fieldId?: string
+): void {
   if (!calculatorSlug || !errorType) return;
   sendGa4Event('validation_error', {
     calculator_slug: calculatorSlug,
     error_type: errorType,
+    ...(fieldId ? { field_id: fieldId } : {}),
+  });
+}
+
+export function trackCalculatorValidationError(
+  calculatorSlug: string,
+  errorType: string,
+  fieldId?: string
+): void {
+  if (!calculatorSlug || !errorType) return;
+  sendGa4Event('calculator_validation_error', {
+    calculator_slug: calculatorSlug,
+    error_type: errorType,
+    ...(fieldId ? { field_id: fieldId } : {}),
   });
 }

@@ -4187,225 +4187,616 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Reiskoch-Rechner",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: 'Reis kochen Rechner – Wasser-Reis-Verhältnis nach Quellmeth...',
-    metaDescription: 'Berechnen Sie die perfekte Wassermenge und Kochzeit für Basmatireis (1:1,5), Jasminreis (1:1,25), Vollkornreis (1:2) und Milchreis nach der Quellmethode.',
-    h1: 'Reis kochen Rechner – Perfektes Wasser-Reis-Verhältnis ermitteln',
-    shortDescription: 'Berechnet die genaue Wassermenge und Garzeit für alle Reissorten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["reis kochen verhaeltnis wasser reis","quellmethode reis wasser berechnen","basmati reis wasser menge gramm ml","naturreis vollstreis garzeit wasser"],
+    metaTitle: "Reis-Wasser-Rechner: Menge nach Reissorte berechnen",
+    metaDescription: "Berechnen Sie die passende Wassermenge, Garzeit und Ausbeute für Basmati (1:1,5), Jasmin (1:1,3), Vollkorn (1:2,0), Sushi (1:1,2) und Risotto nach Quellmethode.",
+    h1: "Reis-Wasser-Rechner: Menge nach Reissorte berechnen",
+    shortDescription: "Berechnet die empfohlene Wassermenge, Kochzeit und Ausbeute für gängige Reissorten nach der Quellmethode im geschlossenen Topf sowie für Risotto.",
+    searchKeywords: ["reis kochen verhaeltnis wasser reis", "quellmethode reis wasser berechnen", "basmati reis wasser menge gramm ml", "naturreis vollstreis garzeit wasser", "reis wasser rechner"],
     inputs: [
+      {
+        id: "riceGrams",
+        label: "Reismenge (ungekocht)",
+        type: "number",
+        defaultValue: 200,
+        min: 20,
+        max: 3000,
+        step: 25,
+        unit: "g Reis"
+      },
+      {
+        id: "riceType",
+        label: "Reissorte & Garmethode",
+        type: "select",
+        defaultValue: "basmati",
+        options: [
           {
-                "id": "riceGrams",
-                "label": "Reismenge (ungekocht)",
-                "type": "number",
-                "defaultValue": 200,
-                "min": 50,
-                "max": 2000,
-                "step": 25,
-                "unit": "g Reis"
+            value: "basmati",
+            label: "Basmati-Reis (1 : 1,5 – ca. 12–15 Min. Quellmethode)"
           },
           {
-                "id": "riceType",
-                "label": "Reissorte",
-                "type": "select",
-                "defaultValue": "basmati",
-                "options": [
-                      {
-                            "value": "basmati",
-                            "label": "Basmati-Reis (Verhältnis 1 : 1,5 – ca. 12-15 Min.)"
-                      },
-                      {
-                            "value": "jasmine",
-                            "label": "Jasmin-Reis / Duftreis (Verhältnis 1 : 1,3 – ca. 12-14 Min.)"
-                      },
-                      {
-                            "value": "wholegrain",
-                            "label": "Vollkornreis / Naturreis (Verhältnis 1 : 2,0 – ca. 35-45 Min.)"
-                      },
-                      {
-                            "value": "sushi",
-                            "label": "Sushireis / Rundkorn (Verhältnis 1 : 1,2 – ca. 15 Min. + Dämpfen)"
-                      },
-                      {
-                            "value": "risotto",
-                            "label": "Risotto-Reis (Arborio/Carnaroli – Verhältnis 1 : 3,0 Brühe)"
-                      }
-                ]
+            value: "jasmine",
+            label: "Jasmin-Reis / Duftreis (1 : 1,3 – ca. 12–14 Min. Quellmethode)"
+          },
+          {
+            value: "wholegrain",
+            label: "Vollkornreis / Naturreis (1 : 2,0 – ca. 35–45 Min. Quellmethode)"
+          },
+          {
+            value: "sushi",
+            label: "Sushi-Reis / Rundkorn (1 : 1,2 – ca. 15 Min. + 10 Min. Dämpfen)"
+          },
+          {
+            value: "risotto",
+            label: "Risotto-Reis (Arborio/Carnaroli – 1 : 3,0 Brühe im offenen Topf)"
           }
+        ]
+      }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const riceG = Number(inputs.riceGrams) || 200;
-      const type = inputs.riceType;
+      const riceG = parseFloat(String(inputs.riceGrams).replace(',', '.'));
+      if (isNaN(riceG) || riceG <= 0) {
+        return {
+          primary: { id: 'waterMl', label: 'Flüssigkeitsmenge', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie eine Reismenge größer als 0 Gramm ein.',
+        };
+      }
+
+      const type = inputs.riceType || 'basmati';
       
       let waterRatio = 1.5;
-      let cookMins = 14;
-      let tip = 'Vor dem Kochen 2-3 Mal gründlich mit kaltem Wasser waschen, bis das Wasser klar bleibt.';
+      let cookMins = '12–15';
+      let liquidLabel = 'Wasser';
+      let methodNote = 'Quellmethode im geschlossenen Topf: Einmal aufkochen, dann bei kleinster Stufe mit fest schließendem Deckel sanft ziehen lassen.';
+      let yieldFactor = 2.45;
       
       if (type === 'jasmine') {
         waterRatio = 1.3;
-        cookMins = 13;
-        tip = 'Nicht zu viel Wasser verwenden, damit Jasminreis schön klebrig und aromatisch bleibt.';
+        cookMins = '12–14';
+        yieldFactor = 2.35;
+        methodNote = 'Quellmethode im geschlossenen Topf: Jasminreis benötigt weniger Wasser (1 : 1,3), damit die aromatischen Körner leicht klebrig, aber nicht matschig werden.';
       } else if (type === 'wholegrain') {
         waterRatio = 2.0;
-        cookMins = 40;
-        tip = 'Vollkornreis behält den Keimling und die Silberhaut und braucht daher deutlich mehr Wasser und Garzeit.';
+        cookMins = '35–45';
+        yieldFactor = 2.50;
+        methodNote = 'Quellmethode im geschlossenen Topf: Da Keimling und Silberhaut erhalten sind, benötigt Vollkornreis mehr Wasser (1 : 2,0) und eine längere Garzeit.';
       } else if (type === 'sushi') {
         waterRatio = 1.2;
-        cookMins = 15;
-        tip = 'Nach dem Kochen 10 Min. bei geschlossenem Deckel ruhen lassen, danach vorsichtig mit Sushi-Essig würzen.';
+        cookMins = '15 (+ 10 Min. Ruhen)';
+        yieldFactor = 2.30;
+        methodNote = 'Quellmethode im geschlossenen Topf: Sushi-Reis nach 15 Min. Garzeit vom Herd nehmen und 10 Min. bei geschlossenem Deckel nachdämpfen lassen. Erst danach mit gewürztem Sushi-Essig vermengen.';
       } else if (type === 'risotto') {
         waterRatio = 3.0;
-        cookMins = 20;
-        tip = 'Heiße Brühe kellenweise unter ständigem Rühren nachgießen, bis der Reis cremig mit bissfestem Kern ist.';
+        cookMins = '20–25';
+        liquidLabel = 'heiße Gemüse- oder Fleischbrühe';
+        yieldFactor = 3.00;
+        methodNote = 'Offener Topf: Risotto wird nicht im geschlossenen Topf gedämpft! Die heiße Brühe kellenweise unter regelmäßigem Rühren nachgießen, bis die Reiskörner sämig und bissfest sind.';
       }
       
       const waterMl = Math.round(riceG * waterRatio);
-      const saltG = Math.round((riceG / 100) * 1.5); // ca. 1.5 g Salz je 100g Reis
-      const cookedWeightG = Math.round(riceG * (1 + (waterRatio * 0.9)));
-      const portions = Math.max(1, Math.round(riceG / 65)); // ca. 60-70g Beilage p.P.
+      const cookedWeightG = Math.round(riceG * yieldFactor);
+      const portionsAsSide = Math.max(1, Math.round(riceG / 65));
+      const portionsAsMain = Math.max(1, Math.round(riceG / 115));
       
+      // Salt guidance: optional recommendation
+      const saltGuidance = type === 'risotto'
+        ? 'Brühe ist in der Regel bereits gesalzen; bei Bedarf am Ende abschmecken.'
+        : 'ca. ' + formatNumber(Math.round((riceG / 100) * 1.5), 0) + ' g (ca. 1/2 gestr. TL, optional nach persönlichem Geschmack)';
+
+      const liquidFormatted = waterMl + ' ml ' + liquidLabel;
+
       return {
-        primary: { id: 'waterMl', label: 'Benötigtes Wasser / Flüssigkeit', value: waterMl, formattedValue: waterMl + ' ml (g)', highlight: true },
+        primary: {
+          id: 'waterMl',
+          label: 'Benötigte ' + (type === 'risotto' ? 'Brühe' : 'Wassermenge'),
+          value: waterMl,
+          formattedValue: liquidFormatted,
+          highlight: true
+        },
         secondary: [
-          { id: 'cookTime', label: 'Garzeit bei geringer Hitze', value: cookMins, formattedValue: cookMins + ' Minuten (mit Deckel)' },
-          { id: 'saltG', label: 'Empfohlenes Salz', value: saltG, formattedValue: 'ca. ' + saltG + ' g (1 gestr. TL)' },
-          { id: 'cookedYield', label: 'Ergibt gekochten Reis', value: cookedWeightG, formattedValue: 'ca. ' + cookedWeightG + ' g (für ca. ' + portions + ' Personen)' },
+          {
+            id: 'cookTime',
+            label: 'Empfohlene Garzeit',
+            value: cookMins,
+            formattedValue: cookMins + ' Minuten'
+          },
+          {
+            id: 'cookedYield',
+            label: 'Ergibt gekochten Reis',
+            value: cookedWeightG,
+            formattedValue: 'ca. ' + formatNumber(cookedWeightG, 0) + ' g'
+          },
+          {
+            id: 'portions',
+            label: 'Portionen',
+            value: portionsAsSide,
+            formattedValue: 'ca. ' + portionsAsSide + ' Portionen (Beilage) / ' + portionsAsMain + ' Portionen (Hauptgericht)'
+          },
+          {
+            id: 'saltGuidance',
+            label: 'Salz-Empfehlung (optional)',
+            value: 0,
+            formattedValue: saltGuidance
+          }
         ],
-        summaryText: 'Für ' + riceG + ' g Reis benötigen Sie genau ' + waterMl + ' ml Wasser und ca. ' + saltG + ' g Salz. Bei geschlossenem Deckel auf kleinster Stufe ca. ' + cookMins + ' Minuten sanft köcheln lassen.',
+        directAnswer: 'Für ' + riceG + ' g Reis benötigen Sie ' + liquidFormatted + ' bei einer Kochzeit von ca. ' + cookMins + ' Minuten.',
+        summaryText: 'Für ' + riceG + ' g Reis (' + (type === 'risotto' ? 'Risotto-Methode' : 'Quellmethode 1 : ' + waterRatio.toFixed(1).replace('.', ',')) + ') benötigen Sie ' + liquidFormatted + '. Nach dem Garen erhalten Sie ca. ' + formatNumber(cookedWeightG, 0) + ' g fertigen Reis.',
+        qualifications: [
+          methodNote,
+          'Hinweis: Packungsangaben des Herstellers haben Vorrang, da Feuchtigkeitsgehalt und Korngröße je nach Ernte und Marke leicht variieren.'
+        ]
       };
     },
-    formula: "Wassermenge (ml) = Reismenge (g) × Sortenspezifisches Verhältnis (1,2 bis 2,0)",
-    formulaExplanation: "Bei der Quellmethode verdampft kaum Wasser, da der Topfdeckel stets geschlossen bleibt. Der Reis nimmt die gesamte Flüssigkeit und die Nährstoffe vollständig auf.",
+    formula: "Wassermenge (ml) = Reismenge (g) × sortenspezifisches Verhältnis (1,2 bis 2,0 bei Quellmethode; 3,0 bei Risotto)",
+    formulaExplanation: "Bei der Quellmethode gart der Reis in einem fest verschlossenen Topf. Da kaum Dampf entweicht, nimmt das Reiskorn die berechnete Wassermenge vollständig auf. Risotto hingegen verdunstet im offenen Topf mehr Flüssigkeit und benötigt daher ca. das Dreifache an Brühe.",
     workedExample: {
-          "title": "Beispiel: 200 g Basmatireis für 3 Personen kochen",
-          "inputValues": [
-                {
-                      "label": "Reis",
-                      "value": "200 g"
-                },
-                {
-                      "label": "Sorte",
-                      "value": "Basmati (1:1,5)"
-                }
-          ],
-          "steps": [
-                "Wasser = 200 g × 1,5 = 300 ml Wasser",
-                "1 Mal aufkochen, dann Deckel drauf und 12-14 Min. auf kleinster Stufe ziehen lassen"
-          ],
-          "result": "300 ml Wasser (ergibt ca. 500 g lockeren Reis)"
+      title: "Beispiel: 200 g Basmatireis mit der Quellmethode kochen",
+      inputValues: [
+        { label: "Reismenge", value: "200 g Basmati" },
+        { label: "Wasser-Reis-Verhältnis", value: "1 : 1,5" }
+      ],
+      steps: [
+        "Wassermenge berechnen: 200 g × 1,5 = 300 ml Wasser",
+        "Reis in kaltem Wasser gründlich waschen, bis das Wasser klar bleibt",
+        "Reis mit 300 ml Wasser und einer Prise Salz aufkochen",
+        "Deckel schließen, Hitze auf kleinste Stufe reduzieren und 12–15 Minuten sanft quellen lassen",
+        "Nach dem Garen kurz mit einer Gabel auflockern"
+      ],
+      result: "300 ml Wasser (ergibt ca. 490 g lockeren, servierfertigen Reis)"
     },
     content: {
-      intro: 'Die Quellmethode gart Reis ohne Nährstoffverlust im geschlossenen Topf mit dem exakt passenden Verhältnis von Reis zu Wasser.',
-      details: 'Richtwerte: Weißer Langkornreis (Basmati, Jasmin) = 1 Teil Reis auf 1,5 Teile Wasser. Rundkornreis (Milchreis, Sushi) = 1 : 1,75 bis 2,0. Naturreis (Vollkornreis) = 1 : 2,25 bei ca. 35 bis 45 Minuten Garzeit.',
+      intro: "Die Quellmethode im geschlossenen Topf ist die aromaschonendste Art, Reis zuzubereiten: Die Körner garen in genau der Wassermenge, die sie aufnehmen können.",
+      details: "Unterschiedliche Reissorten besitzen unterschiedliche Stärkestrukturen und Feuchtigkeitsaufnahmen. Für ein verlässliches Ergebnis stimmen die Mengenverhältnisse im geschlossenen Topf: Basmatireis (1 : 1,5), Jasminreis (1 : 1,3), Rundkorn- und Sushireis (1 : 1,2) sowie Vollkornreis (1 : 2,0). Risotto wird abweichend davon im offenen Topf mit ca. 1 : 3,0 heißer Brühe unter Rühren gegart.",
+      sections: [
+        {
+          title: "Übersicht: Wasser-Reis-Verhältnisse und Garzeiten nach Reissorte",
+          content: "Die folgende Richtwert-Tabelle basiert auf der klassischen Quellmethode im geschlossenen Kochtopf auf dem Herd:\n\n- **Basmati-Reis:** Verhältnis 1 : 1,5 (150 ml Wasser je 100 g Reis), ca. 12–15 Minuten Garzeit.\n- **Jasmin-Reis / Duftreis:** Verhältnis 1 : 1,3 (130 ml Wasser je 100 g Reis), ca. 12–14 Minuten Garzeit.\n- **Vollkornreis / Naturreis:** Verhältnis 1 : 2,0 (200 ml Wasser je 100 g Reis), ca. 35–45 Minuten Garzeit.\n- **Sushi-Reis:** Verhältnis 1 : 1,2 (120 ml Wasser je 100 g Reis), 15 Minuten Garzeit + 10 Minuten Dämpfen bei geschlossenem Deckel.\n- **Risotto (Arborio, Carnaroli):** Verhältnis 1 : 3,0 (300 ml heiße Brühe je 100 g Reis), 20–25 Minuten im offenen Topf unter ständigem Rühren.\n\n*Praxishinweis:* Bei Verwendung eines elektrischen Reiskochers gelten meist die herstellereigenen Markierungen im Innentopf (Messbecher-Prinzip)."
+        },
+        {
+          title: "Reis waschen und salzen: Was ist sinnvoll?",
+          content: "Gründliches Abspülen des Reises vor dem Kochen unter kaltem fließendem Wasser schwemmt überschüssige Oberflächenstärke ab. Dadurch kleben Basmati- und Langkornreissorten nach dem Garen weniger zusammen. Zudem kann das Waschen eventuelle produktionsbedingte Staubreste und anorganisches Arsen reduzieren.\n\nSalz ist beim Reiskochen eine reine Geschmacksfrage und keine technische Notwendigkeit: 1 bis 2 Gramm Salz (ca. 1/2 gestrichener Teelöffel) pro 100 Gramm Trockenreis genügen vollkommen. Sushi-Reis wird traditionell erst nach dem Garen mit einer Mischung aus Reisessig, Zucker und Salz gewürzt."
+        }
+      ]
     },
     faqs: [
-      { question: 'Muss man Reis vor dem Kochen waschen?', answer: 'Ja, gründliches Waschen im Sieb spült überschüssige Stärke ab (verhindert klebrigen Matschreis) und reduziert eventuelle anorganische Arsen-Rückstände.' },
-      { question: 'Darf man während der Quellmethode den Topfdeckel öffnen?', answer: 'Nein, der heiße Wasserdampf entweicht sofort, wodurch die Temperatur abfällt und das Wasser-Verdampfungsverhältnis gestört wird.' },
+      {
+        question: "Warum darf der Topfdeckel bei der Quellmethode nicht angehoben werden?",
+        answer: "Wenn Sie den Deckel während der Quellzeit abnehmen, entweicht der heiße Wasserdampf schlagartig. Die Gartemperatur bricht ein und ein Teil der kalkulierten Flüssigkeit geht durch Verdampfung verloren, sodass der Reis am Ende ungleichmäßig gart oder am Topfboden ansetzt."
+      },
+      {
+        question: "Wie viel Gramm ungekochter Reis entspricht einer Portion?",
+        answer: "Als Beilage rechnen Sie mit ca. 60 bis 80 g ungekochtem Reis pro erwachsener Person (ergibt ca. 150 bis 200 g gekochten Reis). Bei reinen Reis-Hauptgerichten wie Reispfannen oder Curry kalkuliert man ca. 100 bis 125 g Trockenreis pro Person."
+      },
+      {
+        question: "Gilt das Verhältnis für Volumen (Tassen) oder Gewicht (Gramm)?",
+        answer: "Die angegebenen Verhältnisse beziehen sich auf das Verhältnis von Gramm Trockenreis zu Milliliter Wasser (1 g Wasser entspricht 1 ml). Wenn Sie mit Tassen messen, beachten Sie, dass 1 Tasse Reis (ca. 180–200 g) ein anderes Raumgewicht als 1 Tasse Wasser (ca. 240 ml) hat."
+      }
     ],
     relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'gramm-in-ml-rechner'],
   },
   {
     id: "nudeln-rohmaerk-gewicht-rechner",
     slug: "nudeln-rohmaerk-gewicht-rechner",
-    name: "Nudelportions-Rechner (Trocken- vs. Gekocht-Gewicht & Portionsgröße)",
-    shortName: "Nudelportions-Rechner",
+    name: "Nudeln umrechnen: trocken, gekocht & Portionen",
+    shortName: "Nudeln umrechnen",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: 'Nudeln Rechner – Rohgewicht in gekochtes Gewicht',
-    metaDescription: 'Berechnen Sie, wie viel Gramm trockene Nudeln gekocht ergeben (Faktor ca. 2,3) und wie viel Gramm Pasta Sie pro Person für Vorspeise oder Hauptgericht.',
-    h1: 'Nudeln Rechner – Nudelportionen & Gekochtes Gewicht berechnen',
-    shortDescription: 'Ermittelt Nudelgewicht trocken vs. gekocht und Portionsgrößen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["nudeln rechner trocken gekocht gewicht faktor","wieviel gramm nudeln pro person hauptgericht","nudelportionen berechnen kinder erwachsene","spaghetti menge gramm pro person"],
+    metaTitle: "Nudeln umrechnen: trocken, gekocht & Portionen",
+    metaDescription: "Trockene und gekochte Nudeln umrechnen oder Portionen planen. Mit nachvollziehbarem Rechenweg und anpassbarem Quellfaktor.",
+    h1: "Nudeln umrechnen: trocken, gekocht & Portionen",
+    shortDescription: "Ermittelt das Trocken- und Gekochtgewicht von Nudeln sowie Portionsgrößen für Gäste mit anpassbarem Quellfaktor und Kochwasser-Bedarf.",
+    searchKeywords: ["nudeln rechner trocken gekocht gewicht faktor", "wieviel gramm nudeln pro person hauptgericht", "nudelportionen berechnen kinder erwachsene", "spaghetti menge gramm pro person", "nudeln umrechnen gekocht trocken"],
     inputs: [
+      {
+        id: "mode",
+        label: "Berechnungsmodus wählen",
+        type: "select",
+        defaultValue: "portion_plan",
+        options: [
           {
-                "id": "personsCount",
-                "label": "Anzahl Personen",
-                "type": "number",
-                "defaultValue": 4,
-                "min": 1,
-                "max": 50,
-                "step": 1,
-                "unit": "Personen"
+            value: "portion_plan",
+            label: "Portionen planen (Personen & Hunger)"
           },
           {
-                "id": "mealType",
-                "label": "Mahlzeiten-Art",
-                "type": "select",
-                "defaultValue": "mainDish",
-                "options": [
-                      {
-                            "value": "mainDish",
-                            "label": "Hauptgericht / normaler Hunger (ca. 100 bis 125 g p.P.)"
-                      },
-                      {
-                            "value": "bigHunger",
-                            "label": "Großer Hunger / Sportler (ca. 150 g p.P.)"
-                      },
-                      {
-                            "value": "sideDish",
-                            "label": "Beilage / Vorspeise (ca. 60 bis 80 g p.P.)"
-                      },
-                      {
-                            "value": "kids",
-                            "label": "Kinderportion (ca. 50 bis 60 g p.P.)"
-                      }
-                ]
+            value: "dry_to_cooked",
+            label: "Trockengewicht → Gekochtgewicht"
+          },
+          {
+            value: "cooked_to_dry",
+            label: "Gekochtgewicht → Trockengewicht"
           }
+        ]
+      },
+      {
+        id: "personsCount",
+        label: "Anzahl Personen",
+        type: "number",
+        defaultValue: 4,
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "Personen",
+        dependsOn: { field: "mode", value: "portion_plan" }
+      },
+      {
+        id: "mealType",
+        label: "Mahlzeiten-Art & Hunger",
+        type: "select",
+        defaultValue: "mainDish",
+        options: [
+          {
+            value: "mainDish",
+            label: "Hauptgericht / normaler Hunger (100–125 g p.P. trocken)"
+          },
+          {
+            value: "bigHunger",
+            label: "Großer Hunger / Sportler (ca. 150 g p.P. trocken)"
+          },
+          {
+            value: "sideDish",
+            label: "Beilage / Vorspeise (ca. 60–80 g p.P. trocken)"
+          },
+          {
+            value: "kids",
+            label: "Kinderportion (ca. 50–60 g p.P. trocken)"
+          },
+          {
+            value: "custom",
+            label: "Eigener Richtwert in Gramm pro Person"
+          }
+        ],
+        dependsOn: { field: "mode", value: "portion_plan" }
+      },
+      {
+        id: "customGramsPerPerson",
+        label: "Eigener Richtwert pro Person",
+        type: "number",
+        defaultValue: 100,
+        min: 20,
+        max: 400,
+        step: 5,
+        unit: "g p.P.",
+        dependsOn: { field: "mealType", value: "custom" }
+      },
+      {
+        id: "dryGrams",
+        label: "Trockengewicht Nudeln",
+        type: "number",
+        defaultValue: 250,
+        min: 10,
+        max: 5000,
+        step: 10,
+        unit: "g trocken",
+        dependsOn: { field: "mode", value: "dry_to_cooked" }
+      },
+      {
+        id: "cookedGrams",
+        label: "Gekochtes Nudelgewicht (Wunschmenge)",
+        type: "number",
+        defaultValue: 500,
+        min: 20,
+        max: 10000,
+        step: 10,
+        unit: "g gekocht",
+        dependsOn: { field: "mode", value: "cooked_to_dry" }
+      },
+      {
+        id: "factorPreset",
+        label: "Quellfaktor (Nudelsorte & Garstufe)",
+        type: "select",
+        defaultValue: "aldente",
+        options: [
+          {
+            value: "aldente",
+            label: "Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)"
+          },
+          {
+            value: "soft",
+            label: "Weicher gekocht / Suppennudeln (Faktor 2,5)"
+          },
+          {
+            value: "fresh",
+            label: "Frische Pasta / Eierteigwaren (Faktor 1,5)"
+          },
+          {
+            value: "custom",
+            label: "Benutzerdefinierter Quellfaktor"
+          }
+        ]
+      },
+      {
+        id: "customFactor",
+        label: "Eigener Quellfaktor",
+        type: "number",
+        defaultValue: 2.3,
+        min: 0.5,
+        max: 5.0,
+        step: 0.1,
+        unit: "Faktor",
+        dependsOn: { field: "factorPreset", value: "custom" }
+      }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const persons = Number(inputs.personsCount) || 1;
-      const meal = inputs.mealType;
-      
-      let dryPerPersonG = 110;
-      if (meal === 'bigHunger') dryPerPersonG = 150;
-      else if (meal === 'sideDish') dryPerPersonG = 70;
-      else if (meal === 'kids') dryPerPersonG = 55;
-      
-      const totalDryG = persons * dryPerPersonG;
-      // Trockene Nudeln saugen ca. das 1.2- bis 1.4-fache ihres Eigengewichts an Wasser auf:
-      // Faktor gekocht ≈ 2.25 bis 2.30
-      const cookedWeightG = Math.round(totalDryG * 2.28);
-      // Faustregel Wasser & Salz: Pro 100g Nudeln = 1 Liter Wasser und 10g Salz
-      const waterLiters = Math.max(1.5, Math.ceil((totalDryG / 100) * 1.0));
-      const saltG = Math.round(waterLiters * 10);
-      
-      return {
-        primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: totalDryG, formattedValue: totalDryG + ' g (ca. ' + formatNumber(totalDryG / 500, 1) + ' Packungen à 500g)', highlight: true },
-        secondary: [
-          { id: 'cookedPasta', label: 'Ergibt gekochte Pasta ca.', value: cookedWeightG, formattedValue: formatNumber(cookedWeightG, 0) + ' g gekocht' },
-          { id: 'waterReq', label: 'Kochwasser (1l je 100g Nudeln)', value: waterLiters, formattedValue: waterLiters + ' Liter Wasser' },
-          { id: 'saltReq', label: 'Salzmenge für Kochwasser', value: saltG, formattedValue: saltG + ' g Salz (10g / Liter)' },
-        ],
-        summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalDryG + ' g trockene Nudeln (' + dryPerPersonG + ' g p.P.). Beim Kochen saugen sie Wasser auf und ergeben ca. ' + formatNumber(cookedWeightG, 0) + ' g fertige Pasta.',
-      };
+      const mode = inputs.mode || 'portion_plan';
+      const factorPreset = inputs.factorPreset || 'aldente';
+
+      // Resolve and strictly validate conversion factor
+      let factor = 2.3;
+      if (factorPreset === 'soft') {
+        factor = 2.5;
+      } else if (factorPreset === 'fresh') {
+        factor = 1.5;
+      } else if (factorPreset === 'custom') {
+        const parsedFactor = parseFloat(String(inputs.customFactor).replace(',', '.'));
+        if (isNaN(parsedFactor) || parsedFactor <= 0) {
+          return {
+            primary: { id: 'dryPasta', label: 'Ergebnis', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie einen positiven Quellfaktor größer als 0 ein (z. B. 2,3).'
+          };
+        }
+        factor = parsedFactor;
+      }
+
+      const factorLabel = 'Faktor ' + factor.toFixed(1).replace('.', ',');
+
+      if (mode === 'portion_plan') {
+        const persons = parseInt(String(inputs.personsCount), 10);
+        if (isNaN(persons) || persons <= 0) {
+          return {
+            primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie eine Personenzahl von mindestens 1 ein.'
+          };
+        }
+
+        const meal = inputs.mealType || 'mainDish';
+        let dryPerPersonG = 110;
+        let mealLabel = 'Hauptgericht (110 g p.P.)';
+
+        if (meal === 'bigHunger') {
+          dryPerPersonG = 150;
+          mealLabel = 'Großer Hunger (150 g p.P.)';
+        } else if (meal === 'sideDish') {
+          dryPerPersonG = 70;
+          mealLabel = 'Beilage (70 g p.P.)';
+        } else if (meal === 'kids') {
+          dryPerPersonG = 55;
+          mealLabel = 'Kinderportion (55 g p.P.)';
+        } else if (meal === 'custom') {
+          const customG = parseFloat(String(inputs.customGramsPerPerson).replace(',', '.'));
+          if (isNaN(customG) || customG <= 0) {
+            return {
+              primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: 0, formattedValue: '-' },
+              error: 'Bitte geben Sie eine gültige Grammangabe pro Person ein.'
+            };
+          }
+          dryPerPersonG = customG;
+          mealLabel = 'Individuell (' + customG + ' g p.P.)';
+        }
+
+        const totalDryG = Math.round(persons * dryPerPersonG);
+        const totalCookedG = Math.round(totalDryG * factor);
+        
+        // Exact water calculation: 1 liter per 100 g dry pasta
+        const waterLiters = Number(((totalDryG / 100) * 1.0).toFixed(1));
+        const saltG = Math.round(waterLiters * 10);
+        const recommendedPotLiters = Math.max(2, Math.ceil(waterLiters * 1.25));
+
+        const packages500g = totalDryG >= 500 ? ' (ca. ' + formatNumber(totalDryG / 500, 1) + ' Packungen à 500 g)' : '';
+
+        return {
+          primary: {
+            id: 'dryPasta',
+            label: 'Benötigte Trockennudeln',
+            value: totalDryG,
+            formattedValue: totalDryG + ' g' + packages500g,
+            highlight: true
+          },
+          secondary: [
+            {
+              id: 'cookedPasta',
+              label: 'Ergibt gekochte Pasta (ca.)',
+              value: totalCookedG,
+              formattedValue: formatNumber(totalCookedG, 0) + ' g gekocht'
+            },
+            {
+              id: 'waterReq',
+              label: 'Kochwasser (1 l je 100 g)',
+              value: waterLiters,
+              formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
+            },
+            {
+              id: 'saltReq',
+              label: 'Salzmenge für Kochwasser',
+              value: saltG,
+              formattedValue: saltG + ' g Salz (10 g je Liter)'
+            },
+            {
+              id: 'appliedFactor',
+              label: 'Angewandter Quellfaktor',
+              value: factor,
+              formattedValue: factorLabel
+            }
+          ],
+          directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalDryG + ' g Trockennudeln, was ca. ' + formatNumber(totalCookedG, 0) + ' g gekochter Pasta entspricht.',
+          summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalDryG + ' g trockene Nudeln (' + dryPerPersonG + ' g p.P.). Beim Kochen saugen sie Wasser auf und ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g fertige Pasta.',
+          qualifications: [
+            'Empfohlene Topfgröße: Mindestens ' + recommendedPotLiters + ' Liter Topfvolumen, damit 4,4 l Kochwasser nicht überkochen.',
+            factorPreset === 'fresh'
+              ? 'Frische Eierteig-Pasta enthält bereits Eigenfeuchtigkeit und quillt mit Faktor 1,5 deutlich weniger als getrocknete Hartweizenpasta.'
+              : 'Klassische getrocknete Hartweizenpasta al dente quillt mit Faktor 2,3 (aus 100 g werden ca. 230 g).'
+          ]
+        };
+      } else if (mode === 'dry_to_cooked') {
+        const dryG = parseFloat(String(inputs.dryGrams).replace(',', '.'));
+        if (isNaN(dryG) || dryG <= 0) {
+          return {
+            primary: { id: 'cookedPasta', label: 'Gekochtes Nudelgewicht', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie ein Trockengewicht größer als 0 Gramm ein.'
+          };
+        }
+
+        const totalCookedG = Math.round(dryG * factor);
+        const waterLiters = Number(((dryG / 100) * 1.0).toFixed(1));
+        const saltG = Math.round(waterLiters * 10);
+        const portions = Math.max(1, Math.round(dryG / 100));
+
+        return {
+          primary: {
+            id: 'cookedPasta',
+            label: 'Gekochtes Nudelgewicht',
+            value: totalCookedG,
+            formattedValue: formatNumber(totalCookedG, 0) + ' g gekocht',
+            highlight: true
+          },
+          secondary: [
+            {
+              id: 'dryPasta',
+              label: 'Ausgangsgewicht trocken',
+              value: dryG,
+              formattedValue: dryG + ' g Trockennudeln'
+            },
+            {
+              id: 'estimatedPortions',
+              label: 'Entspricht ca.',
+              value: portions,
+              formattedValue: 'ca. ' + portions + ' Hauptgericht-Portionen (à 100 g trocken)'
+            },
+            {
+              id: 'waterReq',
+              label: 'Kochwasser (1 l je 100 g)',
+              value: waterLiters,
+              formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
+            },
+            {
+              id: 'saltReq',
+              label: 'Salzmenge für Kochwasser',
+              value: saltG,
+              formattedValue: saltG + ' g Salz (10 g je Liter)'
+            },
+            {
+              id: 'appliedFactor',
+              label: 'Quellfaktor',
+              value: factor,
+              formattedValue: factorLabel
+            }
+          ],
+          directAnswer: dryG + ' g Trockennudeln ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
+          summaryText: dryG + ' g ungekochte Pasta ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln. Benötigt werden ' + formatNumber(waterLiters, 1) + ' l Wasser und ' + saltG + ' g Salz.',
+          qualifications: [
+            'Wasseraufnahme variiert je nach Nudelform und Kochzeit: Al-dente-Biss ergibt ca. Faktor 2,2 bis 2,3; weicher gekochte Nudeln bis zu 2,5.'
+          ]
+        };
+      } else {
+        // mode === 'cooked_to_dry'
+        const cookedG = parseFloat(String(inputs.cookedGrams).replace(',', '.'));
+        if (isNaN(cookedG) || cookedG <= 0) {
+          return {
+            primary: { id: 'dryPasta', label: 'Benötigte Trockennudeln', value: 0, formattedValue: '-' },
+            error: 'Bitte geben Sie eine gekochte Wunschmenge größer als 0 Gramm ein.'
+          };
+        }
+
+        const totalDryG = Math.round(cookedG / factor);
+        const waterLiters = Number(((totalDryG / 100) * 1.0).toFixed(1));
+        const saltG = Math.round(waterLiters * 10);
+        const portions = Math.max(1, Math.round(totalDryG / 100));
+
+        return {
+          primary: {
+            id: 'dryPasta',
+            label: 'Einzuwiegende Trockennudeln',
+            value: totalDryG,
+            formattedValue: totalDryG + ' g trocken',
+            highlight: true
+          },
+          secondary: [
+            {
+              id: 'cookedPasta',
+              label: 'Gewünschte Fertigmenge',
+              value: cookedG,
+              formattedValue: formatNumber(cookedG, 0) + ' g gekocht'
+            },
+            {
+              id: 'estimatedPortions',
+              label: 'Entspricht ca.',
+              value: portions,
+              formattedValue: 'ca. ' + portions + ' Hauptgericht-Portionen'
+            },
+            {
+              id: 'waterReq',
+              label: 'Kochwasser (1 l je 100 g)',
+              value: waterLiters,
+              formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
+            },
+            {
+              id: 'saltReq',
+              label: 'Salzmenge für Kochwasser',
+              value: saltG,
+              formattedValue: saltG + ' g Salz'
+            },
+            {
+              id: 'appliedFactor',
+              label: 'Quellfaktor',
+              value: factor,
+              formattedValue: factorLabel
+            }
+          ],
+          directAnswer: 'Für ' + formatNumber(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalDryG + ' g trockene Nudeln ab (bei ' + factorLabel + ').',
+          summaryText: 'Um ca. ' + formatNumber(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalDryG + ' g trockene Nudeln ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
+          qualifications: [
+            'Rückrechnung: Trockengewicht = Gekochtes Gewicht ÷ Quellfaktor (' + factor.toFixed(1).replace('.', ',') + ').'
+          ]
+        };
+      }
     },
-    formula: "Gekochte Nudeln ≈ Trockengewicht × 2,28; Wasser = 1 l je 100 g; Salz = 10 g je Liter Wasser",
-    formulaExplanation: "Hartweizengrieß-Nudeln verdoppeln bis verdreifachen ihr Gewicht beim Kochen \"al dente\" durch die Quellung der Stärke.",
+    formula: "Gekochtgewicht = Trockengewicht × Quellfaktor (Standard 2,3); Trockengewicht = Gekochtgewicht ÷ Quellfaktor; Wasser = 1 l je 100 g Trockennudeln",
+    formulaExplanation: "Getrocknete Hartweizen-Pasta quillt beim Kochen durch Stärkeverkleisterung und Wasseraufnahme auf etwa das 2,2- bis 2,5-fache ihres Trockengewichts an (Standardwert al dente: 2,3). Frische Pasta aus dem Kühlregal enthält bereits 25–30 % Feuchtigkeit und nimmt daher nur ca. 50 % Wasser auf (Faktor ca. 1,5).",
     workedExample: {
-          "title": "Beispiel: Nudeln für 4 Erwachsene als Hauptgericht",
-          "inputValues": [
-                {
-                      "label": "Personen",
-                      "value": "4"
-                },
-                {
-                      "label": "Hunger",
-                      "value": "Normal (110 g)"
-                }
-          ],
-          "steps": [
-                "Trockengewicht = 4 × 110 g = 440 g (fast 1 Paket à 500 g)",
-                "Gekochtes Gewicht = 440 × 2,28 ≈ 1.000 g Pasta",
-                "Wasser = 4 bis 5 Liter Wasser mit 40 g Salz"
-          ],
-          "result": "440 g Trockennudeln (ca. 1 kg gekocht)"
+      title: "Beispiel: 4 Personen Hauptgericht mit Hartweizenspaghetti al dente",
+      inputValues: [
+        { label: "Personen", value: "4 Erwachsene" },
+        { label: "Mahlzeit", value: "Hauptgericht (110 g p.P. trocken)" },
+        { label: "Quellfaktor", value: "2,3 (al dente)" }
+      ],
+      steps: [
+        "Trockengewicht berechnen: 4 Personen × 110 g = 440 g Trockennudeln",
+        "Gekochte Ausbeute berechnen: 440 g × 2,3 = 1.012 g gekochte Pasta",
+        "Kochwasser nach der 10-100-1000-Regel: 440 g ÷ 100 = 4,4 Liter Wasser",
+        "Salzbedarf: 4,4 Liter × 10 g = 44 g Salz",
+        "Topfwahl: Bei 4,4 l Wasser mindestens einen 5- bis 6-Liter-Topf nutzen, damit das Wasser beim Kochen nicht überschäumt"
+      ],
+      result: "440 g Trockennudeln ergeben ca. 1.012 g gekochte Pasta (in 4,4 l Wasser mit 44 g Salz)"
     },
     content: {
-      intro: 'Dieser Mengenkalkulator berechnet das Trockengewicht von Roh-Nudeln und das fertige Serviergewicht nach dem Kochen im Salzwasser.',
-      details: 'Getrocknete Hartweizennudeln nehmen beim Kochen Wasser auf und verdoppeln bis verdreifachen ihr Gewicht (Faktor 2,2 bis 2,5): Aus 100 g trockener Pasta entstehen ca. 220 bis 250 g gekochte Nudeln. Portionsgröße: 80–100 g trocken als Hauptgericht.',
+      intro: "Dieser Nudelrechner rechnet Trockengewichte in gekochte Pasta um, ermittelt die Rückrechnung für Rezeptangaben und plant Portionen für Familie und Gäste.",
+      details: "Getrocknete Hartweizennudeln nehmen beim Kochen Wasser auf und verdoppeln bis verdreifachen ihr Gewicht (Faktor 2,2 bis 2,5). Frische Eierteig-Pasta quillt durch vorhandene Eigenfeuchte deutlich weniger (Faktor ca. 1,5). Als Richtwert für ein Hauptgericht gelten 100 bis 125 g Trockenpasta pro Person.",
+      sections: [
+        {
+          title: "Umrechnungstabelle: Trockengewicht in gekochte Nudeln (Faktor 2,3 al dente)",
+          content: "Die folgende Übersicht zeigt das gekochte Serviergewicht sowie die benötigte Kochwassermenge für gängige Trockennudelmengen bei Standard-Hartweizen:\n\n- **50 g trocken:** ca. 115 g gekocht (0,5 l Wasser, 5 g Salz – kleine Kinderportion)\n- **70 g trocken:** ca. 160 g gekocht (0,7 l Wasser, 7 g Salz – Vorspeise / Beilage)\n- **100 g trocken:** ca. 230 g gekocht (1,0 l Wasser, 10 g Salz – leichtes Hauptgericht)\n- **110 g trocken:** ca. 253 g gekocht (1,1 l Wasser, 11 g Salz – Standard-Hauptgericht)\n- **125 g trocken:** ca. 288 g gekocht (1,3 l Wasser, 13 g Salz – herzhaftes Hauptgericht)\n- **150 g trocken:** ca. 345 g gekocht (1,5 l Wasser, 15 g Salz – großer Hunger / Sportler)\n- **250 g trocken:** ca. 575 g gekocht (2,5 l Wasser, 25 g Salz – halbes Standardpaket)\n- **500 g trocken:** ca. 1.150 g gekocht (5,0 l Wasser, 50 g Salz – 1 volles Nudelpaket)"
+        },
+        {
+          title: "Unterschied zwischen getrockneter Pasta und frischen Nudeln",
+          content: "Getrocknete Pasta (Pasta secca) aus 100 % Hartweizengrieß hat nur ca. 12 % Restfeuchte und bindet beim Kochen sehr viel Wasser (Quellfaktor 2,2 bis 2,5; Standard al dente 2,3). Frische Pasta aus dem Kühlregal oder selbst gemachter Pastateig enthält bereits ca. 25 bis 30 % Wasser und frisches Ei. Sie nimmt beim kurzen Sieden nur noch ca. 50 % ihres Eigengewichts an Wasser auf (Quellfaktor 1,4 bis 1,6; Richtwert 1,5).\n\nWenn ein Rezept 200 g gekochte Pasta verlangt, benötigen Sie bei getrockneten Nudeln ca. 87 g Rohgewicht, bei frischen Nudeln jedoch ca. 133 g."
+        },
+        {
+          title: "Die 10-100-1000-Faustregel für Nudelwasser",
+          content: "In der italienischen Küche gilt für das Kochen von getrockneten Nudeln die einfache Merkformel **10 - 100 - 1000**:\n\n- **10 Gramm Salz**\n- auf **100 Gramm Pasta**\n- in **1.000 Milliliter (1 Liter) Wasser**.\n\n*Wichtig:* Rechnen Sie für 440 g Pasta rechnerisch mit 4,4 Liter Wasser. Verwenden Sie dafür einen Topf mit mindestens 5 bis 6 Liter Fassungsvermögen, damit das siedende Nudelwasser nach der Pastazugabe nicht überkocht."
+        }
+      ]
     },
     faqs: [
-      { question: 'Wie viel Wasser und Salz benötigt man zum Nudelkochen?', answer: 'Klassische italienische Faustregel: 10-100-1000: 10 Gramm Salz auf 100 Gramm Pasta in 1.000 Milliliter (1 Liter) kochendem Wasser.' },
-      { question: 'Wie viel wiegen frische Eierteig-Nudeln nach dem Kochen?', answer: 'Frische Pasta enthält bereits Eigenfeuchte und quillt nur um ca. 50 bis 70 Prozent (Faktor 1,5 bis 1,7); eine Hauptgericht-Portion frische Nudeln beträgt ca. 130 bis 150 Gramm.' },
+      {
+        question: "Wie rechnet man 100 g trockene Nudeln in gekocht um?",
+        answer: "100 g getrocknete Hartweizennudeln ergeben nach dem Kochen al dente ca. 230 g gekochte Pasta (Faktor 2,3). Bei weicher gekochten Nudeln entstehen bis zu 250 g."
+      },
+      {
+        question: "Wie viel Gramm Nudeln benötigt man pro Person als Hauptgericht?",
+        answer: "Als Hauptgericht rechnen Sie mit 100 bis 125 g ungekochten Nudeln pro erwachsener Person (ca. 230 bis 290 g gekocht). Bei großem Hunger oder Sportlern sind 150 g trocken üblich; als Beilage oder Vorspeise genügen 60 bis 80 g."
+      },
+      {
+        question: "Gilt der Umrechnungsfaktor auch für Vollkorn- oder glutenfreie Nudeln?",
+        answer: "Vollkornnudeln aus Hartweizen quellen ähnlich mit Faktor 2,2 bis 2,4. Nudeln aus Hülsenfrüchten (Linsen, Kichererbsen) oder glutenfreie Maisteigwaren nehmen etwas weniger Wasser auf (Faktor ca. 2,0 bis 2,1)."
+      }
     ],
     relatedSlugs: ['portionsrechner', 'wasser-reis-verhaeltnis-rechner', 'kalorien-rezept-rechner'],
   },

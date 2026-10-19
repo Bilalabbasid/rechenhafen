@@ -6155,12 +6155,13 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "wasser-reis-verhaeltnis-rechner",
     "slug": "wasser-reis-verhaeltnis-rechner",
-    "name": "Reiskoch-Rechner (Wasser-Reis-Verhältnis & Garzeit nach Reissorte)",
+    "name": "Reis-Wasser-Rechner (Menge nach Reissorte berechnen)",
     "category": "kochen-backen",
     "keywords": [
       "wasser-reis-verhaeltnis-rechner",
-      "reiskoch-rechner (wasser-reis-verhältnis & garzeit nach reissorte)",
+      "reis-wasser-rechner (menge nach reissorte berechnen)",
       "reiskoch-rechner",
+      "reis wasser rechner",
       "kochen-backen",
       "kochen & garen",
       "reis kochen verhaeltnis wasser reis",
@@ -6172,12 +6173,13 @@ export const SEARCH_INDEX: SearchItem[] = [
   {
     "id": "nudeln-rohmaerk-gewicht-rechner",
     "slug": "nudeln-rohmaerk-gewicht-rechner",
-    "name": "Nudelportions-Rechner (Trocken- vs. Gekocht-Gewicht & Portionsgröße)",
+    "name": "Nudeln umrechnen: trocken, gekocht & Portionen",
     "category": "kochen-backen",
     "keywords": [
       "nudeln-rohmaerk-gewicht-rechner",
-      "nudelportions-rechner (trocken- vs. gekocht-gewicht & portionsgröße)",
+      "nudeln umrechnen: trocken, gekocht & portionen",
       "nudelportions-rechner",
+      "nudeln umrechnen gekocht trocken",
       "kochen-backen",
       "kochen & garen",
       "nudeln rechner trocken gekocht gewicht faktor",
