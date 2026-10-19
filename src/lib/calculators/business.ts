@@ -3,8 +3,12 @@ import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
 export function calculateMargin(inputs: Record<string, any>): CalculationResult {
-  const purchasePrice = parseFloat(inputs.purchasePrice) || 50; // Einkaufspreis netto
-  const sellingPrice = parseFloat(inputs.sellingPrice) || 100;   // Verkaufspreis netto
+  const purchasePrice = inputs.purchasePrice !== undefined && inputs.purchasePrice !== '' && !isNaN(parseFloat(inputs.purchasePrice))
+    ? parseFloat(inputs.purchasePrice)
+    : 50; // Einkaufspreis netto
+  const sellingPrice = inputs.sellingPrice !== undefined && inputs.sellingPrice !== '' && !isNaN(parseFloat(inputs.sellingPrice))
+    ? parseFloat(inputs.sellingPrice)
+    : 100; // Verkaufspreis netto
 
   if (purchasePrice <= 0 || sellingPrice <= 0) {
     return {
@@ -37,14 +41,18 @@ export function calculateMargin(inputs: Record<string, any>): CalculationResult 
 }
 
 export function calculateVat(inputs: Record<string, any>): CalculationResult {
-  const amount = parseFloat(inputs.amount) || 100;
+  const amount = inputs.amount !== undefined && inputs.amount !== '' && !isNaN(parseFloat(inputs.amount))
+    ? parseFloat(inputs.amount)
+    : 100;
   const isGrossInput = inputs.direction === 'grossToNet'; // Bruttopreis gegeben
-  const vatRate = parseFloat(inputs.vatRate) || GERMAN_DATA_2026.mwst_regulaer.value; // 19% oder 7%
+  const vatRate = inputs.vatRate !== undefined && inputs.vatRate !== '' && !isNaN(parseFloat(inputs.vatRate))
+    ? parseFloat(inputs.vatRate)
+    : GERMAN_DATA_2026.mwst_regulaer.value; // 19% oder 7%
 
-  if (amount <= 0) {
+  if (amount < 0) {
     return {
       primary: { id: 'vat', label: 'MwSt', value: 0, formattedValue: '0,00 €' },
-      error: 'Der Betrag muss positiv sein.',
+      error: 'Der Betrag darf nicht negativ sein.',
     };
   }
 

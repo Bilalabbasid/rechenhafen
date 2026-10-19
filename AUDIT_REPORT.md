@@ -1,6 +1,6 @@
 # RechenHafen Refined Quality Gate Audit Report
 
-**Audit-Datum:** 09.10.2026  
+**Audit-Datum:** 19.10.2026  
 **Geprüfte Rechner:** 421  
 **Status:** Evidenzbasierte Prüfung abgeschlossen. Keine automatischen Massenänderungen vorgenommen.
 
@@ -9,19 +9,19 @@
 ## 1. Zusammenfassung der Metriken
 
 - **Betroffene eindeutige Rechner:** 393 von 421
-- **Betroffene eindeutige Eingabefelder:** 1043
+- **Betroffene eindeutige Eingabefelder:** 1050
 - **High-Confidence Mängel (Hohe Priorität):** 15
-- **Informative Formulierungshinweise (Informational):** 1028
+- **Informative Formulierungshinweise (Informational):** 1035
 - **Kritische Systemmängel (Critical):** 0
 - **Mittlere Auffälligkeiten (Medium):** 0
-- **Gesamtzahl Befunde:** 1043
+- **Gesamtzahl Befunde:** 1050
 
 ### Top-Betroffene Rechner-Kategorien
 1. **statistik-wissenschaft**: 95 Befunde
-2. **haushalt-energie**: 93 Befunde
+2. **haushalt-energie**: 94 Befunde
 3. **kredit-schulden**: 90 Befunde
-4. **wohnen-immobilien**: 85 Befunde
-5. **bauen-renovieren**: 85 Befunde
+4. **bauen-renovieren**: 87 Befunde
+5. **wohnen-immobilien**: 85 Befunde
 
 ---
 
@@ -32,8 +32,8 @@
 | **Critical** | 0 | Defekte interne Links, Redirect-Kollisionen, Rechenabbrüche bei Null-Eingaben |
 | **High** | 15 | Ungeklärte Positiv-Defaults bei realem 0-Szenario, fehlende Quellen/Disclaimer in Rechts-/Finanzrechnern |
 | **Medium** | 0 | Fehlendes Stand-Jahr, unvollständige Meta-Beschreibungen |
-| **Informational** | 1028 | Reine Formulierungsempfehlungen (z. B. Kennzeichnung als „Beispielwert“ / „Richtwert“) |
-| **Gesamt** | **1043** | |
+| **Informational** | 1035 | Reine Formulierungsempfehlungen (z. B. Kennzeichnung als „Beispielwert“ / „Richtwert“) |
+| **Gesamt** | **1050** | |
 
 ---
 
@@ -130,7 +130,7 @@ _Keine Befunde mittlerer Priorität._
 
 ---
 
-## 6. Informelle Formulierungsempfehlungen (Informational) — 1028
+## 6. Informelle Formulierungsempfehlungen (Informational) — 1035
 
 _Hinweis: Diese Einträge stellen keine Defekte dar, sondern konsistente redaktionelle Vereinheitlichungsempfehlungen für zukünftige Content-Reviews._
 
@@ -165,4 +165,4 @@ _Hinweis: Diese Einträge stellen keine Defekte dar, sondern konsistente redakti
 - **[pythagoras-rechner](/rechner/pythagoras-rechner/)** (`sideC`): Input 'sideC' (Seite c (Hypotenuse), default: 5) could benefit from explicit 'Beispielwert' or 'Richtwert' wording.
 - **[ggt-rechner](/rechner/ggt-rechner/)** (`num1`): Input 'num1' (Erste Zahl (A), default: 24) could benefit from explicit 'Beispielwert' or 'Richtwert' wording.
 
-_... und 998 weitere informative Hinweise (vollständig in `audit-report.json`)._
+_... und 1005 weitere informative Hinweise (vollständig in `audit-report.json`)._

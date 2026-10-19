@@ -147,8 +147,8 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Berechnet die finanziellen Auswirkungen einer prozentualen oder absoluten Gehaltsanpassung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['gehaltserhöhung rechner', 'gehaltserhöhung prozent berechnen', 'wieviel mehr gehalt', 'lohnerhöhung rechner'],
     inputs: [
-      { id: 'currentSalary', label: 'Aktuelles Brutto-Monatsgehalt', type: 'number', defaultValue: 3800, unit: '€' },
-      { id: 'increasePercent', label: 'Gehaltserhöhung in Prozent', type: 'number', defaultValue: 6.0, step: 0.5, unit: '%' },
+      { id: 'currentSalary', label: 'Aktuelles Brutto-Monatsgehalt', type: 'number', defaultValue: 3800, min: 0, unit: '€' },
+      { id: 'increasePercent', label: 'Gehaltserhöhung in Prozent', type: 'number', defaultValue: 6.0, min: 0, step: 0.5, unit: '%', helpText: 'Prozentuale Erhöhung (0 % bei Gehaltsstillstand / Vergleich).' },
       { id: 'monthsPerYear', label: 'Anzahl Gehälter pro Jahr (inkl. 13. Gehalt)', type: 'number', defaultValue: 12, min: 12, max: 14, step: 0.5 },
     ],
     calculate: calculateSalaryIncrease,

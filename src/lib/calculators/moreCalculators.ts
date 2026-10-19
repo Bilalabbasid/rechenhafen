@@ -138,8 +138,25 @@ export function calculateFlightCO2(inputs: Record<string, any>): CalculationResu
 
 // --- BUSINESS: SKONTO & RABATT ---
 export function calculateDiscount(inputs: Record<string, any>): CalculationResult {
-  const originalPrice = parseFloat(inputs.originalPrice) || 120;
-  const discountPercent = parseFloat(inputs.discountPercent) || 20;
+  const originalPrice = inputs.originalPrice !== undefined && inputs.originalPrice !== '' && !isNaN(parseFloat(inputs.originalPrice))
+    ? parseFloat(inputs.originalPrice)
+    : 120;
+  const discountPercent = inputs.discountPercent !== undefined && inputs.discountPercent !== '' && !isNaN(parseFloat(inputs.discountPercent))
+    ? parseFloat(inputs.discountPercent)
+    : 20;
+
+  if (originalPrice < 0) {
+    return {
+      primary: { id: 'finalPrice', label: 'Reduzierter Endpreis', value: 0, formattedValue: '-' },
+      error: 'Der Ursprungspreis darf nicht negativ sein.',
+    };
+  }
+  if (discountPercent < 0 || discountPercent > 100) {
+    return {
+      primary: { id: 'finalPrice', label: 'Reduzierter Endpreis', value: 0, formattedValue: '-' },
+      error: 'Der Rabatt muss zwischen 0 % und 100 % liegen.',
+    };
+  }
 
   const saved = originalPrice * (discountPercent / 100);
   const finalPrice = originalPrice - saved;
@@ -156,17 +173,30 @@ export function calculateDiscount(inputs: Record<string, any>): CalculationResul
 }
 
 export function calculateCashDiscount(inputs: Record<string, any>): CalculationResult {
-  const invoiceAmount = parseFloat(inputs.invoiceAmount) || 1000;
-  const skontoPercent = parseFloat(inputs.skontoPercent) || 2.0; // 2% oder 3% Skonto
+  const invoiceAmount = inputs.invoiceAmount !== undefined && inputs.invoiceAmount !== '' && !isNaN(parseFloat(inputs.invoiceAmount))
+    ? parseFloat(inputs.invoiceAmount)
+    : 1000;
+  const skontoPercent = inputs.skontoPercent !== undefined && inputs.skontoPercent !== '' && !isNaN(parseFloat(inputs.skontoPercent))
+    ? parseFloat(inputs.skontoPercent)
+    : 2.0; // 2% oder 3% Skonto
   const skontoDays = parseInt(inputs.skontoDays || '10', 10);
   const netDays = parseInt(inputs.netDays || '30', 10);
+
+  if (invoiceAmount < 0 || skontoPercent < 0 || skontoDays < 0 || netDays < 0) {
+    return {
+      primary: { id: 'skontoAmount', label: 'Skonto-Ersparnis', value: 0, formattedValue: '-' },
+      error: 'Beträge, Prozentsätze und Zahlungsfristen dürfen nicht negativ sein.',
+    };
+  }
 
   const skontoAmount = invoiceAmount * (skontoPercent / 100);
   const payAmount = invoiceAmount - skontoAmount;
 
   // Effektiver Jahreszins für Skonto: Zins = (Skontosatz / (100 - Skontosatz)) * (360 / (Nettoziel - Skontoziel))
   const daysDiff = Math.max(1, netDays - skontoDays);
-  const annualInterestEquivalent = (skontoPercent / (100 - skontoPercent)) * (360 / daysDiff) * 100;
+  const annualInterestEquivalent = skontoPercent > 0 && skontoPercent < 100
+    ? (skontoPercent / (100 - skontoPercent)) * (360 / daysDiff) * 100
+    : 0;
 
   return {
     primary: { id: 'skontoAmount', label: 'Skonto-Ersparnis', value: skontoAmount, formattedValue: formatCurrency(skontoAmount), highlight: true },

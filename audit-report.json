@@ -1,14 +1,14 @@
 {
-  "timestamp": "2026-10-09T13:30:15.062Z",
+  "timestamp": "2026-10-19T11:29:41.488Z",
   "totalCalculatorsAudited": 421,
   "metrics": {
     "uniqueCalculatorsAffected": 393,
-    "uniqueInputsAffected": 1043,
+    "uniqueInputsAffected": 1050,
     "highConfidenceIssues": 15,
-    "informationalSuggestions": 1028,
+    "informationalSuggestions": 1035,
     "criticalIssues": 0,
     "mediumIssues": 0,
-    "totalFindings": 1043,
+    "totalFindings": 1050,
     "topAffectedCategories": [
       {
         "category": "statistik-wissenschaft",
@@ -16,18 +16,18 @@
       },
       {
         "category": "haushalt-energie",
-        "count": 93
+        "count": 94
       },
       {
         "category": "kredit-schulden",
         "count": 90
       },
       {
-        "category": "wohnen-immobilien",
-        "count": 85
+        "category": "bauen-renovieren",
+        "count": 87
       },
       {
-        "category": "bauen-renovieren",
+        "category": "wohnen-immobilien",
         "count": 85
       }
     ]
@@ -36,8 +36,8 @@
     "critical": 0,
     "high": 15,
     "medium": 0,
-    "informational": 1028,
-    "total": 1043
+    "informational": 1035,
+    "total": 1050
   },
   "findings": [
     {
@@ -1071,6 +1071,22 @@
       "calculatorName": "Standby-Kosten-Rechner",
       "inputKey": "pricePerKwh",
       "issue": "Input 'pricePerKwh' (Strompreis je kWh, default: 0.38) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "gaskostenrechner",
+      "calculatorName": "Gaskostenrechner (Gasverbrauch & Kosten berechnen)",
+      "inputKey": "meterOld",
+      "issue": "Input 'meterOld' (Alter Zählerstand in m³ (Jahresbeginn), default: 12400) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "gaskostenrechner",
+      "calculatorName": "Gaskostenrechner (Gasverbrauch & Kosten berechnen)",
+      "inputKey": "meterNew",
+      "issue": "Input 'meterNew' (Neuer Zählerstand in m³ (Jahresende), default: 13800) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
     {
       "severity": "Informational",
@@ -3925,16 +3941,8 @@
       "category": "Wording Consistency / Example Value Indicator",
       "calculatorSlug": "wasserverbrauch-haushalt-rechner",
       "calculatorName": "Wasserverbrauch-Rechner für Haushalte (m³ & Kosten)",
-      "inputKey": "dailyLitersPerPerson",
-      "issue": "Input 'dailyLitersPerPerson' (Täglicher Wasserverbrauch pro Kopf in Litern (D-Schnitt ca. 125 l), default: 125) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
-    },
-    {
-      "severity": "Informational",
-      "category": "Wording Consistency / Example Value Indicator",
-      "calculatorSlug": "wasserverbrauch-haushalt-rechner",
-      "calculatorName": "Wasserverbrauch-Rechner für Haushalte (m³ & Kosten)",
       "inputKey": "freshWaterPrice",
-      "issue": "Input 'freshWaterPrice' (Trinkwasserpreis pro m³ (1.000 l), default: 2.1) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+      "issue": "Input 'freshWaterPrice' (Trinkwasserpreis pro m³ (Frischwasser in €), default: 2.1) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
     {
       "severity": "Informational",
@@ -3942,13 +3950,13 @@
       "calculatorSlug": "wasserverbrauch-haushalt-rechner",
       "calculatorName": "Wasserverbrauch-Rechner für Haushalte (m³ & Kosten)",
       "inputKey": "wasteWaterPrice",
-      "issue": "Input 'wasteWaterPrice' (Schmutzwassergebühr (Abwasser) pro m³, default: 2.7) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+      "issue": "Input 'wasteWaterPrice' (Schmutzwassergebühr / Abwasserpreis pro m³ (in €), default: 2.7) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
     {
       "severity": "Informational",
       "category": "Wording Consistency / Example Value Indicator",
       "calculatorSlug": "oelheizung-verbrauch-rechner",
-      "calculatorName": "Heizölverbrauch-Rechner (Liter nach Wohnfläche & Baujahr)",
+      "calculatorName": "Heizölverbrauch schätzen: Wohnfläche und Dämmzustand",
       "inputKey": "livingArea",
       "issue": "Input 'livingArea' (Beheizte Wohnfläche in m², default: 140) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
@@ -3956,7 +3964,7 @@
       "severity": "Informational",
       "category": "Wording Consistency / Example Value Indicator",
       "calculatorSlug": "oelheizung-verbrauch-rechner",
-      "calculatorName": "Heizölverbrauch-Rechner (Liter nach Wohnfläche & Baujahr)",
+      "calculatorName": "Heizölverbrauch schätzen: Wohnfläche und Dämmzustand",
       "inputKey": "oilPricePerLiter",
       "issue": "Input 'oilPricePerLiter' (Heizölpreis in Euro pro Liter, default: 1.05) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
@@ -6077,8 +6085,24 @@
       "category": "Wording Consistency / Example Value Indicator",
       "calculatorSlug": "kies-splitt-rechner",
       "calculatorName": "Kies- & Splitt-Rechner (Menge in Tonnen & m³ nach Schütthöhe)",
-      "inputKey": "compaction",
-      "issue": "Input 'compaction' (Verdichtungs- / Setzungszuschlag, default: 10) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+      "inputKey": "knownVolumeM3",
+      "issue": "Input 'knownVolumeM3' (Vorhandenes Volumen, default: 2) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "kies-splitt-rechner",
+      "calculatorName": "Kies- & Splitt-Rechner (Menge in Tonnen & m³ nach Schütthöhe)",
+      "inputKey": "knownWeightTonnes",
+      "issue": "Input 'knownWeightTonnes' (Vorhandenes Gewicht, default: 3) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "kies-splitt-rechner",
+      "calculatorName": "Kies- & Splitt-Rechner (Menge in Tonnen & m³ nach Schütthöhe)",
+      "inputKey": "customDensity",
+      "issue": "Input 'customDensity' (Individuelle Schüttdichte laut Lieferant, default: 1.5) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
     {
       "severity": "Informational",
@@ -6860,9 +6884,17 @@
       "severity": "Informational",
       "category": "Wording Consistency / Example Value Indicator",
       "calculatorSlug": "zucker-ersatz-rechner",
-      "calculatorName": "Zuckerersatz-Rechner (Erythrit, Xylit, Stevia & Honig)",
+      "calculatorName": "Zucker in Erythrit umrechnen (Rechner & Tabelle)",
       "inputKey": "sugarGrams",
-      "issue": "Input 'sugarGrams' (Zuckermenge im Originalrezept, default: 100) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+      "issue": "Input 'sugarGrams' (Zuckermenge im Rezept in Gramm, default: 100) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "zucker-ersatz-rechner",
+      "calculatorName": "Zucker in Erythrit umrechnen (Rechner & Tabelle)",
+      "inputKey": "erythritGrams",
+      "issue": "Input 'erythritGrams' (Erythritmenge in Gramm, default: 100) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
     {
       "severity": "Informational",
@@ -6996,9 +7028,33 @@
       "severity": "Informational",
       "category": "Wording Consistency / Example Value Indicator",
       "calculatorSlug": "nudeln-rohmaerk-gewicht-rechner",
-      "calculatorName": "Nudelportions-Rechner (Trocken- vs. Gekocht-Gewicht & Portionsgröße)",
+      "calculatorName": "Nudeln umrechnen: trocken, gekocht & Portionen",
       "inputKey": "personsCount",
       "issue": "Input 'personsCount' (Anzahl Personen, default: 4) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "nudeln-rohmaerk-gewicht-rechner",
+      "calculatorName": "Nudeln umrechnen: trocken, gekocht & Portionen",
+      "inputKey": "dryGrams",
+      "issue": "Input 'dryGrams' (Trockengewicht Nudeln, default: 250) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "nudeln-rohmaerk-gewicht-rechner",
+      "calculatorName": "Nudeln umrechnen: trocken, gekocht & Portionen",
+      "inputKey": "cookedGrams",
+      "issue": "Input 'cookedGrams' (Gekochtes Nudelgewicht (Wunschmenge), default: 500) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
+    },
+    {
+      "severity": "Informational",
+      "category": "Wording Consistency / Example Value Indicator",
+      "calculatorSlug": "nudeln-rohmaerk-gewicht-rechner",
+      "calculatorName": "Nudeln umrechnen: trocken, gekocht & Portionen",
+      "inputKey": "customFactor",
+      "issue": "Input 'customFactor' (Eigener Quellfaktor, default: 2.3) could benefit from explicit 'Beispielwert' or 'Richtwert' wording."
     },
     {
       "severity": "Informational",

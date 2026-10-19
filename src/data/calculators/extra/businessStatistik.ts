@@ -807,19 +807,32 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const rev = Number(inputs.revenue) || 1;
+      const rev = Number(inputs.revenue);
       const prof = Number(inputs.profit) || 0;
-      
+
+      if (isNaN(rev) || rev <= 0) {
+        return {
+          primary: { id: 'ros', label: 'Umsatzrendite (ROS)', value: 0, formattedValue: '0,00 %', highlight: true },
+          secondary: [
+            { id: 'centPerEuro', label: 'Gewinn pro 1 Euro Umsatz', value: 0, formattedValue: '0,0 Cent / Euro' },
+            { id: 'rating', label: 'Brancheneinschätzung', value: 0, formattedValue: 'Umsatz muss größer als 0 € sein' },
+          ],
+          summaryText: 'Bitte geben Sie einen Nettoumsatz größer als 0 € an.',
+        };
+      }
+
       // Umsatzrendite ROS = (Gewinn / Umsatz) * 100
       const ros = (prof / rev) * 100;
       const centPerEuro = (prof / rev) * 100; // in Cent
-      
+
       let rating = 'Solide Rentabilität';
-      if (ros < 2.0) rating = 'Geringe Marge (stark krisenanfällig bei Preissteigerungen)';
+      if (prof === 0) rating = 'Ausgeglichen (Break-Even, kein Gewinn)';
+      else if (ros < 0) rating = 'Verlustzone (negativer Ertrag)';
+      else if (ros < 2.0) rating = 'Geringe Marge (stark krisenanfällig bei Preissteigerungen)';
       else if (ros < 5.0) rating = 'Durchschnittlicher Mittelstandsbereich';
       else if (ros < 10.0) rating = 'Gute Ertragskraft';
       else rating = 'Hervorragende Preismacht und Rentabilität';
-      
+
       return {
         primary: { id: 'ros', label: 'Umsatzrendite (ROS)', value: ros, formattedValue: formatPercent(ros), highlight: true },
         secondary: [
@@ -1484,10 +1497,11 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "label": "Anschaffungskosten netto (ohne Vorsteuer)",
                 "type": "number",
                 "defaultValue": 12000,
-                "min": 1,
+                "min": 0,
                 "max": 100000000,
                 "step": 250,
-                "unit": "€"
+                "unit": "€",
+                "helpText": "Netto-Anschaffungs- oder Herstellungskosten des Wirtschaftsguts (0 € bei bereits voll abgeschriebenen Wirtschaftsgütern)."
           },
           {
                 "id": "usefulLifeYears",
@@ -1517,18 +1531,19 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const cost = Number(inputs.assetCost) || 0;
-      const years = Number(inputs.usefulLifeYears) || 5;
+      const cost = Math.max(0, Number(inputs.assetCost) || 0);
+      const rawYears = Number(inputs.usefulLifeYears);
+      const years = !isNaN(rawYears) && rawYears > 0 ? rawYears : 5;
       const method = inputs.afaMethod;
-      
+
       // Lineare AfA:
       const linearRatePct = 100 / years;
       const linearAnnualAmount = cost / years;
-      
+
       let firstYearAmount = linearAnnualAmount;
       let secondYearAmount = linearAnnualAmount;
       let usedRatePct = linearRatePct;
-      
+
       if (method === 'degressive20') {
         // Nach § 7 Abs. 2 EStG: bis zum 2-fachen des linearen Satzes, max. 20%
         usedRatePct = Math.min(20, linearRatePct * 2);
@@ -1536,9 +1551,9 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
         const bookValueAfterYear1 = cost - firstYearAmount;
         secondYearAmount = bookValueAfterYear1 * (usedRatePct / 100);
       }
-      
+
       const taxSavingsYear1 = firstYearAmount * 0.30; // ca. 30% Ertragsteuerersparnis
-      
+
       return {
         primary: { id: 'year1Afa', label: 'Abschreibung im 1. vollen Jahr', value: firstYearAmount, formattedValue: formatCurrency(firstYearAmount), highlight: true },
         secondary: [
@@ -1612,10 +1627,11 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "label": "Skontosatz",
                 "type": "number",
                 "defaultValue": 3,
-                "min": 0.5,
+                "min": 0,
                 "max": 10,
                 "step": 0.5,
-                "unit": "%"
+                "unit": "%",
+                "helpText": "Skontosatz in Prozent (0 % bei reinem Netto-Zahlungsziel ohne Skontovereinbarung)."
           },
           {
                 "id": "skontoDays",
@@ -1645,30 +1661,37 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "min": 0,
                 "max": 30,
                 "step": 0.5,
-                "unit": "%"
+                "unit": "%",
+                "helpText": "Zinssatz für Zwischenfinanzierung (0 % bei vorhandener Eigenliquidität)."
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const inv = Number(inputs.invoiceGross) || 0;
-      const skPct = Number(inputs.skontoPercent) || 3.0;
-      const skDays = Number(inputs.skontoDays) || 10;
-      const netDays = Number(inputs.netDays) || 30;
-      const creditZins = Number(inputs.creditInterestPct) || 9.5;
-      
+      const inv = Math.max(0, Number(inputs.invoiceGross) || 0);
+      const skPct = inputs.skontoPercent !== undefined && inputs.skontoPercent !== null && inputs.skontoPercent !== ''
+        ? Math.max(0, Number(inputs.skontoPercent))
+        : 3.0;
+      const skDays = Math.max(0, Number(inputs.skontoDays) || 10);
+      const netDays = Math.max(skDays + 1, Number(inputs.netDays) || 30);
+      const creditZins = inputs.creditInterestPct !== undefined && inputs.creditInterestPct !== null && inputs.creditInterestPct !== ''
+        ? Math.max(0, Number(inputs.creditInterestPct))
+        : 9.5;
+
       const creditDays = Math.max(1, netDays - skDays);
-      // Kaufmännische Formel für effektiven Jahreszins:
-      // Zins p.a. = (Skontosatz / (100 - Skontosatz)) * (360 / Kreditzeitraum) * 100
-      // bzw. klassische Näherung: (Skontosatz * 360) / Kreditzeitraum
-      const effZinsApprox = (skPct * 360) / creditDays;
-      const effZinsExact = (skPct / (100 - skPct)) * (360 / creditDays) * 100;
-      
-      const skontoSavingsEuro = inv * (skPct / 100);
-      const amountToPay = inv - skontoSavingsEuro;
-      
-      // Zinskosten für Zwischenfinanzierung per Kontokorrentkredit:
-      const creditCostEuro = amountToPay * (creditZins / 100) * (creditDays / 360);
-      const netAdvantageEuro = skontoSavingsEuro - creditCostEuro;
-      
+
+      let effZinsExact = 0;
+      let skontoSavingsEuro = 0;
+      let amountToPay = inv;
+      let creditCostEuro = 0;
+      let netAdvantageEuro = 0;
+
+      if (skPct > 0) {
+        effZinsExact = (skPct / (100 - skPct)) * (360 / creditDays) * 100;
+        skontoSavingsEuro = inv * (skPct / 100);
+        amountToPay = inv - skontoSavingsEuro;
+        creditCostEuro = amountToPay * (creditZins / 100) * (creditDays / 360);
+        netAdvantageEuro = skontoSavingsEuro - creditCostEuro;
+      }
+
       return {
         primary: { id: 'effZins', label: 'Effektiver Jahreszins des Skontos', value: effZinsExact, formattedValue: formatPercent(effZinsExact) + ' p.a.', highlight: true },
         secondary: [
@@ -1676,7 +1699,9 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           { id: 'netBenefit', label: 'Nettovorteil nach Bankzinsen', value: netAdvantageEuro, formattedValue: formatCurrency(netAdvantageEuro) },
           { id: 'creditDaysDisplay', label: 'Finanzierungszeitraum', value: creditDays, formattedValue: creditDays + ' Tage' },
         ],
-        summaryText: 'Durch Skonto sparen Sie ' + formatCurrency(skontoSavingsEuro) + '. Das entspricht einem effektiven Jahreszins von ' + formatPercent(effZinsExact) + ' p.a.! Selbst bei Finanzierung über Kontokorrent (' + creditZins + ' % Zins) sparen Sie immer noch ' + formatCurrency(netAdvantageEuro) + ' unterm Strich.',
+        summaryText: skPct > 0
+          ? 'Durch Skonto sparen Sie ' + formatCurrency(skontoSavingsEuro) + '. Das entspricht einem effektiven Jahreszins von ' + formatPercent(effZinsExact) + ' p.a.! Selbst bei Finanzierung über Kontokorrent (' + creditZins + ' % Zins) sparen Sie immer noch ' + formatCurrency(netAdvantageEuro) + ' unterm Strich.'
+          : 'Bei 0 % Skonto gibt es keinen Skontoabzug (Rechnungsbetrag voll fällig nach ' + netDays + ' Tagen).',
       };
     },
     formula: "Effektiver Jahreszins (%) = (Skontosatz / (100 - Skontosatz)) × (360 / (Zahlungsziel - Skontofrist)) × 100",
@@ -1772,22 +1797,33 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const rev = Number(inputs.revenueNet) || 1;
-      const cogs = Number(inputs.costOfGoods) || 0;
-      
+      const rev = Number(inputs.revenueNet);
+      const cogs = Math.max(0, Number(inputs.costOfGoods) || 0);
+
+      if (isNaN(rev) || rev <= 0) {
+        return {
+          primary: { id: 'ratio', label: 'Wareneinsatzquote (Food Cost)', value: 0, formattedValue: '0,00 %', highlight: true },
+          secondary: [
+            { id: 'grossProfit', label: 'Rohertrag (Deckung für Personal & Gewinn)', value: 0, formattedValue: '0,00 € (0,00 %)' },
+            { id: 'benchmark', label: 'Branchen-Richtwert', value: 0, formattedValue: 'Umsatz muss größer als 0 € sein' },
+          ],
+          summaryText: 'Bitte geben Sie einen Netto-Umsatzerlös größer als 0 € an.',
+        };
+      }
+
       // Wareneinsatzquote = (Wareneinsatz / Nettoumsatz) * 100
       const cogsRatio = (cogs / rev) * 100;
       // Rohertrag = Umsatz - Wareneinsatz
       const grossProfit = rev - cogs;
       const grossProfitMargin = (grossProfit / rev) * 100;
-      
+
       let benchmarkMax = 30;
       if (inputs.sectorType === 'gastroDrinks') benchmarkMax = 20;
       else if (inputs.sectorType === 'bakery') benchmarkMax = 25;
       else if (inputs.sectorType === 'retail') benchmarkMax = 70;
-      
+
       const isOptimal = cogsRatio <= benchmarkMax;
-      
+
       return {
         primary: { id: 'ratio', label: 'Wareneinsatzquote (Food Cost)', value: cogsRatio, formattedValue: formatPercent(cogsRatio), highlight: true },
         secondary: [
@@ -1862,21 +1898,34 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const cogs = Number(inputs.costOfGoodsSold) || 0;
-      const inv = Number(inputs.avgInventoryValue) || 1;
-      
+      const cogs = Math.max(0, Number(inputs.costOfGoodsSold) || 0);
+      const inv = Number(inputs.avgInventoryValue);
+
+      if (isNaN(inv) || inv <= 0) {
+        return {
+          primary: { id: 'turnover', label: 'Lagerumschlagshäufigkeit', value: 0, formattedValue: '0,00 Umschläge / Jahr', highlight: true },
+          secondary: [
+            { id: 'duration', label: 'Durchschnittliche Lagerdauer', value: 0, formattedValue: '0 Tage im Lager' },
+            { id: 'capitalBound', label: 'Gebundenes Kapital im Lager', value: 0, formattedValue: '0,00 €' },
+          ],
+          summaryText: 'Bitte geben Sie einen durchschnittlichen Lagerbestand größer als 0 € an.',
+        };
+      }
+
       // Lagerumschlagshäufigkeit = Wareneinsatz / durchschnittlicher Lagerbestand
       const turnover = cogs / inv;
       // Durchschnittliche Lagerdauer in Tagen = 360 / Umschlagshäufigkeit
-      const durationDays = turnover > 0 ? 360 / turnover : 360;
-      
+      const durationDays = turnover > 0 ? 360 / turnover : 0;
+
       return {
         primary: { id: 'turnover', label: 'Lagerumschlagshäufigkeit', value: turnover, formattedValue: formatNumber(turnover, 2) + ' Umschläge / Jahr', highlight: true },
         secondary: [
-          { id: 'duration', label: 'Durchschnittliche Lagerdauer', value: durationDays, formattedValue: 'ca. ' + Math.round(durationDays) + ' Tage im Lager' },
+          { id: 'duration', label: 'Durchschnittliche Lagerdauer', value: durationDays, formattedValue: turnover > 0 ? 'ca. ' + Math.round(durationDays) + ' Tage im Lager' : 'Kein Umschlag' },
           { id: 'capitalBound', label: 'Gebundenes Kapital im Lager', value: inv, formattedValue: formatCurrency(inv) },
         ],
-        summaryText: 'Das Lager dreht sich genau ' + formatNumber(turnover, 2) + '-mal pro Jahr. Ein Produkt verweilt im Durchschnitt rund ' + Math.round(durationDays) + ' Tage im Lager.',
+        summaryText: turnover > 0
+          ? 'Das Lager dreht sich genau ' + formatNumber(turnover, 2) + '-mal pro Jahr. Ein Produkt verweilt im Durchschnitt rund ' + Math.round(durationDays) + ' Tage im Lager.'
+          : 'Bei einem Wareneinsatz von 0 € findet kein Lagerumschlag statt.',
       };
     },
     formula: "Umschlagshäufigkeit = Wareneinsatz / Ø Lagerbestand; Lagerdauer (Tage) = 360 / Umschlagshäufigkeit",
@@ -1927,10 +1976,11 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "label": "Gewünschtes Nettoeinkommen pro Jahr",
                 "type": "number",
                 "defaultValue": 45000,
-                "min": 10000,
+                "min": 0,
                 "max": 500000,
                 "step": 2500,
-                "unit": "€ Netto"
+                "unit": "€ Netto",
+                "helpText": "Wunsch-Nettoeinkommen pro Jahr (0 € falls rein kostendeckendes Honorar ohne Unternehmerlohn berechnet werden soll)."
           },
           {
                 "id": "businessExpensesAnnual",
@@ -1940,17 +1990,19 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "min": 0,
                 "max": 500000,
                 "step": 1000,
-                "unit": "€"
+                "unit": "€",
+                "helpText": "Jährliche geschäftliche Ausgaben (0 € bei Tätigkeit ohne Betriebsausgaben)."
           },
           {
                 "id": "vacationAndSickDays",
                 "label": "Nicht fakturierbare Tage (Urlaub, Feiertage, Krankheit)",
                 "type": "number",
                 "defaultValue": 45,
-                "min": 20,
+                "min": 0,
                 "max": 100,
                 "step": 5,
-                "unit": "Tage"
+                "unit": "Tage",
+                "helpText": "Nicht fakturierbare Tage wie Urlaub, Krankheit und Feiertage."
           },
           {
                 "id": "billableRatioPct",
@@ -1964,24 +2016,33 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           }
     ],
     calculate: (inputs: Record<string, any>) => {
-      const net = Number(inputs.desiredNetAnnual) || 45000;
-      const expenses = Number(inputs.businessExpensesAnnual) || 12000;
-      const offDays = Number(inputs.vacationAndSickDays) || 45;
-      const billableRatio = (Number(inputs.billableRatioPct) || 60) / 100;
-      
+      const net = inputs.desiredNetAnnual !== undefined && inputs.desiredNetAnnual !== null && inputs.desiredNetAnnual !== ''
+        ? Math.max(0, Number(inputs.desiredNetAnnual) || 0)
+        : 45000;
+      const expenses = inputs.businessExpensesAnnual !== undefined && inputs.businessExpensesAnnual !== null && inputs.businessExpensesAnnual !== ''
+        ? Math.max(0, Number(inputs.businessExpensesAnnual) || 0)
+        : 12000;
+      const offDays = inputs.vacationAndSickDays !== undefined && inputs.vacationAndSickDays !== null && inputs.vacationAndSickDays !== ''
+        ? Math.max(0, Number(inputs.vacationAndSickDays) || 0)
+        : 45;
+      const billableRatioPct = inputs.billableRatioPct !== undefined && inputs.billableRatioPct !== null && inputs.billableRatioPct !== ''
+        ? Number(inputs.billableRatioPct)
+        : 60;
+      const billableRatio = Math.max(0.01, billableRatioPct) / 100;
+
       // Faustregel für Steuern + private/gesetzliche Krankenversicherung + Altersvorsorge:
       // Bruttobedarf vor Steuern ≈ Netto * 1.65
       const grossIncomeNeeded = net * 1.65;
       const totalRevenueNeeded = grossIncomeNeeded + expenses;
-      
+
       // Arbeitstage pro Jahr: 52 Wochen * 5 Tage = 260 Arbeitstage
-      const workingDays = Math.max(100, 260 - offDays);
+      const workingDays = Math.max(0, 260 - offDays);
       const totalWorkHours = workingDays * 8; // 8h-Tag
       const billableHours = totalWorkHours * billableRatio;
-      
+
       const hourlyRateNet = billableHours > 0 ? totalRevenueNeeded / billableHours : 0;
       const dailyRateNet = hourlyRateNet * 8;
-      
+
       return {
         primary: { id: 'hourlyRate', label: 'Empfohlener Netto-Stundensatz', value: hourlyRateNet, formattedValue: formatCurrency(hourlyRateNet) + ' / Stunde', highlight: true },
         secondary: [

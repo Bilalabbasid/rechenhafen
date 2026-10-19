@@ -1740,8 +1740,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den Entgeltausfall und das staatliche Kurzarbeitergeld der Bundesagentur für Arbeit.',
     searchKeywords: ['kurzarbeitergeld rechner kug', 'kurzarbeit netto rechner 60 67 prozent', 'kurzarbeit null wie viel netto', 'arbeitsausfall gehalt berechnen'],
     inputs: [
-      { id: 'regularGross', label: 'Reguläres monatliches Bruttogehalt (Soll-Entgelt)', type: 'number', defaultValue: 3500, min: 500, step: 100, unit: '€' },
-      { id: 'workReductionPct', label: 'Arbeitsausfall in Prozent (z. B. 50 % = halbe Arbeitszeit)', type: 'number', defaultValue: 50, min: 10, max: 100, step: 10, unit: '%' },
+      { id: 'regularGross', label: 'Reguläres monatliches Bruttogehalt (Soll-Entgelt)', type: 'number', defaultValue: 3500, min: 0, step: 100, unit: '€' },
+      { id: 'workReductionPct', label: 'Arbeitsausfall in Prozent (z. B. 50 % = halbe Arbeitszeit)', type: 'number', defaultValue: 50, min: 0, max: 100, step: 10, unit: '%' },
       {
         id: 'hasChildren',
         label: 'Kinder / Leistungssatz',
@@ -1754,8 +1754,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.regularGross) || 3500;
-      const reduction = (parseFloat(inputs.workReductionPct) || 50) / 100;
+      const gross = inputs.regularGross !== undefined && inputs.regularGross !== '' ? Math.max(0, parseFloat(inputs.regularGross) || 0) : 3500;
+      const rawRed = inputs.workReductionPct !== undefined && inputs.workReductionPct !== '' ? parseFloat(inputs.workReductionPct) : 50;
+      const reduction = Math.min(1, Math.max(0, (!isNaN(rawRed) ? rawRed : 50) / 100));
       const rate = inputs.hasChildren === 'with_child' ? 0.67 : 0.60;
 
       // Pauschaliertes Nettoentgelt ca. 62 % des Brutto
@@ -1815,12 +1816,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die Steuerersparnis bei Abfindungen durch die Fünftelregelung für außerordentliche Einkünfte.',
     searchKeywords: ['abfindungsrechner fuenftelregelung', 'paragraph 34 estg abfindung rechner', 'wie viel netto bleibt von abfindung', 'abfindung steuer optimieren'],
     inputs: [
-      { id: 'regularYearlyIncome', label: 'Reguläres zu versteuerndes Jahreseinkommen (ohne Abfindung)', type: 'number', defaultValue: 45000, min: 10000, step: 2500, unit: '€' },
-      { id: 'severancePay', label: 'Vereinbarte Brutto-Abfindung', type: 'number', defaultValue: 30000, min: 1000, step: 2500, unit: '€' },
+      { id: 'regularYearlyIncome', label: 'Reguläres zu versteuerndes Jahreseinkommen (ohne Abfindung)', type: 'number', defaultValue: 45000, min: 0, step: 2500, unit: '€' },
+      { id: 'severancePay', label: 'Vereinbarte Brutto-Abfindung', type: 'number', defaultValue: 30000, min: 0, step: 2500, unit: '€' },
     ],
     calculate: (inputs) => {
-      const income = parseFloat(inputs.regularYearlyIncome) || 45000;
-      const severance = parseFloat(inputs.severancePay) || 30000;
+      const income = inputs.regularYearlyIncome !== undefined && inputs.regularYearlyIncome !== '' ? Math.max(0, parseFloat(inputs.regularYearlyIncome) || 0) : 45000;
+      const severance = inputs.severancePay !== undefined && inputs.severancePay !== '' ? Math.max(0, parseFloat(inputs.severancePay) || 0) : 30000;
 
       // Vereinfachte Schätzung der Einkommensteuer-Tariffunktion ESt
       const est = (zvE: number) => {
@@ -1893,7 +1894,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die gleitenden Sozialversicherungsbeiträge im Übergangsbereich (Midijob) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['minijob rechner 538 euro netto', 'midijob rechner uebergangsbereich 2000 euro', 'paragraph 20 sgb iv gleitzone rechner', 'sozialversicherung midijob abzug'],
     inputs: [
-      { id: 'monthlyGross', label: 'Monatlicher Bruttolohn', type: 'number', defaultValue: 850, min: 100, max: 2500, step: 25, unit: '€' },
+      { id: 'monthlyGross', label: 'Monatlicher Bruttolohn', type: 'number', defaultValue: 850, min: 0, max: 2500, step: 25, unit: '€' },
       {
         id: 'pensionOptOut',
         label: 'Rentenversicherungspflicht im Minijob (nur relevant bis 538 €)',
@@ -1906,7 +1907,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 850;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 850;
       const optOut = inputs.pensionOptOut === 'exempt';
 
       // 1. Minijob (bis 538 €)
@@ -1996,14 +1997,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt den Arbeitgeber-Gesamtaufwand inklusive Sozialversicherungsbeiträgen und gesetzlichen Umlagen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['arbeitgeberanteil rechner', 'lohnnebenkosten arbeitgeber prozent 2026', 'personalkosten rechner brutto', 'arbeitgeberanteil sozialversicherung formel'],
     inputs: [
-      { id: 'monthlyGross', label: 'Vereinbartes monatliches Bruttogehalt des Mitarbeiters', type: 'number', defaultValue: 4000, min: 500, step: 100, unit: '€' },
-      { id: 'healthAddOnPct', label: 'Zusatzbeitrag der Krankenkasse (gesamt, z. B. 1,7 %)', type: 'number', defaultValue: 1.7, min: 0.5, max: 3.5, step: 0.1, unit: '%' },
-      { id: 'umlagenPct', label: 'Umlagen U1 (Krankheit), U2 (Mutterschaft), U3 (Insolvenzgeld) ca.', type: 'number', defaultValue: 2.2, min: 0.5, max: 5.0, step: 0.1, unit: '%' },
+      { id: 'monthlyGross', label: 'Vereinbartes monatliches Bruttogehalt des Mitarbeiters', type: 'number', defaultValue: 4000, min: 0, step: 100, unit: '€' },
+      { id: 'healthAddOnPct', label: 'Zusatzbeitrag der Krankenkasse (gesamt, z. B. 1,7 %)', type: 'number', defaultValue: 1.7, min: 0, max: 3.5, step: 0.1, unit: '%', helpText: 'Kassenindividueller Zusatzbeitrag (0 % bei Kassen ohne Zusatzbeitrag)' },
+      { id: 'umlagenPct', label: 'Umlagen U1 (Krankheit), U2 (Mutterschaft), U3 (Insolvenzgeld) ca.', type: 'number', defaultValue: 2.2, min: 0, max: 5.0, step: 0.1, unit: '%' },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 4000;
-      const addOn = parseFloat(inputs.healthAddOnPct) || 1.7;
-      const umlagen = parseFloat(inputs.umlagenPct) || 2.2;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 4000;
+      const addOn = inputs.healthAddOnPct !== undefined && inputs.healthAddOnPct !== '' ? Math.max(0, parseFloat(inputs.healthAddOnPct) || 0) : 1.7;
+      const umlagen = inputs.umlagenPct !== undefined && inputs.umlagenPct !== '' ? Math.max(0, parseFloat(inputs.umlagenPct) || 0) : 2.2;
 
       // Beitragsbemessungsgrenzen 2026 beachten (grob):
       const bbzKv = 5175; // KV/PV
@@ -2021,7 +2022,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
 
       const agSocialTotal = agKv + agPv + agRv + agAv;
       const totalAgCost = gross + agSocialTotal + agUmlagen;
-      const markupPct = ((totalAgCost - gross) / gross) * 100;
+      const markupPct = gross > 0 ? ((totalAgCost - gross) / gross) * 100 : 0;
 
       return {
         primary: { id: 'totalAgCost', label: 'Monatliche Arbeitgeber-Gesamtkosten', value: totalAgCost, formattedValue: formatCurrency(totalAgCost), highlight: true },
@@ -2080,7 +2081,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const years = parseInt(inputs.yearsEmployed, 10) || 5;
+      const rawYears = inputs.yearsEmployed !== undefined && inputs.yearsEmployed !== '' ? parseInt(inputs.yearsEmployed, 10) : 5;
+      const years = !isNaN(rawYears) && rawYears >= 0 ? rawYears : 5;
       const type = inputs.initiator || 'employer';
 
       if (type === 'probation') {
@@ -2158,16 +2160,17 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt den finanziellen Wert geleisteter Mehrarbeit in Brutto und Netto.',
     searchKeywords: ['ueberstunden auszahlung rechner', 'wie viel netto bleibt von ueberstunden', 'ueberstundenzuschlag 25 prozent berechnen', 'stundenlohn ueberstunden formel'],
     inputs: [
-      { id: 'monthlyGross', label: 'Monatliches Grundgehalt brutto', type: 'number', defaultValue: 3400, min: 800, step: 100, unit: '€' },
-      { id: 'weeklyHours', label: 'Vertragliche Wochenarbeitszeit in Stunden', type: 'number', defaultValue: 40, min: 10, max: 50, step: 1, unit: 'Std./Woche' },
-      { id: 'overtimeHours', label: 'Auszuzahlende Überstunden', type: 'number', defaultValue: 25, min: 1, max: 200, step: 1, unit: 'Stunden' },
-      { id: 'bonusPct', label: 'Vereinbarter Überstundenzuschlag (z. B. 25 %)', type: 'number', defaultValue: 25, min: 0, max: 100, step: 5, unit: '%' },
+      { id: 'monthlyGross', label: 'Monatliches Grundgehalt brutto', type: 'number', defaultValue: 3400, min: 0, step: 100, unit: '€' },
+      { id: 'weeklyHours', label: 'Vertragliche Wochenarbeitszeit in Stunden', type: 'number', defaultValue: 40, min: 1, max: 80, step: 1, unit: 'Std./Woche' },
+      { id: 'overtimeHours', label: 'Auszuzahlende Überstunden', type: 'number', defaultValue: 25, min: 0, max: 200, step: 1, unit: 'Stunden' },
+      { id: 'bonusPct', label: 'Vereinbarter Überstundenzuschlag (z. B. 25 %)', type: 'number', defaultValue: 25, min: 0, max: 100, step: 5, unit: '%', helpText: 'Zuschlagssatz in Prozent (0 % bei Überstunden ohne Zuschlag).' },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 3400;
-      const hoursWeek = parseFloat(inputs.weeklyHours) || 40;
-      const otHours = parseFloat(inputs.overtimeHours) || 25;
-      const bonusPct = (parseFloat(inputs.bonusPct) || 25) / 100;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 3400;
+      const hoursWeek = inputs.weeklyHours !== undefined && inputs.weeklyHours !== '' ? Math.max(0.1, parseFloat(inputs.weeklyHours) || 0) : 40;
+      const otHours = inputs.overtimeHours !== undefined && inputs.overtimeHours !== '' ? Math.max(0, parseFloat(inputs.overtimeHours) || 0) : 25;
+      const rawBonus = inputs.bonusPct !== undefined && inputs.bonusPct !== '' ? parseFloat(inputs.bonusPct) : 25;
+      const bonusPct = (!isNaN(rawBonus) && rawBonus >= 0 ? rawBonus : 25) / 100;
 
       // Stundenlohn = Monatsgehalt / (Wochenstunden × 4,348) bzw. 3 Monate / 13 Wochen
       const monthlyHours = (hoursWeek * 13) / 3;
@@ -2219,8 +2222,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Zeigt die exakten steuerlichen Auswirkungen des Dienstwagens auf dem monatlichen Gehaltszettel.',
     searchKeywords: ['geldwerter vorteil firmenwagen rechner lohnabrechnung', 'firmenwagen netto abzug berechnen', '1 prozent regelung gehaltszettel', 'dienstwagen geldwerter vorteil'],
     inputs: [
-      { id: 'monthlyGross', label: 'Monatliches Grundgehalt (vor Firmenwagen)', type: 'number', defaultValue: 4500, min: 1500, step: 100, unit: '€' },
-      { id: 'grossListPrice', label: 'Bruttolistenpreis des Autos (UVP)', type: 'number', defaultValue: 45000, min: 10000, step: 1000, unit: '€' },
+      { id: 'monthlyGross', label: 'Monatliches Grundgehalt (vor Firmenwagen)', type: 'number', defaultValue: 4500, min: 0, step: 100, unit: '€' },
+      { id: 'grossListPrice', label: 'Bruttolistenpreis des Autos (UVP)', type: 'number', defaultValue: 45000, min: 0, step: 1000, unit: '€' },
       { id: 'distanceWorkKm', label: 'Einfache Entfernung zur Arbeit in km', type: 'number', defaultValue: 15, min: 0, max: 150, step: 1, unit: 'km' },
       {
         id: 'engineType',
@@ -2235,9 +2238,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 4500;
-      const blp = parseFloat(inputs.grossListPrice) || 45000;
-      const km = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? parseFloat(inputs.distanceWorkKm) : 15;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 4500;
+      const blp = inputs.grossListPrice !== undefined && inputs.grossListPrice !== '' ? Math.max(0, parseFloat(inputs.grossListPrice) || 0) : 45000;
+      const km = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? Math.max(0, parseFloat(inputs.distanceWorkKm) || 0) : 15;
       const type = inputs.engineType || 'combustion';
 
       let pRate = 0.01;
@@ -2305,16 +2308,16 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert die Höhe des Krankengeldes nach Ablauf der 6-wöchigen Entgeltfortzahlung.',
     searchKeywords: ['krankengeld rechner', 'wie viel krankengeld nach 6 wochen', 'paragraph 47 sgb v krankengeld formel', 'krankengeld abzug sozialversicherung'],
     inputs: [
-      { id: 'monthlyGross', label: 'Monatliches Bruttogehalt vor der Erkrankung', type: 'number', defaultValue: 3600, min: 500, step: 100, unit: '€' },
-      { id: 'monthlyNet', label: 'Monatliches Nettogehalt vor der Erkrankung', type: 'number', defaultValue: 2350, min: 400, step: 50, unit: '€' },
+      { id: 'monthlyGross', label: 'Monatliches Bruttogehalt vor der Erkrankung', type: 'number', defaultValue: 3600, min: 0, step: 100, unit: '€' },
+      { id: 'monthlyNet', label: 'Monatliches Nettogehalt vor der Erkrankung', type: 'number', defaultValue: 2350, min: 0, step: 50, unit: '€' },
       { id: 'hasChildren', label: 'Haben Sie Kinder? (relevant für Pflegeversicherungsbeitrag)', type: 'select', defaultValue: 'yes', options: [
         { value: 'yes', label: 'Ja (regulärer Pflegeversicherungsbeitrag)' },
         { value: 'no', label: 'Nein (Kinderlosenzuschlag in der Pflegeversicherung)' },
       ]},
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 3600;
-      const net = parseFloat(inputs.monthlyNet) || 2350;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 3600;
+      const net = inputs.monthlyNet !== undefined && inputs.monthlyNet !== '' ? Math.max(0, parseFloat(inputs.monthlyNet) || 0) : 2350;
       const hasKids = inputs.hasChildren === 'yes';
 
       // Regelkrankengeldberechnung nach § 47 SGB V:
@@ -2386,10 +2389,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt das Mutterschaftsgeld und den Arbeitgeberzuschuss während der 14-wöchigen Schutzfrist.',
     searchKeywords: ['mutterschaftsgeld rechner', 'arbeitgeberzuschuss mutterschaftsgeld berechnen', '13 euro krankenkasse mutterschutz', 'paragraph 19 muschg rechner'],
     inputs: [
-      { id: 'avgNetIncome', label: 'Durchschnittliches monatliches Nettogehalt der letzten 3 Monate', type: 'number', defaultValue: 2400, min: 400, step: 50, unit: '€' },
+      { id: 'avgNetIncome', label: 'Durchschnittliches monatliches Nettogehalt der letzten 3 Monate', type: 'number', defaultValue: 2400, min: 0, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
-      const net = parseFloat(inputs.avgNetIncome) || 2400;
+      const net = inputs.avgNetIncome !== undefined && inputs.avgNetIncome !== '' ? Math.max(0, parseFloat(inputs.avgNetIncome) || 0) : 2400;
       // Mutterschutzfrist: 6 Wochen vor der Geburt + 8 Wochen nach der Geburt = 14 Wochen = 98 Tage
       const dailyNet = net / 30;
       const dailyHealthFund = 13.00; // Gesetzlich fest 13 € pro Kalendertag
@@ -2449,14 +2452,15 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert Gehalt und Arbeitszeit für Elternteilzeit bis maximal 32 Stunden pro Woche.',
     searchKeywords: ['elternzeit teilzeit rechner', 'teilzeit in elternzeit 32 stunden rechner', 'beeg elternteilzeit gehalt', 'elterngeld plus zuverdienst rechner'],
     inputs: [
-      { id: 'fulltimeGross', label: 'Bisheriges Vollzeit-Bruttogehalt', type: 'number', defaultValue: 3800, min: 1000, step: 100, unit: '€' },
-      { id: 'fulltimeHours', label: 'Bisherige Vollzeit-Wochenstunden', type: 'number', defaultValue: 40, min: 30, max: 45, step: 1, unit: 'Std./Woche' },
-      { id: 'parttimeHours', label: 'Geplante Teilzeit-Wochenstunden in Elternzeit (max. 32 h)', type: 'number', defaultValue: 24, min: 5, max: 32, step: 1, unit: 'Std./Woche' },
+      { id: 'fulltimeGross', label: 'Bisheriges Vollzeit-Bruttogehalt', type: 'number', defaultValue: 3800, min: 0, step: 100, unit: '€' },
+      { id: 'fulltimeHours', label: 'Bisherige Vollzeit-Wochenstunden', type: 'number', defaultValue: 40, min: 1, max: 60, step: 1, unit: 'Std./Woche' },
+      { id: 'parttimeHours', label: 'Geplante Teilzeit-Wochenstunden in Elternzeit (max. 32 h)', type: 'number', defaultValue: 24, min: 0, max: 32, step: 1, unit: 'Std./Woche', helpText: 'Geplante Teilzeitstunden (0 h bei vollständiger Arbeitsfreistellung).' },
     ],
     calculate: (inputs) => {
-      const ftGross = parseFloat(inputs.fulltimeGross) || 3800;
-      const ftHours = parseFloat(inputs.fulltimeHours) || 40;
-      const ptHours = Math.min(32, parseFloat(inputs.parttimeHours) || 24);
+      const ftGross = inputs.fulltimeGross !== undefined && inputs.fulltimeGross !== '' ? Math.max(0, parseFloat(inputs.fulltimeGross) || 0) : 3800;
+      const ftHours = inputs.fulltimeHours !== undefined && inputs.fulltimeHours !== '' ? Math.max(1, parseFloat(inputs.fulltimeHours) || 0) : 40;
+      const rawPt = inputs.parttimeHours !== undefined && inputs.parttimeHours !== '' ? parseFloat(inputs.parttimeHours) : 24;
+      const ptHours = Math.min(32, Math.max(0, !isNaN(rawPt) ? rawPt : 24));
 
       const ratio = ptHours / ftHours;
       const ptGross = ftGross * ratio;
@@ -2634,7 +2638,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die steuer- und sozialversicherungsfreien Zuschläge nach § 3b EStG.',
     searchKeywords: ['zuschlaege rechner paragraph 3b estg', 'nachtzuschlag steuerfrei berechnen', 'sonntagszuschlag 50 prozent rechner', 'feiertagszuschlag 125 prozent netto'],
     inputs: [
-      { id: 'hourlyWage', label: 'Grundstundenlohn in Euro (maximal 50 €/Std. steuerlich begünstigt)', type: 'number', defaultValue: 18.50, min: 12, max: 80, step: 0.5, unit: '€/Std.' },
+      { id: 'hourlyWage', label: 'Grundstundenlohn in Euro (maximal 50 €/Std. steuerlich begünstigt)', type: 'number', defaultValue: 18.50, min: 0, max: 80, step: 0.5, unit: '€/Std.' },
       {
         id: 'surchargeType',
         label: 'Art des Zuschlags nach § 3b EStG',
@@ -2648,12 +2652,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { value: 'holiday_special', label: 'Besondere Feiertage: 1. Mai, 25./26. Dez, 1. Jan (150 % steuerfrei)' },
         ],
       },
-      { id: 'workedHours', label: 'Geleistete begünstigte Stunden', type: 'number', defaultValue: 8, min: 1, max: 100, step: 0.5, unit: 'Stunden' },
+      { id: 'workedHours', label: 'Geleistete begünstigte Stunden', type: 'number', defaultValue: 8, min: 0, max: 100, step: 0.5, unit: 'Stunden' },
     ],
     calculate: (inputs) => {
-      const wage = parseFloat(inputs.hourlyWage) || 18.50;
+      const wage = inputs.hourlyWage !== undefined && inputs.hourlyWage !== '' ? Math.max(0, parseFloat(inputs.hourlyWage) || 0) : 18.50;
       const type = inputs.surchargeType || 'sunday';
-      const hours = parseFloat(inputs.workedHours) || 8;
+      const hours = inputs.workedHours !== undefined && inputs.workedHours !== '' ? Math.max(0, parseFloat(inputs.workedHours) || 0) : 8;
 
       let pct = 0.50;
       if (type === 'night_standard') pct = 0.25;
@@ -2728,10 +2732,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const ag = parseFloat(inputs.employerVlMonthly) || 26.59;
-      const own = parseFloat(inputs.ownContributionMonthly) || 13.41;
-      const years = parseInt(inputs.investmentYears, 10) || 7;
-      const r = (parseFloat(inputs.interestRatePct) || 6.0) / 100;
+      const ag = inputs.employerVlMonthly !== undefined && inputs.employerVlMonthly !== '' ? Math.max(0, parseFloat(inputs.employerVlMonthly) || 0) : 26.59;
+      const own = inputs.ownContributionMonthly !== undefined && inputs.ownContributionMonthly !== '' ? Math.max(0, parseFloat(inputs.ownContributionMonthly) || 0) : 13.41;
+      const years = inputs.investmentYears !== undefined && inputs.investmentYears !== '' ? Math.max(1, parseInt(inputs.investmentYears, 10) || 0) : 7;
+      const rawR = inputs.interestRatePct !== undefined && inputs.interestRatePct !== '' ? parseFloat(inputs.interestRatePct) : 6.0;
+      const r = (!isNaN(rawR) && rawR >= 0 ? rawR : 6.0) / 100;
       const isEligible = inputs.eligibleForStateSubsidy === 'yes';
 
       const monthlyTotal = ag + own;
@@ -2791,14 +2796,15 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt die Steuer- und Sozialversicherungsersparnis bei betrieblicher Entgeltumwandlung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['betriebliche altersvorsorge rechner', 'bav entgeltumwandlung netto aufwand', '15 prozent arbeitgeberzuschuss bav', 'paragraph 1a betravg rechner'],
     inputs: [
-      { id: 'monthlyGross', label: 'Monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 1000, step: 100, unit: '€' },
-      { id: 'employeeConversion', label: 'Eigene Entgeltumwandlung aus dem Brutto', type: 'number', defaultValue: 150, min: 25, max: 300, step: 25, unit: '€' },
-      { id: 'employerMandatoryPct', label: 'Arbeitgeber-Pflichtzuschuss (mind. 15 %)', type: 'number', defaultValue: 15, min: 15, max: 50, step: 5, unit: '%' },
+      { id: 'monthlyGross', label: 'Monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 0, step: 100, unit: '€' },
+      { id: 'employeeConversion', label: 'Eigene Entgeltumwandlung aus dem Brutto', type: 'number', defaultValue: 150, min: 0, max: 300, step: 25, unit: '€', helpText: 'Eigene monatliche Entgeltumwandlung (0 € wenn nur Arbeitgeber einzahlt).' },
+      { id: 'employerMandatoryPct', label: 'Arbeitgeber-Pflichtzuschuss (mind. 15 %)', type: 'number', defaultValue: 15, min: 0, max: 50, step: 5, unit: '%' },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 3800;
-      const conversion = parseFloat(inputs.employeeConversion) || 150;
-      const agPct = (parseFloat(inputs.employerMandatoryPct) || 15) / 100;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 3800;
+      const conversion = inputs.employeeConversion !== undefined && inputs.employeeConversion !== '' ? Math.max(0, parseFloat(inputs.employeeConversion) || 0) : 150;
+      const rawAgPct = inputs.employerMandatoryPct !== undefined && inputs.employerMandatoryPct !== '' ? parseFloat(inputs.employerMandatoryPct) : 15;
+      const agPct = (!isNaN(rawAgPct) && rawAgPct >= 0 ? rawAgPct : 15) / 100;
 
       const agZuschuss = conversion * agPct;
       const totalMonthlyContribution = conversion + agZuschuss;
@@ -2848,7 +2854,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Schlüsselt das Jahreszielgehalt in monatliche Grundgehälter und Sonderzahlungen auf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['jahresgehalt in monatsgehalt rechner', 'jahresbrutto in monatsbrutto umrechnen', '13 gehälter jahresgehalt aufteilen', 'weihnachtsgeld urlaubsgeld monatsgehalt'],
     inputs: [
-      { id: 'yearlyGross', label: 'Gesamtes Jahresbruttogehalt', type: 'number', defaultValue: 60000, min: 10000, step: 2500, unit: '€' },
+      { id: 'yearlyGross', label: 'Gesamtes Jahresbruttogehalt', type: 'number', defaultValue: 60000, min: 0, step: 2500, unit: '€' },
       {
         id: 'salaryCount',
         label: 'Anzahl Monatsgehälter pro Jahr',
@@ -2863,8 +2869,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
-      const yearly = parseFloat(inputs.yearlyGross) || 60000;
-      const count = parseFloat(inputs.salaryCount) || 12;
+      const yearly = inputs.yearlyGross !== undefined && inputs.yearlyGross !== '' ? Math.max(0, parseFloat(inputs.yearlyGross) || 0) : 60000;
+      const count = inputs.salaryCount !== undefined && inputs.salaryCount !== '' ? Math.max(1, parseFloat(inputs.salaryCount) || 0) : 12;
       const monthlyBase = yearly / count;
       const extraPayTotal = yearly - (monthlyBase * 12);
 
@@ -2909,18 +2915,19 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert den kostendeckenden Stundensatz auf Basis des gewünschten Nettoeinkommens mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['stundensatz rechner freiberufler', 'freelancer stundensatz kalkulieren', 'mindesthonorar selbststaendige berechnen', 'honorarsatz kalkulation formel'],
     inputs: [
-      { id: 'desiredNetMonthly', label: 'Gewünschtes monatliches Nettoeinkommen zum Leben', type: 'number', defaultValue: 3200, min: 1000, step: 200, unit: '€' },
-      { id: 'monthlyBusinessCosts', label: 'Betriebliche Fixkosten pro Monat (Büro, Software, Steuerberater)', type: 'number', defaultValue: 650, min: 0, step: 50, unit: '€' },
-      { id: 'privateHealthInsurance', label: 'Private/Freiwillige Kranken- & Pflegeversicherung pro Monat', type: 'number', defaultValue: 550, min: 200, max: 1200, step: 50, unit: '€' },
-      { id: 'pensionSavingsMonthly', label: 'Rücklage für Altersvorsorge pro Monat', type: 'number', defaultValue: 500, min: 100, step: 50, unit: '€' },
-      { id: 'billableHoursPct', label: 'Fakturierbare Arbeitszeit (üblich ca. 50 % - 65 % wegen Akquise/Büro)', type: 'number', defaultValue: 60, min: 30, max: 90, step: 5, unit: '%' },
+      { id: 'desiredNetMonthly', label: 'Gewünschtes monatliches Nettoeinkommen zum Leben', type: 'number', defaultValue: 3200, min: 0, step: 200, unit: '€' },
+      { id: 'monthlyBusinessCosts', label: 'Betriebliche Fixkosten pro Monat (Büro, Software, Steuerberater)', type: 'number', defaultValue: 650, min: 0, step: 50, unit: '€', helpText: 'Betriebliche Monatskosten (0 € bei Home-Office ohne Zusatzkosten)' },
+      { id: 'privateHealthInsurance', label: 'Private/Freiwillige Kranken- & Pflegeversicherung pro Monat', type: 'number', defaultValue: 550, min: 0, max: 1200, step: 50, unit: '€' },
+      { id: 'pensionSavingsMonthly', label: 'Rücklage für Altersvorsorge pro Monat', type: 'number', defaultValue: 500, min: 0, step: 50, unit: '€' },
+      { id: 'billableHoursPct', label: 'Fakturierbare Arbeitszeit (üblich ca. 50 % - 65 % wegen Akquise/Büro)', type: 'number', defaultValue: 60, min: 10, max: 90, step: 5, unit: '%' },
     ],
     calculate: (inputs) => {
-      const netLife = parseFloat(inputs.desiredNetMonthly) || 3200;
-      const bizCost = parseFloat(inputs.monthlyBusinessCosts) || 650;
-      const pkv = parseFloat(inputs.privateHealthInsurance) || 550;
-      const pension = parseFloat(inputs.pensionSavingsMonthly) || 500;
-      const billablePct = (parseFloat(inputs.billableHoursPct) || 60) / 100;
+      const netLife = inputs.desiredNetMonthly !== undefined && inputs.desiredNetMonthly !== '' ? Math.max(0, parseFloat(inputs.desiredNetMonthly) || 0) : 3200;
+      const bizCost = inputs.monthlyBusinessCosts !== undefined && inputs.monthlyBusinessCosts !== '' ? Math.max(0, parseFloat(inputs.monthlyBusinessCosts) || 0) : 650;
+      const pkv = inputs.privateHealthInsurance !== undefined && inputs.privateHealthInsurance !== '' ? Math.max(0, parseFloat(inputs.privateHealthInsurance) || 0) : 550;
+      const pension = inputs.pensionSavingsMonthly !== undefined && inputs.pensionSavingsMonthly !== '' ? Math.max(0, parseFloat(inputs.pensionSavingsMonthly) || 0) : 500;
+      const rawBillable = inputs.billableHoursPct !== undefined && inputs.billableHoursPct !== '' ? parseFloat(inputs.billableHoursPct) : 60;
+      const billablePct = Math.max(0.05, (!isNaN(rawBillable) && rawBillable > 0 ? rawBillable : 60) / 100);
 
       // Steuerpuffer ca. 28-35% Einkommensteuer auf den Gewinn
       const totalNeededMonthlyPreTax = ((netLife + pkv + pension) / 0.70) + bizCost;
@@ -2975,14 +2982,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Kalkuliert die finanzielle Abgeltung nicht genommener Urlaubstage bei Beendigung des Arbeitsverhältnisses.',
     searchKeywords: ['urlaubsabgeltung rechner', 'resturlaub auszahlen lassen formel', 'paragraph 11 burlg urlaubsentgelt', 'urlaubstage auszahlung brutto'],
     inputs: [
-      { id: 'monthlyGross', label: 'Reguläres Bruttomonatsgehalt der letzten 13 Wochen', type: 'number', defaultValue: 3500, min: 800, step: 100, unit: '€' },
-      { id: 'remainingDays', label: 'Auszuzahlende Resturlaubstage', type: 'number', defaultValue: 12, min: 1, max: 60, step: 0.5, unit: 'Tage' },
+      { id: 'monthlyGross', label: 'Reguläres Bruttomonatsgehalt der letzten 13 Wochen', type: 'number', defaultValue: 3500, min: 0, step: 100, unit: '€' },
+      { id: 'remainingDays', label: 'Auszuzahlende Resturlaubstage', type: 'number', defaultValue: 12, min: 0, max: 60, step: 0.5, unit: 'Tage', helpText: 'Auszuzahlende Tage (0 Tage = kein Resturlaubsanspruch)' },
       { id: 'workDaysPerWeek', label: 'Arbeitstage pro Woche (Standard 5-Tage-Woche)', type: 'number', defaultValue: 5, min: 1, max: 6, step: 1, unit: 'Tage' },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.monthlyGross) || 3500;
-      const days = parseFloat(inputs.remainingDays) || 12;
-      const daysPerWeek = parseInt(inputs.workDaysPerWeek, 10) || 5;
+      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 3500;
+      const days = inputs.remainingDays !== undefined && inputs.remainingDays !== '' ? Math.max(0, parseFloat(inputs.remainingDays) || 0) : 12;
+      const daysPerWeek = inputs.workDaysPerWeek !== undefined && inputs.workDaysPerWeek !== '' ? Math.max(1, parseInt(inputs.workDaysPerWeek, 10) || 0) : 5;
 
       // Gesetzliche Formel nach § 11 Abs. 1 BUrlG:
       // Verdienst der letzten 13 Wochen = Monatsgehalt × 3
@@ -3034,7 +3041,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt das monatliche Arbeitslosengeld 1 und die maximale Bezugsdauer mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['arbeitslosengeld 1 rechner', 'alg 1 wie viel netto rechner', 'paragraph 149 sgb iii bemessungsentgelt', 'anspruchsdauer arbeitslosengeld monate'],
     inputs: [
-      { id: 'avgGrossMonthly', label: 'Durchschnittliches Bruttomonatsgehalt der letzten 12 Monate', type: 'number', defaultValue: 3400, min: 600, step: 100, unit: '€' },
+      { id: 'avgGrossMonthly', label: 'Durchschnittliches Bruttomonatsgehalt der letzten 12 Monate', type: 'number', defaultValue: 3400, min: 0, step: 100, unit: '€' },
       { id: 'taxClass', label: 'Lohnsteuerklasse', type: 'select', defaultValue: '1', options: [
         { value: '1', label: 'Steuerklasse 1 oder 4' },
         { value: '3', label: 'Steuerklasse 3' },
@@ -3046,9 +3053,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'ageYears', label: 'Ihr Lebensalter bei Antragstellung', type: 'number', defaultValue: 35, min: 18, max: 67, step: 1, unit: 'Jahre' },
     ],
     calculate: (inputs) => {
-      const gross = parseFloat(inputs.avgGrossMonthly) || 3400;
+      const gross = inputs.avgGrossMonthly !== undefined && inputs.avgGrossMonthly !== '' ? Math.max(0, parseFloat(inputs.avgGrossMonthly) || 0) : 3400;
       const rate = inputs.hasChildren === 'yes' ? 0.67 : 0.60;
-      const age = parseInt(inputs.ageYears, 10) || 35;
+      const age = inputs.ageYears !== undefined && inputs.ageYears !== '' ? Math.max(18, parseInt(inputs.ageYears, 10) || 0) : 35;
 
       // Pauschaliertes Nettoentgelt nach § 153 SGB III
       const dailyGross = gross / 30;
@@ -3427,12 +3434,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortDescription: 'Prüft die Einhaltung der steuer- und abgabenfreien Sachbezugsfreigrenzen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
     searchKeywords: ['sachbezug 50 euro rechner', 'gutschein arbeitgeber steuerfrei 50 euro', 'aufmerksamkeiten geburtstag 60 euro estg', 'sachbezugsgrenze paragraph 8 estg'],
     inputs: [
-      { id: 'monthlyVoucherValue', label: 'Wert des monatlichen Gutscheins / Sachbezugs (z. B. Tankgutschein)', type: 'number', defaultValue: 50, min: 10, max: 150, step: 5, unit: '€' },
+      { id: 'monthlyVoucherValue', label: 'Wert des monatlichen Gutscheins / Sachbezugs (z. B. Tankgutschein)', type: 'number', defaultValue: 50, min: 0, max: 150, step: 5, unit: '€', helpText: 'Monatlicher Sachbezug (0 € wenn kein regelmäßiger Gutschein gewährt wird)' },
       { id: 'specialOccasionValue', label: 'Geschenk zu persönlichem Anlass (Geburtstag, Jubiläum, Hochzeit)', type: 'number', defaultValue: 60, min: 0, max: 200, step: 5, unit: '€' },
     ],
     calculate: (inputs) => {
-      const monthly = parseFloat(inputs.monthlyVoucherValue) || 50;
-      const special = parseFloat(inputs.specialOccasionValue) || 60;
+      const monthly = inputs.monthlyVoucherValue !== undefined && inputs.monthlyVoucherValue !== '' ? Math.max(0, parseFloat(inputs.monthlyVoucherValue) || 0) : 50;
+      const special = inputs.specialOccasionValue !== undefined && inputs.specialOccasionValue !== '' ? Math.max(0, parseFloat(inputs.specialOccasionValue) || 0) : 60;
 
       // Nach § 8 Abs. 2 Satz 11 EStG: Freigrenze genau 50,00 € (bei 50,01 € wird ALLES steuerpflichtig!)
       const monthlyTaxFree = monthly <= 50.00;
@@ -3501,11 +3508,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { value: 'combined', label: 'Kombination aus beiden Tätigkeiten (zwei getrennte Ämter: bis 3.840 €/Jahr)' },
         ],
       },
-      { id: 'yearlyPayout', label: 'Vereinbarte jährliche Aufwandsentschädigung', type: 'number', defaultValue: 3200, min: 100, step: 100, unit: '€/Jahr' },
+      { id: 'yearlyPayout', label: 'Vereinbarte jährliche Aufwandsentschädigung', type: 'number', defaultValue: 3200, min: 0, step: 100, unit: '€/Jahr' },
     ],
     calculate: (inputs) => {
       const type = inputs.activityType || 'trainer';
-      const payout = parseFloat(inputs.yearlyPayout) || 3200;
+      const payout = inputs.yearlyPayout !== undefined && inputs.yearlyPayout !== '' ? Math.max(0, parseFloat(inputs.yearlyPayout) || 0) : 3200;
 
       let allowance = 3000;
       if (type === 'volunteer') allowance = 840;

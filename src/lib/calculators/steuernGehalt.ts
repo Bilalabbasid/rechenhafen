@@ -616,7 +616,32 @@ export function calculateMinijob(inputs: Record<string, any>): CalculationResult
 export function calculateMidijob(inputs: Record<string, any>): CalculationResult {
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
-  const gross = Math.max(config.minijobGrenze + 0.01, Math.min(config.midijobObergrenze, Number(inputs.earnings) || 1200));
+  const rawInput = inputs.earnings !== undefined ? inputs.earnings : inputs.monthlyGross;
+  const rawEarnings = rawInput !== undefined && rawInput !== '' && !isNaN(Number(rawInput))
+    ? Number(rawInput)
+    : 1200;
+
+  if (rawEarnings <= 0) {
+    return {
+      primary: {
+        id: 'netEarnings',
+        label: 'Netto-Verdienst im Midijob',
+        value: 0,
+        formattedValue: formatCurrency(0),
+      },
+      secondary: [
+        { id: 'gross', label: 'Midijob-Bruttogehalt', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'anSocial', label: 'Ermäßigte Sozialabgaben (AN)', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'monthlyLSt', label: 'Lohnsteuer', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'reducedBase', label: 'Fiktive Beitragsbemessungsgrundlage (§ 20 SGB IV)', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'effectiveRate', label: 'Effektiver Sozialabgabensatz', value: 0, formattedValue: '0 %' },
+        { id: 'fullRVPension', label: 'Voller Rentenanspruch trotz reduzierter Beiträge', value: 0, formattedValue: '0 € Verdienst' },
+      ],
+      summaryText: 'Bei 0 € Verdienst fallen keine Sozialabgaben oder Steuern an.',
+    };
+  }
+
+  const gross = Math.max(config.minijobGrenze + 0.01, Math.min(config.midijobObergrenze, rawEarnings));
 
   // Gleitzonen-Formel nach § 20 Abs. 2 SGB IV:
   // Faktor F = 0,6720 (2026) bzw. 0,6865 (2025)
@@ -663,8 +688,32 @@ export function calculateBonusNetto(inputs: Record<string, any>): CalculationRes
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
 
-  const regularGrossYear = Math.max(0, Number(inputs.regularGrossYear) || 50000);
-  const bonus = Math.max(0, Number(inputs.bonus) || 5000);
+  const rawRegular = inputs.regularGrossYear !== undefined ? inputs.regularGrossYear : inputs.regularGross;
+  const regularGrossYear = rawRegular !== undefined && rawRegular !== '' && !isNaN(Number(rawRegular))
+    ? Math.max(0, Number(rawRegular))
+    : 50000;
+  const rawBonus = inputs.bonus !== undefined ? inputs.bonus : inputs.bonusGross;
+  const bonus = rawBonus !== undefined && rawBonus !== '' && !isNaN(Number(rawBonus))
+    ? Math.max(0, Number(rawBonus))
+    : 5000;
+
+  if (bonus <= 0) {
+    return {
+      primary: {
+        id: 'netBonus',
+        label: 'Netto-Auszahlung der Einmalzahlung',
+        value: 0,
+        formattedValue: formatCurrency(0),
+      },
+      secondary: [
+        { id: 'bonusGross', label: 'Brutto-Einmalzahlung', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'taxOnBonus', label: 'Steuern auf Einmalzahlung', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'svOnBonus', label: 'Sozialabgaben auf Einmalzahlung', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'deductionPercentage', label: 'Gesamtabzugsquote vom Bonus', value: 0, formattedValue: '0 %' },
+      ],
+      summaryText: 'Bei 0 € Einmalzahlung fällt kein Bonusabzug an.',
+    };
+  }
 
   // BMF-Methode: Steuerberechnung auf Jahresbasis mit und ohne Bonus
   const estWithoutBonus = computeEStSingle(Math.max(0, regularGrossYear - 1230 - regularGrossYear * 0.18), config);
@@ -703,8 +752,12 @@ export function calculateAbfindung(inputs: Record<string, any>): CalculationResu
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
 
-  const regularIncome = Math.max(0, Number(inputs.regularIncome) || 45000);
-  const abfindung = Math.max(0, Number(inputs.abfindung) || 30000);
+  const regularIncome = inputs.regularIncome !== undefined && inputs.regularIncome !== '' && !isNaN(Number(inputs.regularIncome))
+    ? Math.max(0, Number(inputs.regularIncome))
+    : 45000;
+  const abfindung = inputs.abfindung !== undefined && inputs.abfindung !== '' && !isNaN(Number(inputs.abfindung))
+    ? Math.max(0, Number(inputs.abfindung))
+    : 30000;
 
   // 1. Reguläre Steuer ohne Abfindung
   const estWithout = computeEStSingle(regularIncome, config);
@@ -863,7 +916,9 @@ export function calculateRenteBruttoNetto(inputs: Record<string, any>): Calculat
 // 14. MWST-RECHNER (BRUTTO/NETTO)
 // ==========================================
 export function calculateMwSt(inputs: Record<string, any>): CalculationResult {
-  const amount = Math.max(0, Number(inputs.amount) || 100);
+  const amount = inputs.amount !== undefined && inputs.amount !== '' && !isNaN(Number(inputs.amount))
+    ? Math.max(0, Number(inputs.amount))
+    : 100;
   const mode = inputs.mode || 'netToGross'; // 'netToGross' oder 'grossToNet'
   const taxRate = Number(inputs.rate || 19);
 

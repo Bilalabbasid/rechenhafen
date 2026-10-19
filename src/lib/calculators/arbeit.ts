@@ -2,13 +2,17 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
 export function calculateHourlyWage(inputs: Record<string, any>): CalculationResult {
-  const monthlySalary = parseFloat(inputs.monthlySalary) || 3500;
-  const weeklyHours = parseFloat(inputs.weeklyHours) || 40;
+  const monthlySalary = inputs.monthlySalary !== undefined && inputs.monthlySalary !== '' && !isNaN(parseFloat(inputs.monthlySalary))
+    ? parseFloat(inputs.monthlySalary)
+    : 3500;
+  const weeklyHours = inputs.weeklyHours !== undefined && inputs.weeklyHours !== '' && !isNaN(parseFloat(inputs.weeklyHours))
+    ? parseFloat(inputs.weeklyHours)
+    : 40;
 
-  if (monthlySalary <= 0 || weeklyHours <= 0) {
+  if (monthlySalary < 0 || weeklyHours <= 0) {
     return {
       primary: { id: 'hourlyWage', label: 'Stundenlohn', value: 0, formattedValue: '0,00 €/Std.' },
-      error: 'Monatsgehalt und Wochenarbeitszeit müssen positiv sein.',
+      error: 'Monatsgehalt darf nicht negativ sein und Wochenarbeitszeit muss größer als 0 sein.',
     };
   }
 
@@ -107,14 +111,18 @@ export function calculatePartTimeSalary(inputs: Record<string, any>): Calculatio
 }
 
 export function calculateSalaryIncrease(inputs: Record<string, any>): CalculationResult {
-  const currentSalary = parseFloat(inputs.currentSalary) || 3500;
-  const increasePercent = parseFloat(inputs.increasePercent) || 5.0;
+  const currentSalary = inputs.currentSalary !== undefined && inputs.currentSalary !== '' && !isNaN(parseFloat(inputs.currentSalary))
+    ? parseFloat(inputs.currentSalary)
+    : 3500;
+  const increasePercent = inputs.increasePercent !== undefined && inputs.increasePercent !== '' && !isNaN(parseFloat(inputs.increasePercent))
+    ? parseFloat(inputs.increasePercent)
+    : 5.0;
   const monthsPerYear = parseInt(inputs.monthsPerYear || '12', 10);
 
-  if (currentSalary <= 0) {
+  if (currentSalary < 0) {
     return {
       primary: { id: 'newSalary', label: 'Neues Gehalt', value: 0, formattedValue: '0,00 €' },
-      error: 'Aktuelles Gehalt muss positiv sein.',
+      error: 'Aktuelles Gehalt darf nicht negativ sein.',
     };
   }
 
@@ -141,14 +149,20 @@ export function calculateSalaryIncrease(inputs: Record<string, any>): Calculatio
 }
 
 export function calculateVacationDays(inputs: Record<string, any>): CalculationResult {
-  const standardDays = parseFloat(inputs.standardDays) || 30; // Urlaubstage bei Vollzeit
-  const workdaysPerWeek = parseFloat(inputs.workdaysPerWeek) || 3; // Tatsächliche Arbeitstage pro Woche
-  const standardWeekDays = parseFloat(inputs.standardWeekDays) || 5; // Übliche Woche
+  const standardDays = inputs.standardDays !== undefined && inputs.standardDays !== '' && !isNaN(parseFloat(inputs.standardDays))
+    ? parseFloat(inputs.standardDays)
+    : 30; // Urlaubstage bei Vollzeit
+  const workdaysPerWeek = inputs.workdaysPerWeek !== undefined && inputs.workdaysPerWeek !== '' && !isNaN(parseFloat(inputs.workdaysPerWeek))
+    ? parseFloat(inputs.workdaysPerWeek)
+    : 3; // Tatsächliche Arbeitstage pro Woche
+  const standardWeekDays = inputs.standardWeekDays !== undefined && inputs.standardWeekDays !== '' && !isNaN(parseFloat(inputs.standardWeekDays))
+    ? parseFloat(inputs.standardWeekDays)
+    : 5; // Übliche Woche
 
-  if (standardDays <= 0 || workdaysPerWeek <= 0) {
+  if (standardDays < 0 || workdaysPerWeek < 0 || standardWeekDays <= 0) {
     return {
       primary: { id: 'vacationDays', label: 'Urlaubsanspruch', value: 0, formattedValue: '0 Tage' },
-      error: 'Bitte positive Werte angeben.',
+      error: 'Bitte gültige, nicht-negative Werte angeben (Wochentage müssen größer als 0 sein).',
     };
   }
 
@@ -165,9 +179,9 @@ export function calculateVacationDays(inputs: Record<string, any>): CalculationR
       highlight: true,
     },
     secondary: [
-      { id: 'weeks', label: 'Wochen freie Zeit', value: entitlement / workdaysPerWeek, formattedValue: `${formatNumber(entitlement / workdaysPerWeek, 1)} Wochen Urlaub` },
+      { id: 'weeks', label: 'Wochen freie Zeit', value: workdaysPerWeek > 0 ? entitlement / workdaysPerWeek : 0, formattedValue: `${formatNumber(workdaysPerWeek > 0 ? entitlement / workdaysPerWeek : 0, 1)} Wochen Urlaub` },
       { id: 'legalMin', label: 'Gesetzlicher Mindesturlaub (§ 3 BUrlG)', value: (20 / 5) * workdaysPerWeek, formattedValue: `${(20 / 5) * workdaysPerWeek} Tage (bei 4 Wochen)` },
     ],
-    summaryText: `Bei ${workdaysPerWeek} Arbeitstagen pro Woche und einem betrieblichen Vollzeitanspruch von ${standardDays} Tagen (bei 5-Tage-Woche) haben Sie Anspruch auf ${formatNumber(entitlement, 1)} Urlaubstage. Dies entspricht genau ${formatNumber(entitlement / workdaysPerWeek, 1)} vollen Wochen Erholungsurlaub.`,
+    summaryText: `Bei ${workdaysPerWeek} Arbeitstagen pro Woche und einem betrieblichen Vollzeitanspruch von ${standardDays} Tagen (bei ${standardWeekDays}-Tage-Woche) haben Sie Anspruch auf ${formatNumber(entitlement, 1)} Urlaubstage. Dies entspricht genau ${formatNumber(workdaysPerWeek > 0 ? entitlement / workdaysPerWeek : 0, 1)} vollen Wochen Erholungsurlaub.`,
   };
 }
