@@ -130,6 +130,177 @@ export function calculateFuelCost(inputs: Record<string, any>): CalculationResul
   };
 }
 
+export function calculateTripExpenses(inputs: Record<string, any>): CalculationResult {
+  if (inputs.distance === undefined || inputs.distance === null || String(inputs.distance).trim() === '') {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die gesamte Reisedistanz in Kilometern ein.',
+    };
+  }
+  const distance = parseFloat(String(inputs.distance).replace(',', '.'));
+  if (isNaN(distance) || distance < 0) {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie eine gültige Reisedistanz ab 0 km ein.',
+    };
+  }
+
+  if (inputs.consumption === undefined || inputs.consumption === null || String(inputs.consumption).trim() === '') {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Kraftstoffverbrauch in l/100 km ein.',
+    };
+  }
+  const consumption = parseFloat(String(inputs.consumption).replace(',', '.'));
+  if (isNaN(consumption) || consumption <= 0) {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie einen positiven Kraftstoffverbrauch größer als 0 l/100km an.',
+    };
+  }
+
+  if (inputs.pricePerLiter === undefined || inputs.pricePerLiter === null || String(inputs.pricePerLiter).trim() === '') {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie den Kraftstoffpreis pro Liter ein.',
+    };
+  }
+  const pricePerLiter = parseFloat(String(inputs.pricePerLiter).replace(',', '.'));
+  if (isNaN(pricePerLiter) || pricePerLiter < 0) {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Der Kraftstoffpreis darf nicht negativ sein (0 € ist zulässig).',
+    };
+  }
+
+  let tollCosts = 0;
+  if (inputs.tollCosts !== undefined && inputs.tollCosts !== null && String(inputs.tollCosts).trim() !== '') {
+    tollCosts = parseFloat(String(inputs.tollCosts).replace(',', '.'));
+    if (isNaN(tollCosts) || tollCosts < 0) {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+        error: 'Die Mautkosten dürfen nicht negativ sein.',
+      };
+    }
+  }
+
+  let parkingCosts = 0;
+  if (inputs.parkingCosts !== undefined && inputs.parkingCosts !== null && String(inputs.parkingCosts).trim() !== '') {
+    parkingCosts = parseFloat(String(inputs.parkingCosts).replace(',', '.'));
+    if (isNaN(parkingCosts) || parkingCosts < 0) {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+        error: 'Die Parkkosten dürfen nicht negativ sein.',
+      };
+    }
+  }
+
+  let vehicleAllowancePerKm = 0;
+  if (inputs.vehicleAllowancePerKm !== undefined && inputs.vehicleAllowancePerKm !== null && String(inputs.vehicleAllowancePerKm).trim() !== '') {
+    vehicleAllowancePerKm = parseFloat(String(inputs.vehicleAllowancePerKm).replace(',', '.'));
+    if (isNaN(vehicleAllowancePerKm) || vehicleAllowancePerKm < 0) {
+      return {
+        primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+        error: 'Die zusätzliche Fahrzeug-Verschleißpauschale darf nicht negativ sein.',
+      };
+    }
+  }
+
+  const rawPassengers = inputs.passengers !== undefined && inputs.passengers !== null && String(inputs.passengers).trim() !== ''
+    ? parseInt(String(inputs.passengers), 10)
+    : 1;
+  if (isNaN(rawPassengers) || rawPassengers < 1) {
+    return {
+      primary: { id: 'totalCost', label: 'Gesamte Fahrtkosten', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Anzahl der Reisenden als ganze Zahl (mindestens 1 Person inklusive Fahrer) an.',
+    };
+  }
+  const passengers = rawPassengers;
+
+  // Berechnung mit voller mathematischer Fließkommagenauigkeit (Rundung erst bei der Ausgabe)
+  const fuelLitres = (distance * consumption) / 100;
+  const fuelCost = fuelLitres * pricePerLiter;
+  const vehicleCost = distance * vehicleAllowancePerKm;
+  const totalCost = fuelCost + tollCosts + parkingCosts + vehicleCost;
+  const perPerson = totalCost / passengers;
+  const costPerKm = distance > 0 ? totalCost / distance : 0;
+
+  const secondary: Array<{ id: string; label: string; value: any; formattedValue: string; highlight?: boolean; helpText?: string }> = [
+    {
+      id: 'costPerPerson',
+      label: `Kosten pro Person (${passengers} ${passengers === 1 ? 'Person' : 'Personen inkl. Fahrer'})`,
+      value: perPerson,
+      formattedValue: formatCurrency(perPerson),
+      highlight: true,
+      helpText: 'Gesamtkosten geteilt durch die Anzahl aller Mitfahrenden inklusive Fahrer.',
+    },
+    {
+      id: 'fuelCost',
+      label: 'Tatsächliche Spritkosten',
+      value: fuelCost,
+      formattedValue: formatCurrency(fuelCost),
+      helpText: `${formatNumber(distance, 1)} km × ${formatNumber(consumption, 1)} l/100km × ${formatCurrency(pricePerLiter)}/l`,
+    },
+    {
+      id: 'fuelLitres',
+      label: 'Benötigte Kraftstoffmenge',
+      value: fuelLitres,
+      formattedValue: `${formatNumber(fuelLitres, 2)} Liter`,
+    },
+    {
+      id: 'tollCosts',
+      label: 'Maut & Vignetten (tatsächliche Ausgabe)',
+      value: tollCosts,
+      formattedValue: formatCurrency(tollCosts),
+      helpText: tollCosts > 0 ? 'Erfasste reale Mautgebühren der gesamten Route.' : 'Keine Mautkosten erfasst.',
+    },
+    {
+      id: 'parkingCosts',
+      label: 'Parkgebühren (tatsächliche Ausgabe)',
+      value: parkingCosts,
+      formattedValue: formatCurrency(parkingCosts),
+      helpText: parkingCosts > 0 ? 'Erfasste reale Parkgebühren der Reise.' : 'Keine Parkgebühren erfasst.',
+    },
+    {
+      id: 'vehicleCost',
+      label: 'Zusätzliche Fahrzeugkosten (geschätzter Verschleiß, ohne Sprit)',
+      value: vehicleCost,
+      formattedValue: formatCurrency(vehicleCost),
+      helpText: vehicleAllowancePerKm > 0
+        ? `${formatCurrency(vehicleAllowancePerKm, 2)}/km × ${formatNumber(distance, 1)} km für Reifen, Inspektion und Wertverlust (keine Kraftstoffkosten enthalten).`
+        : 'Keine zusätzliche Kilometerpauschale angesetzt (nur reine Auslagen).',
+    },
+    {
+      id: 'costPerKm',
+      label: 'Reisekosten pro gefahrenem Kilometer',
+      value: costPerKm,
+      formattedValue: `${formatCurrency(costPerKm, 3)} / km`,
+    },
+  ];
+
+  let summary = `Für die ${formatNumber(distance, 1)} km lange Fahrt entstehen Gesamtkosten von ${formatCurrency(totalCost)} (davon ${formatCurrency(fuelCost)} für ${formatNumber(fuelLitres, 2)} Liter Sprit`;
+  if (tollCosts > 0) summary += `, ${formatCurrency(tollCosts)} Maut`;
+  if (parkingCosts > 0) summary += `, ${formatCurrency(parkingCosts)} Parken`;
+  if (vehicleCost > 0) summary += `, ${formatCurrency(vehicleCost)} Fahrzeugverschleiß`;
+  summary += ').';
+
+  if (passengers > 1) {
+    summary += ` Bei ${passengers} Personen im Fahrzeug beträgt der Anteil ${formatCurrency(perPerson)} pro Person.`;
+  }
+
+  return {
+    primary: {
+      id: 'totalCost',
+      label: 'Gesamte Fahrtkosten der Reise',
+      value: totalCost,
+      formattedValue: formatCurrency(totalCost),
+      highlight: true,
+    },
+    secondary,
+    summaryText: summary,
+  };
+}
+
 export function calculateCommuterAllowance(inputs: Record<string, any>): CalculationResult {
   const rawDist = inputs.distanceKm !== undefined && inputs.distanceKm !== null && String(inputs.distanceKm).trim() !== ''
     ? parseInt(String(inputs.distanceKm), 10)

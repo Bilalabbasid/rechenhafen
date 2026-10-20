@@ -2880,120 +2880,152 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
   {
     id: "treppen-stufen-rechner",
     slug: "treppen-stufen-rechner",
-    name: "Treppenstufen-Rechner (DIN 18065) (Schrittmaßregel 2s + a = 63 cm nach DIN 18065)",
+    name: "Treppenstufen-Rechner: Stufenhöhe & Treppe berechnen (Schrittmaßregel)",
     shortName: "Treppen-Rechner",
     category: "bauen-renovieren",
     subcategory: "Ausbau & Wand",
-    metaTitle: 'Treppenstufen Rechner – Steigung & Auftritt nach DIN 18065',
-    metaDescription: 'Berechnen Sie die Stufenanzahl, Steigungshöhe (s), Auftrittstiefe (a) und Treppenlänge nach der Schrittmaßregel (2s + a = 63 cm) und.',
+    metaTitle: 'Treppenstufen Rechner – Stufenhöhe, Steigung & Auftritt berechnen',
+    metaDescription: 'Stufenhöhe berechnen, Steigung (s), Auftritt (a) und Treppen-Lauflänge ermitteln nach der Schrittmaßregel (2s + a = 63 cm) als ergonomische Planungshilfe.',
     h1: 'Treppen Rechner – Stufenanzahl, Steigung & Auftritt nach Schrittmaß',
-    shortDescription: 'Berechnet Stufenanzahl, Steigung und Auftritt nach der DIN 18065 mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["treppen rechner schrittmassregel","stufenhoehe berechnen 2s plus a","treppenstufen anzahl auftritt din 18065","treppenlauf laenge geschosshoehe"],
+    shortDescription: 'Berechnet Stufenanzahl, Steigungshöhe und Auftrittstiefe als Planungshilfe nach der ergonomischen Schrittmaßregel (2s + a = 63 cm).',
+    searchKeywords: ["treppen rechner schrittmassregel","stufenhoehe berechnen","stufenhoehe ermittlung","treppenstufen anzahl auftritt din 18065","treppenlauf laenge geschosshoehe"],
     inputs: [
-          {
-                "id": "floorHeight",
-                "label": "Geschosshöhe (Oberkante Fertigfußboden zu Fertigfußboden)",
-                "type": "number",
-                "defaultValue": 270,
-                "min": 50,
-                "max": 500,
-                "step": 1,
-                "unit": "cm"
-          },
-          {
-                "id": "idealStepHeight",
-                "label": "Angestrebte ideale Stufenhöhe",
-                "type": "number",
-                "defaultValue": 17.5,
-                "min": 14,
-                "max": 21,
-                "step": 0.1,
-                "unit": "cm"
-          },
-          {
-                "id": "stepFormulaConstant",
-                "label": "Schrittmaß nach DIN (Standard 63 cm)",
-                "type": "number",
-                "defaultValue": 63,
-                "min": 59,
-                "max": 65,
-                "step": 0.5,
-                "unit": "cm"
-          }
+      {
+        id: "calcMode",
+        label: "Berechnungsansatz",
+        type: "select",
+        defaultValue: "target_height",
+        options: [
+          { value: "target_height", label: "Aus Wunsch-Steigungshöhe ermitteln (Standard: ~17,5 cm)" },
+          { value: "fixed_risers", label: "Aus vorgegebener Stufenanzahl (Steigungen) ermitteln" },
+        ],
+      },
+      {
+        id: "floorHeight",
+        label: "Geschosshöhe (Oberkante Fertigfußboden zu Fertigfußboden)",
+        type: "number",
+        defaultValue: 280,
+        min: 50,
+        max: 500,
+        step: 1,
+        unit: "cm",
+      },
+      {
+        id: "customRisersCount",
+        label: "Vorgegebene Anzahl Steigungen (ganzzahlig)",
+        type: "number",
+        defaultValue: 16,
+        min: 1,
+        max: 40,
+        step: 1,
+        unit: "Stk.",
+        dependsOn: { field: "calcMode", value: "fixed_risers" },
+      },
+      {
+        id: "idealStepHeight",
+        label: "Angestrebte ideale Stufenhöhe",
+        type: "number",
+        defaultValue: 17.5,
+        min: 14,
+        max: 21,
+        step: 0.1,
+        unit: "cm",
+        dependsOn: { field: "calcMode", value: "target_height" },
+      },
+      {
+        id: "stepFormulaConstant",
+        label: "Schrittmaß-Konstante (Standard 63 cm, Bereich 59–65 cm)",
+        type: "number",
+        defaultValue: 63,
+        min: 59,
+        max: 65,
+        step: 0.5,
+        unit: "cm",
+      },
     ],
     calculate: (inputs: Record<string, any>) => {
+      const mode = inputs.calcMode || "target_height";
       const h = Number(inputs.floorHeight) || 0;
       const idealS = Number(inputs.idealStepHeight) || 17.5;
+      const customRisers = Math.max(1, Math.round(Number(inputs.customRisersCount) || 16));
       const stepConst = Number(inputs.stepFormulaConstant) || 63;
       
-      if (h <= 0 || idealS <= 0) {
+      if (h <= 0 || (mode === "target_height" && idealS <= 0)) {
         return {
           primary: { id: 'stepsCount', label: 'Anzahl der Steigungen (Stufen)', value: 0, formattedValue: '0 Steigungen (0 Trittstufen)', highlight: true },
           secondary: [
             { id: 'stepHeight', label: 'Exakte Stufenhöhe (Steigung s)', value: 0, formattedValue: '0,00 cm' },
             { id: 'treadDepth', label: 'Stufenauftritt (Tiefe a)', value: 0, formattedValue: '0,00 cm' },
+            { id: 'treadsCount', label: 'Physische Trittstufen im Lauf', value: 0, formattedValue: '0 Trittstufen' },
             { id: 'runLength', label: 'Treppen-Lauflänge Grundriss', value: 0, formattedValue: '0,00 m' },
             { id: 'pitchAngle', label: 'Treppen-Neigungswinkel', value: 0, formattedValue: '0,0°' },
           ],
           summaryText: 'Bitte geben Sie eine positive Geschosshöhe ein.',
-          error: 'Geschosshöhe und ideale Stufenhöhe müssen größer als 0 cm sein.',
+          error: 'Geschosshöhe und Steigung müssen größer als 0 cm sein.',
         };
       }
 
-      // Stufenanzahl (Steigungen):
-      const stepsCount = Math.max(1, Math.round(h / idealS));
+      // Steigungen (Risers) ermitteln
+      const stepsCount = mode === "fixed_risers" ? customRisers : Math.max(1, Math.round(h / idealS));
       const actualStepHeight = h / stepsCount;
-      // Schrittmaßregel: 2 * s + a = 63 cm => a = 63 - 2 * s
+      // Schrittmaßregel: 2 * s + a = 63 cm => a = stepConst - 2 * s
       const actualTreadDepth = Math.max(0, stepConst - (2 * actualStepHeight));
       
-      // Lauflänge (ohne obersten Austritt): (stepsCount - 1) * a
-      const runLength = (stepsCount - 1) * actualTreadDepth;
+      // Physische Trittstufen (oberster Austritt bündig mit oberem Podest/Fertigfußboden):
+      const physicalTreads = Math.max(0, stepsCount - 1);
+      // Lauflänge Grundriss = Trittstufen * Auftritt
+      const runLength = physicalTreads * actualTreadDepth;
       // Steigungswinkel: tan(alpha) = h / runLength
       const angleRad = runLength > 0 ? Math.atan(h / runLength) : Math.PI / 2;
       const angleDeg = (angleRad * 180) / Math.PI;
       
+      // Ergonomischer Richtwert nach DIN 18065 (Wohngebäude)
       const isComfortable = actualStepHeight >= 16 && actualStepHeight <= 18.5 && actualTreadDepth >= 26 && actualTreadDepth <= 30;
       
       return {
-        primary: { id: 'stepsCount', label: 'Anzahl der Steigungen (Stufen)', value: stepsCount, formattedValue: stepsCount + ' Steigungen (' + (stepsCount - 1) + ' Trittstufen)', highlight: true },
+        primary: {
+          id: 'stepsCount',
+          label: 'Anzahl der Steigungen',
+          value: stepsCount,
+          formattedValue: `${stepsCount} Steigungen (${physicalTreads} Trittstufen)`,
+          highlight: true,
+        },
         secondary: [
-          { id: 'stepHeight', label: 'Exakte Stufenhöhe (Steigung s)', value: actualStepHeight, formattedValue: formatNumber(actualStepHeight, 2) + ' cm' },
-          { id: 'treadDepth', label: 'Stufenauftritt (Tiefe a)', value: actualTreadDepth, formattedValue: formatNumber(actualTreadDepth, 2) + ' cm' },
-          { id: 'runLength', label: 'Treppen-Lauflänge Grundriss', value: runLength / 100, formattedValue: formatNumber(runLength / 100, 2) + ' m' },
-          { id: 'pitchAngle', label: 'Treppen-Neigungswinkel', value: angleDeg, formattedValue: formatNumber(angleDeg, 1) + '° (' + (isComfortable ? 'bequeme Treppe' : 'Normgrenze') + ')' },
+          { id: 'stepHeight', label: 'Exakte Stufenhöhe (Steigung s)', value: actualStepHeight, formattedValue: `${formatNumber(actualStepHeight, 2)} cm` },
+          { id: 'treadDepth', label: 'Stufenauftritt (Tiefe a)', value: actualTreadDepth, formattedValue: `${formatNumber(actualTreadDepth, 2)} cm` },
+          { id: 'treadsCount', label: 'Physische Trittstufen im Lauf', value: physicalTreads, formattedValue: `${physicalTreads} Stk.` },
+          { id: 'runLength', label: 'Treppen-Lauflänge Grundriss', value: runLength / 100, formattedValue: `${formatNumber(runLength / 100, 2)} m` },
+          { id: 'pitchAngle', label: 'Treppen-Neigungswinkel', value: angleDeg, formattedValue: `${formatNumber(angleDeg, 1)}° (${isComfortable ? 'bequemes Steigungsverhältnis' : 'Grenzbereich / steil'})` },
         ],
-        summaryText: 'Bei ' + h + ' cm Geschosshöhe planen Sie mit ' + stepsCount + ' Steigungen à ' + formatNumber(actualStepHeight, 2) + ' cm Höhe und ' + formatNumber(actualTreadDepth, 2) + ' cm Auftrittstiefe (Lauflänge ' + formatNumber(runLength / 100, 2) + ' m).',
+        summaryText: `Bei ${formatNumber(h, 0)} cm Geschosshöhe ergeben sich ${stepsCount} Steigungen à ${formatNumber(actualStepHeight, 2)} cm und ${physicalTreads} Trittstufen mit ${formatNumber(actualTreadDepth, 2)} cm Auftritt (Grundriss-Lauflänge: ${formatNumber(runLength / 100, 2)} m).`,
       };
     },
-    formula: "Schrittmaß: 2 × s + a = 63 cm; Stufenanzahl = round(Geschosshöhe / Wunschsteigung)",
-    formulaExplanation: "Die Schrittmaßregel basiert auf der menschlichen Schrittlänge beim Gehen (ca. 63 cm). Beim Treppensteigen verdoppelt sich der Höhenaufwand gegenüber der Vorwärtsbewegung.",
+    formula: "Schrittmaßregel: 2 × s + a = 63 cm; Stufenhöhe s = Geschosshöhe / Steigungsanzahl; Lauflänge = (Steigungen − 1) × a",
+    formulaExplanation: "Die Stufenhöhe (Steigung s) ermittelt sich aus dem Höhenunterschied von Fertigfußboden zu Fertigfußboden geteilt durch die Steigungsanzahl. Nach der ergonomischen Schrittmaßregel (2s + a = 63 cm) ergibt sich die ideale Auftrittstiefe a. Da der oberste Schritt auf den Deckenboden des Zielgeschosses erfolgt, hat ein gerader Treppenlauf genau eine Trittstufe weniger als Steigungen.",
     workedExample: {
-          "title": "Beispiel: 270 cm Geschosshöhe mit Ziel 17,5 cm Steigung",
-          "inputValues": [
-                {
-                      "label": "Geschosshöhe",
-                      "value": "270 cm"
-                },
-                {
-                      "label": "Zielsteigung",
-                      "value": "17,5 cm"
-                }
-          ],
-          "steps": [
-                "Stufenanzahl = 270 / 17,5 = 15,43 -> 15 Stufen",
-                "Exakte Steigung s = 270 / 15 = 18,00 cm",
-                "Auftritt a = 63 - (2 × 18,00) = 27,00 cm",
-                "Lauflänge = 14 × 27 cm = 378 cm (3,78 m)"
-          ],
-          "result": "15 Steigungen (s = 18 cm, a = 27 cm)"
+      title: "Beispiel: Stufenhöhe berechnen bei 280 cm Geschosshöhe & 16 Steigungen",
+      inputValues: [
+        { label: "Geschosshöhe (FFB zu FFB)", value: "280 cm" },
+        { label: "Anzahl Steigungen", value: "16" },
+        { label: "Schrittmaß-Konstante", value: "63 cm" },
+      ],
+      steps: [
+        "Stufenhöhe berechnen: s = 280 cm / 16 Steigungen = 17,50 cm pro Steigung",
+        "Auftrittstiefe nach Schrittmaßregel: a = 63 cm − (2 × 17,50 cm) = 28,00 cm",
+        "Trittstufenanzahl im Lauf: 16 Steigungen − 1 Austrittsstufe = 15 Trittstufen",
+        "Treppen-Lauflänge im Grundriss: 15 Trittstufen × 28,00 cm = 420 cm (4,20 m)",
+      ],
+      result: "16 Steigungen à 17,50 cm, 15 Trittstufen mit 28,00 cm Auftritt (Lauflänge 4,20 m)",
     },
     content: {
-      intro: 'Die Schrittmaßformel nach DIN 18065 (2 · Steigung + Auftritt = 63 cm) gewährleistet die bequeme und ergonomisch sichere Begehbarkeit von Treppen.',
-      details: 'Stufenanzahl = Geschosshöhe / Steigungshöhe (ideal: 17 bis 18 cm). Der Auftritt (Stufentiefe) sollte 27 bis 29 cm betragen. Das Schrittmaß 2s + a muss im Intervall von 59 bis 65 cm liegen.',
+      intro: 'Mit diesem Treppen-Rechner können Sie schnell die exakte Stufenhöhe berechnen sowie Auftritt und Lauflänge nach der bewährten Schrittmaßregel ermitteln. Das Tool dient als ergonomische Planungshilfe für private und gewerbliche Bauvorhaben.',
+      details: 'Wichtig beim Treppenbau: Steigungsanzahl ≠ Trittstufenanzahl. Wenn der oberste Austritt bündig an den oberen Deckenboden bzw. das Treppenpodest anschließt, besitzt die Treppe stets eine Trittstufe weniger als Steigungen. Die Schrittmaßregel (2 · Steigung s + Auftritt a = 63 cm) sichert den natürlichen menschlichen Gehschritt ab. Bitte beachten Sie: Dieser Rechner dient als Vorplanungshilfe und ersetzt keinen baurechtlichen Nachweis nach DIN 18065 oder Landesbauordnung (LBO), da dort zusätzliche Anforderungen an Geländer, lichte Durchgangshöhen (mind. 2,00 m), Nutzbreiten und Rutschhemmung geregelt sind.',
     },
     faqs: [
-      { question: 'Welche Mindest-Durchgangshöhe schreibt die DIN 18065 für Treppen vor?', answer: 'Die lichte Durchgangshöhe senkrecht über der Stufenvorderkante muss über den gesamten Treppenlauf mindestens 2,00 Meter betragen.' },
-      { question: 'Was ist der Treppensteigungswinkel?', answer: 'Das Verhältnis von Steigung zu Auftritt; für normale Wohnungstreppen gilt ein Neigungswinkel von 30° bis 37° als optimal.' },
+      { question: 'Wie kann man die optimale Stufenhöhe berechnen?', answer: 'Die Geschosshöhe (Oberkante Fertigfußboden bis Oberkante Fertigfußboden des nächsten Geschosses) wird durch eine bequeme Zielsteigung (meist 17 bis 18 cm) dividiert. Das gerundete Ergebnis ergibt die ganzzahlige Steigungsanzahl. Teilt man die Geschosshöhe durch diese Steigungsanzahl, erhält man die exakte Stufenhöhe.' },
+      { question: 'Warum unterscheidet sich die Anzahl der Steigungen von der Anzahl der Trittstufen?', answer: 'Bei fast allen Standardtreppen schließt die letzte Steigung bündig an das obere Geschossdecken-Niveau oder Podest an. Daher benötigt die Treppe physisch genau eine Trittstufe weniger als Steigungen (Lauflänge = (Steigungen − 1) × Auftritt).' },
+      { question: 'Ersetzt der Rechner den statischen oder normativen Nachweis nach DIN 18065?', answer: 'Nein. Der Rechner ist eine ergonomische Planungshilfe basierend auf der Schrittmaßformel. Eine vollständige Prüfung nach DIN 18065 und Landesbauordnung umfasst zusätzlich Mindestlaufbreiten, Absturzsicherungen, Geländerhöhen, Rutschklassen und Brandschutzauflagen.' },
+      { question: 'Welcher Neigungswinkel gilt bei Wohnhaustreppen als optimal?', answer: 'Ein Steigungswinkel zwischen 30° und 37° gilt im Wohnungsbau als ergonomisch ausgewogen und sicher zu begehen.' },
     ],
     relatedSlugs: ['parkett-laminat-rechner', 'estrich-rechner', 'bodenbelag-rechner'],
   },
@@ -3099,13 +3131,14 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       },
       {
         id: "compaction",
-        label: "Optionaler Setzungs- & Einbauzuschlag",
+        label: "Optionaler Bestell- & Mehrvolumenzuschlag",
         type: "number",
         defaultValue: 0,
         min: 0,
         max: 30,
         step: 1,
         unit: "%",
+        helpText: "Freiwilliger Mehrvolumenzuschlag für Unebenheiten im Erdplanum, Randausgleiche und Verschnitt (keine universelle physikalische Setzungsberechnung).",
         dependsOn: { field: "calcMode", value: "area_depth" },
       },
     ],
@@ -3173,7 +3206,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           if (!Number.isFinite(comp) || comp < 0) {
             return {
               primary: { id: 'tonnes', label: 'Benötigtes Materialgewicht', value: 0, formattedValue: '–' },
-              error: 'Der Setzungs- oder Einbauzuschlag darf nicht negativ sein (0 % für keinen Zuschlag).',
+              error: 'Der Bestell- oder Mehrvolumenzuschlag darf nicht negativ sein (0 % für keinen Zuschlag).',
             };
           }
           compPercent = comp;
@@ -3198,15 +3231,17 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           secondary: [
             {
               id: 'baseVolume',
-              label: 'Reines Einbauvolumen (ohne Zuschlag)',
+              label: 'Geometrisches Einbauvolumen (ohne Zuschlag)',
               value: baseVolumeM3,
               formattedValue: formatNumber(baseVolumeM3, 2) + ' m³',
+              helpText: 'Fläche in m² × Schütthöhe in Metern.',
             },
             {
               id: 'allowanceVol',
-              label: `Zuschlag (${compPercent} %)`,
+              label: `Bestell-Mehrvolumenzuschlag (${compPercent} %)`,
               value: allowanceM3,
               formattedValue: formatNumber(allowanceM3, 2) + ' m³',
+              helpText: compPercent > 0 ? 'Pauschaler Mehrbedarf für Bodenunebenheiten und Kantenabschnitt.' : 'Kein zusätzlicher Bestellaufschlag gewählt.',
             },
             {
               id: 'totalVolume',
@@ -3216,23 +3251,25 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             },
             {
               id: 'densityUsed',
-              label: 'Angesetzte Schüttdichte',
+              label: 'Angesetzte Schüttdichte (lose Schüttung)',
               value: density,
               formattedValue: formatNumber(density, 2) + ' t/m³',
+              helpText: 'Schüttdichte inklusive Haufwerksporen (nicht die Festgesteinsdichte).',
             },
             {
               id: 'bigbags',
-              label: 'Lieferung in Big Bags (à 1.000 kg Richtwert)',
+              label: 'Liefermenge in Big Bags (Richtwert à 1.000 kg)',
               value: bigBags,
               formattedValue: bigBags + ' Big Bag(s)',
+              helpText: 'Auf ganze Gebinde aufgerundet. Prüfen Sie das tatsächliche Füllgewicht Ihres Händlers (z. B. 1.000 kg, 500 kg oder 1 m³).',
             },
           ],
-          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${formatNumber(d, 1)} cm Einbauhöhe ergibt sich ein Basisvolumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Zuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${bigBags} Big Bag(s) à 1 t Richtwert).`,
+          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${formatNumber(d, 1)} cm Einbauhöhe ergibt sich ein geometrisches Volumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Bestellzuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${bigBags} Big Bag(s) à 1 t Richtwert).`,
           qualifications: [
             mat === 'crushed_0_32'
-              ? 'Hinweis: Der Richtwert für Schotter 0/32 (1,80 t/m³) bezieht sich bereits auf den verdichteten Einbauzustand. Verwenden Sie dafür keinen doppelten Setzungsaufschlag.'
-              : 'Schüttdichte: Die angegebenen Gewichte sind Richtwerte für lose Schüttung. Das tatsächliche Liefergewicht variiert je nach Gesteinsart und Restfeuchte.',
-            'Big Bags: Manche Händler liefern Big Bags nach Füllgewicht (z. B. 1.000 kg oder 500 kg), andere nach Volumen (z. B. 1 m³). Prüfen Sie das Angebot Ihres Baustoffwerks.',
+              ? 'Hinweis: Der Richtwert für Schotter 0/32 (1,80 t/m³) bezieht sich bereits auf den verdichteten Einbauzustand im Unterbau.'
+              : 'Schüttdichte: Die angegebenen Gewichte sind Richtwerte für lose Schüttung. Die tatsächliche Dichte hängt von Gesteinsart, Körnung und Feuchtegehalt ab.',
+            'Gebindegröße: Big Bags werden je nach Lieferant nach Füllgewicht (z. B. 1.000 kg oder 500 kg) oder Volumen (z. B. 1 m³) abgefüllt. Sackware ist häufig in 25-kg-Gebinden erhältlich.',
           ],
         };
       }
@@ -3340,16 +3377,16 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     formula: "Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³); Volumen (m³) = Fläche (m²) × Schütthöhe (m)",
     formulaExplanation: "Die Schüttdichte berücksichtigt im Gegensatz zur Festgesteins-Rohdichte die Haufwerksporen (Lufthohlräume) zwischen den Körnern. Bei reinem Edelsplitt 2/5 (enger Kornbereich) beträgt die lose Schüttdichte ca. 1,45 bis 1,55 t/m³. Breit gestufte Gemische mit Feinanteil (z. B. Mineralbeton/Schotter 0/32) verdichten sich beim Einbau stark und erreichen im Rüttelzustand bis zu 1,80–2,00 t/m³.",
     workedExample: {
-      title: "Beispiel: 30 m² Pflasterbettung mit 5 cm Splitt 2/5 (ohne Setzung)",
-      description: "Berechnung des Schüttvolumens und Gewichts für eine Terrassenbettung mit Splitt 2/5 bei 1,50 t/m³ Schüttdichte.",
+      title: "Beispiel: 30 m² Pflasterbettung mit 5 cm Splitt 2/5 (ohne Zuschlag)",
+      description: "Berechnung des geometrischen Schüttvolumens und Gewichts für eine Terrassenbettung mit Splitt 2/5 bei 1,50 t/m³ Schüttdichte.",
       inputValues: [
         { label: "Fläche", value: "30 m²" },
         { label: "Einbauhöhe", value: "5 cm (0,05 m)" },
         { label: "Material", value: "Splitt 2/5 (1,50 t/m³)" },
-        { label: "Einbauzuschlag", value: "0 %" },
+        { label: "Bestellzuschlag", value: "0 %" },
       ],
       steps: [
-        "Reines Einbauvolumen berechnen: 30 m² × 0,05 m = 1,50 m³",
+        "Geometrisches Einbauvolumen: 30 m² × 0,05 m = 1,50 m³",
         "Materialgewicht ermitteln: 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
         "Bestellmenge in Big Bags: 2,25 t entsprechen aufgerundet 3 Big Bags à 1 t Richtwert",
       ],
@@ -3357,21 +3394,39 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     workedExamples: [
       {
-        title: "Beispiel 1: Fläche & Höhe (30 m², 5 cm Splitt 2/5)",
-        description: "Pflasterbettung für Terrasse oder Einfahrt mit Splitt 2/5 (1,50 t/m³) ohne zusätzlichen Setzungszuschlag.",
+        title: "Beispiel 1: 30 m² Fläche & 5 cm Tiefe ohne Bestellzuschlag (2,25 t)",
+        description: "30 m² Pflasterbettung mit 5 cm Splitt 2/5 (1,50 t/m³) ohne Mehrvolumenaufschlag.",
         inputValues: [
           { label: "Fläche", value: "30 m²" },
           { label: "Schichthöhe", value: "5 cm" },
           { label: "Schüttdichte", value: "1,50 t/m³" },
+          { label: "Bestellzuschlag", value: "0 %" },
         ],
         steps: [
-          "Einbauvolumen = 30 m² × 0,05 m = 1,50 m³",
-          "Materialgewicht = 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
+          "Geometrisches Volumen = 30 m² × 0,05 m = 1,50 m³",
+          "Geschätztes Gewicht = 1,50 m³ × 1,50 t/m³ = 2,25 Tonnen",
         ],
         resultSummary: "2,25 t (1,50 m³)",
       },
       {
-        title: "Beispiel 2: 2 m³ Kies 16/32 in Tonnen umrechnen",
+        title: "Beispiel 2: 30 m² mit 10 % Bestell-Mehrvolumenzuschlag (2,475 t)",
+        description: "30 m² Terrassenbettung mit 5 cm Splitt 2/5 (1,50 t/m³) und 10 % Bestellzuschlag für Unebenheiten im Erdplanum und Randausgleiche.",
+        inputValues: [
+          { label: "Fläche", value: "30 m²" },
+          { label: "Schichthöhe", value: "5 cm" },
+          { label: "Schüttdichte", value: "1,50 t/m³" },
+          { label: "Bestellzuschlag", value: "10 %" },
+        ],
+        steps: [
+          "Geometrisches Volumen = 30 m² × 0,05 m = 1,50 m³",
+          "Mehrvolumenzuschlag (10 %) = 1,50 m³ × 0,10 = 0,15 m³",
+          "Gesamtbestellvolumen = 1,50 m³ + 0,15 m³ = 1,65 m³",
+          "Geschätztes Gesamtgewicht = 1,65 m³ × 1,50 t/m³ = 2,475 Tonnen",
+        ],
+        resultSummary: "2,48 t bzw. 2,475 t (1,65 m³)",
+      },
+      {
+        title: "Beispiel 3: 2 m³ Kies 16/32 in Tonnen umrechnen",
         description: "Umrechnung eines bekannten Raumvolumens bei 1,60 t/m³ Schüttdichte in das Transportgewicht.",
         inputValues: [
           { label: "Ausgangsvolumen", value: "2,0 m³" },
@@ -3384,7 +3439,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         resultSummary: "3,20 Tonnen",
       },
       {
-        title: "Beispiel 3: 3 Tonnen Splitt in Kubikmeter (m³)",
+        title: "Beispiel 4: 3 Tonnen Splitt in Kubikmeter (m³)",
         description: "Rückrechnung eines Lieferscheins mit 3 Tonnen Splitt 2/5 (1,50 t/m³) in das Schüttvolumen.",
         inputValues: [
           { label: "Ausgangsgewicht", value: "3,0 t" },

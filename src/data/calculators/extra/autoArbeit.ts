@@ -1518,6 +1518,18 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
             formattedValue: formatCurrency(routeTollPart),
           },
           {
+            id: 'vehicleClass',
+            label: 'Erfasste Fahrzeugklasse',
+            value: 0,
+            formattedValue: 'PKW / Wohnmobil bis 3,5 t hzG',
+          },
+          {
+            id: 'tariffBasis',
+            label: 'Tarifstand & Währungsgrundlage',
+            value: 0,
+            formattedValue: route === 'ch_year' ? 'Offizieller Tarif 2026 (40,00 CHF Festpreis ≈ ca. 42 €)' : 'Offizieller Betreibertarif 2026 (Euro)',
+          },
+          {
             id: 'validity',
             label: 'Gültigkeitsdauer',
             value: 0,
@@ -1546,7 +1558,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       result: '36,80 € Gesamtkosten',
     },
     content: {
-      intro: 'Dieser Rechner ermittelt die offiziellen Vignetten- und Streckenmaut-Tarife für gängige Reiserouten durch Österreich, die Schweiz und über den Brennerpass nach Norditalien (PKW bis 3,5 t zGG).',
+      intro: 'Dieser Rechner ermittelt die offiziellen Vignetten- und Streckenmaut-Tarife für ausgewählte Korridore durch Österreich, die Schweiz und über den Brennerpass nach Norditalien (PKW bis 3,5 t zGG). Er ist kein europaweiter Freiform-Routenplaner.',
       sections: [
         {
           title: 'Offizielle Vignettenpreise Österreich 2026 (ASFINAG)',
@@ -1558,14 +1570,18 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         },
         {
           title: 'Schweiz: Nationalstrassen-Vignette (40 CHF)',
-          content: 'In der Schweiz gibt es für PKW bis 3,5 t keine Tages- oder Zehn-Tages-Vignetten, sondern ausschließlich die gesetzliche Jahresvignette für **40,00 CHF** (erhältlich als digitale E-Vignette oder Klebevignette über das Bundesamt für Zoll und Grenzsicherheit BAZG). Bei aktuellem Wechselkurs entspricht dies circa 42,00 €.',
+          content: 'In der Schweiz gibt es für PKW bis 3,5 t keine Tages- oder Zehn-Tages-Vignetten, sondern ausschließlich die gesetzliche Jahresvignette für **40,00 CHF** (erhältlich als digitale E-Vignette oder Klebevignette über das Bundesamt für Zoll und Grenzsicherheit BAZG). Bei aktuellem Wechselkurs entspricht dies circa 42,00 € (Tageskurs vorbehalten).',
         },
         {
           title: 'Italien: Entfernungsabhängige Streckenmaut',
           content: 'In Italien wird auf den meisten Autobahnen keine Vignette verlangt, sondern an den Mautstationen streckenabhängig pro gefahrenem Kilometer abgerechnet. Auf der Brennerautobahn A22 (Brennero bis Rovereto Sud / Affi am Gardasee) beträgt die Maut für einen Standard-PKW (Klasse A) rund 16,80 € einfache Fahrt bzw. circa 33,60 € für Hin- und Rückfahrt.',
         },
+        {
+          title: 'Nicht unterstützte Länder (Frankreich, Spanien, Gesamtitalien)',
+          content: 'Für beliebige Mautstrecken in Frankreich (APRR, SANEF, VINCI Autoroutes), Spanien (Autopistas) oder dem restlichen italienischen Autobahnnetz (Autostrade per l’Italia) nutzen Sie bitte direkt die offiziellen Routen- und Tarifrechner der jeweiligen Betreibergesellschaften oder des ADAC.',
+        },
       ],
-      details: 'Der Rechner bietet offizielle Tarife für vordefinierte Routen in Österreich, der Schweiz und Norditalien. Er ist kein europaweiter Routenplaner für beliebige Einzelfahrten in Frankreich oder Spanien. Alle Angaben basieren auf den amtlichen Betreibertarifen für Personenkraftwagen bis 3,5 t zGG.',
+      details: 'Der Rechner bietet verifizierte Betreiberpreise für die gängigsten Transit- und Urlaubsstrecken im Alpenraum (Österreich, Schweiz, Brennerroute). Er ist kein europaweiter Routenplaner für beliebige Einzelfahrten in Frankreich oder Spanien. Er deckt Personenkraftwagen und leichte Wohnmobile bis 3,5 t ab. Für LKW über 3,5 t gilt in Österreich die streckenbezogene GO-Box und in Deutschland die [LKW-Maut](/rechner/lkw-maut-deutschland-rechner/).',
     },
     faqs: [
       {

@@ -263,9 +263,28 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   const monthlySocialAN = anRv + anAv + anKv + anPv;
   const annualSocialAN = monthlySocialAN * 12;
 
-  // --- LOHNSTEUER (JÄHRLICH) ---
-  // Gesetzliche Vorsorgepauschale Schätzung für Lohnsteuerabzug
-  const vorsorgepauschale = annualSocialAN;
+  // --- LOHNSTEUER (JÄHRLICH) NACH § 39b Abs. 2 Satz 5 Nr. 3 EStG ---
+  // 1. Teilbetrag Rentenversicherung (§ 39b Abs. 2 Satz 5 Nr. 3 Buchstabe a EStG)
+  const vsp1 = Math.min(annualGross, config.bbgRentenversicherungJahr) * (config.beitragssatzRentenversicherung / 2);
+
+  // 2. Teilbetrag Kranken- und Pflegeversicherung (§ 39b Abs. 2 Satz 5 Nr. 3 Buchstabe b & c EStG)
+  let vspKpv = 0;
+  if (!isPrivateKv) {
+    // Ermäßigter Beitragssatz nach § 241 SGB V (um 0,3 % vermindert) zzgl. kassenindividuellem Zusatzbeitrag
+    const vspKvRateAN = (config.beitragssatzKrankenversicherungAllgemein - 0.003 + kvZusatz / 100) / 2;
+    const vspKv = Math.min(annualGross, config.bbgKrankenversicherungJahr) * vspKvRateAN;
+    const isSachsen = state === 'sachsen';
+    const vspPvRateAN = isSachsen ? config.pflegeSachsenAnteilAN : (config.beitragssatzPflegeversicherung / 2);
+    const vspPv = Math.min(annualGross, config.bbgKrankenversicherungJahr) * vspPvRateAN;
+    vspKpv = vspKv + vspPv;
+  }
+
+  // 3. Mindestvorsorgepauschale (§ 39b Abs. 2 Satz 5 Nr. 3 Buchstabe d EStG)
+  const minVspLimit = taxClass === '3' ? 3000 : 1900;
+  const minVsp = Math.min(minVspLimit, annualGross * 0.12);
+
+  // Gesetzliche Vorsorgepauschale insgesamt (auf volle Euro gerundet)
+  const vorsorgepauschale = Math.round(vsp1 + Math.max(vspKpv, minVsp));
   const werbungskostenpauschale = 1230; // § 9a Satz 1 Nr. 1a EStG
   const sonderausgabenpauschbetrag = 36; // § 10c EStG
 
@@ -290,15 +309,15 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
     annualLohnsteuer = computeEStSingle(taxableBase + config.grundfreibetrag, config);
   }
 
-  const monthlyLohnsteuer = annualLohnsteuer / 12;
+  const monthlyLohnsteuer = Math.round((annualLohnsteuer / 12) * 100) / 100;
 
   // SolZ und Kirchensteuer
   const isMarried = taxClass === '3';
   const annualSolz = computeSolZ(annualLohnsteuer, isMarried, config);
-  const monthlySolz = annualSolz / 12;
+  const monthlySolz = Math.round((annualSolz / 12) * 100) / 100;
 
   const annualChurchTax = computeChurchTax(annualLohnsteuer, churchTaxRate);
-  const monthlyChurchTax = annualChurchTax / 12;
+  const monthlyChurchTax = Math.round((annualChurchTax / 12) * 100) / 100;
 
   const monthlyTaxTotal = monthlyLohnsteuer + monthlySolz + monthlyChurchTax;
   const annualTaxTotal = annualLohnsteuer + annualSolz + annualChurchTax;
