@@ -110,8 +110,8 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Gaskosten berechnen',
     category: 'haushalt-energie',
     subcategory: 'Gas & Heizung',
-    metaTitle: 'Gaskostenrechner: m³ oder kWh in Euro berechnen',
-    metaDescription: 'Gaskosten kostenlos aus kWh oder m³ berechnen: mit Arbeitspreis, Grundpreis, Jahreskosten und rechnerischem Monatsdurchschnitt.',
+    metaTitle: 'Gaskostenrechner: Jahreskosten & Monatsdurchschnitt',
+    metaDescription: 'Berechnen Sie Ihre jährlichen Gaskosten aus Verbrauch, Arbeitspreis und Grundpreis. Mit separater Ausweisung fixer Gebühren und rechnerischem Monatsdurchschnitt.',
     h1: 'Gaskosten berechnen: Gasverbrauch und Kosten im Überblick',
     shortDescription: 'Berechnet die jährlichen Gaskosten, den rechnerischen Monatsdurchschnitt und rechnet Zählerstände in Kubikmetern (m³) zuverlässig in Kilowattstunden (kWh) um.',
     searchKeywords: [

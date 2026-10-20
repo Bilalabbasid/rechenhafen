@@ -81,7 +81,7 @@ describe('SEO & 301 Redirects Verification', () => {
   it('verifies Gasverbrauch Rechner updated title and H1', () => {
     const calc = getCalculatorBySlug('gasverbrauch-kwh-m3-rechner');
     expect(calc).toBeDefined();
-    expect(calc?.metaTitle).toBe('Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner');
+    expect(calc?.metaTitle).toBe('Gasverbrauch berechnen: Zählerstände & m³ in kWh');
     expect(calc?.h1).toBe('Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner');
     expect(calc?.formula).toContain('kWh');
     expect(calc?.workedExample.description).toBeDefined();
@@ -157,7 +157,7 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 3. Spritkosten
     const sprit = getCalculatorBySlug('spritkostenrechner');
-    expect(sprit?.metaTitle).toBe('Spritkostenrechner: Fahrtkosten, Spritverbrauch & Kosten pro km berechnen');
+    expect(sprit?.metaTitle).toBe('Spritkostenrechner: Benzinkosten für Ihre Fahrt');
     expect(sprit?.h1).toBe('Spritkostenrechner – Benzin- & Dieselkosten pro Fahrt, km & Mitfahrer berechnen');
     expect(sprit?.workedExample.description).toBeDefined();
     expect(sprit?.faqs.length).toBeGreaterThanOrEqual(4);

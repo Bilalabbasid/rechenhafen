@@ -2205,8 +2205,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'Gasverbrauch berechnen',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner',
-    metaDescription: 'Gasverbrauch berechnen: Wandeln Sie Gaszähler-Kubikmeter (m³) in Kilowattstunden (kWh) um und ermitteln Sie Ihre monatlichen und jährlichen Gaskosten exakt.',
+    metaTitle: 'Gasverbrauch berechnen: Zählerstände & m³ in kWh',
+    metaDescription: 'Rechnen Sie Gaszählerstände oder Kubikmeter (m³) über Brennwert und Zustandszahl in Kilowattstunden (kWh) um – für Ihren konkreten Ablesezeitraum ohne Grundgebühr.',
     h1: 'Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner',
     shortDescription: 'Wandelt abgelesene Kubikmeter (m³) vom Gaszähler in Kilowattstunden (kWh) um und kalkuliert Ihre monatlichen und jährlichen Gaskosten.',
     searchKeywords: [

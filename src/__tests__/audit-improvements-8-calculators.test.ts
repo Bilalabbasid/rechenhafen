@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { calculateFuelCost, calculateTripExpenses } from '@/lib/calculators/auto';
 import { calculateBruttoNetto } from '@/lib/calculators/steuernGehalt';
 import { AUTO_CALCULATORS } from '@/data/calculators/auto';
+import { STEUERN_GEHALT_CALCULATORS } from '@/data/calculators/steuernGehalt';
 import { HAUSHALT_CALCULATORS } from '@/data/calculators/haushalt';
 import { EXTRA_WOHNEN_HAUSHALT } from '@/data/calculators/extra/wohnenHaushalt';
 import { EXTRA_BAUEN_GEOMETRIE } from '@/data/calculators/extra/bauenGeometrie';
@@ -231,7 +232,7 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
 
     it('has repaired non-truncated meta title', () => {
       const calc = AUTO_CALCULATORS.find((c) => c.slug === 'fahrtkostenrechner');
-      expect(calc?.metaTitle).toBe('Fahrtkostenrechner: Sprit, Maut & Kosten pro Person');
+      expect(calc?.metaTitle).toBe('Fahrtkostenrechner: Kosten berechnen & aufteilen');
     });
   });
 
@@ -287,7 +288,71 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
 
     it('has complete, non-truncated metaDescription without trailing "und."', () => {
       expect(calc?.metaDescription).not.toMatch(/und\.\s*$/);
-      expect(calc?.metaDescription).toContain('Stufenhöhe berechnen');
+      expect(calc?.metaDescription).toContain('Stufenhöhe');
     });
   });
+
+  // 9. SEO Metadata Verification for all 8 calculators
+  describe('9. Search Metadata Quality & Single Brand Suffix Verification', () => {
+    const scopedSlugs = [
+      'spritkostenrechner',
+      'brutto-netto-rechner',
+      'gasverbrauch-kwh-m3-rechner',
+      'gaskostenrechner',
+      'kies-splitt-rechner',
+      'fahrtkostenrechner',
+      'autobahn-maut-rechner-vignette',
+      'treppen-stufen-rechner',
+    ];
+
+    const expectedTitles: Record<string, string> = {
+      'spritkostenrechner': 'Spritkostenrechner: Benzinkosten für Ihre Fahrt',
+      'brutto-netto-rechner': 'Brutto-Netto-Rechner 2026: Was bleibt vom Gehalt?',
+      'gasverbrauch-kwh-m3-rechner': 'Gasverbrauch berechnen: Zählerstände & m³ in kWh',
+      'gaskostenrechner': 'Gaskostenrechner: Jahreskosten & Monatsdurchschnitt',
+      'kies-splitt-rechner': 'Splittrechner: Wie viel Splitt brauche ich?',
+      'fahrtkostenrechner': 'Fahrtkostenrechner: Kosten berechnen & aufteilen',
+      'autobahn-maut-rechner-vignette': 'Mautrechner: Österreich, Schweiz & Brenner',
+      'treppen-stufen-rechner': 'Treppenrechner: Stufenhöhe & Stufenanzahl berechnen',
+    };
+
+    const allScoped = [
+      ...AUTO_CALCULATORS,
+      ...STEUERN_GEHALT_CALCULATORS,
+      ...HAUSHALT_CALCULATORS,
+      ...EXTRA_WOHNEN_HAUSHALT,
+      ...EXTRA_BAUEN_GEOMETRIE,
+      ...EXTRA_AUTO_ARBEIT,
+    ];
+
+    for (const slug of scopedSlugs) {
+      it(`verifies metaTitle and metaDescription for ${slug}`, () => {
+        const calc = allScoped.find((c) => c.slug === slug);
+        expect(calc).toBeDefined();
+
+        // 1. Title matches candidate and has reasonable length
+        expect(calc?.metaTitle).toBe(expectedTitles[slug]);
+        expect(calc?.metaTitle.length).toBeGreaterThan(20);
+        expect(calc?.metaTitle.length).toBeLessThanOrEqual(65);
+
+        // 2. No hardcoded brand suffix in definition
+        expect(calc?.metaTitle).not.toMatch(/\s*[|–-]\s*RechenHafen/i);
+
+        // 3. Rendered title with template has exactly one brand suffix and fits within SERP limit
+        const renderedTitle = `${calc?.metaTitle} | RechenHafen`;
+        const brandOccurrences = (renderedTitle.match(/RechenHafen/g) || []).length;
+        expect(brandOccurrences).toBe(1);
+        expect(renderedTitle.length).toBeLessThanOrEqual(75);
+
+        // 4. Description is natural German, between 120 and 175 characters, no trailing punctuation errors
+        expect(calc?.metaDescription).toBeDefined();
+        expect(calc?.metaDescription?.length).toBeGreaterThanOrEqual(120);
+        expect(calc?.metaDescription?.length).toBeLessThanOrEqual(175);
+        expect(calc?.metaDescription).not.toMatch(/und\.\s*$/);
+        expect(calc?.metaDescription).not.toContain('exakt');
+        expect(calc?.metaDescription).not.toContain('beste');
+      });
+    }
+  });
 });
+

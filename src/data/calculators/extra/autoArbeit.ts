@@ -1411,8 +1411,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Mautrechner Alpen',
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
-    metaTitle: 'Mautrechner Österreich & Schweiz – Vignettenkosten 2026',
-    metaDescription: 'Berechnen Sie die offiziellen Vignetten- und Streckenmaut-Kosten für PKW in Österreich (1-Tages-, 10-Tages-Vignette, Brenner A13), der Schweiz und auf der Brennerroute.',
+    metaTitle: 'Mautrechner: Österreich, Schweiz & Brenner',
+    metaDescription: 'Ermitteln Sie offizielle Vignetten- und Streckenmaut-Preise für PKW in Österreich, der Schweiz und am Brenner. Feste Tarife statt europaweiter Routenplanung.',
     h1: 'Mautrechner – Vignetten & Streckenmaut für Österreich, Schweiz & Brenner',
     shortDescription: 'Kalkuliert die offiziellen Gebühren für Autobahn-Vignetten und Streckenmauten (PKW bis 3,5 t zGG) für Österreich, die Schweiz und die Brennerautobahn nach Italien.',
     searchKeywords: [

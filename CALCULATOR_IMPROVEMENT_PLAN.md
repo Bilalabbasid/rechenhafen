@@ -822,9 +822,30 @@ Aufgrund von realen Nutzer-Suchanfragen (u. a. `spritkostenrechner`, `nettolohnr
 | 8 | `/rechner/treppen-stufen-rechner/` | MetaDescription brach mit „und.“ ab; Modus zur direkten Ermittlung der Stufenhöhe aus Geschosshöhe und Steigungsanzahl fehlte; Verhältnis Steigungen vs. Trittstufen unklar. | MetaDescription repariert („Stufenhöhe berechnen...“). Berechnungsmodus `fixed_risers` hinzugefügt ($s = h / n$; $a = 63 - 2s$). Physische Trittstufen ($n - 1$ bei bündigem Austritt) gegenüber Steigungen ($n$) differenziert. Als ergonomische Planungshilfe deklariert (DIN 18065 umfasst zusätzliche Landesbauordnungs-Vorgaben). | $280\text{ cm} / 16\text{ Steigungen} = 17,5\text{ cm}$ Steigung, $28\text{ cm}$ Auftritt, $15\text{ Trittstufen}$, $4,20\text{ m}$ Lauflänge | **locally verified & build clean** |
 
 ### 9.2 Verifizierte Prüfergebnisse & Regressionsergebnisse
-- **Dedizierte Testdatei:** `src/__tests__/audit-improvements-8-calculators.test.ts` (18 von 18 Tests erfolgreich)
-- **Gesamte Testsuite:** 39 Testdateien, 1.107 Tests bestanden (`npm test`, Exit-Code 0)
+- **Dedizierte Testdatei:** `src/__tests__/audit-improvements-8-calculators.test.ts` (26 von 26 Tests erfolgreich)
+- **Gesamte Testsuite:** 39 Testdateien, 1.115 Tests bestanden (`npm test`, Exit-Code 0)
 - **TypeScript-Typisierung:** `npx tsc --noEmit` (0 Fehler, Exit-Code 0)
 - **Linter:** `npm run lint` mit `--max-warnings 0` (0 Fehler, 0 Warnungen, Exit-Code 0)
 - **Produktions-Build:** `npm run build` (Next.js 15 SSG, 471/471 Routen erfolgreich generiert, Exit-Code 0)
+
+### 9.3 Aktualisierte Such-Metadaten (Titel & Beschreibungen)
+
+| Slug | Alter metaTitle | Neuer metaTitle (gerendert inkl. Brand) | Neue metaDescription | Begründung & Funktionsabgleich |
+|:---|:---|:---|:---|:---|
+| `spritkostenrechner` | `Spritkostenrechner: Fahrtkosten, Spritverbrauch & Kosten pro km berechnen` (74 Z.) | `Spritkostenrechner: Benzinkosten für Ihre Fahrt` (61 Z. gerendert) | `Ermitteln Sie den Kraftstoffbedarf in Litern und die reinen Spritkosten aus Strecke, Verbrauch und Preis pro Liter – für einfache Fahrten oder Hin- und Rückweg.` (162 Z.) | Kürzere, prägnante Formulierung verhindert SERP-Abschneiden; klare Trennung: reine Kraftstoffkosten (keine Maut/Parkgebühren). |
+| `brutto-netto-rechner` | `Brutto-Netto-Rechner 2026 & 2025 – Gehalt exakt berechnen` (56 Z.) | `Brutto-Netto-Rechner 2026: Was bleibt vom Gehalt?` (61 Z. gerendert) | `Ermitteln Sie aus Ihrem Monatsbrutto das Nettogehalt nach Steuerklasse, Bundesland und Krankenkasse. Mit Vorsorgepauschale nach § 39b EStG und Sozialabgaben 2026.` (160 Z.) | Entfernt werbliches, unüberprüftes „exakt“; beantwortet die zentrale Suchintention („Was bleibt vom Gehalt?“); nennt § 39b EStG Vorsorgepauschale. |
+| `gasverbrauch-kwh-m3-rechner` | `Gasverbrauch berechnen: m³ in kWh & Gaskosten Rechner` (53 Z.) | `Gasverbrauch berechnen: Zählerstände & m³ in kWh` (62 Z. gerendert) | `Rechnen Sie Gaszählerstände oder Kubikmeter (m³) über Brennwert und Zustandszahl in Kilowattstunden (kWh) um – für Ihren konkreten Ablesezeitraum ohne Grundgebühr.` (161 Z.) | Fokussiert auf Zählerumrechnung und kWh-Thermodynamik; grenzt sich explizit gegen den Tarif- und Grundpreisrechner ab. |
+| `gaskostenrechner` | `Gaskostenrechner: m³ oder kWh in Euro berechnen` (47 Z.) | `Gaskostenrechner: Jahreskosten & Monatsdurchschnitt` (64 Z. gerendert) | `Berechnen Sie Ihre jährlichen Gaskosten aus Verbrauch, Arbeitspreis und Grundpreis. Mit separater Ausweisung fixer Gebühren und rechnerischem Monatsdurchschnitt.` (160 Z.) | Hebt Jahreskosten und rechnerischen Monatsdurchschnitt hervor; stellt klar, dass es kein garantierter Versorgerabschlag ist. |
+| `kies-splitt-rechner` | `Kies & Splitt Rechner – Bedarf in Tonnen & m³ berechnen` (54 Z.) | `Splittrechner: Wie viel Splitt brauche ich?` (56 Z. gerendert) | `Ermitteln Sie das Gewicht in Tonnen und Volumen in m³ für Splitt 2/5, Kies oder Schotter aus Fläche und Schichthöhe. Mit Schüttdichte und Bestellzuschlag.` (152 Z.) | Zielt direkt auf die Suchanfrage `splittrechner` ab; natürliche Frageform; nennt lose Schüttdichte und freiwilligen Bestellzuschlag. |
+| `fahrtkostenrechner` | `Fahrtkostenrechner: Sprit, Maut & Kosten pro Person` (51 Z.) | `Fahrtkostenrechner: Kosten berechnen & aufteilen` (61 Z. gerendert) | `Berechnen Sie die Reisekosten aus Sprit, Maut, Parkgebühren und Fahrzeugverschleiß. Mit fairer Aufteilung pro Mitfahrer (keine steuerliche Pendlerpauschale).` (158 Z.) | Betont die Kernfunktion: Gesamtkosten ermitteln und unter Mitfahrern aufteilen; grenzt sich gegen die steuerliche Pendlerpauschale ab. |
+| `autobahn-maut-rechner-vignette` | `Mautrechner Österreich & Schweiz – Vignettenkosten 2026` (54 Z.) | `Mautrechner: Österreich, Schweiz & Brenner` (56 Z. gerendert) | `Ermitteln Sie offizielle Vignetten- und Streckenmaut-Preise für PKW in Österreich, der Schweiz und am Brenner. Feste Tarife statt europaweiter Routenplanung.` (157 Z.) | Macht den begrenzten Alpen-Geltungsbereich im Titel deutlich; verhindert Fehlinterpretation als universaler Europa-Routenplaner. |
+| `treppen-stufen-rechner` | `Treppenstufen Rechner – Stufenhöhe, Steigung & Auftritt berechnen` (66 Z.) | `Treppenrechner: Stufenhöhe & Stufenanzahl berechnen` (65 Z. gerendert) | `Berechnen Sie die Stufenhöhe (Steigung s), den Auftritt (a) und die Lauflänge aus der Geschosshöhe nach der Schrittmaßregel. Ergonomische Planungshilfe.` (153 Z.) | Beantwortet `stufenhöhe ermittlung`; passt exakt in die Längenbegrenzung; deklariert Tool ehrlich als ergonomische Planungshilfe. |
+
+### 9.4 Messung & Baseline-Richtlinien
+
+1. **Datenbasis & Transparenz:** Im Repository liegen keine rohen Google Search Console-Exporte vor. Daher werden keine fiktiven Klickzahlen, Rankings oder CTR-Veränderungen erfunden.
+2. **Baseline-Messung:** Für jede geänderte Seite wird als Baseline der Zeitraum vor der Auslieferung (20. Oktober 2026) in der Search Console herangezogen (gefiltert nach URL, Land Deutschland, Gerät und relevanter Query).
+3. **Vergleichszeitraum:** Nach Auslieferung ist ein vollständiger 28-Tage-Zyklus (bzw. bei Seiten mit geringerem Volumen ein längerer Zeitraum) mit identischen Filtern zu vergleichen.
+4. **Ganzheitliche Kausalität:** Ranking- und Klickänderungen dürfen nicht isoliert dem Title-Tag zugeschrieben werden, da gleichzeitig mathematische Korrekturen, BMF-Rechnungsanpassungen und Content-Verbesserungen live gingen.
+
 

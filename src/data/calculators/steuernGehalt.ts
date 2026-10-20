@@ -26,8 +26,8 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Brutto-Netto-Rechner',
     category: 'steuern-gehalt',
     subcategory: 'Gehalt & Lohn',
-    metaTitle: 'Brutto-Netto-Rechner 2026 & 2025 – Gehalt exakt berechnen',
-    metaDescription: 'Berechnen Sie Ihr monatliches und jährliches Nettogehalt nach aktuellem deutschem Steuer- und Beitragsrecht 2026/2025. Alle Steuerklassen, KV, PV, RV & ALV.',
+    metaTitle: 'Brutto-Netto-Rechner 2026: Was bleibt vom Gehalt?',
+    metaDescription: 'Ermitteln Sie aus Ihrem Monatsbrutto das Nettogehalt nach Steuerklasse, Bundesland und Krankenkasse. Mit Vorsorgepauschale nach § 39b EStG und Sozialabgaben 2026.',
     h1: 'Brutto-Netto-Rechner – Ihr Nettogehalt für 2026 & 2025',
     shortDescription: 'Ermittelt Ihr exaktes Nettogehalt aus dem Bruttoverdienst inklusive Lohnsteuer, Solidaritätszuschlag, Kirchensteuer und aller Sozialabgaben.',
     searchKeywords: [
