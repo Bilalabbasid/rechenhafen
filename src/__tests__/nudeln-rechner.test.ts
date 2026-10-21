@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EXTRA_EINHEITEN_KOCHEN } from '@/data/calculators/extra/einheitenKochen';
+import { resolveFieldOptions, resolveFieldLabel, resolveFieldUnit } from '@/components/calculator/CalculatorRunner';
 
 describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
   const pastaCalc = EXTRA_EINHEITEN_KOCHEN.find((c) => c.slug === 'nudeln-rohmaerk-gewicht-rechner');
@@ -84,7 +85,7 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
       expect(res?.primary.value).toBe(300);
       expect(res?.primary.formattedValue).toBe('300 g gekocht');
       expect(res?.primary.label).not.toContain('Trockennudeln');
-      expect(res?.directAnswer).toContain('200 g frische Pasta (ungekocht)');
+      expect(res?.directAnswer).toContain('200 g ungekochte frische Pasta');
       expect(res?.directAnswer).not.toContain('Trockennudeln');
     });
 
@@ -190,12 +191,94 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
       expect(res?.primary.label).toBe('Benötigte frische Pasta (ungekocht)');
       expect(res?.primary.formattedValue).toContain('600 g frische Pasta');
       expect(res?.primary.formattedValue).not.toContain('Trockennudeln');
-      expect(res?.directAnswer).toContain('600 g frische Pasta (ungekocht)');
+      expect(res?.directAnswer).toContain('600 g ungekochte frische Pasta');
       expect(res?.directAnswer).not.toContain('Trockennudeln');
 
       // 600 * 1.5 = 900 g cooked
       const cookedSec = res?.secondary?.find((s) => s.id === 'cookedPasta');
       expect(cookedSec?.value).toBe(900);
+
+      // Basis summary displays consistent assumption
+      const mealBasis = res?.basisSummary?.find((b) => b.label === 'Mahlzeiten-Art & Hunger');
+      expect(mealBasis?.value).toContain('150 g p.P. ungekochte frische Pasta');
+      expect(mealBasis?.value).not.toContain('trocken');
+
+      const portionBasis = res?.basisSummary?.find((b) => b.label === 'Portionsannahme p.P.');
+      expect(portionBasis?.value).toBe('150 g ungekochte frische Pasta p.P.');
+
+      // Calculation steps are explicit and match calculation
+      expect(res?.calculationSteps).toBeDefined();
+      expect(res?.calculationSteps?.[0]).toContain('4 Personen × 150 g ungekochte frische Pasta p.P. = 600 g');
+      expect(res?.calculationSteps?.[2]).toContain('600 g ÷ 100 × 1,0 l = 6 Liter Wasser');
+      expect(res?.calculationSteps?.[3]).toContain('6 l × 10 g = 60 g Salz');
+    });
+
+    it('verifies acceptance check: four people dried default vs four people fresh default', () => {
+      // 1. Dried default: 4 people, mainDish (110 g) -> 440 g dry * 2.3 = 1,012 g cooked
+      const driedRes = pastaCalc?.calculate({
+        mode: 'portion_plan',
+        personsCount: 4,
+        mealType: 'mainDish',
+        factorPreset: 'aldente',
+      });
+      expect(driedRes?.primary.value).toBe(440);
+      expect(driedRes?.secondary?.find((s) => s.id === 'cookedPasta')?.value).toBe(1012);
+      expect(driedRes?.basisSummary?.find((b) => b.label === 'Portionsannahme p.P.')?.value).toBe('110 g Trockennudeln p.P.');
+      expect(driedRes?.calculationSteps?.[0]).toContain('4 Personen × 110 g Trockennudeln p.P. = 440 g');
+      expect(driedRes?.calculationSteps?.[1]).toContain('440 g × 2,3');
+
+      // 2. Fresh default: 4 people, mainDish (150 g) -> 600 g fresh * 1.5 = 900 g cooked
+      const freshRes = pastaCalc?.calculate({
+        mode: 'portion_plan',
+        personsCount: 4,
+        mealType: 'mainDish',
+        factorPreset: 'fresh',
+      });
+      expect(freshRes?.primary.value).toBe(600);
+      expect(freshRes?.secondary?.find((s) => s.id === 'cookedPasta')?.value).toBe(900);
+      expect(freshRes?.basisSummary?.find((b) => b.label === 'Portionsannahme p.P.')?.value).toBe('150 g ungekochte frische Pasta p.P.');
+      expect(freshRes?.calculationSteps?.[0]).toContain('4 Personen × 150 g ungekochte frische Pasta p.P. = 600 g');
+      expect(freshRes?.calculationSteps?.[1]).toContain('600 g × 1,5');
+    });
+
+    it('provides dynamic mealType options that reflect fresh vs dried pasta', () => {
+      const mealInput = pastaCalc?.inputs.find((i) => i.id === 'mealType');
+      expect(mealInput).toBeDefined();
+      expect(mealInput?.conditionalOptions).toBeDefined();
+
+      // For dried pasta
+      const driedOptions = resolveFieldOptions(mealInput!, { factorPreset: 'aldente' }) || [];
+      const driedMain = driedOptions.find((o: any) => o.value === 'mainDish');
+      expect(driedMain?.label).toBe('Hauptgericht / normaler Hunger (110 g p.P. Trockennudeln)');
+      const driedBig = driedOptions.find((o: any) => o.value === 'bigHunger');
+      expect(driedBig?.label).toBe('Großer Hunger / Sportler (150 g p.P. Trockennudeln)');
+      const driedSide = driedOptions.find((o: any) => o.value === 'sideDish');
+      expect(driedSide?.label).toBe('Beilage / Vorspeise (70 g p.P. Trockennudeln)');
+      const driedKids = driedOptions.find((o: any) => o.value === 'kids');
+      expect(driedKids?.label).toBe('Kinderportion (55 g p.P. Trockennudeln)');
+
+      // For fresh pasta
+      const freshOptions = resolveFieldOptions(mealInput!, { factorPreset: 'fresh' }) || [];
+      const freshMain = freshOptions.find((o: any) => o.value === 'mainDish');
+      expect(freshMain?.label).toBe('Hauptgericht / normaler Hunger (150 g p.P. ungekochte frische Pasta)');
+      const freshBig = freshOptions.find((o: any) => o.value === 'bigHunger');
+      expect(freshBig?.label).toBe('Großer Hunger / Sportler (200 g p.P. ungekochte frische Pasta)');
+      const freshSide = freshOptions.find((o: any) => o.value === 'sideDish');
+      expect(freshSide?.label).toBe('Beilage / Vorspeise (100 g p.P. ungekochte frische Pasta)');
+      const freshKids = freshOptions.find((o: any) => o.value === 'kids');
+      expect(freshKids?.label).toBe('Kinderportion (80 g p.P. ungekochte frische Pasta)');
+    });
+
+    it('provides dynamic labels and units for custom and raw inputs based on pasta type', () => {
+      const customGramsInput = pastaCalc?.inputs.find((i) => i.id === 'customGramsPerPerson');
+      expect(resolveFieldLabel(customGramsInput!, { factorPreset: 'fresh' })).toContain('ungekochte frische Pasta');
+      expect(resolveFieldLabel(customGramsInput!, { factorPreset: 'aldente' })).toContain('Trockennudeln');
+
+      const dryGramsInput = pastaCalc?.inputs.find((i) => i.id === 'dryGrams');
+      expect(resolveFieldLabel(dryGramsInput!, { factorPreset: 'fresh' })).toBe('Ungekochte frische Pasta');
+      expect(resolveFieldLabel(dryGramsInput!, { factorPreset: 'aldente' })).toBe('Trockengewicht Nudeln');
+      expect(resolveFieldUnit(dryGramsInput!, { factorPreset: 'fresh' })).toBe('g frisch');
+      expect(resolveFieldUnit(dryGramsInput!, { factorPreset: 'aldente' })).toBe('g trocken');
     });
 
     it('supports custom grams per person', () => {
@@ -209,6 +292,24 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
 
       expect(res?.primary.value).toBe(170); // 2 * 85 = 170 g
       expect(res?.directAnswer).toContain('170 g');
+    });
+
+    it('pauses calculation and returns dash for empty inputs', () => {
+      const emptyPersons = pastaCalc?.calculate({
+        mode: 'portion_plan',
+        personsCount: '',
+      });
+      expect(emptyPersons?.error).toBe('Bitte geben Sie die Anzahl der Personen ein.');
+      expect(emptyPersons?.primary.formattedValue).toBe('–');
+
+      const emptyCustom = pastaCalc?.calculate({
+        mode: 'portion_plan',
+        personsCount: 2,
+        mealType: 'custom',
+        customGramsPerPerson: '',
+      });
+      expect(emptyCustom?.error).toBe('Bitte geben Sie eine Grammangabe pro Person ein.');
+      expect(emptyCustom?.primary.formattedValue).toBe('–');
     });
   });
 });

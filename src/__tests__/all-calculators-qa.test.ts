@@ -81,8 +81,13 @@ describe('RechenHafen Calculators Comprehensive QA Verification', () => {
           boundaryInputs[inp.id] = '2024-02-29';
         } else if (inp.type === 'boolean') {
           boundaryInputs[inp.id] = true;
-        } else if (inp.type === 'select' && inp.options && inp.options.length > 0) {
-          boundaryInputs[inp.id] = inp.options[inp.options.length - 1].value;
+        } else if (inp.type === 'select') {
+          const opts = typeof inp.options === 'function' ? (inp.options as any)(boundaryInputs) : inp.options;
+          if (opts && opts.length > 0) {
+            boundaryInputs[inp.id] = opts[opts.length - 1].value;
+          } else {
+            boundaryInputs[inp.id] = inp.defaultValue;
+          }
         } else {
           boundaryInputs[inp.id] = inp.defaultValue;
         }

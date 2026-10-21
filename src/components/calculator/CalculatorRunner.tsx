@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useId } from 'react';
 import Link from 'next/link';
-import { CalculatorInput, CalculationResult } from '@/types/calculator';
+import { CalculatorInput, CalculationResult, SelectOption } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
 import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info, Bookmark, BookmarkCheck } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
@@ -24,6 +24,39 @@ import {
 } from '@/lib/storage/favorites';
 import ContextualNextSteps from './ContextualNextSteps';
 import { renderInlineMarkdown } from '@/components/common/FormattedContent';
+
+export const resolveFieldLabel = (def: CalculatorInput, currentInputs: Record<string, any>): string => {
+  if (def.conditionalLabels) {
+    for (const item of def.conditionalLabels) {
+      if (currentInputs[item.condition.field] === item.condition.value) {
+        return item.label;
+      }
+    }
+  }
+  return def.label;
+};
+
+export const resolveFieldUnit = (def: CalculatorInput, currentInputs: Record<string, any>): string | undefined => {
+  if (def.conditionalLabels) {
+    for (const item of def.conditionalLabels) {
+      if (currentInputs[item.condition.field] === item.condition.value && item.unit !== undefined) {
+        return item.unit;
+      }
+    }
+  }
+  return def.unit;
+};
+
+export const resolveFieldOptions = (def: CalculatorInput, currentInputs: Record<string, any>): SelectOption[] | undefined => {
+  if (def.conditionalOptions) {
+    for (const item of def.conditionalOptions) {
+      if (currentInputs[item.condition.field] === item.condition.value) {
+        return item.options;
+      }
+    }
+  }
+  return def.options;
+};
 
 interface Props {
   slug: string;
@@ -147,7 +180,8 @@ export default function CalculatorRunner({
                   updated[inp.id] = raw.toLowerCase() === 'true' || raw === '1';
                   changed = true;
                 } else if (inp.type === 'select') {
-                  const isValidOption = inp.options?.some((opt) => opt.value === raw);
+                  const options = resolveFieldOptions(inp, updated);
+                  const isValidOption = options?.some((opt) => opt.value === raw);
                   if (isValidOption) {
                     updated[inp.id] = raw;
                     changed = true;
@@ -749,11 +783,15 @@ export default function CalculatorRunner({
                 }
               }
 
+              const fieldLabel = resolveFieldLabel(field, inputs);
+              const fieldUnit = resolveFieldUnit(field, inputs);
+              const fieldOptions = resolveFieldOptions(field, inputs);
+
               return (
                 <div key={field.id} className={styles.inputGroup}>
                   <label htmlFor={inputId} className={styles.label}>
-                    {field.label}
-                    {field.unit && <span className={styles.unitBadge}>({field.unit})</span>}
+                    {fieldLabel}
+                    {fieldUnit && <span className={styles.unitBadge}>({fieldUnit})</span>}
                   </label>
 
                   {field.type === 'select' ? (
@@ -764,7 +802,7 @@ export default function CalculatorRunner({
                       value={inputs[field.id] ?? ''}
                       onChange={(e) => handleInputChange(field.id, e.target.value)}
                     >
-                      {field.options?.map((opt) => (
+                      {fieldOptions?.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
                         </option>
@@ -939,7 +977,7 @@ export default function CalculatorRunner({
                       const fDef = inputDefs.find((inp) => inp.id === fId);
                       return (
                         <li key={fId}>
-                          <strong>{fDef?.label || fId}:</strong> {errMsg}
+                          <strong>{fDef ? resolveFieldLabel(fDef, inputs) : fId}:</strong> {errMsg}
                         </li>
                       );
                     })}
@@ -1040,8 +1078,10 @@ export default function CalculatorRunner({
                         if (rawVal === undefined || rawVal === null || rawVal === '') {
                           return '–';
                         }
+                        const options = resolveFieldOptions(def, inputs);
+                        const unit = resolveFieldUnit(def, inputs);
                         if (def.type === 'select') {
-                          const matchedOption = def.options?.find((opt) => String(opt.value) === String(rawVal));
+                          const matchedOption = options?.find((opt) => String(opt.value) === String(rawVal));
                           return matchedOption ? matchedOption.label : String(rawVal);
                         }
                         if (def.type === 'boolean') {
@@ -1053,18 +1093,19 @@ export default function CalculatorRunner({
                         if (def.type === 'number') {
                           const num = typeof rawVal === 'number' ? rawVal : parseFloat(String(rawVal).replace(',', '.'));
                           if (!isNaN(num)) {
-                            return `${formatNumber(num)}${def.unit ? ' ' + def.unit : ''}`;
+                            return `${formatNumber(num)}${unit ? ' ' + unit : ''}`;
                           }
-                          return `${rawVal}${def.unit ? ' ' + def.unit : ''}`;
+                          return `${rawVal}${unit ? ' ' + unit : ''}`;
                         }
-                        return `${rawVal}${def.unit ? ' ' + def.unit : ''}`;
+                        return `${rawVal}${unit ? ' ' + unit : ''}`;
                       };
 
                       const items = result.basisSummary && result.basisSummary.length > 0
                         ? result.basisSummary.map((bItem: { label: string; value: string }) => {
                             for (const def of inputDefs) {
-                              if (def.type === 'select' && def.options) {
-                                const match = def.options.find((opt) => String(opt.value) === String(bItem.value));
+                              const options = resolveFieldOptions(def, inputs);
+                              if (def.type === 'select' && options) {
+                                const match = options.find((opt) => String(opt.value) === String(bItem.value));
                                 if (match) {
                                   return { ...bItem, value: match.label };
                                 }
@@ -1075,7 +1116,7 @@ export default function CalculatorRunner({
                         : inputDefs
                             .filter(isFieldVisible)
                             .map((def) => ({
-                              label: def.label,
+                              label: resolveFieldLabel(def, inputs),
                               value: formatVal(def, inputs[def.id]),
                             }));
 

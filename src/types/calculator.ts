@@ -5,6 +5,17 @@ export interface SelectOption {
   label: string;
 }
 
+export interface ConditionalOptionGroup {
+  condition: { field: string; value: any };
+  options: SelectOption[];
+}
+
+export interface ConditionalLabelGroup {
+  condition: { field: string; value: any };
+  label: string;
+  unit?: string;
+}
+
 export interface CalculatorInput {
   id: string;
   label: string;
@@ -17,6 +28,8 @@ export interface CalculatorInput {
   placeholder?: string;
   helpText?: string;
   options?: SelectOption[];
+  conditionalOptions?: ConditionalOptionGroup[];
+  conditionalLabels?: ConditionalLabelGroup[];
   dependsOn?: { field: string; value: any | any[] };
 }
 

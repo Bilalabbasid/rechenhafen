@@ -135,4 +135,95 @@ describe('Gaskostenrechner (calculateGasCost)', () => {
     const periodBasis = result.basisSummary?.find((b) => b.label === 'Betrachtungszeitraum');
     expect(periodBasis?.value).toContain('1 vollständiges Abrechnungsjahr');
   });
+
+  it('regression: 12,000 kWh × 0.10 € + 120 €/year = 1,320 €/year and 110 €/month', () => {
+    const res = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: 12000,
+      pricePerKwh: 0.10,
+      basePrice: 120,
+      basePricePeriod: 'yearly',
+    });
+
+    expect(res.error).toBeUndefined();
+    expect(res.primary.value).toBe(1320);
+    expect(res.primary.formattedValue).toBe('1.320,00 €');
+
+    const monthly = res.secondary?.find((s) => s.id === 'monthlyPayment');
+    expect(monthly?.value).toBe(110);
+    expect(monthly?.formattedValue).toBe('110,00 €');
+    expect(monthly?.label).toBe('Rechnerischer Monatsdurchschnitt (Orientierungswert)');
+
+    const workCost = res.secondary?.find((s) => s.id === 'workCost');
+    expect(workCost?.value).toBe(1200);
+
+    const baseCost = res.secondary?.find((s) => s.id === 'baseCost');
+    expect(baseCost?.value).toBe(120);
+  });
+
+  it('regression: tests equivalent inputs in cents (10 ct) and euros (0.10 €)', () => {
+    const resEuro = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: 12000,
+      priceUnit: 'euro',
+      pricePerKwh: 0.10,
+      basePrice: 120,
+      basePricePeriod: 'yearly',
+    });
+
+    const resCt = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: 12000,
+      priceUnit: 'ct',
+      pricePerKwh: 10,
+      basePrice: 120,
+      basePricePeriod: 'yearly',
+    });
+
+    expect(resEuro.primary.value).toBe(resCt.primary.value);
+    expect(resEuro.primary.formattedValue).toBe(resCt.primary.formattedValue);
+    expect(resCt.primary.value).toBe(1320);
+  });
+
+  it('regression: 10 €/month and 120 €/year base charges give identical annual total', () => {
+    const resMonthlyBase = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: 12000,
+      pricePerKwh: 0.10,
+      basePrice: 10,
+      basePricePeriod: 'monthly',
+    });
+
+    const resYearlyBase = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: 12000,
+      pricePerKwh: 0.10,
+      basePrice: 120,
+      basePricePeriod: 'yearly',
+    });
+
+    expect(resMonthlyBase.primary.value).toBe(1320);
+    expect(resYearlyBase.primary.value).toBe(1320);
+    expect(resMonthlyBase.primary.value).toBe(resYearlyBase.primary.value);
+  });
+
+  it('regression: pauses calculation and returns dash for empty required fields', () => {
+    const resEmptyKwh = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: '',
+      pricePerKwh: 0.10,
+      basePrice: 10,
+    });
+    expect(resEmptyKwh.error).toBeDefined();
+    expect(resEmptyKwh.primary.formattedValue).toBe('-');
+
+    const resEmptyPrice = calculateGasCost({
+      inputType: 'kwh',
+      annualKwh: 12000,
+      pricePerKwh: '',
+      basePrice: 10,
+    });
+    expect(resEmptyPrice.error).toBeDefined();
+    expect(resEmptyPrice.primary.formattedValue).toBe('-');
+  });
 });

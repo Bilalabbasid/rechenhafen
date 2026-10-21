@@ -4454,79 +4454,6 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         ]
       },
       {
-        id: "personsCount",
-        label: "Anzahl Personen",
-        type: "number",
-        defaultValue: 4,
-        min: 1,
-        max: 50,
-        step: 1,
-        unit: "Personen",
-        dependsOn: { field: "mode", value: "portion_plan" }
-      },
-      {
-        id: "mealType",
-        label: "Mahlzeiten-Art & Hunger",
-        type: "select",
-        defaultValue: "mainDish",
-        options: [
-          {
-            value: "mainDish",
-            label: "Hauptgericht / normaler Hunger (100–125 g p.P. trocken)"
-          },
-          {
-            value: "bigHunger",
-            label: "Großer Hunger / Sportler (ca. 150 g p.P. trocken)"
-          },
-          {
-            value: "sideDish",
-            label: "Beilage / Vorspeise (ca. 60–80 g p.P. trocken)"
-          },
-          {
-            value: "kids",
-            label: "Kinderportion (ca. 50–60 g p.P. trocken)"
-          },
-          {
-            value: "custom",
-            label: "Eigener Richtwert in Gramm pro Person"
-          }
-        ],
-        dependsOn: { field: "mode", value: "portion_plan" }
-      },
-      {
-        id: "customGramsPerPerson",
-        label: "Eigener Richtwert pro Person",
-        type: "number",
-        defaultValue: 100,
-        min: 20,
-        max: 400,
-        step: 5,
-        unit: "g p.P.",
-        dependsOn: { field: "mealType", value: "custom" }
-      },
-      {
-        id: "dryGrams",
-        label: "Trockengewicht Nudeln",
-        type: "number",
-        defaultValue: 250,
-        min: 10,
-        max: 5000,
-        step: 10,
-        unit: "g trocken",
-        dependsOn: { field: "mode", value: "dry_to_cooked" }
-      },
-      {
-        id: "cookedGrams",
-        label: "Gekochtes Nudelgewicht (Wunschmenge)",
-        type: "number",
-        defaultValue: 500,
-        min: 20,
-        max: 10000,
-        step: 10,
-        unit: "g gekocht",
-        dependsOn: { field: "mode", value: "cooked_to_dry" }
-      },
-      {
         id: "factorPreset",
         label: "Quellfaktor (Nudelsorte & Garstufe)",
         type: "select",
@@ -4560,6 +4487,120 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         step: 0.1,
         unit: "Faktor",
         dependsOn: { field: "factorPreset", value: "custom" }
+      },
+      {
+        id: "personsCount",
+        label: "Anzahl Personen",
+        type: "number",
+        defaultValue: 4,
+        min: 1,
+        max: 50,
+        step: 1,
+        unit: "Personen",
+        dependsOn: { field: "mode", value: "portion_plan" }
+      },
+      {
+        id: "mealType",
+        label: "Mahlzeiten-Art & Hunger",
+        type: "select",
+        defaultValue: "mainDish",
+        options: [
+          {
+            value: "mainDish",
+            label: "Hauptgericht / normaler Hunger (110 g p.P. Trockennudeln)"
+          },
+          {
+            value: "bigHunger",
+            label: "Großer Hunger / Sportler (150 g p.P. Trockennudeln)"
+          },
+          {
+            value: "sideDish",
+            label: "Beilage / Vorspeise (70 g p.P. Trockennudeln)"
+          },
+          {
+            value: "kids",
+            label: "Kinderportion (55 g p.P. Trockennudeln)"
+          },
+          {
+            value: "custom",
+            label: "Eigener Richtwert in Gramm pro Person"
+          }
+        ],
+        conditionalOptions: [
+          {
+            condition: { field: "factorPreset", value: "fresh" },
+            options: [
+              {
+                value: "mainDish",
+                label: "Hauptgericht / normaler Hunger (150 g p.P. ungekochte frische Pasta)"
+              },
+              {
+                value: "bigHunger",
+                label: "Großer Hunger / Sportler (200 g p.P. ungekochte frische Pasta)"
+              },
+              {
+                value: "sideDish",
+                label: "Beilage / Vorspeise (100 g p.P. ungekochte frische Pasta)"
+              },
+              {
+                value: "kids",
+                label: "Kinderportion (80 g p.P. ungekochte frische Pasta)"
+              },
+              {
+                value: "custom",
+                label: "Eigener Richtwert in Gramm pro Person"
+              }
+            ]
+          }
+        ],
+        dependsOn: { field: "mode", value: "portion_plan" }
+      },
+      {
+        id: "customGramsPerPerson",
+        label: "Eigener Richtwert pro Person (Trockennudeln)",
+        conditionalLabels: [
+          {
+            condition: { field: "factorPreset", value: "fresh" },
+            label: "Eigener Richtwert pro Person (ungekochte frische Pasta)",
+            unit: "g p.P. frisch"
+          }
+        ],
+        type: "number",
+        defaultValue: 100,
+        min: 20,
+        max: 400,
+        step: 5,
+        unit: "g p.P.",
+        dependsOn: { field: "mealType", value: "custom" }
+      },
+      {
+        id: "dryGrams",
+        label: "Trockengewicht Nudeln",
+        conditionalLabels: [
+          {
+            condition: { field: "factorPreset", value: "fresh" },
+            label: "Ungekochte frische Pasta",
+            unit: "g frisch"
+          }
+        ],
+        type: "number",
+        defaultValue: 250,
+        min: 10,
+        max: 5000,
+        step: 10,
+        unit: "g trocken",
+        dependsOn: { field: "mode", value: "dry_to_cooked" }
+      },
+      {
+        id: "cookedGrams",
+        label: "Gekochtes Nudelgewicht (Wunschmenge)",
+        type: "number",
+        defaultValue: 500,
+        min: 20,
+        max: 10000,
+        step: 10,
+        unit: "g gekocht",
+        dependsOn: { field: "mode", value: "cooked_to_dry" }
       }
     ],
     calculate: (inputs: Record<string, any>) => {
@@ -4591,7 +4632,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
 
       const factorLabel = 'Faktor ' + factor.toFixed(1).replace('.', ',');
-      const rawTerm = isFresh ? 'frische Pasta (ungekocht)' : 'Trockennudeln';
+      const rawTerm = isFresh ? 'ungekochte frische Pasta' : 'Trockennudeln';
       const rawTitle = isFresh ? 'Frische Pasta (ungekocht)' : 'Trockennudeln';
 
       if (mode === 'portion_plan') {
@@ -4615,17 +4656,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         // Dry pasta (factor ~2.3): 110 g dry yields ~253 g cooked
         // Fresh pasta (factor 1.5): 150 g fresh yields ~225 g cooked (fresh pasta contains 25–30% native moisture)
         let rawPerPersonG = isFresh ? 150 : 110;
-        let mealLabel = isFresh ? 'Hauptgericht (150 g frische Pasta p.P.)' : 'Hauptgericht (110 g Trockenpasta p.P.)';
+        let mealLabel = isFresh ? 'Hauptgericht / normaler Hunger (150 g p.P. ungekochte frische Pasta)' : 'Hauptgericht / normaler Hunger (110 g p.P. Trockennudeln)';
 
         if (meal === 'bigHunger') {
           rawPerPersonG = isFresh ? 200 : 150;
-          mealLabel = isFresh ? 'Großer Hunger (200 g frische Pasta p.P.)' : 'Großer Hunger (150 g Trockenpasta p.P.)';
+          mealLabel = isFresh ? 'Großer Hunger / Sportler (200 g p.P. ungekochte frische Pasta)' : 'Großer Hunger / Sportler (150 g p.P. Trockennudeln)';
         } else if (meal === 'sideDish') {
           rawPerPersonG = isFresh ? 100 : 70;
-          mealLabel = isFresh ? 'Beilage (100 g frische Pasta p.P.)' : 'Beilage (70 g Trockenpasta p.P.)';
+          mealLabel = isFresh ? 'Beilage / Vorspeise (100 g p.P. ungekochte frische Pasta)' : 'Beilage / Vorspeise (70 g p.P. Trockennudeln)';
         } else if (meal === 'kids') {
           rawPerPersonG = isFresh ? 80 : 55;
-          mealLabel = isFresh ? 'Kinderportion (80 g frische Pasta p.P.)' : 'Kinderportion (55 g Trockenpasta p.P.)';
+          mealLabel = isFresh ? 'Kinderportion (80 g p.P. ungekochte frische Pasta)' : 'Kinderportion (55 g p.P. Trockennudeln)';
         } else if (meal === 'custom') {
           if (inputs.customGramsPerPerson === undefined || inputs.customGramsPerPerson === null || String(inputs.customGramsPerPerson).trim() === '') {
             return {
@@ -4641,7 +4682,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             };
           }
           rawPerPersonG = customG;
-          mealLabel = 'Individuell (' + customG + ' g p.P.)';
+          mealLabel = `Individuell (${customG} g p.P. ${rawTerm})`;
         }
 
         const totalRawG = Math.round(persons * rawPerPersonG);
@@ -4688,13 +4729,35 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               formattedValue: factorLabel
             }
           ],
+          basisSummary: [
+            { label: 'Berechnungsmodus', value: 'Portionen planen (Personen & Hunger)' },
+            {
+              label: 'Nudelsorte / Quellfaktor',
+              value: isFresh
+                ? 'Frische Pasta / Eierteigwaren (Faktor 1,5)'
+                : (factorPreset === 'soft'
+                    ? 'Weicher gekocht / Suppennudeln (Faktor 2,5)'
+                    : (factorPreset === 'custom'
+                        ? `Benutzerdefinierter Quellfaktor (Faktor ${factor.toFixed(1).replace('.', ',')})`
+                        : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
+            },
+            { label: 'Anzahl Personen', value: `${persons} Personen` },
+            { label: 'Mahlzeiten-Art & Hunger', value: mealLabel },
+            { label: 'Portionsannahme p.P.', value: `${rawPerPersonG} g ${rawTerm} p.P.` }
+          ],
+          calculationSteps: [
+            `Portionsannahme: ${persons} Personen × ${rawPerPersonG} g ${rawTerm} p.P. = ${totalRawG} g ${rawTerm} (Rohgewicht)`,
+            `Gekochte Ausbeute: ${totalRawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatNumber(totalCookedG, 0)} g gekochte Pasta`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatNumber(waterLiters, 1)} Liter Wasser`,
+            `Salzempfehlung (ca. 10 g je Liter): ${formatNumber(waterLiters, 1)} l × 10 g = ${saltG} g Salz`
+          ],
           directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalRawG + ' g ' + rawTerm + ', was bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertiger Pasta entspricht.',
           summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalRawG + ' g ' + rawTerm + ' (' + rawPerPersonG + ' g p.P.). Beim Kochen saugt die Pasta Wasser auf und ergibt bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln.',
           qualifications: [
             'Empfohlene Topfgröße: Mindestens ' + recommendedPotLiters + ' Liter Topfvolumen, damit das Kochwasser nach dem Hineingeben der Pasta ausreichend Raum hat.',
             isFresh
-              ? 'Frische Eierteig-Pasta aus dem Kühlregal enthält bereits ca. 25–30 % Eigenfeuchtigkeit und quillt mit Faktor 1,5 deutlich weniger als Hartweizen-Trockennudeln. Daher wird für die gleiche gekochte Portion ein höheres Rohgewicht benötigt (ca. 150 g p.P. für ein Hauptgericht).'
-              : 'Klassische getrocknete Hartweizenpasta al dente quillt mit Faktor 2,3 (aus 100 g werden ca. 230 g gekochte Pasta).',
+              ? 'Frische Eierteig-Pasta aus dem Kühlregal enthält bereits ca. 25–30 % Eigenfeuchtigkeit und quillt mit Faktor 1,5 deutlich weniger als Hartweizen-Trockennudeln. Die Richtwerte (150 g p.P. ungekochte frische Pasta ergeben ca. 225 g gekocht gegenüber 110 g p.P. Trockennudeln mit ca. 253 g gekocht) stellen separate praxisnahe Portionsorientierungen dar und sind kein identisches Ausbeutegewicht.'
+              : 'Klassische getrocknete Hartweizenpasta al dente quillt mit Faktor 2,3 (110 g Rohgewicht ergeben ca. 253 g gekochte Pasta).',
             'Kochwasser und Salz sind praktische Zubereitungsempfehlungen (10-100-1000-Regel) und stellen keine Mindestverzehrmengen dar.'
           ]
         };
@@ -4758,6 +4821,28 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               value: factor,
               formattedValue: factorLabel
             }
+          ],
+          basisSummary: [
+            { label: 'Berechnungsmodus', value: 'Trockengewicht → Gekochtgewicht' },
+            {
+              label: 'Nudelsorte / Quellfaktor',
+              value: isFresh
+                ? 'Frische Pasta / Eierteigwaren (Faktor 1,5)'
+                : (factorPreset === 'soft'
+                    ? 'Weicher gekocht / Suppennudeln (Faktor 2,5)'
+                    : (factorPreset === 'custom'
+                        ? `Benutzerdefinierter Quellfaktor (Faktor ${factor.toFixed(1).replace('.', ',')})`
+                        : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
+            },
+            { label: isFresh ? 'Ausgangsgewicht (frische Pasta)' : 'Ausgangsgewicht (Trockennudeln)', value: `${rawG} g ${rawTerm}` },
+            { label: 'Ergebnis (gekocht)', value: `ca. ${formatNumber(totalCookedG, 0)} g gekocht` }
+          ],
+          calculationSteps: [
+            `Ausgangsgewicht: ${rawG} g ${rawTerm}`,
+            `Gekochte Ausbeute: ${rawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatNumber(totalCookedG, 0)} g gekochte Pasta`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${rawG} g ÷ 100 × 1,0 l = ${formatNumber(waterLiters, 1)} Liter Wasser`,
+            `Salzempfehlung: ${formatNumber(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
+            `Portionen-Richtwert: ${rawG} g ÷ ${portionRef} g p.P. = ca. ${portions} Portionen`
           ],
           directAnswer: rawG + ' g ' + rawTerm + ' ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
           summaryText: rawG + ' g ' + rawTerm + ' ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln. Empfohlen werden ca. ' + formatNumber(waterLiters, 1) + ' l Kochwasser und ' + saltG + ' g Salz.',
@@ -4828,6 +4913,28 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               formattedValue: factorLabel
             }
           ],
+          basisSummary: [
+            { label: 'Berechnungsmodus', value: 'Gekochtgewicht → Trockengewicht' },
+            {
+              label: 'Nudelsorte / Quellfaktor',
+              value: isFresh
+                ? 'Frische Pasta / Eierteigwaren (Faktor 1,5)'
+                : (factorPreset === 'soft'
+                    ? 'Weicher gekocht / Suppennudeln (Faktor 2,5)'
+                    : (factorPreset === 'custom'
+                        ? `Benutzerdefinierter Quellfaktor (Faktor ${factor.toFixed(1).replace('.', ',')})`
+                        : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
+            },
+            { label: 'Gewünschte Fertigmenge (gekocht)', value: `${formatNumber(cookedG, 0)} g gekocht` },
+            { label: isFresh ? 'Ergebnis Rohgewicht (frische Pasta)' : 'Ergebnis Rohgewicht (Trockennudeln)', value: `${totalRawG} g ${rawTerm}` }
+          ],
+          calculationSteps: [
+            `Gewünschte Fertigmenge: ${formatNumber(cookedG, 0)} g gekochte Pasta`,
+            `Rückrechnung Rohgewicht: ${formatNumber(cookedG, 0)} g ÷ ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${totalRawG} g ${rawTerm}`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatNumber(waterLiters, 1)} Liter Wasser`,
+            `Salzempfehlung: ${formatNumber(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
+            `Portionen-Richtwert: ${totalRawG} g ÷ ${portionRef} g p.P. = ca. ${portions} Portionen`
+          ],
           directAnswer: 'Für ' + formatNumber(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalRawG + ' g ' + rawTerm + ' ab (bei ' + factorLabel + ').',
           summaryText: 'Um ca. ' + formatNumber(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalRawG + ' g ' + rawTerm + ' ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
           qualifications: [
@@ -4844,7 +4951,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       description: "Portionsplanung für 4 Erwachsene als Hauptgericht mit getrockneten Hartweizenspaghetti bei Quellfaktor 2,3 (al dente) inklusive Kochwasser- und Salzempfehlung nach der 10-100-1000-Regel.",
       inputValues: [
         { label: "Personen", value: "4 Erwachsene" },
-        { label: "Mahlzeit", value: "Hauptgericht (110 g p.P. trocken)" },
+        { label: "Mahlzeit", value: "Hauptgericht (110 g p.P. Trockennudeln)" },
         { label: "Quellfaktor", value: "2,3 (al dente)" }
       ],
       steps: [
@@ -4889,6 +4996,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
     ],
     relatedSlugs: ['portionsrechner', 'wasser-reis-verhaeltnis-rechner', 'kalorien-rezept-rechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-21',
+      sourceName: 'Küchenfachliche Richtwerte für Hartweizen- und Frischteigwaren & Barilla-Kochstandards',
+      methodology: 'Quellfaktoren nach Stärkeverkleisterung und 10-100-1000-Wasserfaustregel',
+    },
   },
   {
     id: "sauerteig-anstellgut-rechner",
