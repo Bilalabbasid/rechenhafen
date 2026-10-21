@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="co2PreisSvgTitle co2PreisSvgDesc">
+  <title id="co2PreisSvgTitle">CO2-Kosten berechnen: kg in Tonnen und Euro-Betrag</title>
+  <desc id="co2PreisSvgDesc">Infografik zur Berechnung von CO2-Kosten: Emissionsmenge in Kilogramm geteilt durch 1.000 ergibt Tonnen, multipliziert mit dem Preis je Tonne ergibt den CO2-Kostenbetrag.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; rx: 12; }
+      .card-accent { fill: #ffffff; stroke: #0284c7; stroke-width: 2; rx: 12; }
+      .card-info { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.5; rx: 10; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; }
+      .text-head { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 14px; }
+      .text-body { fill: #334155; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .text-sub { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" class="bg" />
+
+  <!-- Top Title Header -->
+  <text x="400" y="36" text-anchor="middle" class="text-title" font-size="20">Wie werden CO₂-Kosten berechnet?</text>
+  <text x="400" y="58" text-anchor="middle" class="text-sub" font-size="12">Die Grundrechnung: Emissionen in kg ÷ 1.000 = Tonnen CO₂ × Preis je Tonne = CO₂-Kostenbetrag</text>
+
+  <!-- Step 1: Emissionsmenge in kg -->
+  <g transform="translate(35, 80)">
+    <rect width="210" height="185" class="card" />
+    <rect x="0" y="0" width="210" height="34" rx="12" fill="#f1f5f9" />
+    <rect x="0" y="20" width="210" height="14" fill="#f1f5f9" />
+    <text x="105" y="22" text-anchor="middle" class="text-head">1. Emissionen in kg</text>
+    
+    <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0284c7">2.000 kg CO₂</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">z. B. aus Abrechnung</text>
+
+    <line x1="20" y1="102" x2="190" y2="102" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="22" y="125" class="text-body">• Aus Brennstoffmenge</text>
+    <text x="22" y="145" class="text-body">• Oder Heizkostenabrechnung</text>
+    <text x="22" y="165" class="text-body">• 0 kg ergibt 0 Euro</text>
+  </g>
+
+  <!-- Operator ÷ 1.000 -->
+  <g transform="translate(255, 140)">
+    <text x="18" y="25" text-anchor="middle" font-size="20" font-weight="bold" fill="#64748b">÷ 1.000</text>
+    <path d="M 5,35 L 30,35" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- Step 2: Tonnen CO2 & Multiplikator -->
+  <g transform="translate(295, 80)">
+    <rect width="210" height="185" class="card" />
+    <rect x="0" y="0" width="210" height="34" rx="12" fill="#f1f5f9" />
+    <rect x="0" y="20" width="210" height="14" fill="#f1f5f9" />
+    <text x="105" y="22" text-anchor="middle" class="text-head">2. Tonnen × Preis/t</text>
+    
+    <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0369a1">2,00 Tonnen</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">× 60,00 € je Tonne CO₂</text>
+
+    <line x1="20" y1="102" x2="190" y2="102" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="20" y="125" class="text-body">• Gesetzlicher BEHG-Tarif</text>
+    <text x="20" y="145" class="text-body">• Oder frei gewähltes Szenario</text>
+    <text x="20" y="165" class="text-body">• 2,00 t × 60 €/t</text>
+  </g>
+
+  <!-- Operator = -->
+  <g transform="translate(518, 140)">
+    <text x="15" y="32" text-anchor="middle" font-size="28" font-weight="bold" fill="#64748b">=</text>
+  </g>
+
+  <!-- Step 3: Rechnerischer CO2-Kostenbetrag -->
+  <g transform="translate(555, 80)">
+    <rect width="210" height="185" class="card-accent" />
+    <rect x="0" y="0" width="210" height="34" rx="12" fill="#e0f2fe" />
+    <rect x="0" y="20" width="210" height="14" fill="#e0f2fe" />
+    <text x="105" y="22" text-anchor="middle" class="text-head" fill="#0369a1">3. CO₂-Kostenbetrag</text>
+    
+    <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0f172a">120,00 €</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">rechnerischer Kostenanteil</text>
+
+    <line x1="20" y1="102" x2="190" y2="102" stroke="#bae6fd" stroke-width="1" />
+
+    <text x="20" y="125" class="text-body">• Reine Multiplikation</text>
+    <text x="20" y="145" class="text-body">• Keine automatische MwSt</text>
+    <text x="20" y="165" class="text-body">• Keine Gesamtrechnung</text>
+  </g>
+
+  <!-- Clarification Bottom Card -->
+  <g transform="translate(35, 285)">
+    <rect width="730" height="135" class="card-info" />
+    <text x="25" y="28" font-size="14" font-weight="bold" fill="#0f172a">Wichtige Grundsätze zur Einordnung des Ergebnisses:</text>
+    
+    <text x="25" y="55" class="text-body">• <tspan font-weight="bold">Nur der CO₂-Anteil:</tspan> Das Ergebnis zeigt ausschließlich die rechnerischen CO₂-Kosten, nicht die gesamte Heiz- oder Tankrechnung.</text>
+    <text x="25" y="78" class="text-body">• <tspan font-weight="bold">Keine Doppelzählung:</tspan> In Bruttopreisen an Tankstellen und in Gasverträgen ist der CO₂-Preis bereits einkalkuliert.</text>
+    <text x="25" y="101" class="text-body">• <tspan font-weight="bold">Vermieter-Mieter-Aufteilung:</tspan> Für die 10-Stufen-Aufteilung nach CO2KostAufG gilt ein gesonderter Prüfpfad im Kostenaufteilungsrechner.</text>
+    <text x="25" y="122" class="text-sub">Berechnungsmethodik gem. BEHG und EBeV 2030 Standardfaktoren (Erdgas Ho: 0,182 kg/kWh, Heizöl: 2,66 kg/l, Diesel: 2,65 kg/l, Benzin: 2,37 kg/l).</text>
+  </g>
+</svg>

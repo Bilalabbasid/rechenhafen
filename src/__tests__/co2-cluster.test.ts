@@ -227,6 +227,20 @@ describe('CO2 Calculator Cluster Verification Suite', () => {
       expect(res.primary.value).toBe(0);
       expect(res.qualifications?.some((q) => q.includes('NICHT Ihre gesamte Heiz- oder Spritrechnung'))).toBe(true);
     });
+
+    it('supports Modus A: known emissions (2,000 kg * 60 €/t = 120 €) preserving user tax basis', () => {
+      const res = calculateCarbonPrice({
+        calculationMode: 'by_emissions',
+        emissionsAmount: 2000,
+        emissionsUnit: 'kg',
+        pricePerTonne: 60,
+      });
+
+      expect(res.error).toBeUndefined();
+      expect(res.primary.value).toBe(120);
+      expect(res.directAnswer).toContain('2.000 kg CO₂ (2 Tonnen)');
+      expect(res.directAnswer).toContain('120,00');
+    });
   });
 
   describe('5. Existing Page Improvements', () => {
@@ -320,12 +334,12 @@ describe('CO2 Calculator Cluster Verification Suite', () => {
     });
 
     it('includes both new supporting articles in getAllArticles()', () => {
-      const art1 = getArticleBySlug('wie-viel-co2-verursacht-eine-kilowattstunde-strom');
+      const art1 = getArticleBySlug('co2-pro-kwh-strom');
       expect(art1).toBeDefined();
       expect(art1?.primaryCalculator.slug).toBe('co2-strom-rechner');
       expect(art1?.coverIllustration?.src).toBe('/images/ratgeber/co2-strom-kwh-berechnung-formel.svg');
 
-      const art2 = getArticleBySlug('co2-beim-pendeln-auto-und-bahn-richtig-vergleichen');
+      const art2 = getArticleBySlug('co2-arbeitsweg-auto-bahn');
       expect(art2).toBeDefined();
       expect(art2?.primaryCalculator.slug).toBe('co2-pendeln-rechner');
       expect(art2?.coverIllustration?.src).toBe('/images/ratgeber/co2-pendeln-verkehrsmittel-vergleich.svg');
@@ -359,8 +373,8 @@ describe('CO2 Calculator Cluster Verification Suite', () => {
       expect(urls.has('https://rechenhafen.de/rechner/co2-abgabe-vermieter-mieter-rechner/')).toBe(true);
       expect(urls.has('https://rechenhafen.de/rechner/heizkostenvergleich-rechner/')).toBe(true);
 
-      expect(urls.has('https://rechenhafen.de/ratgeber/wie-viel-co2-verursacht-eine-kilowattstunde-strom/')).toBe(true);
-      expect(urls.has('https://rechenhafen.de/ratgeber/co2-beim-pendeln-auto-und-bahn-richtig-vergleichen/')).toBe(true);
+      expect(urls.has('https://rechenhafen.de/ratgeber/co2-pro-kwh-strom/')).toBe(true);
+      expect(urls.has('https://rechenhafen.de/ratgeber/co2-arbeitsweg-auto-bahn/')).toBe(true);
     });
   });
 });
