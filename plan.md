@@ -586,3 +586,66 @@
 #### H. SEO, Metadata & Internal Links
 - [x] **[Already Fixed]** Canonical URLs and slugs preserved without changes (`/rechner/wasserverbrauch-haushalt-rechner/`, `/rechner/kies-splitt-rechner/`, `/rechner/schalungssteine-rechner/`, `/rechner/nudeln-rohmaerk-gewicht-rechner/`, `/rechner/wasser-reis-verhaeltnis-rechner/`).
 - [x] **[Already Fixed]** Titles, descriptions, and H1s match actual user tasks and include "kostenlos" naturally. Contextual guide links and backlinks verified.
+
+---
+
+## 13. Sourced CO₂ Calculator Cluster & Existing Calculator Improvements (October 2026)
+
+### Scope Overview
+1. **Shared Versioned Emissions Factor Registry** (`src/data/emissions/index.ts`):
+   - Versioned, verified factors with explicit boundaries (`direct_combustion` Scope 1 vs. `energy_generation` Scope 2 vs. `lifecycle` Well-to-Wheel / CO₂e).
+   - Full metadata: value, unit, geographic coverage (DE), reference year, source URL, source publication/table, status (`estimated` | `provisional` | `final`), verification date, and boundary caveats.
+2. **New Calculators (in order)**:
+   - 1. `/rechner/co2-strom-rechner/` (Electricity consumption in kWh, period, sourced UBA factor 344 g CO₂/kWh for 2025 published March 2026, scenario comparisons, original SVG).
+   - 2. `/rechner/co2-pendeln-rechner/` (Commuting distance, return trip, actual commuting days, home-office reduction, sourced UBA 2024 Pkm factors [car 164 g/Pkm, train long-distance 44 g/Pkm, regional 79 g/Pkm, bus 108 g/Pkm], separate route lengths, original SVG).
+   - 3. `/rechner/co2-preis-rechner/` (BEHG/EBeV fuel carbon pricing for gas, heating oil, petrol, diesel, LPG; statutory rates 2024–2026, VAT treatment, clear separation of carbon surcharge vs. total bill, no speculative market price claims for ETS-2).
+3. **Existing Page Improvements**:
+   - `/rechner/co2-auto-rechner/`: Audit 0.38 kg/kWh factor, update to latest UBA factor (344 g/kWh for generation vs. 400 g/kWh lifecycle), add trip mode (annual vs. single trip), clarify combustion vs. electricity generation.
+   - `/rechner/co2-abgabe-vermieter-mieter-rechner/`: Audit against CO2KostAufG 10-Stufenmodell, clarify building vs. dwelling scope, invoice data support, partial-year periods, statutory exemption cases (§ 9).
+   - `/rechner/heizkostenvergleich-rechner/`: Resolve promise mismatch (implement district heating / Fernwärme, optional maintenance), add emission comparison with compatible boundaries.
+4. **Supporting Guides & Articles**:
+   - `/ratgeber/wie-viel-co2-verursacht-eine-kilowattstunde-strom/`
+   - `/ratgeber/co2-beim-pendeln-auto-und-bahn-richtig-vergleichen/`
+5. **Original SVG Visualizations**:
+   - Electricity calculation flow diagram (`kWh × Faktor → kg CO₂`).
+   - Commuting comparison bar visualization with accessible numerical data alternative.
+6. **Regression Tests & Release**:
+   - Unit tests covering arithmetic (e.g., 2,500 kWh × 344 g = 860 kg; 7,200 Pkm × 164 g = 1,180.8 kg; 7,200 Pkm × 44 g = 316.8 kg), edge cases, zero handling, input pauses, sitemap inclusion, and clean build.
+
+### Implementation Status
+- [x] Phase 1: Shared Versioned Emissions Factor Registry (`src/data/emissions/index.ts`)
+  - Created strongly typed registry with complete metadata: value, unit, geographicCoverage ('Deutschland (DE)'), referenceYear, sourceUrl, sourcePublication, sourceSection, gasType ('CO2' | 'CO2e'), boundary ('direct_combustion' | 'energy_generation' | 'lifecycle'), status ('estimated' | 'provisional' | 'final' | 'statutory'), verificationDate, and boundary notes.
+  - Sourced UBA Strommix 2025 estimate (344 g CO₂/kWh direct generation; published March 2026), lifecycle Strommix (410 g CO₂e/kWh), certified green electricity lifecycle (25 g CO₂e/kWh), UBA TREMOD 2024 passenger-km factors (Pkw: 164 g CO₂e/Pkm; Fernverkehr Bahn: 44 g CO₂e/Pkm; Nahverkehr Bahn: 79 g CO₂e/Pkm; Linienbus: 108 g CO₂e/Pkm; E-Bike: 4 g CO₂e/Pkm), and statutory BEHG/EBeV fuel factors (Erdgas: 0.182 kg/kWh; Heizöl: 2.66 kg/l; Benzin: 2.37 kg/l; Diesel: 2.65 kg/l; LPG: 1.65 kg/l).
+- [x] Phase 2: Improve Existing Calculators
+  - `/rechner/co2-auto-rechner/`: Audited legacy 0.38 kg/kWh factor. Updated to official UBA 2025 values (344 g CO₂/kWh generation Scope 2 vs. 410 g CO₂e/kWh lifecycle Scope 3); added mode selection (annual vs. single trip); added clear distinction between direct combustion and well-to-wheel lifecycle.
+  - `/rechner/co2-abgabe-vermieter-mieter-rechner/`: Audited against Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG 10-Stufenmodell); clarified building vs. dwelling scope; added invoice value input; added annualized partial-year calculation for under-year tenancy changes; implemented § 9 statutory exemptions (Denkmalschutz / legal hurdles halving landlord share to 50%; district heating mandate setting landlord share to 0%).
+  - `/rechner/heizkostenvergleich-rechner/`: Implemented missing district heating (Fernwärme) functionality; added optional maintenance and chimney sweep toggle (`includeMaintenance`); added compatible lifecycle CO₂e emission comparisons based on useful heat delivered.
+- [x] Phase 3: New Calculators (in exact order)
+  - 1. `/rechner/co2-strom-rechner/` (haushalt category): Supports kWh, billing period (year, month, single), UBA 2025 factor (344 g CO₂/kWh), lifecycle option (410 g CO₂e/kWh), certified green electricity option (25 g CO₂e/kWh), custom factor input, kg and tonnes output, step-by-step formula breakdown, and green electricity savings calculation.
+  - 2. `/rechner/co2-pendeln-rechner/` (auto category): One-way and return distance support, actual commuting days, vehicle modes (fleet average 164 g/Pkm, personal car with custom fuel/occupancy, carpooling, train ICE 44 g/Pkm, regional train 79 g/Pkm, transit bus 108 g/Pkm, bike/foot 0 g), separate route lengths for rail vs. road, homeoffice savings reduction, and strict adherence to passenger-km methodology (no double division by occupancy).
+  - 3. `/rechner/co2-preis-rechner/` (haushalt category): Statutory BEHG rates (2024: 45 €/t, 2025: 55 €/t, 2026: corridor 55–65 €/t), EBeV 2030 fuel factors, VAT toggle (19 % gross vs. net), unit surcharge output (ct/kWh, ct/l), clear distinction that result is the carbon component only and not the total fuel bill, and warnings against adding it to already taxed retail prices.
+- [x] Phase 4: Supporting Ratgeber Articles & Original SVG Visualizations
+  - Generated original SVG `public/images/ratgeber/co2-strom-kwh-berechnung-formel.svg` (kWh × factor → kg CO₂ flow, formula steps, green power comparison).
+  - Generated original SVG `public/images/ratgeber/co2-pendeln-verkehrsmittel-vergleich.svg` (commuting comparison chart based on 20 km × 2 × 180 d = 7,200 Pkm, numerical data alternative, homeoffice levers).
+  - Published Ratgeber article `/ratgeber/wie-viel-co2-verursacht-eine-kilowattstunde-strom/` with UBA 2025/2026 context, Scope 2 vs. lifecycle boundary clarification, green power lifecycle truth, EnWG § 42 electricity labeling guidance, worked examples, and official citations.
+  - Published Ratgeber article `/ratgeber/co2-beim-pendeln-auto-und-bahn-richtig-vergleichen/` with Pkm methodology, carpooling, public transit vs. train comparison, homeoffice levers, worked examples, and UBA TREMOD 2024 citations.
+- [x] Phase 5: Test Suites, Quality Verification, Production Build, Git Commit & Push
+  - Built comprehensive test suite `src/__tests__/co2-cluster.test.ts` (22 tests) verifying arithmetic fixtures:
+    - 2,500 kWh × 344 g/kWh ÷ 1,000 = 860 kg CO₂.
+    - 20 km × 2 × 180 d = 7,200 km; 7,200 × 164 g = 1,180.8 kg CO₂e; 7,200 × 44 g = 316.8 kg CO₂e (864 kg CO₂e saved).
+    - Gas carbon price: 15,000 kWh × 0.182 kg/kWh = 2,730 kg CO₂; 2.73 t × 55 €/t = 150.15 € net; 178.68 € gross with 19% VAT (1.19 ct/kWh surcharge).
+    - Heating oil carbon price: 2,000 l × 2.66 kg/l = 5,320 kg CO₂; 5.32 t × 45 €/t = 239.40 € net; 284.89 € gross.
+    - Zero inputs: 0 kWh / 0 km / 0 units return valid 0 result without fallback to default.
+    - Stale inputs: blank / negative inputs pause calculations and return validation feedback.
+    - Dynamic loader resolves all 6 engines (`loadCalculatorEngine`).
+    - Sitemap includes all 6 calculators and 2 new articles with truthful lastmod dates.
+  - All 40 test suites passing (1,145 tests).
+  - Typecheck (`tsc --noEmit`): 0 errors.
+  - Linter (`npm run lint`): 0 warnings.
+  - Production build (`next build`): 476/476 static pages prerendered successfully.
+
+### Outstanding Questions & Methodological Limitations
+1. **Scope 2 vs. Scope 3 Lifecycle**: In accordance with GHG protocol, generation factors (344 g CO₂/kWh) and lifecycle factors (410 g CO₂e/kWh) are presented as distinct scenarios with prominent labels so users never conflate Kraftwerksebene with Well-to-Wheel.
+2. **Post-2026 Carbon Pricing (ETS-2)**: The EU Emissions Trading System (ETS-2) for buildings and transport will take effect from 2027 onwards with market-based auctioning. In accordance with guidelines, future auction prices are not presented as known facts; the calculator explicitly labels 2027+ values as variable market scenarios rather than statutory fixed rates.
+3. **No Certification Claims**: RechenHafen calculators do not claim official carbon certification or calculate total personal footprints. Scope boundaries are disclosed near every result.
+

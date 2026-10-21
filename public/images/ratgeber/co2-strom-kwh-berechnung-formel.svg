@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450" role="img" aria-labelledby="co2StromSvgTitle co2StromSvgDesc">
+  <title id="co2StromSvgTitle">CO2-Ausstoß aus Stromverbrauch berechnen: kWh × Emissionsfaktor = kg CO2</title>
+  <desc id="co2StromSvgDesc">Infografik zur Umrechnung von Kilowattstunden Strom in CO2-Emissionen anhand der offiziellen UBA-Faktoren für den deutschen Strommix und Ökostrom.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; rx: 12; }
+      .card-accent { fill: #ffffff; stroke: #0284c7; stroke-width: 2; rx: 12; }
+      .card-green { fill: #f0fdf4; stroke: #16a34a; stroke-width: 1.5; rx: 12; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; }
+      .text-head { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 14px; }
+      .text-body { fill: #334155; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .text-sub { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; }
+      .badge-blue { fill: #0284c7; }
+      .badge-green { fill: #16a34a; }
+      .arrow { stroke: #0284c7; stroke-width: 2; fill: none; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" class="bg" />
+
+  <!-- Top Title Header -->
+  <text x="400" y="36" text-anchor="middle" class="text-title" font-size="20">Wie wird Stromverbrauch in CO₂ umgerechnet?</text>
+  <text x="400" y="58" text-anchor="middle" class="text-sub" font-size="12">Offizielle Formel des Umweltbundesamtes (UBA): Kilowattstunden (kWh) × Emissionsfaktor (g/kWh) ÷ 1.000</text>
+
+  <!-- Step 1: Stromverbrauch (kWh) -->
+  <g transform="translate(35, 80)">
+    <rect width="210" height="185" class="card" />
+    <rect x="0" y="0" width="210" height="34" rx="12" fill="#f1f5f9" />
+    <rect x="0" y="20" width="210" height="14" fill="#f1f5f9" />
+    <text x="105" y="22" text-anchor="middle" class="text-head">1. Stromverbrauch</text>
+    
+    <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0284c7">2.500 kWh</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">z. B. 2-Personen-Haushalt</text>
+
+    <line x1="20" y1="102" x2="190" y2="102" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="25" y="125" class="text-body">• 1 Person: ca. 1.500 kWh</text>
+    <text x="25" y="145" class="text-body">• 2 Personen: ca. 2.500 kWh</text>
+    <text x="25" y="165" class="text-body">• Familie (4 P.): ca. 3.500 kWh</text>
+  </g>
+
+  <!-- Operator × -->
+  <text x="270" y="178" text-anchor="middle" font-size="26" font-weight="bold" fill="#64748b">×</text>
+
+  <!-- Step 2: Emissionsfaktor (g/kWh) -->
+  <g transform="translate(295, 80)">
+    <rect width="210" height="185" class="card" />
+    <rect x="0" y="0" width="210" height="34" rx="12" fill="#f1f5f9" />
+    <rect x="0" y="20" width="210" height="14" fill="#f1f5f9" />
+    <text x="105" y="22" text-anchor="middle" class="text-head">2. UBA-Faktor (g/kWh)</text>
+    
+    <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0369a1">344 g CO₂/kWh</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">Strommix 2025 (UBA 2026)</text>
+
+    <line x1="20" y1="102" x2="190" y2="102" stroke="#e2e8f0" stroke-width="1" />
+
+    <text x="20" y="125" class="text-body">• Kraftwerksebene: 344 g CO₂</text>
+    <text x="20" y="145" class="text-body">• Lebenszyklus: 410 g CO₂e</text>
+    <text x="20" y="165" class="text-body">• Neuanlagen-Öko: 25 g CO₂e</text>
+  </g>
+
+  <!-- Operator = -->
+  <text x="530" y="178" text-anchor="middle" font-size="26" font-weight="bold" fill="#64748b">=</text>
+
+  <!-- Step 3: Resultat (kg / t CO2) -->
+  <g transform="translate(555, 80)">
+    <rect width="210" height="185" class="card-accent" />
+    <rect x="0" y="0" width="210" height="34" rx="12" fill="#e0f2fe" />
+    <rect x="0" y="20" width="210" height="14" fill="#e0f2fe" />
+    <text x="105" y="22" text-anchor="middle" class="text-head" fill="#0369a1">3. CO₂-Emissionen</text>
+    
+    <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0f172a">860 kg CO₂</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">entspricht 0,86 Tonnen CO₂</text>
+
+    <line x1="20" y1="102" x2="190" y2="102" stroke="#bae6fd" stroke-width="1" />
+
+    <text x="20" y="125" class="text-body">• 860.000 g ÷ 1.000 = 860 kg</text>
+    <text x="20" y="145" class="text-body">• Monatsmittel: ca. 71,7 kg</text>
+    <text x="20" y="165" class="text-body">• Lebenszyklus: 1.025 kg CO₂e</text>
+  </g>
+
+  <!-- Comparison Box: Ökostrom vs. Standard Strommix -->
+  <g transform="translate(35, 285)">
+    <rect width="730" height="135" class="card-green" />
+    <text x="25" y="28" font-size="14" font-weight="bold" fill="#15803d">Vergleich &amp; Einsparpotenzial: Standard-Strommix vs. Neuanlagen-Ökostrom</text>
+    <text x="25" y="48" class="text-sub">Basis: 2.500 kWh Jahresverbrauch | Ökostrom verursacht im Lebenszyklus ca. 25 g CO₂e/kWh</text>
+
+    <!-- Bar 1: Standard Mix -->
+    <text x="25" y="78" class="text-body" font-weight="600">Standard-Strommix (344 g CO₂/kWh):</text>
+    <rect x="300" y="65" width="320" height="18" rx="4" fill="#64748b" />
+    <text x="630" y="79" font-size="12" font-weight="bold" fill="#0f172a">860 kg CO₂</text>
+
+    <!-- Bar 2: Green Electricity -->
+    <text x="25" y="108" class="text-body" font-weight="600">Ökostrom Neuanlagen (25 g CO₂e/kWh):</text>
+    <rect x="300" y="95" width="23" height="18" rx="4" fill="#16a34a" />
+    <text x="335" y="109" font-size="12" font-weight="bold" fill="#15803d">62,5 kg CO₂e (-797,5 kg Vermeidung)</text>
+  </g>
+</svg>

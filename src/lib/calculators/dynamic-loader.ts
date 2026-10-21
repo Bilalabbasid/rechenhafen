@@ -452,7 +452,10 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "wahrscheinlichkeit-wuerfel-muenze-rechner": "extraBusinessStatistik",
   "perzentil-rechner": "extraBusinessStatistik",
   "effektstaerke-cohens-d-rechner": "extraBusinessStatistik",
-  "chi-quadrat-unabhaengigkeitstest-rechner": "extraBusinessStatistik"
+  "chi-quadrat-unabhaengigkeitstest-rechner": "extraBusinessStatistik",
+  "co2-pendeln-rechner": "auto",
+  "co2-strom-rechner": "haushalt",
+  "co2-preis-rechner": "haushalt"
 };
 
 // In-Memory-Cache für bereits geladene Engines

@@ -2624,22 +2624,24 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
   {
     id: 'heizkostenvergleich-rechner',
     slug: 'heizkostenvergleich-rechner',
-    name: 'Heizkostenvergleich-Rechner (Wärmepumpe, Gas, Öl, Pellets)',
+    name: 'Heizkostenvergleich-Rechner (Wärmepumpe, Gas, Öl, Pellets, Fernwärme)',
     shortName: 'Heizkostenvergleich',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'Heizkostenvergleich Rechner – Gas, Öl, Pellets',
-    metaDescription: 'Vergleichen Sie die jährlichen Brennstoff- und Heizkosten verschiedener Heizsysteme bei identischem Wärmebedarf Ihres Hauses.',
-    h1: 'Heizkostenvergleich Rechner – Heizsysteme & Kosten vergleichen',
-    shortDescription: 'Vergleicht die reinen Brennstoff- und Verbrauchskosten verschiedener Heiztechnologien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['heizkostenvergleich rechner', 'waermepumpe vs gasheizung kosten', 'heizoel pellets vergleich kwh', 'was heizt am guenstigsten'],
+    metaTitle: 'Heizkostenvergleich Rechner – Wärmepumpe, Gas, Öl, Pellets & Fernwärme',
+    metaDescription: 'Vergleichen Sie die jährlichen Brennstoffkosten, Wartungsausgaben und CO2-Emissionen moderner Heizsysteme bei identischem Nutzwärmebedarf.',
+    h1: 'Heizkostenvergleich Rechner – Heizsysteme, Kosten & CO2 vergleichen',
+    shortDescription: 'Vergleicht die jährlichen Brennstoff- und Betriebskosten sowie die CO2-Emissionen von Wärmepumpe, Gas, Öl, Pellets und Fernwärme bei gleichem Nutzwärmebedarf.',
+    searchKeywords: ['heizkostenvergleich rechner', 'waermepumpe vs gasheizung kosten', 'heizoel pellets vergleich kwh', 'fernwaerme kosten vergleich', 'co2 heizung vergleich'],
     inputs: [
-      { id: 'heatDemandKwh', label: 'Jährlicher Heizenergiebedarf in kWh', type: 'number', defaultValue: 18000, min: 3000, step: 1000, unit: 'kWh' },
-      { id: 'gasPriceCent', label: 'Gaspreis in Cent pro kWh', type: 'number', defaultValue: 11.0, min: 5, max: 25, step: 0.5, unit: 'ct/kWh' },
-      { id: 'oilPricePerLiter', label: 'Heizölpreis in Euro pro Liter', type: 'number', defaultValue: 1.05, min: 0.5, max: 2.0, step: 0.05, unit: '€/Liter' },
-      { id: 'pelletPricePerTon', label: 'Holzpellets Preis in Euro pro Tonne', type: 'number', defaultValue: 320, min: 150, max: 600, step: 10, unit: '€/t' },
-      { id: 'heatPumpJaz', label: 'Wärmepumpe Jahresarbeitszahl (JAZ)', type: 'number', defaultValue: 3.6, min: 2.0, max: 5.0, step: 0.1 },
-      { id: 'heatPumpPowerPrice', label: 'Wärmepumpenstrom-Tarif in Cent pro kWh', type: 'number', defaultValue: 28, min: 15, max: 45, step: 1, unit: 'ct/kWh' },
+      { id: 'heatDemandKwh', label: 'Jährlicher Nutzwärmebedarf des Gebäudes in kWh', type: 'number', defaultValue: 18000, min: 1000, max: 200000, step: 1000, unit: 'kWh' },
+      { id: 'gasPriceCent', label: 'Gaspreis in Cent pro kWh (Brennwertbezogen)', type: 'number', defaultValue: 11.0, min: 4, max: 35, step: 0.5, unit: 'ct/kWh' },
+      { id: 'oilPricePerLiter', label: 'Heizölpreis in Euro pro Liter', type: 'number', defaultValue: 1.05, min: 0.5, max: 3.0, step: 0.05, unit: '€/Liter' },
+      { id: 'pelletPricePerTon', label: 'Holzpellets Preis in Euro pro Tonne', type: 'number', defaultValue: 320, min: 150, max: 800, step: 10, unit: '€/t' },
+      { id: 'heatPumpJaz', label: 'Wärmepumpe Jahresarbeitszahl (JAZ)', type: 'number', defaultValue: 3.6, min: 1.5, max: 6.0, step: 0.1 },
+      { id: 'heatPumpPowerPrice', label: 'Wärmepumpenstrom-Tarif in Cent pro kWh', type: 'number', defaultValue: 28, min: 15, max: 55, step: 1, unit: 'ct/kWh' },
+      { id: 'districtHeatingPriceCent', label: 'Fernwärmepreis in Cent pro kWh', type: 'number', defaultValue: 12.5, min: 5, max: 35, step: 0.5, unit: 'ct/kWh' },
+      { id: 'includeMaintenance', label: 'Jährliche Schornsteinfeger- & Wartungskosten einbeziehen', type: 'boolean', defaultValue: false },
     ],
     calculate: (inputs) => {
       const demand = inputs.heatDemandKwh !== undefined && inputs.heatDemandKwh !== '' ? Math.max(0, parseFloat(inputs.heatDemandKwh) || 0) : 18000;
@@ -2648,53 +2650,175 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const pelletTon = inputs.pelletPricePerTon !== undefined && inputs.pelletPricePerTon !== '' ? Math.max(0, parseFloat(inputs.pelletPricePerTon) || 0) : 320;
       const jaz = inputs.heatPumpJaz !== undefined && inputs.heatPumpJaz !== '' ? Math.max(0.1, parseFloat(inputs.heatPumpJaz) || 0.1) : 3.6;
       const wpCent = inputs.heatPumpPowerPrice !== undefined && inputs.heatPumpPowerPrice !== '' ? Math.max(0, parseFloat(inputs.heatPumpPowerPrice) || 0) : 28;
+      const fwCent = inputs.districtHeatingPriceCent !== undefined && inputs.districtHeatingPriceCent !== '' ? Math.max(0, parseFloat(inputs.districtHeatingPriceCent) || 0) : 12.5;
+      const withMaint = Boolean(inputs.includeMaintenance);
 
-      // 1. Gas (Nutzungsgrad ca. 92%)
-      const gasCost = ((demand / 0.92) * gasCent) / 100;
-      // 2. Öl (ca. 10 kWh/Liter, Nutzungsgrad ca. 88%)
-      const litersNeeded = demand / (10 * 0.88);
-      const oilCost = litersNeeded * oilLiter;
-      // 3. Pellets (ca. 4.900 kWh/Tonne, Nutzungsgrad ca. 90%)
-      const tonsNeeded = demand / (4900 * 0.90);
-      const pelletCost = tonsNeeded * pelletTon;
-      // 4. Wärmepumpe
-      const wpCost = ((demand / jaz) * wpCent) / 100;
+      // Wartungspauschalen pro Jahr
+      const maintWp = withMaint ? 100 : 0;
+      const maintGas = withMaint ? 180 : 0;
+      const maintOil = withMaint ? 240 : 0;
+      const maintPellet = withMaint ? 300 : 0;
+      const maintFw = withMaint ? 50 : 0;
+
+      // 1. Wärmepumpe (Strombedarf = Nutzwärme / JAZ)
+      const wpPowerKwh = demand / jaz;
+      const wpEnergyCost = (wpPowerKwh * wpCent) / 100;
+      const wpTotal = wpEnergyCost + maintWp;
+      // Emissionen: UBA Strommix 2025 (344 g CO2/kWh Erzeugung, 410 g CO2e/kWh Well-to-Wheel)
+      const wpCo2Tonnes = (wpPowerKwh * 0.410) / 1000;
+
+      // 2. Gasbrennwert (Nutzungsgrad ca. 92% bezogen auf Ho)
+      const gasBrennstoffKwh = demand / 0.92;
+      const gasEnergyCost = (gasBrennstoffKwh * gasCent) / 100;
+      const gasTotal = gasEnergyCost + maintGas;
+      // Emissionen: 240 g CO2e/kWh inkl. Vorkette
+      const gasCo2Tonnes = (gasBrennstoffKwh * 0.240) / 1000;
+
+      // 3. Öl-Brennwert (ca. 10 kWh/l Heizwert, Nutzungsgrad ca. 88%)
+      const oilLiters = demand / (10 * 0.88);
+      const oilEnergyCost = oilLiters * oilLiter;
+      const oilTotal = oilEnergyCost + maintOil;
+      // Emissionen: 3,10 kg CO2e/l inkl. Vorkette
+      const oilCo2Tonnes = (oilLiters * 3.10) / 1000;
+
+      // 4. Holzpellets (ca. 4.900 kWh/Tonne, Nutzungsgrad ca. 90%)
+      const pelletTons = demand / (4900 * 0.90);
+      const pelletEnergyCost = pelletTons * pelletTon;
+      const pelletTotal = pelletEnergyCost + maintPellet;
+      // Emissionen: Fossile Vorkette 0,027 kg CO2e/kWh (biogenes CO2 neutral)
+      const pelletCo2Tonnes = ((demand / 0.90) * 0.027) / 1000;
+
+      // 5. Fernwärme (Übergabewirkungsgrad ca. 98%)
+      const fwKwh = demand / 0.98;
+      const fwEnergyCost = (fwKwh * fwCent) / 100;
+      const fwTotal = fwEnergyCost + maintFw;
+      // Emissionen: Bundesweiter Fernwärmemix ca. 0,160 kg CO2e/kWh
+      const fwCo2Tonnes = (fwKwh * 0.160) / 1000;
 
       return {
-        primary: { id: 'wpCost', label: 'Kosten Wärmepumpe pro Jahr', value: wpCost, formattedValue: formatCurrency(wpCost), highlight: true },
+        primary: {
+          id: 'wpCost',
+          label: 'Kosten Wärmepumpe pro Jahr',
+          value: wpTotal,
+          formattedValue: formatCurrency(wpTotal),
+          highlight: true,
+          helpText: withMaint ? 'Inklusive 100 € jährlicher Wartungspauschale.' : 'Reine Strombetriebskosten.',
+        },
         secondary: [
-          { id: 'gasCost', label: 'Kosten Gasheizung', value: gasCost, formattedValue: formatCurrency(gasCost) },
-          { id: 'oilCost', label: 'Kosten Ölheizung', value: oilCost, formattedValue: formatCurrency(oilCost) },
-          { id: 'pelletCost', label: 'Kosten Pelletheizung', value: pelletCost, formattedValue: formatCurrency(pelletCost) },
+          { id: 'gasCost', label: 'Kosten Gasheizung', value: gasTotal, formattedValue: formatCurrency(gasTotal) },
+          { id: 'fwCost', label: 'Kosten Fernwärme', value: fwTotal, formattedValue: formatCurrency(fwTotal) },
+          { id: 'pelletCost', label: 'Kosten Pelletheizung', value: pelletTotal, formattedValue: formatCurrency(pelletTotal) },
+          { id: 'oilCost', label: 'Kosten Ölheizung', value: oilTotal, formattedValue: formatCurrency(oilTotal) },
         ],
-        summaryText: `Bei ${formatNumber(demand, 0)} kWh Wärmebedarf liegen die jährlichen Kosten bei ca. ${formatCurrency(wpCost)} (Wärmepumpe), ${formatCurrency(pelletCost)} (Pellets), ${formatCurrency(gasCost)} (Gas) und ${formatCurrency(oilCost)} (Öl).`,
-        directAnswer: `Bei einem Heizbedarf von ${formatNumber(demand, 0)} kWh verursacht die Wärmepumpe ca. ${formatCurrency(wpCost)}/Jahr, verglichen mit ${formatCurrency(pelletCost)} (Pellets), ${formatCurrency(gasCost)} (Gas) und ${formatCurrency(oilCost)} (Öl).`,
+        breakdown: {
+          columns: [
+            { key: 'system', label: 'Heizsystem' },
+            { key: 'fuelCost', label: 'Brennstoff / Strom' },
+            { key: 'maintenance', label: 'Wartung / Schornsteinfeger' },
+            { key: 'total', label: 'Gesamtkosten / Jahr' },
+            { key: 'emissions', label: 'Treibhausgase (CO₂e/Jahr)' },
+          ],
+          rows: [
+            {
+              period: 1,
+              values: {
+                system: `Wärmepumpe (JAZ ${formatNumber(jaz, 1)})`,
+                fuelCost: formatCurrency(wpEnergyCost),
+                maintenance: formatCurrency(maintWp),
+                total: formatCurrency(wpTotal),
+                emissions: `${formatNumber(wpCo2Tonnes, 2)} t CO₂e`,
+              },
+            },
+            {
+              period: 2,
+              values: {
+                system: 'Pelletheizung (modern)',
+                fuelCost: formatCurrency(pelletEnergyCost),
+                maintenance: formatCurrency(maintPellet),
+                total: formatCurrency(pelletTotal),
+                emissions: `${formatNumber(pelletCo2Tonnes, 2)} t CO₂e`,
+              },
+            },
+            {
+              period: 3,
+              values: {
+                system: 'Fernwärme (Übergabestation)',
+                fuelCost: formatCurrency(fwEnergyCost),
+                maintenance: formatCurrency(maintFw),
+                total: formatCurrency(fwTotal),
+                emissions: `${formatNumber(fwCo2Tonnes, 2)} t CO₂e`,
+              },
+            },
+            {
+              period: 4,
+              values: {
+                system: 'Gas-Brennwertkessel',
+                fuelCost: formatCurrency(gasEnergyCost),
+                maintenance: formatCurrency(maintGas),
+                total: formatCurrency(gasTotal),
+                emissions: `${formatNumber(gasCo2Tonnes, 2)} t CO₂e`,
+              },
+            },
+            {
+              period: 5,
+              values: {
+                system: 'Öl-Brennwertkessel',
+                fuelCost: formatCurrency(oilEnergyCost),
+                maintenance: formatCurrency(maintOil),
+                total: formatCurrency(oilTotal),
+                emissions: `${formatNumber(oilCo2Tonnes, 2)} t CO₂e`,
+              },
+            },
+          ],
+        },
+        directAnswer: `Bei einem Nutzwärmebedarf von ${formatNumber(demand, 0)} kWh verursacht die Wärmepumpe jährlich ca. ${formatCurrency(wpTotal)} (${formatNumber(wpCo2Tonnes, 2)} t CO₂e), verglichen mit ${formatCurrency(fwTotal)} (Fernwärme), ${formatCurrency(pelletTotal)} (Pellets), ${formatCurrency(gasTotal)} (Gas) und ${formatCurrency(oilTotal)} (Öl).`,
+        summaryText: `Bei ${formatNumber(demand, 0)} kWh Nutzwärmebedarf liegen die jährlichen Gesamtkosten bei ca. ${formatCurrency(wpTotal)} (Wärmepumpe), ${formatCurrency(fwTotal)} (Fernwärme), ${formatCurrency(pelletTotal)} (Pellets), ${formatCurrency(gasTotal)} (Gas) und ${formatCurrency(oilTotal)} (Öl).`,
         basisSummary: [
-          { label: 'Wärmebedarf', value: `${formatNumber(demand, 0)} kWh` },
+          { label: 'Nutzwärmebedarf', value: `${formatNumber(demand, 0)} kWh` },
+          { label: 'Wärmepumpenstrom', value: `${formatNumber(wpCent, 1)} ct/kWh bei JAZ ${formatNumber(jaz, 1)}` },
           { label: 'Gaspreis', value: `${formatNumber(gasCent, 1)} ct/kWh` },
+          { label: 'Fernwärmepreis', value: `${formatNumber(fwCent, 1)} ct/kWh` },
           { label: 'Heizölpreis', value: `${formatCurrency(oilLiter)}/l` },
           { label: 'Pelletpreis', value: `${formatCurrency(pelletTon)}/t` },
-          { label: 'Wärmepumpenstrom', value: `${formatNumber(wpCent, 1)} ct/kWh (JAZ ${formatNumber(jaz, 1)})` },
+          { label: 'Wartungskosten', value: withMaint ? 'Einbezogen (Pauschalwerte)' : 'Nicht einbezogen (reine Brennstoffkosten)' },
+        ],
+        calculationSteps: [
+          `Wärmepumpe: (${formatNumber(demand, 0)} kWh ÷ ${formatNumber(jaz, 1)}) × ${formatNumber(wpCent, 1)} ct = ${formatCurrency(wpEnergyCost)} Strom + ${formatCurrency(maintWp)} Wartung = ${formatCurrency(wpTotal)}`,
+          `Fernwärme: (${formatNumber(demand, 0)} kWh ÷ 0,98) × ${formatNumber(fwCent, 1)} ct = ${formatCurrency(fwEnergyCost)} Wärme + ${formatCurrency(maintFw)} Wartung = ${formatCurrency(fwTotal)}`,
+          `Gas-Brennwert: (${formatNumber(demand, 0)} kWh ÷ 0,92) × ${formatNumber(gasCent, 1)} ct = ${formatCurrency(gasEnergyCost)} Gas + ${formatCurrency(maintGas)} Wartung = ${formatCurrency(gasTotal)}`,
+          `Holzpellets: (${formatNumber(demand, 0)} kWh ÷ (4.900 kWh/t × 0,90)) = ${formatNumber(pelletTons, 2)} t × ${formatCurrency(pelletTon)} = ${formatCurrency(pelletEnergyCost)} + ${formatCurrency(maintPellet)} Wartung = ${formatCurrency(pelletTotal)}`,
+          `Öl-Brennwert: (${formatNumber(demand, 0)} kWh ÷ (10 kWh/l × 0,88)) = ${formatNumber(oilLiters, 0)} l × ${formatCurrency(oilLiter)} = ${formatCurrency(oilEnergyCost)} + ${formatCurrency(maintOil)} Wartung = ${formatCurrency(oilTotal)}`,
+        ],
+        qualifications: [
+          'Emissionen werden einheitlich auf Well-to-Wheel Lebenszyklus-Basis (CO₂e inkl. Vorkette nach UBA GEMIS) verglichen.',
+          'Anschaffungs- und Investitionskosten (Heizungstausch) sind in diesem jährlichen Betriebs- und Verbrauchskostenvergleich nicht enthalten.',
+          'Wärmepumpen mit zertifiziertem 100% Ökostrom emittieren im Betrieb 0 g direkte Emissionen und ca. 0,12 t CO₂e/Jahr in der Anlagenvorkette.',
         ],
       };
     },
-    formula: 'Brennstoffkosten = (Wärmebedarf / Wirkungsgrad) × Brennstoffpreis',
-    formulaExplanation: 'Wirkungsgrade und Brennwerte bestimmen, wie viel Primärenergie zur Deckung des realen Nutzwärmebedarfs verbrannt werden muss.',
+    formula: 'Jahreskosten = (Nutzwärmebedarf / Jahresnutzungsgrad) × Brennstoffpreis + Wartung',
+    formulaExplanation: 'Der Nutzwärmebedarf wird über den feuerungstechnischen Nutzungsgrad bzw. die Jahresarbeitszahl (JAZ) in den tatsächlichen Endenergiebedarf umgerechnet und mit den Tarifpreisen sowie CO₂e-Emissionsfaktoren multipliziert.',
     workedExample: {
-      title: 'Beispiel: 18.000 kWh Nutzwärmebedarf',
-      inputValues: [{ label: 'Wärmebedarf', value: '18.000 kWh' }, { label: 'Gaspreis', value: '11 ct/kWh' }, { label: 'Wärmepumpenstrom', value: '28 ct/kWh bei JAZ 3,6' }],
-      steps: ['Wärmepumpe: (18.000 / 3,6) × 0,28 € = 1.400,00 €', 'Gasheizung: (18.000 / 0,92) × 0,11 € ≈ 2.152,17 €'],
-      result: 'Wärmepumpe spart ca. 752 € pro Jahr gegenüber Gas',
+      title: 'Beispiel: 18.000 kWh Nutzwärmebedarf im Einfamilienhaus',
+      description: 'Vergleich der jährlichen Energiekosten zwischen Wärmepumpe (JAZ 3,6 bei 28 ct), Fernwärme (12,5 ct), Gas (11 ct), Pellets (320 €/t) und Öl (1,05 €/l).',
+      inputs: { heatDemandKwh: 18000, gasPriceCent: 11, oilPricePerLiter: 1.05, pelletPricePerTon: 320, heatPumpJaz: 3.6, heatPumpPowerPrice: 28, districtHeatingPriceCent: 12.5, includeMaintenance: false },
+      resultSummary: 'Wärmepumpe: ca. 1.400,00 € (spart ca. 752 € ggü. Gas und 746 € ggü. Öl)',
     },
     content: {
-      intro: 'Dieser Systemvergleich stellt die Vollkosten verschiedener Heizsysteme (Wärmepumpe, Gasbrennwert, Pelletheizung, Fernwärme) inklusive Brennstoff, CO₂-Preis und Wartung gegenüber.',
-      details: 'Der Rechner normiert die Brennstoffpreise auf Kosten pro Kilowattstunde Nutzwärme unter Berücksichtigung des feuerungstechnischen Nutzungsgrads der jeweiligen Kessel- und Pumpentechnik.',
+      intro: 'Dieser Systemvergleich stellt die jährlichen Brennstoff- und Betriebskosten sowie die Treibhausgasemissionen von fünf gängigen Heiztechnologien (Wärmepumpe, Fernwärme, Holzpellets, Gasbrennwert, Ölbrennwert) transparent gegenüber.',
+      details: 'Der Rechner normiert die Brennstoffpreise auf den realen Nutzwärmebedarf des Gebäudes unter Berücksichtigung des Wirkungsgrads und der Jahresarbeitszahl. Die Treibhausgase werden auf einheitlicher Lebenszyklusbasis (Well-to-Wheel nach UBA GEMIS) verglichen.',
     },
     faqs: [
-      { question: 'Warum steigen die Heizkosten für fossile Brennstoffe in Zukunft weiter?', answer: 'Durch den gesetzlich steigenden nationalen CO₂-Preis (BEHG) und die künftige Einbindung in das europäische Emissionshandelssystem ETS-2 ab 2027 verteuern sich Gas und Heizöl kontinuierlich.' },
-      { question: 'Wie viel Prozent Förderung gibt es für den Heizungstausch?', answer: 'Über die Bundesförderung für effiziente Gebäude (KfW-Programm 458) erhalten selbstnutzende Eigentümer eine Grundförderung von 30 % plus Geschwindigkeitsbonus und Einkommensbonus bis zu maximal 70 % der förderfähigen Kosten.' },
+      { question: 'Wie wird Nutzwärme in Brennstoffbedarf umgerechnet?', answer: 'Der Nutzwärmebedarf ist die Wärmeenergie, die tatsächlich den Wohnräumen zugutekommt. Da jede Heizung Wandlungs- und Abgasverluste aufweist, muss mehr Energie zugeführt werden: Gasbrennwert arbeitet mit ca. 92 % Jahresnutzungsgrad, Ölbrennwert mit ca. 88 %, moderne Pelletkessel mit ca. 90 % und Fernwärme-Übergabestationen mit ca. 98 %. Bei einer Wärmepumpe wird Umweltwärme genutzt: Eine JAZ von 3,6 erzeugt aus 1 kWh Strom 3,6 kWh Nutzwärme.' },
+      { question: 'Wie entwickelt sich der CO₂-Preis für fossile Heizungen?', answer: 'Nach dem Brennstoffemissionshandelsgesetz (BEHG) steigt der nationale CO₂-Preis 2026 im Korridor von 55 bis 65 € pro Tonne. Ab 2027 greift der europäische Emissionshandel ETS-2, wodurch sich fossile Brennstoffe wie Gas und Heizöl schrittweise weiter verteuern.' },
+      { question: 'Welche Fördermittel gibt es für den Umstieg auf erneuerbare Heizungen?', answer: 'Über die Bundesförderung für effiziente Gebäude (KfW-Programm 458) erhalten selbstnutzende Eigentümer beim Tausch einer alten fossilen Heizung gegen eine Wärmepumpe oder Biomasseheizung bis zu 70 % der förderfähigen Kosten bezuschusst (Grundförderung 30 % + Klimageschwindigkeitsbonus 20 % + Einkommensbonus 30 %, maximal gedeckelt).' },
     ],
-    relatedSlugs: ['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'pelletheizung-verbrauch-rechner', 'waermepumpe-stromkosten-rechner'],
+    relatedSlugs: ['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'pelletheizung-verbrauch-rechner', 'waermepumpe-stromkosten-rechner', 'co2-preis-rechner'],
+    trustMeta: {
+      methodology: 'Physikalische Wirkungsgradberechnung auf Nutzwärmebasis und UBA-Lebenszyklus-Emissionsfaktoren (GEMIS)',
+      sourceName: 'Umweltbundesamt (UBA) & Bundesverband Wärmepumpe (BWP)',
+      lastReviewed: '2026-10-21',
+    },
   },
 
   {
@@ -3711,88 +3835,286 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'CO2-Kostenaufteilung',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'CO2-Kostenaufteilung Rechner – Stufenmodell Vermieter',
-    metaDescription: 'Ermitteln Sie die Aufteilung der CO2-Kosten für Gas und Heizöl zwischen Vermieter und Mieter nach dem 10-Stufenmodell des CO2KostAufG.',
-    h1: 'CO2-Kostenaufteilung Rechner – Stufenmodell nach CO2KostAufG',
-    shortDescription: 'Berechnet die gesetzliche Aufteilung der CO2-Heizkosten zwischen Mieter und Vermieter.',
-    searchKeywords: ['co2 kostenaufteilung rechner', 'co2kostaufg 10 stufenmodell', 'co2 preis vermieter mieter anteil', 'kohlendioxidkostenaufteilungsgesetz'],
+    metaTitle: 'CO2-Kostenaufteilung Rechner – Stufenmodell Vermieter & Mieter',
+    metaDescription: 'Ermitteln Sie die gesetzliche Aufteilung der CO2-Kosten für Gas, Heizöl & Fernwärme nach dem 10-Stufenmodell des CO2KostAufG mit Ausnahmeregelungen.',
+    h1: 'CO2-Kostenaufteilung Rechner – Gesetzliches Stufenmodell nach CO2KostAufG',
+    shortDescription: 'Berechnet die Aufteilung der CO2-Heizkosten zwischen Mieter und Vermieter nach dem 10-Stufen-Modell gemäß Kohlendioxidkostenaufteilungsgesetz.',
+    searchKeywords: ['co2 kostenaufteilung rechner', 'co2kostaufg 10 stufenmodell', 'co2 preis vermieter mieter anteil', 'kohlendioxidkostenaufteilungsgesetz', 'heizkostenabrechnung co2 anteil'],
     inputs: [
-      { id: 'livingArea', label: 'Wohnfläche der Wohnung in m²', type: 'number', defaultValue: 80, min: 20, max: 400, step: 5, unit: 'm²' },
-      { id: 'co2CostTotal', label: 'Gesamte CO2-Kosten auf der Heizkostenabrechnung', type: 'number', defaultValue: 140, min: 10, step: 5, unit: '€' },
-      { id: 'co2EmissionKgPerSqm', label: 'CO2-Ausstoß in kg pro m² Wohnfläche im Jahr (z. B. 28 kg/m²a)', type: 'number', defaultValue: 28, min: 5, max: 70, step: 1, unit: 'kg/m²a' },
+      {
+        id: 'co2CostTotal',
+        label: 'CO2-Kosten der Wohnung laut Heizkostenabrechnung in Euro',
+        type: 'number',
+        defaultValue: 140,
+        min: 0,
+        max: 5000,
+        step: 1,
+        unit: '€',
+        helpText: 'Der auf Ihre Wohnung entfallende CO₂-Kostenbetrag, der vom Vermieter bzw. Messdienstleister auf der Heizkostenabrechnung ausgewiesen ist.',
+      },
+      {
+        id: 'co2EmissionKgPerSqm',
+        label: 'Spezifischer CO2-Ausstoß des Gebäudes (in kg CO₂/m² Wohnfläche im Jahr)',
+        type: 'number',
+        defaultValue: 28,
+        min: 0,
+        max: 150,
+        step: 0.5,
+        unit: 'kg/m²a',
+        helpText: 'Maßgeblicher Wert für die Stufeneinstufung. Dieser Wert bezieht sich stets auf das Gesamtgebäude und steht auf der Abrechnung.',
+      },
+      {
+        id: 'livingArea',
+        label: 'Wohnfläche der Wohnung in m²',
+        type: 'number',
+        defaultValue: 80,
+        min: 10,
+        max: 500,
+        step: 1,
+        unit: 'm²',
+        helpText: 'Fläche der Mietwohnung zur Plausibilitätsprüfung des Anteils.',
+      },
+      {
+        id: 'billingMonths',
+        label: 'Dauer des Abrechnungszeitraums in Monaten',
+        type: 'number',
+        defaultValue: 12,
+        min: 1,
+        max: 12,
+        step: 1,
+        unit: 'Monate',
+        helpText: 'Regulär 12 Monate. Bei unterjährigem Ein-/Auszug wird die Einstufung auf ein volles Kalenderjahr hochgerechnet.',
+      },
+      {
+        id: 'statutoryExemption',
+        label: 'Gesetzliche Ausnahmeregelung (§ 9 CO2KostAufG)',
+        type: 'select',
+        defaultValue: 'none',
+        options: [
+          { value: 'none', label: 'Keine Ausnahme (Reguläres 10-Stufenmodell)' },
+          { value: 'heritage', label: 'Denkmalschutz / Sanierungsbeschränkung (§ 9 Abs. 1: Vermieteranteil halbiert)' },
+          { value: 'district_mandate', label: 'Anschluss- & Benutzungszwang Fernwärme (§ 9 Abs. 2: Vermieteranteil entfällt)' },
+        ],
+      },
     ],
     calculate: (inputs) => {
-      const area = inputs.livingArea !== undefined && inputs.livingArea !== '' ? Math.max(0, parseFloat(inputs.livingArea) || 0) : 80;
-      const total = inputs.co2CostTotal !== undefined && inputs.co2CostTotal !== '' ? Math.max(0, parseFloat(inputs.co2CostTotal) || 0) : 140;
-      const kg = inputs.co2EmissionKgPerSqm !== undefined && inputs.co2EmissionKgPerSqm !== '' ? Math.max(0, parseFloat(inputs.co2EmissionKgPerSqm) || 0) : 28;
+      if (inputs.co2CostTotal === undefined || inputs.co2CostTotal === null || String(inputs.co2CostTotal).trim() === '') {
+        return {
+          primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie den CO₂-Kostenbetrag aus der Abrechnung an.',
+        };
+      }
 
-      // 10-Stufenmodell nach Anlage zu § 5 CO2KostAufG:
-      // < 12 kg: 0% Vermieter / 100% Mieter
-      // 12-17 kg: 10% Vermieter
-      // 17-22 kg: 20% Vermieter
-      // 22-27 kg: 30% Vermieter
-      // 27-32 kg: 40% Vermieter
-      // 32-37 kg: 50% Vermieter
-      // 37-42 kg: 60% Vermieter
-      // 42-47 kg: 70% Vermieter
-      // 47-52 kg: 80% Vermieter
-      // >= 52 kg: 95% Vermieter
-      let landlordPct = 0.40;
-      if (kg < 12) landlordPct = 0;
-      else if (kg < 17) landlordPct = 0.10;
-      else if (kg < 22) landlordPct = 0.20;
-      else if (kg < 27) landlordPct = 0.30;
-      else if (kg < 32) landlordPct = 0.40;
-      else if (kg < 37) landlordPct = 0.50;
-      else if (kg < 42) landlordPct = 0.60;
-      else if (kg < 47) landlordPct = 0.70;
-      else if (kg < 52) landlordPct = 0.80;
-      else landlordPct = 0.95;
+      const total = parseFloat(String(inputs.co2CostTotal).replace(',', '.'));
+      if (isNaN(total) || total < 0) {
+        return {
+          primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: 0, formattedValue: '-' },
+          error: 'Die CO₂-Kosten dürfen nicht negativ sein (0 € ist zulässig).',
+        };
+      }
 
-      const tenantPct = 1 - landlordPct;
-      const landlordShare = total * landlordPct;
+      const rawKg = inputs.co2EmissionKgPerSqm !== undefined && inputs.co2EmissionKgPerSqm !== null && String(inputs.co2EmissionKgPerSqm).trim() !== ''
+        ? parseFloat(String(inputs.co2EmissionKgPerSqm).replace(',', '.'))
+        : 28;
+
+      if (isNaN(rawKg) || rawKg < 0) {
+        return {
+          primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: 0, formattedValue: '-' },
+          error: 'Der spezifische CO₂-Ausstoß darf nicht negativ sein.',
+        };
+      }
+
+      const area = inputs.livingArea !== undefined && inputs.livingArea !== null && String(inputs.livingArea).trim() !== ''
+        ? Math.max(1, parseFloat(String(inputs.livingArea).replace(',', '.')) || 80)
+        : 80;
+
+      const months = inputs.billingMonths !== undefined && inputs.billingMonths !== null && String(inputs.billingMonths).trim() !== ''
+        ? Math.min(12, Math.max(1, parseInt(String(inputs.billingMonths), 10) || 12))
+        : 12;
+
+      const exemption = String(inputs.statutoryExemption || 'none');
+
+      // Jahreshochrechnung bei unterjähriger Mietdauer (§ 5 Abs. 3 CO2KostAufG)
+      const annualizedKg = months < 12 ? (rawKg * 12) / months : rawKg;
+
+      // 10-Stufenmodell nach Anlage zu § 5 Abs. 1 CO2KostAufG:
+      let baseLandlordPct = 0;
+      let stepNumber = 1;
+      let stepRange = '< 12 kg CO₂/m²a';
+
+      if (annualizedKg < 12) {
+        baseLandlordPct = 0.00;
+        stepNumber = 1;
+        stepRange = '< 12 kg CO₂/m²a (sehr effizient / Niedrigenergie)';
+      } else if (annualizedKg < 17) {
+        baseLandlordPct = 0.10;
+        stepNumber = 2;
+        stepRange = '12 bis < 17 kg CO₂/m²a';
+      } else if (annualizedKg < 22) {
+        baseLandlordPct = 0.20;
+        stepNumber = 3;
+        stepRange = '17 bis < 22 kg CO₂/m²a';
+      } else if (annualizedKg < 27) {
+        baseLandlordPct = 0.30;
+        stepNumber = 4;
+        stepRange = '22 bis < 27 kg CO₂/m²a';
+      } else if (annualizedKg < 32) {
+        baseLandlordPct = 0.40;
+        stepNumber = 5;
+        stepRange = '27 bis < 32 kg CO₂/m²a';
+      } else if (annualizedKg < 37) {
+        baseLandlordPct = 0.50;
+        stepNumber = 6;
+        stepRange = '32 bis < 37 kg CO₂/m²a';
+      } else if (annualizedKg < 42) {
+        baseLandlordPct = 0.60;
+        stepNumber = 7;
+        stepRange = '37 bis < 42 kg CO₂/m²a';
+      } else if (annualizedKg < 47) {
+        baseLandlordPct = 0.70;
+        stepNumber = 8;
+        stepRange = '42 bis < 47 kg CO₂/m²a';
+      } else if (annualizedKg < 52) {
+        baseLandlordPct = 0.80;
+        stepNumber = 9;
+        stepRange = '47 bis < 52 kg CO₂/m²a';
+      } else {
+        baseLandlordPct = 0.95;
+        stepNumber = 10;
+        stepRange = '≥ 52 kg CO₂/m²a (sehr sanierungsbedürftig)';
+      }
+
+      // Berücksichtigung gesetzlicher Ausnahmen nach § 9 CO2KostAufG
+      let effectiveLandlordPct = baseLandlordPct;
+      let exemptionNote = '';
+
+      if (exemption === 'heritage') {
+        effectiveLandlordPct = baseLandlordPct * 0.5;
+        exemptionNote = 'Vermieteranteil nach § 9 Abs. 1 CO2KostAufG halbiert (Denkmalschutz / rechtliche Sanierungshindernisse).';
+      } else if (exemption === 'district_mandate') {
+        effectiveLandlordPct = 0;
+        exemptionNote = 'Vermieteranteil nach § 9 Abs. 2 CO2KostAufG entfallen (öffentlich-rechtlicher Anschluss- und Benutzungszwang).';
+      }
+
+      const tenantPct = 1 - effectiveLandlordPct;
+      const landlordShare = total * effectiveLandlordPct;
       const tenantShare = total * tenantPct;
 
       return {
-        primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: landlordShare, formattedValue: formatCurrency(landlordShare), highlight: true },
+        primary: {
+          id: 'landlordShare',
+          label: 'Kostenanteil Vermieter',
+          value: landlordShare,
+          formattedValue: formatCurrency(landlordShare),
+          highlight: true,
+          helpText: `Entspricht ${formatPercent(effectiveLandlordPct * 100, 1)} der Gesamtkosten von ${formatCurrency(total)}.`,
+        },
         secondary: [
-          { id: 'tenantShare', label: 'Kostenanteil Mieter', value: tenantShare, formattedValue: formatCurrency(tenantShare) },
-          { id: 'landlordPct', label: 'Vermieter-Anteil nach Stufe', value: landlordPct * 100, formattedValue: formatPercent(landlordPct * 100, 0) },
-          { id: 'tenantPct', label: 'Mieter-Anteil nach Stufe', value: tenantPct * 100, formattedValue: formatPercent(tenantPct * 100, 0) },
+          {
+            id: 'tenantShare',
+            label: 'Kostenanteil Mieter',
+            value: tenantShare,
+            formattedValue: formatCurrency(tenantShare),
+            helpText: `Entspricht ${formatPercent(tenantPct * 100, 1)} der Gesamtkosten.`,
+          },
+          {
+            id: 'landlordPct',
+            label: 'Vermieter-Anteil nach Stufe',
+            value: effectiveLandlordPct * 100,
+            formattedValue: formatPercent(effectiveLandlordPct * 100, 0),
+          },
+          {
+            id: 'tenantPct',
+            label: 'Mieter-Anteil nach Stufe',
+            value: tenantPct * 100,
+            formattedValue: formatPercent(tenantPct * 100, 0),
+          },
+          {
+            id: 'stepDisplay',
+            label: 'Gesetzliche Einstufung',
+            value: stepNumber,
+            formattedValue: `Stufe ${stepNumber} von 10 (${formatPercent(effectiveLandlordPct * 100, 0)} Vermieter)`,
+            helpText: stepRange,
+          },
+          {
+            id: 'specificEmission',
+            label: 'Gebäude-Emissionswert',
+            value: annualizedKg,
+            formattedValue: `${formatNumber(annualizedKg, 1)} kg CO₂/m²a`,
+            helpText: months < 12 ? `Aus ${formatNumber(rawKg, 1)} kg in ${months} Monaten aufs Gesamtjahr hochgerechnet.` : 'Jahreswert des Gebäudes.',
+          },
         ],
-        summaryText: `Bei ${formatNumber(kg, 1)} kg CO2/m²a übernimmt der Vermieter ${formatPercent(landlordPct * 100, 0)} (${formatCurrency(landlordShare)}) und der Mieter ${formatPercent(tenantPct * 100, 0)} (${formatCurrency(tenantShare)}) der CO2-Kosten nach CO2KostAufG.`,
-        directAnswer: `Von den ${formatCurrency(total)} CO₂-Kosten übernimmt der Vermieter ${formatCurrency(landlordShare)} (${formatPercent(landlordPct * 100, 0)}) und der Mieter ${formatCurrency(tenantShare)} (${formatPercent(tenantPct * 100, 0)}).`,
+        directAnswer: `Von den ${formatCurrency(total)} CO₂-Kosten muss der Vermieter ${formatCurrency(landlordShare)} (${formatPercent(effectiveLandlordPct * 100, 1)}) übernehmen und der Mieter ${formatCurrency(tenantShare)} (${formatPercent(tenantPct * 100, 1)}).`,
+        summaryText: `Bei einem spezifischen CO₂-Ausstoß von ${formatNumber(annualizedKg, 1)} kg/m²a fällt das Gebäude in Stufe ${stepNumber} des CO2KostAufG. Der Vermieter trägt ${formatCurrency(landlordShare)} (${formatPercent(effectiveLandlordPct * 100, 1)}) und der Mieter ${formatCurrency(tenantShare)} (${formatPercent(tenantPct * 100, 1)}) der CO₂-Kosten.`,
         basisSummary: [
-          { label: 'Wohnfläche', value: `${formatNumber(area, 0)} m²` },
-          { label: 'CO2-Kosten gesamt', value: formatCurrency(total) },
-          { label: 'Spezifischer CO2-Ausstoß', value: `${formatNumber(kg, 1)} kg/m²a` },
+          { label: 'CO2-Kosten der Wohnung', value: formatCurrency(total) },
+          { label: 'Spezifischer Gebäude-Ausstoß', value: `${formatNumber(annualizedKg, 1)} kg CO₂/m²a (Stufe ${stepNumber})` },
+          { label: 'Abrechnungsdauer', value: `${months} Monate` },
+          { label: 'Gesetzliche Ausnahme', value: exemption === 'none' ? 'Keine (Regulär)' : (exemption === 'heritage' ? '§ 9 Abs. 1 (Halbierung)' : '§ 9 Abs. 2 (Befreiung)') },
+        ],
+        calculationSteps: [
+          months < 12
+            ? `Jahreshochrechnung (§ 5 Abs. 3): ${formatNumber(rawKg, 1)} kg/m² × (12 ÷ ${months}) = ${formatNumber(annualizedKg, 1)} kg CO₂/m²a`
+            : `Spezifischer Gebäude-Emissionswert: ${formatNumber(annualizedKg, 1)} kg CO₂/m²a`,
+          `Stufenzuordnung nach § 5 Anlage: ${stepRange} → Basis-Vermieteranteil: ${formatPercent(baseLandlordPct * 100, 0)}`,
+          exemption !== 'none'
+            ? `Ausnahmeregelung (§ 9): ${exemptionNote} → Effektiver Vermieteranteil: ${formatPercent(effectiveLandlordPct * 100, 1)}`
+            : `Effektiver Vermieteranteil: ${formatPercent(effectiveLandlordPct * 100, 0)}, Mieteranteil: ${formatPercent(tenantPct * 100, 0)}`,
+          `Vermieter-Kosten: ${formatCurrency(total)} × ${formatPercent(effectiveLandlordPct * 100, 1)} = ${formatCurrency(landlordShare)}`,
+          `Mieter-Kosten: ${formatCurrency(total)} × ${formatPercent(tenantPct * 100, 1)} = ${formatCurrency(tenantShare)}`,
+        ],
+        qualifications: [
+          'Gilt ausschließlich für Wohngebäude. Für Nichtwohngebäude (Gewerberäume) gilt nach § 8 CO2KostAufG eine gesetzliche 50:50-Pauschalaufteilung.',
+          'Die Stufeneinstufung muss nach § 5 Abs. 1 stets auf den Emissionsdaten des Gesamtgebäudes basieren, nicht auf den individuellen Heizgewohnheiten einzelner Mieter.',
+          'Vertragliche Klauseln im Mietvertrag, die den Mieter über das CO2KostAufG hinaus belasten, sind nach § 3 CO2KostAufG unwirksam.',
         ],
       };
     },
-    formula: 'Aufteilung nach 10-Stufenmodell des CO2KostAufG gemäß CO2-Ausstoß pro m²',
-    formulaExplanation: 'Je schlechter das Gebäude energetisch isoliert ist (höhere CO2-Emissionen pro m²), desto größer ist der Kostenanteil, den der Vermieter tragen muss.',
+    formula: 'Vermieteranteil = Gesamt-CO2-Kosten × Stufen-Prozentsatz nach § 5 CO2KostAufG',
+    formulaExplanation: 'Das 10-Stufen-Modell staffelt den Vermieteranteil von 0 % (bei < 12 kg CO₂/m²a) bis 95 % (bei ≥ 52 kg CO₂/m²a). Bei Denkmalschutz oder Fernwärmezwang greifen Minderungstatbestände nach § 9.',
     workedExample: {
-      title: 'Beispiel: 140 € CO2-Kosten bei 28 kg CO2/m²a',
-      inputValues: [{ label: 'Gesamtkosten', value: '140 €' }, { label: 'Emission', value: '28 kg CO2/m²a' }],
-      steps: ['Bereich 27 bis 32 kg CO2/m²a = 40 % Vermieter, 60 % Mieter', 'Vermieteranteil: 140 € × 0,40 = 56,00 €', 'Mieteranteil: 140 € × 0,60 = 84,00 €'],
-      result: 'Vermieter: 56,00 € / Mieter: 84,00 €',
+      title: 'Beispiel: 140,00 € CO2-Kosten bei 28 kg CO2/m²a Gebäudeausstoß',
+      description: 'Mit 28 kg/m²a fällt das Wohngebäude in Stufe 5 (27 bis < 32 kg CO₂/m²a). Gesetzlicher Verteilschlüssel: 40 % Vermieter, 60 % Mieter.',
+      inputs: { co2CostTotal: 140, co2EmissionKgPerSqm: 28, livingArea: 80, billingMonths: 12, statutoryExemption: 'none' },
+      resultSummary: 'Vermieter: 56,00 € (40 %) / Mieter: 84,00 € (60 %)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Reguläres Mehrfamilienhaus (Stufe 5)',
+        description: '140,00 € CO₂-Kosten bei 28 kg CO₂/m²a. Vermieter: 140 € × 0,40 = 56,00 €. Mieter: 140 € × 0,60 = 84,00 €.',
+        inputs: { co2CostTotal: 140, co2EmissionKgPerSqm: 28, livingArea: 80, billingMonths: 12, statutoryExemption: 'none' },
+        resultSummary: 'Vermieter: 56,00 € / Mieter: 84,00 €',
+      },
+      {
+        title: 'Beispiel 2: Denkmalgeschütztes Gebäude (§ 9 Abs. 1 Halbierung)',
+        description: '200,00 € CO₂-Kosten bei 45 kg CO₂/m²a (regulär Stufe 8: 70 % Vermieter). Durch Denkmalschutz wird der Vermieteranteil halbiert (35 % Vermieter, 65 % Mieter).',
+        inputs: { co2CostTotal: 200, co2EmissionKgPerSqm: 45, livingArea: 80, billingMonths: 12, statutoryExemption: 'heritage' },
+        resultSummary: 'Vermieter: 70,00 € (35 %) / Mieter: 130,00 € (65 %)',
+      },
+    ],
     content: {
-      intro: 'Das Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) teilt die CO₂-Kosten für Heizöl, Gas und Fernwärme nach einem 10-Stufen-Modell zwischen Vermieter und Mieter auf.',
-      details: 'Je schlechter der energetische Zustand des Gebäudes (hoher CO₂-Ausstoß je m² Wohnfläche), desto höher ist der prozentuale Anteil, den der Vermieter selbst tragen muss (bis zu 95 %). Bei Passivhäusern trägt der Mieter die Kosten zu 100 % allein.',
+      intro: 'Das Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) regelt die verbindliche Verteilung der CO₂-Zertifikatskosten für Erdgas, Heizöl und Fernwärme zwischen Vermietern und Mietern über ein 10-Stufen-Modell.',
+      details: 'Die gesetzliche Einstufung richtet sich nach dem spezifischen Kohlendioxidausstoß des gesamten Gebäudes je Quadratmeter Wohnfläche und Jahr. Je energieeffizienter das Gebäude saniert ist, desto geringer ist der Vermieteranteil (bei unter 12 kg CO₂/m²a trägt der Mieter 100 %). Bei unsanierten Altbauten mit hohem Heizbedarf übernimmt der Vermieter bis zu 95 % der CO₂-Kosten.',
     },
     faqs: [
-      { question: 'Wie ermittelt der Vermieter die CO₂-Einstufung des Gebäudes?', answer: 'Anhand der CO₂-Menge aus der Brennstoffrechnung geteilt durch die Wohnfläche. Die Stufentabelle im CO2KostAufG weist den genauen prozentualen Verteilungsschlüssel aus.' },
-      { question: 'Darf der Vermieter seinen CO₂-Anteil auf den Mieter abwälzen?', answer: 'Nein, vertragliche Vereinbarungen, die dem Mieter einen höheren CO₂-Kostenanteil auferlegen als gesetzlich vorgeschrieben, sind nach § 3 CO2KostAufG unwirksam.' },
+      { question: 'Woher stammen die Werte für den CO₂-Ausstoß und die CO₂-Kosten?', answer: 'Brennstofflieferanten (Gas-, Öl- und Fernwärmeversorger) sind nach § 3 CO2KostAufG gesetzlich verpflichtet, die gelieferte Brennstoffmenge, den spezifischen Emissionsfaktor, die Gesamtemissionen in kg sowie den auf den CO₂-Preis entfallenden Rechnungsbetrag transparent auf der Rechnung auszuweisen. Der Vermieter muss diese Angaben in die jährliche Heizkostenabrechnung übernehmen.' },
+      { question: 'Gilt das 10-Stufen-Modell auch für Gewerbe- und Büromieten?', answer: 'Nein. Für Nichtwohngebäude gilt nach § 8 CO2KostAufG eine gesetzliche 50:50-Halbteilung der CO₂-Kosten zwischen Vermieter und Mieter, solange kein gesetzliches Stufenmodell für Nichtwohngebäude in Kraft tritt.' },
+      { question: 'Was gilt bei Denkmalschutz oder Fernwärme-Anschlusszwang?', answer: 'Nach § 9 CO2KostAufG wird der Vermieteranteil um 50 % gekürzt, wenn rechtliche Vorgaben wie Denkmalschutzauflagen oder Erhaltungsverordnungen wesentliche energetische Sanierungsmaßnahmen an der Gebäudehülle verhindern. Bei einem behördlichen Anschluss- und Benutzungszwang an ein Fernwärmenetz entfällt der Vermieteranteil vollständig.' },
+      { question: 'Darf der Vermieter die CO₂-Kostenaufteilung vertraglich abbedingen?', answer: 'Nein. Nach § 3 Abs. 4 CO2KostAufG sind Vereinbarungen im Mietvertrag unwirksam, die zum Nachteil des Mieters von den gesetzlichen Aufteilungsvorschriften abweichen.' },
     ],
-    relatedSlugs: ['gasverbrauch-kwh-m3-rechner', 'warmmiete-rechner', 'heizkostenvergleich-rechner'],
+    relatedSlugs: ['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'warmmiete-rechner', 'heizkostenvergleich-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG Stufenmodell)',
-      sourceUrl: 'https://www.bmwk.de',
-      lastVerified: '2026-01-15',
-    }
+      source: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG)',
+      sourceUrl: 'https://www.gesetze-im-internet.de/co2kostaufg/',
+      lastVerified: '2026-03-15',
+    },
+    trustMeta: {
+      methodology: 'Offizielles 10-Stufenmodell nach Anlage zu § 5 Abs. 1 CO2KostAufG inklusive Hochrechnung für unterjährige Zeiträume (§ 5 Abs. 3) und Sonderkürzungen (§ 9)',
+      sourceName: 'Bundesministerium für Wirtschaft und Klimaschutz (BMWK) / CO2KostAufG',
+      lastReviewed: '2026-10-21',
+    },
   },
 
   {

@@ -107,7 +107,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   // =========================================================================
   describe('Calculator Registry & Route Smoke Tests', () => {
     it('discovers all registered calculators from real registry with self-referencing canonicals and exactly one H1', async () => {
-      expect(ALL_CALCULATORS.length).toBe(421);
+      expect(ALL_CALCULATORS.length).toBe(424);
 
       for (const calc of ALL_CALCULATORS) {
         // Self-referencing canonical

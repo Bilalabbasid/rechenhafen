@@ -5,6 +5,10 @@ import {
   calculateGasCost,
   calculateLedSavings,
 } from '@/lib/calculators/haushalt';
+import {
+  calculateElectricityCO2,
+  calculateCarbonPrice,
+} from '@/lib/calculators/co2';
 import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
@@ -362,4 +366,252 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     ],
     relatedSlugs: ['stromkostenrechner', 'standby-kosten-rechner', 'gaskostenrechner'],
   },
+  {
+    id: 'co2-strom-rechner',
+    slug: 'co2-strom-rechner',
+    name: 'CO2-Strom-Rechner (kWh in kg & Tonnen CO2)',
+    shortName: 'CO2 Strom',
+    category: 'haushalt-energie',
+    subcategory: 'CO₂ & Umwelt',
+    metaTitle: 'CO2-Strom-Rechner 2026: Stromverbrauch in CO2 umrechnen (g/kWh)',
+    metaDescription: 'Berechnen Sie die CO2-Emissionen Ihres Stromverbrauchs (kWh) in kg und Tonnen: Offizieller UBA-Faktor 2025 (344 g CO2/kWh), Lebenszyklus & Ökostrom-Vergleich.',
+    h1: 'CO2-Strom-Rechner – Stromverbrauch in CO2 umrechnen',
+    shortDescription: 'Ermittelt präzise Treibhausgasemissionen aus Ihrem Kilowattstunden-Stromverbrauch mit offiziellen UBA-Emissionsfaktoren, Lebenszyklus-Option und Ökostrom-Einsparung.',
+    searchKeywords: [
+      'co2 strom rechner',
+      'kwh in co2 umrechnen',
+      'strom co2 ausstoß berechnen',
+      'co2 rechner stromverbrauch',
+      'uba strommix faktor co2',
+      'strommix deutschland emissionen',
+    ],
+    inputs: [
+      {
+        id: 'consumptionKwh',
+        label: 'Stromverbrauch in Kilowattstunden (kWh)',
+        type: 'number',
+        defaultValue: 2500,
+        min: 0,
+        step: 50,
+        unit: 'kWh',
+        helpText: 'Typisch: 1.500 kWh (1 Person), 2.500 kWh (2 Personen), 3.500 kWh (Familie). 0 kWh ist zulässig.',
+      },
+      {
+        id: 'period',
+        label: 'Abrechnungszeitraum',
+        type: 'select',
+        defaultValue: 'year',
+        options: [
+          { value: 'year', label: '1 Kalenderjahr (Standard Jahresrechnung)' },
+          { value: 'month', label: '1 Monat' },
+          { value: 'single', label: 'Einmaliger Verbrauch / Messung' },
+        ],
+        helpText: 'Wählen Sie den Zeitraum, auf den sich die eingegebenen Kilowattstunden beziehen.',
+      },
+      {
+        id: 'tariffType',
+        label: 'Berechnungsgrundlage & Emissionsfaktor',
+        type: 'select',
+        defaultValue: 'grid_2025',
+        options: [
+          { value: 'grid_2025', label: 'Deutscher Strommix 2025 (344 g CO₂/kWh Inlandserzeugung – UBA)' },
+          { value: 'grid_lifecycle', label: 'Deutscher Strommix Lebenszyklus (410 g CO₂e/kWh inkl. Vorkette)' },
+          { value: 'green_lifecycle', label: 'Zertifizierter Ökostrom aus Neuanlagen (25 g CO₂e/kWh Lebenszyklus)' },
+          { value: 'custom', label: 'Benutzerdefinierter Emissionsfaktor (g/kWh)' },
+        ],
+        helpText: 'Erzeugungsemissionen erfassen den Kraftwerkspark; der Lebenszykluswert schließt Bau, Vorkette und Netzverluste ein.',
+      },
+      {
+        id: 'customFactorGrams',
+        label: 'Individueller Emissionsfaktor in g/kWh',
+        type: 'number',
+        defaultValue: 344,
+        min: 0,
+        step: 1,
+        unit: 'g/kWh',
+        helpText: 'Geben Sie den ausgewiesenen Strommix-Faktor Ihres Energieversorgers laut Stromkennzeichnung ein.',
+      },
+    ],
+    calculate: calculateElectricityCO2,
+    formula: 'CO₂-Ausstoß (kg) = Stromverbrauch (kWh) × Emissionsfaktor (g CO₂/kWh) ÷ 1.000',
+    formulaExplanation: 'Der Stromverbrauch in Kilowattstunden wird mit dem spezifischen Treibhausgasfaktor je kWh multipliziert und durch 1.000 geteilt, um Kilogramm CO₂ bzw. CO₂-Äquivalente (CO₂e) zu erhalten.',
+    workedExample: {
+      title: 'Beispiel: 2-Personen-Haushalt mit 2.500 kWh Stromverbrauch im Jahr',
+      description: 'Bei 2.500 kWh/Jahr und dem offiziellen UBA-Inlandsmix 2025 (344 g CO₂/kWh) entstehen: 2.500 kWh × 344 g/kWh ÷ 1.000 = 860 kg CO₂ (entspricht 0,86 Tonnen CO₂ pro Jahr oder ca. 71,7 kg CO₂ pro Monat). Bei Bezug von Ökostrom aus Neuanlagen (25 g CO₂e/kWh) sinkt die Lebenszykluslast auf ca. 62,5 kg CO₂e – eine rechnerische Vermeidung von rund 797,5 kg Treibhausgasen.',
+      inputs: { consumptionKwh: 2500, period: 'year', tariffType: 'grid_2025' },
+      resultSummary: '860 kg CO₂ im Jahr (0,86 Tonnen)',
+    },
+    content: {
+      intro: 'Wie viel Kohlendioxid verursacht der eigene Stromverbrauch? Dieser Rechner ermittelt den CO₂-Ausstoß Ihres Haushalts in Kilogramm und Tonnen. Als Berechnungsgrundlage dient die offizielle Schätzung des Umweltbundesamtes (UBA) für den deutschen Strommix 2025 (344 g CO₂/kWh), ergänzt um eine vollständige Lebenszyklusbilanz (Well-to-Wheel) und den Vergleich mit echtem Neuanlagen-Ökostrom.',
+      sections: [
+        {
+          title: 'Erzeugungsemissionen (Scope 2) versus Lebenszyklus (CO₂e)',
+          content: 'Bei der Bewertung von Stromemissionen ist die exakte **Bilanzgrenze** entscheidend:\n\n1. **Direkte Erzeugung (Scope 2)**: Der Standardfaktor des Umweltbundesamtes von **344 g CO₂/kWh** (Schätzung für das Jahr 2025, publiziert im März 2026) erfasst die reinen Kaminemissionen der deutschen Kraftwerke bei der Stromproduktion.\n2. **Lebenszyklus / Well-to-Wheel (Scope 3 Vorkette)**: Werden Förderung, Raffination und Transport von Kohle und Gas sowie Leitungsverluste eingerechnet, liegt die Treibhausgaslast des deutschen Strommix bei rund **410 g CO₂e/kWh**.\n3. **Ökostrom ist nicht automatisch null**: Bei Windkraft und Photovoltaik entstehen während der Stromerzeugung zwar keine direkten Emissionen, über den gesamten Lebenszyklus (Herstellung der Module, Errichtung der Windräder, Rückbau) fallen jedoch ca. **20 bis 30 g CO₂e/kWh** an.',
+        },
+        {
+          title: 'Typischer Stromverbrauch und CO₂-Last im deutschen Haushalt',
+          content: 'Wie ordnet sich Ihr Stromverbrauch im Bundesdurchschnitt ein?\n\n- **1-Personen-Haushalt**: ca. 1.500 kWh/Jahr → ca. 516 kg CO₂\n- **2-Personen-Haushalt**: ca. 2.500 kWh/Jahr → ca. 860 kg CO₂\n- **3- bis 4-Personen-Haushalt**: ca. 3.500 kWh/Jahr → ca. 1.204 kg CO₂ (1,2 Tonnen)\n- **Einfamilienhaus mit Wärmepumpe**: ca. 6.500 kWh/Jahr (Haushalt + Heizung) → ca. 2.236 kg CO₂ (2,24 Tonnen)\n\nBerechnen Sie parallel auch Ihre Stromkosten mit dem [Stromkostenrechner](/rechner/stromkostenrechner/), vergleichen Sie Pendeldistanzen im [CO2-Pendeln-Rechner](/rechner/co2-pendeln-rechner/) oder prüfen Sie Ertragsoptionen mit dem [Balkonkraftwerk-Ertrag-Rechner](/rechner/balkonkraftwerk-ertrag-rechner/).',
+        },
+      ],
+      details: 'Formel: CO₂ (kg) = kWh × Faktor (g/kWh) ÷ 1.000. Ein durchschnittlicher Bundesbürger verursacht insgesamt rund 10,5 Tonnen CO₂e pro Jahr (über Wohnen, Mobilität, Ernährung und Konsum). Der Haushaltsstrom macht daran typischerweise zwischen 5 und 10 Prozent aus.',
+    },
+    faqs: [
+      {
+        question: 'Wie hoch ist der CO2-Faktor für den deutschen Strommix aktuell?',
+        answer: 'Das Umweltbundesamt (UBA) schätzt den direkten CO₂-Emissionsfaktor des deutschen Strommix für das Jahr 2025 auf 344 g CO₂ pro Kilowattstunde (publiziert im März 2026 im Bericht zur Strom- und Wärmeversorgung). Durch den Ausbau erneuerbarer Energien sinkt dieser Wert seit Jahren kontinuierlich (1990: 764 g/kWh; 2020: 369 g/kWh).',
+      },
+      {
+        question: 'Warum hat Ökostrom nicht null Gramm CO2-Emissionen?',
+        answer: 'Zwar entstehen beim Betrieb von Windkraftanlagen, Photovoltaik oder Wasserkraft keine Kamin- oder Auspuffgase. Bei der Herstellung von Solarmodulen, beim Gießen der Fundamente von Windrädern und beim späteren Recycling fallen jedoch Energie und Rohstoffe an. Wissenschaftliche Ökobilanzen beziffern diesen Lebenszyklus-Rucksack auf ca. 20 bis 30 g CO₂e/kWh.',
+      },
+      {
+        question: 'Wo finde ich den CO2-Emissionsfaktor meines Stromversorgers?',
+        answer: 'Jeder Energieversorger in Deutschland ist nach § 42 EnWG gesetzlich verpflichtet, auf der Jahresrechnung und auf Werbematerialien die sogenannte „Stromkennzeichnung“ abzudrucken. Dort finden Sie den unternehmens- oder produktspezifischen CO₂-Emissionsfaktor in g/kWh, den Sie im Rechner unter „Benutzerdefinierter Emissionsfaktor“ eingeben können.',
+      },
+      {
+        question: 'Stellt dieser Rechner meinen gesamten CO2-Fußabdruck dar?',
+        answer: 'Nein. Dieser Rechner ermittelt ausschließlich die Treibhausgase, die durch den elektrischen Stromverbrauch im Haushalt verursacht werden. Weitere Lebensbereiche wie Heizung (Erdgas, Öl, Fernwärme), Mobilität (Auto, Bahn, Flüge), Ernährung und sonstiger Konsum sind nicht enthalten.',
+      },
+    ],
+    relatedSlugs: ['stromkostenrechner', 'co2-pendeln-rechner', 'co2-preis-rechner', 'balkonkraftwerk-ertrag-rechner', 'co2-auto-rechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'Umweltbundesamt (UBA) – Entwicklung der spezifischen Treibhausgas-Emissionen des deutschen Strommix',
+      sourceUrl: 'https://www.umweltbundesamt.de/themen/klima-energie/energieversorgung/strom-waermeversorgung-in-zahlen#strommix',
+      lastVerified: '2026-10-21',
+    },
+  },
+  {
+    id: 'co2-preis-rechner',
+    slug: 'co2-preis-rechner',
+    name: 'CO2-Preis-Rechner (BEHG: Gas, Heizöl & Kraftstoffe)',
+    shortName: 'CO2-Preis Rechner',
+    category: 'haushalt-energie',
+    subcategory: 'CO₂ & Umwelt',
+    metaTitle: 'CO2-Preis-Rechner 2026: Gesetzliche CO2-Kosten für Gas, Öl & Benzin',
+    metaDescription: 'Berechnen Sie den CO2-Kostenanteil nach dem Brennstoffemissionshandelsgesetz (BEHG) für Erdgas, Heizöl, Benzin und Diesel (45, 55 oder 65 €/t). Inklusive 19 % MwSt.',
+    h1: 'CO2-Preis-Rechner – CO2-Kosten für Heizung und Kraftstoffe berechnen',
+    shortDescription: 'Berechnet den gesetzlichen CO2-Preisaufschlag nach dem Brennstoffemissionshandelsgesetz (BEHG) für Erdgas, Heizöl, Benzin und Diesel mit EBeV-Standardfaktoren und Mehrwertsteuer.',
+    searchKeywords: [
+      'co2 preis rechner',
+      'co2 steuer rechner gas heizoel',
+      'behg co2 preis 2026 berechnen',
+      'co2 aufschlag kwh gas',
+      'co2 abgabe benzin diesel liter',
+      'ebev emissionsfaktoren',
+    ],
+    inputs: [
+      {
+        id: 'fuel',
+        label: 'Brennstoff / Kraftstoff',
+        type: 'select',
+        defaultValue: 'gas',
+        options: [
+          { value: 'gas', label: 'Erdgas (in kWh Brennwert Ho)' },
+          { value: 'heizoel', label: 'Heizöl EL (in Liter)' },
+          { value: 'benzin', label: 'Superbenzin / Benzin (in Liter)' },
+          { value: 'diesel', label: 'Dieselkraftstoff (in Liter)' },
+          { value: 'lpg', label: 'Flüssiggas / Autogas LPG (in Liter)' },
+        ],
+        helpText: 'Wählen Sie Ihren Energieträger für Heizung oder Mobilität.',
+      },
+      {
+        id: 'amount',
+        label: 'Verbrauchsmenge (in kWh bzw. Liter)',
+        type: 'number',
+        defaultValue: 15000,
+        min: 0,
+        step: 100,
+        unit: 'Menge',
+        helpText: 'Beispiele: 15.000 kWh Gas, 2.000 Liter Heizöl, 1.200 Liter Benzin oder Diesel. 0 ist zulässig.',
+      },
+      {
+        id: 'priceYear',
+        label: 'CO2-Zertifikatspreis pro Tonne (nach BEHG)',
+        type: 'select',
+        defaultValue: '2026_corridor_55',
+        options: [
+          { value: '2026_corridor_55', label: '2026 Gesetzlicher Preiskorridor (55 €/t Mindestpreis)' },
+          { value: '2026_corridor_60', label: '2026 Gesetzlicher Preiskorridor (60 €/t Mittelwert)' },
+          { value: '2026_corridor_65', label: '2026 Gesetzlicher Preiskorridor (65 €/t Höchstpreis gem. § 10 Abs. 2 BEHG)' },
+          { value: '2025_festpreis', label: '2025 Gesetzlicher Festpreis (55 €/t gem. § 10 BEHG)' },
+          { value: '2024_festpreis', label: '2024 Gesetzlicher Festpreis (45 €/t gem. § 10 BEHG)' },
+          { value: 'custom', label: 'Benutzerdefinierter Preis (€/t)' },
+        ],
+        helpText: 'Gemäß § 10 Abs. 2 BEHG gilt für 2026 ein Versteigerungskorridor von 55 bis 65 Euro je Emissionszertifikat.',
+      },
+      {
+        id: 'customPricePerTonne',
+        label: 'Individueller CO2-Preis in €/t',
+        type: 'number',
+        defaultValue: 55,
+        min: 0,
+        step: 5,
+        unit: '€/t',
+        helpText: 'Nur relevant bei Auswahl von „Benutzerdefinierter Preis“.',
+      },
+      {
+        id: 'includeVat',
+        label: 'Mehrwertsteuer (19 % nach UStG) einrechnen',
+        type: 'boolean',
+        defaultValue: true,
+        helpText: 'Auf den CO₂-Zertifikatspreis wird gesetzlich die reguläre Mehrwertsteuer von 19 % erhoben.',
+      },
+    ],
+    calculate: calculateCarbonPrice,
+    formula: 'CO₂-Kosten = Menge × EBeV-Emissionsfaktor (kg/Einheit) ÷ 1.000 × CO₂-Preis (€/t) × (1 + MwSt)',
+    formulaExplanation: 'Aus der Verbrauchsmenge und dem amtlichen EBeV-Standardfaktor wird die Treibhausgasmenge berechnet. Diese wird mit dem Zertifikatspreis multipliziert. Da der CO₂-Preis Bestandteil der Bemessungsgrundlage für die Umsatzsteuer ist, fallen 19 % Mehrwertsteuer an.',
+    workedExample: {
+      title: 'Beispiel: 15.000 kWh Gasverbrauch bei 55 €/t CO₂-Preis (2025/2026 Mindestpreis)',
+      description: '1. CO₂-Menge: 15.000 kWh × 0,182 kg/kWh = 2.730 kg CO₂ (2,73 Tonnen). 2. CO₂-Kosten netto: 2,73 t × 55,00 €/t = 150,15 €. 3. Mehrwertsteuer (19 %): 150,15 € × 0,19 = 28,53 €. 4. CO₂-Kosten brutto: 178,68 € (entspricht einem Aufschlag von 1,19 Cent brutto bzw. 1,00 Cent netto je kWh Erdgas).',
+      inputs: { fuel: 'gas', amount: 15000, priceYear: '2026_corridor_55', includeVat: true },
+      resultSummary: '178,68 € brutto (ca. 1,19 ct/kWh Aufschlag)',
+    },
+    content: {
+      intro: 'Was kostet der nationale CO₂-Preis Verbraucher beim Heizen und Tanken? Dieser Rechner ermittelt den exakten CO₂-Kostenanteil für Erdgas, Heizöl, Benzin und Diesel gemäß den gesetzlichen Vorgaben des Brennstoffemissionshandelsgesetzes (BEHG) und den offiziellen Emissionsfaktoren der Emissionsberichterstattungsverordnung (EBeV 2030).',
+      sections: [
+        {
+          title: 'Wichtiger Hinweis: CO₂-Aufschlag ist nicht die Gesamtrechnung',
+          content: 'Das Ergebnis dieses Rechners beziffert ausschließlich den **gesetzlichen CO₂-Zertifikateanteil** inklusive Mehrwertsteuer. Es handelt sich **nicht** um Ihre gesamte Gas- oder Heizkostenabrechnung!\n\n**Achtung bei Endkundenpreisen**: An öffentlichen Tankstellen sowie in den kWh-Arbeitspreisen von Gasversorgern ist dieser CO₂-Preis im regulär ausgewiesenen Bruttopreis **bereits enthalten**. Addieren Sie diesen Betrag niemals nochmals zu einem bereits bezahlten Bruttopreis hinzu!',
+        },
+        {
+          title: 'Gesetzliche Entwicklung des BEHG-Preises (2021 bis 2026+)',
+          content: 'Der nationale Emissionshandel (nEHS) startete 2021 mit einem schrittweise ansteigenden Festpreissystem:\n\n- **2021**: 25 €/t CO₂\n- **2022**: 30 €/t CO₂\n- **2023**: 30 €/t CO₂ (krisenbedingt eingefroren)\n- **2024**: 45 €/t CO₂ (gesetzlicher Festpreis gem. § 10 Abs. 2 BEHG)\n- **2025**: 55 €/t CO₂ (gesetzlicher Festpreis gem. § 10 Abs. 2 BEHG)\n- **2026**: Preiskorridor von **55 bis 65 €/t CO₂** mit Versteigerung\n- **Ab 2027**: Geplanter Übergang in das europäische Emissionshandelssystem für Gebäude und Verkehr (EU-ETS-2), in dem sich die Preise frei am Markt bilden.',
+        },
+        {
+          title: 'Amtliche Standard-Emissionsfaktoren nach EBeV 2030',
+          content: 'Die Deutsche Emissionshandelsstelle (DEHSt) legt verbindliche Standardfaktoren für Brennstoffe fest:\n\n- **Erdgas**: 0,182 kg CO₂/kWh (bezogen auf den Brennwert Ho) → bei 55 €/t ca. **1,19 ct/kWh brutto**\n- **Heizöl EL**: 2,66 kg CO₂/Liter → bei 55 €/t ca. **17,4 ct/Liter brutto**\n- **Superbenzin**: 2,37 kg CO₂/Liter → bei 55 €/t ca. **15,5 ct/Liter brutto**\n- **Diesel**: 2,65 kg CO₂/Liter → bei 55 €/t ca. **17,3 ct/Liter brutto**\n- **Autogas (LPG)**: 1,65 kg CO₂/Liter → bei 55 €/t ca. **10,8 ct/Liter brutto**\n\nPrüfen Sie bei Mietwohnungen die gesetzliche Kostenaufteilung mit unserem [CO2-Kostenaufteilungsrechner für Vermieter und Mieter](/rechner/co2-abgabe-vermieter-mieter-rechner/) oder vergleichen Sie Heizsysteme mit dem [Heizkostenvergleich-Rechner](/rechner/heizkostenvergleich-rechner/).',
+        },
+      ],
+      details: 'Formel: CO₂-Kosten (€) = Menge × EBeV-Faktor (kg/Einheit) ÷ 1.000 × CO₂-Preis (€/t) × 1,19 (MwSt). Das Brennstoffemissionshandelsgesetz verpflichtet Inverkehrbringer fossiler Brennstoffe zum Kauf von Zertifikaten, die über den Großhandel an die Endverbraucher weitergereicht werden.',
+    },
+    faqs: [
+      {
+        question: 'Muss auf den CO2-Preis Mehrwertsteuer gezahlt werden?',
+        answer: 'Ja. Nach deutschem Umsatzsteuerrecht (§ 10 Abs. 1 UStG) gehört der CO₂-Preis zum Entgelt für die Brennstofflieferung und unterliegt damit der regulären Mehrwertsteuer von 19 %. Der CO₂-Preis erhöht somit die umsatzsteuerliche Bemessungsgrundlage.',
+      },
+      {
+        question: 'Wie teilen Vermieter und Mieter den CO2-Preis auf?',
+        answer: 'Seit dem 1. Januar 2023 regelt das Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) ein 10-Stufen-Modell für Wohngebäude. Je schlechter der energetische Zustand des Gebäudes (in kg CO₂ pro m² und Jahr), desto höher ist der prozentuale Anteil, den der Vermieter tragen muss (zwischen 0 % und 95 %). Berechnen Sie die exakte Aufteilung in unserem [CO2-Kostenaufteilungsrechner für Vermieter und Mieter](/rechner/co2-abgabe-vermieter-mieter-rechner/).',
+      },
+      {
+        question: 'Was passiert mit dem CO2-Preis ab 2027 (EU-ETS-2)?',
+        answer: 'Ab 2027 soll das nationale Brennstoffemissionshandelsgesetz in das neue europäische Emissionshandelssystem für Brennstoffe im Gebäude- und Straßenverkehrssektor (EU-ETS-2) überführt werden. Zertifikate werden dann europaweit versteigert, wodurch sich der Preis marktgetrieben nach Angebot und Nachfrage bildet (kein gesetzlicher Festpreis mehr).',
+      },
+      {
+        question: 'Ist der CO2-Preis im Benzin- und Gaspreis bereits enthalten?',
+        answer: 'Ja. Wenn Sie an der Tankstelle tanken oder von Ihrem Gasversorger eine Rechnung erhalten, ist der CO₂-Preis in den Brutto-Preisen pro Liter oder kWh bereits einkalkuliert. Der Rechner zeigt Ihnen, welcher Teilbetrag Ihrer Rechnung auf das Emissionshandelssystem entfällt.',
+      },
+    ],
+    relatedSlugs: ['gaskostenrechner', 'co2-abgabe-vermieter-mieter-rechner', 'heizkostenvergleich-rechner', 'co2-strom-rechner', 'co2-auto-rechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'Deutsche Emissionshandelsstelle (DEHSt) – Nationaler Emissionshandel (BEHG / EBeV 2030)',
+      sourceUrl: 'https://www.dehst.de/DE/Nationaler-Emissionshandel/Brennstoffemissionen/brennstoffemissionen_node.html',
+      lastVerified: '2026-10-21',
+    },
+  },
 ];
+

@@ -1,4 +1,4 @@
-import { CalculationResult } from '@/types/calculator';
+import { CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
@@ -448,38 +448,164 @@ export function calculateTravelTime(inputs: Record<string, any>): CalculationRes
   };
 }
 
+import { EMISSION_FACTORS } from '@/data/emissions';
+
 export function calculateCarCO2(inputs: Record<string, any>): CalculationResult {
-  const distanceKm = parseFloat(inputs.distanceKm) || 15000;
-  const fuelType = inputs.fuelType || 'benzin'; // 'benzin', 'diesel', 'electric'
-  const consumption = parseFloat(inputs.consumption) || (fuelType === 'diesel' ? 5.5 : (fuelType === 'electric' ? 18 : 6.8));
-
-  let factor = GERMAN_DATA_2026.co2_faktor_benzin.value; // kg CO2 / Liter
-  let unit = 'Liter';
-
-  if (fuelType === 'diesel') {
-    factor = GERMAN_DATA_2026.co2_faktor_diesel.value;
-  } else if (fuelType === 'electric') {
-    factor = GERMAN_DATA_2026.co2_faktor_strommix.value;
-    unit = 'kWh';
+  if (inputs.distanceKm === undefined || inputs.distanceKm === null || String(inputs.distanceKm).trim() === '') {
+    return {
+      primary: { id: 'co2', label: 'CO2-Ausstoß', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie die Fahrstrecke in Kilometern an.',
+    };
   }
 
-  const totalFuel = (distanceKm * consumption) / 100;
+  const distanceKm = parseFloat(String(inputs.distanceKm).replace(',', '.'));
+  if (isNaN(distanceKm) || distanceKm <= 0) {
+    return {
+      primary: { id: 'co2', label: 'CO2-Ausstoß', value: 0, formattedValue: '-' },
+      error: 'Die Fahrstrecke muss eine positive Zahl größer als 0 km sein.',
+    };
+  }
+
+  const fuelType = String(inputs.fuelType || 'benzin');
+  const tripMode = String(inputs.tripMode || 'annual'); // 'annual' | 'single_trip'
+  const boundary = String(inputs.boundary || 'direct'); // 'direct' | 'lifecycle'
+
+  let defaultConsumption = 6.8;
+  if (fuelType === 'diesel') defaultConsumption = 5.5;
+  else if (fuelType.startsWith('electric')) defaultConsumption = 18.0;
+
+  const rawConsumption = inputs.consumption !== undefined && inputs.consumption !== null && String(inputs.consumption).trim() !== ''
+    ? parseFloat(String(inputs.consumption).replace(',', '.'))
+    : defaultConsumption;
+
+  if (isNaN(rawConsumption) || rawConsumption <= 0) {
+    return {
+      primary: { id: 'co2', label: 'CO2-Ausstoß', value: 0, formattedValue: '-' },
+      error: 'Der Kraftstoff- bzw. Stromverbrauch muss eine positive Zahl sein.',
+    };
+  }
+
+  const isElectric = fuelType.startsWith('electric');
+  const unit = isElectric ? 'kWh' : 'Liter';
+
+  // Determine factor from verified registry
+  let factor = EMISSION_FACTORS.brennstoff_benzin_direkt.value; // default: 2.37 kg/l
+  let factorName = 'Superbenzin direkte Verbrennung (2,37 kg CO₂/l)';
+  let gasType: 'CO2' | 'CO2e' = 'CO2';
+
+  if (fuelType === 'diesel') {
+    if (boundary === 'lifecycle') {
+      factor = EMISSION_FACTORS.brennstoff_diesel_lifecycle.value; // 3.24
+      factorName = 'Diesel Well-to-Wheel (3,24 kg CO₂e/l inkl. Vorkette)';
+      gasType = 'CO2e';
+    } else {
+      factor = EMISSION_FACTORS.brennstoff_diesel_direkt.value; // 2.65
+      factorName = 'Diesel direkte Verbrennung (2,65 kg CO₂/l)';
+    }
+  } else if (fuelType === 'electric_green') {
+    factor = EMISSION_FACTORS.strom_oekostrom_lifecycle.value / 1000; // 0.025 kg/kWh
+    factorName = 'Ökostrom Lebenszyklus (25 g CO₂e/kWh für PV/Wind-Herstellung)';
+    gasType = 'CO2e';
+  } else if (isElectric) {
+    if (boundary === 'lifecycle') {
+      factor = EMISSION_FACTORS.strom_mix_de_lifecycle_2025.value / 1000; // 0.410 kg/kWh
+      factorName = 'Deutscher Strommix 2025 Lebenszyklus (410 g CO₂e/kWh inkl. Vorkette)';
+      gasType = 'CO2e';
+    } else {
+      factor = EMISSION_FACTORS.strom_mix_de_generation_2025.value / 1000; // 0.344 kg/kWh
+      factorName = 'Deutscher Strommix 2025 Erzeugung (344 g CO₂/kWh Inlandskraftwerke)';
+    }
+  } else {
+    // benzin
+    if (boundary === 'lifecycle') {
+      factor = EMISSION_FACTORS.brennstoff_benzin_lifecycle.value; // 2.82
+      factorName = 'Superbenzin Well-to-Wheel (2,82 kg CO₂e/l inkl. Vorkette)';
+      gasType = 'CO2e';
+    } else {
+      factor = EMISSION_FACTORS.brennstoff_benzin_direkt.value; // 2.37
+      factorName = 'Superbenzin direkte Verbrennung (2,37 kg CO₂/l)';
+    }
+  }
+
+  const totalFuel = (distanceKm * rawConsumption) / 100;
   const totalCO2Kg = totalFuel * factor;
-  const co2PerKmGrams = (totalCO2Kg / distanceKm) * 1000;
+  const co2PerKmGrams = distanceKm > 0 ? (totalCO2Kg / distanceKm) * 1000 : 0;
+  const co2Tonnes = totalCO2Kg / 1000;
+
+  const isAnnual = tripMode === 'annual';
+  const labelPrefix = isAnnual ? 'Jährlicher CO2-Ausstoß' : 'CO2-Ausstoß der Einzelfahrt';
+  const formattedPrimary = isAnnual
+    ? (co2Tonnes >= 1 ? `${formatNumber(co2Tonnes, 2)} Tonnen ${gasType}` : `${formatNumber(totalCO2Kg, 1)} kg ${gasType}`)
+    : (totalCO2Kg >= 1000 ? `${formatNumber(co2Tonnes, 2)} Tonnen ${gasType} (${formatNumber(totalCO2Kg, 0)} kg)` : `${formatNumber(totalCO2Kg, 1)} kg ${gasType}`);
+
+  const secondary: ResultItem[] = [
+    {
+      id: 'co2PerKm',
+      label: `Spezifische Emissionen pro Kilometer`,
+      value: co2PerKmGrams,
+      formattedValue: `${formatNumber(co2PerKmGrams, 1)} g ${gasType}/km`,
+      highlight: true,
+      helpText: 'Tatsächliche Treibhausgas-Emissionen geteilt durch die gefahrene Wegstrecke.',
+    },
+    {
+      id: 'totalFuel',
+      label: isAnnual ? `Jahresbedarf an ${unit}` : `Bedarf für diese Fahrt`,
+      value: totalFuel,
+      formattedValue: `${formatNumber(totalFuel, 1)} ${unit}`,
+      helpText: `Berechnet aus ${formatNumber(distanceKm, 0)} km bei ${formatNumber(rawConsumption, 1)} ${unit}/100 km.`,
+    },
+    {
+      id: 'factorUsed',
+      label: 'Angewandter Emissionsfaktor',
+      value: factor,
+      formattedValue: `${formatNumber(factor, 3)} kg ${gasType} pro ${unit}`,
+      helpText: factorName,
+    },
+  ];
+
+  if (isAnnual) {
+    secondary.push({
+      id: 'monthlyAverage',
+      label: 'Monatlicher Durchschnitt',
+      value: totalCO2Kg / 12,
+      formattedValue: `${formatNumber(totalCO2Kg / 12, 1)} kg ${gasType}/Monat`,
+    });
+  }
 
   return {
     primary: {
-      id: 'co2Annual',
-      label: 'Jährlicher CO2-Ausstoß',
-      value: totalCO2Kg / 1000,
-      formattedValue: `${formatNumber(totalCO2Kg / 1000, 2)} Tonnen CO2`,
+      id: 'co2Total',
+      label: labelPrefix,
+      value: isAnnual ? co2Tonnes : totalCO2Kg,
+      formattedValue: formattedPrimary,
       highlight: true,
     },
-    secondary: [
-      { id: 'co2PerKm', label: 'CO2-Emissionen pro Kilometer', value: co2PerKmGrams, formattedValue: `${formatNumber(co2PerKmGrams, 0)} g CO2/km` },
-      { id: 'totalFuel', label: `Jahresbedarf an ${unit}`, value: totalFuel, formattedValue: `${formatNumber(totalFuel, 1)} ${unit}` },
-      { id: 'factorUsed', label: 'Emissionsfaktor', value: factor, formattedValue: `${factor} kg CO2 pro ${unit}` },
+    secondary,
+    directAnswer: isAnnual
+      ? `Bei ${formatNumber(distanceKm, 0)} km Fahrleistung und ${formatNumber(rawConsumption, 1)} ${unit}/100 km entstehen jährlich ca. ${formatNumber(co2Tonnes, 2)} Tonnen ${gasType} (${formatNumber(co2PerKmGrams, 0)} g/km).`
+      : `Für eine Einzelfahrt über ${formatNumber(distanceKm, 0)} km entstehen ca. ${formatNumber(totalCO2Kg, 1)} kg ${gasType} (${formatNumber(co2PerKmGrams, 0)} g/km).`,
+    summaryText: isAnnual
+      ? `Bei einer Jahresfahrleistung von ${formatNumber(distanceKm, 0)} km und einem Verbrauch von ${formatNumber(rawConsumption, 1)} ${unit}/100 km emittiert Ihr Fahrzeug rund ${formatNumber(co2Tonnes, 2)} Tonnen ${gasType} im Jahr (ca. ${formatNumber(co2PerKmGrams, 0)} g/km).`
+      : `Für die Fahrtstrecke von ${formatNumber(distanceKm, 0)} km bei einem Verbrauch von ${formatNumber(rawConsumption, 1)} ${unit}/100 km entstehen rund ${formatNumber(totalCO2Kg, 1)} kg ${gasType} (ca. ${formatNumber(co2PerKmGrams, 0)} g/km).`,
+    basisSummary: [
+      { label: 'Fahrtart', value: isAnnual ? 'Jährliche Gesamtfahrleistung' : 'Einzelfahrt' },
+      { label: 'Strecke', value: `${formatNumber(distanceKm, 0)} km` },
+      { label: 'Verbrauch', value: `${formatNumber(rawConsumption, 1)} ${unit}/100 km` },
+      { label: 'Emissionsgrenze', value: boundary === 'lifecycle' ? 'Well-to-Wheel (Lebenszyklus inkl. Vorkette)' : 'Direkte Emissionen (Tank-to-Wheel / Kraftwerk)' },
+      { label: 'Spezifischer Faktor', value: `${formatNumber(factor, 3)} kg ${gasType}/${unit}` },
     ],
-    summaryText: `Bei einer Fahrleistung von ${formatNumber(distanceKm, 0)} km und einem Verbrauch von ${formatNumber(consumption, 1)} ${unit}/100 km emittiert Ihr Fahrzeug rund ${formatNumber(totalCO2Kg / 1000, 2)} Tonnen CO2 im Jahr (${formatNumber(co2PerKmGrams, 0)} g/km).`,
+    calculationSteps: [
+      `Brennstoff- / Strombedarf: (${formatNumber(distanceKm, 0)} km × ${formatNumber(rawConsumption, 1)} ${unit}) ÷ 100 = ${formatNumber(totalFuel, 2)} ${unit}`,
+      `CO2-Ausstoß: ${formatNumber(totalFuel, 2)} ${unit} × ${formatNumber(factor, 3)} kg/${unit} = ${formatNumber(totalCO2Kg, 1)} kg ${gasType}`,
+      `Spezifische Emission: (${formatNumber(totalCO2Kg, 1)} kg × 1.000) ÷ ${formatNumber(distanceKm, 0)} km = ${formatNumber(co2PerKmGrams, 1)} g ${gasType}/km`,
+    ],
+    qualifications: [
+      boundary === 'direct' && isElectric
+        ? 'Für Elektrofahrzeuge werden die Emissionen der inländischen Stromerzeugung (deutscher Strommix 2025: geschätzt 344 g CO₂/kWh laut UBA) zugrunde gelegt. Am Auspuff entstehen 0 g direkte Emissionen.'
+        : (boundary === 'direct'
+            ? 'Reine direkte Verbrennungsemissionen des Kraftstoffs im Motor (Tank-to-Wheel). Vorketten wie Ölförderung, Raffinerie und Transport sind nicht enthalten.'
+            : 'Well-to-Wheel Bilanz: Berücksichtigt sowohl die Vorkette (Gewinnung, Raffinerie, Transport) als auch die Verbrennung bzw. Kraftwerksverluste.'),
+      'Fahrzeugbau, Reifenabrieb und Entsorgung sind nicht eingerechnet. Dieser Wert bildet keine vollständige persönliche Ökobilanz ab.',
+    ],
   };
 }

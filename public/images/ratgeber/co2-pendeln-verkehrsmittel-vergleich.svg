@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480" role="img" aria-labelledby="co2PendelnSvgTitle co2PendelnSvgDesc">
+  <title id="co2PendelnSvgTitle">CO2-Vergleich beim Pendeln: Verkehrsmittel im Jahresvergleich</title>
+  <desc id="co2PendelnSvgDesc">Balkendiagramm mit jährlichen Treibhausgasemissionen für 20 km Arbeitsweg (180 Pendeltage = 7.200 Personenkilometer) nach offiziellen UBA-Emissionsfaktoren.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .card { fill: #ffffff; stroke: #e2e8f0; stroke-width: 1.5; rx: 12; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; }
+      .text-head { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 13px; }
+      .text-body { fill: #334155; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .text-sub { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; }
+      .bar-car { fill: #ef4444; }
+      .bar-carpool { fill: #f97316; }
+      .bar-transit { fill: #0284c7; }
+      .bar-train { fill: #0d9488; }
+      .bar-bike { fill: #16a34a; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="480" class="bg" />
+
+  <!-- Top Header -->
+  <text x="400" y="34" text-anchor="middle" class="text-title" font-size="19">CO₂ beim Pendeln: Verkehrsmittel im Jahresvergleich</text>
+  <text x="400" y="54" text-anchor="middle" class="text-sub" font-size="12">Szenario: 20 km einfache Strecke × 2 × 180 Tage = 7.200 Personenkilometer (Pkm) pro Jahr | Quelle: UBA Treibhausgas-Emissionsfaktoren</text>
+
+  <!-- Main Chart Card -->
+  <g transform="translate(35, 75)">
+    <rect width="730" height="290" class="card" />
+
+    <!-- Y-Axis Categories & Bars -->
+    <!-- 1. Pkw Alleinfahrt -->
+    <text x="25" y="42" class="text-head">Pkw Alleinfahrt (164 g/Pkm)</text>
+    <rect x="230" y="27" width="370" height="22" rx="4" class="bar-car" />
+    <text x="610" y="43" font-size="12" font-weight="bold" fill="#0f172a">1.180,8 kg CO₂e</text>
+
+    <!-- 2. Fahrgemeinschaft (2 Personen) -->
+    <text x="25" y="90" class="text-head">Pkw zu zweit (82 g/Pkm)</text>
+    <rect x="230" y="75" width="185" height="22" rx="4" class="bar-carpool" />
+    <text x="425" y="91" font-size="12" font-weight="bold" fill="#0f172a">590,4 kg CO₂e</text>
+
+    <!-- 3. Öffentlicher Nahverkehr (Bus/Tram) -->
+    <text x="25" y="138" class="text-head">ÖPNV Linienbus (79 g/Pkm)</text>
+    <rect x="230" y="123" width="178" height="22" rx="4" class="bar-transit" />
+    <text x="418" y="139" font-size="12" font-weight="bold" fill="#0f172a">568,8 kg CO₂e</text>
+
+    <!-- 4. Schienenfernverkehr (ICE/IC) -->
+    <text x="25" y="186" class="text-head">Bahn Fernverkehr (44 g/Pkm)</text>
+    <rect x="230" y="171" width="99" height="22" rx="4" class="bar-train" />
+    <text x="340" y="187" font-size="12" font-weight="bold" fill="#0f172a">316,8 kg CO₂e</text>
+
+    <!-- 5. E-Bike / Pedelec -->
+    <text x="25" y="234" class="text-head">Pedelec / E-Bike (7 g/Pkm)</text>
+    <rect x="230" y="219" width="16" height="22" rx="4" class="bar-bike" />
+    <text x="256" y="235" font-size="12" font-weight="bold" fill="#0f172a">50,4 kg CO₂e</text>
+
+    <!-- Scale ticks -->
+    <line x1="230" y1="255" x2="600" y2="255" stroke="#cbd5e1" stroke-width="1" />
+    <text x="230" y="272" class="text-sub" text-anchor="middle">0 kg</text>
+    <text x="322" y="272" class="text-sub" text-anchor="middle">300 kg</text>
+    <text x="415" y="272" class="text-sub" text-anchor="middle">600 kg</text>
+    <text x="507" y="272" class="text-sub" text-anchor="middle">900 kg</text>
+    <text x="600" y="272" class="text-sub" text-anchor="middle">1.200 kg</text>
+  </g>
+
+  <!-- Bottom Insight Box: Homeoffice & Kombi -->
+  <g transform="translate(35, 380)">
+    <rect width="730" height="75" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1" />
+    <text x="20" y="26" font-size="13" font-weight="bold" fill="#15803d">Hebel zur CO₂-Senkung beim Pendeln:</text>
+    <text x="20" y="47" class="text-body">• 1 Tag Homeoffice pro Woche (36 Tage weniger im Auto): Spart sofort 236,2 kg CO₂e (-20 %).</text>
+    <text x="20" y="65" class="text-body">• Umstieg Pkw auf Bahn: Spart bei 7.200 Pkm jährlich 864 kg CO₂e (-73 % Treibhausgase).</text>
+  </g>
+</svg>

@@ -3328,7 +3328,325 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     ],
     relatedArticleSlugs: ['werktage-arbeitstage-unterschied', 'erythrit-statt-zucker-backen', 'heizoelverbrauch-aus-tankstand-berechnen'],
   },
+  {
+    slug: 'wie-viel-co2-verursacht-eine-kilowattstunde-strom',
+    title: 'Wie viel CO₂ verursacht eine Kilowattstunde Strom? UBA-Faktoren & Strommix',
+    metaTitle: 'Wie viel CO2 verursacht 1 kWh Strom? UBA-Faktoren & Strommix',
+    metaDescription: 'Wie viel Gramm CO2 entstehen pro Kilowattstunde Strom? Offizielle UBA-Zahlen (344 g CO2/kWh 2025), Vorkette (410 g CO2e) und Ökostrom im wissenschaftlichen Vergleich.',
+    h1: 'Wie viel CO₂ verursacht eine Kilowattstunde Strom in Deutschland?',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-21',
+    updatedAt: '2026-10-21',
+    readingTimeMin: 7,
+    coverIllustration: {
+      src: '/images/ratgeber/co2-strom-kwh-berechnung-formel.svg',
+      alt: 'Berechnung von CO2-Emissionen aus Stromverbrauch in kWh',
+      caption: 'Formel und Zusammenhänge der Strom-CO2-Berechnung nach UBA-Kriterien',
+      width: 800,
+      height: 450,
+    },
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Umweltökonomie',
+    },
+    reviewer: {
+      name: 'Klima- und Energieanalyse RechenHafen',
+      role: 'Wissenschaftliche Qualitätssicherung',
+    },
+    summary:
+      'Im Jahr 2025 verursachte eine Kilowattstunde Strom im deutschen Strommix laut offizieller UBA-Schätzung durchschnittlich 344 Gramm direkte CO₂-Emissionen im Kraftwerkspark. Werden Vorketten und Netzverluste einbezogen, liegt der Lebenszykluswert bei rund 410 g CO₂e/kWh. Auch Ökostrom ist nicht völlig emissionsfrei, sondern liegt über den gesamten Lebenszyklus bei etwa 20 bis 30 g CO₂e/kWh.',
+    keyTakeaways: [
+      'Offizieller UBA-Emissionsfaktor: Für 2025 schätzt das Umweltbundesamt die direkten Emissionen auf 344 g CO₂/kWh (veröffentlicht im März 2026).',
+      'Bilanzgrenze beachten: 344 g CO₂/kWh erfasst nur direkte Kaminemissionen deutscher Kraftwerke (Scope 2); unter Einbezug von Brennstoffvorkette und Netzverlusten entstehen rund 410 g CO₂e/kWh.',
+      'Ökostrom ist nicht emissionsfrei im Lebenszyklus: Windkraft und Photovoltaik stoßen beim Betrieb kein CO₂ aus, erfordern bei Herstellung, Montage und Rückbau aber rund 20 bis 30 g CO₂e/kWh.',
+      'Langfristiger Trend: 1990 lag der Strommix noch bei 764 g CO₂/kWh – durch den Kohleausstieg und erneuerbare Energien hat sich der Wert mehr als halbiert.',
+    ],
+    primaryCalculator: {
+      slug: 'co2-strom-rechner',
+      title: 'CO2-Strom-Rechner',
+      ctaText: 'Eigenen Strom-CO₂-Ausstoß berechnen',
+      description: 'Rechnen Sie Ihren Stromverbrauch (kWh) exakt in kg und Tonnen CO₂ um – mit UBA-Faktoren und Ökostrom-Option.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'stromkostenrechner',
+        title: 'Stromkostenrechner',
+        ctaText: 'Stromkosten ermitteln',
+        description: 'Berechnet Ihre jährlichen und monatlichen Gesamtkosten aus Kilowattstunden, Arbeitspreis und Grundpreis.',
+      },
+      {
+        slug: 'balkonkraftwerk-ertrag-rechner',
+        title: 'Balkonkraftwerk-Ertrag-Rechner',
+        ctaText: 'Solarertrag & Ersparnis berechnen',
+        description: 'Kalkuliert eigenen Solarstrom, Eigenverbrauchsquote und die jährliche CO₂-Vermeidung durch Stecker-Solar.',
+      },
+      {
+        slug: 'co2-preis-rechner',
+        title: 'CO2-Preis-Rechner',
+        ctaText: 'CO2-Kosten berechnen',
+        description: 'Ermittelt den gesetzlichen CO₂-Zertifikateaufschlag nach BEHG für Gas, Heizöl und Kraftstoffe.',
+      },
+    ],
+    sections: [
+      {
+        id: 'uba-emissionsfaktor-strommix',
+        title: 'Der deutsche Strommix: 344 Gramm CO₂ pro Kilowattstunde (UBA 2025/2026)',
+        paragraphs: [
+          'Wie viel Kohlendioxid entsteht, wenn wir die Waschmaschine einschalten, das Smartphone laden oder den Fernseher laufen lassen? Die Antwort hängt davon ab, zu welchen Anteilen der deutsche Strom aus Kohle, Erdgas, Kernkraft, Wind, Sonne, Biomasse und Wasserkraft erzeugt wird.',
+          'Das Umweltbundesamt (UBA) ermittelt diesen Wert jährlich in seiner Publikation „Entwicklung der spezifischen Treibhausgas-Emissionen des deutschen Strommix“. Für das Jahr 2025 beziffert das UBA den Wert in der vorläufigen Schätzung (Stand März 2026) auf 344 Gramm CO₂ pro Kilowattstunde (g/kWh).',
+          'Das bedeutet: Verbraucht ein Haushalt 2.500 Kilowattstunden Strom im Jahr, führt dies rechnerisch zu 860 Kilogramm CO₂-Ausstoß (2.500 kWh × 344 g/kWh ÷ 1.000).',
+        ],
+      },
+      {
+        id: 'bilanzgrenzen-scope2-vs-lebenszyklus',
+        title: 'Bilanzgrenzen verstehen: Direkte Erzeugung vs. Lebenszyklus (CO₂e)',
+        paragraphs: [
+          'In der öffentlichen Diskussion und auf Stromrechnungen werden häufig unterschiedliche Zahlen genannt. Grund hierfür sind abweichende Bilanzgrenzen:',
+          '1. Direkte Erzeugungsemissionen (Scope 2): Der Standardfaktor von 344 g CO₂/kWh misst ausschließlich das Kohlendioxid, das bei der Verbrennung von Braun-, Stein- und Erdgaskohlenstoffen direkt im Kraftwerksschornstein entsteht. Andere Treibhausgase wie Methan (CH₄) und Lachgas (N₂O) oder Emissionen außerhalb Deutschlands werden hier nicht abgebildet.',
+          '2. Lebenszyklus / Well-to-Wheel (Scope 3 Vorkette): Eine vollständige Ökobilanz betrachtet auch die Gewinnung der Brennstoffe (z. B. Gasförderung und Transportverluste), den Bau von Kraftwerken und Stromleitungen sowie Übertragungsverluste im Stromnetz. Unter dieser ganzheitlichen Betrachtung liegt der deutsche Strommix bei rund 410 g CO₂e/kWh.',
+        ],
+      },
+      {
+        id: 'oekostrom-lebenszyklus',
+        title: 'Warum Ökostrom nicht null Gramm Treibhausgase verursacht',
+        paragraphs: [
+          'Häufig wird Ökostrom fälschlicherweise mit „0 Gramm CO₂“ gleichgesetzt. Zwar entsteht bei der Umwandlung von Sonnenlicht oder Windenergie im laufenden Betrieb kein Abgas. Bei der Rohstoffgewinnung, der Herstellung von Silizium-Wafern für Solarmodule, beim Stahl und Beton für Windkrafttürme sowie beim Transport und späteren Recycling wird jedoch Energie verbraucht.',
+          'Wissenschaftliche Ökobilanzen zeigen, dass moderner Neuanlagen-Ökostrom aus Wind- und Photovoltaikanlagen über die gesamte Lebensdauer rund 20 bis 30 g CO₂e/kWh verursacht (UBA-Mittelwert: ca. 25 g CO₂e/kWh). Gegenüber dem fossilen Durchschnittsstrommix von 344 bis 410 g/kWh spart Ökostrom somit über 90 Prozent der Treibhausgase ein – ist aber streng genommen nicht absolut emissionsfrei.',
+        ],
+      },
+      {
+        id: 'stromkennzeichnung-rechnung',
+        title: 'Stromkennzeichnung: Wo finde ich den individuellen Faktor meines Anbieters?',
+        paragraphs: [
+          'Nach § 42 des Energiewirtschaftsgesetzes (EnWG) ist jeder Energieversorger in Deutschland verpflichtet, auf der Stromrechnung sowie auf Informationsmaterialien die Stromkennzeichnung auszuweisen.',
+          'Dort finden Sie zwei zentrale Werte: Die CO₂-Emissionen des gesamten Unternehmensmix sowie die spezifischen Emissionen Ihres gebuchten Tarifs. Bei Tarifen mit Herkunftsnachweisen (HKE) aus bestehenden europäischen Wasserkraftwerken weist die Kennzeichnung bilanziell oft 0 g/kWh aus, was jedoch nicht zwingend bedeutet, dass neue erneuerbare Erzeugungskapazitäten geschaffen wurden.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: Strom-CO₂ eines 2-Personen-Haushalts im Detail berechnet',
+      scenario: 'Ein 2-Personen-Haushalt verbraucht 2.500 kWh Strom im Jahr. Berechnet werden die Emissionen nach UBA-Kraftwerksstandard sowie der Vergleich zum Lebenszykluswert.',
+      formula: 'CO₂-Ausstoß (kg) = Verbrauch (kWh) × Faktor (g/kWh) ÷ 1.000',
+      steps: [
+        {
+          label: '1. Direkte Erzeugung (UBA 2025: 344 g CO₂/kWh)',
+          calculation: '2.500 kWh × 344 g/kWh ÷ 1.000 = 860,0 kg CO₂ (0,86 Tonnen)',
+          note: 'Reine Verbrennungsemissionen der deutschen Kraftwerke.',
+        },
+        {
+          label: '2. Lebenszyklusbetrachtung (410 g CO₂e/kWh)',
+          calculation: '2.500 kWh × 410 g/kWh ÷ 1.000 = 1.025,0 kg CO₂e (1,03 Tonnen)',
+          note: 'Inklusive Vorkette für Erdgas- und Kohleimporte sowie Netzverluste.',
+        },
+        {
+          label: '3. Vergleich mit Neuanlagen-Ökostrom (25 g CO₂e/kWh)',
+          calculation: '2.500 kWh × 25 g/kWh ÷ 1.000 = 62,5 kg CO₂e',
+          note: 'Ergibt eine rechnerische Vermeidung von rund 797,5 kg CO₂ bzw. 962,5 kg CO₂e.',
+        },
+      ],
+      resultSummary: '860 kg CO₂ direkte Kraftwerksemissionen bzw. 1.025 kg CO₂e Lebenszykluslast pro Jahr.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Direkte Erzeugung (CO₂) mit Lebenszykluswerten (CO₂e) gleichsetzen.',
+        correction: 'Vergleichen Sie niemals Äpfel mit Birnen: 344 g ist der Kraftwerksfaktor für reines CO₂; ganzheitliche Ökobilanzen erfordern 410 g CO₂e inklusive Vorkette.',
+      },
+      {
+        mistake: 'Annehmen, Ökostrom sei absolut emissionsfrei (0 g).',
+        correction: 'Im laufenden Betrieb stoßen Wind und Sonne kein CO₂ aus, über ihren Lebenszyklus (Herstellung, Betonfundamente, Rückbau) fallen jedoch ca. 25 g CO₂e/kWh an.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie entwickelt sich der CO2-Faktor des deutschen Strommix?',
+        answer: 'Der Faktor sinkt kontinuierlich: 1990 lag er bei 764 g CO₂/kWh, 2010 bei 563 g/kWh, 2020 bei 369 g/kWh und 2025 liegt die Schätzung des UBA bei 344 g CO₂/kWh. Haupttreiber sind der Rückgang der Kohleverstromung und der Zubau von Wind- und Solaranlagen.',
+      },
+      {
+        question: 'Wie viel CO2 spart eine Photovoltaikanlage oder ein Balkonkraftwerk?',
+        answer: 'Jede Kilowattstunde eigener Solarstrom, die Netzstrom ersetzt, verdrängt im Schnitt den fossilen Grenzstrommix. Ein Balkonkraftwerk mit 600 bis 800 kWh Jahresertrag vermeidet somit rechnerisch rund 200 bis 270 kg CO₂ pro Jahr.',
+      },
+      {
+        question: 'Zählt Strom zu Scope 1 oder Scope 2?',
+        answer: 'Nach dem Greenhouse Gas Protocol (GHG) gehört bezogener Netzstrom zu Scope 2 (indirekte Emissionen aus eingekaufter Energie). Scope 1 erfasst direkte Verbrennung vor Ort (z. B. Gasheizung oder Benzin-PKW).',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Umweltbundesamt (UBA): Entwicklung der spezifischen Treibhausgas-Emissionen des deutschen Strommix',
+        citation: 'Publikation der Emissionsbilanz erneuerbarer Energieträger und des Strommixes, Stand März 2026',
+        url: 'https://www.umweltbundesamt.de/themen/klima-energie/energieversorgung/strom-waermeversorgung-in-zahlen#strommix',
+      },
+      {
+        title: '§ 42 Energiewirtschaftsgesetz (EnWG): Stromkennzeichnung',
+        citation: 'Gesetzliche Pflicht zur transparenten Angabe des Energieträgermixes und der CO₂-Emissionen auf Stromrechnungen',
+        url: 'https://www.gesetze-im-internet.de/enwg_2005/__42.html',
+      },
+    ],
+    relatedArticleSlugs: ['co2-beim-pendeln-auto-und-bahn-richtig-vergleichen', 'heizoelverbrauch-aus-tankstand-berechnen', 'werktage-arbeitstage-unterschied'],
+  },
+  {
+    slug: 'co2-beim-pendeln-auto-und-bahn-richtig-vergleichen',
+    title: 'CO₂ beim Pendeln: Auto und Bahn richtig vergleichen (Pkm-Faktoren & Formel)',
+    metaTitle: 'CO2 beim Pendeln: Auto vs. Bahn richtig vergleichen (UBA 2024)',
+    metaDescription: 'Auto oder Bahn für den Arbeitsweg? So vergleichen Sie Pendel-Emissionen methodisch sauber: Personenkilometer-Faktoren nach UBA, Fahrgemeinschaften und Homeoffice-Effekt.',
+    h1: 'CO₂ beim Pendeln: Auto, Bahn und Fahrgemeinschaften richtig vergleichen',
+    category: 'auto-mobilitaet',
+    categoryName: 'Auto & Mobilität',
+    publishedAt: '2026-10-21',
+    updatedAt: '2026-10-21',
+    readingTimeMin: 8,
+    coverIllustration: {
+      src: '/images/ratgeber/co2-pendeln-verkehrsmittel-vergleich.svg',
+      alt: 'Vergleich der jährlichen Pendel-Emissionen verschiedener Verkehrsmittel',
+      caption: 'CO2-Emissionen nach Personenkilometern für 20 km Arbeitsweg',
+      width: 800,
+      height: 480,
+    },
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Mobilität & Klimabilanzierung',
+    },
+    reviewer: {
+      name: 'Verkehrsökonomie RechenHafen',
+      role: 'Wissenschaftliche Qualitätssicherung',
+    },
+    summary:
+      'Wer seinen täglichen Arbeitsweg klimafreundlicher gestalten möchte, muss Verkehrsdaten methodisch sauber vergleichen: Entscheidend sind Personenkilometer (Pkm) und tatsächliche Besetzungsgrade. Laut Umweltbundesamt verursacht ein Pkw im Bundesdurchschnitt 164 g CO₂e pro Personenkilometer, während der Bahnfernverkehr bei 44 g und der öffentliche Nahverkehr bei rund 79 g liegt. Fahrgemeinschaften und Homeoffice halbieren oder senken die Pendellast drastisch.',
+    keyTakeaways: [
+      'Personenkilometer-Prinzip: Um Verkehrsmittel fair zu vergleichen, werden die Treibhausgase durch die transportierten Personen geteilt (UBA-Standardfaktor: 164 g CO₂e/Pkm für durchschnittliche Pkw-Fahrten).',
+      'Besetzungsgrad-Falle: Ein Pro-Kopf-Faktor darf niemals nochmals durch die Anzahl der Mitfahrer geteilt werden. Bei 2 Personen in einem Pkw halbiert sich der Gesamtfahrzeugausstoß auf 82 g CO₂e/Pkm pro Person.',
+      'Schiene spart massiv: Mit 44 g CO₂e/Pkm im Fernverkehr und rund 79 g/Pkm im ÖPNV stößt die Bahn 50 bis 73 Prozent weniger Treibhausgase aus als ein Alleinfahrer im Pkw.',
+      'Größter Einzeleffekt durch Homeoffice: Wer an 2 von 5 Tagen von zu Hause arbeitet, reduziert seine Pendel-Emissionen und Fahrtkosten unmittelbar um 40 Prozent.',
+    ],
+    primaryCalculator: {
+      slug: 'co2-pendeln-rechner',
+      title: 'CO2-Pendeln-Rechner',
+      ctaText: 'Eigenen Pendelweg vergleichen',
+      description: 'Vergleicht Pkw, Fahrgemeinschaften, Bahn, ÖPNV und Fahrrad für Ihren exakten Arbeitsweg inklusive Homeoffice-Ersparnis.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'co2-auto-rechner',
+        title: 'CO2-Auto-Rechner',
+        ctaText: 'Fahrzeug-CO₂ berechnen',
+        description: 'Ermittelt direkte Verbrennungsemissionen oder Lebenszykluswerte für Benziner, Diesel, Hybrid und Elektroautos.',
+      },
+      {
+        slug: 'spritkostenrechner',
+        title: 'Spritkostenrechner',
+        ctaText: 'Fahrtkosten berechnen',
+        description: 'Kalkuliert die reinen Kraftstoffkosten und den Verbrauch für Einzelfahrten oder den täglichen Arbeitsweg.',
+      },
+      {
+        slug: 'pendlerpauschale-rechner',
+        title: 'Pendlerpauschale-Rechner',
+        ctaText: 'Steuerersparnis berechnen',
+        description: 'Berechnet die steuerliche Entfernungspauschale für Arbeitnehmer in der Einkommensteuererklärung.',
+      },
+    ],
+    sections: [
+      {
+        id: 'personenkilometer-und-besetzungsgrad',
+        title: 'Die Messgröße im Verkehrsvergleich: Was sind Personenkilometer (Pkm)?',
+        paragraphs: [
+          'Beim Vergleich verschiedener Verkehrsträger stößt man schnell auf ein methodisches Problem: Ein ICE verbraucht als Gesamtfahrzeug enorme Energiemengen, transportiert aber Hunderte Fahrgäste gleichzeitig. Ein Kleinwagen verbraucht pro Kilometer scheinbar wenig, wird im Berufsverkehr aber fast immer nur von einer einzigen Person genutzt.',
+          'Aus diesem Grund nutzt das Umweltbundesamt (UBA) in seiner TREMOD-Datenbank die Einheit Personenkilometer (Pkm). Ein Personenkilometer entspricht der Beförderung einer Person über eine Distanz von einem Kilometer.',
+          'Wichtig: Die offiziellen UBA-Emissionsfaktoren sind bereits als Gramm Treibhausgase je Personenkilometer (g CO₂e/Pkm) ausgewiesen. Wer einen solchen Faktor nutzt, darf ihn keinesfalls ein zweites Mal durch die Insassenzahl teilen!',
+        ],
+      },
+      {
+        id: 'uba-verkehrsmittel-vergleich',
+        title: 'Die offiziellen UBA-Emissionsfaktoren im Überblick (TREMOD 2024)',
+        paragraphs: [
+          'Das Umweltbundesamt beziffert die durchschnittlichen Treibhausgasemissionen (Well-to-Wheel inklusive Fahrzeugbetrieb und Energiebereitstellung) für den Personenverkehr in Deutschland wie folgt:',
+          '• Pkw (Bundesdurchschnitt, Realbetrieb): ca. 164 g CO₂e/Pkm (bei mittlerer Besetzung von ca. 1,4 Personen; bei Alleinfahrt im Berufsverkehr ca. 190–210 g/Pkm)',
+          '• Öffentlicher Nahverkehr (Bus & Tram): ca. 79 g CO₂e/Pkm',
+          '• Eisenbahn-Nahverkehr (Regionalbahn / S-Bahn): ca. 56 g CO₂e/Pkm',
+          '• Eisenbahn-Fernverkehr (ICE / IC): ca. 44 g CO₂e/Pkm (bzw. bei 100 % Ökostrom im DB-Fernverkehr nochmals deutlich geringer)',
+          '• Pedelec / E-Bike: ca. 5 bis 10 g CO₂e/Pkm (überwiegend aus Stromerzeugung und Akku-Lebenszyklus)',
+          '• Reines Fahrrad & Fußweg: 0 g CO₂e im direkten Betrieb',
+        ],
+      },
+      {
+        id: 'fahrgemeinschaften-und-homeoffice',
+        title: 'Fahrgemeinschaften und Homeoffice: Die schnellsten Hebel zur CO₂-Minderung',
+        paragraphs: [
+          'Nicht jeder Pendler hat eine direkte Bahnverbindung vor der Haustür. Zwei praxistaugliche Maßnahmen ermöglichen dennoch erhebliche Einsparungen:',
+          '1. Fahrgemeinschaften bilden: Fahren zwei Kollegen gemeinsam in einem Pkw zur Arbeit, teilen sich die Gesamtemissionen des Autos durch zwei Personen. Aus 164 g werden rechnerisch 82 g CO₂e pro Personenkilometer – das ist bereits nahezu auf dem Niveau des öffentlichen Nahverkehrs.',
+          '2. Homeoffice-Tage nutzen: Wer bei einer 5-Tage-Woche an zwei Tagen von zu Hause aus arbeitet (144 statt 240 Bürotage), spart exakt 40 Prozent seiner gesamten Pendelkilometer, Fahrtkosten und Emissionen ein.',
+        ],
+      },
+      {
+        id: 'unterschiedliche-streckenlaengen',
+        title: 'Streckenlängen beachten: Auto und Bahn fahren selten dieselbe Route',
+        paragraphs: [
+          'In der Praxis ist die Schienenstrecke zwischen zwei Orten häufig etwas länger oder kürzer als die Autobahnroute. Zudem erfordert die Anreise zum Bahnhof oft eine kurze Zuwegung (mit dem Fahrrad oder zu Fuß).',
+          'Ein sauberer CO₂-Rechner muss daher für das Auto und den öffentlichen Verkehr getrennte Kilometerangaben zulassen, um keine verzerrten Vergleichswerte zu erzeugen.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: 20 km Arbeitsweg im Jahresvergleich (180 Pendeltage)',
+      scenario: 'Ein Pendler hat 20 km einfachen Weg zur Arbeitsstätte und fährt an 180 Tagen im Jahr (nach Abzug von 30 Urlaubstagen, Feiertagen und 1 Tag Homeoffice pro Woche). Gesamtdistanz: 20 km × 2 × 180 = 7.200 Personenkilometer pro Jahr.',
+      formula: 'Emissionen = Personenkilometer (Pkm) × UBA-Faktor (g/Pkm) ÷ 1.000',
+      steps: [
+        {
+          label: '1. Pkw Alleinfahrt (164 g CO₂e/Pkm)',
+          calculation: '7.200 Pkm × 164 g/Pkm ÷ 1.000 = 1.180,8 kg CO₂e (1,18 Tonnen)',
+          note: 'Bundesdurchschnitt nach UBA inklusive Fahrzeugvorkette.',
+        },
+        {
+          label: '2. Fahrgemeinschaft zu zweit (82 g CO₂e/Pkm)',
+          calculation: '7.200 Pkm × 82 g/Pkm ÷ 1.000 = 590,4 kg CO₂e',
+          note: 'Halbierung der Pro-Kopf-Emissionen gegenüber der Alleinfahrt.',
+        },
+        {
+          label: '3. Schienenfernverkehr (44 g CO₂e/Pkm)',
+          calculation: '7.200 Pkm × 44 g/Pkm ÷ 1.000 = 316,8 kg CO₂e',
+          note: 'Ersparnis gegenüber dem Auto: 864,0 kg CO₂e (-73 Prozent).',
+        },
+      ],
+      resultSummary: '1.180,8 kg CO₂e im Pkw gegenüber 316,8 kg CO₂e in der Bahn (864 kg CO₂e Ersparnis).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Einen Personenkilometer-Faktor ein zweites Mal durch die Mitfahrerzahl teilen.',
+        correction: 'UBA-Faktoren je Personenkilometer sind bereits Pro-Kopf-Werte. Wenn Sie eine Fahrgemeinschaft kalkulieren, halbieren Sie den Gesamtfahrzeugausstoß, nicht den bereits geteilten Pkm-Faktor.',
+      },
+      {
+        mistake: 'Einfache Entfernung statt Hin- und Rückweg ansetzen.',
+        correction: 'Da Pendler in der Regel abends wieder nach Hause fahren, muss die einfache Entfernung stets verdoppelt werden (Hin- und Rückweg).',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viele Tage pendelt ein Vollzeitbeschäftigter im Jahr?',
+        answer: 'Bei einer 5-Tage-Woche gibt es ca. 250 bis 255 Arbeitstage im Jahr. Nach Abzug von gesetzlichen Feiertagen (ca. 10 Tage), Erholungsurlaub (ca. 30 Tage) und gelegentlichen Krankheitstagen verbleiben im Durchschnitt ca. 200 bis 220 reale Präsenztage. Bei 1 bis 2 Tagen Homeoffice pro Woche sinkt die Zahl auf ca. 140 bis 180 Pendeltage.',
+      },
+      {
+        question: 'Wie schneidet ein Elektroauto im Vergleich zur Bahn ab?',
+        answer: 'Ein durchschnittliches Elektroauto (Verbrauch ca. 18 kWh/100 km) verursacht beim aktuellen deutschen Strommix (344 g CO₂/kWh) ca. 62 g CO₂ pro Fahrzeugkilometer. Bei Alleinfahrt liegt es damit zwischen Linienbus (79 g) und Bahnfernverkehr (44 g). Wird das E-Auto mit 100 % Solarstrom geladen, sinkt der Wert auf ca. 5 bis 10 g CO₂e/Pkm (Lebenszyklus von PV und Akku).',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Umweltbundesamt (UBA): Vergleich der durchschnittlichen Emissionen einzelner Verkehrsträger im Personenverkehr',
+        citation: 'TREMOD-Datenbank (Transport Emission Model), Stand 2024',
+        url: 'https://www.umweltbundesamt.de/themen/verkehr/nachhaltige-mobilitaet/bahn-fahren-klimaschuetzen',
+      },
+      {
+        title: 'Statistisches Bundesamt (Destatis): Pendleratlas und Mobilitätserhebungen',
+        citation: 'Erhebungen zu durchschnittlichen Pendeldistanzen und Verkehrsmittelwahl der Erwerbstätigen in Deutschland',
+        url: 'https://www.destatis.de',
+      },
+    ],
+    relatedArticleSlugs: ['wie-viel-co2-verursacht-eine-kilowattstunde-strom', 'werktage-arbeitstage-unterschied', 'heizoelverbrauch-aus-tankstand-berechnen'],
+  },
 ];
+
 
 // O(1) Lookup Maps
 const ARTICLE_SLUG_MAP = new Map<string, RatgeberArticle>();
