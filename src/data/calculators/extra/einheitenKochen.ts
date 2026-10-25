@@ -73,6 +73,51 @@ function buildPastaConversionTable(): string {
   return `Die folgende Übersicht zeigt das gekochte Serviergewicht sowie die benötigte Kochwassermenge für gängige Trockennudelmengen bei Standard-Hartweizen:\n\n${lines}`;
 }
 
+// Zucker-Ersatz-Rechner: angenommene Süßkraft von reinem Erythrit (Haushaltszucker = 100 %)
+const ERYTHRIT_SWEETNESS = 0.70;
+const erythritToSugarG = (erythritG: number) => (erythritG === 0 ? 0 : Math.round(erythritG * ERYTHRIT_SWEETNESS));
+const sugarToErythritG = (sugarG: number) => Math.round(sugarG / ERYTHRIT_SWEETNESS);
+
+function buildErythritQuickReference(): string {
+  const eryRows = [20, 50, 60, 80, 100, 120, 125, 150, 200]
+    .map((g) => {
+      const exact = g * ERYTHRIT_SWEETNESS;
+      const rounded = erythritToSugarG(g);
+      const exactNote = Number.isInteger(Math.round(exact * 100) / 100) ? '' : ` (rechnerisch ${formatNumber(exact, 2)} g)`;
+      return `| ${g} g Erythrit | ${rounded} g Zucker${exactNote} |`;
+    })
+    .join('\n');
+  const sugarRows = [50, 100, 120, 150, 200, 250]
+    .map((g) => `| ${g} g Zucker | ${sugarToErythritG(g)} g Erythrit (rechnerisch ${formatNumber(g / ERYTHRIT_SWEETNESS, 2, 2)} g) |`)
+    .join('\n');
+  const pct = Math.round(ERYTHRIT_SWEETNESS * 100);
+  return [
+    `Die Tabellen nutzen dieselbe Annahme wie der Rechner: Reines Erythrit hat ca. ${pct} % der Süßkraft von Haushaltszucker. **Erythrit → Zucker:** Erythrit × ${formatNumber(ERYTHRIT_SWEETNESS, 2, 2)}. **Zucker → Erythrit:** Zucker ÷ ${formatNumber(ERYTHRIT_SWEETNESS, 2, 2)}. Der Rechner rundet auf ganze Gramm.`,
+    `**Wie viel Zucker entspricht Erythrit?**`,
+    `| Erythrit | entspricht an Süße ca. |\n| --- | --- |\n${eryRows}`,
+    `**Wie viel Erythrit ersetzt Zucker?**`,
+    `| Zucker im Rezept | benötigtes Erythrit ca. |\n| --- | --- |\n${sugarRows}`,
+    `*Die Werte vergleichen nur die Süße. Volumen, Feuchtigkeit, Bräunung und Bindung im Teig können sich mit Erythrit verändern – bei Mischprodukten (z. B. Erythrit mit Stevia) gelten die Angaben auf der Packung.*`,
+  ].join('\n\n');
+}
+
+// Marmeladen-Rechner: Gelierzucker-Verhältnis Frucht : Gelierzucker
+const JAM_SUGAR_FACTORS: Record<string, number> = { '1_1': 1.0, '2_1': 0.5, '3_1': 1 / 3 };
+const jamSugarG = (fruitG: number, ratio: string) => Math.round(fruitG * (JAM_SUGAR_FACTORS[ratio] ?? 0.5));
+
+function buildJamRatioReference(): string {
+  const rows = [500, 750, 1000, 1500, 2000]
+    .map((g) => `| ${formatNumber(g, 0)} g | ${formatNumber(jamSugarG(g, '1_1'), 0)} g | ${formatNumber(jamSugarG(g, '2_1'), 0)} g | ${formatNumber(jamSugarG(g, '3_1'), 0)} g |`)
+    .join('\n');
+  return [
+    'Die Zahl auf der Gelierzucker-Packung beschreibt das Gewichtsverhältnis **Frucht : Gelierzucker**. Der Rechner teilt das Fruchtgewicht deshalb durch die erste Zahl des Verhältnisses:',
+    `- **1:1** – 1 Teil Frucht auf 1 Teil Gelierzucker: 1.000 g Frucht → ${formatNumber(jamSugarG(1000, '1_1'), 0)} g Gelierzucker\n- **2:1** – 2 Teile Frucht auf 1 Teil Gelierzucker: 1.000 g Frucht → ${jamSugarG(1000, '2_1')} g Gelierzucker\n- **3:1** – 3 Teile Frucht auf 1 Teil Gelierzucker: 1.500 g Frucht → ${jamSugarG(1500, '3_1')} g Gelierzucker (1.000 g Frucht → ca. ${jamSugarG(1000, '3_1')} g)`,
+    '**Benötigter Gelierzucker je Verhältnis:**',
+    `| Früchte | 1:1 | 2:1 | 3:1 |\n| --- | --- | --- | --- |\n${rows}`,
+    'Je höher die erste Zahl, desto weniger Zucker kommt ins Glas. Damit die Masse trotzdem fest wird, enthalten 2:1- und 3:1-Gelierzucker anteilig mehr Geliermittel. Produkte unterscheiden sich in Zusammensetzung, Kochzeit und Zitronensäureanteil – richten Sie sich beim Kochen zusätzlich nach der Anleitung auf Ihrer Packung.',
+  ].join('\n\n');
+}
+
 export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "gewicht-masse-umrechner",
@@ -3195,10 +3240,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Zucker in Erythrit",
     category: "kochen-backen",
     subcategory: "Ernährung & Diät",
-    metaTitle: 'Zucker in Erythrit umrechnen: Rechner & Tabelle',
-    metaDescription: 'Zucker in Erythrit und Erythrit in Zucker umrechnen: kostenloser Rechner mit Tabellen für beide Richtungen und Hinweisen zur Süßkraft.',
-    h1: 'Zucker in Erythrit umrechnen: Rechner & Tabelle',
-    shortDescription: 'Rechnet Haushaltszucker und Erythrit anhand einer 70-%-Süßkraft-Annahme um – inklusive Tabelle und Vergleich mit Xylit.',
+    metaTitle: 'Zucker in Erythrit umrechnen: Verhältnis & Tabelle',
+    metaDescription: 'Zucker und Erythrit in beide Richtungen umrechnen. Mit Verhältnis (ca. 70 % Süßkraft), Tabelle für häufige Mengen und Alternativen wie Xylit, Honig oder Stevia.',
+    h1: 'Zucker und Erythrit umrechnen',
+    shortDescription: 'Wählen Sie die Richtung: Zucker → Erythrit (oder Xylit, Honig, Agavendicksaft, Stevia) oder Erythrit → Zucker, und geben Sie die Menge in Gramm ein. Grundlage ist eine angenommene Süßkraft von 70 %: Erythrit = Zucker ÷ 0,7, Zucker = Erythrit × 0,7. Die Umrechnung gleicht die Süße aus, nicht das Backverhalten.',
     searchKeywords: [
       "zucker in erythrit umrechnen",
       "zuckerersatz rechner",
@@ -3207,6 +3252,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       "wie viel erythrit ersetzt 100g zucker",
       "zucker durch erythrit ersetzen",
       "xylit zucker umrechnen",
+      "erythrit zucker verhältnis",
+      "erythrit in zucker umrechnen",
+      "100 g erythrit wieviel zucker",
     ],
     inputs: [
       {
@@ -3301,7 +3349,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         }
 
         // Modellannahme 70 %: Zucker-Süßkraft = Erythrit × 0,70 (Zero stays zero)
-        const sugarEquivalent = erythritG === 0 ? 0 : Math.round(erythritG * 0.70);
+        const sugarEquivalent = erythritToSugarG(erythritG);
 
         return {
           primary: {
@@ -3367,7 +3415,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
 
       if (sub === 'erythrit') {
         // Modellannahme 70 %: Erythrit = Zucker / 0,70
-        subGrams = Math.round(sugarG / 0.70);
+        subGrams = sugarToErythritG(sugarG);
         calPerG = 0;
         subName = 'Erythrit';
       } else if (sub === 'xylit') {
@@ -3451,20 +3499,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         resultSummary: '70 g Zucker-Äquivalent',
       },
     ],
+    quickReference: [
+      {
+        title: 'Häufige Erythrit-Zucker-Umrechnungen',
+        content: buildErythritQuickReference(),
+      },
+    ],
     content: {
       intro: 'Dieser Rechner vergleicht die Süßkraft von Haushaltszucker (Saccharose) und reinem Erythrit sowie Xylit für Rezepte und Backvorhaben.',
       sections: [
         {
           title: 'Wie viel Erythrit ersetzt 100 g Zucker?',
           content: 'Reines Erythrit besitzt ungefähr 70 Prozent der Süßkraft von Haushaltszucker. Mit dieser Annahme entsprechen 100 g Zucker rechnerisch rund 143 g Erythrit. Die Umrechnung vergleicht die Süße – sie garantiert nicht, dass ein Rezept mit der größeren Menge genauso gelingt. Beachten Sie bei Mischprodukten die Angaben auf der Verpackung.',
-        },
-        {
-          title: 'Zucker in Erythrit: Umrechnungstabelle',
-          content: '| Zucker (Haushaltszucker) | Erythrit (ca. 70 % Süßkraft) |\n| --- | --- |\n| 50 g | 71 g |\n| 100 g | 143 g |\n| 120 g | 171 g |\n| 150 g | 214 g |\n| 200 g | 286 g |\n| 250 g | 357 g |\n\nGerundete Richtwerte bei angenommener Süßkraft von 70 %.',
-        },
-        {
-          title: 'Wie viel Zucker entspricht Erythrit? (Rückrechnung & Tabelle)',
-          content: 'Für die umgekehrte Richtung multiplizieren Sie das vorhandene Erythritgewicht mit 0,70 (Formel: `Zucker-Süße = Erythrit × 0,70`):\n\n| Reines Erythrit | Entsprechende Süßkraft in Haushaltszucker (70 %) |\n| --- | --- |\n| 60 g | 42 g Zucker |\n| 80 g | 56 g Zucker |\n| 100 g | 70 g Zucker |\n| 120 g | 84 g Zucker |\n| 125 g | 87,5 g Zucker (gerundet ca. 88 g) |\n| 150 g | 105 g Zucker |\n\n*Wichtig: Diese Tabelle vergleicht ausschließlich die Süßkraft nach Modellannahme. Backtechnische Eigenschaften wie Teigvolumen, Schmelzpunkt und Bindung müssen rezeptabhängig geprüft werden.*',
         },
         {
           title: 'Wie viel Gramm wiegt ein Esslöffel Erythrit? (Volumen vs. Gewicht)',
@@ -3492,6 +3538,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       },
     ],
     relatedSlugs: ['eiweiss-eigelb-ersatz-rechner', 'kalorien-rezept-rechner', 'cups-in-gramm-rechner', 'portionsrechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+      methodology: 'Süßkraftvergleich gegenüber Haushaltszucker (Saccharose = 100 %); Umrechnungstabellen werden aus demselben Faktor erzeugt wie das Rechnerergebnis.',
+    },
   },
   {
     id: "backzeit-temperatur-umluft-oberhitze-rechner",
@@ -5214,11 +5264,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Marmelade-Rechner",
     category: "kochen-backen",
     subcategory: "Einkochen & Haltbarkeit",
-    metaTitle: 'Marmelade Rechner – Gelierzucker 1:1, 2:1, 3:1',
-    metaDescription: 'Berechnen Sie die benötigte Menge Gelierzucker (1:1, 2:1 oder 3:1) nach Fruchtgewicht in Gramm, Zitronensaft-Zugabe und die Anzahl benötigter.',
-    h1: 'Marmelade Rechner – Gelierzucker nach Fruchtgewicht ermitteln',
-    shortDescription: 'Berechnet Gelierzucker und Gläseranzahl für Marmelade und Konfitüre mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["marmelade rechner gelierzucker 1 zu 1 2 zu 1 3 zu 1","wieviel gelierzucker fuer 1 kg erdbeeren","marmeladenglaeser anzahl berechnen","gelierprobe zitronensaeure marmelade"],
+    metaTitle: 'Gelierzucker-Rechner: 1:1, 2:1 & 3:1 für Marmelade',
+    metaDescription: 'Fruchtmenge eingeben und Gelierzucker für 1:1, 2:1 oder 3:1 berechnen – mit Zitronensaft, ungefährer Marmeladenmenge und Anzahl der Gläser.',
+    h1: 'Gelierzucker für Marmelade berechnen',
+    shortDescription: 'Geben Sie das Gewicht der vorbereiteten Früchte ein und wählen Sie das Verhältnis Ihrer Gelierzucker-Packung (1:1, 2:1 oder 3:1). Der Rechner zeigt die benötigte Menge Gelierzucker sowie Zitronensaft, ungefähre Marmeladenmenge und Gläseranzahl.',
+    searchKeywords: ["marmelade rechner gelierzucker 1 zu 1 2 zu 1 3 zu 1","wieviel gelierzucker fuer 1 kg erdbeeren","marmeladenglaeser anzahl berechnen","gelierprobe zitronensaeure marmelade","gelierzucker rechner","gelierzucker verhältnis"],
     inputs: [
           {
                 "id": "fruitGrams",
@@ -5238,15 +5288,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                 "options": [
                       {
                             "value": "2_1",
-                            "label": "Gelierzucker 2:1 (Fruchtig-süß – 500 g Zucker auf 1.000 g Frucht – Empfehlung)"
+                            "label": "Gelierzucker 2:1 (fruchtig-süß – 500 g Gelierzucker auf 1.000 g Frucht)"
                       },
                       {
                             "value": "3_1",
-                            "label": "Gelierzucker 3:1 (Sehr fruchtig, weniger süß – 333 g Zucker auf 1.000 g Frucht)"
+                            "label": "Gelierzucker 3:1 (sehr fruchtig, weniger süß – ca. 333 g Gelierzucker auf 1.000 g Frucht)"
                       },
                       {
                             "value": "1_1",
-                            "label": "Gelierzucker 1:1 (Klassisch süß, extrem lange haltbar – 1.000 g Zucker auf 1.000 g Frucht)"
+                            "label": "Gelierzucker 1:1 (klassisch süß – 1.000 g Gelierzucker auf 1.000 g Frucht)"
                       }
                 ]
           },
@@ -5275,11 +5325,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const fruitG = Number(inputs.fruitGrams) || 0;
       const sugarType = inputs.sugarType;
       
-      let sugarFactor = 0.5; // 2:1
-      if (sugarType === '1_1') sugarFactor = 1.0;
-      else if (sugarType === '3_1') sugarFactor = 1 / 3;
-      
-      const sugarG = Math.round(fruitG * sugarFactor);
+      // Frucht : Gelierzucker (Standard 2:1)
+      const sugarG = jamSugarG(fruitG, sugarType);
       const lemonJuiceMl = Math.round((fruitG / 1000) * 20); // 1-2 EL je kg
       // Gesamtmasse vor Kochverlust:
       const rawTotalG = fruitG + sugarG;
@@ -5301,7 +5348,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         summaryText: 'Für ' + fruitG + ' g Früchte benötigen Sie ' + sugarG + ' g Gelierzucker ' + (String(sugarType || '2_1').replace('_', ':')) + ' und ca. ' + lemonJuiceMl + ' ml Zitronensaft. Ergibt rund ' + jarsCount + ' Gläser à ' + jarMl + ' ml.',
       };
     },
-    formula: "2:1 Zucker = Fruchtgewicht / 2; 3:1 Zucker = Fruchtgewicht / 3; Gläser = (Gesamtmasse / 1,25) / Glasvolumen",
+    formula: "1:1 Gelierzucker = Fruchtgewicht; 2:1 Gelierzucker = Fruchtgewicht / 2; 3:1 Gelierzucker = Fruchtgewicht / 3; Gläser = (Gesamtmasse / 1,25) / Glasvolumen",
     formulaExplanation: "Gelierzucker 2:1 und 3:1 enthält zusätzlich pflanzliches Pektin (aus Äpfeln oder Zitrusfrüchten) und Zitronensäure, damit die Marmelade trotz geringerem Zuckergehalt zuverlässig geliert.",
     workedExample: {
           "title": "Beispiel: 1.500 g Erdbeeren mit 2:1 Gelierzucker",
@@ -5321,6 +5368,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           "result": "750 g Gelierzucker (7 Gläser)"
     },
+    quickReference: [
+      {
+        title: 'Gelierzucker-Verhältnis verstehen',
+        content: buildJamRatioReference(),
+      },
+    ],
     content: {
       intro: 'Dieser Einkochrechner kalkuliert die Frucht- und Zuckermengen für Konfitüren und Gelees bei 1:1, 2:1 oder 3:1 Gelierzucker.',
       details: 'Beim 2:1-Gelierzucker kommen auf 1.000 g vorbereitete Früchte exakt 500 g Gelierzucker. 3:1 verwendet nur 333 g Gelierzucker auf 1 kg Frucht (fruchtiger, aber kürzere Haltbarkeit nach dem Öffnen).',
@@ -5330,6 +5383,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Wie funktioniert die Gelierprobe?', answer: 'Geben Sie nach 4 Minuten Kochen einen Teelöffel heiße Marmelade auf einen eiskalten Teller: Wird die Masse innerhalb von 1 bis 2 Minuten fest, ist die Konfitüre fertig.' },
     ],
     relatedSlugs: ['kuehlschrank-haltbarkeit-rechner', 'portionsrechner', 'zucker-ersatz-rechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+      methodology: 'Gelierzucker = Fruchtgewicht ÷ erste Zahl des Verhältnisses (1:1, 2:1, 3:1); Mengen auf ganze Gramm gerundet.',
+      assumptions: [
+        'Zitronensaft: ca. 20 ml je 1.000 g Früchte (1–2 EL).',
+        'Fertige Marmeladenmenge: Frucht + Gelierzucker abzüglich ca. 8 % Verdampfung beim Kochen.',
+        'Gläseranzahl: Marmeladendichte ca. 1,25 g/ml, auf volle Gläser aufgerundet.',
+      ],
+      limitations: [
+        'Zusammensetzung und Kochzeit unterscheiden sich je nach Gelierzucker-Produkt – die Packungsanleitung hat Vorrang.',
+      ],
+    },
   },
   {
     id: "kaffee-wasser-verhaeltnis-rechner",

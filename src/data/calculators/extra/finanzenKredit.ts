@@ -1,6 +1,25 @@
 import { CalculatorDefinition, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
+// Zwischenfinanzierung: Beispielwerte für die Kurzreferenz (gleiche Formel wie im Rechner,
+// endfälliges Darlehen mit einfacher Zinsrechnung).
+function buildBridgeLoanQuickReference(): string {
+  const loan = 120000;
+  const rate = 5.2;
+  const monthly = (loan * (rate / 100)) / 12;
+  const rows = [6, 12, 18]
+    .map((m) => `| ${m} Monate | ${formatCurrency(monthly)} | ${formatCurrency(monthly * m)} |`)
+    .join('\n');
+  return [
+    '**Eingaben:** Betrag der Zwischenfinanzierung, Sollzinssatz pro Jahr laut Angebot und die Dauer in Monaten bis zur erwarteten Rückzahlung.',
+    '**Ergebnis:** monatliche Zinszahlung, Gesamtzinsen über die Laufzeit und der Betrag, der am Ende in einer Summe zurückgezahlt wird (endfällig, z. B. aus dem Verkaufserlös der bisherigen Immobilie).',
+    '`Monatliche Zinsen = Betrag × Zinssatz ÷ 12` · `Gesamtzinsen = monatliche Zinsen × Monate`',
+    `Beispiel mit ${formatCurrency(loan)} und ${formatNumber(rate, 1)} % Beispielzins (kein aktueller Marktzins):`,
+    `| Laufzeit | Zinsen pro Monat | Zinsen gesamt |\n| --- | --- | --- |\n${rows}`,
+    '**Nicht enthalten:** Bearbeitungsgebühren, Bereitstellungszinsen, Kosten für Grundschuld und Notar oder andere Bedingungen Ihrer Bank. Die Berechnung ist eine unverbindliche Beispielrechnung, keine Finanzierungsberatung und kein verbindliches Angebot.',
+  ].join('\n\n');
+}
+
 export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
   // ==================== FINANZEN (18) ====================
   {
@@ -3073,15 +3092,15 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     shortName: 'Zwischenfinanzierung',
     category: 'kredit-schulden',
     subcategory: 'Immobilienkauf & Finanzierung',
-    metaTitle: 'Zwischenfinanzierung Rechner – Kosten für kurzfristige Darl...',
-    metaDescription: 'Berechnen Sie die Zinskosten für eine Zwischenfinanzierung beim Immobilienkauf: Vorzeitiger Kauf vor Verkauf der alten Immobilie.',
-    h1: 'Zwischenfinanzierung Rechner (Immobilienüberbrückung)',
-    shortDescription: 'Ermittelt die Zinskosten für endfällige Überbrückungskredite bis zum Zufluss von Eigenkapital.',
-    searchKeywords: ['zwischenfinanzierung rechner', 'ueberbrueckungskredit immobilie kosten', 'endfaelliges darlehen zinsen berechnen', 'altes haus verkaufen neues kaufen kredit'],
+    metaTitle: 'Zwischenfinanzierung-Rechner: Zinskosten beim Hauskauf',
+    metaDescription: 'Alte Immobilie noch nicht verkauft? Zinsen einer endfälligen Zwischenfinanzierung aus Betrag, Zinssatz und Laufzeit berechnen – pro Monat und insgesamt.',
+    h1: 'Zwischenfinanzierung berechnen: Zinsen pro Monat und gesamt',
+    shortDescription: 'Sie möchten eine neue Immobilie kaufen, bevor der Verkaufserlös Ihrer bisherigen Immobilie verfügbar ist? Mit diesem Rechner schätzen Sie die Zinskosten einer Zwischenfinanzierung anhand von Betrag, Zinssatz und Laufzeit. Unterstellt wird ein endfälliges Darlehen: monatlich nur Zinsen, Rückzahlung des vollen Betrags am Ende.',
+    searchKeywords: ['zwischenfinanzierung rechner', 'ueberbrueckungskredit immobilie kosten', 'endfaelliges darlehen zinsen berechnen', 'altes haus verkaufen neues kaufen kredit', 'zwischenfinanzierung hauskauf', 'zwischenfinanzierung zinsen', 'zwischenfinanzierung kosten'],
     inputs: [
-      { id: 'loan', label: 'Zwischenfinanzierungs-Betrag', type: 'number', defaultValue: 120000, min: 5000, step: 5000, unit: '€' },
-      { id: 'rate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 5.2, min: 1, step: 0.1, unit: '%' },
-      { id: 'months', label: 'Überbrückungsdauer in Monaten', type: 'number', defaultValue: 12, min: 1, max: 36, step: 1, unit: 'Monate' },
+      { id: 'loan', label: 'Zwischenfinanzierungs-Betrag', type: 'number', defaultValue: 120000, min: 5000, step: 5000, unit: '€', helpText: 'Der Betrag, der bis zum Verkauf der bisherigen Immobilie überbrückt werden soll.' },
+      { id: 'rate', label: 'Sollzinssatz p.a. laut Angebot', type: 'number', defaultValue: 5.2, min: 0, step: 0.1, unit: '%', helpText: 'Voreingestellt ist ein Beispielwert, kein aktueller Marktzins. Tragen Sie den Sollzins aus Ihrem Bankangebot ein.' },
+      { id: 'months', label: 'Überbrückungsdauer in Monaten', type: 'number', defaultValue: 12, min: 1, max: 36, step: 1, unit: 'Monate', helpText: 'Zeitraum bis zur erwarteten Rückzahlung, z. B. bis der Verkaufserlös eingeht.' },
     ],
     calculate: (inputs) => {
       if (inputs.loan === undefined || inputs.loan === null || String(inputs.loan).trim() === '') {
@@ -3093,11 +3112,22 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       }
       const loan = rawLoan;
 
-      const rawZ = inputs.rate !== undefined && inputs.rate !== null && String(inputs.rate).trim() !== '' ? parseFloat(inputs.rate) : 5.2;
-      const z = !isNaN(rawZ) && rawZ >= 0 ? rawZ : 0;
+      // Leere oder ungültige Felder führen zu einer Hinweismeldung statt zu einem stillschweigend angenommenen Wert.
+      if (inputs.rate === null || String(inputs.rate ?? '5.2').trim() === '') {
+        return { primary: { id: 'totalInterest', label: 'Gesamte Zinskosten für die Überbrückung', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie den Zinssatz ein (0 % ist zulässig).' };
+      }
+      const z = inputs.rate !== undefined ? parseFloat(String(inputs.rate).replace(',', '.')) : 5.2;
+      if (isNaN(z) || z < 0) {
+        return { primary: { id: 'totalInterest', label: 'Gesamte Zinskosten für die Überbrückung', value: 0, formattedValue: '-' }, error: 'Der Zinssatz darf nicht negativ sein.' };
+      }
 
-      const rawM = parseInt(inputs.months, 10);
-      const m = !isNaN(rawM) && rawM >= 1 ? rawM : 12;
+      if (inputs.months === null || String(inputs.months ?? '12').trim() === '') {
+        return { primary: { id: 'totalInterest', label: 'Gesamte Zinskosten für die Überbrückung', value: 0, formattedValue: '-' }, error: 'Bitte geben Sie die Überbrückungsdauer in Monaten ein.' };
+      }
+      const m = inputs.months !== undefined ? parseInt(String(inputs.months), 10) : 12;
+      if (isNaN(m) || m < 1) {
+        return { primary: { id: 'totalInterest', label: 'Gesamte Zinskosten für die Überbrückung', value: 0, formattedValue: '-' }, error: 'Die Überbrückungsdauer muss mindestens 1 Monat betragen.' };
+      }
 
       const monthlyInterest = (loan * (z / 100)) / 12;
       const totalInterest = monthlyInterest * m;
@@ -3106,6 +3136,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         secondary: [
           { id: 'monthly', label: 'Reine monatliche Zinsrate (keine Tilgung)', value: monthlyInterest, formattedValue: formatCurrency(monthlyInterest) },
           { id: 'bullet', label: 'Endfällige Gesamttilgung am Ende', value: loan, formattedValue: formatCurrency(loan) },
+          { id: 'totalRepayment', label: 'Summe aus Zinsen und Rückzahlung', value: loan + totalInterest, formattedValue: formatCurrency(loan + totalInterest) },
+        ],
+        calculationSteps: [
+          `Monatliche Zinsen: ${formatCurrency(loan)} × ${formatNumber(z, 2)} % ÷ 12 = ${formatCurrency(monthlyInterest)}`,
+          `Gesamtzinsen: ${formatCurrency(monthlyInterest)} × ${m} Monate = ${formatCurrency(totalInterest)}`,
+          `Am Ende zurückzuzahlen: ${formatCurrency(loan)} (endfällig, z. B. aus dem Verkaufserlös)`,
         ],
         summaryText: `Für eine Zwischenfinanzierung über ${formatCurrency(loan)} zahlen Sie monatlich ${formatCurrency(monthlyInterest)} Zinsen (insgesamt ${formatCurrency(totalInterest)} über ${m} Monate).`,
       };
@@ -3118,14 +3154,34 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       inputs: { loan: 120000, rate: 5.2, months: 12 },
       resultSummary: '520,00 € / Monat (6.240 € Gesamtzins)',
     },
+    quickReference: [
+      {
+        title: 'Was der Rechner berechnet – und was nicht',
+        content: buildBridgeLoanQuickReference(),
+      },
+    ],
     content: {
       intro: 'Eine Zwischenfinanzierung überbrückt kurzfristige Liquiditätsengpässe beim Immobilienkauf, bis sichere Mittel (z. B. aus dem Verkauf der bisherigen Immobilie oder Zuteilung eines Bausparvertrags) bereitstehen.',
       details: 'Es handelt sich um ein endfälliges Darlehen: Während der Laufzeit (meist 6 bis 24 Monate) werden ausschließlich Zinsen gezahlt; die Tilgung erfolgt auf einen Schlag bei Fälligkeit der erwarteten Mittel.',
     },
     faqs: [
-      { question: 'Wie hoch sind die Zinsen bei einer Zwischenfinanzierung?', answer: 'Da Banken Zwischenkredite flexibel und kurzfristig bereitstellen, liegen die Zinssätze meist 1 bis 2 Prozentpunkte über den Konditionen langfristiger Festzinsdarlehen.' },
-      { question: 'Kann eine Zwischenfinanzierung vorzeitig ohne Vorfälligkeitsentschädigung abgelöst werden?', answer: 'Ja, Zwischenfinanzierungen werden üblicherweise mit variabler Verzinsung oder flexibler Rückzahlungsoption vereinbart, sodass sie bei Geldeingang sofort getilgt werden können.' },
+      { question: 'Wie hoch sind die Zinsen bei einer Zwischenfinanzierung?', answer: 'Das hängt von Bank, Bonität, Sicherheiten und Laufzeit ab und kann von den Konditionen langfristiger Baufinanzierungen abweichen. Der Rechner nennt bewusst keinen Marktzins: Tragen Sie den Sollzins aus Ihrem Angebot ein, um die Zinskosten pro Monat und für die gesamte Laufzeit zu sehen.' },
+      { question: 'Kann eine Zwischenfinanzierung vorzeitig ohne Vorfälligkeitsentschädigung abgelöst werden?', answer: 'Häufig werden Zwischenfinanzierungen variabel verzinst oder mit flexibler Rückzahlung vereinbart, sodass sie bei Eingang des Verkaufserlöses abgelöst werden können. Ob und zu welchen Bedingungen das möglich ist, regelt Ihr Darlehensvertrag – prüfen Sie das vor Abschluss.' },
+      { question: 'Was passiert, wenn die alte Immobilie später verkauft wird als geplant?', answer: 'Dann laufen die Zinsen weiter, und die Zwischenfinanzierung muss gegebenenfalls verlängert werden. Rechnen Sie im Rechner mit einer längeren Überbrückungsdauer, um zu sehen, wie sich die Gesamtzinsen erhöhen. Ob eine Verlängerung möglich ist, entscheidet die Bank.' },
     ],
-    relatedSlugs: ['baufinanzierung-rechner', 'kreditrechner', 'kaufnebenkosten-rechner'],
+    relatedSlugs: ['baufinanzierung-rechner', 'kaufnebenkosten-rechner', 'forward-darlehen-rechner', 'vorfaelligkeitsentschaedigung-baufinanzierung-rechner', 'kreditrechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+      methodology: 'Einfache Zinsrechnung für ein endfälliges Darlehen: Monatszins = Betrag × Sollzins ÷ 12; Gesamtzinsen = Monatszins × Laufzeit in Monaten.',
+      assumptions: [
+        'Zinsen werden monatlich gezahlt und nicht dem Darlehen zugeschlagen (kein Zinseszins).',
+        'Der volle Darlehensbetrag wird am Ende der Laufzeit in einer Summe zurückgezahlt.',
+        'Der Zinssatz bleibt über die gesamte Laufzeit konstant.',
+      ],
+      limitations: [
+        'Bearbeitungsgebühren, Bereitstellungszinsen, Kosten für Grundschuld und Notar sowie andere Bankkonditionen sind nicht enthalten.',
+        'Unverbindliche Beispielrechnung – keine Finanzierungsberatung und kein Angebot.',
+      ],
+    },
   },
 ];

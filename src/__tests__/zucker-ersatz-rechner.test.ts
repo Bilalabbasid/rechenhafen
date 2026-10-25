@@ -7,11 +7,11 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
   it('exists and has the exact required metadata', () => {
     expect(calc).toBeDefined();
     expect(calc.slug).toBe('zucker-ersatz-rechner');
-    expect(calc.metaTitle).toBe('Zucker in Erythrit umrechnen: Rechner & Tabelle');
+    expect(calc.metaTitle).toBe('Zucker in Erythrit umrechnen: Verhältnis & Tabelle');
     expect(calc.metaDescription).toBe(
-      'Zucker in Erythrit und Erythrit in Zucker umrechnen: kostenloser Rechner mit Tabellen für beide Richtungen und Hinweisen zur Süßkraft.'
+      'Zucker und Erythrit in beide Richtungen umrechnen. Mit Verhältnis (ca. 70 % Süßkraft), Tabelle für häufige Mengen und Alternativen wie Xylit, Honig oder Stevia.'
     );
-    expect(calc.h1).toBe('Zucker in Erythrit umrechnen: Rechner & Tabelle');
+    expect(calc.h1).toBe('Zucker und Erythrit umrechnen');
   });
 
   it('calculates the exact required conversion table values for sugar -> erythrit (70% sweetness assumption)', () => {
@@ -35,9 +35,9 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
       expect(res.primary.formattedValue).toBe(`${expectedErythrit} g`);
     }
 
-    // Verify forward table in content contains 120 g row
-    const forwardSection = calc.content?.sections?.find((s) => s.title.includes('Umrechnungstabelle') && !s.title.includes('Rückrechnung'));
-    expect(forwardSection?.content).toContain('| 120 g | 171 g |');
+    // Verify forward table (now in the quick reference directly under the calculator) contains 120 g row
+    const quickRef = calc.quickReference?.find((s) => s.title === 'Häufige Erythrit-Zucker-Umrechnungen');
+    expect(quickRef?.content).toContain('| 120 g Zucker | 171 g Erythrit');
   });
 
   it('calculates the exact required reverse conversion values for erythrit -> sugar (70% sweetness assumption)', () => {
@@ -192,15 +192,15 @@ describe('Zucker in Erythrit Umrechner (zucker-ersatz-rechner)', () => {
     // 150 g -> 105 g
     expect(calc.calculate({ direction: 'erythrit_to_sugar', erythritGrams: 150 }).primary.value).toBe(105);
 
-    // Section table check
-    const reverseSection = calc.content?.sections?.find((s) => s.title.includes('Rückrechnung & Tabelle'));
+    // Reverse table check (quick reference directly under the calculator)
+    const reverseSection = calc.quickReference?.find((s) => s.title === 'Häufige Erythrit-Zucker-Umrechnungen');
     expect(reverseSection).toBeDefined();
-    expect(reverseSection?.content).toContain('| 60 g | 42 g Zucker |');
-    expect(reverseSection?.content).toContain('| 80 g | 56 g Zucker |');
-    expect(reverseSection?.content).toContain('| 100 g | 70 g Zucker |');
-    expect(reverseSection?.content).toContain('| 120 g | 84 g Zucker |');
-    expect(reverseSection?.content).toContain('| 125 g | 87,5 g Zucker');
-    expect(reverseSection?.content).toContain('| 150 g | 105 g Zucker |');
+    expect(reverseSection?.content).toContain('| 60 g Erythrit | 42 g Zucker |');
+    expect(reverseSection?.content).toContain('| 80 g Erythrit | 56 g Zucker |');
+    expect(reverseSection?.content).toContain('| 100 g Erythrit | 70 g Zucker |');
+    expect(reverseSection?.content).toContain('| 120 g Erythrit | 84 g Zucker |');
+    expect(reverseSection?.content).toContain('| 125 g Erythrit | 88 g Zucker (rechnerisch 87,5 g) |');
+    expect(reverseSection?.content).toContain('| 150 g Erythrit | 105 g Zucker |');
 
     // Tablespoon volume/weight distinction check
     const tbSection = calc.content?.sections?.find((s) => s.title.includes('Esslöffel'));
