@@ -12,7 +12,7 @@ export const FAMILIE_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Geburtstermin',
     category: 'familie-schwangerschaft',
     subcategory: 'Schwangerschaft & Geburt',
-    metaTitle: 'Geburtstermin Rechner – Voraussichtlichen Entbindungstermin...',
+    metaTitle: 'Geburtstermin-Rechner: Entbindungstermin & SSW berechnen',
     metaDescription: 'Berechnen Sie Ihren Geburtstermin und die aktuelle Schwangerschaftswoche (SSW) nach der erweiterten Naegele-Regel online.',
     h1: 'Geburtstermin Rechner nach der Naegele-Regel',
     shortDescription: 'Ermittelt den voraussichtlichen Entbindungstermin (ET) und die aktuelle SSW mit Zykluslängen-Korrektur.',

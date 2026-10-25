@@ -16,7 +16,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Stundenlohn berechnen',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Stundenlohn',
-    metaTitle: 'Stundenlohnrechner – Monatsgehalt exakt in Stundenlohn umre...',
+    metaTitle: 'Stundenlohnrechner: Monatsgehalt in Stundenlohn umrechnen',
     metaDescription: 'Berechnen Sie Ihren Brutto-Stundenlohn aus dem Monatsgehalt nach der offiziellen deutschen 13-Wochen-Formel (§ 11 BUrlG / ArbZG).',
     h1: 'Stundenlohnrechner – Monatsgehalt in Stundenlohn umrechnen',
     shortDescription: 'Ermittelt Ihren Bruttostundenlohn aus Monatsgehalt und Wochenarbeitszeit nach gesetzlichem Standard.',
