@@ -17,6 +17,9 @@ export const ALL_SEO_CTR_SLUGS = [
   'zwischenfinanzierung-rechner',
 ];
 
+/** Pages whose content was materially reworked on the same day (ranking-gap work: Abfindung, LKW-Maut). */
+export const RANKING_GAP_SLUGS = ['abfindungsrechner', 'lkw-maut-deutschland-rechner'];
+
 export const getCalc = (slug: string): CalculatorDefinition => {
   const calc = getCalculatorBySlug(slug);
   if (!calc) throw new Error(`missing calculator ${slug}`);
@@ -65,6 +68,6 @@ export function expectScopedSitemapLastmod(slugs: string[], date = '2026-10-25')
     expect(entries.some((e) => e.url === url(s)), s).toBe(true);
     expect(bumped).toContain(url(s));
   }
-  const allowed = ALL_SEO_CTR_SLUGS.map(url);
+  const allowed = [...ALL_SEO_CTR_SLUGS, ...RANKING_GAP_SLUGS].map(url);
   for (const u of bumped) expect(allowed).toContain(u);
 }

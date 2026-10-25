@@ -63,6 +63,17 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
 
+      // Doppelter Abfindungsrechner zusammengeführt (gleiche Suchintention, siehe /rechner/abfindungsrechner/)
+      {
+        source: '/rechner/abfindung-fuenftelregelung-rechner',
+        destination: '/rechner/abfindungsrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/abfindung-fuenftelregelung-rechner/',
+        destination: '/rechner/abfindungsrechner/',
+        permanent: true,
+      },
       {
         source: '/rechner/sparziel-rechner',
         destination: '/rechner/spardauer-rechner/',
