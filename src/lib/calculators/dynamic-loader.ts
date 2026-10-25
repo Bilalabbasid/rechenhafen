@@ -254,7 +254,6 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "motorrad-unterhaltskosten-rechner": "extraAutoArbeit",
   "lkw-maut-deutschland-rechner": "extraAutoArbeit",
   "kurzarbeitergeld-rechner": "extraAutoArbeit",
-  "abfindung-fuenftelregelung-rechner": "extraAutoArbeit",
   "minijob-midijob-rechner": "extraAutoArbeit",
   "arbeitgeberanteil-sozialversicherung-rechner": "extraAutoArbeit",
   "kuendigungsfrist-arbeitnehmer-rechner": "extraAutoArbeit",

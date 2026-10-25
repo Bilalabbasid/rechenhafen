@@ -22,7 +22,6 @@ const BATCH_1_SLUGS = [
   'gehaltserhoehung-rechner',
   'urlaubstage-rechner',
   'kurzarbeitergeld-rechner',
-  'abfindung-fuenftelregelung-rechner',
   'minijob-midijob-rechner',
   'arbeitgeberanteil-sozialversicherung-rechner',
   'kuendigungsfrist-arbeitnehmer-rechner',
@@ -56,7 +55,8 @@ const BATCH_1_SLUGS = [
 
 describe('Batch 1 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   it('contains exactly 50 calculators assigned to Batch 1', () => {
-    expect(BATCH_1_SLUGS.length).toBe(50);
+    // 50 → 49: abfindung-fuenftelregelung-rechner wurde in abfindungsrechner zusammengeführt (301)
+    expect(BATCH_1_SLUGS.length).toBe(49);
   });
 
   describe('1. Registry Resolution & Metadata Quality', () => {

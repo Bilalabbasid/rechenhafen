@@ -17,6 +17,9 @@ export const ALL_SEO_CTR_SLUGS = [
   'zwischenfinanzierung-rechner',
 ];
 
+/** Pages whose content was materially reworked on the same day (ranking-gap work: Abfindung, LKW-Maut). */
+export const RANKING_GAP_SLUGS = ['abfindungsrechner', 'lkw-maut-deutschland-rechner'];
+
 /**
  * Pages re-verified on the same day outside the SEO/CTR scope: Minijob/Mindestlohn 2026 values, the
  * 2026 tax config values Ø-Zusatzbeitrag 2,9 %, Kindergeld 259 €, SolZ-Freigrenze 20.350 €, Insolvenzgeldumlage 0,15 %,
@@ -88,6 +91,6 @@ export function expectScopedSitemapLastmod(slugs: string[], date = '2026-10-25')
     expect(entries.some((e) => e.url === url(s)), s).toBe(true);
     expect(bumped).toContain(url(s));
   }
-  const allowed = [...ALL_SEO_CTR_SLUGS, ...LASTMOD_2026_10_25_DATA_REVIEW_SLUGS].map(url);
+  const allowed = [...ALL_SEO_CTR_SLUGS, ...RANKING_GAP_SLUGS, ...LASTMOD_2026_10_25_DATA_REVIEW_SLUGS].map(url);
   for (const u of bumped) expect(allowed).toContain(u);
 }
