@@ -18,8 +18,9 @@ export const ALL_SEO_CTR_SLUGS = [
 ];
 
 /**
- * Pages re-verified on the same day outside the SEO/CTR scope: Minijob/Mindestlohn 2026 values, and the
- * 2026 tax config values Ø-Zusatzbeitrag 2,9 %, Kindergeld 259 €, SolZ-Freigrenze 20.350 €, Insolvenzgeldumlage 0,15 %.
+ * Pages re-verified on the same day outside the SEO/CTR scope: Minijob/Mindestlohn 2026 values, the
+ * 2026 tax config values Ø-Zusatzbeitrag 2,9 %, Kindergeld 259 €, SolZ-Freigrenze 20.350 €, Insolvenzgeldumlage 0,15 %,
+ * and the Unterhalt pages (Düsseldorfer Tabelle 2026, Mindestunterhalt 486/558/653 €, UVG 227/299/394 €).
  */
 export const LASTMOD_2026_10_25_DATA_REVIEW_SLUGS = [
   'minijob-midijob-rechner',
@@ -33,6 +34,10 @@ export const LASTMOD_2026_10_25_DATA_REVIEW_SLUGS = [
   'sozialabgaben-rechner',
   'arbeitgeberkosten-rechner',
   'kindergeld-rechner-2026',
+  'unterhaltsvorschuss-rechner',
+  'duesseldorfer-tabelle-rechner',
+  'unterhalt-volljaehrige-kinder-rechner',
+  'ausbildungsunterhalt-bedarfskontrollbetrag-rechner',
 ];
 
 export const getCalc = (slug: string): CalculatorDefinition => {
