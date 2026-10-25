@@ -52,76 +52,111 @@
    Calculator Card (Content/Navigation Object)
    ========================================================================== */
 .calcCard {
+  /* Accent colours are set per category on the element (see CalculatorCard.tsx) */
+  --card-accent: var(--color-primary);
+  --card-accent-bg: var(--color-primary-light);
   display: flex;
   flex-direction: column;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 22px;
+  padding: 20px 20px 16px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
   min-width: 0;
   box-sizing: border-box;
   position: relative;
+  overflow: hidden;
 }
 
-.calcCard:hover {
+/* Thin accent line that appears on hover/focus */
+.calcCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background-color: var(--card-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s ease;
+}
+
+.calcCard:hover,
+.calcCard:focus-visible {
   text-decoration: none;
-  border-color: var(--color-border-strong);
-  box-shadow: 0 6px 18px -4px rgba(15, 23, 42, 0.07);
+  border-color: color-mix(in srgb, var(--card-accent) 35%, var(--color-border));
+  box-shadow: 0 10px 24px -12px rgba(15, 23, 42, 0.18);
   transform: translateY(-2px);
 }
 
+.calcCard:hover::before,
+.calcCard:focus-visible::before {
+  transform: scaleX(1);
+}
+
 .calcCard:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--card-accent);
   outline-offset: 2px;
 }
 
+.calcCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: var(--space-3);
+  min-width: 0;
+}
+
 .iconWrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-primary-light);
-  color: var(--color-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: var(--card-accent-bg);
+  color: var(--card-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-bottom: var(--space-3);
-  transition: transform 0.15s ease;
+  transition: transform 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
 
-.calcCard:hover .iconWrapper {
-  transform: scale(1.04);
+.calcCard:hover .iconWrapper,
+.calcCard:focus-visible .iconWrapper {
+  background-color: var(--card-accent);
+  color: #ffffff;
+  transform: rotate(-4deg) scale(1.04);
 }
 
 .calcTitle {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--color-text-primary);
-  line-height: 1.35;
-  margin: 0 0 var(--space-2);
+  line-height: 1.3;
+  margin: 0;
+  min-width: 0;
+  /* Break only words that cannot fit at all; no automatic mid-word hyphens */
   overflow-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto;
+  hyphens: manual;
+  transition: color 0.18s ease;
 }
 
-.calcCard:hover .calcTitle {
-  color: var(--color-primary);
+.calcCard:hover .calcTitle,
+.calcCard:focus-visible .calcTitle {
+  color: var(--card-accent);
 }
 
 .calcDesc {
-  font-size: 0.85rem;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.55;
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-4);
   flex-grow: 1;
   overflow-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto;
+  hyphens: manual;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -130,18 +165,24 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-2);
   margin-top: auto;
   padding-top: var(--space-3);
-  border-top: 1px solid var(--color-surface-subtle);
-  font-size: 0.8rem;
+  border-top: 1px solid var(--color-border);
 }
 
 .categoryBadge {
-  font-size: 0.775rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--card-accent);
+  background-color: var(--card-accent-bg);
+  padding: 3px 10px;
+  border-radius: 999px;
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 75%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -149,20 +190,46 @@
 .actionIndicator {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-weight: 600;
-  color: var(--color-primary);
-  font-size: 0.85rem;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  color: var(--card-accent);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .actionArrow {
-  font-size: 0.95rem;
-  line-height: 1;
-  transition: transform 0.15s ease;
+  transition: transform 0.18s ease;
 }
 
-.calcCard:hover .actionArrow {
-  transform: translateX(3px);
+.calcCard:hover .actionIndicator,
+.calcCard:focus-visible .actionIndicator {
+  background-color: var(--card-accent);
+  border-color: var(--card-accent);
+  color: #ffffff;
+}
+
+.calcCard:hover .actionArrow,
+.calcCard:focus-visible .actionArrow {
+  transform: translateX(2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calcCard,
+  .calcCard::before,
+  .iconWrapper,
+  .actionArrow {
+    transition: none;
+  }
+  .calcCard:hover,
+  .calcCard:focus-visible,
+  .calcCard:hover .iconWrapper,
+  .calcCard:focus-visible .iconWrapper {
+    transform: none;
+  }
 }
 
 /* ==========================================================================
@@ -195,6 +262,8 @@
 }
 
 .catCard {
+  --card-accent: var(--color-primary);
+  --card-accent-bg: var(--color-primary-light);
   display: flex;
   flex-direction: column;
   background-color: var(--color-surface);
@@ -203,20 +272,21 @@
   padding: 20px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
   min-width: 0;
   box-sizing: border-box;
 }
 
-.catCard:hover {
+.catCard:hover,
+.catCard:focus-visible {
   text-decoration: none;
-  border-color: var(--color-primary-border);
-  box-shadow: 0 6px 16px -4px rgba(2, 132, 199, 0.1);
+  border-color: color-mix(in srgb, var(--card-accent) 35%, var(--color-border));
+  box-shadow: 0 10px 24px -12px rgba(15, 23, 42, 0.18);
   transform: translateY(-2px);
 }
 
 .catCard:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--card-accent);
   outline-offset: 2px;
 }
 
@@ -228,32 +298,32 @@
 }
 
 .catIconBox {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-surface-subtle);
-  border: 1px solid var(--color-border);
-  color: var(--color-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: var(--card-accent-bg);
+  color: var(--card-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
 
-.catCard:hover .catIconBox {
-  background-color: var(--color-primary-light);
-  border-color: var(--color-primary-border);
+.catCard:hover .catIconBox,
+.catCard:focus-visible .catIconBox {
+  background-color: var(--card-accent);
+  color: #ffffff;
+  transform: rotate(-4deg) scale(1.04);
 }
 
 .catCountBadge {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-text-muted);
-  background-color: var(--color-surface-subtle);
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  color: var(--card-accent);
+  background-color: var(--card-accent-bg);
+  padding: 3px 10px;
+  border-radius: 999px;
   white-space: nowrap;
 }
 
@@ -264,25 +334,28 @@
   margin: 0 0 var(--space-1);
   line-height: 1.35;
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: manual;
+  transition: color 0.18s ease;
 }
 
-.catCard:hover .catTitle {
-  color: var(--color-primary);
+.catCard:hover .catTitle,
+.catCard:focus-visible .catTitle {
+  color: var(--card-accent);
 }
 
 .catDesc {
   font-size: 0.8125rem;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-4);
   flex-grow: 1;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: manual;
 }
 
 .catBottomRow {
@@ -291,10 +364,10 @@
   justify-content: space-between;
   margin-top: auto;
   padding-top: var(--space-3);
-  border-top: 1px solid var(--color-surface-subtle);
+  border-top: 1px solid var(--color-border);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--card-accent);
 }
 
 .catExploreText {
@@ -303,9 +376,24 @@
 
 .catArrow {
   font-size: 0.95rem;
-  transition: transform 0.15s ease;
+  transition: transform 0.18s ease;
 }
 
-.catCard:hover .catArrow {
+.catCard:hover .catArrow,
+.catCard:focus-visible .catArrow {
   transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catCard,
+  .catIconBox,
+  .catArrow {
+    transition: none;
+  }
+  .catCard:hover,
+  .catCard:focus-visible,
+  .catCard:hover .catIconBox,
+  .catCard:focus-visible .catIconBox {
+    transform: none;
+  }
 }

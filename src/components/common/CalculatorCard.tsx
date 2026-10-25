@@ -3,20 +3,68 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  Calculator,
-  Percent,
-  CreditCard,
-  Receipt,
-  Calendar,
-  Car,
-  Zap,
   Activity,
-  Home,
+  ArrowRight,
+  Baby,
+  BatteryCharging,
+  Bike,
+  Binary,
+  Box,
+  BrickWall,
   Briefcase,
+  Building2,
+  Cake,
+  Calculator,
+  CalendarDays,
+  Candy,
+  Car,
+  ChartColumn,
+  Circle,
+  Clock,
+  Coffee,
+  CookingPot,
+  CreditCard,
+  Divide,
+  Droplets,
+  Dumbbell,
+  Flame,
+  Fuel,
+  Gift,
+  HandCoins,
+  Hammer,
+  Heart,
+  HeartPulse,
+  House,
+  Landmark,
+  Leaf,
   LucideIcon,
+  Maximize2,
+  Moon,
+  Paintbrush,
+  Percent,
+  PiggyBank,
+  Radical,
+  Receipt,
+  Ruler,
+  Scale,
+  Shuffle,
+  Sigma,
+  Sun,
+  Thermometer,
+  TrendingDown,
+  TrendingUp,
+  Triangle,
+  Truck,
+  Users,
+  Utensils,
+  Wallet,
+  Wheat,
+  Wine,
+  Zap,
 } from 'lucide-react';
 import styles from '@/styles/cards.module.css';
 import { trackRelatedCalculatorClicked } from '@/lib/analytics/ga4';
+import { accentStyle } from '@/lib/ui/categoryAccents';
 
 interface CalculatorCardProps {
   slug: string;
@@ -28,21 +76,97 @@ interface CalculatorCardProps {
   fromSlug?: string;
 }
 
-function resolveIcon(slug: string, category?: string): LucideIcon {
+/**
+ * Specific icon per calculator topic, checked in order (most specific first).
+ * Anything not matched falls back to the icon of its category.
+ */
+const ICON_RULES: Array<[RegExp, LucideIcon]> = [
+  [/mietrendite|immobilienrendite/, House],
+  [/motorrad|wohnmobil|wohnwagen/, Car],
+  [/kaffee/, Coffee],
+  [/wasser-reis|reis-wasser/, CookingPot],
+  [/brutto-netto|netto-brutto|nettolohn/, Wallet],
+  [/stundenlohn|stundensatz/, Clock],
+  [/abfindung/, HandCoins],
+  [/rente|renten|altersvorsorge/, PiggyBank],
+  [/prozent|promillerechner|rabatt|skonto/, Percent],
+  [/inflation|kaufkraft/, TrendingDown],
+  [/zinseszins|rendite|etf|sparplan|dividende|thesaurierend/, TrendingUp],
+  [/kredit|darlehen|tilgung|finanzierung|umschuldung|schulden|zinsbindung/, Landmark],
+  [/spar|tagesgeld|festgeld/, PiggyBank],
+  [/steuer|soli|mwst|afa|abschreibung/, Receipt],
+  [/gehalt|lohn|bonus|ueberstunden|minijob|midijob|elterngeld|krankengeld|arbeitslosengeld|buergergeld/, Wallet],
+  [/weihnachten|ostern|silvester/, Gift],
+  [/alter|geburtstag|lebenszeit|jubilaeum/, Cake],
+  [/tage|datum|woche|werktag|arbeitstag|feiertag|monat|kalender/, CalendarDays],
+  [/uhrzeit|zeitrechner|stunden|minuten|zeitzone/, Clock],
+  [/maut|lkw/, Truck],
+  [/e-auto|ladekosten|ladesaeule|wallbox/, BatteryCharging],
+  [/fahrrad|jobrad|dienstfahrrad/, Bike],
+  [/sprit|benzin|diesel|tank|kraftstoff/, Fuel],
+  [/photovoltaik|balkonkraftwerk|solar|pv-/, Sun],
+  [/frittier/, CookingPot],
+  [/gas|heiz|oel|pellet|waerme/, Flame],
+  [/strom|kwh|watt|led|standby|klimaanlage|trockner|spuelmaschine|waschmaschine/, Zap],
+  [/wasser/, Droplets],
+  [/co2|thg/, Leaf],
+  [/auto|kfz|fahrzeug|pendler|fahrt|fahrzeit|anhaenger|reifen/, Car],
+  [/blutdruck|puls|herz/, HeartPulse],
+  [/bmi|gewicht|koerperfett|taille/, Scale],
+  [/one-rep|1rm|kraft|muskel/, Dumbbell],
+  [/kalorien|schwimmen|laufen|schritte|sport|grundumsatz/, Activity],
+  [/schlaf/, Moon],
+  [/alkohol|cocktail|promille/, Wine],
+  [/fieber|temperatur/, Thermometer],
+  [/schwanger|ssw|geburtstermin|baby|eisprung|zyklus|mutterschutz|empfaengnis|stillen/, Baby],
+  [/unterhalt|kindergeld|taschengeld|eltern|grosseltern|schulbedarf/, Users],
+  [/miete|miet|nebenkosten|wohnflaeche|immobil|grunderwerb|makler|kaufneben|grundsteuer|erbbau|kaufpreis/, House],
+  [/farbe|tapete|lack|anstrich|fassade/, Paintbrush],
+  [/beton|estrich|fliesen|putz|mauer|stein|pflaster|kies|splitt|ziegel|moertel|schalung/, BrickWall],
+  [/holz|dach|treppe|balken|daemm|laminat|parkett|zaun/, Hammer],
+  [/kaffee|tee-/, Coffee],
+  [/brot|teig|hefe|mehl|pizza|backen|sauerteig/, Wheat],
+  [/zucker|erythrit|suess|marmelade|schokolade/, Candy],
+  [/nudel|reis|kochen|garzeit|portion|rezept|fleisch|ei-|eier|frittier|kuehlschrank|lake/, CookingPot],
+  [/dreieck|pythagoras|trigonometrie/, Triangle],
+  [/kreis|kugel|zylinder|kegel/, Circle],
+  [/quader|wuerfel|volumen|pyramide/, Box],
+  [/flaeche|umfang|rechteck|quadrat|trapez|parallelogramm|winkel|bogenmass/, Ruler],
+  [/binaer|hex|dezimal-|roemisch/, Binary],
+  [/wurzel|potenz|logarithmus|exponent/, Radical],
+  [/bruch|dreisatz|division|modulo|verhaeltnis/, Divide],
+  [/ggt|kgv|prim|teiler|quersumme|fakultaet|fibonacci|zahlen/, Sigma],
+  [/statistik|mittel|median|standardabweichung|varianz|wahrscheinlich|korrelation|chi-|bayes|stichprobe|noten/, ChartColumn],
+  [/umrechner|einheit|in-cm|zoll|in-gramm|in-ml|cups|meter|liter|dezibel|viskositaet|drehzahl/, Shuffle],
+  [/umsatz|gewinn|marge|cashflow|roas|break-even|kapital|working-capital|liquiditaet|preis/, Building2],
+];
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  'datum-zeit': CalendarDays,
+  mathematik: Percent,
+  finanzen: TrendingUp,
+  'kredit-schulden': CreditCard,
+  'wohnen-immobilien': House,
+  'haushalt-energie': Zap,
+  'auto-verkehr': Car,
+  'arbeit-gehalt': Briefcase,
+  'steuern-gehalt': Receipt,
+  'gesundheit-fitness': Activity,
+  'familie-schwangerschaft': Heart,
+  'bauen-renovieren': Hammer,
+  geometrie: Maximize2,
+  einheiten: Shuffle,
+  'kochen-backen': Utensils,
+  business: Building2,
+  'statistik-wissenschaft': ChartColumn,
+};
+
+export function resolveIcon(slug: string, category?: string): LucideIcon {
   const s = slug.toLowerCase();
-  const c = category?.toLowerCase() || '';
-
-  if (s.includes('prozent')) return Percent;
-  if (s.includes('gehalt') || s.includes('brutto') || s.includes('netto') || s.includes('lohn') || s.includes('steuer') || c.includes('steuer')) return Receipt;
-  if (s.includes('zins') || s.includes('kredit') || s.includes('tilgung') || s.includes('spar') || c.includes('finanz')) return CreditCard;
-  if (s.includes('alter') || s.includes('datum') || s.includes('zeit') || s.includes('tag') || c.includes('datum')) return Calendar;
-  if (s.includes('sprit') || s.includes('auto') || s.includes('pendler') || s.includes('fahrt') || c.includes('auto')) return Car;
-  if (s.includes('strom') || s.includes('energie') || s.includes('watt') || s.includes('gas') || c.includes('energie')) return Zap;
-  if (s.includes('bmi') || s.includes('kalorien') || s.includes('gewicht') || c.includes('gesundheit')) return Activity;
-  if (s.includes('haus') || s.includes('miet') || s.includes('kaufneben') || c.includes('wohnen')) return Home;
-  if (c.includes('arbeit')) return Briefcase;
-
-  return Calculator;
+  for (const [pattern, icon] of ICON_RULES) {
+    if (pattern.test(s)) return icon;
+  }
+  return (category && CATEGORY_ICONS[category]) || Calculator;
 }
 
 export default function CalculatorCard({
@@ -69,12 +193,14 @@ export default function CalculatorCard({
       className={styles.calcCard}
       title={`${displayName} öffnen`}
       onClick={handleClick}
+      style={accentStyle(category) as React.CSSProperties}
     >
-      <div className={styles.iconWrapper} aria-hidden="true">
-        <Icon size={20} />
+      <div className={styles.calcCardHeader}>
+        <div className={styles.iconWrapper} aria-hidden="true">
+          <Icon size={22} strokeWidth={2} />
+        </div>
+        <h3 className={styles.calcTitle}>{displayName}</h3>
       </div>
-
-      <h3 className={styles.calcTitle}>{displayName}</h3>
 
       <p className={styles.calcDesc}>{shortDescription}</p>
 
@@ -83,7 +209,7 @@ export default function CalculatorCard({
           {categoryName || category || 'Rechner'}
         </span>
         <span className={styles.actionIndicator} aria-hidden="true">
-          <span className={styles.actionArrow}>→</span>
+          <ArrowRight size={16} strokeWidth={2.25} className={styles.actionArrow} />
         </span>
       </div>
     </Link>

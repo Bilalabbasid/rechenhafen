@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import CategoryIcon from '@/components/common/CategoryIcon';
 import styles from '@/styles/cards.module.css';
+import { accentStyle } from '@/lib/ui/categoryAccents';
 
 interface CategoryCardProps {
   slug: string;
@@ -19,10 +20,10 @@ export default function CategoryCard({
   calculatorCount,
 }: CategoryCardProps) {
   return (
-    <Link href={`/${slug}/`} className={styles.catCard} title={`Zur Kategorie ${name}`}>
+    <Link href={`/${slug}/`} className={styles.catCard} title={`Zur Kategorie ${name}`} style={accentStyle(slug) as React.CSSProperties}>
       <div className={styles.catTopRow}>
         <div className={styles.catIconBox} aria-hidden="true">
-          <CategoryIcon name={iconName} size={20} />
+          <CategoryIcon name={iconName} size={22} />
         </div>
         <span className={styles.catCountBadge}>
           {calculatorCount} Rechner
