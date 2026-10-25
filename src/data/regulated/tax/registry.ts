@@ -58,8 +58,8 @@ export const REGULATED_TAX_REGISTRY: RegulatedMaintenanceItem[] = [
     category: 'statutory_wage',
     name: 'Geringfügigkeits- und Übergangsbereich (§ 8, § 20 SGB IV)',
     currentYear: 2026,
-    lastVerified: '2026-01-15',
-    nextReviewDate: '2026-10-15',
+    lastVerified: '2026-10-25',
+    nextReviewDate: '2026-12-01', // 2027: Mindestlohn 14,60 € → Minijob-Grenze 633 €, neuer Faktor F
     sourceAuthority: 'Minijob-Zentrale / BMAS',
     sourceUrl: 'https://www.minijob-zentrale.de',
     configFile: 'src/data/regulated/tax/2026.ts',

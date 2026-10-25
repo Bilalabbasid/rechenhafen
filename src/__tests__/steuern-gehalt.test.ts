@@ -244,14 +244,14 @@ describe('Steuern & Gehalt — German Statutory Tax & Payroll Engine', () => {
   });
 
   describe('7. Minijob & Midijob', () => {
-    it('handles Minijob 556 € in 2026 with RV opt-out (100 % Netto)', () => {
-      const res = calculateMinijob({ earnings: 556, rvOptOut: true, taxYear: '2026' });
-      expect(res.primary.value).toBe(556);
+    it('handles Minijob 603 € in 2026 with RV opt-out (100 % Netto)', () => {
+      const res = calculateMinijob({ earnings: 603, rvOptOut: true, taxYear: '2026' });
+      expect(res.primary.value).toBe(603);
     });
 
     it('deducts 3,6 % RV contribution without opt-out', () => {
-      const res = calculateMinijob({ earnings: 556, rvOptOut: false, taxYear: '2026' });
-      expect(Number(res.primary.value)).toBeCloseTo(556 - 556 * 0.036, 1);
+      const res = calculateMinijob({ earnings: 603, rvOptOut: false, taxYear: '2026' });
+      expect(Number(res.primary.value)).toBeCloseTo(603 - 603 * 0.036, 1);
     });
 
     it('calculates Midijob reduced contributions in transition zone', () => {
@@ -262,7 +262,7 @@ describe('Steuern & Gehalt — German Statutory Tax & Payroll Engine', () => {
       // Reduced base must be lower than 1200 €
       const redBase = res.secondary?.find((s) => s.id === 'reducedBase')?.value || 0;
       expect(Number(redBase)).toBeLessThan(1200);
-      expect(Number(redBase)).toBeGreaterThan(556);
+      expect(Number(redBase)).toBeGreaterThan(603);
     });
   });
 

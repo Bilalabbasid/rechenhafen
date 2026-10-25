@@ -67,10 +67,11 @@ export const TAX_CONFIG_2025: TaxYearConfig = {
   pflegeSachsenAnteilAN: 0.023, // 2,3 % in Sachsen
   pflegeSachsenAnteilAG: 0.013, // 1,3 % in Sachsen
 
-  // Minijob & Midijob 2025
-  minijobGrenze: 538.00,
-  midijobObergrenze: 2000.00,
-  midijobFaktorF: 0.6865, // Gesetzlicher Faktor F nach § 20 Abs. 2 SGB IV für 2025
+  // Minijob & Midijob 2025 (korrigiert am 2026-10-25; 538 € war die Grenze 2024)
+  // Geringfügigkeitsgrenze: 12,82 € Mindestlohn × 130 ÷ 3 = 555,53 € → 556 € (§ 8 Abs. 1a SGB IV)
+  minijobGrenze: 556.00,
+  midijobObergrenze: 2000.00, // § 20 Abs. 2 SGB IV
+  midijobFaktorF: 0.6683, // 28 % ÷ Gesamtsozialversicherungsbeitragssatz 2025 von 41,9 %
 
   // Arbeitgeber-Umlagen (Standard-Schätzwerte für 2025)
   umlageU1: 0.011, // ca. 1,1 %

@@ -67,10 +67,14 @@ export const TAX_CONFIG_2026: TaxYearConfig = {
   pflegeSachsenAnteilAN: 0.023, // 2,3 % in Sachsen
   pflegeSachsenAnteilAG: 0.013, // 1,3 % in Sachsen
 
-  // Minijob & Midijob 2026
-  minijobGrenze: 556.00,
-  midijobObergrenze: 2000.00,
-  midijobFaktorF: 0.6720, // Gesetzlicher Faktor F nach § 20 Abs. 2 SGB IV für 2026
+  // Minijob & Midijob 2026 (geprüft am 2026-10-25)
+  // Geringfügigkeitsgrenze nach § 8 Abs. 1a SGB IV = Mindestlohn × 130 ÷ 3, aufgerundet auf volle Euro:
+  // 13,90 € (MiLoV5, BGBl. 2025 I Nr. 268) × 130 ÷ 3 = 602,33 € → 603 € (Minijob-Zentrale, DRV-Meldung vom 23.02.2026)
+  minijobGrenze: 603.00,
+  midijobObergrenze: 2000.00, // § 20 Abs. 2 SGB IV
+  // Faktor F = 28 % ÷ Gesamtsozialversicherungsbeitragssatz 2026 von 42,3 % = 0,6619
+  // (Bekanntmachung des BMAS vom 25.11.2025, BAnz AT 18.12.2025 B5)
+  midijobFaktorF: 0.6619,
 
   // Arbeitgeber-Umlagen (Standard-Schätzwerte für 2026)
   umlageU1: 0.011, // ca. 1,1 %

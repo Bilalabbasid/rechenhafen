@@ -632,6 +632,45 @@ export function calculateMinijob(inputs: Record<string, any>): CalculationResult
 // ==========================================
 // 10. MIDIJOB-RECHNER (ÜBERGANGSBEREICH § 20 SGB IV)
 // ==========================================
+
+export interface UebergangsbereichResult {
+  /** Beitragspflichtige Einnahme für den Gesamtsozialversicherungsbeitrag (§ 20 Abs. 2a Satz 1 SGB IV) */
+  beGesamt: number;
+  /** Beitragspflichtige Einnahme für den Arbeitnehmeranteil (§ 20 Abs. 2a Satz 4 SGB IV) */
+  beArbeitnehmer: number;
+  /** Arbeitnehmeranteil KV (inkl. ½ durchschnittlicher Zusatzbeitrag), PV (ohne Kinderlosenzuschlag), RV, ALV */
+  anBeitrag: number;
+  /** Gesamtbeitrag auf beGesamt */
+  gesamtBeitrag: number;
+  /** Arbeitgeberanteil = Gesamtbeitrag − Arbeitnehmeranteil */
+  agBeitrag: number;
+}
+
+/**
+ * Beitragsberechnung im Übergangsbereich nach § 20 Abs. 2a SGB IV (Fassung seit 01.01.2023).
+ * G = Geringfügigkeitsgrenze, OG = 2.000 €, AE = Arbeitsentgelt:
+ *   BE gesamt = F × G + ([OG ÷ (OG − G)] − [G ÷ (OG − G)] × F) × (AE − G)
+ *   BE AN     = [OG ÷ (OG − G)] × (AE − G)
+ * Ungerundete Werte; die Entgeltabrechnung rundet je Versicherungszweig auf Cent.
+ */
+export function computeUebergangsbereich(gross: number, config: TaxYearConfig): UebergangsbereichResult {
+  const G = config.minijobGrenze;
+  const OG = config.midijobObergrenze;
+  const F = config.midijobFaktorF;
+  const ae = Math.min(OG, Math.max(G, gross));
+
+  const beGesamt = F * G + (OG / (OG - G) - (G / (OG - G)) * F) * (ae - G);
+  const beArbeitnehmer = (OG / (OG - G)) * (ae - G);
+
+  const fullRate = config.beitragssatzRentenversicherung + config.beitragssatzArbeitslosenversicherung
+    + config.beitragssatzKrankenversicherungAllgemein + config.zusatzbeitragKrankenversicherungDurchschnitt
+    + config.beitragssatzPflegeversicherung;
+  const anBeitrag = beArbeitnehmer * (fullRate / 2);
+  const gesamtBeitrag = beGesamt * fullRate;
+
+  return { beGesamt, beArbeitnehmer, anBeitrag, gesamtBeitrag, agBeitrag: gesamtBeitrag - anBeitrag };
+}
+
 export function calculateMidijob(inputs: Record<string, any>): CalculationResult {
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
@@ -652,7 +691,7 @@ export function calculateMidijob(inputs: Record<string, any>): CalculationResult
         { id: 'gross', label: 'Midijob-Bruttogehalt', value: 0, formattedValue: formatCurrency(0) },
         { id: 'anSocial', label: 'Ermäßigte Sozialabgaben (AN)', value: 0, formattedValue: formatCurrency(0) },
         { id: 'monthlyLSt', label: 'Lohnsteuer', value: 0, formattedValue: formatCurrency(0) },
-        { id: 'reducedBase', label: 'Fiktive Beitragsbemessungsgrundlage (§ 20 SGB IV)', value: 0, formattedValue: formatCurrency(0) },
+        { id: 'reducedBase', label: 'Beitragspflichtige Einnahme Arbeitnehmer (§ 20 Abs. 2a SGB IV)', value: 0, formattedValue: formatCurrency(0) },
         { id: 'effectiveRate', label: 'Effektiver Sozialabgabensatz', value: 0, formattedValue: '0 %' },
         { id: 'fullRVPension', label: 'Voller Rentenanspruch trotz reduzierter Beiträge', value: 0, formattedValue: '0 € Verdienst' },
       ],
@@ -662,18 +701,8 @@ export function calculateMidijob(inputs: Record<string, any>): CalculationResult
 
   const gross = Math.max(config.minijobGrenze + 0.01, Math.min(config.midijobObergrenze, rawEarnings));
 
-  // Gleitzonen-Formel nach § 20 Abs. 2 SGB IV:
-  // Faktor F = 0,6720 (2026) bzw. 0,6865 (2025)
-  // Beitragsbemessungsgrundlage AN = F * MinijobGrenze + ((2000 - F * MinijobGrenze) / (2000 - MinijobGrenze)) * (Entgelt - MinijobGrenze)
-  const F = config.midijobFaktorF;
-  const minLimit = config.minijobGrenze;
-  const maxLimit = config.midijobObergrenze;
-
-  const reducedBase = F * minLimit + ((maxLimit - F * minLimit) / (maxLimit - minLimit)) * (gross - minLimit);
-
-  // Sozialabgaben berechnet von der reduzierten Bemessungsgrundlage
-  const anRateTotal = (config.beitragssatzRentenversicherung + config.beitragssatzArbeitslosenversicherung + config.beitragssatzKrankenversicherungAllgemein + config.zusatzbeitragKrankenversicherungDurchschnitt + config.beitragssatzPflegeversicherung) / 2;
-  const anSocial = reducedBase * anRateTotal;
+  // Übergangsbereich nach § 20 Abs. 2a SGB IV: Arbeitnehmeranteil auf die reduzierte beitragspflichtige Einnahme
+  const { beArbeitnehmer: reducedBase, anBeitrag: anSocial } = computeUebergangsbereich(gross, config);
 
   // Lohnsteuer im Übergangsbereich
   const estAnnual = computeEStSingle(Math.max(0, gross * 12 - anSocial * 12 - 1230), config);
@@ -693,7 +722,7 @@ export function calculateMidijob(inputs: Record<string, any>): CalculationResult
       { id: 'gross', label: 'Midijob-Bruttogehalt', value: gross, formattedValue: formatCurrency(gross) },
       { id: 'anSocial', label: 'Ermäßigte Sozialabgaben (AN)', value: anSocial, formattedValue: formatCurrency(anSocial) },
       { id: 'monthlyLSt', label: 'Lohnsteuer', value: monthlyLSt, formattedValue: formatCurrency(monthlyLSt) },
-      { id: 'reducedBase', label: 'Fiktive Beitragsbemessungsgrundlage (§ 20 SGB IV)', value: reducedBase, formattedValue: formatCurrency(reducedBase) },
+      { id: 'reducedBase', label: 'Beitragspflichtige Einnahme Arbeitnehmer (§ 20 Abs. 2a SGB IV)', value: reducedBase, formattedValue: formatCurrency(reducedBase) },
       { id: 'effectiveRate', label: 'Effektiver Sozialabgabensatz', value: effectiveSocialRate, formattedValue: formatPercent(effectiveSocialRate) },
       { id: 'fullRVPension', label: 'Voller Rentenanspruch trotz reduzierter Beiträge', value: 100, formattedValue: 'Ja (100 % Rentenanspruch)' },
     ],

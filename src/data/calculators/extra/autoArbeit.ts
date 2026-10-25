@@ -1,5 +1,11 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+import { getTaxConfig } from '@/data/regulated/tax';
+import { computeEStSingle, computeUebergangsbereich } from '@/lib/calculators/steuernGehalt';
+
+// Minijob-Zentrale, gewerblicher Minijob 2026 (geprüft 2026-10-25)
+const MINIJOB_RV_EIGENANTEIL = 0.036; // 18,6 % RV-Beitragssatz − 15 % Arbeitgeber-Pauschale
+const MINIJOB_AG_ABGABEN = 0.13 + 0.15 + 0.02 + 0.008 + 0.0022 + 0.0015; // = 31,17 % (KV, RV, Pauschsteuer, U1, U2, Insolvenzgeldumlage)
 
 export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   // ==================== AUTO & VERKEHR (18 ZUSÄTZLICHE) ====================
@@ -1904,16 +1910,16 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Minijob & Midijob',
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Netto',
-    metaTitle: 'Minijob & Midijob Rechner: Abzüge & Netto berechnen',
-    metaDescription: 'Berechnen Sie Abzüge und Nettoverdienst im Minijob (538 € Grenze) und im Midijob (Übergangsbereich bis 2.000 €) nach § 20 SGB IV.',
+    metaTitle: 'Minijob & Midijob Rechner 2026: Abzüge & Netto berechnen',
+    metaDescription: 'Berechnen Sie Abzüge und Nettoverdienst 2026 im Minijob (603 € Grenze) und im Midijob (Übergangsbereich 603,01 € bis 2.000 €) nach § 20 SGB IV.',
     h1: 'Minijob & Midijob Rechner – Abzüge im Übergangsbereich berechnen',
-    shortDescription: 'Ermittelt die gleitenden Sozialversicherungsbeiträge im Übergangsbereich (Midijob) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['minijob rechner 538 euro netto', 'midijob rechner uebergangsbereich 2000 euro', 'paragraph 20 sgb iv gleitzone rechner', 'sozialversicherung midijob abzug'],
+    shortDescription: 'Ermittelt die gleitenden Sozialversicherungsbeiträge im Übergangsbereich (Midijob) mit der amtlichen Formel nach § 20 Abs. 2a SGB IV und dem Faktor F 2026.',
+    searchKeywords: ['minijob rechner 603 euro netto', 'minijob grenze 2026', 'midijob rechner uebergangsbereich 2000 euro', 'paragraph 20 sgb iv gleitzone rechner', 'sozialversicherung midijob abzug'],
     inputs: [
       { id: 'monthlyGross', label: 'Monatlicher Bruttolohn', type: 'number', defaultValue: 850, min: 0, max: 2500, step: 25, unit: '€' },
       {
         id: 'pensionOptOut',
-        label: 'Rentenversicherungspflicht im Minijob (nur relevant bis 538 €)',
+        label: 'Rentenversicherungspflicht im Minijob (nur relevant bis 603 €)',
         type: 'select',
         defaultValue: 'keep',
         options: [
@@ -1925,78 +1931,124 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     calculate: (inputs) => {
       const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 850;
       const optOut = inputs.pensionOptOut === 'exempt';
+      const config = getTaxConfig(2026);
+      const minijobGrenze = config.minijobGrenze; // 603 € (2026)
+      const obergrenze = config.midijobObergrenze; // 2.000 €
+      const anRate = (config.beitragssatzRentenversicherung + config.beitragssatzArbeitslosenversicherung
+        + config.beitragssatzKrankenversicherungAllgemein + config.zusatzbeitragKrankenversicherungDurchschnitt
+        + config.beitragssatzPflegeversicherung) / 2;
+      // Vereinfachte Lohnsteuer-Schätzung (Steuerklasse I, Arbeitnehmer-Pauschbetrag), wie im Midijob-Rechner
+      const lohnsteuer = (sv: number) => computeEStSingle(Math.max(0, (gross - sv) * 12 - 1230), config) / 12;
 
-      // 1. Minijob (bis 538 €)
-      if (gross <= 538) {
-        const rvDeduction = optOut ? 0 : gross * 0.036;
+      // 1. Minijob (bis 603 €, § 8 Abs. 1a SGB IV)
+      if (gross <= minijobGrenze) {
+        const rvDeduction = optOut ? 0 : gross * MINIJOB_RV_EIGENANTEIL;
         const net = gross - rvDeduction;
+        const employerCosts = gross * MINIJOB_AG_ABGABEN;
         return {
           primary: { id: 'net', label: 'Nettolohn im Minijob', value: net, formattedValue: formatCurrency(net), highlight: true },
           secondary: [
             { id: 'rvDeduction', label: 'Eigenanteil Rentenversicherung', value: rvDeduction, formattedValue: formatCurrency(rvDeduction) },
-            { id: 'jobType', label: 'Beschäftigungsart', value: 0, formattedValue: 'Geringfügige Beschäftigung (Minijob)' },
-            { id: 'employerCosts', label: 'Pauschale Arbeitgeberabgaben (ca. 31,5 %)', value: gross * 0.315, formattedValue: formatCurrency(gross * 0.315) },
+            { id: 'jobType', label: 'Beschäftigungsart', value: 0, formattedValue: `Geringfügige Beschäftigung (Minijob bis ${formatCurrency(minijobGrenze)})` },
+            { id: 'employerCosts', label: 'Pauschalabgaben Arbeitgeber (höchstens 31,17 %)', value: employerCosts, formattedValue: formatCurrency(employerCosts) },
           ],
           summaryText: `Bei ${formatCurrency(gross)} Brutto im Minijob erhalten Sie ${formatCurrency(net)} netto ausgezahlt (${optOut ? 'ohne Abzüge' : 'abzgl. 3,6 % Rentenbeitrag zur Sicherung von Rentenansprüchen'}).`,
         };
       }
 
-      // 2. Midijob / Übergangsbereich (538,01 € bis 2.000,00 €)
-      if (gross <= 2000) {
-        // Gleitende Beitragsberechnung nach § 20 Abs. 2 SGB IV
-        // Arbeitnehmerbeitrag steigt von ca. 0 % progressiv auf den regulären Satz von ca. 20,5 % bei 2.000 €
-        const factor = (gross - 538) / (2000 - 538);
-        const employeeRate = 0.08 + (factor * 0.125); // ca. 8 % bis 20,5 %
-        const svDeduction = gross * employeeRate;
-        const net = gross - svDeduction; // in Steuerklasse 1 bis ca. 1.200 € steuerfrei
+      // 2. Midijob / Übergangsbereich (603,01 € bis 2.000,00 €, § 20 Abs. 2a SGB IV)
+      if (gross <= obergrenze) {
+        const { beArbeitnehmer, anBeitrag, agBeitrag } = computeUebergangsbereich(gross, config);
+        const taxEstimate = lohnsteuer(anBeitrag);
+        const net = gross - anBeitrag - taxEstimate;
+        const employeeRate = anBeitrag / gross;
 
         return {
           primary: { id: 'net', label: 'Nettolohn im Midijob', value: net, formattedValue: formatCurrency(net), highlight: true },
           secondary: [
-            { id: 'svDeduction', label: 'Ermäßigte Sozialversicherungsbeiträge', value: svDeduction, formattedValue: formatCurrency(svDeduction) },
+            { id: 'svDeduction', label: 'Ermäßigte Sozialversicherungsbeiträge (Arbeitnehmer)', value: anBeitrag, formattedValue: formatCurrency(anBeitrag) },
             { id: 'rateEffective', label: 'Effektiver SV-Beitragssatz Arbeitnehmer', value: employeeRate * 100, formattedValue: formatPercent(employeeRate * 100, 1) },
+            { id: 'beArbeitnehmer', label: 'Beitragspflichtige Einnahme Arbeitnehmer (§ 20 Abs. 2a SGB IV)', value: beArbeitnehmer, formattedValue: formatCurrency(beArbeitnehmer) },
+            { id: 'taxEstimate', label: 'Geschätzte Lohnsteuer (Steuerklasse I)', value: taxEstimate, formattedValue: formatCurrency(taxEstimate) },
+            { id: 'employerContribution', label: 'Arbeitgeberanteil Sozialversicherung', value: agBeitrag, formattedValue: formatCurrency(agBeitrag) },
             { id: 'jobType', label: 'Beschäftigungsart', value: 0, formattedValue: 'Übergangsbereich (Midijob)' },
           ],
-          summaryText: `Im Midijob bei ${formatCurrency(gross)} Brutto zahlen Sie ermäßigte Sozialversicherungsbeiträge von nur ${formatPercent(employeeRate * 100, 1)} (${formatCurrency(svDeduction)}). Sie erhalten ca. ${formatCurrency(net)} netto.`,
+          summaryText: `Im Midijob bei ${formatCurrency(gross)} Brutto zahlen Sie ermäßigte Sozialversicherungsbeiträge von ${formatPercent(employeeRate * 100, 1)} (${formatCurrency(anBeitrag)}). Sie erhalten ca. ${formatCurrency(net)} netto.`,
         };
       }
 
-      // 3. Regulärer Job (> 2.000 €)
-      const svNormal = gross * 0.205;
-      const taxNormal = Math.max(0, (gross - 1200) * 0.25);
+      // 3. Regulärer Job (> 2.000 €): voller Arbeitnehmeranteil
+      const svNormal = gross * anRate;
+      const taxNormal = lohnsteuer(svNormal);
       const netNormal = gross - svNormal - taxNormal;
       return {
         primary: { id: 'netNormal', label: 'Nettolohn (reguläre Beschäftigung)', value: netNormal, formattedValue: formatCurrency(netNormal), highlight: true },
         secondary: [
-          { id: 'svNormal', label: 'Volle Sozialversicherungsbeiträge (ca. 20,5 %)', value: svNormal, formattedValue: formatCurrency(svNormal) },
-          { id: 'taxNormal', label: 'Geschätzte Lohnsteuer', value: taxNormal, formattedValue: formatCurrency(taxNormal) },
+          { id: 'svNormal', label: `Volle Sozialversicherungsbeiträge (${formatPercent(anRate * 100, 2)})`, value: svNormal, formattedValue: formatCurrency(svNormal) },
+          { id: 'taxNormal', label: 'Geschätzte Lohnsteuer (Steuerklasse I)', value: taxNormal, formattedValue: formatCurrency(taxNormal) },
         ],
         summaryText: `Über 2.000 € greift der reguläre Sozialversicherungssatz. Bei ${formatCurrency(gross)} Brutto verbleiben ca. ${formatCurrency(netNormal)} netto.`,
       };
     },
-    formula: 'Midijob-Beitrag nach amtlicher Übergangsbereichs-Formel (§ 20 SGB IV)',
-    formulaExplanation: 'Im Übergangsbereich (früher Gleitzone) zwischen 538,01 € und 2.000,00 € zahlen Arbeitnehmer reduzierte Sozialversicherungsbeiträge, erwerben aber dennoch volle Rentenansprüche.',
+    formula: 'Beitragspflichtige Einnahme AN = 2.000 ÷ (2.000 − 603) × (Brutto − 603); Gesamt = F × 603 + (2.000 ÷ 1.397 − 603 ÷ 1.397 × F) × (Brutto − 603), F = 0,6619 (2026)',
+    formulaExplanation: 'Im Übergangsbereich (früher Gleitzone) zwischen 603,01 € und 2.000,00 € zahlen Arbeitnehmer Sozialversicherungsbeiträge nur auf eine reduzierte beitragspflichtige Einnahme (§ 20 Abs. 2a SGB IV), erwerben aber dennoch volle Rentenansprüche. Der Arbeitgeberanteil ergibt sich aus dem Gesamtbeitrag auf die mit dem Faktor F 2026 (0,6619) berechnete Einnahme abzüglich des Arbeitnehmeranteils. Annahmen: Steuerklasse I, ohne Kirchensteuer, Pflegeversicherung ohne Kinderlosenzuschlag, durchschnittlicher Zusatzbeitrag der Krankenkassen.',
     workedExample: {
-      title: 'Beispiel: 850 € Midijob',
+      title: 'Beispiel: 850 € Midijob (2026)',
       inputValues: [{ label: 'Brutto', value: '850 €' }],
-      steps: ['Übergangsbereich greift (538 € bis 2.000 €)', 'Ermäßigter SV-Satz ca. 10,7 %', 'Nettoauszahlung: ca. 759 €'],
-      result: 'ca. 759,00 € Netto',
+      steps: [
+        'Übergangsbereich greift (603,01 € bis 2.000 €)',
+        'Beitragspflichtige Einnahme AN: 2.000 ÷ 1.397 × (850 − 603) = 353,61 €',
+        'Arbeitnehmeranteil SV: 353,61 € × 20,95 % = 74,08 € (effektiv ca. 8,7 %)',
+        'Lohnsteuer in Steuerklasse I: 0 €',
+      ],
+      result: 'ca. 775,92 € Netto',
     },
     content: {
-      intro: 'Dieser Rechner ermittelt Abgaben und Nettobeträge im Minijob (bis 538 € monatlich) und im Übergangsbereich (Midijob von 538,01 € bis 2.000 €).',
-      details: 'Im Minijob zahlt der Arbeitnehmer bei Befreiung von der Rentenversicherungspflicht keine Abgaben (538 € brutto = netto). Im Midijob steigen die Arbeitnehmer-Sozialabgaben gleitend von rund 12 % auf die regulären ca. 20 % an.',
+      intro: 'Dieser Rechner ermittelt Abgaben und Nettobeträge 2026 im Minijob (bis 603 € monatlich) und im Übergangsbereich (Midijob von 603,01 € bis 2.000 €). Die Minijob-Grenze ist an den Mindestlohn gekoppelt: 13,90 € × 130 ÷ 3 = 602,33 €, aufgerundet 603 € (§ 8 Abs. 1a SGB IV).',
+      details: 'Im Minijob zahlt der Arbeitnehmer bei Befreiung von der Rentenversicherungspflicht keine Abgaben (603 € brutto = netto). Im Midijob steigt der Arbeitnehmeranteil zur Sozialversicherung gleitend von 0 € knapp oberhalb der Minijob-Grenze auf den vollen Anteil von rund 21 % bei 2.000 €.',
     },
     faqs: [
-      { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Der Eigenanteil beträgt nur 3,6 % (ca. 19,37 € im Monat); dafür sichern Sie sich vollwertige Beitragsmonate für Reha-Ansprüche, Erwerbsminderungsrente und frühere Altersrenten.' },
-      { question: 'Wie viele Stunden darf man im Minijob beim gesetzlichen Mindestlohn arbeiten?', answer: 'Teilen Sie die Minijob-Grenze durch den Mindestlohn: Bei 538 € und z. B. 12,82 € Mindestlohn liegt die Höchstarbeitszeit bei knapp 42 Stunden pro Kalendermonat.' },
+      { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Der Eigenanteil beträgt nur 3,6 % (bei 603 € rund 21,71 € im Monat); dafür sichern Sie sich vollwertige Beitragsmonate für Reha-Ansprüche, Erwerbsminderungsrente und frühere Altersrenten.' },
+      { question: 'Wie viele Stunden darf man im Minijob beim gesetzlichen Mindestlohn arbeiten?', answer: 'Teilen Sie die Minijob-Grenze durch den Mindestlohn: Bei 603 € und 13,90 € Mindestlohn (2026) liegt die Höchstarbeitszeit bei rund 43 Stunden pro Kalendermonat.' },
+      { question: 'Wie hoch ist die Minijob-Grenze 2027?', answer: 'Zum 1. Januar 2027 steigt der Mindestlohn auf 14,60 € (MiLoV5). Daraus ergibt sich eine Minijob-Grenze von 14,60 € × 130 ÷ 3 = 632,67 €, aufgerundet 633 € im Monat. Dieser Rechner verwendet die Werte für 2026.' },
+    ],
+    legalFootnotes: [
+      {
+        citation: '§ 8 Abs. 1a SGB IV',
+        text: 'Geringfügigkeitsgrenze = Mindestlohn × 130 ÷ 3, auf volle Euro aufgerundet: 13,90 € × 130 ÷ 3 = 602,33 € → 603 € monatlich (Minijob-Zentrale; Deutsche Rentenversicherung, Meldung vom 23.02.2026).',
+        url: 'https://www.gesetze-im-internet.de/sgb_4/__8.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '2026-10-25',
+      },
+      {
+        citation: 'MiLoV5, BGBl. 2025 I Nr. 268',
+        text: 'Fünfte Mindestlohnanpassungsverordnung vom 5. November 2025: Mindestlohn 13,90 € brutto je Stunde ab 01.01.2026, 14,60 € ab 01.01.2027.',
+        url: 'https://www.gesetze-im-internet.de/milov5/BJNR10C0A0025.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '2026-10-25',
+      },
+      {
+        citation: '§ 20 Abs. 2, 2a SGB IV; BMAS-Bekanntmachung vom 25.11.2025 (BAnz AT 18.12.2025 B5)',
+        text: 'Übergangsbereich 603,01 € bis 2.000 €. Faktor F 2026 = 28 % ÷ Gesamtsozialversicherungsbeitragssatz 42,3 % = 0,6619.',
+        url: 'https://www.gesetze-im-internet.de/sgb_4/__20.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '2026-10-25',
+      },
+      {
+        citation: 'Minijob-Zentrale: Abgaben im gewerblichen Minijob',
+        text: 'Arbeitgeber zahlen höchstens 31,17 % (KV 13 %, RV 15 %, Pauschsteuer 2 %, U1 0,8 %, U2 0,22 %, Insolvenzgeldumlage 0,15 %); Eigenanteil des Minijobbers zur Rentenversicherung 3,6 %.',
+        url: 'https://www.minijob-zentrale.de/DE/fuer-gewerbetreibende/abgaben-und-steuern/abgaben-und-steuern_node.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '2026-10-25',
+      },
     ],
     relatedSlugs: ['teilzeit-gehaltsrechner', 'arbeitgeberanteil-sozialversicherung-rechner', 'stundenlohnrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Minijob-Zentrale / BMAS (§ 8, § 20 SGB IV)',
-      sourceUrl: 'https://www.minijob-zentrale.de',
-      lastVerified: '2026-01-15',
+      source: 'Minijob-Zentrale / Deutsche Rentenversicherung (§ 8 Abs. 1a, § 20 SGB IV), MiLoV5 (BGBl. 2025 I Nr. 268), BMAS-Bekanntmachung Faktor F 2026',
+      sourceUrl: 'https://www.minijob-zentrale.de/DE/fuer-gewerbetreibende/abgaben-und-steuern/abgaben-und-steuern_node.html',
+      lastVerified: '2026-10-25',
     }
   },
 

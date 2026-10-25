@@ -71,7 +71,7 @@ export interface TaxYearConfig {
   pflegeSachsenAnteilAG: number; // 1.3 %
 
   // Geringfügigkeit & Übergangsbereich
-  minijobGrenze: number; // 538 € (2025) / 556 € (2026)
+  minijobGrenze: number; // 556 € (2025) / 603 € (2026), § 8 Abs. 1a SGB IV
   midijobObergrenze: number; // 2000 €
   midijobFaktorF: number; // Gesetzlicher Faktor F nach § 20 Abs. 2 SGB IV
 

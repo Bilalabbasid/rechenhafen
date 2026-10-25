@@ -17,6 +17,14 @@ export const ALL_SEO_CTR_SLUGS = [
   'zwischenfinanzierung-rechner',
 ];
 
+/** Pages re-verified on the same day outside the SEO/CTR scope (Minijob/Mindestlohn 2026 values). */
+export const LASTMOD_2026_10_25_DATA_REVIEW_SLUGS = [
+  'minijob-midijob-rechner',
+  'minijob-rechner',
+  'midijob-rechner',
+  'stundenlohnrechner',
+];
+
 export const getCalc = (slug: string): CalculatorDefinition => {
   const calc = getCalculatorBySlug(slug);
   if (!calc) throw new Error(`missing calculator ${slug}`);
@@ -65,6 +73,6 @@ export function expectScopedSitemapLastmod(slugs: string[], date = '2026-10-25')
     expect(entries.some((e) => e.url === url(s)), s).toBe(true);
     expect(bumped).toContain(url(s));
   }
-  const allowed = ALL_SEO_CTR_SLUGS.map(url);
+  const allowed = [...ALL_SEO_CTR_SLUGS, ...LASTMOD_2026_10_25_DATA_REVIEW_SLUGS].map(url);
   for (const u of bumped) expect(allowed).toContain(u);
 }
