@@ -99,15 +99,17 @@ describe('Steuern & Gehalt — German Statutory Tax & Payroll Engine', () => {
   });
 
   describe('3. Solidaritätszuschlag & Freigrenzen', () => {
-    it('applies 0 € SolZ below the Freigrenze in 2026', () => {
-      expect(computeSolZ(19100, false, TAX_CONFIG_2026)).toBe(0);
+    it('applies 0 € SolZ up to the 2026 Freigrenze of 20.350 € / 40.700 € (§ 3 Abs. 3 SolzG)', () => {
+      expect(computeSolZ(20350, false, TAX_CONFIG_2026)).toBe(0);
       expect(computeSolZ(15000, false, TAX_CONFIG_2026)).toBe(0);
+      expect(computeSolZ(40700, true, TAX_CONFIG_2026)).toBe(0);
     });
 
     it('calculates Milderungszone above Freigrenze', () => {
-      // 20.000 € ESt (900 € über Freigrenze 19.100 €): 11,9 % von 900 € = 107,10 € (weniger als 5,5 % von 20.000 = 1.100 €)
-      const solz = computeSolZ(20000, false, TAX_CONFIG_2026);
-      expect(solz).toBeCloseTo(107.1, 1);
+      // 21.000 € ESt (650 € über Freigrenze 20.350 €): 11,9 % von 650 € = 77,35 € (weniger als 5,5 % von 21.000 = 1.155 €)
+      expect(computeSolZ(21000, false, TAX_CONFIG_2026)).toBeCloseTo(77.35, 2);
+      // Splitting: 41.700 € ESt (1.000 € über 40.700 €): 11,9 % von 1.000 € = 119,00 €
+      expect(computeSolZ(41700, true, TAX_CONFIG_2026)).toBeCloseTo(119, 2);
     });
 
     it('caps SolZ at full 5,5 % at high income tax', () => {
@@ -173,8 +175,8 @@ describe('Steuern & Gehalt — German Statutory Tax & Payroll Engine', () => {
 
       // RV gedeckelt bei 8.450 * 9,3 % = 785,85 €
       expect(rv).toBeCloseTo(8450 * 0.093, 1);
-      // KV gedeckelt bei 5.812,50 * 8,55 % = 496,97 €
-      expect(kv).toBeCloseTo(5812.5 * 0.0855, 1);
+      // KV gedeckelt bei 5.812,50 * (14,6 % + Ø-Zusatzbeitrag 2,9 %) / 2 = 5.812,50 * 8,75 % = 508,59 €
+      expect(kv).toBeCloseTo(5812.5 * 0.0875, 1);
     });
 
     it('applies Pflegeversicherung Kinderlosenzuschlag only for age >= 23 with 0 kids', () => {

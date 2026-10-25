@@ -61,7 +61,7 @@ export interface TaxYearConfig {
   beitragssatzRentenversicherung: number; // 18.6 %
   beitragssatzArbeitslosenversicherung: number; // 2.6 %
   beitragssatzKrankenversicherungAllgemein: number; // 14.6 %
-  zusatzbeitragKrankenversicherungDurchschnitt: number; // 2.5 %
+  zusatzbeitragKrankenversicherungDurchschnitt: number; // § 242a SGB V, vom BMG bekanntgemacht (2025: 2,5 %, 2026: 2,9 %)
   beitragssatzPflegeversicherung: number; // 3.6 %
   pflegeZuschlagKinderlos: number; // 0.6 % (ab 23 Jahre)
   pflegeAbschlagKind: number; // 0.25 % (ab 2. bis 5. Kind unter 25 Jahren)
@@ -78,6 +78,15 @@ export interface TaxYearConfig {
   // Arbeitgeber-Umlagen (Richtwerte)
   umlageU1: number; // Lohnfortzahlung Krankheit (z.B. ~1.0%)
   umlageU2: number; // Mutterschutz (z.B. ~0.3%)
-  umlageU3Insolvenzgeld: number; // Insolvenzgeldumlage (0.06%)
+  umlageU3Insolvenzgeld: number; // Insolvenzgeldumlage (§ 360 SGB III: 0,15 %; 2023/2024 per Verordnung 0,06 %)
   berufsgenossenschaftDurchschnitt: number; // Unfallversicherung (~1.3%)
+
+  // Gewerbliche Minijobs: Pauschalabgaben und Umlagen bei der Minijob-Zentrale (Knappschaft-Bahn-See)
+  minijobPauschaleKv: number; // 13 % (§ 249b SGB V)
+  minijobPauschaleRv: number; // 15 % (§ 172 Abs. 3 SGB VI)
+  minijobPauschsteuer: number; // 2 % (§ 40a Abs. 2 EStG)
+  minijobRvEigenanteil: number; // 3,6 % = 18,6 % RV-Beitragssatz − 15 % AG-Pauschale
+  minijobUmlageU1: number; // Umlagesatz U1 der Minijob-Zentrale
+  minijobUmlageU2: number; // Umlagesatz U2 der Minijob-Zentrale
+  minijobInsolvenzgeldumlage: number; // § 360 SGB III
 }

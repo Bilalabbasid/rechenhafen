@@ -1,5 +1,6 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+import { getTaxConfig } from '@/data/regulated/tax';
 
 export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   // ==================== GESUNDHEIT & FITNESS (21 ZUSÄTZLICHE) ====================
@@ -1540,7 +1541,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaDescription: 'Berechnen Sie Ihr monatliches Kindergeld und prüfen Sie im automatischen Vergleich, ob der Kinderfreibetrag in der Steuererklärung mehr Steuern spart.',
     h1: 'Kindergeld Rechner – Kindergeld & Kinderfreibetrag vergleichen',
     shortDescription: 'Vergleicht die monatliche Kindergeldauszahlung mit der Steuerersparnis durch den Kinderfreibetrag.',
-    searchKeywords: ['kindergeld rechner 2026', 'kindergeld hoehe 250 euro 255 euro', 'guenstigerpruefung kindergeld kinderfreibetrag', 'kindergeld tabelle kinder'],
+    searchKeywords: ['kindergeld rechner 2026', 'kindergeld hoehe 259 euro', 'guenstigerpruefung kindergeld kinderfreibetrag', 'kindergeld tabelle kinder'],
     inputs: [
       { id: 'childrenCount', label: 'Anzahl kindergeldberechtigter Kinder', type: 'number', defaultValue: 2, min: 1, max: 10, step: 1 },
       { id: 'taxableIncomeYearly', label: 'Gemeinsames zu versteuerndes Jahreseinkommen der Eltern', type: 'number', defaultValue: 65000, min: 10000, step: 5000, unit: '€' },
@@ -1549,13 +1550,14 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const kids = inputs.childrenCount !== undefined && inputs.childrenCount !== '' ? Math.max(0, parseInt(inputs.childrenCount, 10) || 0) : 2;
       const zvE = inputs.taxableIncomeYearly !== undefined && inputs.taxableIncomeYearly !== '' ? Math.max(0, parseFloat(inputs.taxableIncomeYearly) || 0) : 65000;
 
-      // Einheitliches Kindergeld: 250 € pro Kind und Monat (bzw. 255 € ab 2025/2026)
-      const monthlyPerChild = 250;
+      const config = getTaxConfig(2026);
+      // Einheitliches Kindergeld nach § 66 Abs. 1 EStG: 259 € pro Kind und Monat ab 01.01.2026 (2025: 255 €)
+      const monthlyPerChild = config.kindergeldMonat;
       const totalMonthlyKindergeld = kids * monthlyPerChild;
       const totalYearlyKindergeld = totalMonthlyKindergeld * 12;
 
-      // Kinderfreibetrag + BEA-Freibetrag (ca. 9.540 € je Kind bei Zusammenveranlagung)
-      const freibetragJeKind = 9540;
+      // Kinderfreibetrag + BEA-Freibetrag bei Zusammenveranlagung (§ 32 Abs. 6 EStG, 2026: 6.828 € + 2.928 € = 9.756 € je Kind)
+      const freibetragJeKind = config.kinderfreibetragGesamt;
       const totalFreibetrag = kids * freibetragJeKind;
 
       // Schätzung Grenzsteuersatz Eltern
@@ -1578,17 +1580,17 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         summaryText: `Für ${kids} Kinder erhalten Sie monatlich ${formatCurrency(totalMonthlyKindergeld)} Kindergeld (${formatCurrency(totalYearlyKindergeld)}/Jahr). ${freibetragBetter ? 'Bei Ihrem Einkommen bringt der Kinderfreibetrag eine zusätzliche Steuererstattung über die Steuererklärung!' : 'Das monatlich ausgezahlte Kindergeld ist für Sie vorteilhafter als der Freibetrag.'}`,
       };
     },
-    formula: 'Kindergeld = Anzahl Kinder × 250 € monatlich; Günstigerprüfung nach § 31 EStG',
+    formula: 'Kindergeld = Anzahl Kinder × 259 € monatlich (2026); Günstigerprüfung nach § 31 EStG',
     formulaExplanation: 'Das Finanzamt prüft bei der jährlichen Einkommensteuererklärung automatisch von Amts wegen, ob das ausgezahlte Kindergeld oder der steuerliche Kinderfreibetrag für die Eltern vorteilhafter ist.',
     workedExample: {
       title: 'Beispiel: 2 Kinder bei 65.000 € Familieneinkommen',
       inputValues: [{ label: 'Kinder', value: '2 Kinder' }, { label: 'Einkommen', value: '65.000 €' }],
-      steps: ['Kindergeld: 2 × 250 € = 500,00 €/Monat = 6.000 € im Jahr', 'Günstigerprüfung erfolgt automatisch in Anlage Kind'],
-      result: '500,00 € monatliches Kindergeld',
+      steps: ['Kindergeld: 2 × 259 € = 518,00 €/Monat = 6.216 € im Jahr', 'Günstigerprüfung erfolgt automatisch in Anlage Kind'],
+      result: '518,00 € monatliches Kindergeld',
     },
     content: {
       intro: 'Das gesetzliche Kindergeld nach § 66 EStG sichert die steuerliche Freistellung des sächlichen Existenzminimums eines Kindes für alle anspruchsberechtigten Eltern in Deutschland.',
-      details: 'Das Kindergeld wird ab dem ersten Kind in einheitlicher Höhe pro Monat ausgezahlt. Es wird bis zum 18. Lebensjahr gezahlt, in der Erstausbildung oder im Studium bis zum vollendeten 25. Lebensjahr.',
+      details: 'Das Kindergeld wird ab dem ersten Kind in einheitlicher Höhe pro Monat ausgezahlt: 2026 sind es 259 € je Kind (2025: 255 €). Der Kinderfreibetrag einschließlich BEA-Freibetrag beträgt 2026 bei zusammen veranlagten Eltern 9.756 € je Kind (6.828 € + 2.928 €). Es wird bis zum 18. Lebensjahr gezahlt, in der Erstausbildung oder im Studium bis zum vollendeten 25. Lebensjahr.',
     },
     faqs: [
       { question: 'Was ist die Günstigerprüfung zwischen Kindergeld und Kinderfreibetrag?', answer: 'Das Finanzamt prüft in der Einkommensteuererklärung automatisch, ob das ausgezahlte Kindergeld oder der steuerliche Kinderfreibetrag für die Eltern zu einer geringeren Steuer führt.' },
@@ -1598,9 +1600,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Familienkasse / Einkommensteuergesetz (§ 66 EStG)',
+      source: 'Familienkasse / Einkommensteuergesetz (§ 66 Abs. 1, § 32 Abs. 6 EStG i. d. F. des Steuerfortentwicklungsgesetzes, BGBl. 2024 I Nr. 449)',
       sourceUrl: 'https://www.arbeitsagentur.de/familie-und-kinder',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     }
   },
 

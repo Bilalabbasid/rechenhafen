@@ -78,4 +78,14 @@ export const TAX_CONFIG_2025: TaxYearConfig = {
   umlageU2: 0.0035, // 0,35 % Mutterschutz
   umlageU3Insolvenzgeld: 0.0006, // 0,06 %
   berufsgenossenschaftDurchschnitt: 0.013, // 1,3 %
+
+  // Gewerbliche Minijobs 2025 (Minijob-Zentrale, "Minijob-Beiträge 2026", 16.12.2025: U1 sank zum 01.01.2026
+  // von 1,1 % auf 0,8 %, die übrigen Abgaben blieben unverändert)
+  minijobPauschaleKv: 0.13, // § 249b SGB V
+  minijobPauschaleRv: 0.15, // § 172 Abs. 3 SGB VI
+  minijobPauschsteuer: 0.02, // § 40a Abs. 2 EStG
+  minijobRvEigenanteil: 0.036, // 18,6 % − 15 %
+  minijobUmlageU1: 0.011, // 1,1 %
+  minijobUmlageU2: 0.0022, // 0,22 %
+  minijobInsolvenzgeldumlage: 0.0015, // 0,15 % (§ 360 SGB III, ab 2025 wieder gesetzlicher Satz)
 };

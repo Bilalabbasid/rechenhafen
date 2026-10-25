@@ -3,10 +3,6 @@ import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { computeEStSingle, computeUebergangsbereich } from '@/lib/calculators/steuernGehalt';
 
-// Minijob-Zentrale, gewerblicher Minijob 2026 (geprüft 2026-10-25)
-const MINIJOB_RV_EIGENANTEIL = 0.036; // 18,6 % RV-Beitragssatz − 15 % Arbeitgeber-Pauschale
-const MINIJOB_AG_ABGABEN = 0.13 + 0.15 + 0.02 + 0.008 + 0.0022 + 0.0015; // = 31,17 % (KV, RV, Pauschsteuer, U1, U2, Insolvenzgeldumlage)
-
 export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   // ==================== AUTO & VERKEHR (18 ZUSÄTZLICHE) ====================
   {
@@ -1942,9 +1938,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
 
       // 1. Minijob (bis 603 €, § 8 Abs. 1a SGB IV)
       if (gross <= minijobGrenze) {
-        const rvDeduction = optOut ? 0 : gross * MINIJOB_RV_EIGENANTEIL;
+        const rvDeduction = optOut ? 0 : gross * config.minijobRvEigenanteil;
         const net = gross - rvDeduction;
-        const employerCosts = gross * MINIJOB_AG_ABGABEN;
+        // Minijob-Zentrale 2026: KV 13 % + RV 15 % + Pauschsteuer 2 % + U1 0,8 % + U2 0,22 % + Insolvenzgeldumlage 0,15 % = 31,17 %
+        const employerCosts = gross * (config.minijobPauschaleKv + config.minijobPauschaleRv + config.minijobPauschsteuer
+          + config.minijobUmlageU1 + config.minijobUmlageU2 + config.minijobInsolvenzgeldumlage);
         return {
           primary: { id: 'net', label: 'Nettolohn im Minijob', value: net, formattedValue: formatCurrency(net), highlight: true },
           secondary: [
@@ -1998,14 +1996,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       steps: [
         'Übergangsbereich greift (603,01 € bis 2.000 €)',
         'Beitragspflichtige Einnahme AN: 2.000 ÷ 1.397 × (850 − 603) = 353,61 €',
-        'Arbeitnehmeranteil SV: 353,61 € × 20,95 % = 74,08 € (effektiv ca. 8,7 %)',
+        'Arbeitnehmeranteil SV: 353,61 € × 21,15 % (½ von 42,3 % inkl. Ø-Zusatzbeitrag 2,9 %) = 74,79 € (effektiv ca. 8,8 %)',
         'Lohnsteuer in Steuerklasse I: 0 €',
       ],
-      result: 'ca. 775,92 € Netto',
+      result: 'ca. 775,21 € Netto',
     },
     content: {
       intro: 'Dieser Rechner ermittelt Abgaben und Nettobeträge 2026 im Minijob (bis 603 € monatlich) und im Übergangsbereich (Midijob von 603,01 € bis 2.000 €). Die Minijob-Grenze ist an den Mindestlohn gekoppelt: 13,90 € × 130 ÷ 3 = 602,33 €, aufgerundet 603 € (§ 8 Abs. 1a SGB IV).',
-      details: 'Im Minijob zahlt der Arbeitnehmer bei Befreiung von der Rentenversicherungspflicht keine Abgaben (603 € brutto = netto). Im Midijob steigt der Arbeitnehmeranteil zur Sozialversicherung gleitend von 0 € knapp oberhalb der Minijob-Grenze auf den vollen Anteil von rund 21 % bei 2.000 €.',
+      details: 'Im Minijob zahlt der Arbeitnehmer bei Befreiung von der Rentenversicherungspflicht keine Abgaben (603 € brutto = netto). Im Midijob steigt der Arbeitnehmeranteil zur Sozialversicherung gleitend von 0 € knapp oberhalb der Minijob-Grenze auf den vollen Anteil von 21,15 % bei 2.000 € (RV 9,3 %, ALV 1,3 %, KV 7,3 % + ½ des durchschnittlichen Zusatzbeitrags 2026 von 2,9 %, PV 1,8 % ohne Kinderlosenzuschlag).',
     },
     faqs: [
       { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Der Eigenanteil beträgt nur 3,6 % (bei 603 € rund 21,71 € im Monat); dafür sichern Sie sich vollwertige Beitragsmonate für Reha-Ansprüche, Erwerbsminderungsrente und frühere Altersrenten.' },
@@ -2031,6 +2029,13 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         citation: '§ 20 Abs. 2, 2a SGB IV; BMAS-Bekanntmachung vom 25.11.2025 (BAnz AT 18.12.2025 B5)',
         text: 'Übergangsbereich 603,01 € bis 2.000 €. Faktor F 2026 = 28 % ÷ Gesamtsozialversicherungsbeitragssatz 42,3 % = 0,6619.',
         url: 'https://www.gesetze-im-internet.de/sgb_4/__20.html',
+        effectiveDate: '01.01.2026',
+        reviewedDate: '2026-10-25',
+      },
+      {
+        citation: '§ 242a Abs. 2 SGB V; BMG-Bekanntmachung vom 7. November 2025 (BAnz AT 10.11.2025 B7)',
+        text: 'Durchschnittlicher Zusatzbeitragssatz 2026: 2,9 %. Er ist Teil des Gesamtsozialversicherungsbeitragssatzes von 42,3 % (18,6 + 2,6 + 14,6 + 2,9 + 3,6) und wird im Rechner für die Midijob-Beiträge angesetzt.',
+        url: 'https://www.bundesanzeiger.de/pub/publication/oUJYVk8GYRXybnb9Y4h/content/oUJYVk8GYRXybnb9Y4h/BAnz%20AT%2010.11.2025%20B7.pdf',
         effectiveDate: '01.01.2026',
         reviewedDate: '2026-10-25',
       },

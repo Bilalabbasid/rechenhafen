@@ -142,12 +142,12 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         id: 'kvZusatzbeitrag',
         label: 'GKV-Zusatzbeitragssatz',
         type: 'number',
-        defaultValue: 2.5,
+        defaultValue: 2.9,
         min: 0,
         max: 5,
         step: 0.1,
         unit: '%',
-        helpText: 'Bundesweiter Durchschnitt: 2,5 % (wird je zur Hälfte von AN und AG getragen).',
+        helpText: 'Amtlicher durchschnittlicher Zusatzbeitragssatz 2026: 2,9 % (BMG, BAnz AT 10.11.2025 B7; 2025: 2,5 %). Ihr kassenindividueller Satz kann abweichen; er wird je zur Hälfte von AN und AG getragen.',
       },
     ],
     calculate: calculateBruttoNetto,
@@ -155,22 +155,22 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Vom Bruttogehalt werden die gesetzlichen Sozialversicherungsbeiträge (paritätisch bis zur Beitragsbemessungsgrenze) und die Lohnsteuer nach dem progressiven Tarif (§ 32a EStG) unter Berücksichtigung der gesetzlichen Vorsorgepauschale (§ 39b EStG), des Arbeitnehmer-Pauschbetrags und des Sonderausgaben-Pauschbetrags abgezogen.',
     workedExample: {
       title: 'Beispiel: 3.800 € Monatsbrutto in Steuerklasse 1, kinderlos (2026)',
-      description: 'Vollständige Eingabeparameter: 3.800 € Monatsbrutto (45.600 € jährlich), Steuerklasse 1, keine Kinder, Alter 30 Jahre, gesetzlich versichert (GKV) mit 2,5 % Zusatzbeitrag, Bundesland Standard, keine Kirchensteuer (Abrechnungsjahr 2026).\n- Sozialabgaben AN: RV (9,3 % = 353,40 €), AV (1,3 % = 49,40 €), KV (8,55 % = 324,90 €), PV (2,4 % = 91,20 € inkl. 0,6 % Kinderlosenzuschlag). Gesamt-SV: 818,90 € monatlich.\n- Vorsorgepauschale nach § 39b EStG: 8.892 € jährlich (RV 4.240,80 € + KV/PV 4.651,20 €).\n- Steuerliche Bemessungsgrundlage: 45.600 € − 1.230 € (Werbungskosten) − 36 € (Sonderausgaben) − 8.892 € (Vorsorgepauschale) = 35.442 €.\n- Lohnsteuer 2026: 5.802 € jährlich → 483,50 € monatlich (im Tarif 2025: 5.917 € jährlich → 493,08 € monatlich).\n- Solidaritätszuschlag: 0,00 € (Freigrenze 19.100 €).\n- Nettoverdienst 2026: 3.800,00 € − 818,90 € − 483,50 € = 2.497,60 € monatlich (im Jahr 2025: 2.488,02 € monatlich).',
-      inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.5 },
-      resultSummary: '2.497,60 € Netto pro Monat (im Tarif 2026) bzw. 2.488,02 € (im Tarif 2025)',
+      description: 'Vollständige Eingabeparameter: 3.800 € Monatsbrutto (45.600 € jährlich), Steuerklasse 1, keine Kinder, Alter 30 Jahre, gesetzlich versichert (GKV) mit dem durchschnittlichen Zusatzbeitrag 2026 von 2,9 %, Bundesland Standard, keine Kirchensteuer (Abrechnungsjahr 2026).\n- Sozialabgaben AN: RV (9,3 % = 353,40 €), AV (1,3 % = 49,40 €), KV (8,75 % = 332,50 €), PV (2,4 % = 91,20 € inkl. 0,6 % Kinderlosenzuschlag). Gesamt-SV: 826,50 € monatlich.\n- Vorsorgepauschale nach § 39b EStG: 8.983 € jährlich (RV 4.240,80 € + KV/PV 4.742,40 €).\n- Steuerliche Bemessungsgrundlage: 45.600 € − 1.230 € (Werbungskosten) − 36 € (Sonderausgaben) − 8.983 € (Vorsorgepauschale) = 35.351 €.\n- Lohnsteuer 2026: 5.775 € jährlich → 481,25 € monatlich.\n- Solidaritätszuschlag: 0,00 € (Freigrenze 20.350 €).\n- Nettoverdienst 2026: 3.800,00 € − 826,50 € − 481,25 € = 2.492,25 € monatlich (im Jahr 2025 mit 2,5 % Zusatzbeitrag: 2.489,35 € monatlich).',
+      inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 },
+      resultSummary: '2.492,25 € Netto pro Monat (im Tarif 2026) bzw. 2.489,35 € (im Tarif 2025)',
     },
     workedExamples: [
       {
         title: 'Beispiel 1: 3.800 € Monatsbrutto im Tarif 2026 (Steuerklasse 1, 30 Jahre, kinderlos)',
-        description: 'Sozialabgaben 818,90 € (RV 353,40 €, AV 49,40 €, KV 324,90 €, PV 91,20 €), Vorsorgepauschale nach § 39b EStG 8.892 €, Lohnsteuer 483,50 €, SolZ 0 €. Ausgezahltes Netto: 2.497,60 €.',
-        inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.5 },
-        resultSummary: '2.497,60 € Netto pro Monat',
+        description: 'Sozialabgaben 826,50 € (RV 353,40 €, AV 49,40 €, KV 332,50 € bei 2,9 % Zusatzbeitrag, PV 91,20 €), Vorsorgepauschale nach § 39b EStG 8.983 €, Lohnsteuer 481,25 €, SolZ 0 €. Ausgezahltes Netto: 2.492,25 €.',
+        inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 },
+        resultSummary: '2.492,25 € Netto pro Monat',
       },
       {
         title: 'Beispiel 2: Dasselbe Gehaltsszenario im Vorjahr 2025 (Steuerklasse 1, kinderlos)',
-        description: 'Im Abrechnungsjahr 2025 galt ein Grundfreibetrag von 12.096 €. Bei identischen 3.800 € Brutto betrug die monatliche Lohnsteuer 493,08 € und das Netto 2.488,02 € monatlich.',
+        description: 'Im Abrechnungsjahr 2025 galten ein Grundfreibetrag von 12.096 € und ein durchschnittlicher Zusatzbeitrag von 2,5 %. Bei identischen 3.800 € Brutto betrugen die Sozialabgaben 818,90 €, die monatliche Lohnsteuer 491,75 € und das Netto 2.489,35 € monatlich.',
         inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2025', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.5 },
-        resultSummary: '2.488,02 € Netto pro Monat',
+        resultSummary: '2.489,35 € Netto pro Monat',
       },
     ],
     content: {
@@ -180,7 +180,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Welche Abzüge fallen vom Bruttogehalt an?', answer: 'In Deutschland werden Lohnsteuer, ggf. Solidaritätszuschlag und Kirchensteuer sowie vier Sozialversicherungsbeiträge abgezogen: Rentenversicherung (9,3 % AN-Anteil), Krankenversicherung (7,3 % + halber Zusatzbeitrag), Pflegeversicherung (1,8 % zzgl. eventuellem Kinderlosenzuschlag von 0,6 % ab 23 Jahren) und Arbeitslosenversicherung (1,3 %).' },
       { question: 'Welche Steuerklasse gilt für mich?', answer: 'Steuerklasse 1 gilt für Ledige, Geschiedene und dauernd Getrenntlebende. Steuerklasse 2 für Alleinerziehende (inkl. Entlastungsbetrag von 4.260 € nach § 24b EStG). Verheiratete wählen zwischen 4/4 (Standard bei ähnlichem Einkommen) oder 3/5 (höheres Netto beim Besserverdiener in Steuerklasse 3). Steuerklasse 6 gilt für einen Zweitjob.' },
-      { question: 'Warum weicht der Nettolohn 2026 vom Vorjahr 2025 ab?', answer: 'Im Steuerjahr 2026 wurde der steuerliche Grundfreibetrag auf 12.348 € angehoben (Vorjahr: 12.096 €), wodurch die Lohnsteuer bei gleichem Bruttoverdienst sinkt. Bei 3.800 € Monatsbrutto verbleiben im Tarif 2026 ca. 2.497,60 € Netto gegenüber ca. 2.488,02 € im Tarif 2025.' },
+      { question: 'Warum weicht der Nettolohn 2026 vom Vorjahr 2025 ab?', answer: 'Im Steuerjahr 2026 wurde der steuerliche Grundfreibetrag auf 12.348 € angehoben (Vorjahr: 12.096 €), wodurch die Lohnsteuer bei gleichem Bruttoverdienst sinkt. Gleichzeitig stieg der durchschnittliche Zusatzbeitrag der Krankenkassen von 2,5 % auf 2,9 %, was den Krankenversicherungsbeitrag erhöht. Bei 3.800 € Monatsbrutto verbleiben im Tarif 2026 ca. 2.492,25 € Netto gegenüber ca. 2.489,35 € im Tarif 2025.' },
       { question: 'Bleiben meine Gehaltsdaten privat?', answer: 'Ja. Die gesamte Gehaltsberechnung läuft ausschließlich lokal in Ihrem Webbrowser (Client-side). Es werden keinerlei Gehalts- oder Personendaten an Server übertragen.' },
     ],
     relatedSlugs: [
@@ -194,9 +194,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Bundesfinanzministerium (BMF) Programmablaufplan Lohnsteuer 2026 & 2025 / BMAS',
+      source: 'Bundesfinanzministerium (BMF) Programmablaufplan Lohnsteuer 2026 & 2025 / BMAS / BMG (durchschnittlicher Zusatzbeitragssatz 2026: 2,9 %, BAnz AT 10.11.2025 B7)',
       sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -268,9 +268,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Da der deutsche Steuertarif progressiv verläuft und nicht linear umkehrbar ist, ermittelt ein numerisches Bisektionsverfahren das exakte Bruttogehalt auf den Cent genau.',
     workedExample: {
       title: 'Beispiel: 2.500 € Wunsch-Netto in Steuerklasse 1 (2026)',
-      description: 'Um 2.500 € netto ausgezahlt zu bekommen, ist bei Steuerklasse 1 ein monatliches Bruttogehalt von rund 3.820 € erforderlich.',
+      description: 'Um 2.500 € netto ausgezahlt zu bekommen, ist bei Steuerklasse 1 (kinderlos, durchschnittlicher Zusatzbeitrag 2026 von 2,9 %) ein monatliches Bruttogehalt von rund 3.814 € erforderlich.',
       inputs: { desiredNet: 2500, taxClass: '1', taxYear: '2026' },
-      resultSummary: 'ca. 3.820,00 € Brutto monatlich erforderlich',
+      resultSummary: 'ca. 3.814,28 € Brutto monatlich erforderlich',
     },
     content: {
       intro: 'Bei Gehaltsverhandlungen wird fast immer über das Bruttogehalt gesprochen – für Ihren Lebensstandard zählt jedoch das Geld auf dem Konto. Dieser Rechner ermittelt sofort das nötige Brutto.',
@@ -284,9 +284,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'BMF Programmablaufplan / EStG',
+      source: 'BMF Programmablaufplan / EStG; BMG: durchschnittlicher Zusatzbeitragssatz 2026 2,9 % (BAnz AT 10.11.2025 B7)',
       sourceUrl: 'https://www.bundesfinanzministerium.de',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -357,9 +357,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Offizielle Formel gemäß § 32a Abs. 1 EStG. Das zu versteuernde Einkommen wird auf volle Euro abgerundet und in 5 Tarifzonen mit degressiver Steigung der Grenzbelastung berechnet.',
     workedExample: {
       title: 'Beispiel: 45.000 € zvE im Grundtarif (2026)',
-      description: 'Grundfreibetrag: 12.348 €. Liegt in Zone 3 (Progressionszone 2). Tarifliche Einkommensteuer: ca. 8.618 €. Durchschnittssteuersatz: 19,15 %. Grenzsteuersatz: 33,37 %.',
+      description: 'Grundfreibetrag: 12.348 €. Liegt in Zone 3 (Progressionszone 2): z = (45.000 − 17.799) ÷ 10.000 = 2,7201; (173,10 × z + 2.397) × z + 1.034,87 = 8.835,70 € → tarifliche Einkommensteuer 8.835 €. Durchschnittssteuersatz: 19,63 %. Grenzsteuersatz: 33,39 %. SolZ: 0 € (unter der Freigrenze von 20.350 €).',
       inputs: { taxableIncome: 45000, taxYear: '2026', tariffType: 'single' },
-      resultSummary: 'ca. 8.618,00 € Einkommensteuer (19,15 % Durchschnitt)',
+      resultSummary: 'ca. 8.835,00 € Einkommensteuer (19,63 % Durchschnitt)',
     },
     content: {
       intro: 'Die Einkommensteuer ist die wichtigste direkte Personensteuer in Deutschland. Wie viel Steuer auf Ihr Jahresgesamteinkommen fällig wird, regelt die progressive Formel des § 32a EStG.',
@@ -376,7 +376,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       year: 2026,
       source: '§ 32a EStG / Bundesgesetzblatt',
       sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32a.html',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -486,8 +486,8 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'single',
         options: [
-          { value: 'single', label: 'Alleinstehend (Freigrenze: 19.100 € in 2026)' },
-          { value: 'married', label: 'Verheiratet / Zusammenveranlagt (Freigrenze: 38.200 € in 2026)' },
+          { value: 'single', label: 'Alleinstehend (Freigrenze: 20.350 € in 2026)' },
+          { value: 'married', label: 'Verheiratet / Zusammenveranlagt (Freigrenze: 40.700 € in 2026)' },
         ],
       },
       {
@@ -506,13 +506,13 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Nach dem Gesetz zur Rückführung des Solidaritätszuschlags zahlen rund 90 % der Steuerzahler keinen SolZ mehr. Bei Überschreiten der Freigrenze greift eine Milderungszone nach § 4 SolzG.',
     workedExample: {
       title: 'Beispiel: 15.000 € Einkommensteuer (Single, 2026)',
-      description: 'Da die Steuer unter der Freigrenze von 19.100 € liegt, fällt genau 0,00 € Solidaritätszuschlag an.',
+      description: 'Da die Steuer unter der Freigrenze von 20.350 € liegt, fällt genau 0,00 € Solidaritätszuschlag an.',
       inputs: { incomeTax: 15000, maritalStatus: 'single', taxYear: '2026' },
       resultSummary: '0,00 € SolZ (vollständig befreit)',
     },
     content: {
       intro: 'Der Solidaritätszuschlag wurde für die große Mehrheit der Bürger abgeschafft. Nur wer eine hohe Einkommensteuer zahlt oder Kapitaleinkünfte versteuert, ist noch abgabepflichtig.',
-      details: 'Liegt Ihre Einkommensteuer knapp über der Freigrenze (19.100 € für Alleinstehende im Jahr 2026), greift die Milderungszone: Der SolZ steigt schrittweise mit maximal 11,9 % des übersteigenden Betrags an, bis die volle Höhe von 5,5 % erreicht ist.',
+      details: 'Liegt Ihre Einkommensteuer knapp über der Freigrenze (20.350 € für Alleinstehende bzw. 40.700 € bei Zusammenveranlagung im Jahr 2026, § 3 Abs. 3 SolzG), greift die Milderungszone: Der SolZ steigt schrittweise mit maximal 11,9 % des übersteigenden Betrags an, bis die volle Höhe von 5,5 % erreicht ist.',
     },
     faqs: [
       { question: 'Gilt die SolZ-Freigrenze auch für Kapitalerträge?', answer: 'Nein, auf die Abgeltungsteuer (25 % Kapitalertragsteuer bei Zinsen, Dividenden und ETF-Gewinnen) wird der Solidaritätszuschlag von 5,5 % weiterhin grundsätzlich erhoben, sofern kein Freistellungsauftrag greift.' },
@@ -521,9 +521,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: '§ 3, § 4 Solidaritätszuschlaggesetz (SolzG)',
+      source: '§ 3, § 4 Solidaritätszuschlaggesetz (SolzG); Freigrenze 2026: 20.350 € / 40.700 € (Steuerfortentwicklungsgesetz, BGBl. 2024 I Nr. 449)',
       sourceUrl: 'https://www.gesetze-im-internet.de/solzg_1995/',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -658,12 +658,12 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         id: 'kvZusatzbeitrag',
         label: 'GKV-Zusatzbeitrag',
         type: 'number',
-        defaultValue: 2.5,
+        defaultValue: 2.9,
         min: 0,
         max: 5,
         step: 0.1,
         unit: '%',
-        helpText: 'Kassenindividueller Zusatzbeitrag (0 % bei Kassen ohne Zusatzbeitrag, Bundesschnitt 2026: ca. 2,5 %).',
+        helpText: 'Kassenindividueller Zusatzbeitrag (0 % bei Kassen ohne Zusatzbeitrag). Amtlicher Durchschnitt 2026: 2,9 % (BMG, BAnz AT 10.11.2025 B7).',
       },
     ],
     calculate: calculateSozialabgaben,
@@ -671,9 +671,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Beiträge werden paritätisch geteilt und bis zu den gesetzlichen Beitragsbemessungsgrenzen erhoben (2026: 8.450 € für RV/AV und 5.812,50 € für KV/PV monatlich).',
     workedExample: {
       title: 'Beispiel: 4.000 € Monatsbrutto (2026, kinderlos)',
-      description: 'AN-Anteile: RV (9,3 % = 372 €), AV (1,3 % = 52 €), KV (8,55 % = 342 €), PV (2,4 % = 96 €). Gesamt-SV für den Arbeitnehmer: 862,00 € monatlich.',
+      description: 'AN-Anteile: RV (9,3 % = 372 €), AV (1,3 % = 52 €), KV (7,3 % + ½ × 2,9 % Ø-Zusatzbeitrag = 8,75 % = 350 €), PV (2,4 % = 96 €). Gesamt-SV für den Arbeitnehmer: 870,00 € monatlich.',
       inputs: { monthlyGross: 4000, taxYear: '2026', children: '0' },
-      resultSummary: '862,00 € monatliche Sozialabgaben (Arbeitnehmeranteil)',
+      resultSummary: '870,00 € monatliche Sozialabgaben (Arbeitnehmeranteil)',
     },
     content: {
       intro: 'Die gesetzliche Sozialversicherung in Deutschland schützt vor großen Lebensrisiken: Krankheit, Pflegebedürftigkeit, Erwerbslosigkeit und Alter. Arbeitnehmer und Arbeitgeber teilen sich diese Kosten weitgehend zur Hälfte.',
@@ -686,9 +686,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Sozialversicherungs-Rechengrößenverordnung 2026 (BMAS)',
+      source: 'Sozialversicherungs-Rechengrößenverordnung 2026 (BMAS); BMG: durchschnittlicher Zusatzbeitragssatz 2026 2,9 % (BAnz AT 10.11.2025 B7)',
       sourceUrl: 'https://www.bmas.de',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -731,24 +731,24 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Neben dem Bruttogehalt trägt der Arbeitgeber rund 19,5 % bis 21 % gesetzliche Sozialversicherungsbeiträge sowie Umlagen für Entgeltfortzahlung (U1), Mutterschutz (U2), Insolvenzgeld (U3) und gesetzliche Unfallversicherung.',
     workedExample: {
       title: 'Beispiel: 3.500 € Monatsbrutto (2026)',
-      description: 'Brutto: 3.500 €. AG-Anteil SV: ca. 685 €. Umlagen (U1/U2/U3/BG): ca. 98 €. Monatliche Gesamtkosten: ca. 4.283 € (ca. 22 % Nebenkostenaufschlag).',
+      description: 'Brutto: 3.500 €. AG-Anteil SV: 740,25 € (RV 9,3 % = 325,50 €, AV 1,3 % = 45,50 €, KV 7,3 % + ½ × 2,9 % Ø-Zusatzbeitrag = 306,25 €, PV 1,8 % = 63,00 €). Umlagen: 101,50 € (U1 ca. 1,1 %, U2 ca. 0,35 %, Insolvenzgeldumlage 0,15 %, BG ca. 1,3 %). Monatliche Gesamtkosten: 4.341,75 € (ca. 24 % Nebenkostenaufschlag).',
       inputs: { monthlyGross: 3500, taxYear: '2026' },
-      resultSummary: 'ca. 4.283,00 € Arbeitgeber-Gesamtkosten pro Monat',
+      resultSummary: 'ca. 4.341,75 € Arbeitgeber-Gesamtkosten pro Monat',
     },
     content: {
       intro: 'Was kostet eine Neueinstellung wirklich? Für Unternehmen und Selbstständige ist das Bruttogehalt nur ein Teil der Wahrheit. Dieser Rechner ermittelt die vollständigen Lohnnebenkosten.',
       details: 'In der Praxis schlagen die gesetzlichen Lohnnebenkosten in Deutschland mit rund 20 % bis 23 % auf das Bruttogehalt zu Buche. Hinzu kommen betriebliche Kosten wie Arbeitsplatz, Softwarelizenzen und Fortbildungen.',
     },
     faqs: [
-      { question: 'Was sind die Umlagen U1, U2 und U3?', answer: 'Die Umlage U1 finanziert die Erstattung von Arbeitgeberkosten bei Krankheit (für Betriebe bis 30 Mitarbeiter). Die Umlage U2 erstattet Mutterschutzaufwendungen. Die Umlage U3 deckt die Insolvenzgeldversicherung ab.' },
+      { question: 'Was sind die Umlagen U1, U2 und U3?', answer: 'Die Umlage U1 finanziert die Erstattung von Arbeitgeberkosten bei Krankheit (für Betriebe bis 30 Mitarbeiter). Die Umlage U2 erstattet Mutterschutzaufwendungen. Die Umlage U3 (Insolvenzgeldumlage) sichert das Insolvenzgeld; ihr Satz beträgt 2026 gesetzlich 0,15 % (§ 360 SGB III). U1 und U2 legt jede Krankenkasse in ihrer Satzung selbst fest, der Rechner setzt dafür Durchschnittswerte an.' },
     ],
     relatedSlugs: ['brutto-netto-rechner', 'sozialabgaben-rechner', 'stundenlohnrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'BMAS / Spitzenverbände der Sozialversicherung',
+      source: 'BMAS / Spitzenverbände der Sozialversicherung; BMG: Ø-Zusatzbeitrag 2026 2,9 % (BAnz AT 10.11.2025 B7); Insolvenzgeldumlage 0,15 % (§ 360 SGB III)',
       sourceUrl: 'https://www.bmas.de',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -798,11 +798,11 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     calculate: calculateMinijob,
-    formula: 'Netto = Verdienst - (RV-Pflicht ? Verdienst · 3,6 % : 0 €) | AG-Kosten = Verdienst · ~131,4 %',
-    formulaExplanation: 'Minijobber sind versicherungsfrei in KV, PV und ALV. In der Rentenversicherung gilt Versicherungspflicht mit Befreiungsoption. Der Arbeitgeber zahlt pauschal rund 30 % an die Minijob-Zentrale.',
+    formula: 'Netto = Verdienst - (RV-Pflicht ? Verdienst · 3,6 % : 0 €) | AG-Kosten = Verdienst · 131,17 % (2026)',
+    formulaExplanation: 'Minijobber sind versicherungsfrei in KV, PV und ALV. In der Rentenversicherung gilt Versicherungspflicht mit Befreiungsoption. Der Arbeitgeber zahlt 2026 höchstens 31,17 % an die Minijob-Zentrale: 13 % KV, 15 % RV, 2 % Pauschsteuer, 0,8 % Umlage U1, 0,22 % Umlage U2 und 0,15 % Insolvenzgeldumlage (2025: U1 1,1 %, zusammen 31,47 %).',
     workedExample: {
       title: 'Beispiel: 603 € Minijob (2026) mit Befreiungsantrag',
-      description: 'Auszahlung: 603,00 € (Brutto gleich Netto). Der Arbeitgeber zahlt rund 190 € Pauschalbeiträge (RV 15 %, KV 13 %, Steuern 2 % zzgl. Umlagen).',
+      description: 'Auszahlung: 603,00 € (Brutto gleich Netto). Der Arbeitgeber zahlt 187,96 € Pauschalabgaben (31,17 %: RV 15 %, KV 13 %, Pauschsteuer 2 %, U1 0,8 %, U2 0,22 %, Insolvenzgeldumlage 0,15 %).',
       inputs: { earnings: 603, rvOptOut: 'yes', taxYear: '2026' },
       resultSummary: '603,00 € Nettoauszahlung (100 %)',
     },
@@ -817,7 +817,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Minijob-Zentrale / § 8 Abs. 1a SGB IV (Minijob-Grenze 2026: 603 €)',
+      source: 'Minijob-Zentrale / § 8 Abs. 1a SGB IV (Minijob-Grenze 2026: 603 €; Abgaben 2026 höchstens 31,17 % inkl. U1 0,8 %, U2 0,22 %, Insolvenzgeldumlage 0,15 %)',
       sourceUrl: 'https://www.minijob-zentrale.de/DE/fuer-gewerbetreibende/abgaben-und-steuern/abgaben-und-steuern_node.html',
       lastVerified: '2026-10-25',
     },

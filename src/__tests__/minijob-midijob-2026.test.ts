@@ -16,8 +16,9 @@ import { calculateMidijob, calculateMinijob } from '@/lib/calculators/steuernGeh
 const G = 603;
 const OG = 2000;
 const F = 0.6619;
-// Beitragssätze aus der Rechenkonfiguration: RV 18,6 + ALV 2,6 + KV 14,6 + Ø-Zusatzbeitrag 2,5 + PV 3,6 (ohne Kinderlosenzuschlag)
-const FULL_RATE = 0.186 + 0.026 + 0.146 + 0.025 + 0.036;
+// Gesamtsozialversicherungsbeitragssatz 2026 = 42,3 % (die Basis von Faktor F):
+// RV 18,6 + ALV 2,6 + KV 14,6 + Ø-Zusatzbeitrag 2,9 (BMG, BAnz AT 10.11.2025 B7) + PV 3,6 (ohne Kinderlosenzuschlag)
+const FULL_RATE = 0.186 + 0.026 + 0.146 + 0.029 + 0.036;
 const AN_RATE = FULL_RATE / 2;
 
 const beArbeitnehmer = (ae: number) => (OG / (OG - G)) * (ae - G);
@@ -52,6 +53,7 @@ describe('2026 Minijob/Midijob statutory values', () => {
   });
 
   it('uses Faktor F = 28 % ÷ Gesamtsozialversicherungsbeitragssatz (2026: 42,3 %, 2025: 41,9 %)', () => {
+    expect(FULL_RATE * 100).toBeCloseTo(42.3, 10);
     expect(Math.round((28 / 42.3) * 10000) / 10000).toBe(0.6619);
     expect(TAX_CONFIG_2026.midijobFaktorF).toBe(0.6619);
     expect(Math.round((28 / 41.9) * 10000) / 10000).toBe(0.6683);
@@ -104,11 +106,12 @@ describe('minijob-midijob-rechner (2026)', () => {
     expect(Number(res.primary.value)).toBeCloseTo(gross - an - lohnsteuerMonat(gross, an), 6);
   });
 
-  it('850 €: matches the published worked example (353,61 € base, 74,08 € SV, 775,92 € net)', () => {
+  it('850 €: matches the published worked example (353,61 € base, 74,79 € SV, 775,21 € net)', () => {
+    // 2.000 / 1.397 × 247 = 353,6149 €; × 21,15 % = 74,7895 €; Lohnsteuer 0 € (zvE unter Grundfreibetrag)
     const res = run(850);
     expect(secondary(res, 'beArbeitnehmer')).toBeCloseTo(353.61, 2);
-    expect(secondary(res, 'svDeduction')).toBeCloseTo(74.08, 2);
-    expect(Number(res.primary.value)).toBeCloseTo(775.92, 2);
+    expect(secondary(res, 'svDeduction')).toBeCloseTo(74.79, 2);
+    expect(Number(res.primary.value)).toBeCloseTo(775.21, 2);
   });
 
   it('2.000 €: both bases equal the full wage, employer and employee pay equal halves', () => {
@@ -141,6 +144,20 @@ describe('minijob-rechner and midijob-rechner share the 2026 values', () => {
   it('minijob-rechner caps 2026 earnings at 603 € and 2025 earnings at 556 €', () => {
     expect(calculateMinijob({ earnings: 700, rvOptOut: 'yes', taxYear: '2026' }).primary.value).toBe(603);
     expect(calculateMinijob({ earnings: 700, rvOptOut: 'yes', taxYear: '2025' }).primary.value).toBe(556);
+  });
+
+  it('minijob-rechner uses the Minijob-Zentrale rates: 31,17 % in 2026 (U1 0,8 %), 31,47 % in 2025 (U1 1,1 %)', () => {
+    // 2026: 13 + 15 + 2 + 0,8 + 0,22 + 0,15 = 31,17 %; 603 € × 0,3117 = 187,9551 €
+    const res2026 = calculateMinijob({ earnings: 603, rvOptOut: 'no', taxYear: '2026' });
+    expect(Number(res2026.primary.value)).toBeCloseTo(603 - 603 * 0.036, 8);
+    expect(Number(res2026.secondary?.find((s) => s.id === 'agTotalCosts')?.value)).toBeCloseTo(603 + 187.9551, 8);
+    expect(Number(res2026.secondary?.find((s) => s.id === 'agLumpSum')?.value)).toBeCloseTo(187.9551, 8);
+    expect(res2026.secondary?.find((s) => s.id === 'agLumpSum')?.label).toBe('AG-Pauschalabgaben (31,17 %)');
+    expect(res2026.secondary?.find((s) => s.id === 'rvContribution')?.label).toBe('RV-Eigenanteil (3,6 %)');
+    // 2025: 13 + 15 + 2 + 1,1 + 0,22 + 0,15 = 31,47 %; 556 € × 0,3147 = 174,9732 €
+    const res2025 = calculateMinijob({ earnings: 556, rvOptOut: 'yes', taxYear: '2025' });
+    expect(Number(res2025.secondary?.find((s) => s.id === 'agLumpSum')?.value)).toBeCloseTo(174.9732, 8);
+    expect(res2025.secondary?.find((s) => s.id === 'agLumpSum')?.label).toBe('AG-Pauschalabgaben (31,47 %)');
   });
 
   it('midijob-rechner uses the § 20 Abs. 2a employee base (1.200 € → 854,69 €)', () => {

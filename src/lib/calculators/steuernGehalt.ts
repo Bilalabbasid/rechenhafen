@@ -493,7 +493,7 @@ export function calculateSozialabgaben(inputs: Record<string, any>): Calculation
   const state = String(inputs.federalState || 'other');
   const numChildren = Math.max(0, parseInt(inputs.children || '0', 10));
   const age = Math.max(0, parseInt(inputs.age || '30', 10));
-  const kvZusatz = Math.max(0, Number(inputs.kvZusatzbeitrag ?? 2.5));
+  const kvZusatz = Math.max(0, Number(inputs.kvZusatzbeitrag ?? config.zusatzbeitragKrankenversicherungDurchschnitt * 100));
 
   // Rentenversicherung
   const rvGross = Math.min(monthlyGross, config.bbgRentenversicherungMonat);
@@ -602,15 +602,17 @@ export function calculateMinijob(inputs: Record<string, any>): CalculationResult
   const hasRvOptOut = inputs.rvOptOut === 'yes' || inputs.rvOptOut === true;
 
   // Rentenversicherung Eigenanteil (3,6 %): 18,6 % Mindestbeitrag abzüglich 15 % AG-Pauschale
-  const anRv = hasRvOptOut ? 0 : earnings * 0.036;
+  const anRv = hasRvOptOut ? 0 : earnings * config.minijobRvEigenanteil;
   const netEarnings = earnings - anRv;
 
-  // AG-Pauschale: 15 % RV + 13 % KV + 2 % Pauschalsteuer + ca. 1,4 % Umlagen = ~31,4 %
-  const agRv = earnings * 0.15;
-  const agKv = earnings * 0.13;
-  const agTax = earnings * 0.02;
-  const agUmlagen = earnings * (config.umlageU1 + config.umlageU2 + config.umlageU3Insolvenzgeld);
+  // AG-Pauschalabgaben mit den Umlagesätzen der Minijob-Zentrale (2026: 13 + 15 + 2 + 0,8 + 0,22 + 0,15 = 31,17 %)
+  const agRv = earnings * config.minijobPauschaleRv;
+  const agKv = earnings * config.minijobPauschaleKv;
+  const agTax = earnings * config.minijobPauschsteuer;
+  const agUmlagen = earnings * (config.minijobUmlageU1 + config.minijobUmlageU2 + config.minijobInsolvenzgeldumlage);
   const totalAgCosts = earnings + agRv + agKv + agTax + agUmlagen;
+  const agRate = config.minijobPauschaleKv + config.minijobPauschaleRv + config.minijobPauschsteuer
+    + config.minijobUmlageU1 + config.minijobUmlageU2 + config.minijobInsolvenzgeldumlage;
 
   return {
     primary: {
@@ -621,10 +623,10 @@ export function calculateMinijob(inputs: Record<string, any>): CalculationResult
     },
     secondary: [
       { id: 'grossEarnings', label: 'Minijob-Verdienst (brutto)', value: earnings, formattedValue: formatCurrency(earnings) },
-      { id: 'rvContribution', label: 'RV-Eigenanteil (3,6 %)', value: anRv, formattedValue: formatCurrency(anRv) },
+      { id: 'rvContribution', label: `RV-Eigenanteil (${formatNumber(config.minijobRvEigenanteil * 100, 1)} %)`, value: anRv, formattedValue: formatCurrency(anRv) },
       { id: 'limit', label: 'Aktuelle Geringfügigkeitsgrenze', value: config.minijobGrenze, formattedValue: formatCurrency(config.minijobGrenze) },
       { id: 'agTotalCosts', label: 'Gesamtkosten für Arbeitgeber', value: totalAgCosts, formattedValue: formatCurrency(totalAgCosts) },
-      { id: 'agLumpSum', label: 'AG-Pauschalabgaben (~30 %)', value: totalAgCosts - earnings, formattedValue: formatCurrency(totalAgCosts - earnings) },
+      { id: 'agLumpSum', label: `AG-Pauschalabgaben (${formatNumber(agRate * 100, 2)} %)`, value: totalAgCosts - earnings, formattedValue: formatCurrency(totalAgCosts - earnings) },
     ],
   };
 }

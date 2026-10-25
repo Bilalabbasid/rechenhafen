@@ -17,12 +17,22 @@ export const ALL_SEO_CTR_SLUGS = [
   'zwischenfinanzierung-rechner',
 ];
 
-/** Pages re-verified on the same day outside the SEO/CTR scope (Minijob/Mindestlohn 2026 values). */
+/**
+ * Pages re-verified on the same day outside the SEO/CTR scope: Minijob/Mindestlohn 2026 values, and the
+ * 2026 tax config values Ø-Zusatzbeitrag 2,9 %, Kindergeld 259 €, SolZ-Freigrenze 20.350 €, Insolvenzgeldumlage 0,15 %.
+ */
 export const LASTMOD_2026_10_25_DATA_REVIEW_SLUGS = [
   'minijob-midijob-rechner',
   'minijob-rechner',
   'midijob-rechner',
   'stundenlohnrechner',
+  'brutto-netto-rechner',
+  'netto-brutto-rechner',
+  'einkommensteuerrechner',
+  'solidaritaetszuschlag-rechner',
+  'sozialabgaben-rechner',
+  'arbeitgeberkosten-rechner',
+  'kindergeld-rechner-2026',
 ];
 
 export const getCalc = (slug: string): CalculatorDefinition => {
