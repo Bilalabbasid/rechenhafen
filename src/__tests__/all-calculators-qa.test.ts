@@ -3,8 +3,9 @@ import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
 
 describe('RechenHafen Calculators Comprehensive QA Verification', () => {
-  it('contains exactly 424 calculators across 17 categories', () => {
-    expect(ALL_CALCULATORS.length).toBe(424);
+  it('contains exactly 423 calculators across 17 categories', () => {
+    // 424 → 423: doppelter Abfindungsrechner (abfindung-fuenftelregelung-rechner) per 301 in abfindungsrechner zusammengeführt
+    expect(ALL_CALCULATORS.length).toBe(423);
     expect(CATEGORIES.length).toBe(17);
   });
 

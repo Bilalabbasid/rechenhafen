@@ -16,6 +16,37 @@ import {
   calculateMwSt,
   calculateGewerbesteuer,
 } from '@/lib/calculators/steuernGehalt';
+import { formatCurrency, formatNumber } from '@/lib/formatters';
+
+// Abfindungsrechner: Beispiele und Tabelle werden mit derselben Funktion erzeugt wie das Rechnerergebnis.
+function abfindungSecondary(r: ReturnType<typeof calculateAbfindung>, id: string): number {
+  return (r.secondary?.find((x) => x.id === id)?.value as number) ?? 0;
+}
+
+function buildAbfindungWorkedExample() {
+  const r = calculateAbfindung({ regularIncome: 45000, abfindung: 35000, taxYear: '2026' });
+  return {
+    title: 'Beispiel: 35.000 € Abfindung bei 45.000 € Jahreseinkommen (2026)',
+    description: `Ohne Fünftelregelung würde die Abfindung rund ${formatCurrency(abfindungSecondary(r, 'taxRegular'))} Einkommensteuer kosten. Mit Fünftelregelung sind es ${formatCurrency(abfindungSecondary(r, 'taxFuenftel'))} – eine Ersparnis von ${formatCurrency(abfindungSecondary(r, 'taxSavings'))}.`,
+    inputs: { regularIncome: 45000, abfindung: 35000, taxYear: '2026' },
+    resultSummary: `${r.primary.formattedValue} Netto-Abfindung (${formatCurrency(abfindungSecondary(r, 'taxSavings'))} Steuerersparnis)`,
+  };
+}
+
+function buildAbfindungQuickReference(): string {
+  const income = 45000;
+  const rows = [10000, 20000, 30000, 40000, 50000]
+    .map((a) => {
+      const r = calculateAbfindung({ regularIncome: income, abfindung: a, taxYear: '2026' });
+      return `| ${formatNumber(a, 0)} € | ${formatCurrency(abfindungSecondary(r, 'taxFuenftel'))} | ${formatCurrency(abfindungSecondary(r, 'taxSavings'))} | ${r.primary.formattedValue} |`;
+    })
+    .join('\n');
+  return [
+    `Beispiele für ein zu versteuerndes Jahreseinkommen von ${formatNumber(income, 0)} € ohne Abfindung (Grundtarif 2026, ohne Solidaritätszuschlag und Kirchensteuer):`,
+    `| Brutto-Abfindung | Steuer mit Fünftelregelung | Ersparnis | Netto-Abfindung |\n| --- | --- | --- | --- |\n${rows}`,
+    'Ihr Ergebnis hängt vor allem vom regulären Einkommen im Auszahlungsjahr ab – tragen Sie oben Ihre eigenen Werte ein. Seit 2025 wird die Fünftelregelung nicht mehr beim Lohnsteuerabzug durch den Arbeitgeber berücksichtigt, sondern erst mit der Einkommensteuererklärung.',
+  ].join('\n\n');
+}
 
 export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
   // 1. BRUTTO-NETTO-RECHNER
@@ -961,11 +992,11 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Abfindungsrechner',
     category: 'steuern-gehalt',
     subcategory: 'Einkommensteuer & Tarif',
-    metaTitle: 'Abfindungsrechner 2026 – Fünftelregelung § 34 EStG berechnen',
-    metaDescription: 'Berechnen Sie die Steuerersparnis Ihrer Abfindung durch die gesetzliche Fünftelregelung. Ermittelt das exakte Netto nach Steuerbegünstigung.',
-    h1: 'Abfindungsrechner – Steuerersparnis mit Fünftelregelung',
-    shortDescription: 'Berechnet die steuerliche Begünstigung für Abfindungen und Entschädigungen nach der Fünftelregelung des § 34 EStG.',
-    searchKeywords: ['abfindungsrechner 2026', 'fünftelregelung rechner', 'abfindung versteuern', 'wie viel netto bleibt von abfindung'],
+    metaTitle: 'Abfindungsrechner 2026: Fünftelregelung, Steuer & Netto',
+    metaDescription: 'Wie viel Netto bleibt von der Abfindung? Einkommensteuer mit und ohne Fünftelregelung nach § 34 EStG für 2025 und 2026 berechnen – mit Hinweis zur Steuererklärung seit 2025.',
+    h1: 'Abfindungsrechner: Abfindung versteuern mit Fünftelregelung',
+    shortDescription: 'Geben Sie Ihr zu versteuerndes Jahreseinkommen ohne Abfindung und die Brutto-Abfindung ein. Der Rechner zeigt die Einkommensteuer auf die Abfindung mit Fünftelregelung (§ 34 EStG), die Ersparnis gegenüber der normalen Besteuerung und die Netto-Abfindung für 2025 oder 2026.',
+    searchKeywords: ['abfindungsrechner 2026', 'fünftelregelung rechner', 'abfindung versteuern', 'wie viel netto bleibt von abfindung', 'abfindungsrechner fünftelregelung', 'abfindung steuer rechner', '5tel regelung abfindung', 'abfindungsrechner 1/5 regelung', 'paragraph 34 estg abfindung rechner'],
     inputs: [
       {
         id: 'regularIncome',
@@ -999,20 +1030,47 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     calculate: calculateAbfindung,
     formula: 'Steuer = 5 · [ Tarif(Einkommen + Abfindung / 5) - Tarif(Einkommen) ]',
     formulaExplanation: 'Nach § 34 EStG wird die Steuerbelastung so berechnet, als würde die Abfindung über fünf Jahre gestreckt zufließen. Das dämpft den Progressionssprung erheblich.',
-    workedExample: {
-      title: 'Beispiel: 35.000 € Abfindung bei 45.000 € Jahreseinkommen',
-      description: 'Reguläre Versteuerung würde ca. 12.800 € Steuer kosten. Mit Fünftelregelung sinkt die Steuer auf ca. 10.900 €. Steuerersparnis: rund 1.900 €.',
-      inputs: { regularIncome: 45000, abfindung: 35000, taxYear: '2026' },
-      resultSummary: 'ca. 24.100,00 € Netto-Abfindung (1.900 € Steuerersparnis)',
-    },
+    workedExample: buildAbfindungWorkedExample(),
+    quickReference: [
+      {
+        title: 'Wie viel Netto bleibt von der Abfindung? Beispiele 2026',
+        content: buildAbfindungQuickReference(),
+      },
+    ],
     content: {
       intro: 'Wer seinen Arbeitsplatz verliert und eine Abfindung erhält, soll nicht durch eine extreme Progression bestraft werden. Die gesetzliche Fünftelregelung nach § 34 EStG mildert diesen Steuersprung ab.',
+      sections: [
+        {
+          title: 'So funktioniert die Fünftelregelung',
+          content: 'Das Finanzamt rechnet so, als würde die Abfindung über fünf Jahre verteilt zufließen:\n\n1. Einkommensteuer auf das reguläre zu versteuernde Einkommen **ohne** Abfindung ermitteln.\n2. Einkommensteuer auf das reguläre Einkommen **plus ein Fünftel** der Abfindung ermitteln.\n3. Die Differenz beider Beträge **mit fünf multiplizieren** – das ist die Steuer auf die Abfindung.\n\n`Steuer auf Abfindung = 5 × [Tarif(Einkommen + Abfindung ÷ 5) − Tarif(Einkommen)]`\n\nDie Ersparnis ist umso größer, je stärker die Abfindung Ihren Steuersatz in einem einzigen Jahr nach oben treiben würde. Liegt Ihr reguläres Einkommen bereits im Spitzensteuersatz, bringt die Fünftelregelung kaum noch einen Vorteil. Voraussetzung ist eine sogenannte Zusammenballung von Einkünften: Die Abfindung muss grundsätzlich in einem Kalenderjahr zufließen und Ihre Einkünfte in diesem Jahr gegenüber dem Normalfall erhöhen.',
+        },
+        {
+          title: 'Seit 2025: Fünftelregelung erst über die Steuererklärung',
+          content: 'Seit dem 1. Januar 2025 wendet der Arbeitgeber die Fünftelregelung beim Lohnsteuerabzug nicht mehr an (Änderung durch das Wachstumschancengesetz). Die Abfindung wird bei der Auszahlung zunächst regulär mit Lohnsteuer belegt. Die Steuerermäßigung nach § 34 EStG bleibt aber bestehen – Sie erhalten sie über die **Einkommensteuererklärung** für das Jahr der Auszahlung.\n\nPraktisch heißt das: Die Netto-Auszahlung auf Ihrem Konto kann zunächst niedriger sein als das Ergebnis dieses Rechners. Die Differenz bekommen Sie, sofern die Voraussetzungen erfüllt sind, mit dem Steuerbescheid zurück.',
+        },
+        {
+          title: 'Wie hoch ist eine übliche Abfindung?',
+          content: 'Einen allgemeinen gesetzlichen Anspruch auf eine Abfindung gibt es nicht. Sie entsteht meist durch einen Aufhebungsvertrag, einen gerichtlichen Vergleich oder nach § 1a KSchG bei betriebsbedingter Kündigung. Für den Fall des § 1a KSchG nennt das Gesetz **0,5 Monatsverdienste je Beschäftigungsjahr**; diese Faustformel wird häufig auch in Verhandlungen als Ausgangspunkt genutzt.\n\nBeispiel: 4.000 € Bruttomonatsgehalt und 10 Beschäftigungsjahre → 0,5 × 4.000 € × 10 = 20.000 € Abfindung. Den Netto-Betrag dieser Summe berechnen Sie oben im Rechner.',
+        },
+        {
+          title: 'Was der Rechner berücksichtigt – und was nicht',
+          content: '- **Berücksichtigt:** Einkommensteuer-Grundtarif des gewählten Jahres (2025 oder 2026) mit und ohne Fünftelregelung.\n- **Nicht berücksichtigt:** Solidaritätszuschlag, Kirchensteuer, Splittingtarif bei Zusammenveranlagung, Progressionsvorbehalt (z. B. durch Arbeitslosengeld) sowie individuelle Abzüge.\n- **Sozialabgaben:** Auf eine echte Abfindung für den Verlust des Arbeitsplatzes fallen keine Beiträge zur Sozialversicherung an.\n\nDas Ergebnis ist eine Orientierung und ersetzt keine Steuerberatung.',
+        },
+      ],
       details: 'Wichtig: Auf echte Abfindungen wegen Beendigung des Arbeitsverhältnisses fallen keine gesetzlichen Sozialversicherungsbeiträge an, es wird ausschließlich Einkommensteuer fällig.',
     },
     faqs: [
       { question: 'Muss ich auf eine Abfindung Sozialabgaben zahlen?', answer: 'Nein. Auf eine echte Abfindung für den Verlust des Arbeitsplatzes fallen für Arbeitnehmer keine Renten-, Kranken-, Pflege- oder Arbeitslosenversicherungsbeiträge an (sofern keine privaten Sonderkonstellationen vorliegen).' },
+      { question: 'Zieht der Arbeitgeber die Fünftelregelung noch bei der Auszahlung ab?', answer: 'Nein, seit 2025 nicht mehr. Der Arbeitgeber versteuert die Abfindung beim Lohnsteuerabzug regulär. Die Ermäßigung durch die Fünftelregelung erhalten Sie erst über Ihre Einkommensteuererklärung für das Jahr der Auszahlung.' },
+      { question: 'Gibt es einen gesetzlichen Anspruch auf eine Abfindung bei Kündigung?', answer: 'Grundsätzlich nein; ein Anspruch besteht nur bei Vereinbarung im Aufhebungsvertrag, nach § 1a KSchG bei betriebsbedingter Kündigung oder im Rahmen eines gerichtlichen Vergleichs.' },
+      { question: 'Wie hoch ist die übliche Regelabfindung nach Kündigungsschutzgesetz?', answer: 'Für den Fall des § 1a KSchG beträgt sie 0,5 Monatsverdienste für jedes Beschäftigungsjahr. In Verhandlungen dient dieser Wert oft als Ausgangspunkt.' },
+      { question: 'Kann ich den Rechner auch für frühere Jahre nutzen?', answer: 'Die Formel der Fünftelregelung ist dieselbe, aber der Einkommensteuertarif ändert sich jedes Jahr. Der Rechner enthält die Tarife für 2025 und 2026; für frühere Jahre weichen die Ergebnisse ab.' },
     ],
-    relatedSlugs: ['einkommensteuerrechner', 'bonus-netto-rechner', 'brutto-netto-rechner'],
+    relatedSlugs: ['einkommensteuerrechner', 'kuendigungsfrist-arbeitnehmer-rechner', 'arbeitslosengeld-1-rechner', 'bonus-netto-rechner', 'brutto-netto-rechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+      methodology: 'Fünftelregelung nach § 34 Abs. 1 EStG mit dem Einkommensteuer-Grundtarif des gewählten Jahres; Beispiele werden mit derselben Berechnungsfunktion erzeugt wie das Rechnerergebnis.',
+    },
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

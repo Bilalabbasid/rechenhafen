@@ -27,6 +27,27 @@ function buildHeatingOilQuickReference(): string {
   ].join('\n\n');
 }
 
+// Gasverbrauch-Rechner: m³-in-kWh-Tabelle mit denselben Standardwerten und derselben Formel wie der Rechner
+// (kWh = m³ × Brennwert × Zustandszahl; Kosten = kWh × Arbeitspreis).
+const GAS_TABLE_DEFAULTS = { brennwert: 10.8, zustandszahl: 0.95, priceCt: 11.0 } as const;
+
+function buildGasM3QuickReference(): string {
+  const { brennwert, zustandszahl, priceCt } = GAS_TABLE_DEFAULTS;
+  const rows = [1, 10, 100, 500, 1000, 1500, 2000]
+    .map((m3) => {
+      const kwh = m3 * brennwert * zustandszahl;
+      return `| ${formatNumber(m3, 0)} m³ | ${formatNumber(kwh, m3 < 10 ? 2 : 0)} kWh | ${formatCurrency((kwh * priceCt) / 100)} |`;
+    })
+    .join('\n');
+  const perM3 = brennwert * zustandszahl;
+  return [
+    '`kWh = m³ × Brennwert × Zustandszahl`',
+    `Beispielwerte: Brennwert ${formatNumber(brennwert, 1)} kWh/m³, Zustandszahl ${formatNumber(zustandszahl, 2)} und ${formatNumber(priceCt, 1)} ct/kWh Arbeitspreis. Damit entspricht 1 m³ Gas ${formatNumber(perM3, 2)} kWh und kostet rund ${formatCurrency((perM3 * priceCt) / 100, 3)} ohne Grundpreis.`,
+    `| Gasverbrauch | in kWh | Arbeitspreis-Kosten |\n| --- | --- | --- |\n${rows}`,
+    'Brennwert und Zustandszahl unterscheiden sich je nach Netzgebiet – beide Werte stehen auf Ihrer Gasabrechnung. Die Beispielpreise sind keine aktuellen Marktpreise. Jahreskosten inklusive Grundpreis und monatlichem Durchschnitt berechnen Sie mit dem [Gaskostenrechner](/rechner/gaskostenrechner/).',
+  ].join('\n\n');
+}
+
 export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
   // ==================== WOHNEN & IMMOBILIEN (20 ZUSÄTZLICHE) ====================
   {
@@ -2396,6 +2417,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         description: 'Zählerdifferenz: 8.450 − 7.250 = 1.200 m³. Thermische Energie: 1.200 m³ × 10,8 × 0,95 = 12.312 kWh. Reine Verbrauchskosten bei 11 ct/kWh: 1.354,32 € (feste Grundpreise des Versorgers kommen separat hinzu).',
         inputs: { inputMode: 'readings', meterReadingOld: 7250, meterReadingNew: 8450, brennwert: 10.8, zustandszahl: 0.95, gasPricePerKwh: 11.0 },
         resultSummary: '12.312 kWh (1.354,32 € reine Verbrauchskosten)',
+      },
+    ],
+    quickReference: [
+      {
+        title: 'Gas m³ in kWh umrechnen: Tabelle',
+        content: buildGasM3QuickReference(),
       },
     ],
     content: {

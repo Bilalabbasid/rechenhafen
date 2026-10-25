@@ -1,4 +1,4 @@
-import { CalculatorDefinition } from '@/types/calculator';
+import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { computeEStSingle, computeUebergangsbereich } from '@/lib/calculators/steuernGehalt';
@@ -6,6 +6,164 @@ import { computeEStSingle, computeUebergangsbereich } from '@/lib/calculators/st
 // Minijob-Zentrale, gewerblicher Minijob 2026 (geprüft 2026-10-25)
 const MINIJOB_RV_EIGENANTEIL = 0.036; // 18,6 % RV-Beitragssatz − 15 % Arbeitgeber-Pauschale
 const MINIJOB_AG_ABGABEN = 0.13 + 0.15 + 0.02 + 0.008 + 0.0022 + 0.0015; // = 31,17 % (KV, RV, Pauschsteuer, U1, U2, Insolvenzgeldumlage)
+
+// ---------------------------------------------------------------------------
+// LKW-Maut Deutschland: Mautteilsätze in Euro je km nach Anlage 1 BFStrMG
+// (Fassung BGBl. 2023 I Nr. 315, abgerufen und geprüft am 2026-10-25).
+// Mautsatz = Infrastruktur + Luftverschmutzung + Lärm + CO₂ (§ 3 Abs. 3 BFStrMG).
+// ---------------------------------------------------------------------------
+type LkwWeightClass = 'from3_5to7_5' | 'from7_5to12' | 'from12to18' | 'over18t_upto3axles' | 'over18t_4axles' | 'over18t_5plusaxles';
+type LkwEuroClass = 'euro6' | 'euro5' | 'euro4' | 'euro3' | 'euro2' | 'euro1';
+
+export const LKW_WEIGHT_CLASS_LABELS: Record<LkwWeightClass, string> = {
+  from3_5to7_5: '> 3,5 bis < 7,5 t',
+  from7_5to12: '7,5 bis < 12 t',
+  from12to18: '12 bis 18 t',
+  over18t_upto3axles: '> 18 t, bis 3 Achsen',
+  over18t_4axles: '> 18 t, 4 Achsen',
+  over18t_5plusaxles: '> 18 t, ab 5 Achsen',
+};
+
+// Nr. 1: Infrastruktur (für > 18 t gilt "4 oder mehr Achsen" einheitlich)
+const LKW_INFRA: Record<LkwWeightClass, number> = {
+  from3_5to7_5: 0.052, from7_5to12: 0.066, from12to18: 0.107,
+  over18t_upto3axles: 0.141, over18t_4axles: 0.155, over18t_5plusaxles: 0.155,
+};
+// Nr. 2: Luftverschmutzung, Kategorien A (EURO VI) bis F (EURO I / keine Klasse)
+const LKW_AIR: Record<LkwEuroClass, Record<LkwWeightClass, number>> = {
+  euro6: { from3_5to7_5: 0.011, from7_5to12: 0.015, from12to18: 0.015, over18t_upto3axles: 0.022, over18t_4axles: 0.023, over18t_5plusaxles: 0.023 },
+  euro5: { from3_5to7_5: 0.043, from7_5to12: 0.043, from12to18: 0.052, over18t_upto3axles: 0.062, over18t_4axles: 0.062, over18t_5plusaxles: 0.062 },
+  euro4: { from3_5to7_5: 0.055, from7_5to12: 0.059, from12to18: 0.063, over18t_upto3axles: 0.080, over18t_4axles: 0.087, over18t_5plusaxles: 0.087 },
+  euro3: { from3_5to7_5: 0.079, from7_5to12: 0.088, from12to18: 0.101, over18t_upto3axles: 0.134, over18t_4axles: 0.149, over18t_5plusaxles: 0.149 },
+  euro2: { from3_5to7_5: 0.098, from7_5to12: 0.113, from12to18: 0.121, over18t_upto3axles: 0.164, over18t_4axles: 0.182, over18t_5plusaxles: 0.182 },
+  euro1: { from3_5to7_5: 0.102, from7_5to12: 0.114, from12to18: 0.123, over18t_upto3axles: 0.169, over18t_4axles: 0.187, over18t_5plusaxles: 0.187 },
+};
+// Nr. 3: Lärm
+const LKW_NOISE: Record<LkwWeightClass, number> = {
+  from3_5to7_5: 0.014, from7_5to12: 0.016, from12to18: 0.016,
+  over18t_upto3axles: 0.016, over18t_4axles: 0.012, over18t_5plusaxles: 0.012,
+};
+// Nr. 4: CO₂. Klasse 1 hängt zusätzlich von der Schadstoffklasse ab.
+type Co2Row = Record<LkwWeightClass, number>;
+const row = (a: number, b: number, c: number, d: number, e: number, f: number): Co2Row => ({
+  from3_5to7_5: a, from7_5to12: b, from12to18: c, over18t_upto3axles: d, over18t_4axles: e, over18t_5plusaxles: f,
+});
+const LKW_CO2_CLASS1: Record<'euro1' | 'euro2_3' | 'euro4_5' | 'euro6', Co2Row> = {
+  euro1: row(0.080, 0.080, 0.104, 0.158, 0.158, 0.162),
+  euro2_3: row(0.080, 0.080, 0.104, 0.138, 0.138, 0.162),
+  euro4_5: row(0.080, 0.080, 0.100, 0.134, 0.134, 0.160),
+  euro6: row(0.074, 0.080, 0.100, 0.124, 0.134, 0.158),
+};
+const LKW_CO2_CLASS: Record<'2' | '3' | '4' | '5', Co2Row> = {
+  '2': row(0.070, 0.076, 0.096, 0.118, 0.128, 0.150),
+  '3': row(0.067, 0.072, 0.090, 0.111, 0.120, 0.142),
+  '4': row(0.037, 0.040, 0.050, 0.063, 0.068, 0.079),
+  '5': row(0, 0, 0, 0, 0, 0),
+};
+
+/** Mautteilsätze in Euro je km für eine Fahrzeugkonfiguration. */
+export function lkwMautRates(weight: LkwWeightClass, euro: LkwEuroClass, co2: string) {
+  const infra = LKW_INFRA[weight];
+  const air = LKW_AIR[euro][weight];
+  const noise = LKW_NOISE[weight];
+  let co2Rate: number;
+  if (co2 === '1') {
+    const key = euro === 'euro6' ? 'euro6' : euro === 'euro4' || euro === 'euro5' ? 'euro4_5' : euro === 'euro2' || euro === 'euro3' ? 'euro2_3' : 'euro1';
+    co2Rate = LKW_CO2_CLASS1[key][weight];
+  } else {
+    co2Rate = LKW_CO2_CLASS[(co2 as '2' | '3' | '4' | '5')][weight];
+  }
+  // Summe auf 0,1 Cent runden, um Gleitkomma-Reste zu vermeiden (Teilsätze haben 3 Nachkommastellen)
+  const total = Math.round((infra + air + noise + co2Rate) * 1000) / 1000;
+  return { infra, air, noise, co2: co2Rate, total };
+}
+
+const LKW_LEGACY_WEIGHT: Record<string, LkwWeightClass> = {
+  // Frühere Auswahlwerte des Rechners
+  over18t_5axles: 'over18t_5plusaxles',
+};
+
+export function calculateLkwMaut(inputs: Record<string, any>): CalculationResult {
+  const kmStr = String(inputs.distanceKm ?? '').trim();
+  if (kmStr === '') {
+    return { primary: { id: 'totalMaut', label: 'Gesamte LKW-Maut für die Strecke', value: 0, formattedValue: '–' }, error: 'Bitte geben Sie die mautpflichtige Strecke in Kilometern ein.' };
+  }
+  const km = parseFloat(kmStr.replace(',', '.'));
+  if (!Number.isFinite(km) || km < 0) {
+    return { primary: { id: 'totalMaut', label: 'Gesamte LKW-Maut für die Strecke', value: 0, formattedValue: '–' }, error: 'Bitte geben Sie eine gültige Strecke ab 0 km ein.' };
+  }
+  const rawWeight = String(inputs.weightClass || 'over18t_5plusaxles');
+  const weight = (LKW_LEGACY_WEIGHT[rawWeight] || (rawWeight in LKW_INFRA ? rawWeight : 'over18t_5plusaxles')) as LkwWeightClass;
+  const rawEuro = String(inputs.euroClass || 'euro6');
+  const euro = (rawEuro in LKW_AIR ? rawEuro : 'euro6') as LkwEuroClass;
+  const co2 = ['1', '2', '3', '4', '5'].includes(String(inputs.co2Class)) ? String(inputs.co2Class) : '1';
+
+  const ct = (eur: number) => `${formatNumber(eur * 100, 1, 1)} ct/km`;
+
+  if (co2 === '5') {
+    return {
+      primary: { id: 'totalMaut', label: 'Gesamte LKW-Maut für die Strecke', value: 0, formattedValue: formatCurrency(0), highlight: true },
+      secondary: [
+        { id: 'ratePerKm', label: 'Mautsatz pro Kilometer', value: 0, formattedValue: '0,0 ct/km' },
+        { id: 'exemption', label: 'Mautbefreiung', value: 0, formattedValue: 'Emissionsfreie Fahrzeuge: befreit bis 30.06.2031 (§ 1 Abs. 2 Nr. 7 BFStrMG)' },
+      ],
+      summaryText: `Emissionsfreie schwere Nutzfahrzeuge (CO₂-Klasse 5) sind nach § 1 Abs. 2 Nr. 7 BFStrMG bis zum 30. Juni 2031 von der LKW-Maut befreit. Für ${formatNumber(km, 0)} km fällt daher keine Maut an.`,
+    };
+  }
+
+  const r = lkwMautRates(weight, euro, co2);
+  const totalMaut = Math.round(km * r.total * 100) / 100;
+
+  return {
+    primary: { id: 'totalMaut', label: 'Gesamte LKW-Maut für die Strecke', value: totalMaut, formattedValue: formatCurrency(totalMaut), highlight: true },
+    secondary: [
+      { id: 'ratePerKm', label: 'Mautsatz pro Kilometer', value: r.total * 100, formattedValue: ct(r.total) },
+      { id: 'per100km', label: 'Maut je 100 km', value: Math.round(r.total * 100 * 100) / 100, formattedValue: formatCurrency(r.total * 100) },
+      { id: 'infra', label: 'davon Infrastruktur', value: r.infra * 100, formattedValue: ct(r.infra) },
+      { id: 'air', label: 'davon Luftverschmutzung', value: r.air * 100, formattedValue: ct(r.air) },
+      { id: 'noise', label: 'davon Lärm', value: r.noise * 100, formattedValue: ct(r.noise) },
+      { id: 'co2', label: 'davon CO₂', value: r.co2 * 100, formattedValue: ct(r.co2) },
+      { id: 'distance', label: 'Mautstrecke', value: km, formattedValue: `${formatNumber(km, 0)} km` },
+    ],
+    calculationSteps: [
+      `Mautsatz = ${formatNumber(r.infra * 100, 1, 1)} (Infrastruktur) + ${formatNumber(r.air * 100, 1, 1)} (Luft) + ${formatNumber(r.noise * 100, 1, 1)} (Lärm) + ${formatNumber(r.co2 * 100, 1, 1)} (CO₂) = ${ct(r.total)}`,
+      `Maut = ${formatNumber(km, 0)} km × ${formatNumber(r.total, 3, 3)} €/km = ${formatCurrency(totalMaut)}`,
+    ],
+    summaryText: `Für ${formatNumber(km, 0)} km fallen bei einem Mautsatz von ${ct(r.total)} rund ${formatCurrency(totalMaut)} LKW-Maut an (${LKW_WEIGHT_CLASS_LABELS[weight]}, ${euro.replace('euro', 'EURO ').replace('6', 'VI').replace('5', 'V').replace('4', 'IV').replace('3', 'III').replace('2', 'II').replace('1', 'I')}, CO₂-Klasse ${co2}).`,
+  };
+}
+
+function buildLkwMautWorkedExample() {
+  const r = lkwMautRates('over18t_5plusaxles', 'euro6', '1');
+  const res = calculateLkwMaut({ distanceKm: 350, weightClass: 'over18t_5plusaxles', euroClass: 'euro6', co2Class: '1' });
+  return {
+    title: 'Beispiel: 350 km mit 40-Tonner-Sattelzug (5 Achsen, EURO VI, CO₂-Klasse 1)',
+    inputValues: [{ label: 'Strecke', value: '350 km' }, { label: 'Fahrzeug', value: 'Über 18 t, 5 Achsen' }, { label: 'Klassen', value: 'EURO VI, CO₂-Klasse 1' }],
+    steps: [
+      `Mautsatz: ${formatNumber(r.infra * 100, 1, 1)} + ${formatNumber(r.air * 100, 1, 1)} + ${formatNumber(r.noise * 100, 1, 1)} + ${formatNumber(r.co2 * 100, 1, 1)} = ${formatNumber(r.total * 100, 1, 1)} ct/km`,
+      `Maut: 350 km × ${formatNumber(r.total, 3, 3)} € = ${res.primary.formattedValue}`,
+    ],
+    result: `${res.primary.formattedValue} Mautgebühren`,
+  };
+}
+
+function buildLkwMautQuickReference(): string {
+  const classes = Object.keys(LKW_INFRA) as LkwWeightClass[];
+  const fmt = (eur: number) => formatNumber(eur * 100, 1, 1);
+  const rows = classes
+    .map((w) => `| ${LKW_WEIGHT_CLASS_LABELS[w]} | ${fmt(lkwMautRates(w, 'euro6', '1').total)} | ${fmt(lkwMautRates(w, 'euro6', '2').total)} | ${fmt(lkwMautRates(w, 'euro6', '3').total)} | ${fmt(lkwMautRates(w, 'euro6', '4').total)} |`)
+    .join('\n');
+  const cost100 = classes
+    .map((w) => `| ${LKW_WEIGHT_CLASS_LABELS[w]} | ${formatCurrency(lkwMautRates(w, 'euro6', '1').total * 100)} | ${formatCurrency(Math.round(lkwMautRates(w, 'euro6', '1').total * 500 * 100) / 100)} |`)
+    .join('\n');
+  return [
+    'Mautsatz in **Cent pro km** für EURO-VI-Fahrzeuge, berechnet als Summe der vier Mautteilsätze nach Anlage 1 BFStrMG. Ältere Schadstoffklassen zahlen einen höheren Luftverschmutzungsanteil – wählen Sie diese oben im Rechner aus.',
+    `| Gewichtsklasse | CO₂-Klasse 1 | CO₂-Klasse 2 | CO₂-Klasse 3 | CO₂-Klasse 4 |\n| --- | --- | --- | --- | --- |\n${rows}`,
+    '**Was kostet die Maut für 100 km und 500 km?** (EURO VI, CO₂-Klasse 1)',
+    `| Gewichtsklasse | 100 km | 500 km |\n| --- | --- | --- |\n${cost100}`,
+    'CO₂-Klasse 5 (emissionsfreie Fahrzeuge) ist bis zum 30. Juni 2031 mautbefreit. Die Werte sind eine Kalkulationshilfe; verbindlich ist die Abrechnung des Mautbetreibers, der jeden Mautabschnitt einzeln auf volle Cent rundet.',
+  ].join('\n\n');
+}
 
 export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   // ==================== AUTO & VERKEHR (18 ZUSÄTZLICHE) ====================
@@ -1685,67 +1843,102 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'LKW-Maut Deutschland',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'LKW-Maut Rechner Deutschland – Mautgebühren nach Euro-Klasse',
-    metaDescription: 'Berechnen Sie die deutsche LKW-Maut nach zulässiger Gesamtmasse (ab 3,5 t), Achszahl, Schadstoffklasse (Euro 6) und CO2-Emissionsklasse (Toll Collect).',
-    h1: 'LKW-Maut Rechner Deutschland – Mautsätze & Streckenkosten berechnen',
-    shortDescription: 'Ermittelt die Bundesfernstraßenmaut für schwere Nutzfahrzeuge ab 3,5 t mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['lkw maut rechner deutschland', 'toll collect mautsaetze pro kilometer', 'lkw maut ab 3 5 tonnen berechnen', 'co2 aufschlag lkw maut euro 6'],
+    metaTitle: 'LKW-Maut-Rechner: Kosten pro km nach Euro- & CO₂-Klasse',
+    metaDescription: 'LKW-Maut für Deutschland berechnen: Mautsatz pro km nach Gewicht, Achsen, Euro-Schadstoffklasse und CO₂-Klasse – mit Mauttabelle nach BFStrMG und Kosten für Ihre Strecke.',
+    h1: 'LKW-Maut berechnen: Mautsatz pro km und Kosten für Ihre Strecke',
+    shortDescription: 'Geben Sie die mautpflichtige Strecke, Gewichtsklasse und Achszahl, Euro-Schadstoffklasse und CO₂-Emissionsklasse ein. Der Rechner setzt den Mautsatz pro km aus den vier gesetzlichen Mautteilsätzen nach Anlage 1 BFStrMG zusammen und berechnet die Maut für Ihre Strecke.',
+    searchKeywords: ['lkw maut rechner deutschland', 'toll collect mautsaetze pro kilometer', 'lkw maut ab 3 5 tonnen berechnen', 'co2 aufschlag lkw maut euro 6', 'lkw maut berechnen', 'mautrechner lkw', 'lkw maut pro km', 'mauttabelle', 'was kostet 1 km lkw maut'],
     inputs: [
-      { id: 'distanceKm', label: 'Mautpflichtige Fahrtstrecke in km', type: 'number', defaultValue: 350, min: 10, max: 2500, step: 10, unit: 'km' },
+      { id: 'distanceKm', label: 'Mautpflichtige Fahrtstrecke in km', type: 'number', defaultValue: 350, min: 0, max: 5000, step: 10, unit: 'km', helpText: 'Nur Kilometer auf mautpflichtigen Bundesautobahnen und Bundesstraßen.' },
       {
         id: 'weightClass',
-        label: 'Gewichtsklasse / Fahrzeugtyp',
+        label: 'Technisch zulässige Gesamtmasse & Achszahl',
         type: 'select',
-        defaultValue: 'over18t_5axles',
+        defaultValue: 'over18t_5plusaxles',
         options: [
-          { value: 'from3_5to7_5', label: '3,5 t bis unter 7,5 t (ca. 17,8 ct/km)' },
-          { value: 'from7_5to12', label: '7,5 t bis unter 12 t (ca. 24,1 ct/km)' },
-          { value: 'from12to18', label: '12 t bis 18 t (ca. 27,8 ct/km)' },
-          { value: 'over18t_4axles', label: 'Über 18 t bis 3 Achsen (ca. 32,5 ct/km)' },
-          { value: 'over18t_5axles', label: 'Über 18 t ab 4 Achsen / Standard-Sattelzug (ca. 34,8 ct/km)' },
+          { value: 'from3_5to7_5', label: 'Mehr als 3,5 t bis unter 7,5 t' },
+          { value: 'from7_5to12', label: '7,5 t bis unter 12 t' },
+          { value: 'from12to18', label: '12 t bis einschließlich 18 t' },
+          { value: 'over18t_upto3axles', label: 'Über 18 t mit bis zu 3 Achsen' },
+          { value: 'over18t_4axles', label: 'Über 18 t mit 4 Achsen' },
+          { value: 'over18t_5plusaxles', label: 'Über 18 t mit 5 oder mehr Achsen (z. B. Sattelzug)' },
         ],
       },
-    ],
-    calculate: (inputs) => {
-      const km = parseFloat(inputs.distanceKm) || 350;
-      const type = inputs.weightClass || 'over18t_5axles';
-
-      const rates: Record<string, number> = {
-        from3_5to7_5: 0.178,
-        from7_5to12: 0.241,
-        from12to18: 0.278,
-        over18t_4axles: 0.325,
-        over18t_5axles: 0.348,
-      };
-      const rate = rates[type] || 0.348;
-      const totalMaut = km * rate;
-
-      return {
-        primary: { id: 'totalMaut', label: 'Gesamte LKW-Maut für die Strecke', value: totalMaut, formattedValue: formatCurrency(totalMaut), highlight: true },
-        secondary: [
-          { id: 'ratePerKm', label: 'Mautsatz pro Kilometer', value: rate * 100, formattedValue: `${formatNumber(rate * 100, 1)} ct/km` },
-          { id: 'distance', label: 'Mautstrecke', value: km, formattedValue: `${formatNumber(km, 0)} km` },
+      {
+        id: 'euroClass',
+        label: 'Schadstoffklasse',
+        type: 'select',
+        defaultValue: 'euro6',
+        options: [
+          { value: 'euro6', label: 'EURO VI' },
+          { value: 'euro5', label: 'EURO V oder EEV Klasse 1' },
+          { value: 'euro4', label: 'EURO IV' },
+          { value: 'euro3', label: 'EURO III' },
+          { value: 'euro2', label: 'EURO II' },
+          { value: 'euro1', label: 'EURO I oder keine Schadstoffklasse' },
         ],
-        summaryText: `Für die Fahrtstrecke von ${formatNumber(km, 0)} km fallen bei einem Mautsatz von ${formatNumber(rate * 100, 1)} ct/km Mautkosten in Höhe von ${formatCurrency(totalMaut)} an.`,
-      };
-    },
-    formula: 'Maut = Mautpflichtige Kilometer × Mautsatz je km (nach BFStrMG)',
-    formulaExplanation: 'Seit 1. Juli 2024 gilt die LKW-Maut in Deutschland bereits ab 3,5 Tonnen technisch zulässiger Gesamtmasse (tzGm). Handwerkerfahrzeuge können unter bestimmten Bedingungen befreit werden.',
-    workedExample: {
-      title: 'Beispiel: 350 km mit 40-Tonner Sattelzug (Euro 6)',
-      inputValues: [{ label: 'Strecke', value: '350 km' }, { label: 'Typ', value: 'Über 18 t / ab 4 Achsen' }],
-      steps: ['Mautsatz: 0,348 €/km', 'Kosten: 350 km × 0,348 € = 121,80 €'],
-      result: '121,80 € Mautgebühren',
-    },
+      },
+      {
+        id: 'co2Class',
+        label: 'CO₂-Emissionsklasse',
+        type: 'select',
+        defaultValue: '1',
+        options: [
+          { value: '1', label: 'CO₂-Klasse 1 (Standard für die meisten Diesel-LKW)' },
+          { value: '2', label: 'CO₂-Klasse 2' },
+          { value: '3', label: 'CO₂-Klasse 3' },
+          { value: '4', label: 'CO₂-Klasse 4 (emissionsarm)' },
+          { value: '5', label: 'CO₂-Klasse 5 (emissionsfrei, z. B. Elektro- oder Wasserstoff-LKW)' },
+        ],
+        helpText: 'Die CO₂-Klasse steht im Fahrzeugnachweis bzw. wird bei der Registrierung (z. B. bei Toll Collect) festgelegt.',
+      },
+    ],
+    calculate: calculateLkwMaut,
+    formula: 'Mautsatz je km = Infrastruktur + Luftverschmutzung + Lärm + CO₂ (Anlage 1 BFStrMG); Maut = Kilometer × Mautsatz',
+    formulaExplanation: 'Der Mautsatz setzt sich nach § 3 BFStrMG aus vier Mautteilsätzen zusammen: Infrastrukturkosten (nach Gewicht und Achszahl), Luftverschmutzung (nach Euro-Schadstoffklasse), Lärm sowie verkehrsbedingte CO₂-Emissionen (nach CO₂-Emissionsklasse). Toll Collect rechnet jeden Mautabschnitt einzeln und rundet je Abschnitt auf volle Cent; der Rechner multipliziert die Gesamtstrecke mit dem Mautsatz, kleine Rundungsunterschiede sind daher möglich.',
+    workedExample: buildLkwMautWorkedExample(),
+    quickReference: [
+      {
+        title: 'LKW-Maut pro km: Mauttabelle für EURO-VI-Fahrzeuge',
+        content: buildLkwMautQuickReference(),
+      },
+    ],
     content: {
-      intro: 'Die deutsche LKW-Maut nach dem Bundesfernstraßenmautgesetz (BFStrMG) erhebt streckenbezogene Gebühren gestaffelt nach Gewichtsklasse, Achszahl, Schadstoffklasse und CO₂-Emissionsklasse.',
-      details: 'Seit 2023/2024 gilt ein CO₂-Aufschlag von 200 € pro Tonne CO₂. Die Mautpflicht gilt für alle Nutzfahrzeuge ab 3,5 Tonnen technisch zulässiger Gesamtmasse auf allen Bundesautobahnen und Bundesstraßen.',
+      intro: 'Die deutsche LKW-Maut nach dem Bundesfernstraßenmautgesetz (BFStrMG) wird pro Kilometer auf Bundesautobahnen und Bundesstraßen erhoben. Mautpflichtig sind Fahrzeuge und Fahrzeugkombinationen für den Güterkraftverkehr mit mehr als 3,5 Tonnen technisch zulässiger Gesamtmasse.',
+      sections: [
+        {
+          title: 'So setzt sich der Mautsatz zusammen',
+          content: 'Nach § 3 BFStrMG ist der Mautsatz je Kilometer die Summe aus vier Mautteilsätzen, deren Höhe Anlage 1 des Gesetzes festlegt:\n\n- **Infrastrukturkosten:** abhängig von Gesamtmasse und Achszahl\n- **Luftverschmutzung:** abhängig von der Euro-Schadstoffklasse (EURO VI am günstigsten)\n- **Lärmbelastung:** abhängig von Gesamtmasse und Achszahl\n- **CO₂-Emissionen:** abhängig von der CO₂-Emissionsklasse 1 bis 5\n\nBeispiel Sattelzug über 18 t mit 5 Achsen, EURO VI, CO₂-Klasse 1: 15,5 + 2,3 + 1,2 + 15,8 = **34,8 Cent pro km**.',
+        },
+        {
+          title: 'Wer muss LKW-Maut zahlen?',
+          content: 'Mautpflichtig sind Kraftfahrzeuge und Fahrzeugkombinationen, die für den Güterkraftverkehr bestimmt sind oder verwendet werden und deren technisch zulässige Gesamtmasse **mehr als 3,5 Tonnen** beträgt. Bei Kombinationen zählt die Summe der Einzelfahrzeuge, die Mautpflicht besteht aber nur, wenn das Zugfahrzeug selbst mehr als 3,5 t hat.\n\nAusgenommen sind nach § 1 Abs. 2 BFStrMG unter anderem Kraftomnibusse, bestimmte Fahrzeuge von Behörden und Notdiensten, emissionsfreie schwere Nutzfahrzeuge bis 30. Juni 2031, emissionsfreie Fahrzeuge bis 4,25 t sowie Fahrzeuge unter 7,5 t, mit denen Handwerker nicht gewerblich Material, Ausrüstung oder selbst hergestellte Güter befördern.',
+        },
+        {
+          title: 'Wo finde ich die genauen Streckenkilometer?',
+          content: 'Die mautpflichtigen Abschnitte und ihre Längen veröffentlicht der Bund unter mauttabelle.de. Für eine Kalkulation reicht meist die Kilometerzahl der Route auf Autobahnen und Bundesstraßen; Strecken auf Landes- und Kommunalstraßen sind in der Regel nicht mautpflichtig.',
+        },
+      ],
+      details: 'Rechtsgrundlage: §§ 1 und 3 sowie Anlage 1 BFStrMG (Fassung BGBl. 2023 I Nr. 315). Der Rechner ersetzt nicht die verbindliche Mauterhebung durch den Betreiber.',
     },
     faqs: [
-      { question: 'Welche Ausnahmen gelten von der LKW-Maut ab 3,5 Tonnen?', answer: 'Handwerkerfahrzeuge unter 7,5 Tonnen sind über die Handwerkerprivileg-Regelung von der Maut befreit, wenn das Fahrzeug Material oder Güter für eigene handwerkliche Tätigkeiten transportiert.' },
-      { question: 'Sind emissionsfreie LKW (z. B. Elektro-LKW) mautbefreit?', answer: 'Ja, rein batterieelektrische und wasserstoffbetriebene LKW sind bis Ende 2025 vollständig von der LKW-Maut befreit und zahlen ab 2026 nur einen reduzierten Mautsatz für die Infrastruktur.' },
+      { question: 'Was kostet 1 km LKW-Maut?', answer: 'Das hängt von Gewicht, Achszahl, Schadstoff- und CO₂-Klasse ab. Für EURO-VI-Fahrzeuge der CO₂-Klasse 1 reicht der Mautsatz von 15,1 Cent pro km (3,5 bis unter 7,5 t) bis 34,8 Cent pro km (über 18 t mit 5 oder mehr Achsen).' },
+      { question: 'Welche Ausnahmen gelten von der LKW-Maut ab 3,5 Tonnen?', answer: 'Fahrzeuge unter 7,5 Tonnen sind befreit, wenn sie Material, Ausrüstung oder Maschinen befördern, die der Fahrer für sein Handwerk oder einen vergleichbaren Beruf benötigt, oder handwerklich hergestellte Güter ausliefern – jeweils nur, wenn die Beförderung nicht gewerblich erfolgt (§ 1 Abs. 2 Nr. 10 BFStrMG).' },
+      { question: 'Sind emissionsfreie LKW (z. B. Elektro-LKW) mautbefreit?', answer: 'Ja. Emissionsfreie schwere Nutzfahrzeuge sind nach § 1 Abs. 2 Nr. 7 BFStrMG bis zum 30. Juni 2031 von der Maut befreit; emissionsfreie Fahrzeuge bis 4,25 t technisch zulässiger Gesamtmasse sind ebenfalls ausgenommen.' },
+      { question: 'Warum weicht die Maut von Toll Collect leicht ab?', answer: 'Toll Collect berechnet jeden Mautabschnitt einzeln und rundet je Abschnitt auf volle Cent. Der Rechner multipliziert die Gesamtstrecke mit dem Mautsatz. Dadurch können wenige Cent Unterschied entstehen.' },
     ],
     relatedSlugs: ['spritkostenrechner', 'fahrtkostenrechner', 'autobahn-maut-rechner-vignette'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'Bundesfernstraßenmautgesetz (BFStrMG), Anlage 1 – Berechnung der Höhe des Mautsatzes',
+      sourceUrl: 'https://www.gesetze-im-internet.de/bfstrmg/anlage_1.html',
+      lastVerified: '2026-10-25',
+    },
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+      methodology: 'Mautsatz je km als Summe der vier Mautteilsätze nach Anlage 1 BFStrMG; Maut = mautpflichtige Kilometer × Mautsatz, kaufmännisch auf volle Cent gerundet.',
+    },
   },
 
   // ==================== ARBEIT & GEHALT (21 ZUSÄTZLICHE) ====================
@@ -1821,84 +2014,6 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       year: 2026,
       source: 'Bundesagentur für Arbeit (§ 105 SGB III)',
       sourceUrl: 'https://www.arbeitsagentur.de',
-      lastVerified: '2026-01-15',
-    },
-  },
-
-  {
-    id: 'abfindung-fuenftelregelung-rechner',
-    slug: 'abfindung-fuenftelregelung-rechner',
-    name: 'Abfindungsrechner mit Fünftelregelung (§ 34 EStG)',
-    shortName: 'Abfindungsrechner Fünftelregelung',
-    category: 'arbeit-gehalt',
-    subcategory: 'Gehalt & Netto',
-    metaTitle: 'Abfindungsrechner Fünftelregelung: Steuer & Netto',
-    metaDescription: 'Berechnen Sie die Steuerlast auf Ihre Abfindung mit der ermäßigten Fünftelregelung nach § 34 EStG. Sehen Sie, wie viel Netto von der Abfindung bleibt.',
-    h1: 'Abfindungsrechner – Abfindung versteuern mit Fünftelregelung',
-    shortDescription: 'Ermittelt die Steuerersparnis bei Abfindungen durch die Fünftelregelung für außerordentliche Einkünfte.',
-    searchKeywords: ['abfindungsrechner fuenftelregelung', 'paragraph 34 estg abfindung rechner', 'wie viel netto bleibt von abfindung', 'abfindung steuer optimieren'],
-    inputs: [
-      { id: 'regularYearlyIncome', label: 'Reguläres zu versteuerndes Jahreseinkommen (ohne Abfindung)', type: 'number', defaultValue: 45000, min: 0, step: 2500, unit: '€' },
-      { id: 'severancePay', label: 'Vereinbarte Brutto-Abfindung', type: 'number', defaultValue: 30000, min: 0, step: 2500, unit: '€' },
-    ],
-    calculate: (inputs) => {
-      const income = inputs.regularYearlyIncome !== undefined && inputs.regularYearlyIncome !== '' ? Math.max(0, parseFloat(inputs.regularYearlyIncome) || 0) : 45000;
-      const severance = inputs.severancePay !== undefined && inputs.severancePay !== '' ? Math.max(0, parseFloat(inputs.severancePay) || 0) : 30000;
-
-      // Vereinfachte Schätzung der Einkommensteuer-Tariffunktion ESt
-      const est = (zvE: number) => {
-        if (zvE <= 11784) return 0;
-        if (zvE <= 17005) { const y = (zvE - 11784) / 10000; return (995.21 * y + 1400) * y; }
-        if (zvE <= 66760) { const z = (zvE - 17005) / 10000; return (208.85 * z + 2397) * z + 1015; }
-        if (zvE <= 277825) return 0.42 * zvE - 10632;
-        return 0.45 * zvE - 18967;
-      };
-
-      const taxBase = est(income);
-      // 1. Reguläre Besteuerung ohne Fünftelregelung
-      const taxWithSeveranceFull = est(income + severance);
-      const taxOnSeveranceRegular = taxWithSeveranceFull - taxBase;
-
-      // 2. Fünftelregelung nach § 34 Abs. 1 EStG
-      const taxWithOneFifth = est(income + (severance / 5));
-      const taxOnOneFifth = taxWithOneFifth - taxBase;
-      const taxSeveranceFünftel = taxOnOneFifth * 5;
-
-      const taxSaving = Math.max(0, taxOnSeveranceRegular - taxSeveranceFünftel);
-      const netSeverance = severance - taxSeveranceFünftel;
-
-      return {
-        primary: { id: 'netSeverance', label: 'Netto-Auszahlung der Abfindung', value: netSeverance, formattedValue: formatCurrency(netSeverance), highlight: true },
-        secondary: [
-          { id: 'taxSeveranceFünftel', label: 'Steuer auf Abfindung (mit Fünftelregelung)', value: taxSeveranceFünftel, formattedValue: formatCurrency(taxSeveranceFünftel) },
-          { id: 'taxSaving', label: 'Steuerersparnis durch Fünftelregelung', value: taxSaving, formattedValue: formatCurrency(taxSaving) },
-          { id: 'taxRegular', label: 'Steuer ohne Fünftelregelung (Vergleich)', value: taxOnSeveranceRegular, formattedValue: formatCurrency(taxOnSeveranceRegular) },
-        ],
-        summaryText: `Von ${formatCurrency(severance)} Abfindung bleiben dank der Fünftelregelung netto ca. ${formatCurrency(netSeverance)} übrig. Sie sparen dadurch rund ${formatCurrency(taxSaving)} Einkommensteuer.`,
-      };
-    },
-    formula: 'Steuer = 5 × [Tarif(Einkommen + Abfindung/5) - Tarif(Einkommen)]',
-    formulaExplanation: 'Die Fünftelregelung nach § 34 EStG mildert die Steuerprogression bei Einmalzahlungen, indem die Abfindung rechnerisch auf fünf Jahre verteilt besteuert wird.',
-    workedExample: {
-      title: 'Beispiel: 30.000 € Abfindung bei 45.000 € Grundgehalt',
-      inputValues: [{ label: 'Jahreseinkommen', value: '45.000 €' }, { label: 'Abfindung', value: '30.000 €' }],
-      steps: ['Steuer auf 1/5 (6.000 €) ermitteln', 'Differenz mit 5 multiplizieren', 'Ersparnis gegenüber Vollprogression: meist mehrere tausend Euro'],
-      result: 'ca. 18.000 € bis 20.000 € Netto-Auszahlung',
-    },
-    content: {
-      intro: 'Die steuerliche Fünftelregelung (§ 34 EStG) mildert die Progression ab, wenn eine Abfindung nach Beendigung des Arbeitsverhältnisses in einer Summe ausgezahlt wird.',
-      details: 'Steuer = 5 · [Einkommensteuer(Reguläres Einkommen + Abfindung / 5) - Einkommensteuer(Reguläres Einkommen)]. Voraussetzung ist, dass es sich um eine echte Zusammenballung von Einkünften handelt.',
-    },
-    faqs: [
-      { question: 'Gibt es einen gesetzlichen Anspruch auf eine Abfindung bei Kündigung?', answer: 'Grundsätzlich nein; ein Anspruch besteht nur bei Vereinbarung im Aufhebungsvertrag, nach § 1a KSchG bei betriebsbedingter Kündigung oder im Rahmen eines gerichtlichen Vergleichs.' },
-      { question: 'Wie hoch ist die übliche Regelabfindung nach Kündigungsschutzgesetz?', answer: 'Als Faustformel gilt nach § 1a Abs. 2 KSchG ein halbes Bruttomonatsgehalt pro vollem Beschäftigungsjahr (Faktor 0,5).' },
-    ],
-    relatedSlugs: ['kuendigungsfrist-arbeitnehmer-rechner', 'teilzeit-gehaltsrechner', 'urlaubsabgeltung-rechner'],
-    isTimeSensitive: true,
-    timeSensitiveMeta: {
-      year: 2026,
-      source: 'Einkommensteuergesetz (§ 34 EStG Außerordentliche Einkünfte)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
       lastVerified: '2026-01-15',
     },
   },
@@ -2212,7 +2327,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Gilt die verlängerte Kündigungsfrist automatisch auch für den Arbeitnehmer?', answer: 'Nein, nach § 622 Abs. 2 BGB gilt die Staffelung nur für Kündigungen durch den Arbeitgeber, es sei denn, im Arbeitsvertrag wurde ausdrücklich dieselbe Verlängerung für beide Seiten vereinbart.' },
       { question: 'Bis wann muss eine Kündigung zugehen?', answer: 'Die Kündigung muss dem Empfänger spätestens am letzten Tag vor Beginn der Kündigungsfrist nachweisbar zugegangen sein (Schriftformerfordernis mit Originalunterschrift, § 623 BGB).' },
     ],
-    relatedSlugs: ['abfindung-fuenftelregelung-rechner', 'urlaubsabgeltung-rechner', 'arbeitslosengeld-1-rechner'],
+    relatedSlugs: ['abfindungsrechner', 'urlaubsabgeltung-rechner', 'arbeitslosengeld-1-rechner'],
   },
 
   {
@@ -3093,7 +3208,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Darf der Arbeitgeber verlangen, dass der Urlaub vor dem Austritt genommen wird?', answer: 'Ja, der Arbeitgeber kann den Mitarbeiter unter Anrechnung auf die verbleibenden Urlaubstage unwiderruflich von der Arbeit freistellen; die Barabgeltung greift nur für unverbrauchte Tage.' },
       { question: 'Unterliegt die Urlaubsabgeltung der Steuer- und Sozialversicherungspflicht?', answer: 'Ja, als sonstiger Bezug wird die Urlaubsabgeltung wie ein Einmalbezug voll lohnsteuer- und beitragspflichtig abgerechnet.' },
     ],
-    relatedSlugs: ['urlaubstage-rechner', 'kuendigungsfrist-arbeitnehmer-rechner', 'abfindung-fuenftelregelung-rechner'],
+    relatedSlugs: ['urlaubstage-rechner', 'kuendigungsfrist-arbeitnehmer-rechner', 'abfindungsrechner'],
   },
 
   {
