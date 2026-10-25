@@ -1,6 +1,17 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
+import { DUESSELDORFER_TABELLE_2026, getDtEinkommensgruppe, getDtTabellenbetrag, DtAltersstufe } from '@/data/regulated/unterhalt/duesseldorferTabelle2026';
+
+// Unterhalt 2026: Mindestunterhalt (MUV) und Düsseldorfer Tabelle 2026; Kindergeld aus der Steuer-Konfiguration (§ 66 Abs. 1 EStG: 259 €)
+const DT_2026 = DUESSELDORFER_TABELLE_2026;
+const KINDERGELD_2026 = getTaxConfig(2026).kindergeldMonat;
+// § 2 Abs. 1 und 2 UVG: Mindestunterhalt der Altersstufe abzüglich des vollen Kindergeldes für ein erstes Kind
+const UVG_2026 = {
+  age0_5: DT_2026.mindestbedarf[1] - KINDERGELD_2026,
+  age6_11: DT_2026.mindestbedarf[2] - KINDERGELD_2026,
+  age12_17: DT_2026.mindestbedarf[3] - KINDERGELD_2026,
+};
 
 export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   // ==================== GESUNDHEIT & FITNESS (21 ZUSÄTZLICHE) ====================
@@ -1764,9 +1775,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'age6_11',
         options: [
-          { value: 'age0_5', label: '0 bis 5 Jahre (1. Altersstufe: 230 €/Monat)' },
-          { value: 'age6_11', label: '6 bis 11 Jahre (2. Altersstufe: 301 €/Monat)' },
-          { value: 'age12_17', label: '12 bis 17 Jahre (3. Altersstufe: 395 €/Monat)' },
+          { value: 'age0_5', label: `0 bis 5 Jahre (1. Altersstufe: ${UVG_2026.age0_5} €/Monat)` },
+          { value: 'age6_11', label: `6 bis 11 Jahre (2. Altersstufe: ${UVG_2026.age6_11} €/Monat)` },
+          { value: 'age12_17', label: `12 bis 17 Jahre (3. Altersstufe: ${UVG_2026.age12_17} €/Monat)` },
         ],
       },
       { id: 'partialPayment', label: 'Vom anderen Elternteil tatsächlich gezahlter Teilunterhalt', type: 'number', defaultValue: 0, min: 0, max: 600, step: 25, unit: '€' },
@@ -1775,13 +1786,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const group = inputs.childAgeGroup || 'age6_11';
       const paid = parseFloat(inputs.partialPayment) || 0;
 
-      // Gesetzliche UVG-Sätze 2026 (Mindestunterhalt abzüglich volles Kindergeld):
-      // 0-5 Jahre: ca. 230 €
-      // 6-11 Jahre: ca. 301 €
-      // 12-17 Jahre: ca. 395 €
-      let standardRate = 301;
-      if (group === 'age0_5') standardRate = 230;
-      if (group === 'age12_17') standardRate = 395;
+      // UVG-Sätze 2026 = Mindestunterhalt (486 / 558 / 653 €) − volles Kindergeld (259 €) = 227 / 299 / 394 €
+      // (§ 2 UVG; Beträge bestätigt im BMBFSFJ-Einleger „Leistungen für Alleinerziehende 2026“)
+      let standardRate = UVG_2026.age6_11;
+      if (group === 'age0_5') standardRate = UVG_2026.age0_5;
+      if (group === 'age12_17') standardRate = UVG_2026.age12_17;
 
       const payout = Math.max(0, standardRate - paid);
 
@@ -1800,12 +1809,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     workedExample: {
       title: 'Beispiel: 8-jähriges Kind, Vater zahlt keinen Unterhalt',
       inputValues: [{ label: 'Alter', value: '8 Jahre (2. Stufe)' }, { label: 'Zahlung Pflichtiger', value: '0 €' }],
-      steps: ['2. Altersstufe (6-11 Jahre) = 301,00 €', 'Keine Anrechnung', 'Voller Anspruch = 301,00 €/Monat'],
-      result: '301,00 € monatlich',
+      steps: ['Mindestunterhalt 2. Altersstufe (6–11 Jahre) = 558,00 €', 'Abzug volles Kindergeld = 259,00 €', 'Voller Anspruch = 299,00 €/Monat (keine Zahlung des anderen Elternteils)'],
+      result: '299,00 € monatlich',
     },
     content: {
       intro: 'Der Unterhaltsvorschuss nach dem UVG springt ein, wenn der barunterhaltspflichtige Elternteil keinen oder unregelmäßigen Unterhalt für das Kind leistet.',
-      details: 'Die Höhe richtet sich nach dem gesetzlichen Mindestunterhalt abzüglich des vollen Kindergeldes für ein erstes Kind und staffelt sich in drei Altersstufen (0–5 Jahre, 6–11 Jahre, 12–17 Jahre).',
+      details: 'Die Höhe richtet sich nach dem gesetzlichen Mindestunterhalt abzüglich des vollen Kindergeldes für ein erstes Kind (§ 2 UVG). 2026 beträgt der Mindestunterhalt 486 € / 558 € / 653 € und das Kindergeld 259 €; daraus ergeben sich 227 € (0–5 Jahre), 299 € (6–11 Jahre) und 394 € (12–17 Jahre) im Monat.',
     },
     faqs: [
       { question: 'Bis zu welchem Alter wird Unterhaltsvorschuss gezahlt?', answer: 'Bis zum 18. Lebensjahr des Kindes; für Kinder von 12 bis 17 Jahren jedoch nur, wenn das Kind nicht auf Bürgergeld angewiesen ist oder der alleinerziehende Elternteil mind. 600 € brutto verdient.' },
@@ -1815,9 +1824,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Unterhaltsvorschussgesetz (UVG) / BMFSFJ',
-      sourceUrl: 'https://www.bmfsfj.de',
-      lastVerified: '2026-01-15',
+      source: '§ 2 UVG i. V. m. § 1 Mindestunterhaltsverordnung (BGBl. 2024 I Nr. 359) und § 66 EStG; BMBFSFJ, Leistungen für Alleinerziehende 2026',
+      sourceUrl: 'https://www.bmbfsfj.bund.de/resource/blob/256052/2b19e389612f4244069d5b1a686e82f8/einlegeblatt-leistungen-fuer-alleinerziehende-2026-data.pdf',
+      lastVerified: '2026-10-25',
     },
   },
 
@@ -1844,81 +1853,90 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           { value: 'group1', label: '0 bis 5 Jahre (1. Altersstufe)' },
           { value: 'group2', label: '6 bis 11 Jahre (2. Altersstufe)' },
           { value: 'group3', label: '12 bis 17 Jahre (3. Altersstufe)' },
-          { value: 'group4', label: 'Ab 18 Jahre / Volljährig (4. Altersstufe)' },
+          { value: 'group4', label: 'Ab 18 Jahre, wohnt bei einem Elternteil (4. Altersstufe)' },
+        ],
+      },
+      {
+        id: 'payerEmployed',
+        label: 'Ist der Unterhaltspflichtige erwerbstätig?',
+        type: 'select',
+        defaultValue: 'yes',
+        options: [
+          { value: 'yes', label: 'Ja (notwendiger Selbstbehalt 1.450 €)' },
+          { value: 'no', label: 'Nein (notwendiger Selbstbehalt 1.200 €)' },
         ],
       },
     ],
     calculate: (inputs) => {
       const net = parseFloat(inputs.netIncomeAdjusted) || 2700;
       const group = inputs.childAgeCategory || 'group2';
+      const employed = inputs.payerEmployed !== 'no';
+      const isAdult = group === 'group4';
+      const altersstufe = ({ group1: 1, group2: 2, group3: 3, group4: 4 } as Record<string, DtAltersstufe>)[group] ?? 2;
 
-      // Einkommensgruppe 1 bis 15 nach Düsseldorfer Tabelle:
-      // Stufe 1: bis 2.100 € (100 %)
-      // Stufe 2: 2.101 - 2.500 € (105 %)
-      // Stufe 3: 2.501 - 2.900 € (110 %)
-      // Stufe 4: 2.901 - 3.300 € (115 %)
-      // Stufe 5: 3.301 - 3.700 € (120 %)
-      let pct = 1.10;
-      if (net <= 2100) pct = 1.00;
-      else if (net <= 2500) pct = 1.05;
-      else if (net <= 2900) pct = 1.10;
-      else if (net <= 3300) pct = 1.15;
-      else if (net <= 3700) pct = 1.20;
-      else if (net <= 4100) pct = 1.28;
-      else pct = 1.36;
+      // Einkommensgruppe 1–15 und Tabellenbetrag nach Düsseldorfer Tabelle 2026 (Mindestbedarf × Prozentsatz, aufgerundet)
+      const einkommensgruppe = getDtEinkommensgruppe(net);
+      const tabellenbetrag = getDtTabellenbetrag(altersstufe, einkommensgruppe.prozent);
 
-      // Mindestunterhalt (100%):
-      // 0-5 Jahre: ca. 480 €
-      // 6-11 Jahre: ca. 551 €
-      // 12-17 Jahre: ca. 645 €
-      // ab 18: ca. 689 €
-      let baseUnder100 = 551;
-      if (group === 'group1') baseUnder100 = 480;
-      if (group === 'group3') baseUnder100 = 645;
-      if (group === 'group4') baseUnder100 = 689;
+      // Kindergeldanrechnung nach § 1612b BGB: hälftig bei Minderjährigen (2026: 259 € ÷ 2 = 129,50 €), voll bei Volljährigen (259 €)
+      const kindergeldDeduction = isAdult ? KINDERGELD_2026 : KINDERGELD_2026 / 2;
+      const zahlbetragTabelle = Math.max(0, tabellenbetrag - kindergeldDeduction);
 
-      const tabellenbetrag = Math.round(baseUnder100 * pct);
-      // Kindergeldanrechnung: Bei Minderjährigen wird das halbe Kindergeld (125 €) abgezogen, bei Volljährigen das volle Kindergeld (250 €)
-      const kindergeldDeduction = group === 'group4' ? 250 : 125;
-      const zahlbetrag = Math.max(0, tabellenbetrag - kindergeldDeduction);
-
-      // Notwendiger Eigenbedarf (Selbstbehalt): ca. 1.450 € bei Erwerbstätigen
-      const selbstbehalt = 1450;
+      // Selbstbehalt (DT 2026 Anm. A.VII): notwendig 1.450 € / 1.200 € gegenüber Minderjährigen,
+      // angemessen 1.750 € gegenüber nicht privilegierten volljährigen Kindern
+      const selbstbehalt = isAdult
+        ? DT_2026.selbstbehaltAngemessen
+        : employed ? DT_2026.selbstbehaltNotwendigErwerbstaetig : DT_2026.selbstbehaltNotwendigNichtErwerbstaetig;
+      const zahlbetrag = Math.min(zahlbetragTabelle, Math.max(0, net - selbstbehalt));
+      const mangelfall = zahlbetrag < zahlbetragTabelle;
       const remainingForPayer = net - zahlbetrag;
+      const kindergeldText = isAdult ? 'des vollen Kindergeldes' : 'des halben Kindergeldes';
 
       return {
-        primary: { id: 'zahlbetrag', label: 'Tatsächlicher Zahlbetrag nach Kindergeldabzug', value: zahlbetrag, formattedValue: formatCurrency(zahlbetrag), highlight: true },
+        primary: { id: 'zahlbetrag', label: 'Zahlbetrag nach Kindergeldabzug und Selbstbehalt', value: zahlbetrag, formattedValue: formatCurrency(zahlbetrag), highlight: true },
         secondary: [
-          { id: 'tabellenbetrag', label: 'Tabellenunterhalt nach Düsseldorfer Tabelle', value: tabellenbetrag, formattedValue: formatCurrency(tabellenbetrag) },
-          { id: 'kindergeldDeduction', label: 'Kindergeldanrechnung', value: kindergeldDeduction, formattedValue: formatCurrency(kindergeldDeduction) },
+          { id: 'einkommensgruppe', label: 'Einkommensgruppe (Prozentsatz)', value: einkommensgruppe.gruppe, formattedValue: `${einkommensgruppe.gruppe} (${einkommensgruppe.prozent} %)` },
+          { id: 'tabellenbetrag', label: 'Tabellenunterhalt (Bedarf) nach Düsseldorfer Tabelle 2026', value: tabellenbetrag, formattedValue: formatCurrency(tabellenbetrag) },
+          { id: 'kindergeldDeduction', label: isAdult ? 'Kindergeldanrechnung (volles Kindergeld)' : 'Kindergeldanrechnung (halbes Kindergeld)', value: kindergeldDeduction, formattedValue: formatCurrency(kindergeldDeduction) },
+          { id: 'zahlbetragTabelle', label: 'Zahlbetrag laut Tabelle (vor Selbstbehalt-Prüfung)', value: zahlbetragTabelle, formattedValue: formatCurrency(zahlbetragTabelle) },
+          { id: 'selbstbehalt', label: 'Selbstbehalt des Unterhaltspflichtigen', value: selbstbehalt, formattedValue: formatCurrency(selbstbehalt) },
+          { id: 'bedarfskontrollbetrag', label: 'Bedarfskontrollbetrag der Einkommensgruppe', value: einkommensgruppe.bedarfskontrollbetrag, formattedValue: formatCurrency(einkommensgruppe.bedarfskontrollbetrag) },
           { id: 'remainingForPayer', label: 'Verbleibendes Einkommen des Pflichtigen', value: remainingForPayer, formattedValue: formatCurrency(remainingForPayer) },
         ],
-        summaryText: `Bei einem bereinigten Netto von ${formatCurrency(net)} beträgt der Tabellenbetrag ${formatCurrency(tabellenbetrag)}. Nach Abzug des halben Kindergeldes zahlt der Elternteil monatlich ${formatCurrency(zahlbetrag)} Kindesunterhalt.`,
+        summaryText: mangelfall
+          ? `Bei einem bereinigten Netto von ${formatCurrency(net)} ergäbe die Tabelle nach Abzug ${kindergeldText} einen Zahlbetrag von ${formatCurrency(zahlbetragTabelle)}. Wegen des Selbstbehalts von ${formatCurrency(selbstbehalt)} kann der Elternteil aber nur ${formatCurrency(zahlbetrag)} monatlich zahlen (Mangelfall).`
+          : `Bei einem bereinigten Netto von ${formatCurrency(net)} (Einkommensgruppe ${einkommensgruppe.gruppe}) beträgt der Tabellenbetrag ${formatCurrency(tabellenbetrag)}. Nach Abzug ${kindergeldText} (${formatCurrency(kindergeldDeduction)}) zahlt der Elternteil monatlich ${formatCurrency(zahlbetrag)} Kindesunterhalt.`,
       };
     },
-    formula: 'Zahlbetrag = Tabellenbetrag nach Einkommensgruppe - Kindergeldanteil (50 % bzw. 100 %)',
-    formulaExplanation: 'Die Düsseldorfer Tabelle des Oberlandesgerichts Düsseldorf dient bundesweit als anerkannte Richtlinie für die Bemessung des Kindesunterhalts.',
+    formula: 'Zahlbetrag = Mindestbedarf × Prozentsatz der Einkommensgruppe (aufgerundet) − Kindergeldanteil (2026: 129,50 € bzw. 259 €), höchstens Einkommen − Selbstbehalt',
+    formulaExplanation: 'Die Düsseldorfer Tabelle des Oberlandesgerichts Düsseldorf dient bundesweit als anerkannte Richtlinie für die Bemessung des Kindesunterhalts. Die 1. Einkommensgruppe entspricht dem gesetzlichen Mindestunterhalt; die höheren Gruppen liegen 5 bis 100 % darüber.',
     workedExample: {
-      title: 'Beispiel: 2.700 € bereinigtes Netto, Kind 8 Jahre alt (Stufe 3 = 110 %)',
-      inputValues: [{ label: 'Netto', value: '2.700 €' }, { label: 'Kind', value: '8 Jahre (Stufe 2)' }],
-      steps: ['110 % von 551 € = 606,10 € Tabellenbetrag', 'Abzug halbes Kindergeld (125 €) = 481,10 €', 'Zahlbetrag = 481,00 € monatlich'],
-      result: '481,00 € monatlicher Zahlbetrag',
+      title: 'Beispiel: 2.700 € bereinigtes Netto, Kind 8 Jahre alt (Einkommensgruppe 3 = 110 %)',
+      inputValues: [{ label: 'Netto', value: '2.700 €' }, { label: 'Kind', value: '8 Jahre (2. Altersstufe)' }],
+      steps: [
+        'Mindestunterhalt 2. Altersstufe 2026 = 558 €',
+        '110 % von 558 € = 613,80 € → aufgerundet 614 € Tabellenbetrag',
+        'Abzug halbes Kindergeld (259 € ÷ 2 = 129,50 €) = 484,50 €',
+        'Selbstbehalt 1.450 € bleibt gewahrt (2.700 € − 484,50 € = 2.215,50 €)',
+      ],
+      result: '484,50 € monatlicher Zahlbetrag',
     },
     content: {
       intro: 'Die Düsseldorfer Tabelle ist die bundesweit von allen Familiengerichten anerkannte Richtlinie zur Bemessung des Kindesunterhalts bei Trennung und Scheidung.',
-      details: 'Der Unterhaltsbetrag bestimmt sich aus dem bereinigten Nettoeinkommen des Unterhaltspflichtigen (15 Einkommensgruppen) und dem Alter des Kindes (4 Altersstufen). Das hälftige Kindergeld wird bedarfsmindernd abgezogen.',
+      details: 'Der Unterhaltsbetrag bestimmt sich aus dem bereinigten Nettoeinkommen des Unterhaltspflichtigen (15 Einkommensgruppen von bis 2.100 € bis 11.200 €) und dem Alter des Kindes (4 Altersstufen). Seit dem 01.01.2026 beträgt der Mindestunterhalt 486 € (0–5 Jahre), 558 € (6–11 Jahre) und 653 € (12–17 Jahre); volljährige Kinder im Haushalt eines Elternteils haben einen Bedarf von mindestens 698 €. Bei Minderjährigen wird das halbe Kindergeld (2026: 129,50 €), bei Volljährigen das volle Kindergeld (259 €) abgezogen. Die Tabelle ist auf zwei Unterhaltsberechtigte zugeschnitten: Bei nur einem Kind ist eine Höhergruppierung möglich, bei mehr Kindern eine Herabstufung. Bei volljährigen Kindern richtet sich der Bedarf nach dem zusammengerechneten Einkommen beider Eltern.',
     },
     faqs: [
-      { question: 'Was ist der Selbstbehalt (Eigenbedarf) des Unterhaltspflichtigen?', answer: 'Der notwendige Eigenbedarf schützt das Existenzminimum des Barunterhaltspflichtigen: Er beträgt für erwerbstätige Unterhaltspflichtige gegenüber minderjährigen Kindern derzeit 1.450 € monatlich.' },
-      { question: 'Wie wird das bereinigte Nettoeinkommen ermittelt?', answer: 'Vom Brutto werden Steuern, Sozialabgaben, berufsbedingte Aufwendungen (pauschal 5 % bis max. 150 €) und vorrangige berücksichtigungsfähige Verbindlichkeiten abgezogen.' },
+      { question: 'Was ist der Selbstbehalt (Eigenbedarf) des Unterhaltspflichtigen?', answer: 'Der notwendige Selbstbehalt gegenüber minderjährigen (und privilegierten volljährigen) Kindern beträgt 2026 unverändert 1.450 € für Erwerbstätige und 1.200 € für Nichterwerbstätige (darin bis 520 € Warmmiete). Gegenüber anderen volljährigen Kindern gilt der angemessene Selbstbehalt von mindestens 1.750 €.' },
+      { question: 'Wie wird das bereinigte Nettoeinkommen ermittelt?', answer: 'Vom Brutto werden Steuern, Sozialabgaben, angemessene Altersvorsorge, konkret nachgewiesene berufsbedingte Aufwendungen (z. B. Fahrtkosten) und berücksichtigungsfähige Schulden abgezogen. Eine Pauschale von 5 % für berufsbedingte Aufwendungen sehen die NRW-Leitlinien 2026 in der Regel nur noch bei fiktivem Einkommen vor.' },
+      { question: 'Wie viel Kindergeld wird 2026 auf den Kindesunterhalt angerechnet?', answer: 'Das Kindergeld beträgt 2026 259 € je Kind. Bei minderjährigen Kindern wird die Hälfte (129,50 €) vom Tabellenbetrag abgezogen, bei volljährigen Kindern das volle Kindergeld (§ 1612b BGB).' },
     ],
     relatedSlugs: ['unterhaltsvorschuss-rechner', 'ehegattenunterhalt-trennungsunterhalt-rechner', 'kindergeld-rechner-2026', 'unterhalt-volljaehrige-kinder-rechner', 'ausbildungsunterhalt-bedarfskontrollbetrag-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Oberlandesgericht Düsseldorf (Düsseldorfer Tabelle)',
-      sourceUrl: 'https://www.olg-duesseldorf.nrw.de',
-      lastVerified: '2026-01-15',
+      source: 'OLG Düsseldorf, Düsseldorfer Tabelle Stand 01.01.2026 (mit Zahlbetragstabelle); Mindestunterhaltsverordnung (BGBl. 2024 I Nr. 359); Kindergeld § 66 EStG',
+      sourceUrl: DT_2026.sourceUrl,
+      lastVerified: '2026-10-25',
     }
   },
 
@@ -2873,10 +2891,10 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'familie-schwangerschaft',
     subcategory: 'Elterngeld & Finanzen',
     metaTitle: 'Unterhalt volljährige Kinder Rechner 2026 – Studium',
-    metaDescription: 'Berechnen Sie den Unterhaltsanspruch für volljährige Kinder (Studenten, Azubis) nach der Düsseldorfer Tabelle 2026 (fester Regelsatz 930 € bei eigener.',
+    metaDescription: 'Berechnen Sie den Unterhaltsanspruch volljähriger Kinder in Studium oder Ausbildung nach der Düsseldorfer Tabelle 2026 (990 € Bedarf bei eigener Wohnung).',
     h1: 'Unterhalt für volljährige Kinder – Studentenunterhalt berechnen',
     shortDescription: 'Ermittelt den Unterhaltsbedarf von volljährigen Kindern mit eigenem Hausstand mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['unterhalt volljaehrige kinder rechner', 'studentenunterhalt 930 euro duesseldorfer tabelle', 'unterhalt student eigene wohnung berechnen', 'haftungsquote eltern volljahrigenunterhalt'],
+    searchKeywords: ['unterhalt volljaehrige kinder rechner', 'studentenunterhalt 990 euro duesseldorfer tabelle', 'unterhalt student eigene wohnung berechnen', 'haftungsquote eltern volljahrigenunterhalt'],
     inputs: [
       {
         id: 'livingArrangement',
@@ -2884,50 +2902,63 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'own_household',
         options: [
-          { value: 'own_household', label: 'Eigene Wohnung / WG / Studentenwohnheim (fester Satz: 930 €/Monat)' },
+          { value: 'own_household', label: 'Eigene Wohnung / WG / Studentenwohnheim (Regelbedarf: 990 €/Monat)' },
           { value: 'with_parents', label: 'Wohnt noch bei einem Elternteil (4. Altersstufe nach Tabelle)' },
         ],
       },
+      { id: 'parentsCombinedNet', label: 'Bereinigtes Nettoeinkommen beider Eltern zusammen', type: 'number', defaultValue: 3000, min: 0, step: 100, unit: '€', dependsOn: { field: 'livingArrangement', value: 'with_parents' } },
       { id: 'childOwnIncome', label: 'Eigenes Einkommen des Kindes (z. B. BAföG, Minijob, Ausbildungsvergütung)', type: 'number', defaultValue: 0, min: 0, max: 1500, step: 50, unit: '€' },
     ],
     calculate: (inputs) => {
       const isOwn = inputs.livingArrangement === 'own_household';
       const ownIncome = inputs.childOwnIncome !== undefined && inputs.childOwnIncome !== '' ? Math.max(0, parseFloat(inputs.childOwnIncome) || 0) : 0;
+      const parentsNet = inputs.parentsCombinedNet !== undefined && inputs.parentsCombinedNet !== '' ? Math.max(0, parseFloat(inputs.parentsCombinedNet) || 0) : 3000;
 
-      // Düsseldorfer Tabelle: Fester Bedarf für Studenten mit eigenem Hausstand = 930 € (inkl. 410 € Warmmiete)
-      const baseNeed = isOwn ? 930 : 689;
-      // Bei Volljährigen wird das volle Kindergeld (250 €) in voller Höhe bedarfsdeckend abgezogen!
-      const kindergeldDeduction = 250;
+      // DT 2026 Anm. A.IV / Leitlinien NRW 13.1: eigener Haushalt 990 € (inkl. bis 440 € Warmmiete);
+      // im Elternhaus 4. Altersstufe nach dem zusammengerechneten Einkommen beider Eltern (ohne Höhergruppierung)
+      const einkommensgruppe = getDtEinkommensgruppe(parentsNet);
+      const baseNeed = isOwn ? DT_2026.bedarfEigenerHaushalt : getDtTabellenbetrag(4, einkommensgruppe.prozent);
+      // Bei Volljährigen wird das volle Kindergeld bedarfsdeckend abgezogen (§ 1612b Abs. 1 Nr. 2 BGB; 2026: 259 €)
+      const kindergeldDeduction = KINDERGELD_2026;
       const netNeedAfterKindergeld = Math.max(0, baseNeed - kindergeldDeduction);
+      // Leitlinien NRW 13.2: Einkommen des volljährigen Kindes wird in voller Höhe angerechnet
       const finalParentsShare = Math.max(0, netNeedAfterKindergeld - ownIncome);
 
       return {
         primary: { id: 'finalParentsShare', label: 'Restlicher Unterhaltsanspruch gegen beide Eltern', value: finalParentsShare, formattedValue: formatCurrency(finalParentsShare), highlight: true },
         secondary: [
-          { id: 'baseNeed', label: 'Gesamtbedarf nach Düsseldorfer Tabelle', value: baseNeed, formattedValue: formatCurrency(baseNeed) },
-          { id: 'kindergeld', label: 'Abzug volles Kindergeld (fließt an das Kind)', value: kindergeldDeduction, formattedValue: '250,00 €' },
+          { id: 'baseNeed', label: isOwn ? 'Gesamtbedarf nach Düsseldorfer Tabelle (eigener Haushalt)' : `Gesamtbedarf nach Düsseldorfer Tabelle (4. Altersstufe, Gruppe ${einkommensgruppe.gruppe})`, value: baseNeed, formattedValue: formatCurrency(baseNeed) },
+          { id: 'kindergeld', label: 'Abzug volles Kindergeld (fließt an das Kind)', value: kindergeldDeduction, formattedValue: formatCurrency(kindergeldDeduction) },
           { id: 'ownIncome', label: 'Angerechnetes eigenes Einkommen', value: ownIncome, formattedValue: formatCurrency(ownIncome) },
         ],
         summaryText: `Der Gesamtbedarf des Kindes liegt bei ${formatCurrency(baseNeed)}. Nach Abzug von ${formatCurrency(kindergeldDeduction)} Kindergeld und ${formatCurrency(ownIncome)} Eigenanteil müssen beide Elternteile gemeinsam noch ${formatCurrency(finalParentsShare)} monatlich aufbringen.`,
       };
     },
-    formula: 'Zahlbetrag = 930 € (bei eigener Bude) - 250 € Kindergeld - eigenes Einkommen',
-    formulaExplanation: 'Volljährige Kinder sind für ihren Unterhalt selbst verantwortlich, solange sie in Ausbildung sind. Beide Elternteile haften anteilig nach ihren Einkommensverhältnissen (Haftungsquote).',
+    formula: 'Restbedarf = 990 € (eigene Wohnung) bzw. 4. Altersstufe (Elternhaus) − 259 € Kindergeld − eigenes Einkommen',
+    formulaExplanation: 'Volljährige Kinder in Ausbildung haben Anspruch auf Unterhalt gegen beide Eltern. Beide Elternteile haften anteilig nach ihren Einkommensverhältnissen (Haftungsquote, § 1606 Abs. 3 BGB); vorab bleibt jedem Elternteil ein Sockelbetrag von 1.750 € (angemessener Selbstbehalt).',
     workedExample: {
       title: 'Beispiel: Student mit eigener Wohnung ohne eigenes Einkommen',
-      inputValues: [{ label: 'Wohnen', value: 'Eigene Wohnung (930 €)' }, { label: 'Einkommen', value: '0 €' }],
-      steps: ['Bedarf = 930,00 €', 'Abzug volles Kindergeld = 250,00 €', 'Restlicher Unterhalt der Eltern = 680,00 €/Monat'],
-      result: '680,00 € monatlicher Elternunterhalt',
+      inputValues: [{ label: 'Wohnen', value: 'Eigene Wohnung (990 €)' }, { label: 'Einkommen', value: '0 €' }],
+      steps: ['Bedarf = 990,00 € (Düsseldorfer Tabelle 2026, Anm. A.IV)', 'Abzug volles Kindergeld = 259,00 €', 'Restlicher Unterhalt der Eltern = 731,00 €/Monat'],
+      result: '731,00 € monatlicher Elternunterhalt',
     },
     content: {
       intro: 'Mit Vollendung des 18. Lebensjahres erlischt der Betreuungsunterhalt: Beide Elternteile haften nun anteilig als Barunterhaltspflichtige nach ihren Einkommensverhältnissen.',
-      details: 'Volljährige Kinder in eigener Wohnung haben nach der Düsseldorfer Tabelle einen festen Gesamtunterhaltsbedarf (derzeit 930 € monatlich). Das volle Kindergeld (250 €) wird bedarfsmindernd abgezogen; die verbleibende Lücke teilen die Eltern nach Einkommensquote auf.',
+      details: 'Volljährige Kinder mit eigener Wohnung haben nach der Düsseldorfer Tabelle 2026 in der Regel einen Gesamtbedarf von 990 € im Monat (darin bis 440 € Warmmiete, ohne Kranken- und Pflegeversicherung und Studiengebühren). Wohnt das Kind noch bei einem Elternteil, gilt die 4. Altersstufe nach dem zusammengerechneten Einkommen beider Eltern (mindestens 698 €). Das volle Kindergeld (2026: 259 €) und eigenes Einkommen des Kindes werden voll abgezogen; die verbleibende Lücke teilen die Eltern nach Einkommensquote auf.',
     },
     faqs: [
       { question: 'Wann sind Eltern verpflichtet, für volljährige Kinder Unterhalt zu zahlen?', answer: 'Solange sich das Kind in der allgemeinen Schulausbildung oder einer ersten berufsqualifizierenden Ausbildung bzw. einem Erststudium befindet (§ 1610 Abs. 2 BGB).' },
-      { question: 'Was sind privilegierte Volljährige nach § 1603 Abs. 2 BGB?', answer: 'Volljährige Kinder unter 21 Jahren, die unverheiratet sind, im Haushalt eines Elternteils leben und die allgemeine Schulausbildung absolvieren; sie sind minderjährigen Kindern rechtlich gleichgestellt.' },
+      { question: 'Was sind privilegierte Volljährige nach § 1603 Abs. 2 BGB?', answer: 'Volljährige Kinder unter 21 Jahren, die unverheiratet sind, im Haushalt eines Elternteils leben und die allgemeine Schulausbildung absolvieren; sie sind minderjährigen Kindern rechtlich gleichgestellt. Ihnen gegenüber gilt der notwendige Selbstbehalt von 1.450 € (erwerbstätig) bzw. 1.200 €, sonst der angemessene Selbstbehalt von 1.750 €.' },
+      { question: 'Wird die Ausbildungsvergütung voll angerechnet?', answer: 'Bei einem Azubi, der noch bei den Eltern wohnt, werden vorab in der Regel 100 € pauschaler Ausbildungsaufwand abgezogen (Leitlinien NRW Nr. 10.2.3). Im 990-€-Bedarf bei eigener Wohnung sind ausbildungsbedingte Aufwendungen bis 100 € bereits enthalten.' },
     ],
     relatedSlugs: ['duesseldorfer-tabelle-rechner', 'kindergeld-rechner-2026', 'ausbildungsunterhalt-bedarfskontrollbetrag-rechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'OLG Düsseldorf, Düsseldorfer Tabelle Stand 01.01.2026 (Anm. A.II, A.IV) und Leitlinien NRW 2026 (Nr. 13); Kindergeld § 66 EStG',
+      sourceUrl: DT_2026.sourceUrl,
+      lastVerified: '2026-10-25',
+    },
   },
 
   {
@@ -2944,45 +2975,69 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     searchKeywords: ['ausbildungsunterhalt rechner azubigehalt', 'anrechnung lehrlingsentschaedigung unterhalt', 'ausbildungsbedingter mehrbedarf 100 euro', 'wie viel unterhalt bekommt azubi von eltern'],
     inputs: [
       { id: 'netApprenticeSalary', label: 'Netto-Ausbildungsvergütung des Kindes im Monat', type: 'number', defaultValue: 750, min: 200, max: 1500, step: 25, unit: '€' },
-      { id: 'baseChildSupport', label: 'Bisheriger Tabellenunterhalt der Eltern vor Ausbildungsbeginn', type: 'number', defaultValue: 620, min: 300, max: 1200, step: 20, unit: '€' },
+      { id: 'baseChildSupport', label: 'Bisheriger Unterhalts-Zahlbetrag der Eltern (nach Kindergeldabzug)', type: 'number', defaultValue: 620, min: 300, max: 1200, step: 20, unit: '€' },
+      {
+        id: 'childSituation',
+        label: 'Alter und Wohnsituation des Azubis',
+        type: 'select',
+        defaultValue: 'adult_at_home',
+        options: [
+          { value: 'adult_at_home', label: 'Volljährig, wohnt bei einem Elternteil (100 € Pauschale, volle Anrechnung)' },
+          { value: 'minor_at_home', label: 'Minderjährig, wohnt bei einem Elternteil (100 € Pauschale, hälftige Anrechnung)' },
+          { value: 'adult_own_household', label: 'Volljährig, eigene Wohnung (Aufwand im 990-€-Bedarf enthalten)' },
+        ],
+      },
     ],
     calculate: (inputs) => {
       const salary = inputs.netApprenticeSalary !== undefined && inputs.netApprenticeSalary !== '' ? Math.max(0, parseFloat(inputs.netApprenticeSalary) || 0) : 750;
       const baseSupport = inputs.baseChildSupport !== undefined && inputs.baseChildSupport !== '' ? Math.max(0, parseFloat(inputs.baseChildSupport) || 0) : 620;
+      const situation = inputs.childSituation || 'adult_at_home';
 
-      // Gesetzlicher Abzug: Ausbildungsbedingter Mehrbedarf (Pauschale für Fachbücher, Kleidung, Fahrt) = 100 €
-      const allowance = 100;
-      const countedSalary = Math.max(0, salary - allowance);
+      // Leitlinien NRW 2026 Nr. 10.2.3: 100 € pauschaler Ausbildungsaufwand bei Azubis im Haushalt der Eltern;
+      // bei eigener Wohnung sind bis 100 € ausbildungsbedingte Aufwendungen schon im 990-€-Bedarf enthalten (Nr. 13.1 Abs. 2)
+      const allowance = situation === 'adult_own_household' ? 0 : DT_2026.ausbildungsaufwandPauschale;
+      const bereinigteVerguetung = Math.max(0, salary - allowance);
+      // Nr. 12.2 Abs. 1: bei Minderjährigen, die ein Elternteil betreut, hälftige Anrechnung; Nr. 13.2: bei Volljährigen volle Anrechnung
+      const anrechnungsQuote = situation === 'minor_at_home' ? 0.5 : 1;
+      const countedSalary = bereinigteVerguetung * anrechnungsQuote;
       const reducedSupport = Math.max(0, baseSupport - countedSalary);
       const moneySavedParents = baseSupport - reducedSupport;
 
       return {
         primary: { id: 'reducedSupport', label: 'Verbleibender Unterhaltsanspruch gegen die Eltern', value: reducedSupport, formattedValue: formatCurrency(reducedSupport), highlight: true },
         secondary: [
-          { id: 'countedSalary', label: 'Anrechenbare Ausbildungsvergütung', value: countedSalary, formattedValue: formatCurrency(countedSalary) },
-          { id: 'allowance', label: 'Ausbildungsbedingter Mehrbedarf (Freibetrag)', value: allowance, formattedValue: '100,00 €' },
+          { id: 'countedSalary', label: anrechnungsQuote < 1 ? 'Anrechenbare Ausbildungsvergütung (hälftig)' : 'Anrechenbare Ausbildungsvergütung', value: countedSalary, formattedValue: formatCurrency(countedSalary) },
+          { id: 'allowance', label: 'Pauschaler Ausbildungsaufwand (Abzug)', value: allowance, formattedValue: formatCurrency(allowance) },
           { id: 'childTotalBudget', label: 'Gesamteinkommen des Azubis (Lohn + Unterhalt)', value: salary + reducedSupport, formattedValue: formatCurrency(salary + reducedSupport) },
         ],
-        summaryText: `Von ${formatCurrency(salary)} Ausbildungsvergütung werden nach Abzug des 100-€-Mehrbedarfs ${formatCurrency(countedSalary)} auf den Unterhalt angerechnet. Die Eltern zahlen noch ${formatCurrency(reducedSupport)} (Ersparnis: ${formatCurrency(moneySavedParents)}/Monat).`,
+        summaryText: `Von ${formatCurrency(salary)} Ausbildungsvergütung werden nach Abzug von ${formatCurrency(allowance)} Ausbildungsaufwand ${formatCurrency(countedSalary)} auf den Unterhalt angerechnet. Die Eltern zahlen noch ${formatCurrency(reducedSupport)} (Ersparnis: ${formatCurrency(moneySavedParents)}/Monat).`,
       };
     },
-    formula: 'Anrechenbares Einkommen = Netto-Vergütung - 100 € ausbildungsbedingte Aufwendungen',
-    formulaExplanation: 'Nach ständiger Rechtsprechung der Familiengerichte darf der Auszubildende eine Pauschale von 100 Euro monatlich für berufsbedingte Kosten behalten. Der Rest mindert den Unterhaltsbedarf.',
+    formula: 'Anrechenbares Einkommen = (Netto-Vergütung − 100 € Ausbildungsaufwand) × Anrechnungsquote (Volljährige 100 %, Minderjährige 50 %)',
+    formulaExplanation: 'Nach den Unterhaltsrechtlichen Leitlinien (NRW 2026, Nr. 10.2.3) werden von der Ausbildungsvergütung eines Azubis, der bei den Eltern wohnt, in der Regel 100 € als pauschaler Ausbildungsaufwand abgezogen. Der Rest mindert den Unterhalt: bei Volljährigen voll, bei betreuten Minderjährigen zur Hälfte.',
     workedExample: {
-      title: 'Beispiel: 750 € Nettovergütung bei 620 € Unterhaltsanspruch',
-      inputValues: [{ label: 'Vergütung', value: '750 €' }, { label: 'Unterhalt', value: '620 €' }],
-      steps: ['Freibetrag = 100 €', 'Anrechenbar: 750 € - 100 € = 650 €', 'Da 650 € > 620 € liegt, entfällt der Barunterhalt der Eltern komplett!'],
+      title: 'Beispiel: volljähriger Azubi im Elternhaus, 750 € Nettovergütung bei 620 € Zahlbetrag',
+      inputValues: [{ label: 'Vergütung', value: '750 €' }, { label: 'Unterhalt', value: '620 €' }, { label: 'Situation', value: 'Volljährig, bei einem Elternteil' }],
+      steps: ['Ausbildungsaufwand = 100 €', 'Anrechenbar: 750 € − 100 € = 650 € (volle Anrechnung)', 'Da 650 € > 620 € liegt, entfällt der Barunterhalt der Eltern komplett!'],
       result: '0,00 € Unterhalt (Kind deckt Bedarf selbst)',
     },
     content: {
       intro: 'Dieser Rechner ermittelt den Unterhaltsanspruch von Auszubildenden unter Anrechnung der eigenen Ausbildungsvergütung.',
-      details: 'Von der Brutto-Ausbildungsvergütung werden Steuern, Sozialabgaben und eine berufsbedingte Ausbildungspauschale (100 €) abgezogen; der verbleibende Nettobetrag mindert den Unterhaltsanspruch gegenüber den Eltern vollständig.',
+      details: 'Von der Netto-Ausbildungsvergütung wird bei Azubis, die noch bei einem Elternteil wohnen, ein pauschaler Ausbildungsaufwand von 100 € abgezogen (höherer Aufwand ist konkret nachzuweisen). Bei volljährigen Azubis mindert der Rest den Unterhalt voll, bei minderjährigen zur Hälfte, weil die andere Hälfte dem betreuenden Elternteil zugutekommt. Bei eigener Wohnung ist der Ausbildungsaufwand bis 100 € bereits im Bedarf von 990 € enthalten.',
     },
     faqs: [
       { question: 'Dürfen Eltern den Unterhalt verweigern, wenn das Kind die Ausbildung abbricht?', answer: 'Eltern müssen eine angemessene Orientierungsphase zugestehen; bei wiederholten, unbegründeten Ausbildungsabbrüchen oder Bummelstudium kann der Unterhaltsanspruch jedoch verwirken.' },
       { question: 'Wie wirkt sich ein Nebenjob während des Studiums auf den Unterhalt aus?', answer: 'Einkünfte aus Nebentätigkeiten während des Studiums werden in der Regel nur teilweise angerechnet (überobligatorische Leistung), sofern sie das Studium nicht ungebührlich verzögern.' },
+      { question: 'Warum wird die Vergütung bei Minderjährigen nur zur Hälfte angerechnet?', answer: 'Ein minderjähriges Kind erhält Barunterhalt vom einen und Betreuungsunterhalt vom anderen Elternteil. Sein bereinigtes Einkommen entlastet deshalb in der Regel nur zur Hälfte den Barunterhalt (Leitlinien NRW 2026, Nr. 12.2).' },
     ],
     relatedSlugs: ['unterhalt-volljaehrige-kinder-rechner', 'duesseldorfer-tabelle-rechner', 'kindergeld-rechner-2026'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: 'Unterhaltsrechtliche Leitlinien der Familiensenate in NRW, Stand 01.01.2026 (Nr. 10.2.3, 12.2, 13.1, 13.2)',
+      sourceUrl: DT_2026.sourceUrl,
+      lastVerified: '2026-10-25',
+    },
   },
 
   {

@@ -292,8 +292,8 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
         childOwnIncome: '0',
       });
       expect(res?.error).toBeUndefined();
-      // 930 - 250 - 0 = 680
-      expect(res?.primary.value).toBe(680);
+      // Düsseldorfer Tabelle 2026: 990 € Bedarf − 259 € Kindergeld − 0 € = 731 €
+      expect(res?.primary.value).toBe(731);
     });
 
     it('ausbildungsunterhalt-bedarfskontrollbetrag-rechner preserves salary = 0', () => {
