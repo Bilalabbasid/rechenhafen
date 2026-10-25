@@ -9,8 +9,9 @@ describe('Nudeln-Rechner (nudeln-rohmaerk-gewicht-rechner)', () => {
     expect(pastaCalc).toBeDefined();
     expect(pastaCalc?.slug).toBe('nudeln-rohmaerk-gewicht-rechner');
     expect(pastaCalc?.name).toBe('Nudeln umrechnen: trocken, gekocht & Portionen');
-    expect(pastaCalc?.metaTitle).toBe('Nudeln umrechnen: trocken, gekocht & Portionen');
-    expect(pastaCalc?.metaDescription).toContain('Trockene und gekochte Nudeln umrechnen oder Portionen planen');
+    expect(pastaCalc?.metaTitle).toBe('Nudeln pro Person: roh & gekocht umrechnen');
+    expect(pastaCalc?.h1).toBe('Nudel-Rechner: Menge pro Person und roh/gekocht umrechnen');
+    expect(pastaCalc?.metaDescription).toContain('Wie viele Nudeln pro Person?');
     expect(pastaCalc?.metaDescription).toContain('anpassbarem Quellfaktor');
   });
 

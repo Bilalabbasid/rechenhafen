@@ -131,6 +131,8 @@ export interface CalculatorDefinition {
   formulaExplanation: string;
   workedExample: WorkedExample;
   workedExamples?: WorkedExample[];
+  /** Kompakte Kurzreferenz (z. B. Tabelle aus den Rechner-Annahmen), direkt unter dem Rechner gerendert. */
+  quickReference?: ContentSection[];
   content?: {
     intro?: string;
     details?: string;

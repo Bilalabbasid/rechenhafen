@@ -9,10 +9,10 @@ describe('Heizölverbrauch-Rechner (oelheizung-verbrauch-rechner)', () => {
     expect(calc).toBeDefined();
     expect(calc.slug).toBe('oelheizung-verbrauch-rechner');
     expect(calc.name).toBe('Heizölverbrauch schätzen: Wohnfläche und Dämmzustand');
-    expect(calc.metaTitle).toBe('Heizölverbrauch berechnen: Liter & Kosten pro Jahr');
-    expect(calc.h1).toBe('Heizölverbrauch berechnen: Liter & Kosten pro Jahr');
+    expect(calc.metaTitle).toBe('Heizölverbrauch berechnen: Liter pro m², Jahr & Kosten');
+    expect(calc.h1).toBe('Heizölverbrauch berechnen: Liter pro Jahr und Heizölkosten');
     expect(calc.metaDescription).toBe(
-      'Heizölbedarf anhand von Wohnfläche und Dämmzustand schätzen. Liter pro Jahr und Kosten mit Ihrem eigenen Heizölpreis kostenlos berechnen.'
+      'Heizölverbrauch aus Wohnfläche und Gebäudezustand schätzen: Liter pro Jahr, angenommener Verbrauch pro m² und jährliche Heizölkosten mit Ihrem eigenen Literpreis.'
     );
   });
 

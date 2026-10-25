@@ -17,7 +17,7 @@ const CATEGORY_FOCUS_MAP: Record<string, { title: string; subtitle: string; item
       {
         slug: 'gaskostenrechner',
         name: 'Gaskostenrechner',
-        shortDesc: 'Gasverbrauch in m³ und kWh umrechnen, Jahreskosten und fairen Monatsabschlag berechnen.',
+        shortDesc: 'Gasverbrauch in m³ und kWh umrechnen, Jahreskosten und monatlichen Durchschnitt berechnen.',
         badge: 'Fokus',
       },
       {

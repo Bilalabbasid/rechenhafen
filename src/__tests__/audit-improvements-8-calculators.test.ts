@@ -309,7 +309,7 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
       'spritkostenrechner': 'Spritkostenrechner: Benzinkosten für Ihre Fahrt',
       'brutto-netto-rechner': 'Brutto-Netto-Rechner 2026: Was bleibt vom Gehalt?',
       'gasverbrauch-kwh-m3-rechner': 'Gasverbrauch berechnen: Zählerstände & m³ in kWh',
-      'gaskostenrechner': 'Gaskostenrechner: Jahreskosten & Monatsdurchschnitt',
+      'gaskostenrechner': 'Gaskostenrechner: kWh, m³, Grundpreis & Monatskosten',
       'kies-splitt-rechner': 'Splittrechner: Wie viel Splitt brauche ich?',
       'fahrtkostenrechner': 'Fahrtkostenrechner: Kosten berechnen & aufteilen',
       'autobahn-maut-rechner-vignette': 'Mautrechner: Österreich, Schweiz & Brenner',

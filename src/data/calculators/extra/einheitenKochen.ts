@@ -1,6 +1,78 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
+// ---------------------------------------------------------------------------
+// Gemeinsame Annahmen für Berechnung UND Kurzreferenz-Tabellen.
+// Die Tabellen werden aus denselben Werten erzeugt wie das Rechnerergebnis,
+// damit Seitentext und Rechner nicht auseinanderlaufen.
+// ---------------------------------------------------------------------------
+
+// Nudel-Rechner: Quellfaktoren und Portionsrichtwerte (g Rohgewicht p.P.)
+const PASTA_FACTORS = { aldente: 2.3, soft: 2.5, fresh: 1.5 } as const;
+const PASTA_PORTIONS_G = {
+  dry: { mainDish: 110, bigHunger: 150, sideDish: 70, kids: 55 },
+  fresh: { mainDish: 150, bigHunger: 200, sideDish: 100, kids: 80 },
+} as const;
+const pastaCookedG = (rawG: number, factor: number) => Math.round(rawG * factor);
+const pastaWaterL = (rawG: number) => Number(((rawG / 100) * 1.0).toFixed(1));
+const fmtFactor = (f: number) => f.toFixed(1).replace('.', ',');
+
+function buildPastaQuickReference(): string {
+  const meals: Array<[string, keyof typeof PASTA_PORTIONS_G.dry]> = [
+    ['Hauptgericht', 'mainDish'],
+    ['Großer Hunger', 'bigHunger'],
+    ['Beilage / Vorspeise', 'sideDish'],
+    ['Kinderportion', 'kids'],
+  ];
+  const dryF = PASTA_FACTORS.aldente;
+  const freshF = PASTA_FACTORS.fresh;
+  const perPerson = meals
+    .map(([label, key]) => {
+      const d = PASTA_PORTIONS_G.dry[key];
+      const f = PASTA_PORTIONS_G.fresh[key];
+      return `| ${label} | ${d} g → ca. ${formatNumber(pastaCookedG(d, dryF), 0)} g | ${f} g → ca. ${formatNumber(pastaCookedG(f, freshF), 0)} g |`;
+    })
+    .join('\n');
+  const groups = [2, 4, 6, 8]
+    .map((p) => {
+      const d = p * PASTA_PORTIONS_G.dry.mainDish;
+      const f = p * PASTA_PORTIONS_G.fresh.mainDish;
+      return `| ${p} Personen | ${formatNumber(d, 0)} g → ca. ${formatNumber(pastaCookedG(d, dryF), 0)} g | ${formatNumber(f, 0)} g → ca. ${formatNumber(pastaCookedG(f, freshF), 0)} g |`;
+    })
+    .join('\n');
+  const dMain = PASTA_PORTIONS_G.dry.mainDish;
+  const fMain = PASTA_PORTIONS_G.fresh.mainDish;
+  return [
+    `**Getrocknete Nudeln** (Hartweizen, ca. 12 % Restfeuchte) quellen beim Kochen stark auf – der Rechner nutzt al dente Faktor ${fmtFactor(dryF)}. **Frische Pasta** aus dem Kühlregal enthält bereits Wasser und quillt nur mit Faktor ${fmtFactor(freshF)}. Deshalb verwendet der Rechner für frische Pasta höhere Rohgewichte pro Person. Alle Portionsgrößen sind Richtwerte; Hunger, Sauce und Beilagen verändern die passende Menge.`,
+    `| Portion pro Person | Trockennudeln (roh → gekocht) | Frische Pasta (roh → gekocht) |\n| --- | --- | --- |\n${perPerson}`,
+    `Die Spalten sind getrennte Portionsrichtwerte, kein identisches Gekochtgewicht: ${dMain} g Trockennudeln ergeben ca. ${pastaCookedG(dMain, dryF)} g, ${fMain} g frische Pasta ca. ${pastaCookedG(fMain, freshF)} g.`,
+    `**Hauptgericht für mehrere Personen** (${dMain} g trocken bzw. ${fMain} g frisch pro Person):`,
+    `| Personen | Trockennudeln (roh → gekocht) | Frische Pasta (roh → gekocht) |\n| --- | --- | --- |\n${groups}`,
+    `**Roh ↔ gekocht:** 100 g Trockennudeln ergeben ca. ${pastaCookedG(100, dryF)} g gekocht; für 100 g gekochte Nudeln brauchen Sie ca. ${Math.round(100 / dryF)} g trocken. Bei frischer Pasta: 100 g roh ≈ ${pastaCookedG(100, freshF)} g gekocht. Im Rechner können Sie Personenzahl, Portionsgröße und Quellfaktor frei anpassen.`,
+  ].join('\n\n');
+}
+
+function buildPastaConversionTable(): string {
+  const rows: Array<[number, string]> = [
+    [50, 'kleine Kinderportion'],
+    [70, 'Vorspeise / Beilage'],
+    [100, 'leichtes Hauptgericht'],
+    [110, 'Standard-Hauptgericht'],
+    [125, 'herzhaftes Hauptgericht'],
+    [150, 'großer Hunger / Sportler'],
+    [250, 'halbes Standardpaket'],
+    [500, '1 volles Nudelpaket'],
+  ];
+  const f = PASTA_FACTORS.aldente;
+  const lines = rows
+    .map(([g, note]) => {
+      const water = pastaWaterL(g);
+      return `- **${g} g trocken:** ca. ${formatNumber(pastaCookedG(g, f), 0)} g gekocht (${formatNumber(water, 1, 1)} l Wasser, ${Math.round(water * 10)} g Salz – ${note})`;
+    })
+    .join('\n');
+  return `Die folgende Übersicht zeigt das gekochte Serviergewicht sowie die benötigte Kochwassermenge für gängige Trockennudelmengen bei Standard-Hartweizen:\n\n${lines}`;
+}
+
 export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "gewicht-masse-umrechner",
@@ -4427,11 +4499,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Nudeln umrechnen",
     category: "kochen-backen",
     subcategory: "Kochen & Garen",
-    metaTitle: "Nudeln umrechnen: trocken, gekocht & Portionen",
-    metaDescription: "Trockene und gekochte Nudeln umrechnen oder Portionen planen. Mit nachvollziehbarem Rechenweg und anpassbarem Quellfaktor.",
-    h1: "Nudeln umrechnen: trocken, gekocht & Portionen",
-    shortDescription: "Ermittelt das Trocken- und Gekochtgewicht von Nudeln sowie Portionsgrößen für Gäste mit anpassbarem Quellfaktor und Kochwasser-Bedarf.",
-    searchKeywords: ["nudeln rechner trocken gekocht gewicht faktor", "wieviel gramm nudeln pro person hauptgericht", "nudelportionen berechnen kinder erwachsene", "spaghetti menge gramm pro person", "nudeln umrechnen gekocht trocken"],
+    metaTitle: "Nudeln pro Person: roh & gekocht umrechnen",
+    metaDescription: "Wie viele Nudeln pro Person? Trockene und frische Nudeln für mehrere Personen planen und zwischen roh und gekocht umrechnen – mit anpassbarem Quellfaktor.",
+    h1: "Nudel-Rechner: Menge pro Person und roh/gekocht umrechnen",
+    shortDescription: "Planen Sie die Nudelmenge für mehrere Personen oder rechnen Sie ein Gewicht zwischen roh und gekocht um. Sie wählen Personenzahl bzw. Gramm und die Nudelsorte (trocken oder frisch) und erhalten Roh- und Gekochtgewicht samt Kochwasser – die Portionsgrößen sind anpassbare Richtwerte.",
+    searchKeywords: ["nudeln rechner trocken gekocht gewicht faktor", "wieviel gramm nudeln pro person hauptgericht", "nudelportionen berechnen kinder erwachsene", "spaghetti menge gramm pro person", "nudeln umrechnen gekocht trocken", "nudeln pro person", "nudeln roh gekocht umrechnen", "frische nudeln pro person"],
     inputs: [
       {
         id: "mode",
@@ -4609,11 +4681,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const isFresh = factorPreset === 'fresh';
 
       // Resolve and strictly validate conversion factor
-      let factor = 2.3;
+      let factor: number = PASTA_FACTORS.aldente;
       if (factorPreset === 'soft') {
-        factor = 2.5;
+        factor = PASTA_FACTORS.soft;
       } else if (factorPreset === 'fresh') {
-        factor = 1.5;
+        factor = PASTA_FACTORS.fresh;
       } else if (factorPreset === 'custom') {
         if (inputs.customFactor === undefined || inputs.customFactor === null || String(inputs.customFactor).trim() === '') {
           return {
@@ -4655,17 +4727,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         // Distinct portion models:
         // Dry pasta (factor ~2.3): 110 g dry yields ~253 g cooked
         // Fresh pasta (factor 1.5): 150 g fresh yields ~225 g cooked (fresh pasta contains 25–30% native moisture)
-        let rawPerPersonG = isFresh ? 150 : 110;
+        const portionSet = isFresh ? PASTA_PORTIONS_G.fresh : PASTA_PORTIONS_G.dry;
+        let rawPerPersonG: number = portionSet.mainDish;
         let mealLabel = isFresh ? 'Hauptgericht / normaler Hunger (150 g p.P. ungekochte frische Pasta)' : 'Hauptgericht / normaler Hunger (110 g p.P. Trockennudeln)';
 
         if (meal === 'bigHunger') {
-          rawPerPersonG = isFresh ? 200 : 150;
+          rawPerPersonG = portionSet.bigHunger;
           mealLabel = isFresh ? 'Großer Hunger / Sportler (200 g p.P. ungekochte frische Pasta)' : 'Großer Hunger / Sportler (150 g p.P. Trockennudeln)';
         } else if (meal === 'sideDish') {
-          rawPerPersonG = isFresh ? 100 : 70;
+          rawPerPersonG = portionSet.sideDish;
           mealLabel = isFresh ? 'Beilage / Vorspeise (100 g p.P. ungekochte frische Pasta)' : 'Beilage / Vorspeise (70 g p.P. Trockennudeln)';
         } else if (meal === 'kids') {
-          rawPerPersonG = isFresh ? 80 : 55;
+          rawPerPersonG = portionSet.kids;
           mealLabel = isFresh ? 'Kinderportion (80 g p.P. ungekochte frische Pasta)' : 'Kinderportion (55 g p.P. Trockennudeln)';
         } else if (meal === 'custom') {
           if (inputs.customGramsPerPerson === undefined || inputs.customGramsPerPerson === null || String(inputs.customGramsPerPerson).trim() === '') {
@@ -4963,13 +5036,19 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       ],
       result: "440 g Trockennudeln ergeben ca. 1.012 g gekochte Pasta (in 4,4 l Wasser mit 44 g Salz)"
     },
+    quickReference: [
+      {
+        title: "Nudeln pro Person: Richtwerte dieses Rechners",
+        content: buildPastaQuickReference()
+      }
+    ],
     content: {
-      intro: "Dieser Nudelrechner rechnet Trockengewichte in gekochte Pasta um, ermittelt die Rückrechnung für Rezeptangaben und plant Portionen für Familie und Gäste.",
+      intro: "Dieser Nudelrechner plant die Nudelmenge pro Person für Familie und Gäste, rechnet Trockengewichte in gekochte Pasta um und ermittelt die Rückrechnung für Rezeptangaben.",
       details: "Getrocknete Hartweizennudeln nehmen beim Kochen Wasser auf und verdoppeln bis verdreifachen ihr Gewicht (Faktor 2,2 bis 2,5). Frische Eierteig-Pasta quillt durch vorhandene Eigenfeuchte deutlich weniger (Faktor ca. 1,5). Als Richtwert für ein Hauptgericht gelten 100 bis 125 g Trockenpasta pro Person.",
       sections: [
         {
           title: "Umrechnungstabelle: Trockengewicht in gekochte Nudeln (Faktor 2,3 al dente)",
-          content: "Die folgende Übersicht zeigt das gekochte Serviergewicht sowie die benötigte Kochwassermenge für gängige Trockennudelmengen bei Standard-Hartweizen:\n\n- **50 g trocken:** ca. 115 g gekocht (0,5 l Wasser, 5 g Salz – kleine Kinderportion)\n- **70 g trocken:** ca. 160 g gekocht (0,7 l Wasser, 7 g Salz – Vorspeise / Beilage)\n- **100 g trocken:** ca. 230 g gekocht (1,0 l Wasser, 10 g Salz – leichtes Hauptgericht)\n- **110 g trocken:** ca. 253 g gekocht (1,1 l Wasser, 11 g Salz – Standard-Hauptgericht)\n- **125 g trocken:** ca. 288 g gekocht (1,3 l Wasser, 13 g Salz – herzhaftes Hauptgericht)\n- **150 g trocken:** ca. 345 g gekocht (1,5 l Wasser, 15 g Salz – großer Hunger / Sportler)\n- **250 g trocken:** ca. 575 g gekocht (2,5 l Wasser, 25 g Salz – halbes Standardpaket)\n- **500 g trocken:** ca. 1.150 g gekocht (5,0 l Wasser, 50 g Salz – 1 volles Nudelpaket)"
+          content: buildPastaConversionTable()
         },
         {
           title: "Unterschied zwischen getrockneter Pasta und frischen Nudeln",
@@ -4991,13 +5070,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         answer: "Als Hauptgericht rechnen Sie mit 100 bis 125 g ungekochten Nudeln pro erwachsener Person (ca. 230 bis 290 g gekocht). Bei großem Hunger oder Sportlern sind 150 g trocken üblich; als Beilage oder Vorspeise genügen 60 bis 80 g."
       },
       {
+        question: "Wie viele frische Nudeln rechnet man pro Person?",
+        answer: `Frische Pasta enthält bereits Wasser und quillt weniger auf. Der Rechner setzt deshalb für ein Hauptgericht ${PASTA_PORTIONS_G.fresh.mainDish} g ungekochte frische Pasta pro Person an (ca. ${pastaCookedG(PASTA_PORTIONS_G.fresh.mainDish, PASTA_FACTORS.fresh)} g gekocht) und ${PASTA_PORTIONS_G.fresh.sideDish} g als Beilage. Das sind Richtwerte – im Rechner können Sie einen eigenen Wert pro Person eintragen.`
+      },
+      {
         question: "Gilt der Umrechnungsfaktor auch für Vollkorn- oder glutenfreie Nudeln?",
         answer: "Vollkornnudeln aus Hartweizen quellen ähnlich mit Faktor 2,2 bis 2,4. Nudeln aus Hülsenfrüchten (Linsen, Kichererbsen) oder glutenfreie Maisteigwaren nehmen etwas weniger Wasser auf (Faktor ca. 2,0 bis 2,1)."
       }
     ],
     relatedSlugs: ['portionsrechner', 'wasser-reis-verhaeltnis-rechner', 'kalorien-rezept-rechner'],
     trustMeta: {
-      lastReviewed: '2026-10-21',
+      lastReviewed: '2026-10-25',
       sourceName: 'Küchenfachliche Richtwerte für Hartweizen- und Frischteigwaren & Barilla-Kochstandards',
       methodology: 'Quellfaktoren nach Stärkeverkleisterung und 10-100-1000-Wasserfaustregel',
     },

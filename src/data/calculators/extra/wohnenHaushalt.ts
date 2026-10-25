@@ -1,6 +1,32 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
+// Heizölverbrauch-Rechner: Modellannahmen in Litern Heizöl je m² Wohnfläche und Jahr.
+// Werden für Berechnung UND Beispieltabelle verwendet.
+const HEATING_OIL_L_PER_SQM = { modern: 8, standard: 14, unrenovated: 22 } as const;
+const heatingOilCost = (liters: number, price: number) => (liters === 0 || price === 0 ? 0 : Math.round(liters * price * 100) / 100);
+
+function buildHeatingOilQuickReference(): string {
+  const examplePrice = 1.05;
+  const rows = [100, 140, 180]
+    .map((area) => {
+      const cells = (['modern', 'standard', 'unrenovated'] as const).map((k) => {
+        const liters = area * HEATING_OIL_L_PER_SQM[k];
+        return `${formatNumber(liters, 0)} l (${formatCurrency(heatingOilCost(liters, examplePrice))})`;
+      });
+      return `| ${area} m² | ${cells.join(' | ')} |`;
+    })
+    .join('\n');
+  const exLiters = 140 * HEATING_OIL_L_PER_SQM.standard;
+  return [
+    '`Heizölverbrauch = Wohnfläche × angenommener Verbrauch in Liter pro m² und Jahr`',
+    `Beispiel: 140 m² × ${HEATING_OIL_L_PER_SQM.standard} l/m² pro Jahr = ${formatNumber(exLiters, 0)} Liter pro Jahr. Bei ${formatCurrency(examplePrice)} je Liter: ${formatNumber(exLiters, 0)} × ${formatCurrency(examplePrice)} = ${formatCurrency(heatingOilCost(exLiters, examplePrice))} pro Jahr.`,
+    `**Beispielszenarien** (Liter pro Jahr, in Klammern Kosten bei ${formatCurrency(examplePrice)}/l):`,
+    `| Wohnfläche | Gut gedämmt (${HEATING_OIL_L_PER_SQM.modern} l/m²) | Teilsaniert (${HEATING_OIL_L_PER_SQM.standard} l/m²) | Unsaniert (${HEATING_OIL_L_PER_SQM.unrenovated} l/m²) |\n| --- | --- | --- | --- |\n${rows}`,
+    'Die Werte 8, 14 und 22 l/m² sind vereinfachte Modellannahmen des Rechners, keine gemessenen Durchschnittswerte. Der Beispielpreis ist kein aktueller Marktpreis – tragen Sie Ihren eigenen Literpreis ein. Ihren tatsächlichen Verbrauch ermitteln Sie am genauesten über Tankstände und Liefermengen.',
+  ].join('\n\n');
+}
+
 export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
   // ==================== WOHNEN & IMMOBILIEN (20 ZUSÄTZLICHE) ====================
   {
@@ -3520,11 +3546,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'Heizölverbrauch berechnen',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'Heizölverbrauch berechnen: Liter & Kosten pro Jahr',
-    metaDescription: 'Heizölbedarf anhand von Wohnfläche und Dämmzustand schätzen. Liter pro Jahr und Kosten mit Ihrem eigenen Heizölpreis kostenlos berechnen.',
-    h1: 'Heizölverbrauch berechnen: Liter & Kosten pro Jahr',
-    shortDescription: 'Schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand von Wohnfläche und typischen Modellwerten für den Dämmzustand.',
-    searchKeywords: ['heizoelverbrauch rechner', 'wie viel heizoel pro qm', 'heizoelverbrauch berechnen', 'heizoelbedarf einfamilienhaus'],
+    metaTitle: 'Heizölverbrauch berechnen: Liter pro m², Jahr & Kosten',
+    metaDescription: 'Heizölverbrauch aus Wohnfläche und Gebäudezustand schätzen: Liter pro Jahr, angenommener Verbrauch pro m² und jährliche Heizölkosten mit Ihrem eigenen Literpreis.',
+    h1: 'Heizölverbrauch berechnen: Liter pro Jahr und Heizölkosten',
+    shortDescription: 'Geben Sie die beheizte Wohnfläche, den Gebäudezustand und Ihren Heizölpreis ein. Der Rechner schätzt daraus den Verbrauch in Litern pro Jahr und die jährlichen Heizölkosten (Wohnfläche × angenommener Verbrauch von 8, 14 oder 22 l/m²). Das Ergebnis ist eine Modellschätzung, kein gemessener Verbrauch.',
+    searchKeywords: ['heizoelverbrauch rechner', 'wie viel heizoel pro qm', 'heizoelverbrauch berechnen', 'heizoelbedarf einfamilienhaus', 'heizölverbrauch pro m2', 'heizölkosten berechnen', 'wie viel heizöl brauche ich'],
     inputs: [
       { id: 'livingArea', label: 'Beheizte Wohnfläche in m²', type: 'number', defaultValue: 140, min: 0, max: 600, step: 10, unit: 'm²' },
       {
@@ -3587,20 +3613,26 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       }
 
       const type = inputs.insulationStandard || 'standard';
-      let litersPerSqm = 14;
-      if (type === 'modern') litersPerSqm = 8;
-      if (type === 'unrenovated') litersPerSqm = 22;
+      let litersPerSqm: number = HEATING_OIL_L_PER_SQM.standard;
+      if (type === 'modern') litersPerSqm = HEATING_OIL_L_PER_SQM.modern;
+      if (type === 'unrenovated') litersPerSqm = HEATING_OIL_L_PER_SQM.unrenovated;
 
       // Zero stays zero
       const totalLiters = area === 0 ? 0 : area * litersPerSqm;
-      const totalCost = (area === 0 || price === 0) ? 0 : Math.round(totalLiters * price * 100) / 100;
+      const totalCost = heatingOilCost(totalLiters, price);
 
       return {
         primary: { id: 'totalCost', label: 'Geschätzte jährliche Heizölkosten', value: totalCost, formattedValue: formatCurrency(totalCost), highlight: true },
         secondary: [
           { id: 'totalLiters', label: 'Geschätzter Heizölbedarf pro Jahr', value: totalLiters, formattedValue: `ca. ${formatNumber(totalLiters, 0)} Liter` },
+          { id: 'litersPerSqm', label: 'Angenommener Verbrauch pro m²', value: litersPerSqm, formattedValue: `${litersPerSqm} l/m² pro Jahr (Modellannahme)` },
           { id: 'monthlyCost', label: 'Monatlicher Richtwert (Kosten ÷ 12)', value: totalCost / 12, formattedValue: formatCurrency(totalCost / 12) },
           { id: 'kwhEquivalent', label: 'Rechnerischer Brennstoff-Energiegehalt (Heizwert Hi)', value: totalLiters * 10, formattedValue: `ca. ${formatNumber(totalLiters * 10, 0)} kWh` },
+        ],
+        calculationSteps: [
+          `${formatNumber(area, 2)} m² × ${litersPerSqm} l/m² pro Jahr = ${formatNumber(totalLiters, 0)} Liter pro Jahr`,
+          `${formatNumber(totalLiters, 0)} Liter × ${formatCurrency(price)}/l = ${formatCurrency(totalCost)} pro Jahr`,
+          `${formatCurrency(totalCost)} ÷ 12 = ${formatCurrency(totalCost / 12)} pro Monat`,
         ],
         summaryText: `Für ${area} m² Wohnfläche schätzt das Modell ca. ${formatNumber(totalLiters, 0)} Liter Heizöl im Jahr. Bei einem Preis von ${formatCurrency(price)}/Liter entspricht das rechnerisch ${formatCurrency(totalCost)}.`,
       };
@@ -3618,6 +3650,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       ],
       result: '2.058,00 € jährliche Heizölkosten (ca. 171,50 €/Monat)',
     },
+    quickReference: [
+      {
+        title: 'Heizölverbrauch pro m²: so rechnet der Rechner',
+        content: buildHeatingOilQuickReference(),
+      },
+    ],
     content: {
       intro: 'Dieser Rechner schätzt den jährlichen Heizölbedarf und die ungefähren Brennstoffkosten anhand der Wohnfläche und modellhafter Verbrauchswerte für verschiedene Dämmzustände. Wenn Sie bereits konkrete Tankfüllstände und Lieferbelege vorliegen haben, nutzen Sie für die exakte Mengenbilanz unseren Ratgeber [Heizölverbrauch berechnen: Tankstände statt Liefermenge](/ratgeber/heizoelverbrauch-aus-tankstand-berechnen/).',
       sections: [
@@ -3645,6 +3683,9 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wann dürfen alte Ölheizungen nach dem GEG noch betrieben werden?', answer: 'Bestehende Ölheizungen dürfen weiter betrieben und repariert werden; Standard-Heizkessel (keine Brennwert- oder Niedertemperaturtechnik) müssen jedoch nach 30 Jahren Betrieb stillgelegt werden (§ 72 GEG).' },
     ],
     relatedSlugs: ['heizkostenvergleich-rechner', 'gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'waermepumpe-stromkosten-rechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+    },
   },
 
   {

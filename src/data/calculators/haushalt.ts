@@ -12,6 +12,29 @@ import {
 import { formatNumber, formatCurrency } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
+// Kurzreferenz für den Gaskostenrechner: Das Rechenbeispiel wird mit derselben
+// Funktion erzeugt, die auch das Ergebnis im Rechner liefert.
+function buildGasQuickReference(): string {
+  const ex = calculateGasCost({ inputType: 'kwh', annualKwh: 12000, priceUnit: 'eur', pricePerKwh: 0.10, basePricePeriod: 'yearly', basePrice: 120 });
+  const workCost = ex.secondary?.find((s) => s.id === 'workCost')?.value as number;
+  const monthly = ex.secondary?.find((s) => s.id === 'monthlyPayment')?.value as number;
+  const total = ex.primary.value as number;
+  const kwhPerM3 = 10.3 * 0.95;
+  return [
+    '**Das brauchen Sie:** Ihren Jahresverbrauch in kWh **oder** zwei Zählerstände in m³, die ein volles Jahr abdecken (dazu Brennwert und Zustandszahl von der Gasabrechnung), den Arbeitspreis in €/kWh oder ct/kWh und den Grundpreis pro Monat oder pro Jahr.',
+    '**So wird gerechnet:**\n' +
+      `- Zählerstände: kWh = m³ × Brennwert × Zustandszahl (mit den Standardwerten 10,3 × 0,95 entspricht 1 m³ rund ${formatNumber(kwhPerM3, 2)} kWh)\n` +
+      '- Jahreskosten = kWh × Arbeitspreis + Grundpreis pro Jahr (bei Monatsgrundpreis × 12)\n' +
+      '- Monatlicher Durchschnitt = Jahreskosten ÷ 12',
+    '| Rechenschritt | Beispiel |\n| --- | --- |\n' +
+      `| Verbrauchskosten | 12.000 kWh × 0,10 €/kWh = ${formatCurrency(workCost)} |\n` +
+      '| + Grundpreis | 120,00 € pro Jahr |\n' +
+      `| = Jahreskosten | ${formatCurrency(total)} |\n` +
+      `| Monatlicher Durchschnitt | ${formatCurrency(total)} ÷ 12 = ${formatCurrency(monthly)} |`,
+    'Der monatliche Durchschnitt ist ein Orientierungswert, kein Abschlag Ihres Versorgers: Abschläge können abweichen, etwa wenn nur 11 Abschläge im Jahr erhoben oder Beträge gerundet werden. Die Beispielpreise sind keine aktuellen Marktpreise – tragen Sie die Werte aus Ihrem Vertrag ein.',
+  ].join('\n\n');
+}
+
 export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'stromkostenrechner',
@@ -114,10 +137,10 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Gaskosten berechnen',
     category: 'haushalt-energie',
     subcategory: 'Gas & Heizung',
-    metaTitle: 'Gaskostenrechner: Jahreskosten & Monatsdurchschnitt',
-    metaDescription: 'Berechnen Sie Ihre jährlichen Gaskosten aus Verbrauch, Arbeitspreis und Grundpreis. Mit separater Ausweisung fixer Gebühren und rechnerischem Monatsdurchschnitt.',
-    h1: 'Gaskosten berechnen: Gasverbrauch und Kosten im Überblick',
-    shortDescription: 'Berechnet die jährlichen Gaskosten, den rechnerischen Monatsdurchschnitt und rechnet Zählerstände in Kubikmetern (m³) zuverlässig in Kilowattstunden (kWh) um.',
+    metaTitle: 'Gaskostenrechner: kWh, m³, Grundpreis & Monatskosten',
+    metaDescription: 'Gaskosten aus kWh-Verbrauch oder Zählerständen in m³ berechnen. Arbeitspreis, Grundpreis, Jahreskosten und monatlichen Durchschnitt transparent nachvollziehen.',
+    h1: 'Gaskosten berechnen: Jahreskosten, Grundpreis und Monatsdurchschnitt',
+    shortDescription: 'Berechnet aus Ihrem Verbrauch (kWh oder zwei Zählerstände in m³), dem Arbeitspreis und dem Grundpreis die jährlichen Gaskosten und den monatlichen Durchschnitt. Brennwert und Zustandszahl Ihrer Gasabrechnung bestimmen dabei die Umrechnung von m³ in kWh.',
     searchKeywords: [
       'gaskostenrechner',
       'gasverbrauch rechner',
@@ -267,12 +290,18 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         resultSummary: '1.120,00 € pro Jahr (ca. 93,33 €/Monat)',
       },
     ],
+    quickReference: [
+      {
+        title: 'So rechnet der Gaskostenrechner',
+        content: buildGasQuickReference(),
+      },
+    ],
     content: {
       intro: 'Mit unserem kostenlosen Gaskostenrechner ermitteln Sie Ihre jährlichen Heizkosten und den rechnerischen Monatsdurchschnitt für Erdgas aus Arbeitspreis und Grundpreis transparent und centgenau. Welchen Ausgangswert haben Sie zur Hand? 1. „Ich kenne meinen Verbrauch in kWh“: Tragen Sie einfach den Jahresverbrauch Ihrer letzten Abrechnung ein. 2. „Ich habe nur den Gaszählerstand in m³“: Geben Sie zwei Zählerstände ein, die ein vollständiges Abrechnungsjahr abdecken (Monats- oder Wochenablesungen sind für diese Jahresberechnung nicht geeignet, da der Rechner den vollen Jahresgrundpreis ansetzt). Mit Brennwert und Zustandszahl Ihrer Gasabrechnung rechnet der Rechner Kubikmeter physikalisch exakt in Kilowattstunden um (andernfalls mit den gängigen Richtwerten). Vertiefende Erklärungen finden Sie in unserem Ratgeber [Gaskosten berechnen: Formel, Gasrechnung & m³-Umrechnung](/ratgeber/gaskosten-berechnen/) sowie im Ratgeber [Gas m³ in kWh umrechnen](/ratgeber/gaszaehler-m3-in-kwh-umrechnen/). Für reine Zähleranalysen steht Ihnen zudem der [Gasverbrauch Rechner (m³ in kWh)](/rechner/gasverbrauch-kwh-m3-rechner/) zur Verfügung.',
       sections: [
         {
           title: 'Gaskosten berechnen – so funktioniert es',
-          content: 'Die jährlichen Gaskosten setzen sich in Deutschland stets aus zwei Hauptkomponenten zusammen:\n- **Verbrauchskosten (Arbeitspreis)**: Ihr tatsächlicher thermischer Energieverbrauch in Kilowattstunden (kWh), multipliziert mit dem vertraglichen Arbeitspreis je kWh (z. B. 10 bis 13 Cent/kWh).\n- **Feste Bereitstellungskosten (Grundpreis)**: Eine verbrauchsunabhängige monatliche Grundgebühr für Zählermiete, Messstellenbetrieb und Netznutzung (typisch 10 bis 15 Euro pro Monat bzw. 120 bis 180 Euro im Jahr).\n\nDie mathematische Formel lautet:\n`Gesamtkosten = (Verbrauch in kWh × Arbeitspreis) + (Monatsgrundpreis × 12)`\n\nTeilt man die Gesamtsumme durch 12, erhält man den rechnerischen Monatsdurchschnitt, der Ihnen als verlässliche Richtgröße für Ihre Abschlagszahlung dient.',
+          content: 'Die jährlichen Gaskosten setzen sich in Deutschland stets aus zwei Hauptkomponenten zusammen:\n- **Verbrauchskosten (Arbeitspreis)**: Ihr tatsächlicher thermischer Energieverbrauch in Kilowattstunden (kWh), multipliziert mit dem vertraglichen Arbeitspreis je kWh (z. B. 10 bis 13 Cent/kWh).\n- **Feste Bereitstellungskosten (Grundpreis)**: Eine verbrauchsunabhängige monatliche Grundgebühr für Zählermiete, Messstellenbetrieb und Netznutzung (typisch 10 bis 15 Euro pro Monat bzw. 120 bis 180 Euro im Jahr).\n\nDie mathematische Formel lautet:\n`Gesamtkosten = (Verbrauch in kWh × Arbeitspreis) + (Monatsgrundpreis × 12)`\n\nTeilt man die Gesamtsumme durch 12, erhält man den rechnerischen Monatsdurchschnitt. Er kann als Orientierung für Ihre Abschlagszahlung dienen; der tatsächliche Abschlag Ihres Versorgers kann davon abweichen.',
         },
         {
           title: 'Gasverbrauch von m³ in kWh umrechnen',
@@ -320,6 +349,9 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Welche Werte stehen auf der Gasrechnung?', answer: 'Auf Ihrer Gasabrechnung finden Sie den Zählerstand (in m³), den Abrechnungsbrennwert (in kWh/m³), die Zustandszahl z, die daraus errechneten Kilowattstunden (kWh) sowie den Netto- und Brutto-Arbeitspreis (ct/kWh) und monatlichen Grundpreis.' },
     ],
     relatedSlugs: ['gasverbrauch-kwh-m3-rechner', 'heizkostenvergleich-rechner', 'stromkostenrechner', 'oelheizung-verbrauch-rechner', 'balkonkraftwerk-ertrag-rechner'],
+    trustMeta: {
+      lastReviewed: '2026-10-25',
+    },
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

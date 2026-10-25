@@ -207,6 +207,30 @@ export default async function CalculatorPage({ params }: PageProps) {
         shortDescription={calc.shortDescription}
       />
 
+      {/* Kurzreferenz direkt unter dem Rechner (nur für Rechner mit quickReference) */}
+      {calc.quickReference?.map((sec, qIdx) => (
+        <section
+          key={qIdx}
+          style={{
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'clamp(var(--space-4), 4vw, var(--space-6))',
+            margin: 'var(--space-6) 0',
+            lineHeight: 1.6,
+            color: 'var(--color-text-secondary)',
+            fontSize: '0.95rem',
+            overflowWrap: 'break-word',
+            maxWidth: '100%',
+          }}
+        >
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0 0 var(--space-3)', color: 'var(--color-text-primary)' }}>
+            {sec.title}
+          </h2>
+          <FormattedContent content={sec.content} />
+        </section>
+      ))}
+
       {/* Progressiver Tarif- & Zonen-Visualisierer für Einkommensteuer & Grenzsteuersatz */}
       {(calc.slug === 'einkommensteuerrechner' || calc.slug === 'grenzsteuersatz-rechner') && (
         <TaxBracketVisualizer

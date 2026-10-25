@@ -337,6 +337,14 @@ export const GAS_CLUSTER_CONFIG: Record<string, { introNote: string; links: Clus
         reason: 'Erklärt die Zusammensetzung von Heizkosten aus Arbeits- und Grundpreis sowie CO₂-Kostenkomponenten.',
         icon: 'book',
       },
+      {
+        href: '/rechner/co2-preis-rechner/',
+        anchorText: 'CO₂-Kosten für Heizöl berechnen',
+        intentBadge: 'CO₂-Preis',
+        badgeType: 'compare',
+        reason: 'Schätzt den rechnerischen CO₂-Kostenanteil aus Ihrer Heizölmenge in Litern und einem Preis je Tonne CO₂.',
+        icon: 'flame',
+      },
     ],
   },
 };
