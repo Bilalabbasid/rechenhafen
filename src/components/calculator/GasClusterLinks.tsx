@@ -347,6 +347,62 @@ export const GAS_CLUSTER_CONFIG: Record<string, { introNote: string; links: Clus
       },
     ],
   },
+
+  // 8. Ratgeber: Gasverbrauch berechnen: m³ in kWh umrechnen und Kosten verstehen
+  'gasverbrauch-m3-kwh-kosten': {
+    introNote:
+      'Passende Rechenhilfen und Fachbeiträge: Nutzen Sie unsere spezialisierten Rechner, um Zählerstände umzurechnen, Gesamtkosten zu kalkulieren oder Heizsysteme zu vergleichen.',
+    links: [
+      {
+        href: '/rechner/gasverbrauch-kwh-m3-rechner/',
+        anchorText: 'Gasverbrauch Rechner (m³ in kWh)',
+        intentBadge: 'Zählerstände in m³',
+        badgeType: 'm3',
+        reason: 'Wandelt zwei Gaszählerstände in Kubikmetern mit Brennwert und Zustandszahl direkt in Kilowattstunden um.',
+        icon: 'gauge',
+      },
+      {
+        href: '/rechner/gaskostenrechner/',
+        anchorText: 'Gaskosten aus Verbrauch und Tarif berechnen',
+        intentBadge: 'kWh-Verbrauch bekannt',
+        badgeType: 'kwh',
+        reason: 'Berechnet Ihre jährlichen Gesamtkosten und den rechnerischen Monatsdurchschnitt aus Arbeitspreis und Grundpreis.',
+        icon: 'calc',
+      },
+      {
+        href: '/ratgeber/gaszaehler-m3-in-kwh-umrechnen/',
+        anchorText: 'Gaszähler m³ in kWh umrechnen: Zählerstand richtig berechnen',
+        intentBadge: 'Zählerstände in m³',
+        badgeType: 'm3',
+        reason: 'Schritt-für-Schritt-Anleitung zur Differenzbildung alter und neuer Gaszählerstände nach DVGW G 685.',
+        icon: 'book',
+      },
+      {
+        href: '/ratgeber/gaskosten-berechnen/',
+        anchorText: 'Gaskosten berechnen: Formel & Gasrechnung',
+        intentBadge: 'Hintergründe & Formel',
+        badgeType: 'guide',
+        reason: 'Erfahren Sie, wie Arbeitspreis, Grundpreis und gesetzliche Abgaben auf Ihrer Gasrechnung zusammenwirken.',
+        icon: 'book',
+      },
+      {
+        href: '/rechner/heizkostenvergleich-rechner/',
+        anchorText: 'Heizkosten verschiedener Systeme vergleichen',
+        intentBadge: 'Alternativen vergleichen',
+        badgeType: 'compare',
+        reason: 'Stellt Erdgaskosten den Betriebskosten von Wärmepumpe, Holzpellets und Heizöl neutral gegenüber.',
+        icon: 'layers',
+      },
+      {
+        href: '/rechner/stromkostenrechner/',
+        anchorText: 'Stromkosten im Haushalt berechnen',
+        intentBadge: 'Haushaltsenergie',
+        badgeType: 'kwh',
+        reason: 'Kalkuliert die jährlichen Stromkosten einzelner Geräte und des gesamten Haushalts.',
+        icon: 'zap',
+      },
+    ],
+  },
 };
 
 export default function GasClusterLinks({ currentSlug }: Props) {

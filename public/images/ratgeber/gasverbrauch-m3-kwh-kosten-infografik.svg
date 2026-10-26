@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 370" width="800" height="370" role="img" aria-labelledby="gasKostenTitle gasKostenDesc">
+  <title id="gasKostenTitle">Infografik: Gasverbrauch von m³ in kWh umrechnen und Kosten ermitteln</title>
+  <desc id="gasKostenDesc">Infografik zur Umrechnung von Zählerständen in thermische Kilowattstunden: 100 m³ mal Brennwert 11,0 mal Zustandszahl 0,95 ergeben 1.045 kWh. Anschließend werden die Verbrauchskosten mit dem Arbeitspreis plus Grundpreis kalkuliert.</desc>
+  <defs>
+    <style>
+      .canvas { fill: #ffffff; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.5; rx: 12; }
+      .box-green { fill: #f0fdf4; stroke: #22c55e; stroke-width: 1.5; rx: 12; }
+      .box-calc { fill: #ecfdf5; stroke: #10b981; stroke-width: 1.5; rx: 10; }
+      .text-title { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 17px; }
+      .text-sub { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; }
+      .badge-step { fill: #0284c7; rx: 4; }
+      .badge-step-green { fill: #16a34a; rx: 4; }
+      .badge-step-text { fill: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 10px; letter-spacing: 0.5px; }
+      .val-label { fill: #64748b; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; }
+      .val-main { fill: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 18px; }
+      .val-kwh { fill: #0284c7; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 800; font-size: 19px; }
+      .op { fill: #94a3b8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; font-size: 18px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect width="800" height="370" class="canvas" />
+  <rect x="15" y="15" width="770" height="340" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+
+  <!-- Header -->
+  <g transform="translate(40, 42)">
+    <text class="text-title">Gasverbrauch &amp; Kosten: Der Weg vom Zählerstand zur Rechnung</text>
+    <text class="text-sub" y="22">Formel: Gasverbrauch (kWh) = Volumen (m³) × Brennwert (Hs) × Zustandszahl (z)</text>
+  </g>
+
+  <!-- Step 1: Thermische Umrechnung -->
+  <g transform="translate(40, 88)">
+    <rect width="720" height="105" class="box" />
+    <rect x="16" y="12" width="70" height="20" class="badge-step" />
+    <text x="51" y="26" text-anchor="middle" class="badge-step-text">STUFE 1</text>
+    <text x="96" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Umwandlung Zählerdifferenz (m³) in thermische Energie (kWh)</text>
+
+    <g transform="translate(20, 42)">
+      <!-- m3 -->
+      <text x="0" y="20" class="val-label">Zählerdifferenz</text>
+      <text x="0" y="44" class="val-main">100 m³</text>
+
+      <text x="135" y="38" class="op">×</text>
+
+      <!-- Brennwert -->
+      <text x="165" y="20" class="val-label">Brennwert (Hs)</text>
+      <text x="165" y="44" class="val-main">11,0 kWh/m³</text>
+
+      <text x="310" y="38" class="op">×</text>
+
+      <!-- Zustandszahl -->
+      <text x="340" y="20" class="val-label">Zustandszahl (z)</text>
+      <text x="340" y="44" class="val-main">0,95</text>
+
+      <text x="475" y="38" class="op">=</text>
+
+      <!-- Ergebnis kWh -->
+      <text x="505" y="20" class="val-label" fill="#0369a1" font-weight="700">Abrechenbare Energie</text>
+      <text x="505" y="44" class="val-kwh">1.045 kWh</text>
+    </g>
+  </g>
+
+  <!-- Step 2: Kostenberechnung -->
+  <g transform="translate(40, 208)">
+    <rect width="720" height="122" class="box-green" />
+    <rect x="16" y="12" width="70" height="20" class="badge-step-green" />
+    <text x="51" y="26" text-anchor="middle" class="badge-step-text">STUFE 2</text>
+    <text x="96" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#15803d">Gaskosten kalkulieren: Arbeitspreis + monatlicher Grundpreis</text>
+
+    <!-- Left side details -->
+    <g transform="translate(20, 46)">
+      <text x="0" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#475569">Verbrauchskosten:</text>
+      <text x="135" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0f172a">1.045 kWh × 0,11 €/kWh = 114,95 €</text>
+
+      <text x="0" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#475569">+ Grundpreisanteil:</text>
+      <text x="135" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0f172a">z. B. 12,00 € pro Monat</text>
+    </g>
+
+    <!-- Right side total card -->
+    <g transform="translate(460, 42)">
+      <rect width="240" height="65" class="box-calc" />
+      <text x="16" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#047857">Monatsbetrag Gesamt</text>
+      <text x="16" y="49" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#15803d">126,95 €</text>
+    </g>
+  </g>
+</svg>

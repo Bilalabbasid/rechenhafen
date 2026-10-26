@@ -48,6 +48,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const canonicalUrl = `https://rechenhafen.de/ratgeber/${article.slug}/`;
   const cleanTitle = formatMetaTitle(article.metaTitle);
 
+  const ogImage = article.coverIllustration
+    ? article.coverIllustration.src.startsWith('http')
+      ? article.coverIllustration.src
+      : `https://rechenhafen.de${article.coverIllustration.src}`
+    : undefined;
+
   return {
     title: cleanTitle,
     description: article.metaDescription,
@@ -64,11 +70,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
       authors: [article.author.name],
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: article.coverIllustration?.width || 1200,
+              height: article.coverIllustration?.height || 675,
+              alt: article.coverIllustration?.alt || article.title,
+            },
+          ]
+        : undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title: cleanTitle,
       description: article.metaDescription,
+      images: ogImage ? [ogImage] : undefined,
     },
   };
 }
@@ -94,6 +111,13 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
     '@type': 'Article',
     headline: article.h1,
     description: article.metaDescription,
+    image: article.coverIllustration
+      ? [
+          article.coverIllustration.src.startsWith('http')
+            ? article.coverIllustration.src
+            : `https://rechenhafen.de${article.coverIllustration.src}`,
+        ]
+      : undefined,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt,
     inLanguage: 'de-DE',
@@ -335,7 +359,7 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
                 )}
 
                 {/* Passende Rechner & Ratgeber (Gas-Cluster) oder allgemeine Secondary Calculators */}
-                {['gaszaehler-m3-in-kwh-umrechnen', 'gaskosten-berechnen'].includes(article.slug) ? (
+                {['gaszaehler-m3-in-kwh-umrechnen', 'gaskosten-berechnen', 'gasverbrauch-m3-kwh-kosten'].includes(article.slug) ? (
                   <GasClusterLinks currentSlug={article.slug} isRatgeber={true} />
                 ) : (
                   article.secondaryCalculators && article.secondaryCalculators.length > 0 && (

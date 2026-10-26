@@ -382,7 +382,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '6,65 € / 100 km',
     },
     content: {
-      intro: 'Dieser Rechner vergleicht die Ladekosten eines Elektroautos an der heimischen Wallbox mit den Kosten an öffentlichen AC- und DC-Schnellladesäulen.',
+      intro: 'Dieser Rechner vergleicht die Ladekosten eines Elektroautos an der heimischen Wallbox mit den Kosten an öffentlichen AC- und DC-Schnellladesäulen. Mehr erfahren: [Was kostet ein E-Auto auf 100 km?](/ratgeber/e-auto-kosten-100-km/)',
       details: 'Ladekosten = (Verbrauch in kWh/100 km / 100) · Distanz · Strompreis pro kWh · (1 + Ladeverlustfaktor). Typische Ladeverluste betragen an der Wallbox etwa 8 bis 12 Prozent, an der Haushaltssteckdose bis zu 20 Prozent.',
     },
     faqs: [

@@ -106,7 +106,7 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '25,41 m² (12 Pakete)',
     },
     content: {
-      intro: 'Dieser Mengenrechner bestimmt den Quadratmeterbedarf für Laminat, Parkett, Vinyl oder Fliesen inklusive maßgeschneidertem Verschnittaufschlag.',
+      intro: 'Dieser Mengenrechner bestimmt den Quadratmeterbedarf für Laminat, Parkett, Vinyl oder Fliesen inklusive maßgeschneidertem Verschnittaufschlag. Mehr erfahren: [Wie viel Laminat brauche ich? Pakete, Gewicht und Verschnitt berechnen](/ratgeber/laminat-bedarf-gewicht-verschnitt/)',
       details: 'Raumfläche = Länge · Breite. Für rechtwinklige Räume im Standardverband genügen ca. 5 bis 7 Prozent Verschnitt; bei diagonalem Verlegemuster, unregelmäßigen Winkeln oder Erkern sollten 10 bis 12 Prozent eingerechnet werden.',
     },
     faqs: [
