@@ -1,4 +1,5 @@
 import { CalculatorDefinition } from '@/types/calculator';
+import { calculateLandlordTenantCO2 } from '@/lib/calculators/co2';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
 // Heizölverbrauch-Rechner: Modellannahmen in Litern Heizöl je m² Wohnfläche und Jahr.
@@ -3896,292 +3897,187 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     relatedSlugs: ['thg-quote-rechner', 'photovoltaik-amortisation-rechner', 'stromkosten-geraete-rechner', 'stromkostenrechner', 'hybrid-auto-kosten-rechner'],
   },
 
-  {
+    {
     id: 'co2-abgabe-vermieter-mieter-rechner',
     slug: 'co2-abgabe-vermieter-mieter-rechner',
-    name: 'CO2-Kostenaufteilung-Rechner (CO2KostAufG Stufenmodell)',
-    shortName: 'CO2-Kostenaufteilung',
+    name: 'CO₂-Kostenaufteilung Rechner: Vermieter & Mieter 2026',
+    shortName: 'CO₂-Kostenaufteilung',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'CO2-Kostenaufteilung Rechner – Stufenmodell Vermieter & Mieter',
-    metaDescription: 'Ermitteln Sie die gesetzliche Aufteilung der CO2-Kosten für Gas, Heizöl & Fernwärme nach dem 10-Stufenmodell des CO2KostAufG mit Ausnahmeregelungen.',
-    h1: 'CO2-Kostenaufteilung Rechner – Gesetzliches Stufenmodell nach CO2KostAufG',
-    shortDescription: 'Berechnet die Aufteilung der CO2-Heizkosten zwischen Mieter und Vermieter nach dem 10-Stufen-Modell gemäß Kohlendioxidkostenaufteilungsgesetz.',
-    searchKeywords: ['co2 kostenaufteilung rechner', 'co2kostaufg 10 stufenmodell', 'co2 preis vermieter mieter anteil', 'kohlendioxidkostenaufteilungsgesetz', 'heizkostenabrechnung co2 anteil'],
+    metaTitle: 'CO₂-Kostenaufteilung Rechner: Vermieter & Mieter 2026',
+    metaDescription: 'CO₂-Kosten nach dem CO2KostAufG berechnen: 10-Stufenmodell für Vermieter und Mieter, anteilige Abrechnungszeiträume und §9-Sonderfälle.',
+    h1: 'CO₂-Kosten zwischen Vermieter und Mieter berechnen',
+    shortDescription: 'Bei vermieteten Wohngebäuden werden CO₂-Kosten nach dem CO2KostAufG abhängig vom CO₂-Ausstoß des Gebäudes zwischen Vermieter und Mieter verteilt. Geben Sie CO₂-Kosten, Emissionen, Wohnfläche und Abrechnungszeitraum ein.',
+    searchKeywords: [
+      'co2 abgabe rechner',
+      'co2 kostenaufteilung vermieter mieter',
+      'co2kostenaufteilungsgesetz rechner',
+      'co2kostaufg rechner 2026',
+      'co2 stufenmodell vermieter mieter',
+      'heizkostenabrechnung co2 anteil vermieter',
+      'denkmalschutz co2 aufteilung vermieter',
+      'fernwaerme anschlusszwang co2kostaufg',
+    ],
     inputs: [
       {
         id: 'co2CostTotal',
-        label: 'CO2-Kosten der Wohnung laut Heizkostenabrechnung in Euro',
+        label: 'CO₂-Kosten des Abrechnungszeitraums in €',
         type: 'number',
-        defaultValue: 140,
+        defaultValue: 200,
         min: 0,
-        max: 5000,
-        step: 1,
+        step: 10,
         unit: '€',
-        helpText: 'Der auf Ihre Wohnung entfallende CO₂-Kostenbetrag, der vom Vermieter bzw. Messdienstleister auf der Heizkostenabrechnung ausgewiesen ist.',
+        helpText: 'Gesamte CO₂-Kosten der Heizkostenabrechnung für diesen Abrechnungszeitraum laut Brennstoffrechnung.',
       },
       {
-        id: 'co2EmissionKgPerSqm',
-        label: 'Spezifischer CO2-Ausstoß des Gebäudes (in kg CO₂/m² Wohnfläche im Jahr)',
+        id: 'co2EmissionsKg',
+        label: 'CO₂-Emissionen des Abrechnungszeitraums in kg',
         type: 'number',
-        defaultValue: 28,
+        defaultValue: 2800,
         min: 0,
-        max: 150,
-        step: 0.5,
-        unit: 'kg/m²a',
-        helpText: 'Maßgeblicher Wert für die Stufeneinstufung. Dieser Wert bezieht sich stets auf das Gesamtgebäude und steht auf der Abrechnung.',
+        step: 50,
+        unit: 'kg',
+        helpText: 'CO₂-Ausstoß der Heizung im Abrechnungszeitraum (auf der Brennstoff-/Heizkostenabrechnung gesondert ausgewiesen).',
       },
       {
         id: 'livingArea',
-        label: 'Wohnfläche der Wohnung in m²',
+        label: 'Maßgebliche Wohnfläche in m²',
         type: 'number',
-        defaultValue: 80,
-        min: 10,
-        max: 500,
-        step: 1,
+        defaultValue: 100,
+        min: 1,
+        step: 5,
         unit: 'm²',
-        helpText: 'Fläche der Mietwohnung zur Plausibilitätsprüfung des Anteils.',
+        helpText: 'Abrechnungsrelevante Wohnfläche der Wohnung bzw. des Wohngebäudes laut Mietvertrag oder Abrechnung.',
       },
       {
         id: 'billingMonths',
-        label: 'Dauer des Abrechnungszeitraums in Monaten',
+        label: 'Länge des Abrechnungszeitraums in Monaten',
         type: 'number',
         defaultValue: 12,
         min: 1,
         max: 12,
         step: 1,
         unit: 'Monate',
-        helpText: 'Regulär 12 Monate. Bei unterjährigem Ein-/Auszug wird die Einstufung auf ein volles Kalenderjahr hochgerechnet.',
+        helpText: 'Regulär 12 Monate. Bei unterjährigen Zeiträumen (z. B. Ein-/Auszug) werden die Schwellenwerte nach § 5 Abs. 1 Satz 4 CO2KostAufG proportional gekürzt.',
       },
       {
         id: 'statutoryExemption',
-        label: 'Gesetzliche Ausnahmeregelung (§ 9 CO2KostAufG)',
+        label: 'Öffentlich-rechtliche Beschränkung nach § 9 CO2KostAufG',
         type: 'select',
         defaultValue: 'none',
         options: [
-          { value: 'none', label: 'Keine Ausnahme (Reguläres 10-Stufenmodell)' },
-          { value: 'heritage', label: 'Denkmalschutz / Sanierungsbeschränkung (§ 9 Abs. 1: Vermieteranteil halbiert)' },
-          { value: 'district_mandate', label: 'Anschluss- & Benutzungszwang Fernwärme (§ 9 Abs. 2: Vermieteranteil entfällt)' },
+          { value: 'none', label: 'Keine relevante öffentlich-rechtliche Beschränkung' },
+          { value: 'single_restriction', label: 'Beschränkung verhindert entweder Gebäudesanierung ODER Verbesserung der Wärmeversorgung (§ 9 Abs. 1)' },
+          { value: 'both_restrictions', label: 'Beschränkungen verhindern sowohl Gebäudesanierung ALS AUCH Verbesserung der Wärmeversorgung (§ 9 Abs. 2)' },
         ],
+        helpText: '§ 9 greift nur, wenn öffentlich-rechtliche Vorgaben (z. B. Denkmalschutz, Milieuschutz, Anschluss- und Benutzungszwang) nachweisbar eine Sanierung oder Heizungsmodernisierung rechtlich verhindern.',
       },
     ],
-    calculate: (inputs) => {
-      if (inputs.co2CostTotal === undefined || inputs.co2CostTotal === null || String(inputs.co2CostTotal).trim() === '') {
-        return {
-          primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: 0, formattedValue: '-' },
-          error: 'Bitte geben Sie den CO₂-Kostenbetrag aus der Abrechnung an.',
-        };
-      }
-
-      const total = parseFloat(String(inputs.co2CostTotal).replace(',', '.'));
-      if (isNaN(total) || total < 0) {
-        return {
-          primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: 0, formattedValue: '-' },
-          error: 'Die CO₂-Kosten dürfen nicht negativ sein (0 € ist zulässig).',
-        };
-      }
-
-      const rawKg = inputs.co2EmissionKgPerSqm !== undefined && inputs.co2EmissionKgPerSqm !== null && String(inputs.co2EmissionKgPerSqm).trim() !== ''
-        ? parseFloat(String(inputs.co2EmissionKgPerSqm).replace(',', '.'))
-        : 28;
-
-      if (isNaN(rawKg) || rawKg < 0) {
-        return {
-          primary: { id: 'landlordShare', label: 'Kostenanteil Vermieter', value: 0, formattedValue: '-' },
-          error: 'Der spezifische CO₂-Ausstoß darf nicht negativ sein.',
-        };
-      }
-
-      const area = inputs.livingArea !== undefined && inputs.livingArea !== null && String(inputs.livingArea).trim() !== ''
-        ? Math.max(1, parseFloat(String(inputs.livingArea).replace(',', '.')) || 80)
-        : 80;
-
-      const months = inputs.billingMonths !== undefined && inputs.billingMonths !== null && String(inputs.billingMonths).trim() !== ''
-        ? Math.min(12, Math.max(1, parseInt(String(inputs.billingMonths), 10) || 12))
-        : 12;
-
-      const exemption = String(inputs.statutoryExemption || 'none');
-
-      // Jahreshochrechnung bei unterjähriger Mietdauer (§ 5 Abs. 3 CO2KostAufG)
-      const annualizedKg = months < 12 ? (rawKg * 12) / months : rawKg;
-
-      // 10-Stufenmodell nach Anlage zu § 5 Abs. 1 CO2KostAufG:
-      let baseLandlordPct = 0;
-      let stepNumber = 1;
-      let stepRange = '< 12 kg CO₂/m²a';
-
-      if (annualizedKg < 12) {
-        baseLandlordPct = 0.00;
-        stepNumber = 1;
-        stepRange = '< 12 kg CO₂/m²a (sehr effizient / Niedrigenergie)';
-      } else if (annualizedKg < 17) {
-        baseLandlordPct = 0.10;
-        stepNumber = 2;
-        stepRange = '12 bis < 17 kg CO₂/m²a';
-      } else if (annualizedKg < 22) {
-        baseLandlordPct = 0.20;
-        stepNumber = 3;
-        stepRange = '17 bis < 22 kg CO₂/m²a';
-      } else if (annualizedKg < 27) {
-        baseLandlordPct = 0.30;
-        stepNumber = 4;
-        stepRange = '22 bis < 27 kg CO₂/m²a';
-      } else if (annualizedKg < 32) {
-        baseLandlordPct = 0.40;
-        stepNumber = 5;
-        stepRange = '27 bis < 32 kg CO₂/m²a';
-      } else if (annualizedKg < 37) {
-        baseLandlordPct = 0.50;
-        stepNumber = 6;
-        stepRange = '32 bis < 37 kg CO₂/m²a';
-      } else if (annualizedKg < 42) {
-        baseLandlordPct = 0.60;
-        stepNumber = 7;
-        stepRange = '37 bis < 42 kg CO₂/m²a';
-      } else if (annualizedKg < 47) {
-        baseLandlordPct = 0.70;
-        stepNumber = 8;
-        stepRange = '42 bis < 47 kg CO₂/m²a';
-      } else if (annualizedKg < 52) {
-        baseLandlordPct = 0.80;
-        stepNumber = 9;
-        stepRange = '47 bis < 52 kg CO₂/m²a';
-      } else {
-        baseLandlordPct = 0.95;
-        stepNumber = 10;
-        stepRange = '≥ 52 kg CO₂/m²a (sehr sanierungsbedürftig)';
-      }
-
-      // Berücksichtigung gesetzlicher Ausnahmen nach § 9 CO2KostAufG
-      let effectiveLandlordPct = baseLandlordPct;
-      let exemptionNote = '';
-
-      if (exemption === 'heritage') {
-        effectiveLandlordPct = baseLandlordPct * 0.5;
-        exemptionNote = 'Vermieteranteil nach § 9 Abs. 1 CO2KostAufG halbiert (Denkmalschutz / rechtliche Sanierungshindernisse).';
-      } else if (exemption === 'district_mandate') {
-        effectiveLandlordPct = 0;
-        exemptionNote = 'Vermieteranteil nach § 9 Abs. 2 CO2KostAufG entfallen (öffentlich-rechtlicher Anschluss- und Benutzungszwang).';
-      }
-
-      const tenantPct = 1 - effectiveLandlordPct;
-      const landlordShare = total * effectiveLandlordPct;
-      const tenantShare = total * tenantPct;
-
-      return {
-        primary: {
-          id: 'landlordShare',
-          label: 'Kostenanteil Vermieter',
-          value: landlordShare,
-          formattedValue: formatCurrency(landlordShare),
-          highlight: true,
-          helpText: `Entspricht ${formatPercent(effectiveLandlordPct * 100, 1)} der Gesamtkosten von ${formatCurrency(total)}.`,
-        },
-        secondary: [
-          {
-            id: 'tenantShare',
-            label: 'Kostenanteil Mieter',
-            value: tenantShare,
-            formattedValue: formatCurrency(tenantShare),
-            helpText: `Entspricht ${formatPercent(tenantPct * 100, 1)} der Gesamtkosten.`,
-          },
-          {
-            id: 'landlordPct',
-            label: 'Vermieter-Anteil nach Stufe',
-            value: effectiveLandlordPct * 100,
-            formattedValue: formatPercent(effectiveLandlordPct * 100, 0),
-          },
-          {
-            id: 'tenantPct',
-            label: 'Mieter-Anteil nach Stufe',
-            value: tenantPct * 100,
-            formattedValue: formatPercent(tenantPct * 100, 0),
-          },
-          {
-            id: 'stepDisplay',
-            label: 'Gesetzliche Einstufung',
-            value: stepNumber,
-            formattedValue: `Stufe ${stepNumber} von 10 (${formatPercent(effectiveLandlordPct * 100, 0)} Vermieter)`,
-            helpText: stepRange,
-          },
-          {
-            id: 'specificEmission',
-            label: 'Gebäude-Emissionswert',
-            value: annualizedKg,
-            formattedValue: `${formatNumber(annualizedKg, 1)} kg CO₂/m²a`,
-            helpText: months < 12 ? `Aus ${formatNumber(rawKg, 1)} kg in ${months} Monaten aufs Gesamtjahr hochgerechnet.` : 'Jahreswert des Gebäudes.',
-          },
-        ],
-        directAnswer: `Von den ${formatCurrency(total)} CO₂-Kosten muss der Vermieter ${formatCurrency(landlordShare)} (${formatPercent(effectiveLandlordPct * 100, 1)}) übernehmen und der Mieter ${formatCurrency(tenantShare)} (${formatPercent(tenantPct * 100, 1)}).`,
-        summaryText: `Bei einem spezifischen CO₂-Ausstoß von ${formatNumber(annualizedKg, 1)} kg/m²a fällt das Gebäude in Stufe ${stepNumber} des CO2KostAufG. Der Vermieter trägt ${formatCurrency(landlordShare)} (${formatPercent(effectiveLandlordPct * 100, 1)}) und der Mieter ${formatCurrency(tenantShare)} (${formatPercent(tenantPct * 100, 1)}) der CO₂-Kosten.`,
-        basisSummary: [
-          { label: 'CO2-Kosten der Wohnung', value: formatCurrency(total) },
-          { label: 'Spezifischer Gebäude-Ausstoß', value: `${formatNumber(annualizedKg, 1)} kg CO₂/m²a (Stufe ${stepNumber})` },
-          { label: 'Abrechnungsdauer', value: `${months} Monate` },
-          { label: 'Gesetzliche Ausnahme', value: exemption === 'none' ? 'Keine (Regulär)' : (exemption === 'heritage' ? '§ 9 Abs. 1 (Halbierung)' : '§ 9 Abs. 2 (Befreiung)') },
-        ],
-        calculationSteps: [
-          months < 12
-            ? `Jahreshochrechnung (§ 5 Abs. 3): ${formatNumber(rawKg, 1)} kg/m² × (12 ÷ ${months}) = ${formatNumber(annualizedKg, 1)} kg CO₂/m²a`
-            : `Spezifischer Gebäude-Emissionswert: ${formatNumber(annualizedKg, 1)} kg CO₂/m²a`,
-          `Stufenzuordnung nach § 5 Anlage: ${stepRange} → Basis-Vermieteranteil: ${formatPercent(baseLandlordPct * 100, 0)}`,
-          exemption !== 'none'
-            ? `Ausnahmeregelung (§ 9): ${exemptionNote} → Effektiver Vermieteranteil: ${formatPercent(effectiveLandlordPct * 100, 1)}`
-            : `Effektiver Vermieteranteil: ${formatPercent(effectiveLandlordPct * 100, 0)}, Mieteranteil: ${formatPercent(tenantPct * 100, 0)}`,
-          `Vermieter-Kosten: ${formatCurrency(total)} × ${formatPercent(effectiveLandlordPct * 100, 1)} = ${formatCurrency(landlordShare)}`,
-          `Mieter-Kosten: ${formatCurrency(total)} × ${formatPercent(tenantPct * 100, 1)} = ${formatCurrency(tenantShare)}`,
-        ],
-        qualifications: [
-          'Gilt ausschließlich für Wohngebäude. Für Nichtwohngebäude (Gewerberäume) gilt nach § 8 CO2KostAufG eine gesetzliche 50:50-Pauschalaufteilung.',
-          'Die Stufeneinstufung muss nach § 5 Abs. 1 stets auf den Emissionsdaten des Gesamtgebäudes basieren, nicht auf den individuellen Heizgewohnheiten einzelner Mieter.',
-          'Vertragliche Klauseln im Mietvertrag, die den Mieter über das CO2KostAufG hinaus belasten, sind nach § 3 CO2KostAufG unwirksam.',
-        ],
-      };
-    },
-    formula: 'Vermieteranteil = Gesamt-CO2-Kosten × Stufen-Prozentsatz nach § 5 CO2KostAufG',
-    formulaExplanation: 'Das 10-Stufen-Modell staffelt den Vermieteranteil von 0 % (bei < 12 kg CO₂/m²a) bis 95 % (bei ≥ 52 kg CO₂/m²a). Bei Denkmalschutz oder Fernwärmezwang greifen Minderungstatbestände nach § 9.',
+    calculate: calculateLandlordTenantCO2,
+    formula: 'Spezifischer Ausstoß = CO₂-Ausstoß (kg) ÷ Wohnfläche (m²); Einstufung in gesetzliche 10-Stufen-Tabelle (bei unterjährigem Zeitraum proportional gekürzte Grenzwerte nach § 5 Abs. 1 Satz 4).',
+    formulaExplanation: 'Aus der CO₂-Menge und der Wohnfläche wird der spezifische Ausstoß berechnet. Dieser bestimmt nach der Anlage zu § 5 Abs. 1 CO2KostAufG den prozentualen Vermieter- und Mieteranteil. Bei öffentlich-rechtlichen Beschränkungen halbiert sich der Vermieteranteil nach § 9 Abs. 1 bzw. entfällt die reguläre Aufteilung nach § 9 Abs. 2.',
     workedExample: {
-      title: 'Beispiel: 140,00 € CO2-Kosten bei 28 kg CO2/m²a Gebäudeausstoß',
-      description: 'Mit 28 kg/m²a fällt das Wohngebäude in Stufe 5 (27 bis < 32 kg CO₂/m²a). Gesetzlicher Verteilschlüssel: 40 % Vermieter, 60 % Mieter.',
-      inputs: { co2CostTotal: 140, co2EmissionKgPerSqm: 28, livingArea: 80, billingMonths: 12, statutoryExemption: 'none' },
-      resultSummary: 'Vermieter: 56,00 € (40 %) / Mieter: 84,00 € (60 %)',
+      title: 'Beispiel: 100 m² Wohnung mit 2.800 kg CO₂ und 200 € CO₂-Kosten',
+      description: 'Spezifischer Ausstoß: 2.800 kg ÷ 100 m² = 28 kg CO₂/m²a. Dies fällt in Stufe 5 (27 bis < 32 kg CO₂/m²a): 40 % Vermieter (80,00 €) und 60 % Mieter (120,00 €). Liegt eine §-9-Ausnahme vor (z. B. Denkmalschutz), sinkt der Vermieteranteil auf 20 % (40,00 €).',
+      inputs: { co2CostTotal: 200, co2EmissionsKg: 2800, livingArea: 100, billingMonths: 12, statutoryExemption: 'none' },
+      resultSummary: 'Vermieter: 80,00 € (40 %) / Mieter: 120,00 € (60 %)',
     },
     workedExamples: [
       {
-        title: 'Beispiel 1: Reguläres Mehrfamilienhaus (Stufe 5)',
-        description: '140,00 € CO₂-Kosten bei 28 kg CO₂/m²a. Vermieter: 140 € × 0,40 = 56,00 €. Mieter: 140 € × 0,60 = 84,00 €.',
-        inputs: { co2CostTotal: 140, co2EmissionKgPerSqm: 28, livingArea: 80, billingMonths: 12, statutoryExemption: 'none' },
-        resultSummary: 'Vermieter: 56,00 € / Mieter: 84,00 €',
+        title: 'Beispiel 1: Reguläres Abrechnungsjahr (100 m², Stufe 5)',
+        description: '2.800 kg CO₂ ÷ 100 m² = 28 kg/m²a. Einstufung in Stufe 5 (27 bis < 32 kg/m²a): Vermieter trägt 40 % (80,00 €), Mieter trägt 60 % (120,00 €).',
+        inputs: { co2CostTotal: 200, co2EmissionsKg: 2800, livingArea: 100, billingMonths: 12, statutoryExemption: 'none' },
+        resultSummary: 'Vermieter: 80,00 € (40 %) / Mieter: 120,00 € (60 %)',
       },
       {
-        title: 'Beispiel 2: Denkmalgeschütztes Gebäude (§ 9 Abs. 1 Halbierung)',
-        description: '200,00 € CO₂-Kosten bei 45 kg CO₂/m²a (regulär Stufe 8: 70 % Vermieter). Durch Denkmalschutz wird der Vermieteranteil halbiert (35 % Vermieter, 65 % Mieter).',
-        inputs: { co2CostTotal: 200, co2EmissionKgPerSqm: 45, livingArea: 80, billingMonths: 12, statutoryExemption: 'heritage' },
-        resultSummary: 'Vermieter: 70,00 € (35 %) / Mieter: 130,00 € (65 %)',
+        title: 'Beispiel 2: Unterjährige Abrechnung über 6 Monate (§ 5 Abs. 1 Satz 4)',
+        description: '6 Monate Abrechnungsdauer, 100 m², 1.200 kg CO₂, 200 € Kosten. Spezifischer Zeitraum-Ausstoß: 1.200 ÷ 100 = 12 kg/m². Die Schwellenwerte werden mit 6/12 halbiert (Stufe 4: 11,0 bis < 13,5 kg/m²). 12 kg/m² fällt korrekt in Stufe 4 (30 % Vermieter = 60,00 €, 70 % Mieter = 140,00 €).',
+        inputs: { co2CostTotal: 200, co2EmissionsKg: 1200, livingArea: 100, billingMonths: 6, statutoryExemption: 'none' },
+        resultSummary: 'Vermieter: 60,00 € (30 %) / Mieter: 140,00 € (70 %)',
+      },
+      {
+        title: 'Beispiel 3: Denkmalschutz oder Fernwärmezwang (§ 9 Abs. 1)',
+        description: 'Gleiches Gebäude wie in Beispiel 1 (normal 40 % Vermieter), jedoch verhindert eine Denkmalauflage die Fassadendämmung. Nach § 9 Abs. 1 halbiert sich der Vermieteranteil von 40 % auf 20 % (40,00 €). Der Mieteranteil steigt auf 80 % (160,00 €).',
+        inputs: { co2CostTotal: 200, co2EmissionsKg: 2800, livingArea: 100, billingMonths: 12, statutoryExemption: 'single_restriction' },
+        resultSummary: 'Vermieter: 40,00 € (20 %) / Mieter: 160,00 € (80 %)',
       },
     ],
     content: {
-      intro: 'Das Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) regelt die verbindliche Verteilung der CO₂-Zertifikatskosten für Erdgas, Heizöl und Fernwärme zwischen Vermietern und Mietern über ein 10-Stufen-Modell.',
-      details: 'Die gesetzliche Einstufung richtet sich nach dem spezifischen Kohlendioxidausstoß des gesamten Gebäudes je Quadratmeter Wohnfläche und Jahr. Je energieeffizienter das Gebäude saniert ist, desto geringer ist der Vermieteranteil (bei unter 12 kg CO₂/m²a trägt der Mieter 100 %). Bei unsanierten Altbauten mit hohem Heizbedarf übernimmt der Vermieter bis zu 95 % der CO₂-Kosten.',
+      intro: 'Bei vermieteten Wohngebäuden werden CO₂-Kosten nach dem CO2KostAufG abhängig vom CO₂-Ausstoß des Gebäudes zwischen Vermieter und Mieter verteilt. Geben Sie CO₂-Kosten, Emissionen, Wohnfläche und Abrechnungszeitraum ein.',
+      sections: [
+        {
+          title: 'Das gesetzliche 10-Stufenmodell nach CO2KostAufG',
+          content: 'Seit 2023 gilt für Wohngebäude ein 10-stufiges Anreizmodell: Je schlechter der energetische Zustand des Gebäudes, desto höher ist der vom Vermieter zu tragende Kostenanteil (von 0 % in Stufe 1 bis zu 95 % in Stufe 10).\n\n| Stufe | Spezifische CO₂-Emissionen (pro Jahr) | Vermieteranteil | Mieteranteil |\n| :--- | :--- | :--- | :--- |\n| 1 | < 12 kg CO₂/m² | 0 % | 100 % |\n| 2 | 12 bis < 17 kg CO₂/m² | 10 % | 90 % |\n| 3 | 17 bis < 22 kg CO₂/m² | 20 % | 80 % |\n| 4 | 22 bis < 27 kg CO₂/m² | 30 % | 70 % |\n| 5 | 27 bis < 32 kg CO₂/m² | 40 % | 60 % |\n| 6 | 32 bis < 37 kg CO₂/m² | 50 % | 50 % |\n| 7 | 37 bis < 42 kg CO₂/m² | 60 % | 40 % |\n| 8 | 42 bis < 47 kg CO₂/m² | 70 % | 30 % |\n| 9 | 47 bis < 52 kg CO₂/m² | 80 % | 20 % |\n| 10 | ≥ 52 kg CO₂/m² | 95 % | 5 % |',
+        },
+        {
+          title: 'Unterjährige Abrechnungszeiträume (§ 5 Abs. 1 Satz 4)',
+          content: 'Erstreckt sich die Abrechnung auf weniger als 12 Monate (z. B. bei Mieterwechsel unter dem Jahr), dürfen die Messwerte nicht gegen die vollen Jahresgrenzwerte geprüft werden. Nach § 5 Abs. 1 Satz 4 CO2KostAufG werden die Tabellenschwellenwerte proportional gekürzt: Schwellenwert = Jahresgrenzwert × Monate ÷ 12. Bei 6 Monaten halbieren sich alle Grenzwerte (Stufe 1: < 6 kg/m², Stufe 6: 16 bis < 18,5 kg/m², Stufe 10: ≥ 26 kg/m²).',
+        },
+        {
+          title: 'Was passiert bei Denkmalschutz oder Anschlusszwang? (§ 9)',
+          content: 'Öffentlich-rechtliche Vorgaben können Vermieter daran hindern, energetische Sanierungen vorzunehmen. Nach § 9 Abs. 1 CO2KostAufG wird der Vermieteranteil um die Hälfte gekürzt, wenn Vorschriften wie Denkmalschutz, Erhaltungssatzungen oder ein kommunaler Anschluss- und Benutzungszwang an Fernwärme einer wesentlichen energetischen Verbesserung des Gebäudes ODER der Heizungsanlage entgegenstehen.\n\nVerhindern die Vorgaben kumulativ BEIDE Sanierungsbereiche (Gebäudehülle und Heizung), entfällt nach § 9 Abs. 2 CO2KostAufG die Aufteilung nach dem regulären Stufenmodell. Der Vermieter muss dem Mieter die Umstände nachweisen (§ 9 Abs. 3). Ein Fernwärme-Anschlusszwang bedeutet NICHT automatisch 0 % Vermieteranteil.',
+        },
+        {
+          title: 'Wo finden Sie die Angaben auf Ihrer Heizkostenabrechnung?',
+          content: 'Brennstofflieferanten und Fernwärmeversorger sind nach § 3 CO2KostAufG gesetzlich verpflichtet, auf jeder Rechnung die gelieferte Brennstoffmenge, den maßgeblichen Emissionsfaktor, die Gesamtemissionen in Kilogramm CO₂ sowie den darauf entfallenden CO₂-Kostenbetrag gesondert auszuweisen. Diese Angaben übernimmt die Hausverwaltung in die Heizkostenabrechnung.',
+        },
+        {
+          title: 'Rechtlicher Hinweis und Abgrenzung',
+          content: 'Der Rechner dient zur rechnerischen Orientierung anhand der eingegebenen Daten und des gesetzlichen Stufenmodells. Sonderfälle und die rechtliche Einordnung öffentlich-rechtlicher Beschränkungen können eine individuelle Prüfung erfordern. Keine Rechtsberatung.\n\nFür Nichtwohngebäude (Gewerberäume) gilt das 10-Stufenmodell nicht: Dort gilt nach § 8 CO2KostAufG eine pauschale 50:50-Halbteilung zwischen Vermieter und Mieter.',
+        },
+      ],
+      details: 'Gesetzliche Grundlage: Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG). Berechnungsablauf: Spezifischer Ausstoß = Gesamtemissionen (kg) ÷ Wohnfläche (m²). Stufeneinordnung nach proportional reduzierten Grenzwerten (§ 5 Abs. 1 Satz 4). Vermieteranteil halbiert bei Nachweis öffentlich-rechtlicher Hindernisse (§ 9 Abs. 1).',
     },
     faqs: [
-      { question: 'Woher stammen die Werte für den CO₂-Ausstoß und die CO₂-Kosten?', answer: 'Brennstofflieferanten (Gas-, Öl- und Fernwärmeversorger) sind nach § 3 CO2KostAufG gesetzlich verpflichtet, die gelieferte Brennstoffmenge, den spezifischen Emissionsfaktor, die Gesamtemissionen in kg sowie den auf den CO₂-Preis entfallenden Rechnungsbetrag transparent auf der Rechnung auszuweisen. Der Vermieter muss diese Angaben in die jährliche Heizkostenabrechnung übernehmen.' },
-      { question: 'Gilt das 10-Stufen-Modell auch für Gewerbe- und Büromieten?', answer: 'Nein. Für Nichtwohngebäude gilt nach § 8 CO2KostAufG eine gesetzliche 50:50-Halbteilung der CO₂-Kosten zwischen Vermieter und Mieter, solange kein gesetzliches Stufenmodell für Nichtwohngebäude in Kraft tritt.' },
-      { question: 'Was gilt bei Denkmalschutz oder Fernwärme-Anschlusszwang?', answer: 'Nach § 9 CO2KostAufG wird der Vermieteranteil um 50 % gekürzt, wenn rechtliche Vorgaben wie Denkmalschutzauflagen oder Erhaltungsverordnungen wesentliche energetische Sanierungsmaßnahmen an der Gebäudehülle verhindern. Bei einem behördlichen Anschluss- und Benutzungszwang an ein Fernwärmenetz entfällt der Vermieteranteil vollständig.' },
-      { question: 'Darf der Vermieter die CO₂-Kostenaufteilung vertraglich abbedingen?', answer: 'Nein. Nach § 3 Abs. 4 CO2KostAufG sind Vereinbarungen im Mietvertrag unwirksam, die zum Nachteil des Mieters von den gesetzlichen Aufteilungsvorschriften abweichen.' },
+      {
+        question: 'Wie werden CO₂-Kosten zwischen Vermieter und Mieter aufgeteilt?',
+        answer: 'Über ein gesetzliches 10-Stufen-Modell (§ 5 und Anlage CO2KostAufG). Der Vermieter ermittelt den spezifischen CO₂-Ausstoß in kg CO₂ pro Quadratmeter Wohnfläche im Abrechnungszeitraum. Liegt der Wert unter 12 kg/m²a, trägt der Mieter 100 %. Mit steigendem Ausstoß steigt der Vermieteranteil in 10-Prozent-Schritten bis auf 95 % bei 52 kg/m²a oder mehr.',
+      },
+      {
+        question: 'Wo finde ich die CO₂-Emissionen auf meiner Abrechnung?',
+        answer: 'Brennstoff- und Wärmelieferanten sind nach § 3 CO2KostAufG gesetzlich verpflichtet, auf jeder Rechnung die gelieferte Brennstoffmenge, den maßgeblichen Emissionsfaktor, die Gesamtemissionen in kg CO₂ sowie den darauf entfallenden CO₂-Kostenbetrag transparent auszuweisen.',
+      },
+      {
+        question: 'Was passiert bei einem Abrechnungszeitraum unter 12 Monaten?',
+        answer: 'Nach § 5 Abs. 1 Satz 4 CO2KostAufG werden bei einem kürzeren Zeitraum die Schwellenwerte der Einstufungstabelle anteilig gekürzt (z. B. bei 6 Monaten Halbierung aller Grenzwerte). Der gemessene Zeitraum-Ausstoß wird anschließend mit diesen skalierten Grenzwerten verglichen.',
+      },
+      {
+        question: 'Was gilt bei Denkmalschutz?',
+        answer: 'Verhindern denkmalschutzrechtliche Vorgaben eine wesentliche energetische Sanierung des Gebäudes, greift in der Regel § 9 Abs. 1 CO2KostAufG: Der ansonsten geltende Vermieteranteil wird um die Hälfte gekürzt. Der Vermieter muss dem Mieter die Denkmalauflage nachweisen.',
+      },
+      {
+        question: 'Was gilt bei Anschluss- und Benutzungszwang?',
+        answer: 'Besteht ein öffentlich-rechtlicher Anschluss- und Benutzungszwang an ein Fernwärmenetz, liegt ein gesetzliches Hindernis für eine eigene Verbesserung der Wärmeversorgung vor. Nach § 9 Abs. 1 CO2KostAufG führt dies zur Halbierung des Vermieteranteils (z. B. 40 % Basisanteil wird zu 20 % effektivem Vermieteranteil). Es bedeutet NICHT, dass der Vermieteranteil automatisch auf 0 % sinkt.',
+      },
+      {
+        question: 'Wann gilt § 9 Abs. 1?',
+        answer: 'Wenn öffentlich-rechtliche Vorgaben entweder einer wesentlichen energetischen Verbesserung des Gebäudes ODER einer wesentlichen Verbesserung der Wärme- und Warmwasserversorgung entgegenstehen. Die Rechtsfolge ist die Halbierung des nach dem Stufenmodell errechneten Vermieteranteils.',
+      },
+      {
+        question: 'Wann gilt § 9 Abs. 2?',
+        answer: 'Wenn öffentlich-rechtliche Vorgaben kumulativ sowohl einer Verbesserung des Gebäudes als auch der Wärmeversorgung entgegenstehen. In diesem seltenen Ausnahmefall erfolgt keine Kostenaufteilung nach dem regulären Stufenmodell.',
+      },
+      {
+        question: 'Gilt das Stufenmodell für Gewerbe?',
+        answer: 'Nein. Das 10-Stufen-Modell gilt ausschließlich für Wohngebäude. Für Nichtwohngebäude (Gewerberäume) gilt nach § 8 CO2KostAufG eine gesetzliche 50:50-Pauschalaufteilung zwischen Vermieter und Mieter.',
+      },
+      {
+        question: 'Ist das Ergebnis rechtsverbindlich?',
+        answer: 'Nein. Der Rechner dient zur rechnerischen Orientierung anhand der eingegebenen Daten und des gesetzlichen Stufenmodells. Sonderfälle und die rechtliche Einordnung öffentlich-rechtlicher Beschränkungen können eine individuelle Prüfung erfordern. Keine Rechtsberatung.',
+      },
     ],
-    relatedSlugs: ['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'warmmiete-rechner', 'heizkostenvergleich-rechner'],
+    relatedSlugs: ['co2-preis-rechner', 'gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'heizkostenvergleich-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG)',
+      source: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG), aktuelle konsolidierte Fassung 2026',
       sourceUrl: 'https://www.gesetze-im-internet.de/co2kostaufg/',
-      lastVerified: '2026-03-15',
+      lastVerified: '2026-10-29',
     },
     trustMeta: {
-      methodology: 'Offizielles 10-Stufenmodell nach Anlage zu § 5 Abs. 1 CO2KostAufG inklusive Hochrechnung für unterjährige Zeiträume (§ 5 Abs. 3) und Sonderkürzungen (§ 9)',
-      sourceName: 'Bundesministerium für Wirtschaft und Klimaschutz (BMWK) / CO2KostAufG',
-      lastReviewed: '2026-10-21',
+      methodology: 'Offizielles 10-Stufenmodell nach § 5 und Anlage CO2KostAufG, proportionale Grenzwertskalierung nach § 5 Abs. 1 Satz 4 sowie Sonderregelung nach § 9',
+      sourceName: 'Bundesministerium der Justiz / Gesetze im Internet (CO2KostAufG)',
+      lastReviewed: '2026-10-29',
     },
   },
 

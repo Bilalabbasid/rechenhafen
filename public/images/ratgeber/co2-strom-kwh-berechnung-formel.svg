@@ -52,13 +52,13 @@
     <text x="105" y="22" text-anchor="middle" class="text-head">2. UBA-Faktor (g/kWh)</text>
     
     <text x="105" y="65" text-anchor="middle" font-size="22" font-weight="bold" fill="#0369a1">344 g CO₂/kWh</text>
-    <text x="105" y="85" text-anchor="middle" class="text-sub">Strommix 2025 (UBA 2026)</text>
+    <text x="105" y="85" text-anchor="middle" class="text-sub">Stromerzeugung 2025 (UBA 2026)</text>
 
     <line x1="20" y1="102" x2="190" y2="102" stroke="#e2e8f0" stroke-width="1" />
 
-    <text x="20" y="125" class="text-body">• Kraftwerksebene: 344 g CO₂</text>
-    <text x="20" y="145" class="text-body">• Lebenszyklus: 410 g CO₂e</text>
-    <text x="20" y="165" class="text-body">• Neuanlagen-Öko: 25 g CO₂e</text>
+    <text x="20" y="125" class="text-body">• Deutscher Strommix 2025</text>
+    <text x="20" y="145" class="text-body">• Direkte Stromerzeugung</text>
+    <text x="20" y="165" class="text-body">• Veröffentlicht: 23.03.2026</text>
   </g>
 
   <!-- Operator = -->
@@ -76,25 +76,30 @@
 
     <line x1="20" y1="102" x2="190" y2="102" stroke="#bae6fd" stroke-width="1" />
 
-    <text x="20" y="125" class="text-body">• 860.000 g ÷ 1.000 = 860 kg</text>
+    <text x="20" y="125" class="text-body">• 2.500 × 344 ÷ 1.000 = 860 kg</text>
     <text x="20" y="145" class="text-body">• Monatsmittel: ca. 71,7 kg</text>
-    <text x="20" y="165" class="text-body">• Lebenszyklus: 1.025 kg CO₂e</text>
+    <text x="20" y="165" class="text-body">• Tagesschnitt: ca. 2,36 kg</text>
   </g>
 
-  <!-- Comparison Box: Ökostrom vs. Standard Strommix -->
+  <!-- Comparison Box: Verschiedene Verbrauchsstufen -->
   <g transform="translate(35, 285)">
     <rect width="730" height="135" class="card-green" />
-    <text x="25" y="28" font-size="14" font-weight="bold" fill="#15803d">Vergleich &amp; Einsparpotenzial: Standard-Strommix vs. Neuanlagen-Ökostrom</text>
-    <text x="25" y="48" class="text-sub">Basis: 2.500 kWh Jahresverbrauch | Ökostrom verursacht im Lebenszyklus ca. 25 g CO₂e/kWh</text>
+    <text x="25" y="28" font-size="14" font-weight="bold" fill="#15803d">Vergleich typischer Haushaltsgrößen (deutscher Strommix 2025: 344 g CO₂/kWh)</text>
+    <text x="25" y="48" class="text-sub">Rechnerische CO₂-Menge aus der reinen Stromerzeugung im Kraftwerkspark (UBA 2026)</text>
 
-    <!-- Bar 1: Standard Mix -->
-    <text x="25" y="78" class="text-body" font-weight="600">Standard-Strommix (344 g CO₂/kWh):</text>
-    <rect x="300" y="65" width="320" height="18" rx="4" fill="#64748b" />
-    <text x="630" y="79" font-size="12" font-weight="bold" fill="#0f172a">860 kg CO₂</text>
+    <!-- Bar 1: 1 Person -->
+    <text x="25" y="78" class="text-body" font-weight="600">1 Person (1.500 kWh/a):</text>
+    <rect x="250" y="65" width="190" height="18" rx="4" fill="#0284c7" />
+    <text x="450" y="79" font-size="12" font-weight="bold" fill="#0f172a">516 kg CO₂</text>
 
-    <!-- Bar 2: Green Electricity -->
-    <text x="25" y="108" class="text-body" font-weight="600">Ökostrom Neuanlagen (25 g CO₂e/kWh):</text>
-    <rect x="300" y="95" width="23" height="18" rx="4" fill="#16a34a" />
-    <text x="335" y="109" font-size="12" font-weight="bold" fill="#15803d">62,5 kg CO₂e (-797,5 kg Vermeidung)</text>
+    <!-- Bar 2: 2 Personen -->
+    <text x="25" y="102" class="text-body" font-weight="600">2 Personen (2.500 kWh/a):</text>
+    <rect x="250" y="89" width="317" height="18" rx="4" fill="#0369a1" />
+    <text x="577" y="103" font-size="12" font-weight="bold" fill="#0f172a">860 kg CO₂</text>
+
+    <!-- Bar 3: Familie -->
+    <text x="25" y="126" class="text-body" font-weight="600">Familie (3.500 kWh/a):</text>
+    <rect x="250" y="113" width="443" height="18" rx="4" fill="#0f172a" />
+    <text x="703" y="127" font-size="12" font-weight="bold" fill="#0f172a">1.204 kg</text>
   </g>
 </svg>

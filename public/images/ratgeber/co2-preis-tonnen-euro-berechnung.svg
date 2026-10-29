@@ -91,6 +91,6 @@
     <text x="25" y="55" class="text-body">• <tspan font-weight="bold">Nur der CO₂-Anteil:</tspan> Das Ergebnis zeigt ausschließlich die rechnerischen CO₂-Kosten, nicht die gesamte Heiz- oder Tankrechnung.</text>
     <text x="25" y="78" class="text-body">• <tspan font-weight="bold">Keine Doppelzählung:</tspan> In Bruttopreisen an Tankstellen und in Gasverträgen ist der CO₂-Preis bereits einkalkuliert.</text>
     <text x="25" y="101" class="text-body">• <tspan font-weight="bold">Vermieter-Mieter-Aufteilung:</tspan> Für die 10-Stufen-Aufteilung nach CO2KostAufG gilt ein gesonderter Prüfpfad im Kostenaufteilungsrechner.</text>
-    <text x="25" y="122" class="text-sub">Berechnungsmethodik gem. BEHG und EBeV 2030 Standardfaktoren (Erdgas Ho: 0,182 kg/kWh, Heizöl: 2,66 kg/l, Diesel: 2,65 kg/l, Benzin: 2,37 kg/l).</text>
+    <text x="25" y="122" class="text-sub">Berechnungsmethodik gem. BEHG und EBeV 2030 Standardfaktoren (Erdgas Ho: 0,1814 kg/kWh, Heizöl EL: 2,676 kg/l, Diesel: 2,676 kg/l, Benzin: 2,394 kg/l, LPG: 3,013 kg/kg).</text>
   </g>
 </svg>

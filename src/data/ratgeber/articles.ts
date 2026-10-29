@@ -3337,7 +3337,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     category: 'haushalt-energie',
     categoryName: 'Haushalt & Energie',
     publishedAt: '2026-10-21',
-    updatedAt: '2026-10-21',
+    updatedAt: '2026-10-29',
     readingTimeMin: 6,
     coverIllustration: {
       src: '/images/ratgeber/co2-strom-kwh-berechnung-formel.svg',
@@ -3348,17 +3348,17 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     },
     author: {
       name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Umweltökonomie',
+      role: 'Fachredaktion Energie & Finanzen',
     },
     reviewer: {
-      name: 'Klima- und Energieanalyse RechenHafen',
-      role: 'Wissenschaftliche Qualitätssicherung',
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
     },
     summary:
       'Auf Ihrer Stromrechnung steht der Verbrauch in Kilowattstunden. Für eine CO₂-Schätzung benötigen Sie zusätzlich einen Emissionsfaktor. Er beschreibt, welche Emissionsmenge einer Kilowattstunde unter den Annahmen der jeweiligen Quelle zugeordnet wird.',
     keyTakeaways: [
-      'Kein zeitlos fester Wert: Der Strommix verändert sich stetig; das Umweltbundesamt nennt für das Datenjahr 2025 einen geschätzten Wert von 344 g CO₂ je Kilowattstunde.',
-      'Bilanzgrenzen unterscheiden: 344 g CO₂/kWh beschreibt CO₂ aus der Stromerzeugung; Lebenszykluswerte einschließlich Vorketten liegen bei rund 410 g CO₂e/kWh.',
+      'Kein zeitlos fester Wert: Der Strommix verändert sich stetig; das Umweltbundesamt nennt für das Datenjahr 2025 einen geschätzten Wert von 344 g CO₂ je Kilowattstunde (veröffentlicht am 23. März 2026).',
+      'Bilanzgrenzen unterscheiden: 344 g CO₂/kWh beschreibt CO₂ aus der Stromerzeugung im Kraftwerkspark; vorgelagerte Prozesse und Leitungsverluste erfordern eigene Bilanzrahmen.',
       'Einfache Umrechnungsformel: Verbrauch in kWh × Faktor in g CO₂/kWh ÷ 1.000 = kg CO₂.',
       'Stromkosten und Emissionen trennen: Ein günstigerer Tarif führt nicht automatisch zu einer geringeren rechnerischen Emissionsmenge.',
     ],
@@ -3510,11 +3510,11 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     },
     author: {
       name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Mobilität & Klimabilanzierung',
+      role: 'Fachredaktion Energie & Finanzen',
     },
     reviewer: {
-      name: 'Verkehrsökonomie RechenHafen',
-      role: 'Wissenschaftliche Qualitätssicherung',
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
     },
     summary:
       'Wie viel ein Wechsel des Verkehrsmittels verändert, hängt nicht allein von der Entfernung ab. Entscheidend sind auch die tatsächlichen Pendeltage, die Strecke des jeweiligen Verkehrsmittels und die verwendeten Emissionsfaktoren.',
@@ -3607,12 +3607,12 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         {
           label: '1. Pkw Durchschnitt (164 g CO₂e/Pkm)',
           calculation: '7.200 Pkm × 164 g/Pkm ÷ 1.000 = 1.180,8 kg CO₂e',
-          note: 'UBA-Durchschnittswert für Pkw im Personenverkehr (Bezugsjahr 2024).',
+          note: 'UBA-Durchschnittswert für Pkw im Personenverkehr (TREMOD 6.71B, Bezugsjahr 2024).',
         },
         {
-          label: '2. Eisenbahn Fernverkehr (44 g CO₂e/Pkm)',
+          label: '2. Eisenbahn Nahverkehr (44 g CO₂e/Pkm)',
           calculation: '7.200 Pkm × 44 g/Pkm ÷ 1.000 = 316,8 kg CO₂e',
-          note: 'Eisenbahn-Nahverkehr liegt bei rund 79 g CO₂e/Pkm.',
+          note: 'Eisenbahn-Nahverkehr liegt bei 44 g CO₂e/Pkm (Fernverkehr liegt bei 26 g CO₂e/Pkm).',
         },
         {
           label: '3. Rechnerischer Unterschied',
@@ -3620,7 +3620,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
           note: 'Modellvergleich mit gleicher Strecke und gleicher Zahl an Pendeltagen.',
         },
       ],
-      resultSummary: 'Rund 1.181 kg CO₂e im Pkw gegenüber rund 317 kg CO₂e im Schienenfernverkehr (864 kg CO₂e Differenz).',
+      resultSummary: 'Rund 1.181 kg CO₂e im Pkw gegenüber rund 317 kg CO₂e im Eisenbahn-Nahverkehr (864 kg CO₂e Differenz).',
     },
     commonMistakes: [
       {
@@ -4397,6 +4397,881 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       },
     ],
     relatedArticleSlugs: ['gaszaehler-m3-in-kwh-umrechnen', 'gaskosten-berechnen', 'stromverbrauch-geraete-berechnen'],
+  },
+  {
+    slug: 'co2-preis-2026-brennstoffe',
+    title: 'CO₂-Preis 2026: Was kosten Gas, Heizöl, Benzin und Diesel?',
+    metaTitle: 'CO₂-Preis 2026: Was kosten Gas, Heizöl, Benzin & Diesel?',
+    metaDescription: 'CO₂-Preis 2026 im Detail: Preiskorridor nach § 10 BEHG (55–65 €/t), Modellpreis 60 €/t und genaue Mehrkosten je kWh Gas und Liter Kraftstoff.',
+    h1: 'CO₂-Preis 2026: Was kosten Gas, Heizöl, Benzin und Diesel?',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-29',
+    updatedAt: '2026-10-29',
+    readingTimeMin: 7,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Finanzen',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
+    },
+    summary:
+      'Im Jahr 2026 geht das nationale Emissionshandelssystem nach dem Brennstoffemissionshandelsgesetz (BEHG) von festen Ausgabepreisen in einen Versteigerungskorridor von 55 bis 65 Euro pro Emissionszertifikat (Tonne CO₂) über. Welche konkreten Aufschläge entstehen für Gas, Heizöl, Benzin und Diesel?',
+    keyTakeaways: [
+      'Gesetzlicher Rahmen: Gemäß § 10 Abs. 2 BEHG gilt für das Berichtsjahr 2026 ein Preiskorridor zwischen 55 Euro (Mindestpreis) und 65 Euro (Höchstpreis) je Zertifikat (Tonne CO₂).',
+      'Modellpreis 60 €/t: Für gesetzliche Vergleichsrechnungen (wie in § 4 CO2KostAufG) wird rechnerisch der Mittelwert von 60 Euro je Tonne CO₂ netto angesetzt.',
+      'Mehrwertsteuer nicht vergessen: Auf den CO₂-Kostenanteil entfallen für private Endverbraucher regulär 19 % Umsatzsteuer (z. B. 60 € netto = 71,40 € brutto je Tonne).',
+      'Brennstoff-Aufschläge: Bei 60 €/t netto betragen die CO₂-Kosten für Erdgas rund 1,09 Cent/kWh netto (1,30 ct brutto), für Heizöl und Diesel ca. 16,1 Cent/l netto (19,1 ct brutto) und für Benzin ca. 14,4 Cent/l netto (17,1 ct brutto).',
+    ],
+    primaryCalculator: {
+      slug: 'co2-preis-rechner',
+      title: 'CO₂-Preis-Rechner',
+      ctaText: 'CO₂-Kosten für Brennstoffe berechnen',
+      description: 'Ermitteln Sie die genauen CO₂-Kostenanteile für Ihren Erdgas-, Heizöl- oder Kraftstoffverbrauch bei 55, 60 oder 65 €/t.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'gaskostenrechner',
+        title: 'Gaskostenrechner',
+        ctaText: 'Gesamte Gaskosten berechnen',
+        description: 'Berechnet die vollständige Gasrechnung aus Grundpreis, Arbeitspreis und Steuern.',
+      },
+      {
+        slug: 'spritkostenrechner',
+        title: 'Spritkostenrechner',
+        ctaText: 'Kraftstoffkosten ermitteln',
+        description: 'Kalkuliert Spritkosten und CO₂-Bestandteile für Ihre Autofahrten.',
+      },
+      {
+        slug: 'heizkostenvergleich-rechner',
+        title: 'Heizkostenvergleich-Rechner',
+        ctaText: 'Heizsysteme vergleichen',
+        description: 'Vergleicht laufende Kosten und CO₂-Preise für Gas, Öl, Wärmepumpe und Fernwärme.',
+      },
+    ],
+    sections: [
+      {
+        id: 'der-preiskorridor-2026-nach-behg',
+        title: 'Der gesetzliche Preiskorridor 2026 nach § 10 BEHG',
+        paragraphs: [
+          'Bis Ende 2025 legte das Brennstoffemissionshandelsgesetz feste Preise fest: 45 Euro pro Tonne CO₂ im Jahr 2024 und 55 Euro pro Tonne CO₂ im Jahr 2025. Für das Jahr 2026 schreibt § 10 Abs. 2 BEHG erstmals eine Versteigerung mit einem gesetzlich vorgegebenen Preiskorridor vor: Die Zertifikate dürfen nicht unter 55 Euro und nicht über 65 Euro je Tonne veräußert werden.',
+          'Dieser Korridor garantiert Planungssicherheit, indem extreme Preissprünge nach oben gedeckelt und ein Preisverfall nach unten ausgeschlossen werden. Für statistische Modellberechnungen und die gesetzliche CO₂-Kostenaufteilung nach § 4 CO2KostAufG wird häufig der exakte rechnerische Mittelwert von 60 Euro je Tonne herangezogen.',
+        ],
+      },
+      {
+        id: 'so-werden-die-aufschlaege-berechnet',
+        title: 'So werden die CO₂-Aufschläge für die Energieträger berechnet',
+        paragraphs: [
+          'Grundlage der CO₂-Menge je Brennstoffeinheit sind die verbindlichen Standardwerte der Emissionsberichterstattungsverordnung (EBeV 2030, Anlage 2 Teil 4). Aus dem unteren Heizwert bzw. Brennwert und dem spezifischen Emissionsfaktor leiten sich folgende Verbrennungsfaktoren ab:',
+          'Erdgas (Brennwert Ho): 0,1814 kg CO₂/kWh. Bei 60 Euro je Tonne entspricht das netto 1,088 Cent pro kWh. Inklusive 19 % Mehrwertsteuer liegt der Aufschlag bei rund 1,30 Cent pro Kilowattstunde.',
+          'Heizöl EL und Dieselkraftstoff: 2,676 kg CO₂ je Liter. Bei 60 Euro je Tonne entstehen netto 16,06 Cent pro Liter bzw. 19,11 Cent pro Liter brutto.',
+          'Superbenzin: 2,394 kg CO₂ je Liter. Bei 60 Euro je Tonne sind das netto 14,37 Cent pro Liter bzw. 17,09 Cent pro Liter brutto.',
+          'Flüssiggas (LPG): 3,013 kg CO₂ je Kilogramm Brennstoff. In der EBeV 2030 ist LPG als Masse standardisiert; bei 60 €/t entstehen netto 18,08 Cent je kg (21,51 ct/kg brutto).',
+        ],
+      },
+      {
+        id: 'unterschied-brutto-und-netto',
+        title: 'Achtung: Mehrwertsteuer auf den CO₂-Preisbestandteil',
+        paragraphs: [
+          'In Rechnungen von Gas- und Öllieferanten sowie an Tankstellen wird der CO₂-Preis als Bestandteil des Netto-Warenpreises einkalkuliert. Auf diesen gesamten Energiepreis fällt die reguläre Umsatzsteuer von 19 % an.',
+          'Private Verbraucher zahlen bei einem CO₂-Zertifikatspreis von 60 Euro je Tonne netto somit effektiv 71,40 Euro je Tonne brutto. Rechnen Sie daher stets mit dem Bruttobetrag, wenn Sie die tatsächliche Mehrbelastung Ihres Haushaltsbudgets kalkulieren möchten.',
+        ],
+      },
+      {
+        id: 'abgrenzung-zur-vermieteraufteilung',
+        title: 'Abgrenzung: Was dieser CO₂-Preis für Mieter und Vermieter bedeutet',
+        paragraphs: [
+          'In vermieteten Wohngebäuden darf der Vermieter die CO₂-Kosten der Heizung seit 2023 nicht mehr unbesehen vollständig an den Mieter weitergeben. Nach dem Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) hängt die Kostenaufteilung von der energetischen Qualität des Gebäudes ab.',
+          'In energetisch schlechten Gebäuden (Stufe 10) muss der Vermieter bis zu 95 % des CO₂-Preises selbst tragen. Nutzen Sie hierfür unseren [CO₂-Kostenaufteilungsrechner für Vermieter und Mieter](/rechner/co2-abgabe-vermieter-mieter-rechner/).',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: CO₂-Kosten einer Gasheizung mit 15.000 kWh Jahresverbrauch',
+      scenario: 'Ein Haushalt verbraucht 15.000 kWh Erdgas im Jahr 2026. Zur Kalkulation wird der Modellpreis von 60 Euro/t netto (Mittelwert des Preiskorridors) mit 19 % Mehrwertsteuer herangezogen.',
+      formula: 'CO₂-Kosten = 15.000 kWh × 0,1814 kg/kWh ÷ 1.000 × 60 €/t × 1,19',
+      steps: [
+        {
+          label: '1. CO₂-Emissionsmenge ermitteln',
+          calculation: '15.000 kWh × 0,1814 kg CO₂/kWh = 2.721 kg CO₂ (2,721 t CO₂)',
+          note: 'Standardfaktor nach EBeV 2030 (Brennwert Ho).',
+        },
+        {
+          label: '2. Netto-CO₂-Kosten berechnen',
+          calculation: '2,721 t × 60,00 €/t = 163,26 € netto',
+          note: 'Rechnerischer Mittelwert des gesetzlichen Korridors (§ 10 Abs. 2 BEHG).',
+        },
+        {
+          label: '3. Brutto-Kosten inklusive 19 % MwSt.',
+          calculation: '163,26 € × 1,19 = 194,28 € brutto',
+          note: 'Entspricht einem Bruttoaufschlag von rund 1,30 Cent pro Kilowattstunde.',
+        },
+      ],
+      resultSummary: 'Bei 15.000 kWh Gas entstehen bei 60 €/t netto rechnerisch 194,28 Euro brutto CO₂-Kosten pro Jahr.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Mehrwertsteuer beim Vergleich von Heizöl- und Gasangeboten vergessen.',
+        correction: 'Preise für CO₂-Zertifikate werden gesetzlich stets netto angegeben. Private Haushalte zahlen immer zusätzlich 19 % Umsatzsteuer.',
+      },
+      {
+        mistake: 'Den CO₂-Preis auf bereits bestehende Endkundenpreise nochmals aufschlagen.',
+        correction: 'In Rechnungen und Tankstellenpreisen ist der CO₂-Aufschlag bereits im Grundpreis bzw. Arbeitspreis enthalten.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie hoch ist der CO₂-Preis im Jahr 2026 genau?',
+        answer: 'Nach § 10 Abs. 2 BEHG wird der Preis an der Börse versteigert und liegt gesetzlich garantiert zwischen mindestens 55 Euro und maximal 65 Euro je Tonne CO₂.',
+      },
+      {
+        question: 'Wie viel teurer wird der Liter Benzin und Diesel durch den CO₂-Preis 2026?',
+        answer: 'Bei 60 Euro/t netto beträgt der CO₂-Aufschlag inkl. 19 % MwSt. ca. 17,1 Cent je Liter Benzin und ca. 19,1 Cent je Liter Diesel.',
+      },
+      {
+        question: 'Was passiert mit dem CO₂-Preis ab 2027?',
+        answer: 'Ab 2027 soll das nationale System in das neue europäische Emissionshandelssystem ETS 2 überführt werden. Dort bildet sich der Preis am Markt, flankiert von marktstabilisierenden Mechanismen.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Brennstoffemissionshandelsgesetz (BEHG) – § 10',
+        citation: 'Gesetzliche Festlegung des Preiskorridors für Emissionszertifikate im Jahr 2026 auf 55 bis 65 Euro',
+        url: 'https://www.gesetze-im-internet.de/behg/__10.html',
+      },
+      {
+        title: 'Emissionsberichterstattungsverordnung 2030 (EBeV 2030) – Anlage 2 Teil 4',
+        citation: 'Standardfaktoren zur Berechnung von Brennstoffemissionen für Erdgas, Heizöl, Benzin und Diesel',
+        url: 'https://www.gesetze-im-internet.de/ebev_2030/',
+      },
+      {
+        title: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) – § 4',
+        citation: 'Berechnungsgrundlage für CO₂-Kosten unter Heranziehung des Modellpreises von 60 Euro für 2026',
+        url: 'https://www.gesetze-im-internet.de/co2kostaufg/__4.html',
+      },
+    ],
+    relatedArticleSlugs: ['co2-kosten-vermieter-mieter-2026', 'emissionsfaktoren-brennstoffe-erklaert', 'waermepumpe-vs-gasheizung-co2-vergleich'],
+  },
+  {
+    slug: 'co2-kosten-vermieter-mieter-2026',
+    title: 'CO₂-Kosten zwischen Vermieter und Mieter 2026',
+    metaTitle: 'CO₂-Kosten Vermieter & Mieter 2026: 10-Stufen-Modell',
+    metaDescription: 'CO₂-Kostenaufteilung nach CO2KostAufG 2026: 10-Stufen-Modell, unterjährige Abrechnung (§ 5 Abs. 1 Satz 4), Ausnahmen nach § 9 und Nachweispflichten.',
+    h1: 'CO₂-Kostenaufteilung 2026: Das 10-Stufen-Modell für Vermieter und Mieter',
+    category: 'finanzen-vorsorge',
+    categoryName: 'Finanzen & Recht',
+    publishedAt: '2026-10-29',
+    updatedAt: '2026-10-29',
+    readingTimeMin: 8,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Finanzen',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
+    },
+    summary:
+      'Seit dem Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) werden die CO₂-Kosten von Wohngebäuden nach einem gesetzlichen 10-Stufen-Modell zwischen Vermieter und Mieter aufgeteilt. Je schlechter die Energieeffizienz des Gebäudes, desto höher ist der Vermieteranteil.',
+    keyTakeaways: [
+      '10-Stufen-Modell: Reicht von Stufe 1 (< 12 kg CO₂/m²a: 0 % Vermieter, 100 % Mieter) bis Stufe 10 (≥ 52 kg CO₂/m²a: 95 % Vermieter, 5 % Mieter).',
+      'Unterjährige Abrechnung: Nach § 5 Abs. 1 Satz 4 CO2KostAufG werden die Tabellengrenzwerte bei Abrechnungszeiträumen unter einem Jahr proportional gekürzt (N/12).',
+      'Ausnahmen nach § 9 Abs. 1: Stehen Denkmalschutz, Milieuschutz oder ein Anschluss- und Benutzungszwang der Sanierung oder Heizungserneuerung entgegen, wird der Vermieteranteil um die Hälfte gekürzt.',
+      'Ausnahmen nach § 9 Abs. 2: Sind BEIDE Bereiche öffentlich-rechtlich blockiert, entfällt die Aufteilung nach dem regulären Stufenmodell vollständig.',
+      'Nachweispflicht (§ 9 Abs. 3): Der Vermieter muss dem Mieter die Tatsachen nachweisen, die eine Ausnahme oder Kürzung begründen.',
+    ],
+    primaryCalculator: {
+      slug: 'co2-abgabe-vermieter-mieter-rechner',
+      title: 'CO₂-Kostenaufteilung Rechner',
+      ctaText: 'Gesetzliche Aufteilung berechnen',
+      description: 'Berechnet die Aufteilung nach dem 10-Stufen-Modell inklusive unterjähriger Skalierung und §-9-Ausnahmen.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'co2-preis-rechner',
+        title: 'CO₂-Preis-Rechner',
+        ctaText: 'Gesamte CO₂-Kosten ermitteln',
+        description: 'Ermittelt die gesamten CO₂-Kosten der Heizung aus Verbrauch und aktuellem BEHG-Preis.',
+      },
+      {
+        slug: 'heizkostenvergleich-rechner',
+        title: 'Heizkostenvergleich-Rechner',
+        ctaText: 'Heizsysteme vergleichen',
+        description: 'Vergleicht die energetischen und finanziellen Gesamtkosten alternativer Heiztechniken.',
+      },
+      {
+        slug: 'warmmiete-rechner',
+        title: 'Warmmiete-Rechner',
+        ctaText: 'Warmmiete kalkulieren',
+        description: 'Berechnet die Gesamtwarmmiete inklusive Betriebskosten und Heizkostenvorauszahlung.',
+      },
+    ],
+    sections: [
+      {
+        id: 'das-10-stufen-modell-im-ueberblick',
+        title: 'Das gesetzliche 10-Stufen-Modell im Überblick',
+        paragraphs: [
+          'Das CO2KostAufG bezweckt, Vermietern einen finanziellen Anreiz für energetische Gebäudesanierungen zu geben, während Mieter weiterhin motiviert bleiben, sparsam zu heizen. Die Aufteilung orientiert sich an den Kohlendioxidemissionen des Gebäudes in Kilogramm pro Quadratmeter Wohnfläche im Abrechnungsjahr:',
+          'Stufe 1 (< 12 kg CO₂/m²a): 0 % Vermieter, 100 % Mieter (sehr effiziente Gebäude, KfW-Effizienzhaus).\nStufe 2 (12 bis < 17): 10 % Vermieter, 90 % Mieter.\nStufe 3 (17 bis < 22): 20 % Vermieter, 80 % Mieter.\nStufe 4 (22 bis < 27): 30 % Vermieter, 70 % Mieter.\nStufe 5 (27 bis < 32): 40 % Vermieter, 60 % Mieter.\nStufe 6 (32 bis < 37): 50 % Vermieter, 50 % Mieter.\nStufe 7 (37 bis < 42): 60 % Vermieter, 40 % Mieter.\nStufe 8 (42 bis < 47): 70 % Vermieter, 30 % Mieter.\nStufe 9 (47 bis < 52): 80 % Vermieter, 20 % Mieter.\nStufe 10 (≥ 52 kg CO₂/m²a): 95 % Vermieter, 5 % Mieter (besonders sanierungsbedürftige Altbauten).',
+        ],
+      },
+      {
+        id: 'unterjaehrige-abrechnung-proportionale-kuerzung',
+        title: 'Unterjährige Abrechnung: Proportionale Grenzwertkürzung nach § 5 Abs. 1 Satz 4',
+        paragraphs: [
+          'Zieht ein Mieter im laufenden Kalenderjahr ein oder aus, erstreckt sich die Heizkostenabrechnung auf weniger als 12 Monate. Ein häufiger Fehler besteht darin, den unterjährigen Ausstoß gegen die vollen Jahresgrenzwerte zu prüfen – dadurch würde das Gebäude fälschlicherweise in eine viel zu günstige Stufe fallen.',
+          'Der Gesetzgeber hat dies in § 5 Abs. 1 Satz 4 CO2KostAufG eindeutig geregelt: Bei unterjährigen Zeiträumen werden die Schwellenwerte der Tabelle proportional gekürzt. Bei 6 Monaten Abrechnungsdauer halbieren sich alle Grenzwerte (Stufe 1: < 6 kg/m², Stufe 6: 16 bis < 18,5 kg/m², Stufe 10: ≥ 26 kg/m²). Unser Rechner führt diese Skalierung exakt nach Gesetz durch.',
+        ],
+      },
+      {
+        id: 'oeffentlich-rechtliche-beschraenkungen-paragraph-9',
+        title: 'Öffentlich-rechtliche Hindernisse: Sonderregelungen nach § 9 CO2KostAufG',
+        paragraphs: [
+          'Kann der Vermieter Sanierungsmaßnahmen aus Rechtsgründen nicht umsetzen, greift eine gesetzliche Schutzregelung. Nach § 9 Abs. 1 CO2KostAufG wird der Vermieteranteil um die Hälfte gekürzt, wenn öffentlich-rechtliche Vorgaben einer wesentlichen energetischen Verbesserung des Gebäudes ODER einer wesentlichen Verbesserung der Wärme- und Warmwasserversorgung entgegenstehen (z. B. Denkmalschutz, Ensembleschutz, Erhaltungssatzung oder Anschluss- und Benutzungszwang an ein Fernwärmenetz).',
+          'Liegen solche Hinderungsgründe sogar für BEIDE Bereiche vor (Gebäudehülle und Heizungstechnik), ordnet § 9 Abs. 2 CO2KostAufG an, dass keine Aufteilung nach dem regulären Stufenmodell stattfindet. Nach § 9 Abs. 3 trägt der Vermieter die Beweislast und muss dem Mieter die entsprechenden Umstände schriftlich darlegen.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Beispiel: 80 m² Wohnung, Stufe 6 mit 6 Monaten unterjähriger Abrechnung',
+      scenario: 'Ein Mieter bewohnt 80 m² für 6 Monate. In diesem Halbjahr fallen 1.400 kg CO₂ und 100 Euro CO₂-Kosten an. Es liegt keine Ausnahme nach § 9 vor.',
+      formula: 'Spezifischer Ausstoß = 1.400 kg ÷ 80 m² = 17,50 kg/m²; Grenzwertskalierung: 6/12',
+      steps: [
+        {
+          label: '1. Spezifischen Ausstoß für den Zeitraum ermitteln',
+          calculation: '1.400 kg CO₂ ÷ 80 m² = 17,50 kg CO₂/m²',
+          note: 'Gemessener Zeitraum-Ausstoß im 6-monatigen Abrechnungszeitraum.',
+        },
+        {
+          label: '2. Proportionale Grenzwerte nach § 5 Abs. 1 Satz 4 CO2KostAufG',
+          calculation: 'Stufe 6 Jahreswert: 32 bis < 37 kg/m² → skaliert (6/12): 16,00 bis < 18,50 kg/m²',
+          note: '17,50 kg/m² liegt exakt im Bereich 16,00 bis < 18,50 kg/m² (Stufe 6).',
+        },
+        {
+          label: '3. Kostenaufteilung nach Stufe 6 (50 % Vermieter / 50 % Mieter)',
+          calculation: 'Gesamtkosten 100,00 € → Vermieter: 50,00 € / Mieter: 50,00 €',
+          note: 'Wäre eine §-9-Ausnahme wirksam, würde der Vermieteranteil auf 25,00 € halbiert.',
+        },
+      ],
+      resultSummary: 'Das Gebäude wird korrekt in Stufe 6 eingestuft. Vermieter und Mieter tragen jeweils 50,00 Euro der CO₂-Kosten.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Unterjährige Zeiträume gegen unskalierte Jahresgrenzwerte prüfen.',
+        correction: 'Nach § 5 Abs. 1 Satz 4 CO2KostAufG müssen die Schwellenwerte immer mit dem Monatsfaktor N/12 gekürzt werden.',
+      },
+      {
+        mistake: 'Denkmalschutz pauschal als 100%ige Befreiung für den Vermieter behandeln.',
+        correction: 'Nach § 9 Abs. 1 führt ein Hindernis in der Regel nur zur Halbierung des regulären Vermieteranteils, nicht zum vollständigen Entfall.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Gilt das 10-Stufen-Modell auch für Gewerbeimmobilien?',
+        answer: 'Nein. Für Nichtwohngebäude gilt nach § 8 CO2KostAufG eine pauschale gesetzliche 50:50-Halbteilung zwischen Vermieter und gewerblichem Mieter.',
+      },
+      {
+        question: 'Woher erfahre ich die CO₂-Emissionsmenge und -Kosten der Heizung?',
+        answer: 'Brennstofflieferanten und Wärmenetzbetreiber sind gesetzlich verpflichtet, CO₂-Menge und CO₂-Kosten gesondert auf der Brennstoffrechnung auszuweisen (§ 3 CO2KostAufG).',
+      },
+      {
+        question: 'Was passiert, wenn der Vermieter die CO₂-Kostenabrechnung vergisst oder falsch berechnet?',
+        answer: 'Rechnet der Vermieter die CO₂-Kosten nicht nach dem CO2KostAufG ab, hat der Mieter nach § 7 CO2KostAufG das Recht, den auf ihn entfallenden Heizkostenanteil um 5 Prozent zu kürzen.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) – Gesetzestext',
+        citation: 'Gesetz zur Aufteilung der Kohlendioxidkosten (konsolidierte Fassung mit den Änderungen 2026)',
+        url: 'https://www.gesetze-im-internet.de/co2kostaufg/',
+      },
+      {
+        title: 'CO2KostAufG – Anlage zu § 5 Abs. 1: Das 10-Stufen-Modell',
+        citation: 'Tabelle der spezifischen CO₂-Emissionsschwellenwerte und Kostenanteile für Wohngebäude',
+        url: 'https://www.gesetze-im-internet.de/co2kostaufg/anlage.html',
+      },
+      {
+        title: 'CO2KostAufG – § 9: Beschränkungen bei Sanierung und Wärmeversorgung',
+        citation: 'Gesetzliche Sonderregelung zur Halbierung oder zum Entfall der Vermieteraufteilung bei öffentlich-rechtlichen Hindernissen',
+        url: 'https://www.gesetze-im-internet.de/co2kostaufg/__9.html',
+      },
+    ],
+    relatedArticleSlugs: ['co2-preis-2026-brennstoffe', 'emissionsfaktoren-brennstoffe-erklaert', 'waermepumpe-vs-gasheizung-co2-vergleich'],
+  },
+  {
+    slug: 'co2-ausstoss-auto-kilometer-vergleich',
+    title: 'CO₂-Ausstoß Auto pro km: Benzin, Diesel und Elektro richtig vergleichen',
+    metaTitle: 'CO₂-Ausstoß Auto pro km: Benzin, Diesel & E-Auto Vergleich',
+    metaDescription: 'CO₂-Ausstoß von Pkw pro km vergleichen: Direkte Verbrennungsempfindlichkeit (Benzin vs. Diesel) und Stromnetz-Faktor (344 g CO₂/kWh 2025).',
+    h1: 'CO₂-Ausstoß Auto pro km: Benzin, Diesel und Elektro richtig vergleichen',
+    category: 'auto-mobilitaet',
+    categoryName: 'Auto & Mobilität',
+    publishedAt: '2026-10-29',
+    updatedAt: '2026-10-29',
+    readingTimeMin: 7,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Finanzen',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
+    },
+    summary:
+      'Wie viel CO₂ stößt ein Auto pro gefahrenem Kilometer aus? Der Vergleich zwischen Verbrennern und Elektrofahrzeugen erfordert saubere Bilanzgrenzen: Direkte Verbrennung im Motor darf nicht mit Durchschnitten oder Lebenszyklusketten verwechselt werden.',
+    keyTakeaways: [
+      'Chemische Verbrennung: Bei der Verbrennung von 1 Liter Benzin entstehen ca. 2,394 kg CO₂, bei 1 Liter Diesel ca. 2,676 kg CO₂ (EBeV-2030-Standardfaktoren).',
+      'Effizienzunterschied: Weil Dieselmotoren oft ca. 15–20 % weniger Kraftstoff verbrauchen, liegen die realen Emissionen pro km trotz höherer Kohlenstoffdichte von Diesel oft nahe beieinander.',
+      'Elektrofahrzeuge: Am Auspuff entstehen lokal 0 g CO₂. Bei der Stromerzeugung im deutschen Kraftwerkspark fielen im Datenjahr 2025 rechnerisch 344 g CO₂/kWh an (UBA-Schätzung).',
+      'TREMOD-Durchschnitte: Das UBA beziffert den Personenverkehrs-Durchschnitt (inkl. Kraftstoff- und Strombereitstellung) auf 164 g CO₂e/Pkm für Pkw und 98 g CO₂e/Pkm für Elektro-Pkw.',
+    ],
+    primaryCalculator: {
+      slug: 'co2-auto-rechner',
+      title: 'CO₂-Autorechner',
+      ctaText: 'Auto-Emissionen berechnen',
+      description: 'Berechnet den CO₂-Ausstoß Ihres Autos nach Kraftstoffverbrauch oder UBA-Durchschnittswerten.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'co2-pendeln-rechner',
+        title: 'CO₂-Pendelrechner',
+        ctaText: 'Arbeitsweg vergleichen',
+        description: 'Stellt Auto, Bahn und ÖPNV für den täglichen Arbeitsweg gegenüber.',
+      },
+      {
+        slug: 'spritkostenrechner',
+        title: 'Spritkostenrechner',
+        ctaText: 'Kraftstoffkosten kalkulieren',
+        description: 'Berechnet finanzielle Treibstoffkosten aus Verbrauch und aktuellem Literpreis.',
+      },
+      {
+        slug: 'elektroauto-ladekosten-rechner',
+        title: 'E-Auto-Ladekostenrechner',
+        ctaText: 'Ladekosten vergleichen',
+        description: 'Ermittelt Stromkosten für das Laden an Wallbox, AC- und DC-Ladesäulen.',
+      },
+    ],
+    sections: [
+      {
+        id: 'verbrennungschemie-benzin-und-diesel',
+        title: 'Warum Diesel pro Liter mehr CO₂ ausstößt als Benzin',
+        paragraphs: [
+          'Dieselkraftstoff weist eine höhere Dichte auf als Superbenzin (0,845 t je 1.000 Liter gegenüber 0,755 t je 1.000 Liter laut EBeV 2030). Zudem enthält Diesel einen höheren Kohlenstoffanteil pro Volumeneinheit.',
+          'Aus den verbindlichen physikalischen Faktoren der EBeV 2030 Anlage 2 Teil 4 folgt: 1 Liter Benzin emittiert bei direkter Verbrennung ca. 2,394 kg CO₂, 1 Liter Diesel hingegen ca. 2,676 kg CO₂. Bei gleichem Verbrauch stößt ein Dieselmotor pro Kilometer folglich rund 12 % mehr CO₂ aus. Da Dieselmotoren aufgrund ihres höheren thermodynamischen Wirkungsgrads in der Praxis jedoch weniger Liter auf 100 km benötigen, gleicht sich die Bilanz oft an.',
+        ],
+      },
+      {
+        id: 'elektroauto-im-deutschen-strommix',
+        title: 'Wie wird der CO₂-Ausstoß eines Elektroautos berechnet?',
+        paragraphs: [
+          'Elektroautos stoßen beim Fahren am Fahrzeug lokal 0 g Kohlendioxid aus (Tank-to-Wheel = 0). Relevant ist jedoch die Stromerzeugung im Kraftwerkspark.',
+          'Nach der offiziellen Schätzung des Umweltbundesamtes (veröffentlicht am 23. März 2026) betrug der spezifische Emissionsfaktor des deutschen Strommixes im Datenjahr 2025 durchschnittlich 344 g CO₂ je Kilowattstunde bei der Stromerzeugung.',
+          'Verbraucht ein kompaktes Elektroauto beispielsweise 18 kWh Strom auf 100 Kilometer, verursacht es rechnerisch 18 × 0,344 kg = 6,19 kg CO₂ auf 100 km bzw. rund 62 g CO₂/km. Das ist deutlich weniger als ein sparsamer Benziner (ca. 168 g/km).',
+        ],
+      },
+      {
+        id: 'vorsicht-bei-bilanzgrenzen',
+        title: 'Bilanzgrenzen beachten: Direkte Verbrennung vs. TREMOD-Durchschnitt',
+        paragraphs: [
+          'Beim Vergleich von CO₂-Angaben kommt es auf den Bilanzrahmen an: Die verbrauchsbasierte Rechnung (Rechenweg A/B) ermittelt die reine direkte Emission der Verbrennung bzw. der Stromerzeugung im Kraftwerk. Die Vorketten (Erdölförderung, Raffinerie, Seetransport) sind darin nicht enthalten.',
+          'Das Umweltbundesamt veröffentlicht im Modell TREMOD 6.71B (Bezugsjahr 2024) hingegen Durchschnitte je Personenkilometer (Pkm), die die Bereitstellung der Energieträger bereits einschließen (Pkw: 164 g CO₂e/Pkm; Elektro-Pkw: 98 g CO₂e/Pkm bei 1,4 Personen durchschnittlicher Auslastung). Diese beiden Rechenwege dürfen nicht unkommentiert vermischt werden.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Vergleich auf 100 km: Benziner vs. Diesel vs. Elektroauto',
+      scenario: 'Ein Benziner verbraucht 7,0 l/100 km, ein Diesel 5,5 l/100 km und ein Elektroauto 18,0 kWh/100 km. Untersucht werden direkte Verbrennung bzw. Kraftwerksemissionen im Strommix 2025.',
+      formula: 'CO₂ pro 100 km = Verbrauch × Emissionsfaktor',
+      steps: [
+        {
+          label: '1. Benziner (7,0 l/100 km)',
+          calculation: '7,0 l × 2,394 kg CO₂/l = 16,76 kg CO₂ (ca. 168 g/km)',
+          note: 'Direkte Verbrennung nach EBeV 2030.',
+        },
+        {
+          label: '2. Diesel (5,5 l/100 km)',
+          calculation: '5,5 l × 2,676 kg CO₂/l = 14,72 kg CO₂ (ca. 147 g/km)',
+          note: 'Direkte Verbrennung nach EBeV 2030.',
+        },
+        {
+          label: '3. Elektroauto (18,0 kWh/100 km)',
+          calculation: '18,0 kWh × 0,344 kg CO₂/kWh = 6,19 kg CO₂ (ca. 62 g/km)',
+          note: 'Stromerzeugung im deutschen Strommix 2025 (UBA 2026).',
+        },
+      ],
+      resultSummary: 'Das Elektroauto verursacht mit ca. 62 g/km bei der Stromerzeugung rund 63 % weniger CO₂ als der Benziner (168 g/km) und rund 58 % weniger als der Diesel (147 g/km).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Fahrzeugherstellung und Vorketten in einen reinen Verbrennungsvergleich einmischen.',
+        correction: 'Vergleichen Sie nur Werte mit identischer Bilanzgrenze: Entweder direkte Energieemissionen oder vollumfängliche Lebenszyklusanalysen.',
+      },
+      {
+        mistake: 'TREMOD-Personenkilometerfaktoren nochmals durch Insassenzahlen teilen.',
+        correction: 'Pkm-Werte enthalten den durchschnittlichen Besetzungsgrad bereits und beziehen sich auf eine reisende Person.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Stößt ein Elektroauto wirklich null Gramm CO₂ aus?',
+        answer: 'Lokal im Fahrbetrieb am Auspuff: Ja (0 g/km). Bei der Stromerzeugung im Kraftwerkspark entstehen beim aktuellen deutschen Strommix (2025) rechnerisch ca. 344 g CO₂ je kWh Strom.',
+      },
+      {
+        question: 'Wie rechnet man Gramm pro Kilometer in Tonnen pro Jahr um?',
+        answer: 'Gramm pro Kilometer mit den Jahreskilometern multiplizieren und durch 1.000.000 teilen (z. B. 150 g/km × 15.000 km ÷ 1.000.000 = 2,25 Tonnen CO₂/Jahr).',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Umweltbundesamt (UBA): TREMOD 6.71B (10/2025)',
+        citation: 'Vergleich der durchschnittlichen Emissionen einzelner Verkehrsmittel im Personenverkehr in Deutschland 2024',
+        url: 'https://www.umweltbundesamt.de/themen/verkehr/emissionsdaten',
+      },
+      {
+        title: 'Umweltbundesamt (UBA): CO₂-Emissionen pro kWh Strom 2025',
+        citation: 'Spezifische Treibhausgas-Emissionen des deutschen Strommixes, Veröffentlichung vom 23. März 2026',
+        url: 'https://www.umweltbundesamt.de/themen/co2-emissionen-pro-kilowattstunde-strom-2025-nur',
+      },
+      {
+        title: 'EBeV 2030 – Anlage 2 Teil 4',
+        citation: 'Standardfaktoren für Benzin und Dieselkraftstoff',
+        url: 'https://www.gesetze-im-internet.de/ebev_2030/',
+      },
+    ],
+    relatedArticleSlugs: ['co2-arbeitsweg-auto-bahn', 'emissionsfaktoren-brennstoffe-erklaert', 'co2-preis-2026-brennstoffe'],
+  },
+  {
+    slug: 'emissionsfaktoren-brennstoffe-erklaert',
+    title: 'Emissionsfaktoren für Gas, Heizöl, Benzin und Diesel erklärt',
+    metaTitle: 'Emissionsfaktoren für Gas, Heizöl, Benzin & Diesel erklärt',
+    metaDescription: 'Wie entstehen CO₂-Faktoren für Brennstoffe? Gesetzliche Standardwerte nach EBeV 2030, Brennwert Ho, Heizwert Hi, Dichten und Herleitungen.',
+    h1: 'Emissionsfaktoren für Gas, Heizöl, Benzin und Diesel erklärt',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-29',
+    updatedAt: '2026-10-29',
+    readingTimeMin: 8,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Finanzen',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
+    },
+    summary:
+      'Woher stammen die Emissionsfaktoren für Brennstoffe und warum weichen manche Quellen voneinander ab? Die exakten rechtlichen Grundlagen im deutschen Emissionshandelssystem liefert die Emissionsberichterstattungsverordnung (EBeV 2030).',
+    keyTakeaways: [
+      'Rechtliche Bindung: Für den deutschen Brennstoffemissionshandel nach BEHG und die Kostenaufteilung nach CO2KostAufG gelten die Standardwerte der EBeV 2030 Anlage 2 Teil 4.',
+      'Heizwert Hi vs. Brennwert Ho: Erdgas wird im Handel und bei Endkunden stets mit dem oberen Brennwert Ho abgerechnet (Faktor EBeV 2030: 3,2508 GJ/MWh).',
+      'Gasöl als Sammelkategorie: Heizöl EL und Dieselkraftstoff teilen sich in der EBeV dieselbe Brennstoffgruppe und denselben Kohlenstofffaktor (0,0740 t CO₂/GJ).',
+      'Flüssiggas in kg: Die EBeV 2030 normiert Flüssiggas (LPG) ausschließlich massebezogen in Tonnen (46,0 GJ/t und 0,0655 t CO₂/GJ = 3,013 kg CO₂/kg).',
+    ],
+    primaryCalculator: {
+      slug: 'co2-preis-rechner',
+      title: 'CO₂-Preis-Rechner',
+      ctaText: 'Brennstoff-Emissionen berechnen',
+      description: 'Ermittelt CO₂-Emissionen und Kosten für Erdgas, Heizöl, Benzin, Diesel und Flüssiggas auf Basis der EBeV-Standardwerte.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'gaskostenrechner',
+        title: 'Gaskostenrechner',
+        ctaText: 'Gaskosten prüfen',
+        description: 'Berechnet Erdgaskosten aus Kilowattstunden und Abrechnungsbrennwert.',
+      },
+      {
+        slug: 'co2-auto-rechner',
+        title: 'CO₂-Autorechner',
+        ctaText: 'Pkw-Emissionen berechnen',
+        description: 'Nutzt die Kraftstofffaktoren zur exakten Ermittlung von Fahrtemissionen.',
+      },
+      {
+        slug: 'heizkostenvergleich-rechner',
+        title: 'Heizkostenvergleich-Rechner',
+        ctaText: 'Heizbrennstoffe vergleichen',
+        description: 'Stellt Erdgas, Heizöl, Pellets und Wärmepumpen gegenüber.',
+      },
+    ],
+    sections: [
+      {
+        id: 'die-gesetzlichen-standardwerte-der-ebev-2030',
+        title: 'Die gesetzlichen Standardwerte nach EBeV 2030 Anlage 2',
+        paragraphs: [
+          'In Deutschland dürfen Unternehmen im Rahmen des Brennstoffemissionshandelsgesetzes (BEHG) zur Ermittlung ihrer Emissionszertifikate standardisierte Rechenwerte nutzen. Diese sind in Anlage 2 der Emissionsberichterstattungsverordnung (EBeV 2030) festgeschrieben.',
+          'Die Formel zur Herleitung eines anwendbaren Emissionsfaktors je Verbrauchsmenge lautet:\nFaktor = Unterer Heizwert (bzw. Brennwert) × Emissionsfaktor in t CO₂/GJ × Dichte (bei flüssigen Brennstoffen).',
+        ],
+      },
+      {
+        id: 'erdgas-herleitung-des-faktors',
+        title: 'Erdgas: Warum 0,1814 kg CO₂ pro kWh Brennwert gelten',
+        paragraphs: [
+          'In Rechnungen von Energieversorgern wird Erdgas in Kilowattstunden (Brennwert Ho) ausgewiesen. Anlage 2 Teil 4 der EBeV 2030 legt für Erdgas fest:',
+          'Brennwert Ho: 3,2508 GJ je Megawattstunde (MWh).\nEmissionsfaktor: 0,0558 Tonnen CO₂ je Gigajoule (GJ).',
+          'Multipliziert man beide Werte, ergibt sich:\n3,2508 GJ/MWh × 0,0558 t CO₂/GJ = 0,18139464 t CO₂/MWh = 0,18139464 kg CO₂/kWh.\nGerundet entspricht dies dem Standardfaktor von 0,1814 kg CO₂ pro Kilowattstunde Brennwert.',
+        ],
+      },
+      {
+        id: 'heizoel-und-diesel-dieselbe-stoffgruppe',
+        title: 'Heizöl EL und Diesel: Warum beide denselben Faktor teilen',
+        paragraphs: [
+          'Chemisch gehören leichtes Heizöl (Heizöl EL) und Dieselkraftstoff zur selben Stoffgruppe der Mitteldestillate (Gasöle). Die EBeV 2030 führt sie unter derselben Position:',
+          'Dichte: 0,845 Tonnen je 1.000 Liter (0,845 kg/l).\nUnterer Heizwert Hi: 42,8 Gigajoule je Tonne.\nEmissionsfaktor: 0,0740 Tonnen CO₂ je Gigajoule.',
+          'Multiplikation ergibt:\n0,845 t/1.000 l × 42,8 GJ/t × 0,0740 t CO₂/GJ = 2,676284 t CO₂ je 1.000 Liter = 2,676 kg CO₂ je Liter Kraftstoff/Heizöl.',
+        ],
+      },
+      {
+        id: 'superbenzin-und-fluessiggas',
+        title: 'Superbenzin und Flüssiggas (LPG)',
+        paragraphs: [
+          'Für Motorenbenzin legt die EBeV 2030 eine Dichte von 0,755 t/1.000 l, einen unteren Heizwert von 43,5 GJ/t und einen Emissionsfaktor von 0,0729 t CO₂/GJ fest. Daraus errechnet sich:\n0,755 × 43,5 × 0,0729 = 2,39421825 kg CO₂ je Liter Benzin (ca. 2,394 kg/l).',
+          'Für Flüssiggas (Propan/Butan) normiert die EBeV 2030 einen unteren Heizwert von 46,0 GJ/t und einen Faktor von 0,0655 t CO₂/GJ. Da keine amtliche Volumendichte für Flüssiggas vorgegeben ist, lautet der verbindliche Standardwert:\n46,0 × 0,0655 = 3,013 kg CO₂ je Kilogramm Flüssiggas.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Herleitung des Erdgaskosten-Aufschlags bei 60 €/t CO₂',
+      scenario: 'Ein Verbraucher möchte wissen, wie sich der Standardfaktor 0,1814 kg/kWh in Cent Mehrkosten je kWh übersetzt.',
+      formula: 'Aufschlag in ct/kWh = 0,1814 kg/kWh ÷ 1.000 × 60 €/t × 100 ct/€',
+      steps: [
+        {
+          label: '1. Standardfaktor Erdgas Ho ansetzen',
+          calculation: '3,2508 GJ/MWh × 0,0558 t CO₂/GJ = 0,181395 kg CO₂/kWh',
+          note: 'Rechtliche Vorgabe EBeV 2030.',
+        },
+        {
+          label: '2. Multiplikation mit dem CO₂-Preis (60 €/t netto)',
+          calculation: '0,181395 kg × 0,060 €/kg = 0,010884 €/kWh = 1,088 ct/kWh netto',
+          note: 'Reiner Nettoaufschlag.',
+        },
+        {
+          label: '3. Bruttoaufschlag mit 19 % Mehrwertsteuer',
+          calculation: '1,088 ct/kWh × 1,19 = 1,295 ct/kWh brutto (ca. 1,30 ct/kWh)',
+          note: 'Tatsächliche Endverbraucherbelastung.',
+        },
+      ],
+      resultSummary: 'Der offizielle EBeV-Faktor führt bei 60 €/t netto zu einem Endkundenaufschlag von ca. 1,30 Cent brutto je Kilowattstunde Gas.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Heizwert Hi und Brennwert Ho bei Erdgas vertauschen.',
+        correction: 'Da die Gasabrechnung in Deutschland stets auf dem oberen Brennwert Ho basiert, muss zwingend der Ho-Faktor (0,1814 kg/kWh) verwendet werden.',
+      },
+      {
+        mistake: 'Alte oder veraltete Schätzwerte aus Online-Foren verwenden.',
+        correction: 'Nutzen Sie die konsolidierten EBeV-2030-Werte, um rechtliche Konformität mit dem BEHG zu gewährleisten.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Sind diese Faktoren für meine Steuer- oder Heizkostenabrechnung verbindlich?',
+        answer: 'Ja. Für alle Berechnungen nach dem Brennstoffemissionshandelsgesetz und dem CO2KostAufG sind die Standardwerte der EBeV 2030 maßgeblich.',
+      },
+      {
+        question: 'Warum gibt es für Holzpellets keinen EBeV-Faktor?',
+        answer: 'Nachhaltige feste Biomasse (wie Holzpellets oder Scheitholz) gilt nach den BEHG-Kriterien bilanziell als CO₂-neutral (Emissionsfaktor 0) und unterliegt nicht der CO₂-Abgabe.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Emissionsberichterstattungsverordnung 2030 (EBeV 2030)',
+        citation: 'Anlage 2 Teil 4: Standardwerte zur Berechnung von Brennstoffemissionen',
+        url: 'https://www.gesetze-im-internet.de/ebev_2030/',
+      },
+      {
+        title: 'Deutsche Emissionshandelsstelle (DEHSt)',
+        citation: 'Leitfaden zur Ermittlung von Brennstoffemissionen im nationalen Emissionshandelssystem',
+        url: 'https://www.dehst.de',
+      },
+    ],
+    relatedArticleSlugs: ['co2-preis-2026-brennstoffe', 'co2-kosten-vermieter-mieter-2026', 'co2-ausstoss-auto-kilometer-vergleich'],
+  },
+  {
+    slug: 'fernwaerme-co2-faktor-netzunterschiede',
+    title: 'Fernwärme und CO₂: Warum es keinen einzigen Faktor für jedes Wärmenetz gibt',
+    metaTitle: 'Fernwärme & CO₂: Warum Netzunterschiede entscheidend sind',
+    metaDescription: 'Warum gibt es keinen pauschalen Fernwärme-CO₂-Faktor? FW 609, KWK-Stromgutschrift, Biomasse vs. Erdgas und was für die Heizkostenabrechnung gilt.',
+    h1: 'Fernwärme und CO₂: Warum es keinen einheitlichen Emissionsfaktor gibt',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-29',
+    updatedAt: '2026-10-29',
+    readingTimeMin: 7,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Finanzen',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
+    },
+    summary:
+      'Im Gegensatz zu Erdgas oder Heizöl existiert für Fernwärme kein allgemeingültiger bundesweiter CO₂-Emissionsfaktor. Jedes Wärmenetz besitzt seinen eigenen, individuellen Emissionswert, der von den eingesetzten Brennstoffen und der Erzeugungstechnologie abhängt.',
+    keyTakeaways: [
+      'Individuelle Netzfaktoren: Jedes der über 3.000 Wärmenetze in Deutschland hat einen eigenen Primärenergie- und CO₂-Faktor.',
+      'AGFW-Arbeitsblatt FW 609: Die Berechnung der spezifischen CO₂-Emissionsfaktoren erfolgt verbindlich nach dem AGFW-Regelwerk FW 609.',
+      'Stromgutschriftmethode: Bei Kraft-Wärme-Kopplung (KWK) wird der gleichzeitig erzeugte Strom gegengerechnet, was die rechnerischen Wärmezahlen senkt.',
+      'Bandbreite der Emissionen: Die Spanne reicht von nahezu 0 g CO₂/kWh (reine Tiefengeothermie oder Restholz-Biomasse) bis über 250 g CO₂/kWh (fossile Kohle- und Gaskraftwerke ohne KWK).',
+      'Relevanz für CO2KostAufG: Für die Aufteilung zwischen Vermieter und Mieter muss der Netzbetreiber den netzspezifischen Faktor in der Wärmerechnung bescheinigen.',
+    ],
+    primaryCalculator: {
+      slug: 'heizkostenvergleich-rechner',
+      title: 'Heizkostenvergleich-Rechner',
+      ctaText: 'Fernwärme im Systemvergleich prüfen',
+      description: 'Vergleicht Fernwärme mit Erdgas, Heizöl und Wärmepumpe unter individuellen CO₂-Annahmen.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'co2-preis-rechner',
+        title: 'CO₂-Preis-Rechner',
+        ctaText: 'CO₂-Kosten kalkulieren',
+        description: 'Ermittelt Kostenanteile anhand des individuellen Emissionswertes Ihrer Wärmerechnung.',
+      },
+      {
+        slug: 'co2-abgabe-vermieter-mieter-rechner',
+        title: 'CO₂-Kostenaufteilung Rechner',
+        ctaText: 'Vermieter-Mieter-Aufteilung berechnen',
+        description: 'Berechnet die 10-Stufen-Einstufung auch für mit Fernwärme beheizte Gebäude.',
+      },
+      {
+        slug: 'gaskostenrechner',
+        title: 'Gaskostenrechner',
+        ctaText: 'Gas als Vergleichsmaßstab berechnen',
+        description: 'Vergleicht die Kosten einer eigenen Gastherme mit dem Fernwärmeangebot.',
+      },
+    ],
+    sections: [
+      {
+        id: 'warum-waermenetze-so-unterschiedlich-sind',
+        title: 'Warum sich Wärmenetze fundamental unterscheiden',
+        paragraphs: [
+          'Fernwärme ist kein einheitlicher Brennstoff, sondern ein Transportmedium (heißes Wasser oder Dampf). Die Wärmeenergie im Netz wird vor Ort höchst unterschiedlich erzeugt:',
+          'In einigen Kommunen speisen industrielle Abwärme, Müllverbrennungsanlagen, Tiefengeothermie oder Holzhackschnitzel-Heizwerke Energie ins Netz ein. Solche Netze weisen extrem geringe CO₂-Emissionsfaktoren auf (teilweise unter 30 g CO₂/kWh).',
+          'Andere Wärmenetze hängen an fossilen Steinkohle- oder Erdgaskraftwerken. Hier können die spezifischen Emissionen trotz effizienter Kraft-Wärme-Kopplung (KWK) bei 150 bis über 200 g CO₂/kWh liegen.',
+        ],
+      },
+      {
+        id: 'die-zertifizierung-nach-fw-609',
+        title: 'Das Berechnungsverfahren nach AGFW-Arbeitsblatt FW 609',
+        paragraphs: [
+          'Um Transparenz und Vergleichbarkeit zu sichern, berechnen Fernwärmeversorger ihre Emissionsfaktoren nach dem technischen Arbeitsblatt AGFW FW 609 („Ermittlung von Primärenergiefaktoren und CO₂-Emissionsfaktoren für Wärmenetze“).',
+          'Wird Wärme in hocheffizienter Kraft-Wärme-Kopplung erzeugt, kommt in Deutschland überwiegend die Stromgutschriftmethode zur Anwendung: Der im Prozess miterzeugte KWK-Strom verdrängt Strom im allgemeinen Stromnetz, wofür dem Wärmeprozess eine Emissionsgutschrift zugerechnet wird. Dies führt zu rechnerisch sehr günstigen Werten.',
+        ],
+      },
+      {
+        id: 'pflichtangabe-in-der-heizkostenabrechnung',
+        title: 'Bedeutung für die Heizkostenabrechnung und das CO2KostAufG',
+        paragraphs: [
+          'Seit Inkrafttreten des Kohlendioxidkostenaufteilungsgesetzes (CO2KostAufG) sind Fernwärmelieferanten nach § 3 Abs. 2 verpflichtet, in jeder Abrechnung den spezifischen CO₂-Emissionsfaktor des jeweiligen Netzes und die auf die Wärmelieferung entfallenden CO₂-Kosten verbindlich auszuweisen.',
+          'Vermieter und Hausverwaltungen dürfen keinen fiktiven Bundesdurchschnitt ansetzen, sondern müssen exakt den vom Versorger bescheinigten Wert in die 10-Stufen-Berechnung einfließen lassen.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Vergleich zweier Wärmenetze bei 10.000 kWh Jahreswärmebedarf',
+      scenario: 'Zwei identische Wohnungen verbrauchen 10.000 kWh Wärme im Jahr. Wohnung 1 liegt an Netz A (Biomasse/Geothermie mit 35 g CO₂/kWh), Wohnung 2 an Netz B (fossiles Erdgas-KWK-Netz mit 180 g CO₂/kWh).',
+      formula: 'Emissionen = 10.000 kWh × spezifischer Faktor in g/kWh ÷ 1.000',
+      steps: [
+        {
+          label: '1. Netz A (erneuerbar dominiert: 35 g CO₂/kWh)',
+          calculation: '10.000 kWh × 35 g/kWh ÷ 1.000 = 350 kg CO₂ pro Jahr',
+          note: 'Sehr geringer CO₂-Kostenanteil (bei 60 €/t nur 21,00 €).',
+        },
+        {
+          label: '2. Netz B (fossil dominiert: 180 g CO₂/kWh)',
+          calculation: '10.000 kWh × 180 g/kWh ÷ 1.000 = 1.800 kg CO₂ pro Jahr',
+          note: 'Relevanter CO₂-Kostenanteil (bei 60 €/t netto 108,00 €).',
+        },
+        {
+          label: '3. Rechnerischer Netzdifferenz',
+          calculation: '1.800 kg − 350 kg = 1.450 kg CO₂ Unterschied pro Jahr',
+          note: 'Entspricht einer Differenz von über 400 % bei identischem Raumwärmeverbrauch.',
+        },
+      ],
+      resultSummary: 'Der spezifische Netzfaktor führt bei gleichem Wärmeverbrauch zu einem Unterschied von 1.450 kg CO₂ und über 80 Euro jährlichen CO₂-Kosten.',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Einen bundesweiten Durchschnittswert für Fernwärme in die Heizkostenabrechnung einsetzen.',
+        correction: 'Das CO2KostAufG verlangt zwingend die Abrechnungsbescheinigung des konkreten örtlichen Netzbetreibers.',
+      },
+      {
+        mistake: 'Primärenergiefaktor und CO₂-Emissionsfaktor verwechseln.',
+        correction: 'Der Primärenergiefaktor (relevant für Gebäudeenergiegesetz GEG) misst den Gesamtaufwand, der CO₂-Faktor beziffert die Treibhausgasmenge pro kWh Wärme.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wo finde ich den CO₂-Emissionsfaktor meines Fernwärmenetzes?',
+        answer: 'Ihr Fernwärmeversorger weist den Wert auf der Jahresabrechnung aus und veröffentlicht das FW-609-Zertifikat in der Regel auf seiner Website.',
+      },
+      {
+        question: 'Müssen Fernwärmekunden eine CO₂-Abgabe zahlen?',
+        answer: 'Unterliegt die Erzeugungsanlage dem BEHG oder dem EU-Emissionshandel (EU-ETS), werden die Zertifikatskosten in den Wärmepreis einkalkuliert und in der Abrechnung ausgewiesen.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'AGFW e. V. – Regelwerk Arbeitsblatt FW 609',
+        citation: 'Ermittlung von Primärenergiefaktoren und CO₂-Emissionsfaktoren für Wärmenetze',
+        url: 'https://www.agfw.de',
+      },
+      {
+        title: 'Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) – § 3 Abs. 2',
+        citation: 'Pflichten der Brennstoff- und Wärmelieferanten zur gesonderten Ausweisung von Emissionsfaktor und CO₂-Kosten',
+        url: 'https://www.gesetze-im-internet.de/co2kostaufg/__3.html',
+      },
+    ],
+    relatedArticleSlugs: ['co2-kosten-vermieter-mieter-2026', 'waermepumpe-vs-gasheizung-co2-vergleich', 'co2-preis-2026-brennstoffe'],
+  },
+  {
+    slug: 'waermepumpe-vs-gasheizung-co2-vergleich',
+    title: 'Wärmepumpe vs. Gasheizung: CO₂ richtig vergleichen',
+    metaTitle: 'Wärmepumpe vs. Gasheizung: CO₂-Emissionen im Vergleich',
+    metaDescription: 'Wärmepumpe vs. Gasheizung im CO₂-Vergleich: Jahresarbeitszahl (JAZ), Strommix 2025 (344 g CO₂/kWh) und Brennwert-Nutzungsgrad transparent berechnet.',
+    h1: 'Wärmepumpe vs. Gasheizung: CO₂ richtig vergleichen',
+    category: 'haushalt-energie',
+    categoryName: 'Haushalt & Energie',
+    publishedAt: '2026-10-29',
+    updatedAt: '2026-10-29',
+    readingTimeMin: 8,
+    author: {
+      name: 'Redaktion RechenHafen',
+      role: 'Fachredaktion Energie & Finanzen',
+    },
+    reviewer: {
+      name: 'Redaktion RechenHafen',
+      role: 'Qualitätssicherung Redaktion',
+    },
+    summary:
+      'Wie viel Kohlendioxid spart eine Wärmepumpe im Vergleich zu einer modernen Gas-Brennwertheizung ein? Der faire Vergleich betrachtet die Nutzwärme, die Jahresarbeitszahl (JAZ) der Wärmepumpe und den aktuellen deutschen Strommix.',
+    keyTakeaways: [
+      'Nutzwärme als Vergleichsbasis: Verglichen werden muss der tatsächliche Wärmebedarf des Gebäudes (kWh Nutzwärme), nicht der eingesetzte Brennstoff.',
+      'Gas-Brennwert: Aus 1 kWh Erdgas (Ho) entstehen mit 0,1814 kg CO₂ und 95 % Nutzungsgrad rund 191 g CO₂ je Kilowattstunde Nutzwärme.',
+      'Wärmepumpe: Mit einer Jahresarbeitszahl (JAZ) von 3,5 und dem Strommix 2025 (344 g CO₂/kWh Erzeugung) entstehen nur rund 98 g CO₂ je kWh Nutzwärme.',
+      'Dynamischer Vorteil: Mit jedem weiteren Ausbau erneuerbarer Energien im Stromnetz sinkt der CO₂-Ausstoß der Wärmepumpe automatisch weiter ab.',
+    ],
+    primaryCalculator: {
+      slug: 'heizkostenvergleich-rechner',
+      title: 'Heizkostenvergleich-Rechner',
+      ctaText: 'Wärmepumpe und Gasheizung vergleichen',
+      description: 'Stellt Anschaffung, Betriebskosten und CO₂-Preise für Wärmepumpe und Gasbrennwert detailliert gegenüber.',
+      badge: 'Zum Rechner',
+    },
+    secondaryCalculators: [
+      {
+        slug: 'waermepumpe-stromkosten-rechner',
+        title: 'Wärmepumpen-Stromkosten-Rechner',
+        ctaText: 'Heizstromkosten berechnen',
+        description: 'Ermittelt den Jahresstrombedarf und Stromkosten aus Heizlast und Jahresarbeitszahl.',
+      },
+      {
+        slug: 'co2-strom-rechner',
+        title: 'CO₂-Stromrechner',
+        ctaText: 'Strom-CO₂ berechnen',
+        description: 'Rechnet den Stromverbrauch der Wärmepumpe mit dem aktuellen UBA-Emissionsfaktor um.',
+      },
+      {
+        slug: 'gaskostenrechner',
+        title: 'Gaskostenrechner',
+        ctaText: 'Gaskosten ermitteln',
+        description: 'Kalkuliert die laufenden Brennstoffkosten einer Gasheizung.',
+      },
+    ],
+    sections: [
+      {
+        id: 'die-vergleichsbasis-nutzwaerme',
+        title: 'Die richtige Vergleichsbasis: Kilowattstunden Nutzwärme',
+        paragraphs: [
+          'Ein häufiger Rechenfehler besteht darin, die Kilowattstunden Erdgas direkt mit den Kilowattstunden Strom der Wärmepumpe zu vergleichen. Das verzerrt das Bild, da eine Wärmepumpe Umweltwärme aus Luft, Erde oder Grundwasser nutzt.',
+          'Um 10.000 Kilowattstunden Wärme in die Heizkörper einzuspeisen, benötigt eine Gasheizung bei 95 % Nutzungsgrad rund 10.526 kWh Gas. Eine Wärmepumpe mit einer Jahresarbeitszahl von 3,5 benötigt für dieselbe Wärmemenge jedoch lediglich rund 2.857 kWh Strom.',
+        ],
+      },
+      {
+        id: 'die-emissionsbilanz-im-detail',
+        title: 'Die Emissionsbilanz beider Systeme im Detail',
+        paragraphs: [
+          'Gasheizung (Brennwerttechnik): 1 kWh Erdgas emittiert bei der Verbrennung ca. 0,1814 kg CO₂ (EBeV 2030). Bei 95 % Wirkungsgrad entstehen 0,1814 ÷ 0,95 = 0,1909 kg CO₂ = ca. 191 g CO₂ je kWh Nutzwärme.',
+          'Wärmepumpe (Strommix 2025): Die offizielle UBA-Schätzung für das Datenjahr 2025 beziffert die Erzeugungsemissionen im deutschen Strommix auf 344 g CO₂/kWh. Teilt man diesen Faktor durch die Jahresarbeitszahl der Wärmepumpe, ergibt sich der Ausstoß je kWh Nutzwärme:\n• JAZ 3,0 (z. B. Altbau-Heizkörper): 344 ÷ 3,0 = ca. 115 g CO₂/kWh Nutzwärme (-40 % gegenüber Gas)\n• JAZ 3,5 (z. B. teilsaniert): 344 ÷ 3,5 = ca. 98 g CO₂/kWh Nutzwärme (-49 % gegenüber Gas)\n• JAZ 4,0 (z. B. Fußbodenheizung / Erdwärme): 344 ÷ 4,0 = ca. 86 g CO₂/kWh Nutzwärme (-55 % gegenüber Gas).',
+        ],
+      },
+      {
+        id: 'zukunftssicherheit-und-stromnetz-transformation',
+        title: 'Zukunftssicherheit durch den Wandel des Stromnetzes',
+        paragraphs: [
+          'Während eine Gasheizung über ihre gesamte Betriebszeit von 15 bis 20 Jahren an die festen Verbrennungsemissionen des Erdgases gebunden bleibt (sofern kein teures Biogas beigemischt wird), wird eine Wärmepumpe mit jedem Jahr emissionsärmer.',
+          'Steigt der Anteil erneuerbarer Energien im deutschen Stromnetz weiter an, sinkt der spezifische Strommix-Faktor kontinuierlich ab. Dadurch vergrößert sich der CO₂-Vorteil der Wärmepumpe im Laufe der Betriebsjahre automatisch.',
+        ],
+      },
+    ],
+    workedExample: {
+      title: 'Vergleich bei 15.000 kWh Nutzwärmebedarf im Einfamilienhaus',
+      scenario: 'Ein teilsaniertes Einfamilienhaus benötigt 15.000 kWh Nutzwärme pro Jahr. Verglichen werden eine Gas-Brennwertheizung (95 % Nutzungsgrad) und eine Luft-Wasser-Wärmepumpe mit JAZ 3,5 (Strommix 2025: 344 g CO₂/kWh).',
+      formula: 'Gas: 15.000 ÷ 0,95 × 0,1814 kg; Wärmepumpe: 15.000 ÷ 3,5 × 0,344 kg',
+      steps: [
+        {
+          label: '1. Gas-Brennwertheizung',
+          calculation: '15.000 kWh ÷ 0,95 = 15.789 kWh Gas × 0,1814 kg/kWh = 2.864,1 kg CO₂',
+          note: 'Reine Verbrennungsemissionen nach EBeV 2030.',
+        },
+        {
+          label: '2. Wärmepumpe mit JAZ 3,5',
+          calculation: '15.000 kWh ÷ 3,5 = 4.286 kWh Strom × 0,344 kg/kWh = 1.474,4 kg CO₂',
+          note: 'Stromerzeugung im deutschen Strommix des Datenjahres 2025 (UBA 2026).',
+        },
+        {
+          label: '3. Jährliche Einsparung durch die Wärmepumpe',
+          calculation: '2.864,1 kg − 1.474,4 kg = 1.389,7 kg CO₂ Ersparnis (-48,5 %)',
+          note: 'Fast 1,4 Tonnen CO₂-Vermeidung pro Jahr.',
+        },
+      ],
+      resultSummary: 'Die Wärmepumpe spart bei einem typischen Einfamilienhaus jährlich rund 1,39 Tonnen CO₂ gegenüber der Gasheizung ein (knapp 49 % Reduktion).',
+    },
+    commonMistakes: [
+      {
+        mistake: 'Wärmepumpenstrom direkt mit Gas-Kilowattstunden vergleichen.',
+        correction: 'Da die Wärmepumpe Umweltwärme nutzt, liefert 1 kWh Strom je nach Jahresarbeitszahl das 3- bis 4-fache an Nutzwärme.',
+      },
+      {
+        mistake: 'Fiktiven Ökostromfaktor von 0 g CO₂ ansetzen.',
+        correction: 'Für eine realistische volkswirtschaftliche Betrachtung sollte stets der tatsächliche bundesweite Strommix als Netzfaktor herangezogen werden.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Lohnt sich eine Wärmepumpe CO₂-mäßig auch bei alten Heizkörpern?',
+        answer: 'Ja. Selbst bei einer mäßigen JAZ von 2,8 verursacht die Wärmepumpe mit ca. 123 g CO₂/kWh Nutzwärme rund 35 % weniger Treibhausgase als eine moderne Gas-Brennwerttherme (ca. 191 g/kWh).',
+      },
+      {
+        question: 'Wie wirkt sich eine eigene Photovoltaikanlage auf die CO₂-Bilanz der Wärmepumpe aus?',
+        answer: 'Wird der Strom direkt vom eigenen Dach bezogen, sinkt der CO₂-Ausstoß für diesen Anteil auf nahezu null, was die Gesamtemissionen weiter deutlich reduziert.',
+      },
+    ],
+    officialSources: [
+      {
+        title: 'Umweltbundesamt (UBA): CO₂-Emissionen pro Kilowattstunde Strom 2025',
+        citation: 'Spezifische Treibhausgas-Emissionen des deutschen Strommixes, Veröffentlichung vom 23. März 2026',
+        url: 'https://www.umweltbundesamt.de/themen/co2-emissionen-pro-kilowattstunde-strom-2025-nur',
+      },
+      {
+        title: 'EBeV 2030 – Anlage 2 Teil 4: Erdgas-Standardwerte',
+        citation: 'Standardfaktor für Erdgas Ho (0,1814 kg CO₂/kWh)',
+        url: 'https://www.gesetze-im-internet.de/ebev_2030/',
+      },
+      {
+        title: 'Fraunhofer ISE: Wärmepumpen-Feldtests',
+        citation: 'Reale Jahresarbeitszahlen im Gebäudebestand und im Neubau',
+        url: 'https://www.ise.fraunhofer.de',
+      },
+    ],
+    relatedArticleSlugs: ['fernwaerme-co2-faktor-netzunterschiede', 'co2-pro-kwh-strom', 'co2-preis-2026-brennstoffe'],
   },
 ];
 

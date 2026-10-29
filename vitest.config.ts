@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     testTimeout: 15000,
+    exclude: ['**/node_modules/**', '**/.claude/**', '**/.git/**'],
   },
   resolve: {
     alias: {
