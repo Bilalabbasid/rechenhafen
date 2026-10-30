@@ -55,7 +55,7 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
             color: '#065f46',
             fontWeight: 600,
           }}>
-            Rechtsstand: {timeSensitiveMeta.year} (geprüft am {timeSensitiveMeta.lastVerified})
+            Rechtsstand: <time dateTime={String(timeSensitiveMeta.year)}>{timeSensitiveMeta.year}</time> (geprüft am <time dateTime={timeSensitiveMeta.lastVerified}>{timeSensitiveMeta.lastVerified}</time>)
           </span>
         )}
       </div>
@@ -76,9 +76,9 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
           <ol style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {legalFootnotes!.map((fn, idx) => (
               <li key={idx} id={`quelle-${idx + 1}`} style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', lineHeight: 1.55 }}>
-                <span style={{ fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                <cite style={{ fontStyle: 'normal', fontWeight: 700, color: 'var(--color-text-primary)' }}>
                   [{idx + 1}] {fn.citation}:
-                </span>{' '}
+                </cite>{' '}
                 <span>{fn.text}</span>{' '}
                 {fn.url && (
                   <a
@@ -91,10 +91,10 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
                   </a>
                 )}
                 <span style={{ display: 'inline-block', fontSize: '0.775rem', background: 'var(--color-surface)', padding: '1px 6px', borderRadius: '4px', border: '1px solid var(--color-border)', margin: '2px 4px' }}>
-                  Rechtsstand: {fn.effectiveDate}
+                  Rechtsstand: <time dateTime={fn.effectiveDate}>{fn.effectiveDate}</time>
                 </span>
                 <span style={{ display: 'inline-block', fontSize: '0.775rem', background: '#ecfdf5', color: '#065f46', padding: '1px 6px', borderRadius: '4px', border: '1px solid #a7f3d0', margin: '2px 4px' }}>
-                  Quelle geprüft am: {fn.reviewedDate}
+                  Quelle geprüft am: <time dateTime={fn.reviewedDate}>{fn.reviewedDate}</time>
                 </span>
               </li>
             ))}

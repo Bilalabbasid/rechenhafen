@@ -66,6 +66,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    'max-video-preview': -1,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
     googleBot: {
       index: true,
       follow: true,
@@ -88,9 +91,20 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'RechenHafen',
+    alternateName: ['RechenHafen.de', 'Rechenhafen'],
     url: 'https://rechenhafen.de',
     description: 'Alle Rechner an einem Ort. Hunderte präzise deutsche Online-Rechner.',
     inLanguage: 'de-DE',
+    publisher: {
+      '@type': 'Organization',
+      name: 'RechenHafen',
+      url: 'https://rechenhafen.de',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://rechenhafen.de/icon.svg',
+      },
+      publishingPrinciples: 'https://rechenhafen.de/methodik/',
+    },
   };
 
   return (

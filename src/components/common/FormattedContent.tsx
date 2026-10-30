@@ -189,6 +189,7 @@ export default function FormattedContent({ content, className, style }: BlockPar
                   {headerCols.map((col, cIdx) => (
                     <th
                       key={cIdx}
+                      scope="col"
                       style={{
                         padding: '10px 14px',
                         borderBottom: '2px solid var(--color-border, #e2e8f0)',

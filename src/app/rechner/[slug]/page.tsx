@@ -83,17 +83,77 @@ export default async function CalculatorPage({ params }: PageProps) {
     { label: calc.shortName || calc.name, href: `/rechner/${calc.slug}/` },
   ];
 
-  // Structured Data (SoftwareApplication)
-  const softwareSchema = {
+  const cleanTitle = formatMetaTitle(calc.metaTitle);
+  const canonicalUrl = `https://rechenhafen.de/rechner/${calc.slug}/`;
+  const lastModified =
+    calc.timeSensitiveMeta?.lastVerified ||
+    calc.trustMeta?.lastReviewed ||
+    '2026-01-01';
+
+  // Structured Data Graph: WebPage + WebApplication/SoftwareApplication
+  const structuredDataGraph = {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: calc.name,
-    description: calc.metaDescription,
-    url: `https://rechenhafen.de/rechner/${calc.slug}/`,
-    applicationCategory: 'CalculatorApplication',
-    operatingSystem: 'All',
-    browserRequirements: 'Erfordert aktiviertes JavaScript. Funktioniert in allen modernen Webbrowsern.',
-    isAccessibleForFree: true,
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${canonicalUrl}#webpage`,
+        url: canonicalUrl,
+        name: cleanTitle,
+        description: calc.metaDescription,
+        inLanguage: 'de-DE',
+        dateModified: lastModified,
+        mainEntity: {
+          '@id': `${canonicalUrl}#calculator`,
+        },
+        about: {
+          '@type': 'Thing',
+          name: calc.shortName || calc.name,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'RechenHafen',
+          url: 'https://rechenhafen.de',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://rechenhafen.de/icon.svg',
+          },
+        },
+      },
+      {
+        '@type': ['WebApplication', 'SoftwareApplication'],
+        '@id': `${canonicalUrl}#calculator`,
+        name: calc.name,
+        description: calc.metaDescription,
+        url: canonicalUrl,
+        applicationCategory: 'CalculatorApplication',
+        operatingSystem: 'All',
+        browserRequirements: 'Erfordert aktiviertes JavaScript. Funktioniert in allen modernen Webbrowsern.',
+        isAccessibleForFree: true,
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'EUR',
+        },
+        featureList: calc.formula
+          ? [calc.formula, 'Interaktive Sofort-Berechnung', 'Schritt-für-Schritt Rechenweg']
+          : ['Interaktive Sofort-Berechnung'],
+        inLanguage: 'de-DE',
+        author: {
+          '@type': 'Organization',
+          name: 'RechenHafen Redaktion',
+          url: 'https://rechenhafen.de/ueber-uns/',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'RechenHafen',
+          url: 'https://rechenhafen.de',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://rechenhafen.de/icon.svg',
+          },
+        },
+      },
+    ],
   };
 
   // Serverseitige Vorberechnung mit Standardwerten für 0ms LCP und CLS = 0
@@ -115,7 +175,7 @@ export default async function CalculatorPage({ params }: PageProps) {
     <div className={styles.container}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredDataGraph).replace(/</g, '\\u003c') }}
       />
 
       {/* Breadcrumbs */}
@@ -257,6 +317,7 @@ export default async function CalculatorPage({ params }: PageProps) {
         const renderExampleCard = (ex: any, idx?: number) => (
           <section
             key={idx ?? 0}
+            aria-label={`Beispielrechnung: ${ex.title || 'Schritt für Schritt'}`}
             style={{
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',

@@ -81,8 +81,31 @@ export default async function CategoryPage({ params }: PageProps) {
   // Related categories (excluding current)
   const relatedCategories = CATEGORIES.filter((c) => c.slug !== cat.slug).slice(0, 4);
 
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: cat.name,
+    description: cat.metaDescription,
+    url: `https://rechenhafen.de/${cat.slug}/`,
+    inLanguage: 'de-DE',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: calculators.length,
+      itemListElement: calculators.map((c, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: c.name,
+        url: `https://rechenhafen.de/rechner/${c.slug}/`,
+      })),
+    },
+  };
+
   return (
     <div className={styles.container}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema).replace(/</g, '\\u003c') }}
+      />
       {/* Breadcrumbs */}
       <Breadcrumbs items={[{ label: cat.name, href: `/${cat.slug}/` }]} />
 

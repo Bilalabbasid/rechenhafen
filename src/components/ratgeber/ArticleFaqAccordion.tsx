@@ -1,6 +1,7 @@
 import React from 'react';
 import { RatgeberFaq } from '@/types/ratgeber';
 import styles from '@/styles/components.module.css';
+import { stripMarkdown } from '@/components/common/FormattedContent';
 
 interface Props {
   faqs: RatgeberFaq[];
@@ -17,7 +18,7 @@ export default function ArticleFaqAccordion({ faqs }: Props) {
       name: faq.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: faq.answer,
+        text: stripMarkdown(faq.answer),
       },
     })),
   };
