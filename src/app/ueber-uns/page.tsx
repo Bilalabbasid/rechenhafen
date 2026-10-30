@@ -11,11 +11,48 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://rechenhafen.de/ueber-uns/',
   },
+  openGraph: {
+    title: 'Über uns – Mission & Team',
+    description: 'Erfahren Sie mehr über RechenHafen: Unsere Mission für präzise, werbefreie und datenschutzfreundliche Online-Rechner für Deutschland.',
+    url: 'https://rechenhafen.de/ueber-uns/',
+    siteName: 'RechenHafen',
+    locale: 'de_DE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Über uns – Mission & Team',
+    description: 'Erfahren Sie mehr über RechenHafen: Unsere Mission für präzise, werbefreie und datenschutzfreundliche Online-Rechner für Deutschland.',
+  },
 };
 
 export default function UeberUnsPage() {
+  const aboutSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'Über RechenHafen – Mission & Team',
+    description: 'Erfahren Sie mehr über RechenHafen: Unsere Mission für präzise, werbefreie und datenschutzfreundliche Online-Rechner für Deutschland.',
+    url: 'https://rechenhafen.de/ueber-uns/',
+    inLanguage: 'de-DE',
+    mainEntity: {
+      '@type': 'Organization',
+      name: 'RechenHafen',
+      url: 'https://rechenhafen.de',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://rechenhafen.de/icon.svg',
+      },
+      publishingPrinciples: 'https://rechenhafen.de/methodik/',
+      description: 'RechenHafen ist eine unabhängige deutsche Plattform für über 400 präzise Online-Rechner in den Bereichen Finanzen, Steuern, Gesundheit, Bauen, Arbeit und Alltag.',
+    },
+  };
+
   return (
     <div className={styles.container}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutSchema).replace(/</g, '\\u003c') }}
+      />
       <Breadcrumbs items={[{ label: 'Über uns', href: '/ueber-uns/' }]} />
 
       <article style={{ maxWidth: '800px', margin: '0 auto var(--space-12)', lineHeight: 1.7, color: 'var(--color-text-secondary)' }}>

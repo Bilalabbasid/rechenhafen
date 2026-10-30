@@ -20,9 +20,33 @@ export const metadata: Metadata = {
     locale: 'de_DE',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Alle Rechner – Gesamtverzeichnis',
+    description: 'Das vollständige Verzeichnis aller Online-Rechner für Deutschland: Steuern, Finanzen, Gesundheit, Alltag und mehr.',
+  },
 };
 
 export default function AllCalculatorsPage() {
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Alle Rechner – Gesamtverzeichnis',
+    description: 'Übersicht über alle 421 kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.',
+    url: 'https://rechenhafen.de/rechner/',
+    inLanguage: 'de-DE',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: ALL_CALCULATORS.length,
+      itemListElement: ALL_CALCULATORS.slice(0, 50).map((c, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: c.name,
+        url: `https://rechenhafen.de/rechner/${c.slug}/`,
+      })),
+    },
+  };
+
   // Category counts and metadata
   const categoriesMeta = CATEGORIES.map((cat) => ({
     slug: cat.slug,
@@ -46,6 +70,10 @@ export default function AllCalculatorsPage() {
 
   return (
     <div className={styles.container}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema).replace(/</g, '\\u003c') }}
+      />
       <Breadcrumbs items={[{ label: 'Alle Rechner', href: '/rechner/' }]} />
 
       <div style={{ marginBottom: 'var(--space-6)' }}>

@@ -12,13 +12,49 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://rechenhafen.de/methodik/',
   },
+  openGraph: {
+    title: 'Berechnungsmethodik, Datenquellen & Transparenz',
+    description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
+    url: 'https://rechenhafen.de/methodik/',
+    siteName: 'RechenHafen',
+    locale: 'de_DE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Berechnungsmethodik, Datenquellen & Transparenz',
+    description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
+  },
 };
 
 export default function MethodikPage() {
   const regulatedEntries = Object.entries(GERMAN_DATA_2026);
 
+  const methodikSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemPage',
+    name: 'Berechnungsmethodik, Datenquellen & Transparenz',
+    description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
+    url: 'https://rechenhafen.de/methodik/',
+    inLanguage: 'de-DE',
+    publisher: {
+      '@type': 'Organization',
+      name: 'RechenHafen',
+      url: 'https://rechenhafen.de',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://rechenhafen.de/icon.svg',
+      },
+      publishingPrinciples: 'https://rechenhafen.de/methodik/',
+    },
+  };
+
   return (
     <div className={styles.container}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(methodikSchema).replace(/</g, '\\u003c') }}
+      />
       <Breadcrumbs items={[{ label: 'Methodik & Datenquellen', href: '/methodik/' }]} />
 
       <article style={{ maxWidth: '880px', margin: '0 auto var(--space-12)', lineHeight: 1.75, color: 'var(--color-text-secondary)' }}>

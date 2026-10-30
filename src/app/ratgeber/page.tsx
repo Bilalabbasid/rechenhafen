@@ -22,17 +22,47 @@ export const metadata: Metadata = {
     locale: 'de_DE',
     type: 'website',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt',
+    description:
+      'Fundierte Ratgeber, gesetzliche Hintergründe und nachvollziehbare Rechenbeispiele zu Finanzen, Steuern, Gehalt, Wohnen, Energie und Arbeitstagen.',
+  },
 };
 
 export default function RatgeberHubPage() {
   const articles = getAllArticles();
 
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt',
+    description:
+      'Fundierte Ratgeber, gesetzliche Hintergründe und nachvollziehbare Rechenbeispiele zu Finanzen, Steuern, Gehalt, Wohnen, Energie und Arbeitstagen.',
+    url: 'https://rechenhafen.de/ratgeber/',
+    inLanguage: 'de-DE',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: articles.length,
+      itemListElement: articles.map((a, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: a.title,
+        url: `https://rechenhafen.de/ratgeber/${a.slug}/`,
+      })),
+    },
+  };
+
   const breadcrumbs = [
-    { label: 'Ratgeber' },
+    { label: 'Ratgeber', href: '/ratgeber/' },
   ];
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema).replace(/</g, '\\u003c') }}
+      />
       <header className={styles.ratgeberHero}>
         <div className="container">
           <Breadcrumbs items={breadcrumbs} />
