@@ -1,5 +1,6 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+import { calculateZollCmConversion, calculateTimeConversion } from '@/lib/calculators/einheiten';
 
 // ---------------------------------------------------------------------------
 // Gemeinsame Annahmen für Berechnung UND Kurzreferenz-Tabellen.
@@ -1587,191 +1588,172 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "zoll-in-cm-rechner",
     slug: "zoll-in-cm-rechner",
-    name: "Zoll-in-cm-Rechner (Inch & Diagonale für TV & Smartphones)",
+    name: "Zoll-in-cm-Rechner (Inch ↔ Zentimeter & Bildschirmmaße)",
     shortName: "Zoll-in-cm-Rechner",
     category: "einheiten",
     subcategory: "Geometrische Maße",
-    metaTitle: 'Zoll in cm Rechner – Inch in Zentimeter',
-    metaDescription: 'Rechnen Sie Zoll (Inch) in Zentimeter und Millimeter um. Inklusive Bildschirm-Rechner für TVs und Handys: Breite und Höhe im 16:9 Format.',
-    h1: 'Zoll in cm Rechner – Inch in cm & Bildschirmmaße berechnen',
-    shortDescription: 'Konvertiert Zoll (Inch) in cm und ermittelt Maße von 16:9 Displays.',
-    searchKeywords: ["zoll in cm rechner inch umrechnen","fernseher zoll in cm bildschirmdiagonale","display breite hoehe 16 zu 9 zoll","1 zoll wieviel cm 2 54"],
+    metaTitle: 'Zoll in cm Rechner: Inch ↔ Zentimeter umrechnen',
+    metaDescription: 'Zoll und Zentimeter sofort umrechnen: 1 Zoll = exakt 2,54 cm. Mit cm-in-Zoll-Umrechnung, Tabelle und Bildschirmmaßen für Fernseher und Monitore.',
+    h1: 'Zoll in cm umrechnen – Inch ↔ Zentimeter Rechner',
+    shortDescription: 'Konvertiert Zoll (Inch) in cm und umgekehrt, ermittelt exakte 16:9 Bildschirmabmessungen und Displayflächen.',
+    searchKeywords: ["zoll in cm rechner inch umrechnen","fernseher zoll in cm bildschirmdiagonale","cm in zoll umrechner","display breite hoehe 16 zu 9 zoll","1 zoll wieviel cm 2 54"],
     inputs: [
-          {
-                "id": "inches",
-                "label": "Zoll / Inch (\")",
-                "type": "number",
-                "defaultValue": 55,
-                "min": 0.1,
-                "max": 500,
-                "step": 0.5,
-                "unit": "Zoll"
-          }
+      {
+        id: "inches",
+        label: "Zoll / Inch (\")",
+        type: "number",
+        defaultValue: 55,
+        min: 0,
+        step: 0.1,
+        unit: "Zoll"
+      },
+      {
+        id: "cm",
+        label: "Zentimeter (cm)",
+        type: "number",
+        defaultValue: 139.7,
+        min: 0,
+        step: 0.1,
+        unit: "cm"
+      }
     ],
-    calculate: (inputs: Record<string, any>) => {
-      const inch = Number(inputs.inches) || 0;
-      // 1 Zoll = exakt 2,54 cm
-      const cm = inch * 2.54;
-      const mm = cm * 10;
-      
-      // Bei 16:9 Display:
-      // Diagonale d = sqrt(w^2 + h^2) = sqrt((16x)^2 + (9x)^2) = sqrt(256 + 81)x = sqrt(337)x ≈ 18.35756x
-      const diagCm = cm;
-      const x = diagCm / Math.sqrt(337);
-      const width16_9 = 16 * x;
-      const height16_9 = 9 * x;
-      const displayAreaCm2 = width16_9 * height16_9;
-      
-      return {
-        primary: { id: 'cm', label: 'Länge in Zentimetern (cm)', value: cm, formattedValue: formatNumber(cm, 2) + ' cm', highlight: true },
-        secondary: [
-          { id: 'width16_9', label: 'Bildschirmbreite bei 16:9', value: width16_9, formattedValue: formatNumber(width16_9, 1) + ' cm' },
-          { id: 'height16_9', label: 'Bildschirmhöhe bei 16:9', value: height16_9, formattedValue: formatNumber(height16_9, 1) + ' cm' },
-          { id: 'area', label: 'Displayfläche ca.', value: displayAreaCm2 / 10000, formattedValue: formatNumber(displayAreaCm2 / 10000, 2) + ' m² (' + formatNumber(displayAreaCm2, 0) + ' cm²)' },
-          { id: 'mm', label: 'Millimeter (mm)', value: mm, formattedValue: formatNumber(mm, 1) + ' mm' },
-        ],
-        summaryText: inch + ' Zoll entsprechen exakt ' + formatNumber(cm, 2) + ' cm. Ein ' + inch + '"-Fernseher (16:9) ist ca. ' + formatNumber(width16_9, 0) + ' cm breit und ' + formatNumber(height16_9, 0) + ' cm hoch.',
-      };
-    },
-    formula: "1 Zoll (Inch) = exakt 2,54 cm = 25,4 mm; cm = Zoll × 2,54",
-    formulaExplanation: "Seit 1959 ist das internationale Zoll per Definition an das metrische System gekoppelt: Genau 1 Inch = 25,4 mm.",
+    calculate: calculateZollCmConversion,
+    formula: "1 Zoll (Inch) = exakt 2,54 cm = 25,4 mm | cm = Zoll × 2,54 | Zoll = cm / 2,54",
+    formulaExplanation: "Das internationale Zoll (Inch) ist seit 1959 per NIST-Definition exakt an das metrische System gebunden: 1 in = 2,54 cm. Für 16:9-Bildschirme errechnen sich Breite und Höhe aus der Diagonale über den Satz des Pythagoras (Breite = Diagonale × 16 / √337, Höhe = Diagonale × 9 / √337).",
     workedExample: {
-          "title": "Beispiel: 55-Zoll-Fernseher Bildschirmmaße",
-          "inputValues": [
-                {
-                      "label": "Diagonale",
-                      "value": "55 Zoll"
-                }
-          ],
-          "steps": [
-                "Diagonale in cm = 55 × 2,54 = 139,7 cm",
-                "Breite (16:9) = 139,7 × 0,8716 = 121,8 cm",
-                "Höhe (16:9) = 139,7 × 0,4903 = 68,5 cm"
-          ],
-          "result": "139,7 cm Diagonale (122 × 69 cm)"
+      title: "Beispiel: 55-Zoll-Fernseher Bildschirmmaße",
+      inputValues: [
+        { label: "Diagonale", value: "55 Zoll" }
+      ],
+      steps: [
+        "Diagonale in cm = 55 × 2,54 = 139,7 cm",
+        "Breite (16:9) = 139,7 × 16 / √337 ≈ 121,76 cm",
+        "Höhe (16:9) = 139,7 × 9 / √337 ≈ 68,49 cm"
+      ],
+      result: "139,7 cm Diagonale (ca. 122 × 68,5 cm Displayfläche)"
     },
+    quickReference: [
+      {
+        title: "Gängige Bildschirmdiagonalen (16:9) in Zentimeter",
+        content: `| Diagonale in Zoll | Diagonale in cm | Breite (16:9) ca. | Höhe (16:9) ca. | Displayfläche ca. |
+|---|---|---|---|---|
+| **1"** | 2,54 cm | 2,21 cm | 1,25 cm | 0,0003 m² |
+| **5"** (Smartphone) | 12,70 cm | 11,07 cm | 6,23 cm | 0,0069 m² |
+| **10"** (Tablet) | 25,40 cm | 22,14 cm | 12,45 cm | 0,0276 m² |
+| **13,3"** (Laptop) | 33,78 cm | 29,44 cm | 16,56 cm | 0,0488 m² |
+| **15,6"** (Laptop) | 39,62 cm | 34,53 cm | 19,43 cm | 0,0671 m² |
+| **24"** (Monitor) | 60,96 cm | 53,13 cm | 29,89 cm | 0,1588 m² |
+| **27"** (Monitor) | 68,58 cm | 59,77 cm | 33,62 cm | 0,2010 m² |
+| **32"** (TV/Monitor) | 81,28 cm | 70,84 cm | 39,85 cm | 0,2823 m² |
+| **40"** (TV) | 101,60 cm | 88,55 cm | 49,81 cm | 0,4411 m² |
+| **43"** (TV) | 109,22 cm | 95,19 cm | 53,55 cm | 0,5097 m² |
+| **50"** (TV) | 127,00 cm | 110,69 cm | 62,26 cm | 0,6892 m² |
+| **55"** (TV) | 139,70 cm | 121,76 cm | 68,49 cm | 0,8339 m² |
+| **65"** (TV) | 165,10 cm | 143,90 cm | 80,94 cm | 1,1647 m² |
+| **75"** (TV) | 190,50 cm | 166,03 cm | 93,40 cm | 1,5507 m² |
+| **85"** (TV) | 215,90 cm | 188,17 cm | 105,85 cm | 1,9918 m² |`
+      }
+    ],
     content: {
-      intro: 'Dieser Längenrechner wandelt Zollmaße (Inch) in Zentimeter um und berechnet die Abmessungen von Bildschirmen, TV-Geräten, Felgen und Werkzeugen.',
-      details: '1 Zoll = exakt 2,54 Zentimeter. Die Bildschirmdiagonale eines 65-Zoll-Fernsehers beträgt exakt 65 · 2,54 = 165,1 cm. Bei einem Seitenverhältnis von 16:9 ist das Display ca. 144 cm breit und 81 cm hoch.',
+      intro: 'Dieser Präzisionsrechner wandelt Zollmaße (Inch) in Zentimeter sowie Zentimeter in Zoll um. Neben der reinen Längenumrechnung ermittelt er für Monitore, Fernseher und Smartphones die sichtbaren 16:9-Bildschirmabmessungen und Flächenmaße.',
+      details: 'Die Definition nach internationalem Standard (NIST) lautet: 1 Zoll = exakt 2,54 Zentimeter (bzw. 25,4 Millimeter). 1 Zentimeter entspricht circa 0,393701 Zoll. Für Bildschirmgeräte im Seitenverhältnis 16:9 berechnet sich die Breite mit dem Faktor 16/√337 (≈ 0,871575) und die Höhe mit 9/√337 (≈ 0,490261) der Bildschirmdiagonale.',
     },
     faqs: [
-      { question: 'Wie viel cm sind ein 15-Zoll-Laptop-Display?', answer: '15 Zoll entsprechen einer Bildschirmdiagonale von 15 × 2,54 = 38,1 cm; ein 13,3-Zoll-Display misst 33,78 cm Diagonale.' },
-      { question: 'Wie rechnet man Zentimeter im Kopf schnell in Zoll um?', answer: 'Teilen Sie die Zentimeter durch 2,5 (oder verdoppeln Sie und teilen durch 5): 10 cm / 2,5 = ca. 4 Zoll (exakt 3,94 Zoll).' },
+      { question: 'Wie rechnet man Zoll in cm um?', answer: 'Multiplizieren Sie den Zollwert mit 2,54. Beispiel: 55 Zoll × 2,54 = 139,7 cm.' },
+      { question: 'Wie rechnet man cm in Zoll um?', answer: 'Teilen Sie den Zentimeterwert durch 2,54 (oder multiplizieren Sie mit ca. 0,393701). Beispiel: 100 cm / 2,54 = ca. 39,37 Zoll.' },
+      { question: 'Welche Maße hat ein 55-Zoll-Fernseher in cm?', answer: 'Ein 55-Zoll-Fernseher hat eine Diagonale von 139,7 cm. Bei einem Standard-Seitenverhältnis von 16:9 ist das reine Display ohne Gehäuserahmen etwa 121,8 cm breit und 68,5 cm hoch.' },
+      { question: 'Was ist der Unterschied zwischen Zoll und Inch?', answer: 'Es gibt keinen Unterschied: „Inch“ ist die englische Bezeichnung und „Zoll“ das deutsche Wort für dieselbe Maßeinheit von exakt 2,54 cm (Einheitenzeichen in bzw. Anführungszeichen ").' },
     ],
-    relatedSlugs: ['schuhe-kleidergroessen-umrechner', 'laengen-umrechner', 'rechteckrechner', 'daten-speicher-umrechner'],
+    relatedSlugs: ['laengen-umrechner', 'meilen-km-umrechner', 'papierformat-din-rechner', 'rechteckrechner'],
   },
   {
     id: "zeit-umrechner",
     slug: "zeit-umrechner",
-    name: "Zeit Umrechner (Sekunden, Minuten, Stunden, Tage & Wochen)",
+    name: "Zeit Umrechner (Sekunden, Minuten, Stunden, Tage & Jahre)",
     shortName: "Zeit Umrechner",
     category: "einheiten",
     subcategory: "Alltag & Kalender",
-    metaTitle: 'Zeit Umrechner – Sekunden, Minuten, Stunden, Tage & Wochen',
-    metaDescription: 'Rechnen Sie Zeiteinheiten präzise um: Sekunden, Minuten, Stunden, Tage, Wochen und Jahre inklusive Dezimalstunden in Stunden und Minuten.',
-    h1: 'Zeit Umrechner – Sekunden, Stunden, Tage & Wochen umrechnen',
-    shortDescription: 'Konvertiert Zeiteinheiten und Dezimalstunden mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["zeit umrechner sekunden minuten stunden tage","stunden in sekunden umrechnen 3600","dezimalstunden in stunden und minuten","tage in stunden umrechnen rechner"],
+    metaTitle: 'Zeit umrechnen: Sekunden, Minuten, Stunden, Tage & Jahre',
+    metaDescription: 'Sekunden, Minuten, Stunden, Tage, Wochen und Jahre sofort umrechnen. Mit allen Ergebnissen auf einen Blick, Formeln und verständlicher Zeitdarstellung.',
+    h1: 'Zeit-Umrechner: Sekunden, Minuten, Stunden, Tage & Jahre',
+    shortDescription: 'Konvertiert Zeiteinheiten exakt zwischen Sekunden, Minuten, Stunden, Tagen, Wochen und Umrechnungsjahren inklusive zusammengesetzter Zeitdarstellung.',
+    searchKeywords: ["zeit umrechner sekunden minuten stunden tage","stunden in sekunden umrechnen 3600","dezimalstunden in stunden und minuten","tage in stunden umrechnen rechner","zeit umrechnen jahre sekunden"],
     inputs: [
-          {
-                "id": "inputValue",
-                "label": "Zeitwert",
-                "type": "number",
-                "defaultValue": 36,
-                "min": 0,
-                "max": 1000000000,
-                "step": 0.5,
-                "unit": "Zeit"
-          },
-          {
-                "id": "inputUnit",
-                "label": "Ausgangseinheit",
-                "type": "select",
-                "defaultValue": "hours",
-                "options": [
-                      {
-                            "value": "hours",
-                            "label": "Stunden (h)"
-                      },
-                      {
-                            "value": "minutes",
-                            "label": "Minuten (min)"
-                      },
-                      {
-                            "value": "seconds",
-                            "label": "Sekunden (s)"
-                      },
-                      {
-                            "value": "days",
-                            "label": "Tage (d = 24 h)"
-                      },
-                      {
-                            "value": "weeks",
-                            "label": "Wochen (w = 7 Tage)"
-                      }
-                ]
-          }
-    ],
-    calculate: (inputs: Record<string, any>) => {
-      const val = Number(inputs.inputValue) || 0;
-      const unit = inputs.inputUnit;
-      
-      // Basis Sekunden (s):
-      let s = val * 3600;
-      if (unit === 'seconds') s = val;
-      else if (unit === 'minutes') s = val * 60;
-      else if (unit === 'days') s = val * 86400;
-      else if (unit === 'weeks') s = val * 604800;
-      
-      const minutes = s / 60;
-      const hours = s / 3600;
-      const days = s / 86400;
-      const weeks = s / 604800;
-      
-      // Zusammengesetzt Tage, Stunden, Minuten:
-      const wholeDays = Math.floor(days);
-      const remHours = Math.floor(hours % 24);
-      const remMins = Math.floor(minutes % 60);
-      const remSecs = Math.round(s % 60);
-      
-      const humanStr = wholeDays + ' d, ' + remHours + ' h, ' + remMins + ' min, ' + remSecs + ' s';
-      
-      return {
-        primary: { id: 'hours', label: 'Stunden (dezimal)', value: hours, formattedValue: formatNumber(hours, 2) + ' h', highlight: true },
-        secondary: [
-          { id: 'human', label: 'Zusammengesetzte Zeit', value: 0, formattedValue: humanStr },
-          { id: 'minutes', label: 'Minuten (min)', value: minutes, formattedValue: formatNumber(minutes, 1) + ' min' },
-          { id: 'seconds', label: 'Sekunden (s)', value: s, formattedValue: formatNumber(s, 0) + ' s' },
-          { id: 'days', label: 'Tage (d)', value: days, formattedValue: formatNumber(days, 3) + ' Tage' },
+      {
+        id: "value",
+        label: "Eingabewert",
+        type: "number",
+        defaultValue: 90,
+        min: 0,
+        step: 0.5,
+      },
+      {
+        id: "fromUnit",
+        label: "Von",
+        type: "select",
+        defaultValue: "minutes",
+        options: [
+          { value: "seconds", label: "Sekunden (s)" },
+          { value: "minutes", label: "Minuten (min)" },
+          { value: "hours", label: "Stunden (h)" },
+          { value: "days", label: "Tage (d)" },
+          { value: "weeks", label: "Wochen (w)" },
+          { value: "years", label: "Jahre (365,25 d)" },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(hours, 2) + ' Stunden, ' + formatNumber(minutes, 0) + ' Minuten bzw. ' + formatNumber(s, 0) + ' Sekunden (' + humanStr + ').',
-      };
-    },
-    formula: "1 min = 60 s; 1 h = 3.600 s; 1 d = 24 h = 86.400 s; 1 w = 7 d = 168 h",
-    formulaExplanation: "Unser Zeitsystem basiert historisch auf dem sexagesimalen Zahlensystem (Basis 60) der alten Babylonier für Stunden, Minuten und Sekunden.",
+      },
+      {
+        id: "toUnit",
+        label: "Nach",
+        type: "select",
+        defaultValue: "hours",
+        options: [
+          { value: "seconds", label: "Sekunden (s)" },
+          { value: "minutes", label: "Minuten (min)" },
+          { value: "hours", label: "Stunden (h)" },
+          { value: "days", label: "Tage (d)" },
+          { value: "weeks", label: "Wochen (w)" },
+          { value: "years", label: "Jahre (365,25 d)" },
+        ],
+      },
+    ],
+    calculate: calculateTimeConversion,
+    formula: "Zielwert = Wert × (Basis_Quelle in s / Basis_Ziel in s)",
+    formulaExplanation: "Die Sekunde (s) ist die fundamentale SI-Basiseinheit der Zeit: 1 min = 60 s | 1 h = 3.600 s | 1 d = 24 h = 86.400 s | 1 Woche = 7 d = 604.800 s | 1 Umrechnungsjahr = 365,25 d = 31.557.600 s (Julianische wissenschaftliche Standard-Konvention).",
     workedExample: {
-          "title": "Beispiel: 7,5 Arbeitsstunden in Minuten und Sekunden",
-          "inputValues": [
-                {
-                      "label": "Stunden",
-                      "value": "7,5 h"
-                }
-          ],
-          "steps": [
-                "Minuten = 7,5 × 60 = 450 Minuten",
-                "Sekunden = 450 × 60 = 27.000 Sekunden"
-          ],
-          "result": "450 Minuten = 27.000 Sekunden (7 Std. 30 Min.)"
+      title: "Beispiel: 90 Minuten in Stunden umrechnen",
+      inputValues: [
+        { label: "Zeitwert", value: "90 Minuten" }
+      ],
+      steps: [
+        "Stunden = 90 min ÷ 60 = 1,5 h",
+        "Zusammengesetzt: 1 Stunde und 30 Minuten",
+        "In Sekunden: 90 × 60 = 5.400 s"
+      ],
+      result: "1,50 Stunden (1 h 30 min)"
     },
+    quickReference: [
+      {
+        title: "Grundlegende Zeitumrechnungen im Überblick",
+        content: `| Zeiteinheit | Sekunden (s) | Minuten (min) | Stunden (h) | Tage (d) |
+|---|---|---|---|---|
+| **1 Minute** | 60 s | 1 min | ≈ 0,016667 h | ≈ 0,000694 d |
+| **1 Stunde** | 3.600 s | 60 min | 1 h | ≈ 0,041667 d |
+| **1 Tag** | 86.400 s | 1.440 min | 24 h | 1 d |
+| **1 Woche** | 604.800 s | 10.080 min | 168 h | 7 d |
+| **1 Jahr (365,25 d)** | 31.557.600 s | 525.960 min | 8.766 h | 365,25 d |`
+      }
+    ],
     content: {
-      intro: 'Dieser Zeiteinheiten-Konverter rechnet Zeitspannen deterministisch zwischen Nanosekunden, Millisekunden, Sekunden, Minuten, Stunden, Tagen und Kalenderjahren um.',
-      details: '1 Tag = 24 Stunden = 1.440 Minuten = 86.400 Sekunden = 86.400.000 Millisekunden. Ein durchschnittliches julianisches Jahr umfasst exakt 31.557.600 Sekunden.',
+      intro: 'Dieser Zeiteinheiten-Rechner rechnet Zeitspannen deterministisch zwischen Sekunden, Minuten, Stunden, Tagen, Wochen und wissenschaftlichen Umrechnungsjahren um.',
+      details: 'Als SI-Basiseinheit dient die Sekunde (s). Gesetzlich und kalendarisch hat eine Minute exakt 60 Sekunden, eine Stunde 3.600 Sekunden und ein Tag 24 Stunden bzw. 86.400 Sekunden. In Umrechnungskonventionen (z. B. nach IAU/Julianischem Standard) wird 1 Jahr mit 365,25 Tagen (genau 31.557.600 Sekunden) angesetzt, um Schalttage statistisch abzubilden.',
     },
     faqs: [
-      { question: 'Wie viele Sekunden vergehen in einer Arbeitswoche mit 40 Stunden?', answer: '40 Stunden × 3.600 Sekunden/Stunde = exakt 144.000 Sekunden reine Arbeitszeit.' },
-      { question: 'Wie schnell vergeht eine Nanosekunde im Computer?', answer: 'Eine Nanosekunde ist ein Milliardstel einer Sekunde (10⁻⁹ s); das Licht legt in einer Nanosekunde im Vakuum eine Strecke von ca. 30 cm zurück.' },
+      { question: 'Wie viele Sekunden hat eine Stunde bzw. ein Tag?', answer: 'Eine Stunde hat exakt 3.600 Sekunden (60 Minuten × 60 Sekunden). Ein voller Tag hat 24 Stunden, also 1.440 Minuten bzw. 86.400 Sekunden.' },
+      { question: 'Wie rechnet man Dezimalstunden in Stunden und Minuten um?', answer: 'Multiplizieren Sie die Nachkommastellen mit 60. Beispiel: 1,5 Stunden = 1 Stunde + (0,5 × 60) Minuten = 1 Stunde und 30 Minuten. Bei 7,75 h sind es 7 Stunden und 45 Minuten.' },
+      { question: 'Wie viele Tage und Sekunden hat ein Jahr in der Umrechnung?', answer: 'In der wissenschaftlichen Umrechnungskonvention wird 1 Jahr als Julianisches Jahr mit 365,25 Tagen definiert. Das entspricht exakt 8.766 Stunden, 525.960 Minuten bzw. 31.557.600 Sekunden.' },
+      { question: 'Wie viele Stunden hat eine Woche?', answer: 'Eine Kalenderwoche umfasst genau 7 Tage à 24 Stunden, also 168 Stunden (entsprechend 10.080 Minuten oder 604.800 Sekunden).' },
     ],
-    relatedSlugs: ['radioaktivitaet-strahlendosis-rechner', 'arbeitszeitrechner', 'urlaubstage-rechner', 'datenrate-bandbreite-umrechner'],
+    relatedSlugs: ['arbeitszeitrechner', 'zeitdifferenz-rechner', 'stundenrechner', 'countdown-rechner', 'laengen-umrechner'],
   },
   {
     id: "dichte-umrechner",

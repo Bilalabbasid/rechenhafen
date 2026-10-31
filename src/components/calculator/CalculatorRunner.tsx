@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useId } from 'react';
 import Link from 'next/link';
 import { CalculatorInput, CalculationResult, SelectOption } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
-import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info, Bookmark, BookmarkCheck } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info, Bookmark, BookmarkCheck, ArrowUpDown } from 'lucide-react';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe, formatNumber } from '@/lib/formatters';
 import { getUpcomingEasterDateString, parseDateParts } from '@/lib/calculators/dateMath';
@@ -281,7 +281,43 @@ export default function CalculatorRunner({
     recordCalculatorInteraction(slug);
     setIsUserEdited(true);
 
-    const updatedInputs = { ...inputs, [id]: value };
+    let updatedInputs = { ...inputs, [id]: value };
+
+    // Bidirectional sync for Zoll ↔ cm
+    if (slug === 'zoll-in-cm-rechner') {
+      if (id === 'inches') {
+        updatedInputs.lastEdited = 'inches';
+        const valStr = String(value ?? '').trim().replace(',', '.');
+        const num = parseFloat(valStr);
+        if (!isNaN(num) && valStr !== '') {
+          updatedInputs.cm = Math.round(num * 2.54 * 10000) / 10000;
+        }
+      } else if (id === 'cm') {
+        updatedInputs.lastEdited = 'cm';
+        const valStr = String(value ?? '').trim().replace(',', '.');
+        const num = parseFloat(valStr);
+        if (!isNaN(num) && valStr !== '') {
+          updatedInputs.inches = Math.round((num / 2.54) * 10000) / 10000;
+        }
+      }
+    } else if (slug === 'meilen-km-umrechner') {
+      if (id === 'miles') {
+        updatedInputs.lastEdited = 'miles';
+        const valStr = String(value ?? '').trim().replace(',', '.');
+        const num = parseFloat(valStr);
+        if (!isNaN(num) && valStr !== '') {
+          updatedInputs.km = Math.round(num * 1.609344 * 100000) / 100000;
+        }
+      } else if (id === 'km') {
+        updatedInputs.lastEdited = 'km';
+        const valStr = String(value ?? '').trim().replace(',', '.');
+        const num = parseFloat(valStr);
+        if (!isNaN(num) && valStr !== '') {
+          updatedInputs.miles = Math.round((num / 1.609344) * 100000) / 100000;
+        }
+      }
+    }
+
     setInputs(updatedInputs);
 
     // Track input validation errors and update inline field errors
@@ -314,6 +350,15 @@ export default function CalculatorRunner({
       delete newFieldErrors[id];
     }
 
+    // Clear counterpart validation error on synchronized calculators
+    if (slug === 'zoll-in-cm-rechner') {
+      if (id === 'inches' && !newFieldErrors['inches']) delete newFieldErrors['cm'];
+      if (id === 'cm' && !newFieldErrors['cm']) delete newFieldErrors['inches'];
+    } else if (slug === 'meilen-km-umrechner') {
+      if (id === 'miles' && !newFieldErrors['miles']) delete newFieldErrors['km'];
+      if (id === 'km' && !newFieldErrors['km']) delete newFieldErrors['miles'];
+    }
+
     // Clean up errors for fields that are not active in updatedInputs
     for (const [errId] of Object.entries(newFieldErrors)) {
       const def = inputDefs.find((inp) => inp.id === errId);
@@ -344,6 +389,144 @@ export default function CalculatorRunner({
         }
       } catch {
         trackValidationError(slug, 'calculation_exception');
+        setResult({
+          primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
+          error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
+        });
+      }
+    }
+  };
+
+  const handleSwapFromTo = async () => {
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
+    const oldFrom = inputs.fromUnit;
+    const oldTo = inputs.toUnit;
+    if (!oldFrom || !oldTo) return;
+
+    const updatedInputs = {
+      ...inputs,
+      fromUnit: oldTo,
+      toUnit: oldFrom,
+    };
+    setInputs(updatedInputs);
+
+    let fn = engineRef.current;
+    if (!fn) {
+      fn = await loadCalculatorEngine(slug);
+      if (fn) engineRef.current = fn;
+    }
+    if (fn) {
+      try {
+        const nextResult = fn(updatedInputs);
+        setResult(nextResult);
+        debounceTrackCompleted();
+      } catch {
+        setResult({
+          primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
+          error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
+        });
+      }
+    }
+  };
+
+  const handleSwapZollCm = async () => {
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
+    const isCm = inputs.lastEdited === 'cm';
+    const currentPrimaryVal = isCm ? inputs.cm : inputs.inches;
+    const num = parseFloat(String(currentPrimaryVal ?? '').trim().replace(',', '.'));
+    let updatedInputs: Record<string, any>;
+    if (isCm) {
+      const newInches = isNaN(num) ? 55 : num;
+      updatedInputs = {
+        ...inputs,
+        inches: newInches,
+        cm: Math.round(newInches * 2.54 * 10000) / 10000,
+        lastEdited: 'inches',
+      };
+    } else {
+      const newCm = isNaN(num) ? 139.7 : num;
+      updatedInputs = {
+        ...inputs,
+        cm: newCm,
+        inches: Math.round((newCm / 2.54) * 10000) / 10000,
+        lastEdited: 'cm',
+      };
+    }
+    setInputs(updatedInputs);
+
+    let fn = engineRef.current;
+    if (!fn) {
+      fn = await loadCalculatorEngine(slug);
+      if (fn) engineRef.current = fn;
+    }
+    if (fn) {
+      try {
+        const nextResult = fn(updatedInputs);
+        setResult(nextResult);
+        debounceTrackCompleted();
+      } catch {
+        setResult({
+          primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
+          error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
+        });
+      }
+    }
+  };
+
+  const handleSwapMilesKm = async () => {
+    if (!hasTrackedStartRef.current) {
+      trackCalculatorStart(slug);
+      hasTrackedStartRef.current = true;
+    }
+    recordCalculatorInteraction(slug);
+    setIsUserEdited(true);
+
+    const isKm = inputs.lastEdited === 'km';
+    const currentPrimaryVal = isKm ? inputs.km : inputs.miles;
+    const num = parseFloat(String(currentPrimaryVal ?? '').trim().replace(',', '.'));
+    let updatedInputs: Record<string, any>;
+    if (isKm) {
+      const newMiles = isNaN(num) ? 10 : num;
+      updatedInputs = {
+        ...inputs,
+        miles: newMiles,
+        km: Math.round(newMiles * 1.609344 * 100000) / 100000,
+        lastEdited: 'miles',
+      };
+    } else {
+      const newKm = isNaN(num) ? 16.09344 : num;
+      updatedInputs = {
+        ...inputs,
+        km: newKm,
+        miles: Math.round((newKm / 1.609344) * 100000) / 100000,
+        lastEdited: 'km',
+      };
+    }
+    setInputs(updatedInputs);
+
+    let fn = engineRef.current;
+    if (!fn) {
+      fn = await loadCalculatorEngine(slug);
+      if (fn) engineRef.current = fn;
+    }
+    if (fn) {
+      try {
+        const nextResult = fn(updatedInputs);
+        setResult(nextResult);
+        debounceTrackCompleted();
+      } catch {
         setResult({
           primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: '-' },
           error: 'Bei der Berechnung ist ein unerwarteter Eingabefehler aufgetreten.',
@@ -788,11 +971,54 @@ export default function CalculatorRunner({
               const fieldOptions = resolveFieldOptions(field, inputs);
 
               return (
-                <div key={field.id} className={styles.inputGroup}>
-                  <label htmlFor={inputId} className={styles.label}>
-                    {fieldLabel}
-                    {fieldUnit && <span className={styles.unitBadge}>({fieldUnit})</span>}
-                  </label>
+                <React.Fragment key={field.id}>
+                  {field.id === 'toUnit' && (slug === 'laengen-umrechner' || slug === 'zeit-umrechner') && (
+                    <div className={styles.unitSwapContainer}>
+                      <button
+                        type="button"
+                        onClick={handleSwapFromTo}
+                        className={styles.unitSwapButton}
+                        title="Einheiten tauschen (Von ⇄ Nach)"
+                        aria-label="Einheiten tauschen"
+                      >
+                        <ArrowUpDown size={14} />
+                        <span>Einheiten tauschen (⇄)</span>
+                      </button>
+                    </div>
+                  )}
+                  {field.id === 'cm' && slug === 'zoll-in-cm-rechner' && (
+                    <div className={styles.unitSwapContainer}>
+                      <button
+                        type="button"
+                        onClick={handleSwapZollCm}
+                        className={styles.unitSwapButton}
+                        title="Richtung umkehren (Zoll ⇄ cm)"
+                        aria-label="Richtung umkehren"
+                      >
+                        <ArrowUpDown size={14} />
+                        <span>Richtung umkehren (Zoll ⇄ cm)</span>
+                      </button>
+                    </div>
+                  )}
+                  {field.id === 'km' && slug === 'meilen-km-umrechner' && (
+                    <div className={styles.unitSwapContainer}>
+                      <button
+                        type="button"
+                        onClick={handleSwapMilesKm}
+                        className={styles.unitSwapButton}
+                        title="Richtung umkehren (Meilen ⇄ Kilometer)"
+                        aria-label="Richtung umkehren"
+                      >
+                        <ArrowUpDown size={14} />
+                        <span>Richtung umkehren (Meilen ⇄ Kilometer)</span>
+                      </button>
+                    </div>
+                  )}
+                  <div className={styles.inputGroup}>
+                    <label htmlFor={inputId} className={styles.label}>
+                      {fieldLabel}
+                      {fieldUnit && <span className={styles.unitBadge}>({fieldUnit})</span>}
+                    </label>
 
                   {field.type === 'select' ? (
                     <select
@@ -881,7 +1107,8 @@ export default function CalculatorRunner({
                     <span className={styles.helpText}>{field.helpText}</span>
                   )}
                 </div>
-              );
+              </React.Fragment>
+            );
             })}
 
             {/* Dynamic breaks section for arbeitszeitrechner */}

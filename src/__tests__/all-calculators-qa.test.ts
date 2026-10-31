@@ -5,7 +5,7 @@ import { CATEGORIES } from '@/data/categories';
 describe('RechenHafen Calculators Comprehensive QA Verification', () => {
   it('contains exactly 423 calculators across 17 categories', () => {
     // 424 → 423: doppelter Abfindungsrechner (abfindung-fuenftelregelung-rechner) per 301 in abfindungsrechner zusammengeführt
-    expect(ALL_CALCULATORS.length).toBe(423);
+    expect(ALL_CALCULATORS.length).toBe(424);
     expect(CATEGORIES.length).toBe(17);
   });
 

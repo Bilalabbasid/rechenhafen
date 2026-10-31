@@ -130,6 +130,7 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "zylinderrechner": "geometrie",
   "rechteckrechner": "geometrie",
   "laengen-umrechner": "einheiten",
+  "meilen-km-umrechner": "einheiten",
   "temperatur-umrechner": "einheiten",
   "portionsrechner": "kochen",
   "backform-umrechner": "kochen",
