@@ -18,7 +18,7 @@ import TaxBracketVisualizer from '@/components/calculator/TaxBracketVisualizer';
 import AdSlot from '@/components/common/AdSlot';
 import FormattedContent, { renderInlineMarkdown } from '@/components/common/FormattedContent';
 import styles from '@/styles/layout.module.css';
-import { ShieldCheck, Info } from 'lucide-react';
+import { ShieldCheck, Info, AlertCircle } from 'lucide-react';
 
 import { formatMetaTitle } from '@/lib/seo/title';
 
@@ -109,6 +109,11 @@ export default async function CalculatorPage({ params }: PageProps) {
           '@type': 'Thing',
           name: calc.shortName || calc.name,
         },
+        author: {
+          '@type': 'Person',
+          name: '[FILL: real editor/founder name]',
+          url: 'https://rechenhafen.de/ueber-uns/',
+        },
         publisher: {
           '@type': 'Organization',
           name: 'RechenHafen',
@@ -170,6 +175,10 @@ export default async function CalculatorPage({ params }: PageProps) {
       error: 'Berechnung konnte nicht initialisiert werden.',
     };
   }
+
+  const isYMYL =
+    ['steuern-gehalt', 'finanzen', 'kredit-schulden', 'wohnen-immobilien', 'gesundheit-fitness', 'familie-schwangerschaft', 'arbeit-gehalt'].includes(calc.category) ||
+    ['unterhalt', 'buergergeld', 'kuendigung', 'mutterschutz', 'elterngeld'].some((term) => calc.slug.includes(term));
 
   return (
     <div className={styles.container}>
@@ -253,7 +262,49 @@ export default async function CalculatorPage({ params }: PageProps) {
         }}>
           {renderInlineMarkdown(calc.shortDescription)}
         </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: 'var(--space-3)', fontSize: '0.85rem', color: 'var(--color-text-muted)', flexWrap: 'wrap' }}>
+          <span>Erstellt und gepflegt von</span>
+          <Link href="/ueber-uns/" style={{ color: 'var(--color-text-primary)', fontWeight: 600, textDecoration: 'underline' }}>
+            [FILL: real editor/founder name]
+          </Link>
+          {lastModified && (
+            <>
+              <span>•</span>
+              <span>Geprüfter Stand: {lastModified}</span>
+            </>
+          )}
+        </div>
       </div>
+
+      {/* YMYL Orientierungshinweis */}
+      {isYMYL && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '10px 14px',
+          background: 'var(--color-surface-hover, rgba(0,0,0,0.03))',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)',
+          fontSize: '0.85rem',
+          color: 'var(--color-text-secondary)',
+          margin: '0 0 var(--space-5)',
+        }}>
+          <AlertCircle size={16} style={{ flexShrink: 0, color: 'var(--color-primary)' }} />
+          <span>
+            {calc.category === 'steuern-gehalt' || calc.slug.includes('steuer') || calc.slug.includes('gehalt')
+              ? 'Unverbindlicher Orientierungswert – ersetzt keine steuerliche Beratung.'
+              : calc.category === 'gesundheit-fitness'
+              ? 'Biometrischer Näherungswert – dient der Orientierung und ersetzt keine ärztliche Diagnose oder Beratung.'
+              : calc.category === 'familie-schwangerschaft'
+              ? 'Rechnerischer Orientierungswert – ersetzt keine ärztliche oder hebammenfachliche Betreuung.'
+              : calc.category === 'finanzen' || calc.category === 'kredit-schulden'
+              ? 'Finanzmathematischer Modellwert – ersetzt keine Anlage-, Bank- oder Kreditberatung.'
+              : 'Rechtlicher bzw. rechnerischer Orientierungswert – ersetzt keine individuelle Rechtsberatung.'}
+          </span>
+        </div>
+      )}
 
       {/* Main Interactive Calculator Runner mit serverseitigem Vorab-Ergebnis */}
       <CalculatorRunner

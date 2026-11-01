@@ -15,6 +15,7 @@ import {
   Clock,
   UserCheck,
   CheckCircle2,
+  ShieldCheck,
   AlertTriangle,
   Lightbulb,
   Info,
@@ -126,7 +127,7 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
       '@id': `https://rechenhafen.de/ratgeber/${article.slug}/`,
     },
     author: {
-      '@type': 'Organization',
+      '@type': 'Person',
       name: article.author.name,
       url: 'https://rechenhafen.de/ueber-uns/',
     },
@@ -199,15 +200,17 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
                 RH
               </div>
               <div>
-                <strong style={{ color: 'var(--color-text-primary)' }}>{article.author.name}</strong>
-                <div>{article.author.role}</div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', display: 'block' }}>Erstellt und gepflegt von</span>
+                <Link href="/ueber-uns/" style={{ fontWeight: 700, color: 'var(--color-text-primary)', textDecoration: 'none' }}>
+                  {article.author.name}
+                </Link>
+                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{article.author.role}</div>
               </div>
-              {article.reviewer && (
-                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <UserCheck size={16} color="var(--color-success)" />
-                  <span>Geprüft durch {article.reviewer.name}</span>
-                </div>
-              )}
+              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Link href="/ueber-uns/#methodik" style={{ fontSize: '0.8rem', color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <ShieldCheck size={14} /> Redaktionelle Standards
+                </Link>
+              </div>
             </div>
           </div>
         </header>

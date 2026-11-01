@@ -196,7 +196,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     trustMeta: {
       legalBasis: 'Bürgerliches Gesetzbuch (§ 491 ff. BGB – Verbraucherdarlehensrecht) & PAngV',
       sourceName: 'Deutsche Bundesbank / Verbraucherzentrale Bundesverband',
-      sourceUrl: 'https://www.verbraucherzentrale.de',
+      sourceUrl: 'https://www.verbraucherzentrale.de/wissen/geld-versicherungen/kredite-schulden-insolvenz/autokauf-darauf-sollten-sie-bei-einem-autokredit-achten-13840',
       lastReviewed: '2026-01-15',
     },
   },

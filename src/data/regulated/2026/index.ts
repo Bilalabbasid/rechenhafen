@@ -24,7 +24,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesministerium der Finanzen (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__9.html',
     lastVerified: '2026-01-15',
   },
   pendlerpauschale_fernpendler: {
@@ -35,7 +35,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesministerium der Finanzen (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__9.html',
     lastVerified: '2026-01-15',
   },
   minijob_grenze: {
@@ -90,7 +90,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'BDEW Bundesverband der Energie- und Wasserwirtschaft',
-    sourceUrl: 'https://www.bdew.de',
+    sourceUrl: 'https://www.bdew.de/service/daten-und-grafiken/bdew-strompreisanalyse/',
     lastVerified: '2026-01-20',
   },
   gaspreis_durchschnitt: {
@@ -112,7 +112,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Umweltbundesamt (UBA)',
-    sourceUrl: 'https://www.umweltbundesamt.de',
+    sourceUrl: 'https://www.umweltbundesamt.de/themen/klima-energie/treibhausgas-emissionen',
     lastVerified: '2026-01-10',
   },
   co2_faktor_diesel: {
@@ -123,7 +123,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Umweltbundesamt (UBA)',
-    sourceUrl: 'https://www.umweltbundesamt.de',
+    sourceUrl: 'https://www.umweltbundesamt.de/themen/klima-energie/treibhausgas-emissionen',
     lastVerified: '2026-01-10',
   },
   co2_faktor_strommix: {
@@ -134,7 +134,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Umweltbundesamt (UBA)',
-    sourceUrl: 'https://www.umweltbundesamt.de',
+    sourceUrl: 'https://www.umweltbundesamt.de/themen/klima-energie/energie/stromerzeugung/strom-waermebereitstellung-in-zahlen',
     lastVerified: '2026-01-10',
   },
   buergergeld_regelsatz: {
@@ -145,7 +145,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesministerium für Arbeit und Soziales (BMAS)',
-    sourceUrl: 'https://www.bmas.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/__20.html',
     lastVerified: '2026-01-15',
   },
   kindergeld_betrag: {
@@ -167,7 +167,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesfinanzministerium (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__20.html',
     lastVerified: '2026-01-15',
   },
   kapitalertragsteuer_satz: {
@@ -178,7 +178,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesfinanzministerium (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__43a.html',
     lastVerified: '2026-01-15',
   },
   solidaritaetszuschlag_satz: {
@@ -189,7 +189,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesfinanzministerium (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/solzg_1995/__4.html',
     lastVerified: '2026-01-15',
   },
   kurzarbeitergeld_satz_ohne_kind: {
@@ -200,7 +200,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesagentur für Arbeit (BA)',
-    sourceUrl: 'https://www.arbeitsagentur.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_3/__105.html',
     lastVerified: '2026-01-15',
   },
   kurzarbeitergeld_satz_mit_kind: {
@@ -211,7 +211,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesagentur für Arbeit (BA)',
-    sourceUrl: 'https://www.arbeitsagentur.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_3/__105.html',
     lastVerified: '2026-01-15',
   },
   arbeitslosengeld1_satz_ohne_kind: {
@@ -222,7 +222,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesagentur für Arbeit (BA)',
-    sourceUrl: 'https://www.arbeitsagentur.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_3/__149.html',
     lastVerified: '2026-01-15',
   },
   arbeitslosengeld1_satz_mit_kind: {
@@ -233,7 +233,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesagentur für Arbeit (BA)',
-    sourceUrl: 'https://www.arbeitsagentur.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_3/__149.html',
     lastVerified: '2026-01-15',
   },
   krankengeld_brutto_satz: {
@@ -244,7 +244,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'GKV-Spitzenverband',
-    sourceUrl: 'https://www.gkv-spitzenverband.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_5/__47.html',
     lastVerified: '2026-01-15',
   },
   krankengeld_netto_max_satz: {
@@ -255,7 +255,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'GKV-Spitzenverband',
-    sourceUrl: 'https://www.gkv-spitzenverband.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_5/__47.html',
     lastVerified: '2026-01-15',
   },
   mutterschaftsgeld_gkv_tagessatz: {
@@ -266,7 +266,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesministerium für Familie, Senioren, Frauen und Jugend (BMFSFJ)',
-    sourceUrl: 'https://www.bmfsfj.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/muschg_2018/__19.html',
     lastVerified: '2026-01-15',
   },
   sachbezug_freigrenze_monat: {
@@ -277,7 +277,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesfinanzministerium (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__8.html',
     lastVerified: '2026-01-15',
   },
   ehrenamtspauschale_jahr: {
@@ -288,7 +288,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesfinanzministerium (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__3.html',
     lastVerified: '2026-01-15',
   },
   uebungsleiterpauschale_jahr: {
@@ -299,7 +299,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesfinanzministerium (BMF)',
-    sourceUrl: 'https://www.bundesfinanzministerium.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/estg/__3.html',
     lastVerified: '2026-01-15',
   },
   midijob_obergrenze: {
@@ -310,7 +310,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Minijob-Zentrale / BMAS',
-    sourceUrl: 'https://www.minijob-zentrale.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_4/__20.html',
     lastVerified: '2026-01-15',
   },
   schulbedarfspaket_gesamt: {
@@ -321,7 +321,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Bundesministerium für Arbeit und Soziales (BMAS)',
-    sourceUrl: 'https://www.bmas.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/__28.html',
     lastVerified: '2026-01-15',
   },
   geg_u_wert_aussenwand: {
@@ -332,7 +332,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Gebäudeenergiegesetz (GEG) / Bundesministerium für Wohnen (BMWSB)',
-    sourceUrl: 'https://www.bmwsb.bund.de',
+    sourceUrl: 'https://www.gesetze-im-internet.de/geg/anlage_7.html',
     lastVerified: '2026-01-15',
   },
   gewerbesteuer_freibetrag_personen: {

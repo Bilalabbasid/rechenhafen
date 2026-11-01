@@ -1536,7 +1536,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundeselterngeld- und Elternzeitgesetz (§ 1 bis § 4d BEEG)',
-      sourceUrl: 'https://www.familienportal.de',
+      sourceUrl: 'https://familienportal.de/familienportal/familienleistungen/elterngeld',
       lastVerified: '2026-01-15',
     }
   },
@@ -2740,7 +2740,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundesministerium für Arbeit und Soziales (§ 28 Abs. 3 SGB II)',
-      sourceUrl: 'https://www.bmas.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/__28.html',
       lastVerified: '2026-01-15',
     }
   },

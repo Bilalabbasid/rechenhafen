@@ -5,7 +5,7 @@ import styles from '@/styles/layout.module.css';
 
 export const metadata: Metadata = {
   title: 'Impressum',
-  description: 'Impressum und gesetzliche Anbieterkennzeichnung nach § 5 DDG für die Website RechenHafen.',
+  description: 'Impressum und gesetzliche Anbieterkennzeichnung nach § 5 DDG und § 18 Abs. 2 MStV für RechenHafen.',
   alternates: {
     canonical: 'https://rechenhafen.de/impressum/',
   },
@@ -21,29 +21,26 @@ export default function ImpressumPage() {
           Impressum
         </h1>
         <p style={{ fontSize: '1.05rem', color: 'var(--color-text-muted)', marginBottom: 'var(--space-6)' }}>
-          Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG)
+          Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG) und § 18 Abs. 2 Medienstaatsvertrag (MStV)
         </p>
 
         <section style={{ marginBottom: 'var(--space-6)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            Diensteanbieter & Betreiber der Plattform
+            Diensteanbieter &amp; Betreiber der Website
           </h2>
           <p>
-            <strong>RechenHafen</strong><br />
-            Ein Projekt von RechenHafen Digital<br />
-            Musterstraße 42<br />
-            20457 Hamburg<br />
-            Deutschland
+            <strong>[FILL: legal entity or full name]</strong><br />
+            [FILL: street + number, postcode, city, country]<br />
+            E-Mail: [FILL: contact email, z. B. kontakt@rechenhafen.de]<br />
+            Website: https://rechenhafen.de
           </p>
-        </section>
-
-        <section style={{ marginBottom: 'var(--space-6)' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            Kontakt
-          </h2>
-          <p>
-            E-Mail: <a href="mailto:kontakt@rechenhafen.de" style={{ color: 'var(--color-primary)' }}>kontakt@rechenhafen.de</a><br />
-            Website: <a href="https://rechenhafen.de" style={{ color: 'var(--color-primary)' }}>https://rechenhafen.de</a>
+          <p style={{ marginTop: 'var(--space-2)' }}>
+            <strong>Registereintrag (falls zutreffend):</strong><br />
+            [FILL: company register + number, if a company, z. B. Amtsgericht Musterstadt HRB 12345 / oder: Nicht eingetragen (Einzelunternehmen)]
+          </p>
+          <p style={{ marginTop: 'var(--space-2)' }}>
+            <strong>Umsatzsteuer-Identifikationsnummer (falls vorhanden):</strong><br />
+            [FILL: VAT ID, if any, gemäß § 27a UStG, z. B. DE 123456789]
           </p>
         </section>
 
@@ -52,32 +49,35 @@ export default function ImpressumPage() {
             Verantwortlich für redaktionelle Inhalte
           </h2>
           <p>
-            Verantwortlich im Sinne des § 18 Abs. 2 MStV:<br />
-            Redaktion RechenHafen<br />
-            Musterstraße 42<br />
-            20457 Hamburg
+            Verantwortlich gemäß § 18 Abs. 2 MStV:<br />
+            <strong>[FILL: natural person's name]</strong><br />
+            [FILL: street + number, postcode, city, country]
           </p>
         </section>
 
         <section style={{ marginBottom: 'var(--space-6)' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-            Haftungsausschluss (Disclaimer)
+            Haftung für Inhalte &amp; Berechnungen
           </h2>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: 'var(--space-4)' }}>
-            Haftung für Inhalte
-          </h3>
           <p>
-            Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Die Berechnungen auf RechenHafen dienen der unverbindlichen Orientierung und allgemeinen Information. Trotz sorgfältigster Programmierung, Verifikation gegen amtliche Gesetze und kontinuierlicher mathematischer Kontrollen kann keine Gewähr für die absolute Fehlerfreiheit, Vollständigkeit oder Aktualität der Resultate übernommen werden.
+            Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.
+            Alle Online-Rechner und Ratgebertexte auf RechenHafen wurden mit größter Sorgfalt und anhand amtlicher Quellen (z. B. BMF, Bundesgesetze, DIN-Normen) implementiert und fortlaufend geprüft.
           </p>
-          <p>
-            Die Nutzung der Online-Rechner ersetzt keinesfalls eine professionelle Rechts-, Steuer-, Anlage-, Bau- oder ärztliche Beratung.
+          <p style={{ marginTop: 'var(--space-2)' }}>
+            Die bereitgestellten Rechenergebnisse dienen ausschließlich der unverbindlichen Orientierung und allgemeinen Information.
+            Sie stellen keine Rechts-, Steuer-, Anlage-, Bau- oder medizinische Beratung dar und können eine individuelle Fachberatung nicht ersetzen.
+            Für Entscheidungen, die auf Grundlage der Berechnungsergebnisse getroffen werden, übernehmen wir keine Haftung.
           </p>
+        </section>
 
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-text-primary)', marginTop: 'var(--space-4)' }}>
-            Haftung für Links
-          </h3>
+        <section style={{ marginBottom: 'var(--space-6)' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+            Haftung für externe Links
+          </h2>
           <p>
-            Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.
+            Diese Website enthält Verlinkungen zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben.
+            Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.
+            Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links unverzüglich entfernen.
           </p>
         </section>
 
@@ -86,7 +86,8 @@ export default function ImpressumPage() {
             Urheberrecht
           </h2>
           <p>
-            Die durch die Seitenbetreiber erstellten Inhalte, Rechenalgorithmen und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+            Die auf dieser Website erstellten Inhalte, Rechner und Quelltexte unterliegen dem deutschen Urheberrecht.
+            Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechts bedürfen der vorherigen schriftlichen Zustimmung des Betreibers.
           </p>
         </section>
       </article>

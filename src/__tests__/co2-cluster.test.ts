@@ -598,8 +598,8 @@ describe('CO2 Calculator Cluster Comprehensive Regression & Legal Verification S
       for (const slug of expectedSlugs) {
         const article = getArticleBySlug(slug);
         expect(article, `Article ${slug} must be registered`).toBeDefined();
-        expect(article?.author.name).toBe('Redaktion RechenHafen');
-        expect(article?.reviewer?.name).toBe('Redaktion RechenHafen');
+        expect(article?.author.name).toBe('[FILL: real editor/founder name]');
+        expect(article?.reviewer).toBeUndefined();
         expect(article?.sections.length).toBeGreaterThanOrEqual(3);
         expect(article?.faqs.length).toBeGreaterThanOrEqual(2);
         expect(article?.officialSources.length).toBeGreaterThanOrEqual(1);

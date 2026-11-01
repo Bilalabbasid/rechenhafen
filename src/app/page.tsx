@@ -211,7 +211,7 @@ export default function HomePage() {
               Themenschwerpunkte im Fokus
             </h2>
             <p className={styles.sectionSubtitle}>
-              Die beliebtesten Themenbereiche mit verlässlichen BMF- und Rechtsstandards 2026.
+              Die beliebtesten Themenbereiche für Alltag, Finanzen, Steuern und Beruf im schnellen Überblick.
             </p>
           </div>
         </div>
@@ -470,10 +470,10 @@ export default function HomePage() {
           </div>
           <div>
             <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-              Deutsche Gesetzeslage 2026
+              Rechtskonforme Berechnungsgrundlagen
             </strong>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, display: 'block' }}>
-              Geprüft nach § 32a EStG, SGB IV/XI, BUrlG und offiziellen BMF-Steuertabellen für das laufende Steuerjahr.
+              Gesetzliche und steuerliche Rechner basieren auf aktuellen amtlichen Primärquellen (wie EStG, BMF-Vorgaben und SGB) für das jeweilige Berechnungsjahr.
             </span>
           </div>
         </div>

@@ -527,7 +527,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 EStG, § 8 Abs. 2 EStG)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__6.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -603,7 +603,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 Satz 3 EStG)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__6.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2009,7 +2009,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundesagentur für Arbeit (§ 105 SGB III)',
-      sourceUrl: 'https://www.arbeitsagentur.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_3/__105.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2478,7 +2478,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Einkommensteuergesetz (§ 8 Abs. 2 EStG)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__8.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2559,7 +2559,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Sozialgesetzbuch Fünftes Buch (§ 47 SGB V)',
-      sourceUrl: 'https://www.gkv-spitzenverband.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_5/__47.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2622,7 +2622,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Mutterschutzgesetz (§ 19 MuSchG) / GKV-Spitzenverband',
-      sourceUrl: 'https://www.bmfsfj.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/muschg_2018/__19.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2686,7 +2686,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundeselterngeld- und Elternzeitgesetz (§ 15 BEEG)',
-      sourceUrl: 'https://www.bmfsfj.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/beeg/__15.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2808,7 +2808,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     trustMeta: {
       legalBasis: '§ 7 Abs. 1a & § 7b SGB IV (Wertguthaben) sowie § 7 Abs. 3 SGB IV',
       sourceName: 'Deutsche Rentenversicherung (DRV) / Bundesministerium für Arbeit und Soziales (BMAS)',
-      sourceUrl: 'https://www.deutsche-rentenversicherung.de',
+      sourceUrl: 'https://www.deutsche-rentenversicherung.de/DRV/DE/Rente/Kurz-vor-der-Rente/Wertguthaben/wertguthaben_node.html',
       lastReviewed: '2026-02-01',
     },
   },
@@ -3288,7 +3288,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundesagentur für Arbeit (§ 149, § 151 SGB III)',
-      sourceUrl: 'https://www.arbeitsagentur.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_3/__149.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -3549,7 +3549,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     trustMeta: {
       legalBasis: 'Zweites Buch Sozialgesetzbuch (§ 20, § 21, § 22, § 23, § 11b SGB II)',
       sourceName: 'Bundesministerium für Arbeit und Soziales (BMAS)',
-      sourceUrl: 'https://www.bmas.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/__20.html',
       lastReviewed: '2026-10-01',
       limitations: [
         'Orientierungsberechnung: Die verbindliche Feststellung obliegt ausschließlich dem zuständigen Jobcenter.',
@@ -3667,7 +3667,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Einkommensteuergesetz (§ 8 Abs. 2 Satz 11 EStG, R 19.6 LStR)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__8.html',
       lastVerified: '2026-01-15',
     }
   },
@@ -3740,7 +3740,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Einkommensteuergesetz (§ 3 Nr. 26, Nr. 26a EStG)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__3.html',
       lastVerified: '2026-01-15',
     }
   },

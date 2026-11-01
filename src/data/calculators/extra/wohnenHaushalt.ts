@@ -497,7 +497,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Grundsteuer-Reformgesetze (Bundesmodell & Ländermodelle)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.bundesfinanzministerium.de/Content/DE/Standardartikel/Themen/Steuern/Steuerarten/Grundsteuer-Reform/grundsteuer-reform.html',
       lastVerified: '2026-01-15',
     }
   },
@@ -760,7 +760,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Grunderwerbsteuergesetze der 16 Bundesländer (GrEStG)',
-      sourceUrl: 'https://www.finanzverwaltung.nrw.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/grestg_1983/__11.html',
       lastVerified: '2026-01-15',
     }
   },
@@ -1432,7 +1432,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'BGH-Rechtsprechung zur Aktiv-Passiv-Methode (XI ZR 197/00) & Deutsche Bundesbank',
-      sourceUrl: 'https://www.bundesbank.de',
+      sourceUrl: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/zinsstrukturkurve-608480',
       lastVerified: '2026-01-15',
     },
   },
@@ -2241,7 +2241,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'BDEW Bundesverband der Energie- und Wasserwirtschaft',
-      sourceUrl: 'https://www.bdew.de',
+      sourceUrl: 'https://www.bdew.de/service/daten-und-grafiken/bdew-strompreisanalyse/',
       lastVerified: '2026-01-20',
     },
   },
@@ -2441,7 +2441,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'DVGW Regelwerk Arbeitsblatt G 685 & BDEW',
-      sourceUrl: 'https://www.bdew.de',
+      sourceUrl: 'https://www.bdew.de/energie/gas-umrechnung-m3-in-kwh/',
       lastVerified: '2026-01-20',
     },
     trustMeta: {
@@ -2449,7 +2449,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       assumptions: ['Arbeitspreis ohne Grundpreis; für Gesamtjahreskosten ist der jährliche Grundpreis des Versorgers hinzuzurechnen.'],
       limitations: ['Geringfügige monatliche Brennwertschwankungen des Netzbetreibers werden über den Jahresmittelwert abgerechnet.'],
       sourceName: 'Bundesverband der Energie- und Wasserwirtschaft (BDEW)',
-      sourceUrl: 'https://www.bdew.de',
+      sourceUrl: 'https://www.bdew.de/energie/gas-umrechnung-m3-in-kwh/',
       lastReviewed: '2026-01-20',
     },
   },
@@ -2522,7 +2522,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Solarpaket I / VDE 0100-551-1 / EEG',
-      sourceUrl: 'https://www.bmwk.de',
+      sourceUrl: 'https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/Balkonkraftwerke/start.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2604,7 +2604,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Erneuerbare-Energien-Gesetz (EEG Vergütungssätze) / Bundesnetzagentur',
-      sourceUrl: 'https://www.bundesnetzagentur.de',
+      sourceUrl: 'https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/EEG_Einspeiseverguetung/start.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -2670,7 +2670,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'BDEW / Bundesverband Wärmepumpe (BWP)',
-      sourceUrl: 'https://www.waermepumpe.de',
+      sourceUrl: 'https://www.waermepumpe.de/normen-technik/jahresarbeitszahl/',
       lastVerified: '2026-01-20',
     },
   },

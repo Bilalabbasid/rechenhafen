@@ -13,12 +13,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 6,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Arbeitsrecht & Zeitrechnung',
-    },
-    reviewer: {
-      name: 'Rechtsteam RechenHafen',
-      role: 'Arbeits- und Zivilrecht',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Im deutschen Recht sind Werktage und Arbeitstage zwei grundlegend verschiedene Begriffe. Während der Werktag gesetzlich alle Tage von Montag bis Samstag umfasst, bezeichnet der Arbeitstag ausschließlich die vertraglich vereinbarten Tage mit tatsächlicher Arbeitspflicht.',
@@ -175,12 +171,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-12',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Gehalt & Arbeitsrecht',
-    },
-    reviewer: {
-      name: 'Entwicklungsteam Finanzen',
-      role: 'Lohnbuchhaltung & Steuerrecht',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Da Kalendermonate unterschiedlich viele Tage haben (28 bis 31 Tage), führt die einfache Division des Monatsgehalts durch 4 Wochen zu ungenauen Ergebnissen. Für überschlägige Berechnungen wird daher mit durchschnittlich 4,33 Wochen pro Monat (52 Wochen geteilt durch 12 Monate) kalkuliert. Für konkrete Abrechnungen können tarif- oder arbeitsvertragliche Bestimmungen maßgeblich sein.',
@@ -314,12 +306,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Steuern & Öffentliche Finanzen',
-    },
-    reviewer: {
-      name: 'Steuerprüfteam RechenHafen',
-      role: 'Diplom-Finanzwirte & Lohnsteuer',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Der weit verbreitete Mythos, eine Gehaltserhöhung könne durch die Steuerprogression zu einem geringeren Nettoeinkommen führen, ist mathematisch und rechtlich ausgeschlossen. In Deutschland gilt ein stufenloser progressiver Einkommensteuertarif nach § 32a EStG.',
@@ -466,12 +454,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Haustechnik',
-    },
-    reviewer: {
-      name: 'Verbraucherteam RechenHafen',
-      role: 'Energieberatung & Haushaltsökonomie',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Wer seine Stromrechnung senken möchte, muss die größten Stromfresser im Haushalt identifizieren. Mit einer einfachen Formel lassen sich die Leistungsangaben in Watt vom Typenschild direkt in Kilowattstunden (kWh) und Euro pro Jahr umrechnen.',
@@ -618,12 +602,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Immobilien & Mietrecht',
-    },
-    reviewer: {
-      name: 'Finanzplanung RechenHafen',
-      role: 'Haushaltsbudget & Bonität',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Die Mietbelastungsquote ist die entscheidende Kennzahl für Mieter und Vermieter. Sie setzt die monatliche Gesamtmiete ins Verhältnis zum verfügbaren Haushaltsnettoeinkommen. Erfahren Sie, warum die klassische 30-Prozent-Regel in Großstädten an Grenzen stößt und worauf Vermieter bei der Bonitätsprüfung achten.',
@@ -761,12 +741,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-21',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Baufinanzierung & Kredite',
-    },
-    reviewer: {
-      name: 'Kreditanalyse RechenHafen',
-      role: 'Bankkaufleute & Baufinanzierungsberater',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Eine jährliche Sondertilgung ist einer der stärksten Hebel bei einer Immobilienfinanzierung. Weil jeder zusätzlich getilgte Euro direkt die verbleibende Restschuld mindert, sinkt die künftige Zinslast über die gesamte Restlaufzeit exponentiell.',
@@ -907,12 +883,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-21',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Mobilität & Steuern',
-    },
-    reviewer: {
-      name: 'Verkehrsökonomie RechenHafen',
-      role: 'Kfz-Kostenrechnung & Steuerberatung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Millionen Berufstätige in Deutschland pendeln täglich zur Arbeit. Doch die wenigsten kennen ihre tatsächlichen monatlichen Mobilitätskosten. Wer nur die Benzinkosten kalkuliert, übersieht Reifenverschleiß, Wertverlust und Inspektionen. Erfahren Sie, wie Sie Ihre echten Kosten berechnen und wie viel die Steuer über die Pendlerpauschale erstattet.',
@@ -1046,12 +1018,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-22',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Gehalt & Arbeitszeit',
-    },
-    reviewer: {
-      name: 'Lohnexperten RechenHafen',
-      role: 'Personalabrechnung & Steuerberatung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Wer seine Arbeitszeit von Vollzeit auf Teilzeit reduziert (z. B. eine 4-Tage-Woche oder 30 Wochenstunden), verliert weniger Nettoeinkommen als erwartet. Dank des progressiven Steuersystems und sinkender Sozialabgaben federt das deutsche Abgabensystem die Stundenreduzierung spürbar ab.',
@@ -1185,12 +1153,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-22',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Kapitalanlage & ETF',
-    },
-    reviewer: {
-      name: 'Finanzmathematik RechenHafen',
-      role: 'Vermögensaufbau & Portfoliotheorie',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Der Zinseszinseffekt wird von Albert Einstein legendär als das „achte Weltwunder“ bezeichnet. Bei einem breit gestreuten Welt-ETF führt die kontinuierliche Wiederanlage erwirtschafteter Renditen dazu, dass nach einigen Jahrzehnten die erwirtschafteten Zinsen die eigenen Einzahlungen um ein Vielfaches übertreffen.',
@@ -1324,12 +1288,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-22',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Steuern & Bürgerrechte',
-    },
-    reviewer: {
-      name: 'Steuerprüfteam RechenHafen',
-      role: 'Steuerrecht & Finanzverwaltung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Im alltäglichen Sprachgebrauch werden Lohnsteuer und Einkommensteuer oft synonym verwendet. Steuerrechtlich handelt es sich jedoch nicht um zwei verschiedene Steuern: Die Lohnsteuer ist lediglich eine Vorauszahlung auf die endgültige Jahreseinkommensteuer nach § 38 EStG. Erfahren Sie, warum sich die freiwillige Steuererklärung für die meisten Angestellten lohnt.',
@@ -1467,12 +1427,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-26',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Bauen & Handwerk',
-    },
-    reviewer: {
-      name: 'Fliesenlegermeister RechenHafen',
-      role: 'Geprüfter Fliesen-, Platten- und Mosaiklegermeister',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Die Wahl der passenden Zahnspachtel-Größe entscheidet maßgeblich über die Haltbarkeit und Hohlraumfreiheit jedes Fliesenbelags. Unsere übersichtliche Tabelle zeigt Ihnen genau, welche Zahnung (3 bis 12 mm oder Mittelbett) für welches Fliesenformat, Wand, Boden und Fußbodenheizung erforderlich ist – inklusive Kleberbett-Dicke, Buttering-Floating-Verfahren und praktischer Benetzungskontrolle.',
@@ -1656,8 +1612,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-02',
     readingTimeMin: 6,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Haushaltsfinanzen',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/gaszaehler-m3-in-kwh-cover.svg',
@@ -1839,8 +1795,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-02',
     readingTimeMin: 6,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Haushaltsfinanzen',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/heizluefter-2000-watt-cover.svg',
@@ -2006,12 +1962,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-03',
     readingTimeMin: 5,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Ernährung & Maßeinheiten',
-    },
-    reviewer: {
-      name: 'Ernährungsteam RechenHafen',
-      role: 'Lebensmittelchemie & Küchenmetrologie',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/cup-groessen-messbecher-vergleich.svg',
@@ -2198,12 +2150,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-03',
     readingTimeMin: 6,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Bauphysik & Baustoffe',
-    },
-    reviewer: {
-      name: 'Bautechnik-Team RechenHafen',
-      role: 'Massivbau & Materialbedarfsplanung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/schalungssteine-mauer-ansicht-hohlblock.svg',
@@ -2408,12 +2356,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-05',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Haushaltsfinanzen',
-    },
-    reviewer: {
-      name: 'Fachteam Energiewirtschaft',
-      role: 'Tarif- und Versorgerabrechnungen',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/gaskosten-berechnung-formel-zusammensetzung.svg',
@@ -2615,12 +2559,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Redaktion und Recherche',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Interne Qualitätssicherung & Plausibilitätsprüfung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Im Rezept stehen 100 Gramm Zucker, auf der Packung Erythrit: Kann man einfach dieselbe Menge verwenden? Bei reinem Erythrit rechnen wir mit einer Süßkraft von rund 70 Prozent gegenüber Haushaltszucker. 100 Gramm Zucker entsprechen damit rechnerisch etwa 143 Gramm Erythrit. Warum die richtige Süße beim Backen allein jedoch nicht ausreicht und was bei Mischprodukten zu beachten ist, zeigt dieser Leitfaden.',
@@ -2797,12 +2737,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Redaktion und Recherche',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Interne Qualitätssicherung & Datenabgleich',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Eine Heizöllieferung von 2.000 Litern bedeutet nicht automatisch, dass im selben Jahr 2.000 Liter verbraucht wurden. Entscheidend für den tatsächlichen Jahresverbrauch ist die Mengenbilanz aus Anfangsbestand, Lieferungen und Endbestand. Wie die Tankbilanz funktioniert, wie der Verbrauch pro Quadratmeter berechnet wird und wie Sie widersprüchliche Messergebnisse erkennen, erklärt dieser Ratgeber.',
@@ -2987,12 +2923,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Redaktion und Recherche',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Interne Qualitätssicherung & Plausibilitätsprüfung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Beim Bau von Terrassen, Pflasterflächen und Gartenwegen ist Splitt der Körnung 2/5 mm das Standardmaterial für das Bettungsmaterial. Doch wie rechnet man Kubikmeter in Tonnen um, warum wiegt ein Big Bag nicht immer eine Tonne und welcher Unterschied besteht zwischen Festgesteinsdichte und Schüttdichte? Dieser Fachbeitrag liefert praxiserprobte Formeln, Richtwerte und Rechenbeispiele.',
@@ -3172,12 +3104,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Redaktion und Recherche',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Interne Qualitätssicherung & Plausibilitätsprüfung',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Ob bei U-Untersuchungen beim Kinderarzt, bei der Beikosteinführung oder beim Elterngeld: Ständig ist von „Lebensmonaten“ die Rede. Doch was bedeutet „im 6. Lebensmonat“ – ist das Baby dann 5 oder 6 Monate alt? Und warum unterscheidet sich ein Kalendermonat deutlich von 4 Wochen? Dieser Leitfaden erklärt die Zählweise nach Kalenderrecht und Bürgerlichem Gesetzbuch (BGB) mit anschaulichen Beispielen.',
@@ -3347,12 +3275,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 450,
     },
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Auf Ihrer Stromrechnung steht der Verbrauch in Kilowattstunden. Für eine CO₂-Schätzung benötigen Sie zusätzlich einen Emissionsfaktor. Er beschreibt, welche Emissionsmenge einer Kilowattstunde unter den Annahmen der jeweiligen Quelle zugeordnet wird.',
@@ -3509,12 +3433,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 480,
     },
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Wie viel ein Wechsel des Verkehrsmittels verändert, hängt nicht allein von der Entfernung ab. Entscheidend sind auch die tatsächlichen Pendeltage, die Strecke des jeweiligen Verkehrsmittels und die verwendeten Emissionsfaktoren.',
@@ -3676,12 +3596,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-26',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Mobilität & Energiekosten',
-    },
-    reviewer: {
-      name: 'Fachteam Elektromobilität',
-      role: 'E-Mobilität & Ladeinfrastruktur',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/e-auto-kosten-100-km-wallbox.webp',
@@ -3936,12 +3852,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-26',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Bauen & Renovieren',
-    },
-    reviewer: {
-      name: 'Handwerkerteam RechenHafen',
-      role: 'Bodenbeläge & Innenausbau',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/laminat-bedarf-verlegen-wohnung.webp',
@@ -4170,12 +4082,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-26',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Haushaltsfinanzen',
-    },
-    reviewer: {
-      name: 'Fachteam Energiewirtschaft',
-      role: 'Gasabrechnung & Thermische Messtechnik',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
       src: '/images/ratgeber/gasverbrauch-m3-kwh-heizung.webp',
@@ -4410,12 +4318,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Im Jahr 2026 geht das nationale Emissionshandelssystem nach dem Brennstoffemissionshandelsgesetz (BEHG) von festen Ausgabepreisen in einen Versteigerungskorridor von 55 bis 65 Euro pro Emissionszertifikat (Tonne CO₂) über. Welche konkreten Aufschläge entstehen für Gas, Heizöl, Benzin und Diesel?',
@@ -4567,12 +4471,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Seit dem Kohlendioxidkostenaufteilungsgesetz (CO2KostAufG) werden die CO₂-Kosten von Wohngebäuden nach einem gesetzlichen 10-Stufen-Modell zwischen Vermieter und Mieter aufgeteilt. Je schlechter die Energieeffizienz des Gebäudes, desto höher ist der Vermieteranteil.',
@@ -4714,12 +4614,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Wie viel CO₂ stößt ein Auto pro gefahrenem Kilometer aus? Der Vergleich zwischen Verbrennern und Elektrofahrzeugen erfordert saubere Bilanzgrenzen: Direkte Verbrennung im Motor darf nicht mit Durchschnitten oder Lebenszyklusketten verwechselt werden.',
@@ -4857,12 +4753,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Woher stammen die Emissionsfaktoren für Brennstoffe und warum weichen manche Quellen voneinander ab? Die exakten rechtlichen Grundlagen im deutschen Emissionshandelssystem liefert die Emissionsberichterstattungsverordnung (EBeV 2030).',
@@ -5004,12 +4896,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 7,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Im Gegensatz zu Erdgas oder Heizöl existiert für Fernwärme kein allgemeingültiger bundesweiter CO₂-Emissionsfaktor. Jedes Wärmenetz besitzt seinen eigenen, individuellen Emissionswert, der von den eingesetzten Brennstoffen und der Erzeugungstechnologie abhängt.',
@@ -5143,12 +5031,8 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 8,
     author: {
-      name: 'Redaktion RechenHafen',
-      role: 'Fachredaktion Energie & Finanzen',
-    },
-    reviewer: {
-      name: 'Redaktion RechenHafen',
-      role: 'Qualitätssicherung Redaktion',
+      name: '[FILL: real editor/founder name]',
+      role: 'Redaktion RechenHafen',
     },
     summary:
       'Wie viel Kohlendioxid spart eine Wärmepumpe im Vergleich zu einer modernen Gas-Brennwertheizung ein? Der faire Vergleich betrachtet die Nutzwärme, die Jahresarbeitszahl (JAZ) der Wärmepumpe und den aktuellen deutschen Strommix.',

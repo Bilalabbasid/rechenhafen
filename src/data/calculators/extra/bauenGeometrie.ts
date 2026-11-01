@@ -279,7 +279,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Gebäudeenergiegesetz (GEG § 48 und Anlage 7)',
-      sourceUrl: 'https://www.bmwsb.bund.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/geg/anlage_7.html',
       lastVerified: '2026-01-15',
     }
   },
@@ -1866,7 +1866,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     trustMeta: {
       legalBasis: 'DIN EN 771-3 (Festlegungen für Mauersteine – Betonwerksteine) & DIN EN 1992 (Eurocode 2: Bemessung und Konstruktion von Stahlbetontragwerken)',
       sourceName: 'Herstellerdatenblätter (Delfing, Beyhl, Jasto) & DIN-Normen',
-      sourceUrl: 'https://delfing.de',
+      sourceUrl: 'https://www.bgbau.de/themen/sicherheit-und-gesundheit/baustellen/schalungsbau',
       lastReviewed: '2026-10-02',
     },
   },

@@ -2169,7 +2169,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Preisangabenverordnung (PAngV) & BaFin Verbraucherinformation',
-      sourceUrl: 'https://www.bafin.de',
+      sourceUrl: 'https://www.bafin.de/DE/Verbraucher/Finanzwissen/Kredite/Immobilienkredit/immobilienkredit_node.html',
       lastVerified: '2026-01-15',
     },
     trustMeta: {
@@ -2182,7 +2182,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         'Dient als reine mathematische Orientierungshilfe zur Haushaltsbudget-Ermittlung. Ersetzt keine Bonitätsprüfung, SCHUFA-Auskunft oder rechtsverbindliche Darlehensprüfung eines Kreditinstituts.',
       ],
       sourceName: 'Bundesanstalt für Finanzdienstleistungsaufsicht (BaFin)',
-      sourceUrl: 'https://www.bafin.de',
+      sourceUrl: 'https://www.bafin.de/DE/Verbraucher/Finanzwissen/Kredite/Immobilienkredit/immobilienkredit_node.html',
       lastReviewed: '2026-01-15',
     },
   },

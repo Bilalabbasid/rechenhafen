@@ -226,7 +226,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Bundesfinanzministerium (BMF) Programmablaufplan Lohnsteuer 2026 & 2025 / BMAS / BMG (durchschnittlicher Zusatzbeitragssatz 2026: 2,9 %, BAnz AT 10.11.2025 B7)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32a.html',
       lastVerified: '2026-10-25',
     },
   },
@@ -316,7 +316,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'BMF Programmablaufplan / EStG; BMG: durchschnittlicher Zusatzbeitragssatz 2026 2,9 % (BAnz AT 10.11.2025 B7)',
-      sourceUrl: 'https://www.bundesfinanzministerium.de',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__32a.html',
       lastVerified: '2026-10-25',
     },
   },
@@ -718,7 +718,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Sozialversicherungs-Rechengrößenverordnung 2026 (BMAS); BMG: durchschnittlicher Zusatzbeitragssatz 2026 2,9 % (BAnz AT 10.11.2025 B7)',
-      sourceUrl: 'https://www.bmas.de',
+      sourceUrl: 'https://www.bmas.de/DE/Soziales/Sozialversicherung/Gesetzliche-Rentenversicherung/beitragsbemessungsgrenzen.html',
       lastVerified: '2026-10-25',
     },
   },
@@ -778,7 +778,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'BMAS / Spitzenverbände der Sozialversicherung; BMG: Ø-Zusatzbeitrag 2026 2,9 % (BAnz AT 10.11.2025 B7); Insolvenzgeldumlage 0,15 % (§ 360 SGB III)',
-      sourceUrl: 'https://www.bmas.de',
+      sourceUrl: 'https://www.bmas.de/DE/Soziales/Sozialversicherung/Gesetzliche-Rentenversicherung/beitragsbemessungsgrenzen.html',
       lastVerified: '2026-10-25',
     },
   },

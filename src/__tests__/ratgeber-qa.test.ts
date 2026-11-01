@@ -105,10 +105,9 @@ describe('RechenHafen Ratgeber / Blog QA Verification', () => {
 
     // Verify neither article uses fabricated reviewer bodies
     for (const art of [erythritArticle, heizoelArticle]) {
-      expect(JSON.stringify(art.reviewer)).not.toContain('Qualitätsprüfung Küche');
-      expect(JSON.stringify(art.reviewer)).not.toContain('Fachprüfung Heizung & Gebäude');
+      expect(art.reviewer).toBeUndefined();
       expect(JSON.stringify(art.author)).not.toContain('Fachredaktion');
-      expect(art.author.name).toBe('Redaktion RechenHafen');
+      expect(art.author.name).toBe('[FILL: real editor/founder name]');
     }
   });
 });

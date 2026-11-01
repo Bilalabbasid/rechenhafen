@@ -20,17 +20,7 @@ export const metadata: Metadata = {
   },
   description:
     'RechenHafen ist die führende deutsche Plattform für über 400 präzise Online-Rechner: Finanzen, Zinseszins, Spritkosten, Alter, BMI, Steuern, Bauen und Alltag.',
-  keywords: [
-    'Online Rechner',
-    'Rechner Deutschland',
-    'Zinseszinsrechner',
-    'Spritkostenrechner',
-    'Altersrechner',
-    'Prozentrechner',
-    'Kreditrechner',
-    'Gehaltsrechner',
-  ],
-  authors: [{ name: 'RechenHafen Redaktion' }],
+  authors: [{ name: '[FILL: real editor/founder name]', url: 'https://rechenhafen.de/ueber-uns/' }],
   creator: 'RechenHafen',
   publisher: 'RechenHafen',
   formatDetection: {

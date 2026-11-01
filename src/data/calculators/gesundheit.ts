@@ -158,7 +158,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'DGE (Deutsche Gesellschaft für Ernährung) & Mifflin et al.',
-      sourceUrl: 'https://www.dge.de',
+      sourceUrl: 'https://www.dge.de/gesunde-ernaehrung/gezielte-ernaehrung/energiebedarfsrechner/',
       lastVerified: '2026-02-15',
     },
     trustMeta: {
@@ -171,7 +171,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
         'Der tatsächliche Kalorienverbrauch kann durch Genetik, NEAT-Alltagsaktivität und hormonelle Schwankungen um ca. 5 bis 10 % abweichen.',
       ],
       sourceName: 'Deutsche Gesellschaft für Ernährung e. V. (DGE)',
-      sourceUrl: 'https://www.dge.de',
+      sourceUrl: 'https://www.dge.de/gesunde-ernaehrung/gezielte-ernaehrung/energiebedarfsrechner/',
       lastReviewed: '2026-02-15',
     },
   },
