@@ -280,7 +280,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
     metaTitle: 'Promillerechner: Promille in Prozent & Betrag umrechnen',
     metaDescription: 'Rechnen Sie Promille (Tausendstel) präzise in Prozent, Dezimalzahlen und absolute Beträge um. Schnelle Online-Berechnung.',
     h1: 'Promillerechner (Tausendstel-Rechnung)',
-    shortDescription: 'Wandelt Promillewerte (‰) in Prozent und konkrete Zahlenbeträge um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Wandelt Promillewerte (‰) in Prozent und konkrete Zahlenbeträge um.',
     searchKeywords: ['promillerechner', 'promille in prozent', 'promille berechnen formel', 'tausendstel rechner'],
     inputs: [
       { id: 'promille', label: 'Promillewert (‰)', type: 'number', defaultValue: 5, min: 0, step: 0.1, unit: '‰' },
@@ -738,7 +738,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
     metaTitle: 'Hexadezimal Rechner – Hexadezimal in Dezimal & Binär umrechnen',
     metaDescription: 'Konvertieren Sie Hexadezimalzahlen (Basis 16) in Dezimalzahlen und Binärcode (Basis 2). Mit Ziffern 0-9 und A-F.',
     h1: 'Hexadezimal Rechner (Basis 16 Umrechnung)',
-    shortDescription: 'Wandelt Hex-Werte in Dezimal-, Binär- und Oktalzahlen um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Wandelt Hex-Werte in Dezimal-, Binär- und Oktalzahlen um.',
     searchKeywords: ['hexadezimal rechner', 'hex in dezimal umrechnen', 'hexadezimal binaer', 'basis 16 umrechner'],
     inputs: [
       { id: 'hexVal', label: 'Hexadezimalwert (z. B. FF oder 1A3)', type: 'text', defaultValue: 'FF' },

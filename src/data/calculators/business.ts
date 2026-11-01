@@ -19,7 +19,7 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Marge Rechner – Handelsspanne, Aufschlag & Rohgewinn berechnen',
     metaDescription: 'Ermitteln Sie Handelsmarge (auf Verkaufspreis), Kalkulationsaufschlag (auf Einkaufspreis) und Rohertrag in Euro und Prozent.',
     h1: 'Marge & Handelsspanne Rechner',
-    shortDescription: 'Berechnet Handelsspanne, Kalkulationsaufschlag und Gewinnspanne im Handel und E-Commerce mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Handelsspanne, Kalkulationsaufschlag und Gewinnspanne im Handel und E-Commerce.',
     searchKeywords: ['marge rechner', 'handelsspanne berechnen', 'aufschlag berechnen einkaufspreis', 'gewinnmarge formel'],
     inputs: [
       { id: 'purchasePrice', label: 'Einkaufspreis netto (EK)', type: 'number', defaultValue: 40.0, step: 0.5, unit: '€' },

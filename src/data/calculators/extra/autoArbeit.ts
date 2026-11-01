@@ -542,7 +542,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Fahrtenbuch oder 1-%-Regelung? Rechner & Vergleich',
     metaDescription: 'Finden Sie heraus, ob die pauschale 1-%-Regelung oder ein ordnungsgemäßes Fahrtenbuch für Ihren Dienstwagen günstiger ist.',
     h1: 'Fahrtenbuch vs. 1 % Methode – Vergleich der Besteuerung',
-    shortDescription: 'Vergleicht die steuerlichen Gesamtkosten der 1-%-Pauschale mit der Fahrtenbuchmethode mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht die steuerlichen Gesamtkosten der 1-%-Pauschale mit der Fahrtenbuchmethode.',
     searchKeywords: ['fahrtenbuch vs 1 prozent rechner', 'lohnt sich fahrtenbuch dienstwagen', 'geldwerter vorteil vergleich fahrtenbuch', 'firmenwagen fahrtenbuch vorteil'],
     inputs: [
       { id: 'grossListPrice', label: 'Bruttolistenpreis des Dienstwagens', type: 'number', defaultValue: 52000, min: 10000, step: 1000, unit: '€' },
@@ -618,7 +618,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Leasingfaktor Rechner – Leasingangebote objektiv vergleichen',
     metaDescription: 'Berechnen Sie den Leasingfaktor und Gesamtkostenfaktor für Auto-Leasingangebote. Erkennen Sie echte Leasing-Schnäppchen (Faktor unter 0,7).',
     h1: 'Leasingfaktor Rechner – Leasing-Deals objektiv vergleichen',
-    shortDescription: 'Ermittelt den Leasingfaktor zur fairen Bewertung von Auto-Leasingverträgen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Leasingfaktor zur fairen Bewertung von Auto-Leasingverträgen.',
     searchKeywords: ['leasingfaktor rechner', 'leasingfaktor formel berechnen', 'guter leasingfaktor schnaeppchen', 'gesamtleasingfaktor rechner'],
     inputs: [
       { id: 'monthlyLeasingRate', label: 'Monatliche Leasingrate (netto oder brutto)', type: 'number', defaultValue: 320, min: 50, step: 10, unit: '€' },
@@ -749,7 +749,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Auto-Wertverlust-Rechner: Restwert nach Jahren schätzen',
     metaDescription: 'Berechnen Sie den Wertverlust und den verbleibenden Restwert Ihres Autos nach Alter und Kilometern anhand anerkannter Marktdaten.',
     h1: 'Auto Wertverlust Rechner – Wertminderung von Neu- und Gebrauchtwagen',
-    shortDescription: 'Schätzt den Restwert von Fahrzeugen nach der typischen Wertverlustkurve mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Schätzt den Restwert von Fahrzeugen nach der typischen Wertverlustkurve.',
     searchKeywords: ['auto wertverlust rechner', 'restwert auto berechnen jahre', 'schwacke liste wertverlust kurve', 'wertverlust neuwagen erstes jahr'],
     inputs: [
       { id: 'originalPrice', label: 'Neupreis bzw. Anschaffungspreis', type: 'number', defaultValue: 35000, min: 2000, step: 1000, unit: '€' },
@@ -878,7 +878,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Bußgeldrechner Geschwindigkeit 2026 – Punkte, Fahrverbot',
     metaDescription: 'Berechnen Sie Bußgeld, Punkte in Flensburg und Fahrverbot bei Geschwindigkeitsüberschreitung innerorts und außerorts nach aktuellem Bußgeldkatalog.',
     h1: 'Bußgeldrechner Geschwindigkeit – Bußgeld, Punkte & Fahrverbot',
-    shortDescription: 'Ermittelt Strafen für Geschwindigkeitsüberschreitungen nach aktuellem Bußgeldkatalog mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Strafen für Geschwindigkeitsüberschreitungen nach aktuellem Bußgeldkatalog.',
     searchKeywords: ['bussgeldrechner geschwindigkeit', 'blitzer bussgeldkatalog 2026', 'punkte flensburg geschwindigkeit tabelle', 'fahrverbot ab wie viel kmh'],
     inputs: [
       { id: 'overSpeedKmh', label: 'Gemessene Geschwindigkeitsüberschreitung nach Toleranzabzug in km/h', type: 'number', defaultValue: 21, min: 1, max: 100, step: 1, unit: 'km/h' },
@@ -965,7 +965,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Promillerechner – Alkohol Promille berechnen (Widmark-Formel)',
     metaDescription: 'Berechnen Sie den Blutalkoholspiegel in Promille (‰) nach der wissenschaftlichen Widmark-Formel und ermitteln Sie die exakte Abbauzeit bis 0,0 Promille.',
     h1: 'Promillerechner – Promillewert & Alkoholabbau berechnen',
-    shortDescription: 'Ermittelt die Blutalkoholkonzentration nach Getränkemenge, Körpergewicht und Geschlecht mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Blutalkoholkonzentration nach Getränkemenge, Körpergewicht und Geschlecht.',
     searchKeywords: ['promillerechner widmark formel', 'alkohol promille berechnen rechner', 'wie lange dauert alkoholabbau', '0 5 promille grenze auto'],
     inputs: [
       {
@@ -1171,7 +1171,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'THG-Quote-Rechner: jährliche Prämie für Elektroautos',
     metaDescription: 'Ermitteln Sie Ihre jährliche THG-Quote (Treibhausgasminderungsquote) für Ihr Elektrofahrzeug: Feste vs. risikobasierte variable Auszahlung.',
     h1: 'THG-Quote Rechner – Jährliche Barprämie für E-Autos berechnen',
-    shortDescription: 'Vergleicht Auszahlungsmodelle der THG-Quote für Elektrofahrzeughalter mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht Auszahlungsmodelle der THG-Quote für Elektrofahrzeughalter.',
     searchKeywords: ['thg quote rechner', 'thg praemie elektroauto 2026', 'treibhausgasquote geld bekommen', 'e auto praemie jaehrlich'],
     inputs: [
       {
@@ -1444,7 +1444,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Plug-in-Hybrid Rechner – Verbrauch Strom vs. Benzin',
     metaDescription: 'Berechnen Sie die realen Verbrauchskosten eines Plug-in-Hybriden (PHEV) nach elektrischem Fahranteil im Vergleich zu reinem Benzinbetrieb.',
     h1: 'Plug-in-Hybrid Rechner – Fahrkosten Strom vs. Benzin ermitteln',
-    shortDescription: 'Vergleicht die gemischten Energiekosten von Plug-in-Hybriden nach Ladehäufigkeit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht die gemischten Energiekosten von Plug-in-Hybriden nach Ladehäufigkeit.',
     searchKeywords: ['hybrid auto kosten rechner', 'plug in hybrid verbrauch strom benzin', 'lohnt sich hybridauto rechner', 'hybrid fahrkosten 100 km'],
     inputs: [
       { id: 'electricSharePct', label: 'Elektrischer Fahranteil (z. B. 60 % elektrisch, 40 % Benzin)', type: 'number', defaultValue: 60, min: 0, max: 100, step: 5, unit: '%' },
@@ -1776,7 +1776,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Motorrad Unterhaltskosten Rechner – Saisonkennzeichen',
     metaDescription: 'Berechnen Sie die jährlichen Unterhaltskosten für Ihr Motorrad: Versicherung, KFZ-Steuer (Hubraum), Benzin, Reifen und Inspektion bei Saisonkennzeichen.',
     h1: 'Motorrad Unterhaltskosten Rechner – Saison- & Jahreskosten berechnen',
-    shortDescription: 'Kalkuliert die laufenden Fix- und Betriebskosten für Motorräder mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert die laufenden Fix- und Betriebskosten für Motorräder.',
     searchKeywords: ['motorrad unterhaltskosten rechner', 'was kostet ein motorrad im monat unterhalt', 'saisonkennzeichen motorrad ersparnis', 'motorrad steuer versicherung kosten'],
     inputs: [
       { id: 'displacementCc', label: 'Hubraum in cm³ (z. B. 650 cm³)', type: 'number', defaultValue: 650, min: 50, max: 2500, step: 50, unit: 'cm³' },
@@ -2024,7 +2024,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Kündigungsfrist Rechner – Gesetzliche Fristen nach § 622 BGB',
     metaDescription: 'Ermitteln Sie die genaue Kündigungsfrist für Arbeitnehmer und Arbeitgeber nach Betriebszugehörigkeit und Kündigungstermin gemäß § 622 BGB.',
     h1: 'Kündigungsfrist Rechner – Kündigungstermin nach § 622 BGB ermitteln',
-    shortDescription: 'Berechnet das frühestmögliche Vertragsende nach Betriebszugehörigkeit und Kündigungsdatum mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet das frühestmögliche Vertragsende nach Betriebszugehörigkeit und Kündigungsdatum.',
     searchKeywords: ['kuendigungsfrist rechner bgb', 'gesetzliche kuendigungsfrist arbeitnehmer paragraph 622', 'kuendigungsfristen tabelle betriebszugehoerigkeit', 'kuendigung zum 15 oder monatsende'],
     inputs: [
       { id: 'yearsEmployed', label: 'Dauer der Betriebszugehörigkeit in vollendeten Jahren', type: 'number', defaultValue: 5, min: 0, max: 40, step: 1, unit: 'Jahre' },
@@ -2587,7 +2587,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'VL Rechner – Vermögenswirksame Leistungen',
     metaDescription: 'Berechnen Sie Ihr Sparvermögen durch vermögenswirksame Leistungen (VL bis 40 €/Monat) und staatliche Arbeitnehmersparzulage (neue Einkommensgrenze 40.',
     h1: 'VL Rechner – Vermögenswirksame Leistungen & staatliche Förderung',
-    shortDescription: 'Ermittelt den Vermögensaufbau durch Arbeitgeberzuschuss und staatliche Sparzulage mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Vermögensaufbau durch Arbeitgeberzuschuss und staatliche Sparzulage.',
     searchKeywords: ['vermoegenswirksame leistungen rechner', 'arbeitnehmersparzulage grenze 40000', 'vl sparen etf rechner', 'vl arbeitgeber zuschuss'],
     inputs: [
       { id: 'employerVlMonthly', label: 'Monatlicher Arbeitgeberzuschuss zu VL (bis 40 €)', type: 'number', defaultValue: 26.59, min: 0, max: 40, step: 1, unit: '€' },
@@ -2667,7 +2667,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Betriebliche Altersvorsorge Rechner – bAV Entgeltumwandlung',
     metaDescription: 'Berechnen Sie den Nettoaufwand einer bAV-Entgeltumwandlung inklusive gesetzlichem 15 % Arbeitgeberpflichtzuschuss nach § 1a BetrAVG.',
     h1: 'Betriebliche Altersvorsorge Rechner – Entgeltumwandlung & Zuschuss',
-    shortDescription: 'Ermittelt die Steuer- und Sozialversicherungsersparnis bei betrieblicher Entgeltumwandlung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Steuer- und Sozialversicherungsersparnis bei betrieblicher Entgeltumwandlung.',
     searchKeywords: ['betriebliche altersvorsorge rechner', 'bav entgeltumwandlung netto aufwand', '15 prozent arbeitgeberzuschuss bav', 'paragraph 1a betravg rechner'],
     inputs: [
       { id: 'monthlyGross', label: 'Monatliches Bruttogehalt', type: 'number', defaultValue: 3800, min: 0, step: 100, unit: '€' },
@@ -2725,7 +2725,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Jahresgehalt in Monatsgehalt: 12, 13 oder 14 Gehälter',
     metaDescription: 'Rechnen Sie Ihr Jahresbruttogehalt in das monatliche Grundgehalt um unter Berücksichtigung von Weihnachtsgeld, Urlaubsgeld und 13. Monatsgehalt.',
     h1: 'Jahresgehalt in Monatsgehalt Rechner – Monatsbrutto ermitteln',
-    shortDescription: 'Schlüsselt das Jahreszielgehalt in monatliche Grundgehälter und Sonderzahlungen auf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Schlüsselt das Jahreszielgehalt in monatliche Grundgehälter und Sonderzahlungen auf.',
     searchKeywords: ['jahresgehalt in monatsgehalt rechner', 'jahresbrutto in monatsbrutto umrechnen', '13 gehälter jahresgehalt aufteilen', 'weihnachtsgeld urlaubsgeld monatsgehalt'],
     inputs: [
       { id: 'yearlyGross', label: 'Gesamtes Jahresbruttogehalt', type: 'number', defaultValue: 60000, min: 0, step: 2500, unit: '€' },
@@ -2845,7 +2845,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Arbeitslosengeld 1 Rechner – ALG I Höhe',
     metaDescription: 'Berechnen Sie die genaue Höhe Ihres Arbeitslosengeldes (60 % ohne Kinder, 67 % mit Kindern) sowie die Anspruchsdauer nach Alter und Beschäftigungszeit.',
     h1: 'Arbeitslosengeld 1 Rechner – ALG I Anspruch online berechnen',
-    shortDescription: 'Ermittelt das monatliche Arbeitslosengeld 1 und die maximale Bezugsdauer mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt das monatliche Arbeitslosengeld 1 und die maximale Bezugsdauer.',
     searchKeywords: ['arbeitslosengeld 1 rechner', 'alg 1 wie viel netto rechner', 'paragraph 149 sgb iii bemessungsentgelt', 'anspruchsdauer arbeitslosengeld monate'],
     inputs: [
       { id: 'avgGrossMonthly', label: 'Durchschnittliches Bruttomonatsgehalt der letzten 12 Monate', type: 'number', defaultValue: 3400, min: 0, step: 100, unit: '€' },
@@ -3238,7 +3238,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Sachbezug Rechner 2026 – Monatliche 50 € Freigrenze',
     metaDescription: 'Prüfen Sie steuerfreie Sachbezüge nach § 8 Abs. 2 EStG (50 € monatliche Sachbezugsgrenze) und Aufmerksamkeiten zu persönlichen Anlässen bis 60 €.',
     h1: 'Sachbezug Rechner – Steuerfreie Mitarbeitergutscheine & Geschenke',
-    shortDescription: 'Prüft die Einhaltung der steuer- und abgabenfreien Sachbezugsfreigrenzen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Prüft die Einhaltung der steuer- und abgabenfreien Sachbezugsfreigrenzen.',
     searchKeywords: ['sachbezug 50 euro rechner', 'gutschein arbeitgeber steuerfrei 50 euro', 'aufmerksamkeiten geburtstag 60 euro estg', 'sachbezugsgrenze paragraph 8 estg'],
     inputs: [
       { id: 'monthlyVoucherValue', label: 'Wert des monatlichen Gutscheins / Sachbezugs (z. B. Tankgutschein)', type: 'number', defaultValue: 50, min: 0, max: 150, step: 5, unit: '€', helpText: 'Monatlicher Sachbezug (0 € wenn kein regelmäßiger Gutschein gewährt wird)' },
@@ -3301,7 +3301,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Ehrenamtspauschale & Übungsleiterpauschale Rechner 2026',
     metaDescription: 'Berechnen Sie die steuerfreien Freibeträge für Ehrenamt (840 €/Jahr) und Übungsleiter/Trainer (3.000 €/Jahr) nach § 3 Nr. 26 und 26a EStG.',
     h1: 'Ehrenamtspauschale Rechner – Steuerfreie Vergütung im Verein',
-    shortDescription: 'Ermittelt die steuer- und sozialversicherungsfreien Vergütungen für gemeinnützige Tätigkeiten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die steuer- und sozialversicherungsfreien Vergütungen für gemeinnützige Tätigkeiten.',
     searchKeywords: ['ehrenamtspauschale rechner 840 euro', 'uebungsleiterpauschale 3000 euro steuerfrei', 'paragraph 3 nummer 26 estg freibetrag', 'ehrenamt aufwandsentschaedigung rechner'],
     inputs: [
       {

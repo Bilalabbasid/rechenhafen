@@ -97,7 +97,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Standby-Kosten Rechner – Heimliche Stromkosten',
     metaDescription: 'Wie viel Geld kostet Sie der Standby-Modus von Fernseher, Kaffeemaschine & Co. im Jahr? Berechnen Sie Einsparpotenziale.',
     h1: 'Standby-Kosten Rechner – Stromverschwendung stoppen',
-    shortDescription: 'Berechnet die unnötigen jährlichen Stromkosten durch Geräte im Bereitschaftsmodus mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die unnötigen jährlichen Stromkosten durch Geräte im Bereitschaftsmodus.',
     searchKeywords: ['standby kosten rechner', 'standby stromverbrauch kosten', 'strom sparen standby', 'heimliche stromfresser'],
     inputs: [
       { id: 'standbyWatts', label: 'Geschätzte Standby-Leistung aller Haushaltsgeräte zusammen', type: 'number', defaultValue: 35, min: 1, step: 5, unit: 'Watt', helpText: 'Ein typischer Haushalt hat 20–50 Watt Dauer-Standby' },

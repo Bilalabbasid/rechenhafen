@@ -16,7 +16,7 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Längenumrechner: Meter, Zentimeter, Zoll, Fuß & Meilen',
     metaDescription: 'Längeneinheiten sofort umrechnen: Meter, Zentimeter, Millimeter, Kilometer, Zoll (Inch), Fuß, Yard, Meilen und Seemeilen nach exakten NIST-Normen.',
     h1: 'Längenumrechner – Maßeinheiten präzise umrechnen',
-    shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um mit präziser Formelberechnung, Einheiten-Tausch und allen Ergebnissen auf einen Blick.',
+    shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um.',
     searchKeywords: ['längenumrechner', 'zoll in cm umrechnen', 'inch in cm rechner', 'fuß in meter', 'meilen in km', 'seemeilen umrechnen'],
     inputs: [
       { id: 'value', label: 'Eingabewert', type: 'number', defaultValue: 1, step: 0.1 },
@@ -198,7 +198,7 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Temperatur-Umrechner – Celsius, Fahrenheit',
     metaDescription: 'Rechnen Sie Temperaturen zwischen Grad Celsius, Fahrenheit und Kelvin um. Inklusive Umrechnungsformeln und Siedepunkten.',
     h1: 'Temperatur-Umrechner (°C, °F & Kelvin)',
-    shortDescription: 'Wandelt Temperaturwerte zwischen Celsius, Fahrenheit und Kelvin um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Wandelt Temperaturwerte zwischen Celsius, Fahrenheit und Kelvin um.',
     searchKeywords: ['temperatur umrechner', 'celsius in fahrenheit rechner', 'fahrenheit in celsius formel', 'kelvin umrechnen'],
     inputs: [
       { id: 'value', label: 'Temperaturwert', type: 'number', defaultValue: 25, step: 0.5 },

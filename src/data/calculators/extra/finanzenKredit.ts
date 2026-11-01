@@ -32,7 +32,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Tagesgeld Rechner – Zinsen & Zinsertrag online berechnen',
     metaDescription: 'Berechnen Sie Ihren Zinsertrag auf Tagesgeldkonten: Monatliche, vierteljährliche oder jährliche Zinsgutschrift mit Zinseszinseffekt.',
     h1: 'Tagesgeld Rechner (Zinsertrag & Zinsintervall)',
-    shortDescription: 'Ermittelt die Zinserträge für Tagesgeldanlagen unter Berücksichtigung des Zinsgutschrift-Intervalls mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Zinserträge für Tagesgeldanlagen unter Berücksichtigung des Zinsgutschrift-Intervalls.',
     searchKeywords: ['tagesgeld rechner', 'tagesgeld zinsen berechnen', 'zinsertrag tagesgeld monatlich', 'zinseszins tagesgeld'],
     inputs: [
       { id: 'deposit', label: 'Anlagebetrag', type: 'number', defaultValue: 10000, min: 0, step: 500, unit: '€' },
@@ -1332,7 +1332,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Thesaurierend vs. ausschüttend: ETF-Rechner & Vergleich',
     metaDescription: 'Vergleichen Sie thesaurierende und ausschüttende ETFs: Vorabpauschale, Zinseszins bei automatischer Reinvestition und Steuern.',
     h1: 'Thesaurierend vs. Ausschüttend Rechner',
-    shortDescription: 'Vergleicht die langfristige Vermögensentwicklung von thesaurierenden und ausschüttenden Fonds mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht die langfristige Vermögensentwicklung von thesaurierenden und ausschüttenden Fonds.',
     searchKeywords: ['thesaurierend vs ausschuettend rechner', 'etf ausschuettungsart vergleich', 'vorabpauschale thesaurierer', 'etf reinvestieren rechner'],
     inputs: [
       { id: 'monthlyRate', label: 'Monatliche Sparrate', type: 'number', defaultValue: 300, min: 25, step: 25, unit: '€' },
@@ -1777,7 +1777,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Dispozins Rechner – Zinskosten für Dispokredit',
     metaDescription: 'Berechnen Sie die Zinskosten für Ihre Kontoüberziehung (Dispositionskredit): Taggenaue Abrechnung nach deutscher Zinsmethode.',
     h1: 'Dispozins Rechner (Kontoüberziehung)',
-    shortDescription: 'Ermittelt die Zinskosten für geduldete und vereinbarte Kontoüberziehungen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Zinskosten für geduldete und vereinbarte Kontoüberziehungen.',
     searchKeywords: ['dispozins rechner', 'dispokredit zinsen berechnen', 'konto ueberziehung kosten', 'dispozinsen pro tag'],
     inputs: [
       { id: 'overdraftAmount', label: 'In Anspruch genommener Dispo-Betrag', type: 'number', defaultValue: 1500, min: 50, step: 50, unit: '€' },
@@ -2130,7 +2130,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Zinsbindung Rechner – Zinsänderungsrisiko',
     metaDescription: 'Vergleichen Sie Zinsbindungen (10, 15 oder 20 Jahre): Welche Restschuld verbleibt und wie viel Zinssicherheit kostet der Aufpreis?',
     h1: 'Zinsbindungs-Vergleichsrechner',
-    shortDescription: 'Vergleicht unterschiedliche Zinsbindungsfristen und quantifiziert das Zinsänderungsrisiko der Restschuld mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht unterschiedliche Zinsbindungsfristen und quantifiziert das Zinsänderungsrisiko der Restschuld.',
     searchKeywords: ['zinsbindung rechner', 'sollzinsbindung 10 oder 15 jahre', 'zinsrisiko restschuld berechnen', 'anschlussfinanzierung zinsen'],
     inputs: [
       { id: 'loan', label: 'Darlehenssumme', type: 'number', defaultValue: 250000, min: 10000, step: 5000, unit: '€' },
@@ -2337,7 +2337,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Kreditvergleich-Rechner: zwei Kreditangebote vergleichen',
     metaDescription: 'Vergleichen Sie zwei Kreditangebote nach Monatsrate, Gesamtzinskosten und Restschuld. Transparenter Rechner für Raten- & Baudarlehen.',
     h1: 'Kreditvergleich Rechner (Angebot A vs. Angebot B)',
-    shortDescription: 'Gegenüberstellung zweier Kreditangebote zur Ermittlung des finanziell günstigsten Darlehens mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Gegenüberstellung zweier Kreditangebote zur Ermittlung des finanziell günstigsten Darlehens.',
     searchKeywords: ['kreditvergleich rechner', 'zwei kredite vergleichen online', 'kreditangebote zinsen vergleich', 'baufinanzierung angebote gegenueberstellen'],
     inputs: [
       { id: 'loanAmount', label: 'Kreditsumme', type: 'number', defaultValue: 50000, min: 1000, step: 1000, unit: '€' },
@@ -2532,7 +2532,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Forward-Darlehen-Rechner: Zinsaufschlag berechnen',
     metaDescription: 'Berechnen Sie den Zinsaufschlag bei Forward-Darlehen bis zu 36 oder 60 Monate vor Ablauf der Zinsbindung. Schutz vor steigenden Zinsen.',
     h1: 'Forward-Darlehen Rechner (Zinssicherung im Voraus)',
-    shortDescription: 'Kalkuliert den monatlichen Zinsaufschlag (Forward-Aufschlag) für die vorzeitige Zinssicherung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert den monatlichen Zinsaufschlag (Forward-Aufschlag) für die vorzeitige Zinssicherung.',
     searchKeywords: ['forward darlehen rechner', 'forward aufschlag berechnen', 'anschlussfinanzierung zukunft sichern', 'forward zinsrechner'],
     inputs: [
       { id: 'loanAmount', label: 'Erwartete Restschuld zur Anschlussfinanzierung', type: 'number', defaultValue: 180000, min: 10000, step: 5000, unit: '€' },
@@ -2670,7 +2670,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Kreditrechner ohne Eigenkapital – 100 %',
     metaDescription: 'Berechnen Sie die Rate für eine Baufinanzierung ohne Eigenkapital (100 % Kaufpreis oder 110 % inkl. Kaufnebenkosten) mit Zinsaufschlag.',
     h1: 'Kreditrechner ohne Eigenkapital (Vollfinanzierung)',
-    shortDescription: 'Ermittelt Ratenhöhe und Zinsaufschlag für Vollfinanzierungen von Immobilien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Ratenhöhe und Zinsaufschlag für Vollfinanzierungen von Immobilien.',
     searchKeywords: ['kredit ohne eigenkapital rechner', '110 prozent finanzierung rechner', 'vollfinanzierung hauskauf zinsen', 'immobilienkredit ohne erspartes'],
     inputs: [
       { id: 'purchasePrice', label: 'Kaufpreis der Immobilie', type: 'number', defaultValue: 300000, min: 20000, step: 5000, unit: '€' },
@@ -2743,7 +2743,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     metaTitle: 'Effektivzins-Rechner: effektiven Jahreszins berechnen',
     metaDescription: 'Ermitteln Sie den echten effektiven Jahreszins aus Sollzins, Auszahlungskurs (Disagio) und Gebühren nach der Preisangabenverordnung.',
     h1: 'Effektivzins Rechner für Kredite (PAngV)',
-    shortDescription: 'Berechnet den Effektivzins unter Berücksichtigung von Nebenkosten und Verrechnungsintervallen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Effektivzins unter Berücksichtigung von Nebenkosten und Verrechnungsintervallen.',
     searchKeywords: ['effektivzins kredit rechner', 'effektiver jahreszins berechnen formel', 'pangv kredit zinsen', 'disagio effektivzins rechner'],
     inputs: [
       { id: 'loanAmount', label: 'Nennbetrag des Kredits', type: 'number', defaultValue: 20000, min: 1000, step: 1000, unit: '€' },

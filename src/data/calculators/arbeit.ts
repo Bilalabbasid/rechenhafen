@@ -144,7 +144,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Gehaltserhöhung Rechner – Neues Monats-',
     metaDescription: 'Berechnen Sie das Plus auf Ihrem Gehaltszettel: Gehaltserhöhung in Prozent oder Euro monatlich und jährlich kalkulieren.',
     h1: 'Gehaltserhöhung Rechner – Mehr Gehalt verhandeln',
-    shortDescription: 'Berechnet die finanziellen Auswirkungen einer prozentualen oder absoluten Gehaltsanpassung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die finanziellen Auswirkungen einer prozentualen oder absoluten Gehaltsanpassung.',
     searchKeywords: ['gehaltserhöhung rechner', 'gehaltserhöhung prozent berechnen', 'wieviel mehr gehalt', 'lohnerhöhung rechner'],
     inputs: [
       { id: 'currentSalary', label: 'Aktuelles Brutto-Monatsgehalt', type: 'number', defaultValue: 3800, min: 0, unit: '€' },
@@ -180,7 +180,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Urlaubstage Rechner – Urlaubsanspruch bei Teilzeit (§ 3 BUrlG)',
     metaDescription: 'Berechnen Sie Ihren Urlaubsanspruch bei Wechsel in Teilzeit nach dem Bundesurlaubsgesetz. Exakte Tage & Wochen Freizeit.',
     h1: 'Urlaubsanspruch Rechner bei Teilzeit nach § 3 BUrlG',
-    shortDescription: 'Berechnet den genauen Urlaubsanspruch anhand der wöchentlichen Arbeitstage mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den genauen Urlaubsanspruch anhand der wöchentlichen Arbeitstage.',
     searchKeywords: ['urlaubstage rechner', 'urlaubsanspruch teilzeit berechnen', 'urlaubstage bei 3 tage woche', 'burlg urlaub umrechnen'],
     inputs: [
       { id: 'standardDays', label: 'Betrieblicher Urlaubsanspruch bei Vollzeit (in Tagen)', type: 'number', defaultValue: 30, unit: 'Tage' },

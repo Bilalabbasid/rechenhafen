@@ -104,7 +104,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Grundwert Rechner – 100 % Ausgangswert online berechnen',
     metaDescription: 'Ermitteln Sie den Grundwert (100 %), wenn Prozentwert und Prozentsatz bekannt sind. Formel, Rechenweg & einfache Erklärung.',
     h1: 'Grundwert berechnen (G = W / (p/100))',
-    shortDescription: 'Ermittelt den 100%-Ausgangswert anhand von gegebenem Anteil und Prozentsatz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den 100%-Ausgangswert anhand von gegebenem Anteil und Prozentsatz.',
     searchKeywords: ['grundwert rechner', 'grundwert berechnen formel', '100 prozent berechnen', 'grundwert beispiel'],
     inputs: [
       { id: 'part', label: 'Gegebener Prozentwert (W)', type: 'number', defaultValue: 45, step: 0.01 },
@@ -139,7 +139,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Dreisatzrechner – Einfacher & umgekehrter Dreisatz online',
     metaDescription: 'Lösen Sie jede Dreisatzaufgabe sofort: Proportional (je mehr, desto mehr) und antiproportional (je mehr, desto weniger) mit Schritt-für-Schritt-Rechenweg.',
     h1: 'Dreisatzrechner – Schritt für Schritt lösen',
-    shortDescription: 'Berechnet proportionale und antiproportionale Dreisatzaufgaben zuverlässig mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet proportionale und antiproportionale Dreisatzaufgaben zuverlässig.',
     searchKeywords: ['dreisatzrechner', 'dreisatz online lösen', 'antiproportionaler dreisatz rechner', 'dreisatz formel'],
     inputs: [
       { id: 'a1', label: 'Ausgangsgröße A (z.B. 4 Arbeiter / 5 Äpfel)', type: 'number', defaultValue: 4 },
@@ -410,7 +410,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Satz des Pythagoras Rechner – Hypotenuse & Katheten berechnen',
     metaDescription: 'Rechtwinklige Dreiecke berechnen: Hypotenuse c oder Kathete a/b nach a² + b² = c² online lösen. Inklusive Umfang und Flächeninhalt.',
     h1: 'Satz des Pythagoras Rechner (a² + b² = c²)',
-    shortDescription: 'Berechnet die Hypotenuse oder fehlende Kathete im rechtwinkligen Dreieck mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Hypotenuse oder fehlende Kathete im rechtwinkligen Dreieck.',
     searchKeywords: ['pythagoras rechner', 'satz des pythagoras online', 'hypotenuse berechnen', 'kathete berechnen a2 b2 c2'],
     inputs: [
       {
@@ -492,7 +492,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'kgV Rechner – Kleinstes gemeinsames Vielfaches',
     metaDescription: 'Berechnen Sie das kgV zweier Zahlen online. Unverzichtbar für das Finden des Hauptnenners beim Bruchrechnen.',
     h1: 'kgV Rechner – Kleinstes gemeinsames Vielfaches',
-    shortDescription: 'Findet das kleinste gemeinsame Vielfache (kgV) zweier ganzer Zahlen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Findet das kleinste gemeinsame Vielfache (kgV) zweier ganzer Zahlen.',
     searchKeywords: ['kgv rechner', 'kleinstes gemeinsames vielfaches', 'hauptnenner finden rechner'],
     inputs: [
       { id: 'num1', label: 'Erste Zahl', type: 'number', defaultValue: 15, min: 1, step: 1 },
@@ -537,7 +537,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Wurzelrechner – Quadratwurzel und n-te Wurzel online ziehen',
     metaDescription: 'Berechnen Sie Quadratwurzeln, Kubikwurzeln und beliebige n-te Wurzeln aus Zahlen online mit hoher Präzision.',
     h1: 'Wurzelrechner – Quadratwurzel & n-te Wurzel',
-    shortDescription: 'Zieht Quadratwurzeln und beliebige n-te Wurzeln aus Zahlen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Zieht Quadratwurzeln und beliebige n-te Wurzeln aus Zahlen.',
     searchKeywords: ['wurzelrechner', 'quadratwurzel rechner', 'wurzel ziehen online', 'dritte wurzel berechnen'],
     inputs: [
       { id: 'value', label: 'Radikand (Zahl unter der Wurzel)', type: 'number', defaultValue: 144, step: 0.01 },

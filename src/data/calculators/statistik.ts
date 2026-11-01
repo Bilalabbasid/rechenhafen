@@ -114,7 +114,7 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Ohmsches Gesetz Rechner – Spannung, Strom, Widerstand',
     metaDescription: 'Berechnen Sie Spannung (Volt), Stromstärke (Ampere), Widerstand (Ohm) und elektrische Leistung (Watt) nach dem Ohmschen Dreieck.',
     h1: 'Ohmsches Gesetz Rechner (U = R · I & P = U · I)',
-    shortDescription: 'Berechnet elektrische Grundgrößen wie Spannung, Stromstärke, Widerstand und Leistung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet elektrische Grundgrößen wie Spannung, Stromstärke, Widerstand und Leistung.',
     searchKeywords: ['ohmsches gesetz rechner', 'u r i rechner', 'volt ampere ohm berechnen', 'elektrische leistung watt formel'],
     inputs: [
       {

@@ -64,7 +64,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Ratenkreditrechner – Kreditrate & Gesamtkosten kalkulieren',
     metaDescription: 'Kreditrate für Konsumentenkredite berechnen. Transparente Kostenaufstellung und Tilgungsübersicht. Mit praxisnaher Formelerklärung und schnellem Ergebnis.',
     h1: 'Ratenkreditrechner für Anschaffungen & Konsum',
-    shortDescription: 'Berechnet die Kreditrate und Zinskosten für Ratenkredite mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Kreditrate und Zinskosten für Ratenkredite.',
     searchKeywords: ['ratenkreditrechner', 'konsumentenkredit rechner', 'ratenkredit monatsrate'],
     inputs: [
       { id: 'loanAmount', label: 'Kreditsumme', type: 'number', defaultValue: 10000, min: 500, step: 500, unit: '€' },

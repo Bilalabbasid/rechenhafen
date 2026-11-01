@@ -185,7 +185,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Wasserbedarf Rechner – Wie viel Wasser am Tag trinken?',
     metaDescription: 'Ermitteln Sie Ihren individuellen Flüssigkeitsbedarf nach Körpergewicht, Sportdauer und Umgebungstemperatur nach DGE-Richtwerten.',
     h1: 'Wasserbedarf Rechner – Wie viel Wasser am Tag trinken?',
-    shortDescription: 'Berechnet die optimale tägliche Flüssigkeitsaufnahme in Litern und Gläsern mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die optimale tägliche Flüssigkeitsaufnahme in Litern und Gläsern.',
     searchKeywords: ['wasserbedarf rechner', 'wieviel wasser am tag trinken', 'trinkmenge berechnen dge', 'flüssigkeitsbedarf rechner'],
     inputs: [
       { id: 'weight', label: 'Körpergewicht in kg', type: 'number', defaultValue: 72, unit: 'kg' },

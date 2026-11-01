@@ -12,7 +12,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Estrich Rechner – Zementestrich & Fließestrich Bedarf',
     metaDescription: 'Berechnen Sie den Estrichbedarf in m³, Tonnen und 25-kg-/40-kg-Säcken nach Fläche und Einbaudicke (z. B. 45 mm, 60 mm) inklusive Trocknungszeit-Richtwert.',
     h1: 'Estrich Rechner – Materialmenge & Sackanzahl für Zementestrich',
-    shortDescription: 'Ermittelt den Estrichbedarf nach Raumfläche und Schichtdicke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Estrichbedarf nach Raumfläche und Schichtdicke.',
     searchKeywords: ["estrich rechner sack","zementestrich bedarf berechnen","fliessestrich menge m2","estrich dicke fußbodenheizung"],
     inputs: [
           {
@@ -145,7 +145,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Dämmung U-Wert Rechner – Dämmstoffdicke',
     metaDescription: 'Berechnen Sie den U-Wert (W/m²K) und die erforderliche Dämmstärke nach GEG 2024 für WLG 032, WLG 035, WLG 040 an Wand, Dach und Kellerdecke.',
     h1: 'Dämmung U-Wert Rechner – Dämmstärke & Wärmeschutz nach GEG',
-    shortDescription: 'Berechnet den U-Wert und die nötige Dämmstoffdicke nach Wärmeleitgruppe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den U-Wert und die nötige Dämmstoffdicke nach Wärmeleitgruppe.',
     searchKeywords: ["u wert rechner daemmung","geg u wert fassade dach","daemmstoffdicke berechnen wlg 035","waermedurchgangskoeffizient rechner"],
     inputs: [
           {
@@ -293,7 +293,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Dachfläche Rechner – Dachflächenberechnung nach Grundfläche',
     metaDescription: 'Berechnen Sie die echte Dachfläche für Satteldach, Pultdach und Walmdach nach Grundrissmaßen, Dachneigung in Grad oder Prozent und Dachüberstand.',
     h1: 'Dachfläche Rechner – Echte Dachfläche nach Neigung & Maßen',
-    shortDescription: 'Ermittelt die Quadratmeter Dachfläche nach Dachneigung und Grundriss mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Quadratmeter Dachfläche nach Dachneigung und Grundriss.',
     searchKeywords: ["dachflaeche rechner neigung","satteldach flaeche berechnen cosinus","dach quadratmeter berechnen dachziegel","dachueberstand dachflaeche"],
     inputs: [
           {
@@ -604,7 +604,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Fliesenkleber & Fugenmörtel Rechner – Verbrauch in kg & Säcken',
     metaDescription: 'Berechnen Sie den Bedarf an Fliesenkleber und Fugenbunt nach Quadratmetern, Zahnspachtel-Größe (6, 8, 10, 12 mm) und Fliesenabmessungen.',
     h1: 'Fliesenkleber Rechner – Materialbedarf für Fliesen & Fugen',
-    shortDescription: 'Berechnet den Fliesenkleber- und Fugenmörtelbedarf nach Fläche und Zahnung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Fliesenkleber- und Fugenmörtelbedarf nach Fläche und Zahnung.',
     searchKeywords: ["fliesenkleber rechner verbrauch kg m2","fugenmoertel rechner fliesen","zahnung fliesenkleber verbrauch","flexkleber saecke berechnen"],
     inputs: [
           {
@@ -733,7 +733,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Aushub & Erdarbeiten Rechner – Baugrube m³, Auflockerung & LKW',
     metaDescription: 'Berechnen Sie das Erdreich-Aushubvolumen in m³, die Auflockerung (Auflockerungsfaktor 1,2 bis 1,3), das Gewicht in Tonnen und die Anzahl.',
     h1: 'Aushub Rechner – Erdvolumen, Tonnen & LKW-Entsorgung',
-    shortDescription: 'Berechnet Baugrubenaushub, Auflockerung und benötigte LKW-Ladungen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Baugrubenaushub, Auflockerung und benötigte LKW-Ladungen.',
     searchKeywords: ["aushub rechner m3 tonnen","baugrube aushubvolumen auflockerungsfaktor","erdarbeiten lkw fahrten rechner","erde ausheben gewicht berechnen"],
     inputs: [
           {
@@ -875,7 +875,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Pflastersteine Rechner – Steinbedarf, Quadratmeter',
     metaDescription: 'Berechnen Sie die benötigte Anzahl Pflastersteine, Fläche in m² mit Verschnitt (5-10 %) und die Menge an Splitt/Sand für das Pflasterbett.',
     h1: 'Pflastersteine Rechner – Pflastersteine & Bettungssplitt berechnen',
-    shortDescription: 'Ermittelt Steinanzahl und Splittmenge für Hof, Einfahrt oder Terrasse mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Steinanzahl und Splittmenge für Hof, Einfahrt oder Terrasse.',
     searchKeywords: ["pflastersteine rechner quadratmeter","pflaster bedarf berechnen einfahrt terrasse","splittbett dicke menge berechnen","pflaster verschnitt prozent"],
     inputs: [
           {
@@ -1001,7 +1001,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Trockenbau Gipskarton Rechner – Platten, CW/UW-Profile',
     metaDescription: 'Berechnen Sie den Materialbedarf für Trockenbauwände: Gipskartonplatten (2000/2600 × 600/1250 mm), Ständerprofile (CW/UW)',
     h1: 'Trockenbau Rechner – Gipskartonplatten, Ständerwerk & Zubehör',
-    shortDescription: 'Berechnet Gipskartonplatten, CW/UW-Profile, Schrauben und Spachtelmasse mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Gipskartonplatten, CW/UW-Profile, Schrauben und Spachtelmasse.',
     searchKeywords: ["trockenbau rechner gipskarton","staenderwerk cw uw profile berechnen","gipskartonplatten stueckzahl m2","schnellbauschrauben bedarf trockenbau"],
     inputs: [
           {
@@ -1153,7 +1153,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Fundament Rechner – Betonbedarf für Streifen-, Punkt-',
     metaDescription: 'Berechnen Sie das Betonvolumen in m³ und Tonnen für Streifenfundament (Gartenmauer/Garage), Punktfundament (Carport/Zaun) und Bodenplatte.',
     h1: 'Fundament Rechner – Betonmenge & Frosttiefe berechnen',
-    shortDescription: 'Ermittelt das Betonvolumen für Streifen-, Punkt- und Plattenfundamente mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt das Betonvolumen für Streifen-, Punkt- und Plattenfundamente.',
     searchKeywords: ["fundament rechner beton m3","streifenfundament betonmenge berechnen","punktfundament carport zaun volumen","frostfreie tiefe fundament 80 cm"],
     inputs: [
           {
@@ -1880,7 +1880,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Fassadenfarbe-Rechner: Farbbedarf in Litern berechnen',
     metaDescription: 'Berechnen Sie den Bedarf an Fassadenfarbe in Litern für 1 oder 2 Anstriche nach Hausmaßen, Fensterabzügen und Untergrund (Glattputz, Rauputz, Klinker).',
     h1: 'Fassadenfarbe Rechner – Farbmenge für den Außenanstrich ermitteln',
-    shortDescription: 'Berechnet den Fassadenfarben-Bedarf nach Wandfläche und Putzart mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Fassadenfarben-Bedarf nach Wandfläche und Putzart.',
     searchKeywords: ["fassadenfarbe rechner liter","hauswand streichen farbmenge berechnen","farbverbrauch rauputz liter m2","fassadenanstrich liter eimer"],
     inputs: [
           {
@@ -2019,7 +2019,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Tapeten Rechner – Rollenbedarf berechnen',
     metaDescription: 'Berechnen Sie die benötigte Anzahl Tapetenrollen nach Raumumfang, Deckenhöhe, Fensterabzug und Musterversatz (Rapport) für Euro-Rollen.',
     h1: 'Tapeten Rechner – Rollenanzahl für Euro-Normrollen ermitteln',
-    shortDescription: 'Berechnet die Anzahl Tapetenrollen nach Raumumfang und Rapport mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Anzahl Tapetenrollen nach Raumumfang und Rapport.',
     searchKeywords: ["tapeten rechner rollen bedarf","eurorolle tapete berechnen rapport","tapetenrollen anzahl raumumfang","mustertapete verschnitt berechnen"],
     inputs: [
           {
@@ -2162,7 +2162,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Brennholz Rechner – Festmeter, Raummeter',
     metaDescription: 'Rechnen Sie Brennholz-Einheiten um: Festmeter (FM), Raummeter (RM) und Schüttraummeter (SRM) inklusive Heizwert in kWh und Öl-/Gas-Äquivalent.',
     h1: 'Brennholz Rechner – Umrechnung FM, RM, SRM & Energiegehalt',
-    shortDescription: 'Rechnet Brennholz-Raummaße um und ermittelt den Heizwert in kWh mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Rechnet Brennholz-Raummaße um und ermittelt den Heizwert in kWh.',
     searchKeywords: ["brennholz umrechner srm rm fm","schuettraummeter in raummeter umrechnen","heizwert buche fichte kwh raummeter","brennholz heizoel aequivalent"],
     inputs: [
           {
@@ -2300,7 +2300,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Putz Rechner – Innenputz & Außenputz Sackanzahl & kg berechnen',
     metaDescription: 'Berechnen Sie den Putzmörtel-Bedarf in kg und 25-kg-/30-kg-Säcken für Gipsputz, Kalk-Zement-Putz und Zementputz nach Wandfläche und Auftragsdicke.',
     h1: 'Putz Rechner – Putzbedarf & Sackanzahl für Wand & Decke',
-    shortDescription: 'Ermittelt den Mörtelbedarf für Verputzarbeiten nach Fläche und Putzdicke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Mörtelbedarf für Verputzarbeiten nach Fläche und Putzdicke.',
     searchKeywords: ["putz rechner verbrauch kg m2","kalk zement putz saecke berechnen","gipsputz bedarf wandflaeche","putzmörtel dicke berechnen"],
     inputs: [
           {
@@ -2437,7 +2437,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Zaun Rechner – Doppelstabmatten, Pfosten',
     metaDescription: 'Berechnen Sie die Anzahl Doppelstabmatten (2,50 m Normlänge), Zaunpfosten, Eckpfosten und Säcke Ruck-Zuck-Beton nach Gesamt-Zaunlänge und Zaunhöhe.',
     h1: 'Zaun Rechner – Doppelstabmatten, Pfosten & Betonbedarf',
-    shortDescription: 'Ermittelt Mattenanzahl, Pfosten und Beton für Doppelstabmattenzäune mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Mattenanzahl, Pfosten und Beton für Doppelstabmattenzäune.',
     searchKeywords: ["zaun rechner doppelstabmatten","zaunpfosten anzahl berechnen","beton fuer zaunpfosten ruck zuck beton","zaunlaenge mattenanzahl"],
     inputs: [
           {
@@ -3352,7 +3352,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Gefälle Rechner – Steigung in Prozent, Promille',
     metaDescription: 'Berechnen Sie das Gefälle von Terrassen (min. 2 %), Abwasserrohren nach DIN EN 12056 (1-2 cm/m) und Garagenauffahrten nach Länge und Höhenunterschied.',
     h1: 'Gefälle Rechner – Gefälle in %, cm/m & Höhenunterschied ermitteln',
-    shortDescription: 'Berechnet Gefälle in Prozent, Grad und Höhenunterschied in Zentimetern mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Gefälle in Prozent, Grad und Höhenunterschied in Zentimetern.',
     searchKeywords: ["gefaelle rechner prozent cm m","terrasse gefaelle berechnen 2 prozent","abwasserrohr gefaelle din 12056","hoehenunterschied laenge gefaelle"],
     inputs: [
           {
@@ -3489,7 +3489,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Bodenpressung Rechner – Baugrund-Tragfähigkeit',
     metaDescription: 'Berechnen Sie die vorhandene Bodenpressung (kN/m²) unter Fundamenten und vergleichen Sie diese mit der zulässigen Bodenpressung nach DIN 1054.',
     h1: 'Baugrund Rechner – Bodenpressung & Tragfähigkeit berechnen',
-    shortDescription: 'Ermittelt die Bodenpressung unter Fundamenten und prüft die Tragfähigkeit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Bodenpressung unter Fundamenten und prüft die Tragfähigkeit.',
     searchKeywords: ["bodenpressung rechner din 1054","baugrund tragfaehigkeit kn m2","fundamentbelastung berechnen","zulaessige bodenpressung tabelle"],
     inputs: [
           {
@@ -3788,7 +3788,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Beton mischen Rechner – Mischungsverhältnis Zement',
     metaDescription: 'Berechnen Sie das optimale Mischungsverhältnis für Beton (1:4 Regel) in Schaufeln, Litern und kg Zement, Betonkies (0/16 oder 0/32) und Anmachwasser.',
     h1: 'Beton mischen Rechner – Mischverhältnis in Schaufeln & kg',
-    shortDescription: 'Berechnet Schaufeln und Gewichte für das Selbstanmischen von Beton mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Schaufeln und Gewichte für das Selbstanmischen von Beton.',
     searchKeywords: ["beton mischungsverhaeltnis schaufeln rechner","beton selber mischen verhaeltnis 1 zu 4","zement kies wasser rechner","w z wert beton anmachwasser"],
     inputs: [
           {
@@ -3898,7 +3898,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Dreieck Rechner – Fläche berechnen nach Grundseite/Höhe',
     metaDescription: 'Berechnen Sie die Dreiecksfläche über Grundseite und Höhe (A = 1/2 g h) oder über alle 3 Seiten nach dem Satz des Heron inklusive Umfang.',
     h1: 'Dreieck Rechner – Flächeninhalt & Umfang für jedes Dreieck',
-    shortDescription: 'Berechnet Flächeninhalt und Umfang für beliebige Dreiecke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Flächeninhalt und Umfang für beliebige Dreiecke.',
     searchKeywords: ["dreieck flaeche rechner","heron formel rechner 3 seiten","dreiecksflaeche berechnen grundseite hoehe","dreieck umfang formel"],
     inputs: [
           {
@@ -4118,7 +4118,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Kegel Rechner – Volumen V = 1/3πr²h, Mantelfläche',
     metaDescription: 'Berechnen Sie das Volumen eines Kreiskegels (V = 1/3 · π · r² · h), die Mantellinie s, die Mantelfläche M und die Gesamtoberfläche O nach Radius und Höhe.',
     h1: 'Kegel Rechner – Volumen, Mantellinie & Oberfläche ermitteln',
-    shortDescription: 'Berechnet Volumen, Mantelfläche und Gesamtoberfläche eines Kegels mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Volumen, Mantelfläche und Gesamtoberfläche eines Kegels.',
     searchKeywords: ["kegel rechner volumen formel","kegel mantelflaeche oberflaeche berechnen","mantellinie s kegel pythagoras","kreiskegel volumen 1 drittel pi r2 h"],
     inputs: [
           {
@@ -4209,7 +4209,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Hohlzylinder Rechner – Rohr-Volumen, Wandstärke',
     metaDescription: 'Berechnen Sie das Materialvolumen, Innen-/Außenvolumen und Gewicht eines Hohlzylinders oder Metallrohrs nach Außendurchmesser, Wandstärke, Länge und Material.',
     h1: 'Hohlzylinder Rechner – Rohrvolumen & Gewicht berechnen',
-    shortDescription: 'Ermittelt Materialvolumen und Gewicht von Rohren und zylindrischen Hülsen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Materialvolumen und Gewicht von Rohren und zylindrischen Hülsen.',
     searchKeywords: ["hohlzylinder rechner volumen formel","rohr gewicht berechnen stahl kupfer","wandstaerke hohlzylinder pi r2","rohrvolumen berechnen"],
     inputs: [
           {
@@ -4353,7 +4353,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Pyramide Rechner – Volumen V = 1/3a²h, Mantelfläche',
     metaDescription: 'Berechnen Sie das Volumen einer regelmäßigen quadratischen Pyramide (V = 1/3 · a² · h), die Seitenhöhe h_a, die Kantenlänge s und die Mantelfläche M.',
     h1: 'Pyramide Rechner – Quadratische Pyramide berechnen',
-    shortDescription: 'Berechnet Volumen, Seitenkante, Mantelfläche und Gesamtoberfläche mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Volumen, Seitenkante, Mantelfläche und Gesamtoberfläche.',
     searchKeywords: ["pyramide rechner volumen formel","quadratische pyramide oberflaeche berechnen","seitenhoehe ha pyramide pythagoras","kantenlaenge s pyramide berechnen"],
     inputs: [
           {
@@ -4447,7 +4447,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Trapez Rechner – Fläche, Mittellinie & Umfang berechnen',
     metaDescription: 'Berechnen Sie den Flächeninhalt eines Trapezes über die parallelen Grundseiten a und c, die Höhe h und die Mittellinie m = (a + c) / 2 inklusive Umfang.',
     h1: 'Trapez Rechner – Flächeninhalt & Mittellinie für jedes Trapez',
-    shortDescription: 'Berechnet Flächeninhalt und Mittellinie für beliebige Trapeze mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Flächeninhalt und Mittellinie für beliebige Trapeze.',
     searchKeywords: ["trapez rechner flaeche formel","trapezflaeche berechnen a c 2 mal h","mittellinie m trapez formel","trapez umfang berechnen"],
     inputs: [
           {
@@ -4568,7 +4568,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Parallelogramm Rechner – Fläche A = a · h_a, Umfang',
     metaDescription: 'Berechnen Sie den Flächeninhalt eines Parallelogramms (A = a · h_a = a · b · sin(α)), den Umfang (U = 2a + 2b) und die Diagonalen e und f.',
     h1: 'Parallelogramm Rechner – Flächeninhalt, Umfang & Diagonalen',
-    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonalen eines Parallelogramms mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonalen eines Parallelogramms.',
     searchKeywords: ["parallelogramm rechner flaeche formel","parallelogramm umfang 2a plus 2b","parallelogramm flaeche a mal ha","diagonalen parallelogramm kosinussatz"],
     inputs: [
           {
@@ -4773,7 +4773,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Kugel Rechner – Kugelvolumen V = 4/3πr³',
     metaDescription: 'Berechnen Sie Kugelvolumen (V = 4/3 · π · r³), Kugeloberfläche (O = 4 · π · r²), Durchmesser und Kreisumfang nach Radius oder Durchmesser.',
     h1: 'Kugel Rechner – Kugelvolumen & Kugeloberfläche berechnen',
-    shortDescription: 'Berechnet Kugelvolumen, Oberfläche und Umfang aus dem Radius mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Kugelvolumen, Oberfläche und Umfang aus dem Radius.',
     searchKeywords: ["kugel rechner volumen formel 4 drittel pi r3","kugeloberflaeche berechnen 4 pi r2","kugel volumen radius durchmesser","kugelumfang grosskreis berechnen"],
     inputs: [
           {
@@ -4871,7 +4871,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Quader Rechner – Volumen V = a · b · c, Oberfläche',
     metaDescription: 'Berechnen Sie das Quadervolumen (V = a · b · c), die Gesamtoberfläche (O = 2(ab + bc + ca)) und die 3D-Raumdiagonale d = √(a² + b² + c²) aus Länge, Breite und Höhe.',
     h1: 'Quader Rechner – Volumen, Oberfläche & Raumdiagonale berechnen',
-    shortDescription: 'Berechnet Volumen, Oberfläche und Raumdiagonale eines Quaders mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Volumen, Oberfläche und Raumdiagonale eines Quaders.',
     searchKeywords: ["quader rechner volumen a b c","quader oberflaeche formel berechnen","raumdiagonale quader pythagoras 3d","quader kantenlaenge volumen"],
     inputs: [
           {
@@ -4974,7 +4974,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Prisma Rechner – Prisma Volumen V = G · h',
     metaDescription: 'Berechnen Sie das Volumen eines geraden Dreiecksprismas oder allgemeinen Prismas (V = Grundfläche · Höhe), die Mantelfläche und die Gesamtoberfläche O.',
     h1: 'Prisma Rechner – Volumen & Oberfläche für Dreiecksprismen',
-    shortDescription: 'Berechnet Volumen, Mantelfläche und Oberfläche von geraden Prismen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Volumen, Mantelfläche und Oberfläche von geraden Prismen.',
     searchKeywords: ["prisma rechner volumen formel grundflaeche hoehe","dreiecksprisma volumen berechnen","prisma oberflaeche 2g plus m","mantelflaeche prisma berechnen"],
     inputs: [
           {
@@ -5074,7 +5074,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Sechseck Rechner – Regelmäßiges Hexagon Fläche A, Umfang',
     metaDescription: 'Berechnen Sie die Fläche eines regelmäßigen Sechsecks (A = (3√3 / 2) · a²), den Umfang (U = 6a), den Inkreisradius r_i und den Umkreisradius r_u = a.',
     h1: 'Sechseck Rechner – Hexagon Flächeninhalt & Inkreis berechnen',
-    shortDescription: 'Berechnet Fläche, Umfang, Inkreis- und Umkreisradius eines Sechsecks mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Fläche, Umfang, Inkreis- und Umkreisradius eines Sechsecks.',
     searchKeywords: ["sechseck rechner flaeche formel hexagon","regelmaessiges sechseck inkreisradius umkreisradius","flaecheninhalt sechseck 3 wurzel 3 halbe a2","hexagon umfang 6a"],
     inputs: [
           {
@@ -5150,7 +5150,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Ellipse Rechner – Ellipsenfläche A = πab',
     metaDescription: 'Berechnen Sie die Fläche einer Ellipse (A = π · a · b), den präzisen Umfang nach der Ramanujan-Formel und die lineare Exzentrizität aus den Halbachsen.',
     h1: 'Ellipse Rechner – Ellipsenfläche, Umfang & Brennpunkte',
-    shortDescription: 'Berechnet Flächeninhalt, Umfang und Brennpunkte einer Ellipse mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang und Brennpunkte einer Ellipse.',
     searchKeywords: ["ellipse rechner flaeche formel pi a b","ellipsenumfang ramanujan naeherung","halbachsen a b ellipse berechnen","lineare exzentrizitaet brennpunkt ellipse"],
     inputs: [
           {
@@ -5255,7 +5255,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Kreissektor & Segment Rechner – Bogenlänge, Sehnenlänge',
     metaDescription: 'Berechnen Sie Kreissektor (Tortenstück), Bogenlänge b = (α/180)·π·r, Sehnenlänge s = 2r·sin(α/2) und die Kreissegment-Fläche aus Radius und Mittelpunktswinkel.',
     h1: 'Kreissektor & Kreissegment Rechner – Bogenlänge & Teilflächen',
-    shortDescription: 'Berechnet Kreissektor, Kreissegment, Bogenlänge und Sehnenlänge mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Kreissektor, Kreissegment, Bogenlänge und Sehnenlänge.',
     searchKeywords: ["kreissektor rechner flaeche bogenlaenge","kreissegment berechnen radius sehne","bogenlaenge b alpha 180 pi r","sehnenlaenge kreis berechnen formel"],
     inputs: [
           {
@@ -5442,7 +5442,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Sinussatz & Kosinussatz Rechner – Dreiecksberechnung Seiten',
     metaDescription: 'Lösen Sie beliebige Dreiecke mit dem Sinussatz (a/sin(α) = b/sin(β)) und Kosinussatz (c² = a² + b² - 2ab·cos(γ)) nach SSS, SWS, WSW oder SSW.',
     h1: 'Sinussatz & Kosinussatz Rechner – Allgemeines Dreieck berechnen',
-    shortDescription: 'Berechnet Seiten und Winkel in beliebigen Dreiecken mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Seiten und Winkel in beliebigen Dreiecken.',
     searchKeywords: ["sinussatz rechner dreieck a sin alpha","kosinussatz rechner c2 a2 b2","dreieck aufloesen sws sss","innenwinkel dreieck trigonometrie"],
     inputs: [
           {
@@ -5567,7 +5567,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Skalarprodukt Rechner – Vektoren 3D, Skalarprodukt',
     metaDescription: 'Berechnen Sie das Skalarprodukt zweier 3D-Vektoren (a · b = ax·bx + ay·by + az·bz), deren Beträge (Längen) und den eingeschlossenen Schnittwinkel in Grad.',
     h1: 'Skalarprodukt Rechner – Skalarprodukt, Vektorbetrag & Schnittwinkel',
-    shortDescription: 'Berechnet Skalarprodukt, Betrag und Schnittwinkel zweier 3D-Vektoren mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Skalarprodukt, Betrag und Schnittwinkel zweier 3D-Vektoren.',
     searchKeywords: ["skalarprodukt rechner 3d vektoren","vektor schnittwinkel berechnen cosinus","betrag vektor laenge sqrt ax2 ay2 az2","orthogonale vektoren skalarprodukt null"],
     inputs: [
           {
@@ -5705,7 +5705,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Torus Rechner – Donut Volumen V = 2π²Rr²',
     metaDescription: 'Berechnen Sie das Volumen eines Torus (V = 2 · π² · R · r²) und seine Oberfläche (O = 4 · π² · R · r) nach dem großen Ringradius R und dem kleinen.',
     h1: 'Torus Rechner – Volumen & Oberfläche eines Rings ermitteln',
-    shortDescription: 'Berechnet Volumen und Oberfläche eines Torus (Kreisrings/Donuts) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Volumen und Oberfläche eines Torus (Kreisrings/Donuts).',
     searchKeywords: ["torus rechner volumen formel 2 pi2 r r2","donut oberflaeche berechnen 4 pi2 r r","torus grosser kleiner radius","guldinsche regel torus"],
     inputs: [
           {
@@ -5797,7 +5797,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Kegelstumpf Rechner – Volumen V = 1/3πh',
     metaDescription: 'Berechnen Sie das Volumen eines Kegelstumpfs (V = 1/3 · π · h · (R² + Rr + r²)), die Mantellinie m und die Mantelfläche M für Eimer, Schalen und Trichter.',
     h1: 'Kegelstumpf Rechner – Volumen & Mantelfläche berechnen',
-    shortDescription: 'Berechnet Volumen, Mantelfläche und Mantellinie eines Kegelstumpfs mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Volumen, Mantelfläche und Mantellinie eines Kegelstumpfs.',
     searchKeywords: ["kegelstumpf rechner volumen formel","eimervolumen berechnen kegelstumpf","mantelflaeche kegelstumpf pi m r r","kegelstumpf hoehe radien"],
     inputs: [
           {
@@ -6025,7 +6025,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Goldener Schnitt Rechner – Major, Minor',
     metaDescription: 'Berechnen Sie die Streckenteilung nach dem Goldenen Schnitt: Gesamtlänge, Major (a = ca. 61,8 %) und Minor (b = ca. 38,2 %) mit der Zahl Phi Φ ≈ 1,6180339.',
     h1: 'Goldener Schnitt Rechner – Harmonische Proportionen & Teilung',
-    shortDescription: 'Berechnet Major, Minor und Gesamtstrecke nach dem Goldenen Schnitt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Major, Minor und Gesamtstrecke nach dem Goldenen Schnitt.',
     searchKeywords: ["goldener schnitt rechner formel phi","major minor berechnen 61 8 prozent","goldene proportion architektur kunst","goldener schnitt zahl phi 1 618"],
     inputs: [
           {

@@ -86,7 +86,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Rechteck Rechner – Flächeninhalt (A), Umfang (U) & Diagonale',
     metaDescription: 'Rechteckflächen online berechnen: Länge und Breite eingeben und sofort Fläche, Umfang und Diagonale ermitteln.',
     h1: 'Rechteck Rechner – Fläche & Diagonale berechnen',
-    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonale von Rechtecken und Quadraten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang und Diagonale von Rechtecken und Quadraten.',
     searchKeywords: ['rechteckrechner', 'rechteck fläche berechnen', 'umfang rechteck formel', 'diagonale rechteck berechnen'],
     inputs: [
       { id: 'lengthA', label: 'Länge (Seite a)', type: 'number', defaultValue: 8.0, step: 0.1, unit: 'm' },

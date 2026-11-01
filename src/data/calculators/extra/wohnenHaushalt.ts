@@ -429,7 +429,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Grundsteuer-Rechner: neue Grundsteuer B berechnen',
     metaDescription: 'Ermitteln Sie Ihre jährliche Grundsteuer B nach der Reform: Grundsteuerwert × Steuermesszahl × kommunaler Hebesatz.',
     h1: 'Grundsteuer Rechner – Reformierte Grundsteuer B berechnen',
-    shortDescription: 'Berechnet die neue Grundsteuer nach dem 3-Stufen-Verfahren für Wohngrundstücke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die neue Grundsteuer nach dem 3-Stufen-Verfahren für Wohngrundstücke.',
     searchKeywords: ['grundsteuer rechner', 'grundsteuer reform 2025 2026', 'grundsteuer hebesatz rechner', 'steuermesszahl grundsteuer b'],
     inputs: [
       { id: 'propertyValue', label: 'Festgestellter Grundsteuerwert (Finanzamt-Bescheid)', type: 'number', defaultValue: 280000, min: 0, step: 5000, unit: '€', helpText: 'Vom Finanzamt im Grundsteuerwertbescheid festgestellter Wert.' },
@@ -674,7 +674,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Grunderwerbsteuer-Rechner: alle 16 Bundesländer',
     metaDescription: 'Berechnen Sie die Grunderwerbsteuer für Bayern (3,5 %), NRW (6,5 %), Hamburg (5,5 %) und alle weiteren deutschen Bundesländer.',
     h1: 'Grunderwerbsteuer Rechner – Bundesland-Steuersätze berechnen',
-    shortDescription: 'Ermittelt die exakte Grunderwerbsteuer für Ihren Immobilien- oder Grundstückskauf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die exakte Grunderwerbsteuer für Ihren Immobilien- oder Grundstückskauf.',
     searchKeywords: ['grunderwerbsteuer rechner', 'grunderwerbsteuersatz bundeslaender 2026', 'grunderwerbsteuer bayern 3 5', 'grunderwerbsteuer sparen'],
     inputs: [
       { id: 'purchasePrice', label: 'Beurkundeter Immobilienkaufpreis', type: 'number', defaultValue: 320000, min: 0, step: 5000, unit: '€', helpText: 'Beurkundeter Kaufpreis der Immobilie in Euro.' },
@@ -775,7 +775,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Notarkosten Rechner Immobilienkauf – Notar-',
     metaDescription: 'Berechnen Sie die anfallenden Notarkosten und Grundbuchamtsgebühren nach GNotKG (ca. 1,5 % bis 2,0 % des Kaufpreises) inklusive Grundschuldbestellung.',
     h1: 'Notar- und Grundbuchkosten Rechner – Kaufvertrag & Grundschuld',
-    shortDescription: 'Kalkuliert die gesetzlichen Gebühren für Notarbeurkundung und Grundbucheintragung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert die gesetzlichen Gebühren für Notarbeurkundung und Grundbucheintragung.',
     searchKeywords: ['notarkosten rechner immobilienkauf', 'grundbuchkosten rechner gnotkg', 'notargebuehren grundschuldbestellung', 'nebenkosten hausnotar'],
     inputs: [
       { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 300000, min: 0, step: 10000, unit: '€', helpText: 'Beurkundeter Immobilienkaufpreis in Euro.' },
@@ -1104,7 +1104,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Hausgeld Rechner – Monatliche Kosten für Eigentumswohnungen',
     metaDescription: 'Berechnen Sie das monatliche Hausgeld (Wohngeld) für Eigentumswohnungen aufgeteilt in umlagefähige und nicht umlagefähige Kosten nach WEG.',
     h1: 'Hausgeld Rechner – Kosten für Eigentumswohnungen kalkulieren',
-    shortDescription: 'Kalkuliert die monatliche Hausgeldzahlung und trennt Vermieterkosten von Mieterkosten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert die monatliche Hausgeldzahlung und trennt Vermieterkosten von Mieterkosten.',
     searchKeywords: ['hausgeld rechner', 'wohngeld eigentumswohnung rechner', 'hausgeld pro qm durchschnitt', 'umlagefaehiges hausgeld'],
     inputs: [
       { id: 'livingArea', label: 'Wohnungsgröße in m²', type: 'number', defaultValue: 80, min: 0, max: 400, step: 5, unit: 'm²', helpText: 'Wohnfläche der Eigentumswohnung in m².' },
@@ -1273,7 +1273,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Mietrendite Rechner – Brutto- und Nettorendite berechnen',
     metaDescription: 'Ermitteln Sie die Rentabilität einer Anlageimmobilie: Bruttomietrendite und exakte Nettomietrendite unter Einbezug aller Nebenkosten und Rücklagen.',
     h1: 'Mietrendite Rechner – Brutto- und Nettorendite für Vermieter',
-    shortDescription: 'Vergleicht Brutto- und Nettomietrendite zur objektiven Bewertung von Kapitalanlage-Immobilien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht Brutto- und Nettomietrendite zur objektiven Bewertung von Kapitalanlage-Immobilien.',
     searchKeywords: ['mietrendite rechner', 'bruttomietrendite formel', 'nettomietrendite berechnen', 'immobilie rendite kapitalanlage'],
     inputs: [
       { id: 'purchasePrice', label: 'Immobilienkaufpreis', type: 'number', defaultValue: 250000, min: 0, step: 5000, unit: '€', helpText: 'Reiner Immobilienkaufpreis ohne Erwerbsnebenkosten.' },
@@ -1862,7 +1862,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Untermiete Rechner – Mietanteil für WG-Zimmer',
     metaDescription: 'Berechnen Sie den fairen Mietanteil für Untermieter und WG-Zimmer nach Zimmerfläche, Gemeinschaftsflächen und möglichem Vermieter-Untermietzuschlag.',
     h1: 'Untermiete Rechner – Zimmer-Untervermietung kalkulieren',
-    shortDescription: 'Kalkuliert die Untermiete für WG-Zimmer inklusive Gemeinschaftsflächen und Möblierungszuschlag mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert die Untermiete für WG-Zimmer inklusive Gemeinschaftsflächen und Möblierungszuschlag.',
     searchKeywords: ['untermiete rechner', 'untermietzuschlag berechnen', 'wg zimmer untermiete qm anteil', 'paragraph 553 bgb untervermietung'],
     inputs: [
       { id: 'totalWarmRent', label: 'Gesamte Warmmiete der Wohnung', type: 'number', defaultValue: 1200, min: 0, step: 25, unit: '€', helpText: 'Vollständige Warmmiete der Wohnung in Euro.' },
@@ -1945,7 +1945,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Erbbauzins-Rechner: jährlichen Erbbauzins berechnen',
     metaDescription: 'Ermitteln Sie die jährliche und monatliche Erbbauzinszahlung für Grundstücke bei Erbbaurecht (üblich 3 % bis 5 % des Bodenwerts).',
     h1: 'Erbbauzins Rechner – Erbbaurecht & Pachtzins berechnen',
-    shortDescription: 'Berechnet den Erbbauzins auf Basis des Bodenrichtwerts für Erbpacht-Grundstücke mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Erbbauzins auf Basis des Bodenrichtwerts für Erbpacht-Grundstücke.',
     searchKeywords: ['erbbauzins rechner', 'erbbaurecht kosten pro jahr', 'erbpacht zins berechnen bodenwert', 'erbbaurechtsgesetz rechner'],
     inputs: [
       { id: 'landValue', label: 'Bodenwert des Baugrundstücks', type: 'number', defaultValue: 180000, min: 0, step: 5000, unit: '€', helpText: 'Bodenrichtwert bzw. Verkehrswert des Grundstücks in Euro.' },
@@ -2020,7 +2020,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Kaufpreisfaktor-Rechner: Vervielfältiger & Mietrendite',
     metaDescription: 'Ermitteln Sie den Kaufpreisfaktor (Vervielfältiger) und die entsprechende Bruttomietrendite zur schnellen Ersteinschätzung von Immobilienangeboten.',
     h1: 'Kaufpreisfaktor Rechner – Immobilien-Vervielfältiger ermitteln',
-    shortDescription: 'Berechnet das Verhältnis von Kaufpreis zu Jahresnettokaltmiete mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet das Verhältnis von Kaufpreis zu Jahresnettokaltmiete.',
     searchKeywords: ['kaufpreisfaktor rechner', 'vervielfaeltiger immobilie berechnen', 'maklerfaktor jahresnettokaltmiete', 'faktor 20 oder 25 immobilie'],
     inputs: [
       { id: 'purchasePrice', label: 'Kaufpreis der Immobilie (ohne Nebenkosten)', type: 'number', defaultValue: 280000, min: 0, step: 5000, unit: '€', helpText: 'Kaufpreis der Immobilie ohne Kaufnebenkosten.' },
@@ -2464,7 +2464,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Balkonkraftwerk Rechner – 800W Ertrag, Ersparnis',
     metaDescription: 'Berechnen Sie den Stromertrag, die jährliche Stromkostenersparnis und die Amortisationszeit für Ihr 800-Watt-Balkonkraftwerk (Stecker-Solaranlage).',
     h1: 'Balkonkraftwerk Rechner – 800 Watt Ertrag & Amortisation',
-    shortDescription: 'Ermittelt jährlichen Solarertrag und Geldersparnis für Mini-Photovoltaikanlagen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt jährlichen Solarertrag und Geldersparnis für Mini-Photovoltaikanlagen.',
     searchKeywords: ['balkonkraftwerk rechner', '800 watt balkonkraftwerk ertrag', 'stecker solar ersparnis berechnen', 'amortisation balkonkraftwerk'],
     inputs: [
       { id: 'modulePowerWp', label: 'Modulleistung der Paneele in Watt-Peak', type: 'number', defaultValue: 850, min: 300, max: 1200, step: 50, unit: 'Wp' },
@@ -2537,7 +2537,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Photovoltaik Rechner – PV-Ertrag, Batteriespeicher',
     metaDescription: 'Berechnen Sie Ertrag, Eigenverbrauchsquote, EEG-Einspeisevergütung und Gesamtrendite einer privaten Dachanlage mit oder ohne Stromspeicher.',
     h1: 'Photovoltaik Rechner – PV-Anlage & Stromspeicher kalkulieren',
-    shortDescription: 'Ganzheitliche Wirtschaftlichkeitsrechnung für Photovoltaik-Dachanlagen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ganzheitliche Wirtschaftlichkeitsrechnung für Photovoltaik-Dachanlagen.',
     searchKeywords: ['photovoltaik rechner ertrag', 'pv anlage speicher amortisation', 'einspeiseverguetung eeg rechner', 'photovoltaik wirtschaftlichkeit'],
     inputs: [
       { id: 'peakPowerKwp', label: 'Anlagengröße in Kilowatt-Peak (kWp)', type: 'number', defaultValue: 10, min: 3, max: 30, step: 1, unit: 'kWp' },
@@ -2619,7 +2619,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Wärmepumpen Stromkosten Rechner – JAZ',
     metaDescription: 'Berechnen Sie den jährlichen Stromverbrauch und die Heizkosten einer Wärmepumpe anhand von Heizwärmebedarf und Jahresarbeitszahl (JAZ).',
     h1: 'Wärmepumpen Rechner – Stromverbrauch & Heizkosten berechnen',
-    shortDescription: 'Ermittelt Strombedarf und Betriebskosten von Luft-Wasser- und Sole-Wärmepumpen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Strombedarf und Betriebskosten von Luft-Wasser- und Sole-Wärmepumpen.',
     searchKeywords: ['waermepumpen stromkosten rechner', 'jahresarbeitszahl jaz berechnen', 'stromverbrauch waermepumpe kwh', 'heizstromtarif waermepumpe'],
     inputs: [
       { id: 'heatDemandKwh', label: 'Jährlicher Heizwärmebedarf des Gebäudes inkl. Warmwasser', type: 'number', defaultValue: 16000, min: 3000, step: 500, unit: 'kWh' },
@@ -3067,7 +3067,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Wäschetrockner-Rechner: Stromkosten pro Trockengang',
     metaDescription: 'Berechnen Sie die Stromkosten pro Trocknungsgang und vergleichen Sie den sparsamen Wärmepumpentrockner mit herkömmlichen Kondenstrocknern.',
     h1: 'Wäschetrockner Rechner – Kosten pro Trockengang vergleichen',
-    shortDescription: 'Vergleicht den Stromverbrauch moderner Wärmepumpentrockner mit alten Kondenstrocknern mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht den Stromverbrauch moderner Wärmepumpentrockner mit alten Kondenstrocknern.',
     searchKeywords: ['waeschetrockner kosten rechner', 'waermepumpentrockner vs kondenstrockner stromkosten', 'trockner stromverbrauch euro', 'kwh pro trockengang'],
     inputs: [
       { id: 'dryerType', label: 'Trockner-Technologie', type: 'select', defaultValue: 'heatpump', options: [
@@ -3187,7 +3187,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Fernseher Stromkosten Rechner – TV-Stromverbrauch',
     metaDescription: 'Berechnen Sie den Stromverbrauch Ihres Fernsehers (OLED, QLED, LED) pro Stunde, Monat und Jahr inklusive Standby-Stromverschwendung.',
     h1: 'Fernseher Stromkosten Rechner – TV-Verbrauch & Kosten berechnen',
-    shortDescription: 'Ermittelt die Stromkosten für Fernsehgeräte verschiedener Größen und Display-Technologien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die Stromkosten für Fernsehgeräte verschiedener Größen und Display-Technologien.',
     searchKeywords: ['fernseher stromkosten rechner', 'tv stromverbrauch pro stunde', 'oled vs led stromverbrauch kosten', 'fernseher standby kosten'],
     inputs: [
       { id: 'screenPowerWatts', label: 'Leistungsaufnahme im Betrieb in Watt (z. B. 80 bis 200 W)', type: 'number', defaultValue: 120, min: 20, max: 500, step: 10, unit: 'W' },
@@ -3727,7 +3727,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Klimaanlage Stromkosten: Split-Gerät vs. mobiles Gerät',
     metaDescription: 'Berechnen Sie die Stromkosten für Klimaanlagen im Sommer: Effiziente Split-Klimaanlage im Vergleich zu mobilen Monoblock-Klimageräten.',
     h1: 'Klimaanlage Stromkosten Rechner – Kühlkosten im Sommer berechnen',
-    shortDescription: 'Ermittelt Stromverbrauch und Kosten für Klimageräte an heißen Sommertagen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Stromverbrauch und Kosten für Klimageräte an heißen Sommertagen.',
     searchKeywords: ['klimaanlage stromkosten rechner', 'split klimageraet stromverbrauch euro', 'mobiles klimageraet kosten sommer', 'klimaanlage kwh pro stunde'],
     inputs: [
       {
@@ -3976,7 +3976,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaTitle: 'Lebensmittelbudget Rechner – Monatliche Essenskosten',
     metaDescription: 'Berechnen Sie das optimale Haushaltsbudget für Lebensmittel, Getränke und Drogerieartikel nach Haushaltsgröße und Ernährungsstil.',
     h1: 'Lebensmittelbudget Rechner – Essenskosten & Haushaltsgeld planen',
-    shortDescription: 'Kalkuliert realistische Monats- und Wochenausgaben für Ernährung und Einkäufe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert realistische Monats- und Wochenausgaben für Ernährung und Einkäufe.',
     searchKeywords: ['lebensmittelbudget rechner', 'haushaltsgeld wie viel pro monat', 'essenskosten pro person berechnen', 'wocheneinkauf budget'],
     inputs: [
       { id: 'adults', label: 'Anzahl Erwachsene im Haushalt', type: 'number', defaultValue: 2, min: 1, max: 10, step: 1 },

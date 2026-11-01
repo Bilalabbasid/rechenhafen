@@ -352,7 +352,7 @@ export default async function CalculatorPage({ params }: PageProps) {
       )}
 
       {/* Formula & Explanation */}
-      <FormulaBox formula={calc.formula} formulaExplanation={calc.formulaExplanation} />
+      <FormulaBox formula={calc.formula} formulaExplanation={calc.formulaExplanation} category={calc.category} />
 
       {/* Methodology, Assumptions & Verifiability */}
       <MethodologyBox

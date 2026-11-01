@@ -17,8 +17,9 @@ import { BUSINESS_CALCULATORS } from './business';
 import { STATISTIK_CALCULATORS } from './statistik';
 import { STEUERN_GEHALT_CALCULATORS } from './steuernGehalt';
 import { EXTRA_CALCULATORS } from './extra';
+import { enrichCalculator } from './enrichment';
 
-export const ALL_CALCULATORS: CalculatorDefinition[] = [
+const RAW_CALCULATORS: CalculatorDefinition[] = [
   ...DATUM_ZEIT_CALCULATORS,
   ...MATHEMATIK_CALCULATORS,
   ...FINANZEN_CALCULATORS,
@@ -38,6 +39,8 @@ export const ALL_CALCULATORS: CalculatorDefinition[] = [
   ...STATISTIK_CALCULATORS,
   ...EXTRA_CALCULATORS,
 ];
+
+export const ALL_CALCULATORS: CalculatorDefinition[] = RAW_CALCULATORS.map(enrichCalculator);
 
 // Schnelle O(1) Lookup Map
 const SLUG_MAP = new Map<string, CalculatorDefinition>();

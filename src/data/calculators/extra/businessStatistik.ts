@@ -12,7 +12,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Deckungsbeitrag Rechner – Stück-DB, DB I',
     metaDescription: 'Berechnen Sie den Deckungsbeitrag pro Stück (db = Preis - variable Kosten), den Gesamt-Deckungsbeitrag (DB I), die DB-Quote in % und das Betriebsergebnis.',
     h1: 'Deckungsbeitrag Rechner – DB I, Stück-DB & DB-Quote kalkulieren',
-    shortDescription: 'Ermittelt Stückdeckungsbeitrag, Gesamtdeckungsbeitrag und Betriebsergebnis mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Stückdeckungsbeitrag, Gesamtdeckungsbeitrag und Betriebsergebnis.',
     searchKeywords: ["deckungsbeitrag rechner dbi stueckdeckungsbeitrag","deckungsbeitragsquote berechnen formel","umsatz variable kosten fixkosten betriebsergebnis","deckungsbeitrag 1 berechnen bwl"],
     inputs: [
           {
@@ -149,7 +149,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'ROAS Rechner – Return on Ad Spend berechnen',
     metaDescription: 'Berechnen Sie den ROAS in % und als Faktor (z. B. 4x = 400 %) für Google Ads, Meta Ads und TikTok sowie den erforderlichen Break-Even-ROAS aus Ihrer Produktmarge.',
     h1: 'ROAS Rechner – Return on Ad Spend für Online-Marketing berechnen',
-    shortDescription: 'Ermittelt Werberentabilität (ROAS) und Mindest-ROAS für Profitabilität mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Werberentabilität (ROAS) und Mindest-ROAS für Profitabilität.',
     searchKeywords: ["roas rechner return on ad spend formel","break even roas berechnen marge ecommerce","google ads roas faktor prozent","werberendite berechnen umsatz ad spend"],
     inputs: [
           {
@@ -275,7 +275,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'ROI Rechner – Return on Investment ermitteln',
     metaDescription: 'Berechnen Sie den Return on Investment (ROI in %) und die Amortisationsdauer in Monaten nach Investitionskosten und erzieltem Netto-Gewinnzuwachs.',
     h1: 'ROI Rechner – Return on Investment & Kapitalrendite ermitteln',
-    shortDescription: 'Berechnet Kapitalrendite (ROI) und Amortisationsdauer von Investitionen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Kapitalrendite (ROI) und Amortisationsdauer von Investitionen.',
     searchKeywords: ["roi rechner return on investment formel","kapitalrendite investition berechnen","amortisationszeit monate rechner","roi prozent berechnen gewinn kosten"],
     inputs: [
           {
@@ -400,7 +400,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'EBIT & EBITDA Rechner – Operatives Ergebnis',
     metaDescription: 'Berechnen Sie EBIT (operatives Ergebnis vor Zinsen und Steuern), EBITDA (vor Abschreibungen) und die EBITDA-Marge in % aus Umsatzerlösen und Kosten.',
     h1: 'EBIT & EBITDA Rechner – Operatives Unternehmensergebnis ermitteln',
-    shortDescription: 'Berechnet EBIT, EBITDA und operative Margen nach GuV mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet EBIT, EBITDA und operative Margen nach GuV.',
     searchKeywords: ["ebit rechner ebitda marge formel","earnings before interest taxes bwl rechner","operativer gewinn vor zinsen steuern abschreibungen","ebitda berechnen guv umsatz"],
     inputs: [
           {
@@ -530,7 +530,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Cashflow Rechner – Operativen Cashflow berechnen',
     metaDescription: 'Berechnen Sie den operativen Cashflow nach der Praktiker-Formel: Jahresüberschuss + Abschreibungen (AfA) + Veränderung der langfristigen Rückstellungen.',
     h1: 'Cashflow Rechner – Operative Finanzkraft & Liquiditätszufluss',
-    shortDescription: 'Ermittelt den operativen Cashflow und die Cashflow-Umsatzrate mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den operativen Cashflow und die Cashflow-Umsatzrate.',
     searchKeywords: ["cashflow rechner praktiker formel bwl","operativer cashflow berechnen jahresueberschuss abschreibungen","cashflow marge quote umsatz","innenfinanzierungskraft unternehmen"],
     inputs: [
           {
@@ -852,7 +852,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Umsatzrentabilität Rechner – Umsatzrendite',
     metaDescription: 'Berechnen Sie die Umsatzrendite / Umsatzrentabilität (ROS in %): Wie viel Cent Reingewinn verbleiben dem Unternehmen von jedem Euro Umsatz?',
     h1: 'Umsatzrentabilität Rechner – Umsatzrendite (ROS) ermitteln',
-    shortDescription: 'Berechnet die Umsatzrendite in Prozent aus Gewinn und Gesamtumsatz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Umsatzrendite in Prozent aus Gewinn und Gesamtumsatz.',
     searchKeywords: ["umsatzrentabilitaet rechner formel gewinn umsatz","umsatzrendite return on sales ros prozent","wieviel cent gewinn pro euro umsatz","bruttoumsatzrendite nettoumsatzrendite berechnen"],
     inputs: [
           {
@@ -952,7 +952,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Eigenkapitalrentabilität Rechner – Return on Equity',
     metaDescription: 'Berechnen Sie die Eigenkapitalrendite (ROE in % = Gewinn / Eigenkapital) und analysieren Sie den positiven oder negativen Leverage-Effekt von Fremdkapital.',
     h1: 'Eigenkapitalrentabilität Rechner – Return on Equity (ROE) berechnen',
-    shortDescription: 'Berechnet die Eigenkapitalrendite (ROE) und den Leverage-Effekt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Eigenkapitalrendite (ROE) und den Leverage-Effekt.',
     searchKeywords: ["eigenkapitalrentabilitaet rechner roe formel","return on equity berechnen eigenkapital gewinn","leverage effekt fremdkapitalzinsen hebel","eigenkapitalverzinsung bwl aktie"],
     inputs: [
           {
@@ -1044,7 +1044,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Gesamtkapitalrentabilität Rechner – Return on Assets berechnen',
     metaDescription: 'Berechnen Sie die Gesamtkapitalrendite (ROA in % = (Gewinn + Fremdkapitalzinsen) / Gesamtkapital) zur Bewertung der Rentabilität unabhängig von der Finanzierung.',
     h1: 'Gesamtkapitalrentabilität Rechner – Kapitalverzinsung (ROA) ermitteln',
-    shortDescription: 'Berechnet die Gesamtkapitalrendite unabhängig von der Finanzierung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Gesamtkapitalrendite unabhängig von der Finanzierung.',
     searchKeywords: ["gesamtkapitalrentabilitaet rechner roa formel","return on assets berechnen bwl fremdkapitalzinsen","gesamtkapitalverzinsung bilanz aktiva","rentabilitaet des gesamtkapitals"],
     inputs: [
           {
@@ -1151,7 +1151,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'CAC Rechner – Customer Acquisition Cost',
     metaDescription: 'Berechnen Sie die Customer Acquisition Costs (CAC in €) aus Marketing- und Vertriebsaufwand geteilt durch die Anzahl gewonnener Neukunden.',
     h1: 'CAC Rechner – Kundengewinnungskosten im Vertrieb berechnen',
-    shortDescription: 'Ermittelt die durchschnittlichen Kosten für die Gewinnung eines Neukunden mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die durchschnittlichen Kosten für die Gewinnung eines Neukunden.',
     searchKeywords: ["cac rechner customer acquisition cost formel","kundengewinnungskosten berechnen marketing vertrieb","cac payback period monate","kosten pro neukunde ecommerce saas"],
     inputs: [
           {
@@ -1273,7 +1273,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'CLV Rechner – Customer Lifetime Value',
     metaDescription: 'Berechnen Sie den Customer Lifetime Value (CLV in €) nach durchschnittlichem Bestellwert, Kauffrequenz, Kundenlebensdauer und Bruttomarge.',
     h1: 'CLV Rechner – Customer Lifetime Value & Kundenwert ermitteln',
-    shortDescription: 'Berechnet den Kundenwert (CLV) über die gesamte Kundenbeziehung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Kundenwert (CLV) über die gesamte Kundenbeziehung.',
     searchKeywords: ["clv rechner customer lifetime value formel","kundenwert berechnen marketing ecommerce saas","clv cac ratio verhaeltnis 3 zu 1","lebenszeitwert eines kunden berechnen"],
     inputs: [
           {
@@ -1389,7 +1389,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Churn Rate Rechner – Kundenabwanderungsquote (%) & MRR Churn',
     metaDescription: 'Berechnen Sie die monatliche und jährliche Churn Rate (Kundenabwanderung in %) sowie den Revenue Churn für SaaS-, Abo- und Dienstleistungsunternehmen.',
     h1: 'Churn Rate Rechner – Abwanderungsquote & Kundenverlust ermitteln',
-    shortDescription: 'Berechnet Kunden- und Umsatzabwanderung im Abonnementgeschäft mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Kunden- und Umsatzabwanderung im Abonnementgeschäft.',
     searchKeywords: ["churn rate rechner kundenabwanderungsquote formel","mrr churn berechnen saas abonnement","kundenabwanderung prozent pro monat jahr","durchschnittliche kundenlebensdauer 1 durch churn"],
     inputs: [
           {
@@ -1489,7 +1489,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Conversion Rate Rechner – Konversionsrate für E-Commerce',
     metaDescription: 'Berechnen Sie die Conversion Rate in Prozent für Webshops und Landingpages: Besucher zu Leads, Warenkörbe zu Käufen und Lead-to-Customer Rate.',
     h1: 'Conversion Rate Rechner – Konversionsrate für Shop & Leads ermitteln',
-    shortDescription: 'Berechnet die Conversion Rate aus Besucherzahlen und Abschlüssen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Conversion Rate aus Besucherzahlen und Abschlüssen.',
     searchKeywords: ["conversion rate rechner formel prozent shop","konversionsrate berechnen besucher kunden","lead to customer conversion rate rechner","durchschnittliche ecommerce conversion rate 2 bis 3 prozent"],
     inputs: [
           {
@@ -1591,7 +1591,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'AfA Rechner – Lineare & degressive Abschreibung',
     metaDescription: 'Berechnen Sie die jährliche steuerliche Abschreibung (AfA) linear nach offizieller BMF-Nutzungsdauer oder degressiv – mit Abschreibungsbetrag und Restbuchwert für jedes Jahr.',
     h1: 'AfA Rechner – Lineare & Degressive Abschreibung ermitteln',
-    shortDescription: 'Berechnet jährliche Abschreibungsbeträge und Restbuchwerte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet jährliche Abschreibungsbeträge und Restbuchwerte.',
     searchKeywords: ["afa rechner lineare degressive abschreibung formel","abschreibungstabelle bmf nutzungsdauer jahre","degressive afa 2024 wachstumschancengesetz 20 prozent","restbuchwert abschreibungsplan berechnen"],
     inputs: [
           {
@@ -1711,7 +1711,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Skonto-Rechner: effektiven Jahreszins von Skonto berechnen',
     metaDescription: 'Berechnen Sie den effektiven Jahreszinssatz bei Skontonutzung (z. B. 2 % oder 3 % Skonto bei Zahlung binnen 10 Tagen statt 30 Tagen Nettoziel) im Vergleich zu Ihrem Dispo- oder Kontokorrentzins.',
     h1: 'Skonto Jahreszins Rechner – Lohnt sich Skonto auch auf Pump?',
-    shortDescription: 'Berechnet den enormen effektiven Jahreszins von Skontoangeboten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den enormen effektiven Jahreszins von Skontoangeboten.',
     searchKeywords: ["skonto effektiver jahreszins rechner formel","skonto ausnutzen dispo kredit zinsvergleich","skontosatz tage zahlungsziel kaufmaennisch","skonto vorteil berechnen bwl"],
     inputs: [
           {
@@ -2070,7 +2070,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Stundensatz Rechner – Honorar für Freiberufler',
     metaDescription: 'Berechnen Sie Ihren Mindest-Stundensatz netto nach Wunsch-Nettoeinkommen, Betriebsausgaben, Krankenversicherung, Steuern und Urlaub.',
     h1: 'Stundensatz Rechner – Honorar für Selbstständige & Freelancer',
-    shortDescription: 'Kalkuliert den benötigten Stundensatz nach Lebenshaltungskosten und Auslastung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert den benötigten Stundensatz nach Lebenshaltungskosten und Auslastung.',
     searchKeywords: ["stundensatz kalkulation freiberufler rechner","freelancer stundensatz berechnen formel urlaub krankheit","wieviel stundensatz als selbststaendiger verlangen","honorar berechnen netto zielgehalt"],
     inputs: [
           {
@@ -2455,7 +2455,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Z-Score Rechner – Standardnormalverteilung & Perzentil online',
     metaDescription: 'Berechnen Sie den Z-Wert, die Standardabweichungsdistanz und die kumulierte Wahrscheinlichkeit P(Z <= z) online.',
     h1: 'Z-Score Rechner (Normalverteilung)',
-    shortDescription: 'Standardisiert Rohdatenwerte anhand von Mittelwert und Standardabweichung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Standardisiert Rohdatenwerte anhand von Mittelwert und Standardabweichung.',
     searchKeywords: ["z score rechner","z wert berechnen","standardnormalverteilung","z transformation","standardisierung statistik"],
     inputs: [
           {
@@ -2696,7 +2696,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Konfidenzintervall Rechner – 90 %, 95 %',
     metaDescription: 'Ermitteln Sie die untere und obere Grenze des Konfidenzintervalls für Ihren Mittelwert und die Fehlerspanne (Margin of Error).',
     h1: 'Konfidenzintervall Rechner (Vertrauensintervall)',
-    shortDescription: 'Berechnet den Vertrauensbereich für den wahren Populationsmittelwert mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Vertrauensbereich für den wahren Populationsmittelwert.',
     searchKeywords: ["konfidenzintervall rechner","vertrauensbereich berechnen","margin of error rechner","95 prozent konfidenz","fehlerspanne"],
     inputs: [
           {
@@ -2801,7 +2801,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Stichprobengröße berechnen: Rechner für Umfragen',
     metaDescription: 'Ermitteln Sie die nötige Stichprobengröße n nach Cochran für Umfragen, Marktforschung und wissenschaftliche Erhebungen.',
     h1: 'Stichprobengröße Rechner (Cochran-Formel)',
-    shortDescription: 'Berechnet den erforderlichen Stichprobenumfang bei gewünschter Fehlerspanne und Konfidenz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den erforderlichen Stichprobenumfang bei gewünschter Fehlerspanne und Konfidenz.',
     searchKeywords: ["stichprobengröße rechner","stichprobenumfang berechnen","cochran formel online","fehlertoleranz umfrage","repräsentative stichprobe"],
     inputs: [
           {
@@ -3023,7 +3023,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Binomialverteilung Rechner – Bernoulli-Kette berechnen',
     metaDescription: 'Berechnen Sie Einzelwahrscheinlichkeit P(X=k), P(X<=k), Erwartungswert und Varianz einer Bernoulli-Kette online.',
     h1: 'Binomialverteilung Rechner (B(n, p))',
-    shortDescription: 'Berechnet Wahrscheinlichkeiten für Bernoulli-Versuchsreihen mit Trefferquote p mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Wahrscheinlichkeiten für Bernoulli-Versuchsreihen mit Trefferquote p.',
     searchKeywords: ["binomialverteilung rechner","bernoulli kette berechnen","n über k wahrscheinlichkeit","p x gleich k","kumulierte binomialverteilung"],
     inputs: [
           {
@@ -3203,7 +3203,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Kombinatorik Rechner – Binomialkoeffizient',
     metaDescription: 'Berechnen Sie Kombinationen (Lotto), Permutationen und Variationen mit oder ohne Zurücklegen / Reihenfolge online.',
     h1: 'Kombinatorik Rechner (n über k)',
-    shortDescription: 'Ermittelt Möglichkeiten für Kombinationen, Variationen und Permutationen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Möglichkeiten für Kombinationen, Variationen und Permutationen.',
     searchKeywords: ["kombinatorik rechner","n über k berechnen","binomialkoeffizient rechner","lotto kombinationen","fakultät rechner"],
     inputs: [
           {
@@ -3417,7 +3417,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Kovarianz Rechner – Stichprobenkovarianz',
     metaDescription: 'Berechnen Sie die Kovarianz Cov(X, Y) zwischen zwei Datensätzen zur Messung der gemeinsamen Streuung online.',
     h1: 'Kovarianz Rechner (Cov(X, Y))',
-    shortDescription: 'Misst den unstandardisierten linearen Zusammenhang zweier Merkmale mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Misst den unstandardisierten linearen Zusammenhang zweier Merkmale.',
     searchKeywords: ["kovarianz rechner","cov x y berechnen","stichprobenkovarianz","kovarianz formel","gemeinsame streuung"],
     inputs: [
           {
@@ -3539,7 +3539,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Variationskoeffizient Rechner – Relative Streuung (CV)',
     metaDescription: 'Ermitteln Sie den Variationskoeffizienten (CV = s / x̄) zur Beurteilung der relativen Streuung unabhängig von der Maßeinheit.',
     h1: 'Variationskoeffizient Rechner (Relative Standardabweichung)',
-    shortDescription: 'Vergleicht die relative Streuung verschiedener Datensätze maßstabsunabhängig mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht die relative Streuung verschiedener Datensätze maßstabsunabhängig.',
     searchKeywords: ["variationskoeffizient rechner","relative standardabweichung","coefficient of variation","cv statistik formel","streuung vergleich"],
     inputs: [
           {
@@ -3607,7 +3607,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Geometrisches Mittel: Rechner für Wachstumsraten',
     metaDescription: 'Berechnen Sie das geometrische Mittel für Renditen, Zuwachsraten, Zinseszinsen und Multiplikatoren online.',
     h1: 'Geometrisches Mittel Rechner',
-    shortDescription: 'Ermittelt das geometrische Mittel zur korrekten Durchschnittsberechnung prozentualer Wachstumsraten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt das geometrische Mittel zur korrekten Durchschnittsberechnung prozentualer Wachstumsraten.',
     searchKeywords: ["geometrisches mittel rechner","durchschnittliches wachstum berechnen","geometrischer durchschnitt","zinseszins durchschnitt","wachstumsfaktor rechner"],
     inputs: [
           {
@@ -3773,7 +3773,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Satz von Bayes: Rechner für bedingte Wahrscheinlichkeit',
     metaDescription: 'Berechnen Sie A-posteriori-Wahrscheinlichkeiten für medizinische Tests, Schnelltests, Diagnose-Sensitivität und Spezifität.',
     h1: 'Satz von Bayes Rechner (Bedingte Wahrscheinlichkeit)',
-    shortDescription: 'Berechnet die A-posteriori-Wahrscheinlichkeit P(A|B) nach dem Satz von Bayes mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die A-posteriori-Wahrscheinlichkeit P(A|B) nach dem Satz von Bayes.',
     searchKeywords: ["bayes theorem rechner","satz von bayes berechnen","bedingte wahrscheinlichkeit","sensitivität spezifität rechner","positiver vorhersagewert"],
     inputs: [
           {
@@ -3858,7 +3858,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     metaTitle: 'Würfel & Münze Wahrscheinlichkeitsrechner – Würfe',
     metaDescription: 'Berechnen Sie Trefferchancen für Mehrfach-Würfe mit 6-seitigen Würfeln und Münzwürfe (mindestens eine 6, Pasch, Augensumme).',
     h1: 'Würfel & Münzwurf Wahrscheinlichkeitsrechner',
-    shortDescription: 'Ermittelt Chancen und Gegenwahrscheinlichkeiten für mehrfache Würfel- und Münzwürfe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Chancen und Gegenwahrscheinlichkeiten für mehrfache Würfel- und Münzwürfe.',
     searchKeywords: ["würfel wahrscheinlichkeit rechner","münzwurf wahrscheinlichkeit","mindestens eine sechs rechner","pasch chance berechnen","laplace wahrscheinlichkeit"],
     inputs: [
           {

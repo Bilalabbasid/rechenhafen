@@ -130,7 +130,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Gewicht Umrechner – Kilogramm, Gramm, Pfund (lbs) & Unzen (oz)',
     metaDescription: 'Rechnen Sie Gewichte sekundenschnell um zwischen Kilogramm (kg), Gramm (g), Milligramm (mg), Tonnen (t), englischen Pfund (lbs) und Unzen (oz).',
     h1: 'Gewicht Umrechner – kg, g, lbs & oz präzise umrechnen',
-    shortDescription: 'Konvertiert Gewichtseinheiten zwischen metrischem und angloamerikanischem System mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Gewichtseinheiten zwischen metrischem und angloamerikanischem System.',
     searchKeywords: ["gewicht umrechner kg in lbs","pfund in kilogramm umrechnen formel","unzen oz in gramm umrechner","tonnen in kilogramm berechnen"],
     inputs: [
           {
@@ -239,7 +239,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Druck Umrechner – bar, PSI, Pascal (Pa), hPa & Torr umrechnen',
     metaDescription: 'Rechnen Sie Druckeinheiten exakt um zwischen bar, Millibar (mbar), Pascal (Pa), Hektopascal (hPa), PSI (Pound-force per square inch) und Torr/mmHg.',
     h1: 'Druck Umrechner – bar, PSI, Pascal & mbar sofort umrechnen',
-    shortDescription: 'Konvertiert bar, PSI, Pascal, hPa und Torr mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert bar, PSI, Pascal, hPa und Torr.',
     searchKeywords: ["druck umrechner bar psi","psi in bar umrechnen formel reifendruck","pascal in bar hpa mbar","bar in torr mmhg rechner"],
     inputs: [
           {
@@ -349,7 +349,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Geschwindigkeit Umrechner: km/h in m/s, mph & Knoten umrechnen',
     metaDescription: 'Rechnen Sie Geschwindigkeiten präzise um zwischen km/h, Meter pro Sekunde (m/s), Meilen pro Stunde (mph), Seemeilen/Knoten (kn) und Mach mit Formel.',
     h1: 'Geschwindigkeit Umrechner – km/h, m/s, mph & Knoten präzise umrechnen',
-    shortDescription: 'Konvertiert km/h in m/s, Meilen pro Stunde und Seemeilen-Knoten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert km/h in m/s, Meilen pro Stunde und Seemeilen-Knoten.',
     searchKeywords: ["geschwindigkeit umrechnen kmh ms formel", "mph in kmh umrechnen meilen pro stunde", "knoten in kmh seemeilen umrechner", "meter pro sekunde in kmh teilen 3 6", "geschwindigkeit umrechner knoten"],
     inputs: [
           {
@@ -456,7 +456,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Volumen Umrechner – Liter, Milliliter, m³',
     metaDescription: 'Rechnen Sie Hohlmaße und Raummaße um zwischen Liter, Milliliter, Kubikmeter (m³), US-Gallonen, UK-Gallonen, Fluid Ounces (fl oz) und Kubikfuß.',
     h1: 'Volumen Umrechner – Liter, m³, Gallonen & fl oz berechnen',
-    shortDescription: 'Konvertiert Liter, Kubikmeter, Gallonen und flüssige Unzen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Liter, Kubikmeter, Gallonen und flüssige Unzen.',
     searchKeywords: ["volumen umrechner liter m3 gallonen","us gallon in liter umrechnen formel","kubikmeter in liter m3","fluid ounces fl oz in ml"],
     inputs: [
           {
@@ -566,7 +566,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Flächen Umrechner – Quadratmeter (m²), Hektar (ha), Ar & Acres',
     metaDescription: 'Rechnen Sie Flächenmaße präzise um zwischen Quadratmetern (m²), Quadratkilometern (km²), Hektar (ha), Ar (a), Acres und Quadratfuß (sq ft).',
     h1: 'Flächen Umrechner – m², Hektar, Ar & Acres sofort umrechnen',
-    shortDescription: 'Konvertiert Quadratmeter, Hektar, Ar und angloamerikanische Acres mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Quadratmeter, Hektar, Ar und angloamerikanische Acres.',
     searchKeywords: ["flaechen umrechner m2 hektar","hektar in quadratmeter umrechnen 10000","ar in m2 umrechner","acre in hektar quadratmeter"],
     inputs: [
           {
@@ -676,7 +676,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Energie Umrechner – Joule, Kilowattstunden, kcal',
     metaDescription: 'Rechnen Sie Energie und mechanische Arbeit um zwischen Joule (J), Kilojoule (kJ), Kilowattstunden (kWh), Kilokalorien (kcal) und British Thermal Units.',
     h1: 'Energie Umrechner – Joule, kWh, kcal & BTU berechnen',
-    shortDescription: 'Konvertiert Joule in kWh, Kilokalorien und BTU mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Joule in kWh, Kilokalorien und BTU.',
     searchKeywords: ["energie umrechner joule kwh formel","kwh in joule megajoule umrechnen","kilokalorien in kwh berechnen heizung","btu in wattstunden joule rechner"],
     inputs: [
           {
@@ -787,7 +787,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Leistung Umrechner – kW in PS, Watt',
     metaDescription: 'Rechnen Sie Motor- und Heizleistung exakt um zwischen Kilowatt (kW), DIN-Pferdestärke (PS), Watt (W) und angloamerikanischen Horsepower (hp).',
     h1: 'Leistung Umrechner – kW in PS & Horsepower präzise umrechnen',
-    shortDescription: 'Konvertiert Kilowatt (kW) in Pferdestärken (PS) und Watt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Kilowatt (kW) in Pferdestärken (PS) und Watt.',
     searchKeywords: ["leistung umrechner kw in ps formel 1 36","ps in kw umrechnen auto","horsepower hp in kw rechner","watt in kilowatt pferdestaerke"],
     inputs: [
           {
@@ -995,7 +995,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Downloadzeit Rechner – Mbit/s in MB/s umrechnen',
     metaDescription: 'Berechnen Sie die echte Downloadzeit für Spiele, Filme und Backups nach Dateigröße (GB) und Internet-Bandbreite (z. B.',
     h1: 'Downloadzeit Rechner – Wie lange dauert mein Download?',
-    shortDescription: 'Berechnet Downloadzeit aus Bandbreite (Mbit/s) und Dateigröße (GB) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Downloadzeit aus Bandbreite (Mbit/s) und Dateigröße (GB).',
     searchKeywords: ["downloadzeit rechner wie lange dauert download","mbits in mbs umrechnen faktor 8","glasfaser download dauer spiel 100 gb","dsl geschwindigkeit megabyte pro sekunde"],
     inputs: [
           {
@@ -1121,7 +1121,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Drehmoment Umrechner – Newtonmeter (Nm) in ft-lb, in-lb & kpm',
     metaDescription: 'Rechnen Sie Drehmomente für Drehmomentschlüssel und Kfz um: Newtonmeter (Nm), Foot-Pounds (ft-lb / lbf-ft), Inch-Pounds (in-lb) und Kilopondmeter (kpm).',
     h1: 'Drehmoment Umrechner – Nm, ft-lb & in-lb präzise umrechnen',
-    shortDescription: 'Konvertiert Newtonmeter in Foot-Pounds für Werkzeug und Kraftfahrzeuge mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Newtonmeter in Foot-Pounds für Werkzeug und Kraftfahrzeuge.',
     searchKeywords: ["drehmoment umrechner nm in ft lb","newtonmeter in foot pounds umrechnen","drehmomentschluessel tabelle nm in lb","drehmoment kpm newtonmeter"],
     inputs: [
           {
@@ -1218,7 +1218,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Kraft Umrechner – Newton, Kilonewton, Kilopond',
     metaDescription: 'Rechnen Sie physikalische Kräfte und Zugkräfte um: Newton (N), Kilonewton (kN), Meganewton (MN), Kilopond (kp), Pound-force (lbf) und Dyn (dyn).',
     h1: 'Kraft Umrechner – Newton, kN, Kilopond & Pound-force',
-    shortDescription: 'Konvertiert physikalische Kräfte zwischen Newton, kN und lbf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert physikalische Kräfte zwischen Newton, kN und lbf.',
     searchKeywords: ["kraft umrechner newton kilonewton kn","kilonewton in tonnen umrechnen fahrstuhllast","kilopond kp in newton n","pound force lbf in newton rechner"],
     inputs: [
           {
@@ -1322,7 +1322,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Spritverbrauch Umrechner – l/100km in MPG (US & UK) umrechnen',
     metaDescription: 'Rechnen Sie den Kraftstoffverbrauch um zwischen Litern pro 100 Kilometer (l/100km), US Miles per Gallon (MPG), UK Imperial MPG und km pro Liter.',
     h1: 'Spritverbrauch Umrechner – l/100km in MPG umrechnen',
-    shortDescription: 'Konvertiert l/100km in US- und UK-Miles-per-Gallon (MPG) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert l/100km in US- und UK-Miles-per-Gallon (MPG).',
     searchKeywords: ["spritverbrauch umrechner l 100km in mpg","miles per gallon in liter pro 100 km","us mpg in liter umrechnen","kraftstoffverbrauch rechner umrechnung"],
     inputs: [
           {
@@ -1432,7 +1432,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Römische Zahlen Umrechner – Arabische Zahlen 1–3999 in Römisch',
     metaDescription: 'Konvertieren Sie arabische Dezimalzahlen (1 bis 3999) in römische Ziffern (I, V, X, L, C, D, M) mit Subtraktionsregel und detaillierter Zusammensetzung.',
     h1: 'Römische Zahlen Umrechner – Arabisch in Römisch sofort umrechnen',
-    shortDescription: 'Wandelt Dezimalzahlen in römische Ziffern um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Wandelt Dezimalzahlen in römische Ziffern um.',
     searchKeywords: ["roemische zahlen umrechner dezimal","arabische zahlen in roemische ziffern umwandeln","roemische zahlen tabelle m d c l x v i","jahr 2026 roemische zahlen mmxxvi"],
     inputs: [
           {
@@ -1524,7 +1524,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Binär & Hexadezimal Umrechner – Dezimal, Binär (Dual) & Hex',
     metaDescription: 'Rechnen Sie Zahlen um zwischen Dezimalsystem (Basis 10), Binärsystem / Dualsystem (Basis 2), Hexadezimalsystem (Basis 16) und Oktalsystem (Basis 8).',
     h1: 'Binär & Hexadezimal Umrechner – Zahlensysteme umrechnen',
-    shortDescription: 'Konvertiert Zahlen zwischen Dezimal, Binär, Hexadezimal und Oktal mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Zahlen zwischen Dezimal, Binär, Hexadezimal und Oktal.',
     searchKeywords: ["binaer umrechner dualsystem dezimal in binaer","hexadezimal in dezimal umrechnen hex rechner","binaer hex oktal umrechner basis 2 8 16","dezimal in dualzahl umwandeln"],
     inputs: [
           {
@@ -1765,7 +1765,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Dichte Umrechner – g/cm³ in kg/m³, kg/l & lb/cu ft umrechnen',
     metaDescription: 'Rechnen Sie physikalische Dichten um zwischen Gramm pro Kubikzentimeter (g/cm³), Kilogramm pro Kubikmeter (kg/m³), kg pro Liter und Pounds per cubic foot.',
     h1: 'Dichte Umrechner – g/cm³, kg/m³ & kg/l präzise umrechnen',
-    shortDescription: 'Konvertiert Dichteeinheiten zwischen metrischen und angloamerikanischen Werten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Dichteeinheiten zwischen metrischen und angloamerikanischen Werten.',
     searchKeywords: ["dichte umrechner g cm3 in kg m3","spezifisches gewicht dichte wasser 1 g cm3","dichte umrechnen kg pro liter","density converter lb cu ft"],
     inputs: [
           {
@@ -1862,7 +1862,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Drehzahl Rechner – RPM & Umfangsgeschwindigkeit berechnen',
     metaDescription: 'Berechnen Sie die Schnittgeschwindigkeit und Umfangsgeschwindigkeit v in m/min und m/s aus Werkzeugdurchmesser d (mm) und Drehzahl n (U/min / RPM).',
     h1: 'Drehzahl Rechner – Schnittgeschwindigkeit & RPM berechnen',
-    shortDescription: 'Ermittelt Schnittgeschwindigkeit und Umfangsgeschwindigkeit aus Drehzahl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Schnittgeschwindigkeit und Umfangsgeschwindigkeit aus Drehzahl.',
     searchKeywords: ["drehzahl rechner schnittgeschwindigkeit formel","rpm in m s umrechnen durchmesser","v pi d n durch 1000 schnittgeschwindigkeit bohren","umfangsgeschwindigkeit berechnen"],
     inputs: [
           {
@@ -1949,7 +1949,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Lux & Lumen Rechner – Beleuchtungsstärke',
     metaDescription: 'Berechnen Sie den benötigten Lichtstrom in Lumen nach Raumfläche in m² und Beleuchtungsstärke nach DIN EN 12464 (z. B. Küche 300 lx, Büro 500 lx).',
     h1: 'Lux & Lumen Rechner – Wie viele Lumen brauche ich pro Raum?',
-    shortDescription: 'Berechnet den Lumen-Bedarf nach Raumfläche und DIN EN 12464 mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Lumen-Bedarf nach Raumfläche und DIN EN 12464.',
     searchKeywords: ["lux in lumen umrechnen formel","wieviel lumen pro m2 wohnzimmer kueche buero","beleuchtungsstaerke din en 12464 lux","lumen watt led rechner"],
     inputs: [
           {
@@ -2062,7 +2062,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Akku Kapazität Rechner – mAh in Wh, Wattstunden',
     metaDescription: 'Rechnen Sie die Akkukapazität um zwischen Milliamperestunden (mAh), Amperestunden (Ah), Wattstunden (Wh) nach Akkuspannung (z. B. 3,7 V Li-Ion, 12 V Blei).',
     h1: 'Akku Kapazität Rechner – mAh in Wh & Wattstunden ermitteln',
-    shortDescription: 'Konvertiert mAh und Ah in Wattstunden (Wh) nach Zellenspannung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert mAh und Ah in Wattstunden (Wh) nach Zellenspannung.',
     searchKeywords: ["mah in wh umrechnen formel akku powerbank","amperestunden in wattstunden rechner 12v 3 7v","akku kapazitaet coulomb berechnen","powerbank flugzeug grenze 100 wh"],
     inputs: [
           {
@@ -2171,7 +2171,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Strahlendosis Rechner – Sievert, Becquerel, Gray',
     metaDescription: 'Rechnen Sie ionisierende Strahlung um: Aktivität (Becquerel Bq, Curie Ci), Energiedosis (Gray Gy, Rad) und Äquivalentdosis (Sievert Sv, rem).',
     h1: 'Strahlendosis Rechner – Becquerel, Sievert & Gray umrechnen',
-    shortDescription: 'Konvertiert Aktivität (Bq/Ci) und Äquivalentdosis (Sv/mSv/rem) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Aktivität (Bq/Ci) und Äquivalentdosis (Sv/mSv/rem).',
     searchKeywords: ["radioaktivitaet umrechner becquerel curie","sievert in millisievert mikrosievert umrechnen","gray in sievert strahlendosis rechner","natuerliche strahlenbelastung deutschland msv"],
     inputs: [
           {
@@ -2278,7 +2278,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Viskosität Umrechner – mPa·s in Centipoise (cP) & Stokes (cSt)',
     metaDescription: 'Rechnen Sie Viskositäten von Flüssigkeiten, Ölen und Farben um: Dynamische Viskosität (Pa·s, mPa·s, Centipoise cP) und kinematische Viskosität (mm²/s, cSt).',
     h1: 'Viskosität Umrechner – mPa·s, Centipoise & Centistokes',
-    shortDescription: 'Konvertiert dynamische (mPa·s, cP) und kinematische Viskosität (cSt) mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert dynamische (mPa·s, cP) und kinematische Viskosität (cSt).',
     searchKeywords: ["viskositaet umrechner mpa s centipoise cp","kinematische viskositaet centistokes cst mm2 s","viskositaet motoroel getriebeoel wasser","pascal sekunden in centipoise umrechnen"],
     inputs: [
           {
@@ -2631,7 +2631,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Ringgröße Umrechner – EU-Umfang in US, UK',
     metaDescription: 'Rechnen Sie Ringgrößen um: Deutsche Größe / Innenumfang in Millimetern (z. B. 54 = 54 mm), Innendurchmesser in mm (d = Umfang / π)',
     h1: 'Ringgröße Umrechner – Innenumfang & Durchmesser bestimmen',
-    shortDescription: 'Konvertiert Ringgrößen zwischen EU-Umfang, Durchmesser, US und UK mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Konvertiert Ringgrößen zwischen EU-Umfang, Durchmesser, US und UK.',
     searchKeywords: ["ringgroesse umrechnen tabelle mm","ringgroesse 54 in durchmesser","us ringgroesse in deutsche ringgroesse","ring innenumfang messen"],
     inputs: [
           {
@@ -2718,7 +2718,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Dezibel Rechner – dB Schalldruckpegel, Pascal',
     metaDescription: 'Rechnen Sie einen Schallpegel in dB(A) in effektiven Schalldruck (Pascal) um und sehen Sie empfundene Lautstärke, Schallenergie und eine vergleichbare Lärmquelle.',
     h1: 'Dezibel Rechner – Schallpegel dB, Schalldruck & Lautstärke',
-    shortDescription: 'Berechnet Schalldruckpegel in Dezibel und vergleicht Lärmquellen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Schalldruckpegel in Dezibel und vergleicht Lärmquellen.',
     searchKeywords: ["dezibel rechner schallpegel db a","lautstaerkeverdopplung 3 db 10 db","schalldruck pascal in dezibel berechnen","laerm tabelle dezibel fluestern duese"],
     inputs: [
           {
@@ -3535,7 +3535,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Backofen Umrechner – Umluft in Ober-/Unterhitze',
     metaDescription: 'Rechnen Sie Backofentemperaturen um: Umluft / Heißluft zu Ober-/Unterhitze (Faustregel: 20°C Unterschied) inklusive Backzeitanpassung und passender Gasofen-Stufe.',
     h1: 'Backofen Umrechner – Umluft & Ober-/Unterhitze anpassen',
-    shortDescription: 'Wandelt Backtemperatur und Backzeit zwischen Umluft und Ober-/Unterhitze um mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Wandelt Backtemperatur und Backzeit zwischen Umluft und Ober-/Unterhitze um.',
     searchKeywords: ["backofen umrechner umluft in ober unterhitze","temperatur heissluft oberhitze 20 grad weniger","gasbackofen stufe temperatur tabelle","backzeit anpassen umluft heissluft"],
     inputs: [
           {
@@ -3648,7 +3648,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Kerntemperatur Rechner – Rind, Schwein, Hähnchen, Lamm',
     metaDescription: 'Finden Sie die perfekte Kerntemperatur und Garzeit für Rindersteak, Roastbeef, Schweinebraten, Pulled Pork, Hähnchen und Lammkeule nach Garstufen.',
     h1: 'Kerntemperatur Rechner – Perfekte Garstufe für Braten & Steak',
-    shortDescription: 'Ermittelt Ziel-Kerntemperatur und Garzeit nach Fleischart und Garstufe mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Ziel-Kerntemperatur und Garzeit nach Fleischart und Garstufe.',
     searchKeywords: ["kerntemperatur fleisch tabelle rechner","roastbeef kerntemperatur medium 56 grad","schweinebraten kerntemperatur garzeit rechner","haehnchen gefluegel kerntemperatur sicher"],
     inputs: [
           {
@@ -3814,7 +3814,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Pizza Teig Rechner – Neapolitanische Pizza Teigausbeute',
     metaDescription: 'Berechnen Sie die exakten Zutaten für echten neapolitanischen Pizzateig nach Ballenanzahl, Ballengewicht (z. B.',
     h1: 'Pizza Teig Rechner – Mehl, Wasser, Hefe & Salz für Neapel-Pizza',
-    shortDescription: 'Berechnet Pizzateig-Zutaten nach Hydratation und Ballenanzahl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Pizzateig-Zutaten nach Hydratation und Ballenanzahl.',
     searchKeywords: ["pizza teig rechner neapolitanisch hydratation","pizzateig mehl wasser hefe salz berechnen","ballengewicht pizza 260g","pizzateig fuehrung reifezeit hefe gramm"],
     inputs: [
           {
@@ -3935,7 +3935,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Bäckerprozente Rechner – Bäckermaß, Teigausbeute',
     metaDescription: 'Berechnen Sie Brotteige nach professionellen Bäckerprozenten (Mehl = 100 %) und Teigausbeute (TA 160 bis TA 180) für Mehl, Wasser, Salz und Sauerteig.',
     h1: 'Bäckerprozente Rechner – Teigausbeute (TA) & Rezeptskalierung',
-    shortDescription: 'Berechnet Brotrezepte nach Bäckerprozenten bezogen auf 100 % Mehl mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Brotrezepte nach Bäckerprozenten bezogen auf 100 % Mehl.',
     searchKeywords: ["baeckerprozente rechner brot backen","teigausbeute ta berechnen formel ta 170","baeckermath zutaten mehl 100 prozent","brotteig zutaten rechner sauerteig"],
     inputs: [
           {
@@ -4205,7 +4205,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Ei-Ersatz Rechner – Eier vegan ersetzen beim Backen & Kochen',
     metaDescription: 'Berechnen Sie die optimale Menge an Ei-Ersatz für 1 bis 10 Eier: Apfelmark (60 bis 80 g), reife Banane (1/2 Stk.',
     h1: 'Ei-Ersatz Rechner – Vegane Alternativen für Rührkuchen & Waffeln',
-    shortDescription: 'Ermittelt Mengenangaben für pflanzliche Ei-Alternativen beim Backen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Mengenangaben für pflanzliche Ei-Alternativen beim Backen.',
     searchKeywords: ["ei ersatz rechner vegan backen","1 ei ersetzen durch apfelmus banane chiasamen","veganer eiersatz rührkuchen menge","leinsamen eiersatz verhaeltnis wasser"],
     inputs: [
           {
@@ -5127,7 +5127,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Sauerteig Rechner – Anstellgut füttern',
     metaDescription: 'Berechnen Sie die exakten Mehl- und Wassermengen zur Sauerteig-Führung nach gewünschter Sauerteigmenge und Fütterungsverhältnis (1:1:1, 1:2:2 oder 1:5:5).',
     h1: 'Sauerteig Rechner – Anstellgut füttern & Sauerteigmenge berechnen',
-    shortDescription: 'Berechnet Mehl, Wasser und Anstellgut zur Sauerteig-Herstellung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Mehl, Wasser und Anstellgut zur Sauerteig-Herstellung.',
     searchKeywords: ["sauerteig rechner anstellgut fuettern","sauerteig fuehrung verhaeltnis 1 zu 1 zu 1","roggensauerteig weizensauerteig menge mehl wasser","anstellgut auffrischen gramm rechner"],
     inputs: [
           {
@@ -5388,7 +5388,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Kaffee-Rechner: Kaffeepulver pro Tasse in Gramm',
     metaDescription: 'Berechnen Sie das optimale Verhältnis von Kaffeemehl zu Wasser nach SCA Golden Cup Standard (60 g Kaffee auf 1 Liter Wasser) für Filterkaffee und andere Brühmethoden.',
     h1: 'Kaffee Rechner – Wie viel Kaffeepulver brauche ich pro Tasse?',
-    shortDescription: 'Berechnet Kaffeemehl in Gramm nach Tassenanzahl und Brühmethode mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Kaffeemehl in Gramm nach Tassenanzahl und Brühmethode.',
     searchKeywords: ["kaffee rechner kaffeemehl gramm pro tasse","golden cup ratio sca 60g pro liter","french press kaffee menge berechnen","filterkaffee wieviel kaffeepulver pro tasse"],
     inputs: [
           {
@@ -5504,7 +5504,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Cocktail Alkoholgehalt Rechner – Vol.-%',
     metaDescription: 'Berechnen Sie den exakten Alkoholgehalt (Vol.-% und Gramm reiner Alkohol) von Cocktails und Longdrinks nach Spirituosen (Gin, Wodka, Rum), Likören und Mixern.',
     h1: 'Cocktail Rechner – Wie stark ist mein Drink wirklich?',
-    shortDescription: 'Berechnet den Alkoholgehalt in Vol.-% und Gramm für Cocktails mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet den Alkoholgehalt in Vol.-% und Gramm für Cocktails.',
     searchKeywords: ["cocktail alkoholgehalt rechner vol prozent","wieviel alkohol hat ein gin tonic aperol spritz","cocktail reine gramm alkohol berechnen","schmelzwasser eiswuerfel cocktail verduennung"],
     inputs: [
           {
@@ -5640,7 +5640,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Salzlake Rechner – Salzgehalt in % für Räuchern, Fermentieren',
     metaDescription: 'Berechnen Sie die exakte Salzmenge in Gramm nach Wasservolumen (Liter) und gewünschter Lakekonzentration (z. B.',
     h1: 'Salzlake Rechner – Exakte Salzmenge für Lake & Fermentation',
-    shortDescription: 'Berechnet Salzmenge nach Wasservolumen und Prozentgehalt der Lake mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Salzmenge nach Wasservolumen und Prozentgehalt der Lake.',
     searchKeywords: ["salzlake rechner gramm salz pro liter wasser","poekellake prozent berechnen schinken","forelle raeuchern salzlake 5 bis 7 prozent","gemuese fermentieren salzgehalt 2 prozent"],
     inputs: [
           {
@@ -5754,7 +5754,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Rauchpunkt Rechner – Speiseöle, Rauchpunkt',
     metaDescription: 'Finden Sie den Rauchpunkt und die maximale Erhitzbarkeit für Rapsöl, Olivenöl, Butterschmalz, Sonnenblumenöl, Kokosöl und Erdnussöl für Braten und Frittieren.',
     h1: 'Rauchpunkt Rechner – Welches Speiseöl eignet sich zum Braten?',
-    shortDescription: 'Ermittelt den Rauchpunkt und die Hitzestabilität von Speiseölen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Rauchpunkt und die Hitzestabilität von Speiseölen.',
     searchKeywords: ["rauchpunkt speiseoele tabelle rechner","welches oel zum scharfen anbraten rapsolivenoel","frittieroel temperatur 175 grad acrylarmid","butterschmalz rauchpunkt grad"],
     inputs: [
           {
@@ -5867,7 +5867,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Raclette & Fondue Rechner – Käse- und Fleischmengen berechnen',
     metaDescription: 'Berechnen Sie die perfekten Mengen für Silvester & Feiern: Raclettekäse (200 bis 250 g p.P.), Fleisch (200 bis 250 g p.P.',
     h1: 'Raclette & Fondue Rechner – Einkaufsmenge für Party & Silvester',
-    shortDescription: 'Ermittelt Käse-, Fleisch- und Beilagenmengen pro Person mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Käse-, Fleisch- und Beilagenmengen pro Person.',
     searchKeywords: ["raclette mengen rechner wieviel kaese pro person 200g","fondue fleischmenge pro person 250g","raclette zutaten einkaufsliste berechnen silvester","kartoffeln baguette pro person raclette"],
     inputs: [
           {
@@ -5999,7 +5999,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Kühlschrank-Haltbarkeit: Wie lange halten Lebensmittel?',
     metaDescription: 'Finden Sie die empfohlene Kühlschrank-Haltbarkeit in Tagen für Hackfleisch, Geflügel, geöffnete Milch, gekochte Reste, Eier und angebrochene Gläser.',
     h1: 'Kühlschrank Haltbarkeit Rechner – Haltbarkeitsdauer & Lagertipps',
-    shortDescription: 'Ermittelt Haltbarkeitstage im Kühlschrank (2-7 °C) und Einfrierzeiten mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Haltbarkeitstage im Kühlschrank (2-7 °C) und Einfrierzeiten.',
     searchKeywords: ["kuehlschrank haltbarkeit rechner geoffnet tage","hackfleisch wie lange haltbar kuehlschrank 1 tag","gekochte reste wieviele tage im kuehlschrank","haltbarkeit milch geoffnet verbrauchen"],
     inputs: [
           {
@@ -6123,10 +6123,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     shortName: "Tee Ziehzeit-Rechner",
     category: "kochen-backen",
     subcategory: "Getränke",
-    metaTitle: 'Tee Ziehzeit Rechner – Wassertemperatur',
-    metaDescription: 'Finden Sie die perfekte Wassertemperatur und Ziehzeit für Grünen Tee (70-80 °C, 2 Min.), Schwarzen Tee (95 °C, 3 Min.',
+    metaTitle: 'Tee Ziehzeit Rechner – Optimale Wassertemperatur & Ziehdauer',
+    metaDescription: 'Finden Sie die optimale Wassertemperatur und Ziehdauer für Grünen Tee (70–80 °C), Schwarzen Tee (90–95 °C) sowie Kräutertee nach Empfehlungen des BfR.',
     h1: 'Tee Ziehzeit Rechner – Temperatur & Ziehdauer für besten Geschmack',
-    shortDescription: 'Ermittelt Wassertemperatur und Ziehzeit nach Teesorte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die ideale Wassertemperatur, Ziehzeit und Teeblatt-Dosierung je Tasse für Grüntee, Schwarztee, Oolong und Kräuteraufgüsse.',
     searchKeywords: ["tee ziehzeit rechner wassertemperatur grad","gruener tee temperatur 70 grad nicht bitter","schwarzer tee ziehzeit 3 minuten anregend","kraeutertee sprudelnd kochend ziehen lassen"],
     inputs: [
           {
@@ -6141,15 +6141,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                       },
                       {
                             "value": "matcha",
-                            "label": "Matcha / Gyokuro (Sehr edel – 60 bis 65 °C)"
+                            "label": "Matcha (Besen-Zubereitung – 60 bis 65 °C, schaumig schlagen)"
                       },
                       {
                             "value": "white",
-                            "label": "Weißer Tee (Pai Mu Tan – 75 bis 80 °C, ca. 3-4 Min.)"
+                            "label": "Weißer Tee (Pai Mu Tan – 75 bis 80 °C, ca. 3–4 Min.)"
                       },
                       {
                             "value": "black",
-                            "label": "Schwarzer Tee (Darjeeling, Earl Grey – 90 bis 95 °C, ca. 3-4 Min.)"
+                            "label": "Schwarzer Tee (Darjeeling, Earl Grey, Assam – 90 bis 95 °C, ca. 3–4 Min.)"
                       },
                       {
                             "value": "oolong",
@@ -6157,11 +6157,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                       },
                       {
                             "value": "herbal",
-                            "label": "Kräutertee / Kamille / Minze (100 °C sprudelnd kochend, 6-8 Min.)"
+                            "label": "Kräutertee / Kamille / Pfefferminze (100 °C sprudelnd kochend, 6–8 Min.)"
                       },
                       {
                             "value": "fruit",
-                            "label": "Früchtetee (100 °C sprudelnd kochend, 8-10 Min.)"
+                            "label": "Früchtetee (100 °C sprudelnd kochend, 8–10 Min.)"
                       }
                 ]
           },
@@ -6183,32 +6183,32 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       let temp = 75;
       let brewMins = 2;
       let teaGramsPerLiter = 12; // ca. 2-3g je Tasse (250ml)
-      let effect = 'Harmonisch, feinherb, reich an Antioxidantien';
+      let effect = 'Harmonisch, feinherb, reich an Catechinen und L-Theanin.';
       
       if (tea === 'matcha') {
         temp = 65;
         brewMins = 0; // Aufschlagen mit Bambusbesen
-        effect = 'Extrem reich an Koffein und L-Theanin; wird mit dem Chasen schaumig geschlagen.';
+        effect = 'Wird traditionell mit dem Bambusbesen (Chasen) ca. 20–30 Sekunden schaumig geschlagen; reich an Koffein und L-Theanin.';
       } else if (tea === 'white') {
         temp = 75;
         brewMins = 3.5;
-        effect = 'Sehr mild, samtig und blumig; verträgt mehrfache Aufgüsse.';
+        effect = 'Sehr mild, blumig und samtig; verträgt schonende Mehrfachaufgüsse.';
       } else if (tea === 'black') {
         temp = 95;
         brewMins = 3;
-        effect = 'Nach 3 Min. anregend (Koffein gelöst); ab 5 Min. beruhigend für den Magen, aber bitterer (Gerbstoffe).';
+        effect = 'Kräftig und anregend; nach ca. 3 Minuten ist das Koffein größtenteils gelöst, längere Ziehzeiten lösen mehr herbe Gerbstoffe.';
       } else if (tea === 'oolong') {
         temp = 85;
         brewMins = 3;
-        effect = 'Traditionell in vielen kurzen Aufgüssen genossen (Gong Fu Cha).';
+        effect = 'Komplexes Aroma; traditionell in mehreren kurzen Aufgüssen genossen.';
       } else if (tea === 'herbal') {
         temp = 100;
         brewMins = 7;
-        effect = 'Zwingend mit 100 °C kochendem Wasser aufgießen, um ein sicheres Lebensmittel zu erhalten!';
+        effect = 'Gemäß BfR-Empfehlung zwingend mit sprudelnd kochendem Wasser aufgießen und 6 bis 8 Minuten abgedeckt ziehen lassen.';
       } else if (tea === 'fruit') {
         temp = 100;
         brewMins = 9;
-        effect = 'Benötigt langes Ziehen für vollen Fruchtgeschmack und schöne Färbung.';
+        effect = 'Sprudelnd kochendes Wasser (100 °C) und 8 bis 10 Minuten Ziehdauer für volles Fruchtaroma und mikrobiologische Sicherheit.';
       }
       
       const teaLeavesGrams = Math.round((waterMl / 1000) * teaGramsPerLiter * 10) / 10;
@@ -6221,11 +6221,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           { id: 'teaLeaves', label: 'Teeblätter-Menge', value: teaLeavesGrams, formattedValue: formatNumber(teaLeavesGrams, 1) + ' g (ca. ' + teabagsEquiv + ' Beutel bzw. TL)' },
           { id: 'effectInfo', label: 'Geschmack & Wirkung', value: 0, formattedValue: effect },
         ],
-        summaryText: 'Für ' + waterMl + ' ml Wasser benötigen Sie ca. ' + formatNumber(teaLeavesGrams, 1) + ' g Teeblätter. Wasser auf ' + temp + ' °C temperieren und ' + (brewMins > 0 ? brewMins + ' Minuten' : 'schaumig schlagen') + '. ' + effect,
+        summaryText: 'Für ' + waterMl + ' ml Wasser benötigen Sie ca. ' + formatNumber(teaLeavesGrams, 1) + ' g Teeblätter. Wasser auf ' + temp + ' °C temperieren und ' + (brewMins > 0 ? brewMins + ' Minuten ziehen lassen' : 'schaumig schlagen') + '. ' + effect,
       };
     },
-    formula: "Tee (g) = (Wasservolumen / 1.000) × 12 g; Echte Tees (Camellia sinensis): 60 bis 90 °C; Kräuter/Früchte: 100 °C",
-    formulaExplanation: "Grüner und weißer Tee enthalten empfindliche Aminosäuren und Polyphenole, die bei über 80 °C zerstört werden und den Tee extrem bitter machen.",
+    formula: "Teemenge (g) = (Wasservolumen / 1.000) × 12 g; Echte Tees (Camellia sinensis): 60 bis 95 °C; Kräuter- & Früchtetee: 100 °C",
+    formulaExplanation: "Grüner und weißer Tee enthalten empfindliche Aminosäuren und Catechine, die bei über 80 °C übermäßig Bitterstoffe freisetzen. Kräuter- und Früchtetees verlangen mikrobiologisch 100 °C.",
     workedExample: {
           "title": "Beispiel: Eine Kanne Grüner Tee (750 ml)",
           "inputValues": [
@@ -6239,19 +6239,20 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                 }
           ],
           "steps": [
-                "Wasser nach dem Kochen ca. 6 bis 8 Minuten auf 75 °C abkühlen lassen",
-                "Teemenge = 0,75 × 12 g = 9 g Teeblätter (ca. 3-4 Teelöffel)",
-                "Genau 2 Minuten ziehen lassen"
+                "Wasser aufkochen und ca. 6 bis 8 Minuten auf 75 °C abkühlen lassen",
+                "Teemenge berechnen: 0,75 l × 12 g/l = 9 g Teeblätter (ca. 3–4 gehäufte Teelöffel)",
+                "Genau 2 Minuten abgedeckt ziehen lassen, danach Blätter abseihen"
           ],
           "result": "75 °C Wassertemperatur, 2 Minuten Ziehzeit"
     },
     content: {
-      intro: 'Dieser Teerechner optimiert Wassertemperatur und Ziehdauer für Grüntee, Schwarztee, Weißen Tee, Oolong und Kräuteraufgüsse.',
-      details: 'Grüner Tee (Sencha, Gyokuro) verlangt 60 °C bis 75 °C und 1,5 bis 2 Minuten Ziehzeit (kochendes Wasser macht ihn bitter). Schwarzer Tee benötigt 95 °C bis 100 °C für 3 bis 4 Minuten. Kräuter- und Früchtetees müssen zwingend mit sprudelnd kochendem Wasser (100 °C) für 8 bis 10 Minuten aufgegossen werden (Keimabtötung).',
+      intro: 'Dieser Teerechner optimiert Wassertemperatur, Ziehdauer und Blattmenge für Grüntee, Schwarztee, Weißen Tee, Oolong sowie Kräuter- und Früchteaufgüsse.',
+      details: 'Grüner Tee (z. B. Sencha oder Bancha) entfaltet seinen ausgewogenen Geschmack am besten bei 70 °C bis 80 °C und ca. 2 Minuten Ziehzeit; kochendes Wasser verbrennt zarte Blattstrukturen und macht den Tee adstringierend bitter. Schwarzer Tee (Darjeeling, Ceylon, Assam) verlangt 90 °C bis 95 °C heißes Wasser und 3 bis 4 Minuten Ziehzeit. Kräuter- und Früchtetees hingegen sind getrocknete Pflanzenteile, die nach offizieller Empfehlung des Bundesinstituts für Risikobewertung (BfR) ausnahmslos mit sprudelnd kochendem Wasser (100 °C) aufgegossen werden und mindestens 6 bis 10 Minuten ziehen müssen.',
     },
     faqs: [
-      { question: 'Warum darf man Früchtetee nicht mit 70 °C aufgießen?', answer: 'Kräuter und Trockenfrüchte sind Naturprodukte, die Sporen enthalten können; das Bundesinstitut für Risikobewertung (BfR) empfiehlt sprudelnd kochendes Wasser zur Keimsicherheit.' },
-      { question: 'Wirkt schwarzer Tee nach 5 Minuten Ziehzeit beruhigend?', answer: 'Koffein löst sich in den ersten 2 Minuten vollkommen; danach lösen sich vermehrt Gerbstoffe (Tannine), die das Koffein im Magen-Darm-Trakt langsamer resorbieren lassen und den Geschmack herb machen.' },
+      { question: 'Warum muss Kräuter- und Früchtetee zwingend mit 100 °C kochendem Wasser zubereitet werden?', answer: 'Kräuter-, Blüten- und Früchtetees sind Naturprodukte aus dem Freilandanbau, die harmlose, aber sporenbildende Mikroorganismen tragen können. Das Bundesinstitut für Risikobewertung (BfR) empfiehlt daher dringend, solche Aufgussgetränke stets mit sprudelnd kochendem Wasser (100 °C) zu übergießen und mindestens 5 bis 8 Minuten abgedeckt ziehen zu lassen, um hygienische Unbedenklichkeit zu garantieren.' },
+      { question: 'Wirkt schwarzer Tee nach längerer Ziehzeit beruhigend?', answer: 'Nein, Koffein wird nicht abgebaut. In den ersten 2 bis 3 Minuten löst sich der Großteil des leicht wasserlöslichen Koffeins rasch in den Aufguss. Lässt man den Tee länger ziehen (4 bis 5 Minuten), lösen sich vermehrt hochmolekulare Gerbstoffe (Tannine). Diese binden das Koffein chemisch und verzögern dessen Aufnahme im Darmtrakt, während der Tee spürbar bitterer schmeckt.' },
+      { question: 'Wie kühlt kochendes Wasser am schnellsten auf 70 bis 80 °C ab?', answer: 'Nach dem Aufkochen kühlt ein geschlossener Wasserkocher in etwa 6 bis 8 Minuten auf 75 °C ab. Schneller geht es durch das Umgießen in eine kalte Teekanne (Temperaturverlust ca. 10 °C) oder durch die Zugabe eines kleinen Schusses kaltem Leitungswasser.' },
     ],
     relatedSlugs: ['kaffee-wasser-verhaeltnis-rechner', 'temperatur-umrechner', 'zeit-umrechner'],
   },
@@ -6265,7 +6266,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Rezept Kalorien Rechner – kcal & Makros pro Portion',
     metaDescription: 'Berechnen Sie die Gesamtkalorien (kcal) und Makronährstoffe (Kohlenhydrate, Eiweiß, Fett) eines Rezepts nach Hauptzutaten und Portionen.',
     h1: 'Rezept Kalorien Rechner – Nährwerte & Makros pro Portion ermitteln',
-    shortDescription: 'Berechnet Kalorien und Makros pro Portion für eigene Rezepte mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Kalorien und Makros pro Portion für eigene Rezepte.',
     searchKeywords: ["rezept kalorien rechner kcal pro portion berechnen","makros rezept kohlenhydrate eiweiss fett gramm","rezept naehrwerte selbst berechnen online","kalorien pro teller mahlzeit rechner"],
     inputs: [
           {
@@ -6386,7 +6387,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     metaTitle: 'Schokolade temperieren Rechner – Impfmethode, Kuvertüre',
     metaDescription: 'Berechnen Sie die exakten Temperaturen und Impfmengen (2/3 schmelzen bei 45 °C, 1/3 Impfschokolade bei 27 °C zugeben) für Zartbitter-, Vollmilch- und weiße Kuvertüre.',
     h1: 'Schokolade temperieren Rechner – Perfekter Glanz & Knack nach Impfmethode',
-    shortDescription: 'Ermittelt Impfmengen und Arbeitstemperaturen für Kuvertüre mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Impfmengen und Arbeitstemperaturen für Kuvertüre.',
     searchKeywords: ["schokolade temperieren rechner impfmethode","kuvertuere schmelzen temperatur zartbitter vollmilch weiss","schokolade impfen mengenverhaeltnis 2 drittel 1 drittel","pralinen schokolade glanz knack beta kristalle"],
     inputs: [
           {

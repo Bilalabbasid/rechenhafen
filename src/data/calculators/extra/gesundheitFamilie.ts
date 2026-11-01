@@ -89,7 +89,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Leistungsumsatz Rechner – PAL-Faktor',
     metaDescription: 'Berechnen Sie Leistungsumsatz und Gesamtkalorienbedarf mit dem Physical Activity Level (PAL-Faktor): Büroarbeit, Handwerk, Sport und Freizeitaktivität.',
     h1: 'Leistungsumsatz Rechner – PAL-Faktor & Tages-Kalorienbedarf',
-    shortDescription: 'Ermittelt den zusätzlichen Kalorienverbrauch durch körperliche Bewegung und Beruf mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den zusätzlichen Kalorienverbrauch durch körperliche Bewegung und Beruf.',
     searchKeywords: ['leistungsumsatz rechner pal faktor', 'gesamtenergiebedarf tdee berechnen', 'pal wert tabelle buerotag', 'wie viele kalorien verbrauche ich am tag'],
     inputs: [
       { id: 'bmrKcal', label: 'Ihr täglicher Grundumsatz (BMR) in kcal', type: 'number', defaultValue: 1450, min: 800, max: 3000, step: 25, unit: 'kcal' },
@@ -310,7 +310,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Körperfettanteil-Rechner: KFA nach US-Navy-Formel',
     metaDescription: 'Berechnen Sie Ihren Körperfettanteil (KFA) in Prozent und reine Fettmasse mit der wissenschaftlich validierten US-Navy-Umfangsmethode (Hals, Taille, bei Frauen zusätzlich Hüfte).',
     h1: 'Körperfettanteil Rechner – KFA nach US Navy Methode ermitteln',
-    shortDescription: 'Schätzt den Körperfettanteil präzise ohne Caliper oder teure DEXA-Scans mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Schätzt den Körperfettanteil präzise ohne Caliper oder teure DEXA-Scans.',
     searchKeywords: ['koerperfettanteil rechner kfa', 'us navy kfa rechner formel', 'koerperfett messen mit massband', 'fettfreie masse berechnen'],
     inputs: [
       { id: 'gender', label: 'Biologisches Geschlecht', type: 'select', defaultValue: 'male', options: [
@@ -527,7 +527,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Maximalpuls Rechner – HFmax & Herzfrequenzzonen',
     metaDescription: 'Berechnen Sie Ihre maximale Herzfrequenz (HFmax) und die 5 Trainings-Herzfrequenzzonen (Fettverbrennung, aerob, anaerob) nach der präzisen Karvonen-Formel.',
     h1: 'Maximalpuls Rechner – HFmax & Pulszonen für Ausdauersport',
-    shortDescription: 'Ermittelt die maximale Herzfrequenz und individuelle Trainingspulszonen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die maximale Herzfrequenz und individuelle Trainingspulszonen.',
     searchKeywords: ['maximalpuls rechner hfmax', 'herzfrequenzzonen berechnen karvonen', 'fettverbrennungspuls rechner', 'ausdauertraining puls zonen'],
     inputs: [
       { id: 'ageYears', label: 'Alter in Jahren', type: 'number', defaultValue: 35, min: 14, max: 90, step: 1, unit: 'Jahre' },
@@ -659,7 +659,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: '1RM-Rechner: One-Rep-Max im Krafttraining berechnen',
     metaDescription: 'Berechnen Sie Ihr Einer-Wiederholungs-Maximum (1RM) für Bankdrücken, Kniebeugen oder Kreuzheben nach Epley, Brzycki und Lombardi ohne Verletzungsrisiko.',
     h1: '1RM Rechner – Maximalgewicht im Kraftsport berechnen',
-    shortDescription: 'Schätzt das 1-Rep-Maximum aus Wiederholungen mit submaximalem Trainingsgewicht mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Schätzt das 1-Rep-Maximum aus Wiederholungen mit submaximalem Trainingsgewicht.',
     searchKeywords: ['1rm rechner kraftsport', 'one rep max berechnen epley brzycki', 'maximalgewicht bankdruecken rechner', 'prozent maximalgewicht tabelle'],
     inputs: [
       { id: 'liftedWeightKg', label: 'Bewältigtes Trainingsgewicht in kg', type: 'number', defaultValue: 80, min: 5, max: 500, step: 2.5, unit: 'kg' },
@@ -782,7 +782,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Schlafbedarfs-Rechner: Weckzeit nach 90-Min-Schlafzyklen',
     metaDescription: 'Berechnen Sie die perfekte Einschlafzeit und Weckzeit nach natürlichen 90-Minuten-Schlafzyklen, um erholt und ohne Müdigkeit aufzuwachen.',
     h1: 'Schlafbedarfs Rechner – Perfekte Einschlaf- & Weckzeit ermitteln',
-    shortDescription: 'Berechnet Aufstehzeiten passend zum Ende vollständiger 90-minütiger Schlafzyklen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet Aufstehzeiten passend zum Ende vollständiger 90-minütiger Schlafzyklen.',
     searchKeywords: ['schlafbedarfs rechner aufstehzeit', '90 minuten schlafzyklus rechner', 'wann muss ich ins bett gehen', 'schlafrechner aufwachen erholt'],
     inputs: [
       { id: 'wakeHour', label: 'Gewünschte Aufstehzeit (Stunde 0 - 23)', type: 'number', defaultValue: 6, min: 0, max: 23, step: 1 },
@@ -912,7 +912,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Koffein Rechner – Halbwertszeit & Koffeinabbau berechnen',
     metaDescription: 'Berechnen Sie den Koffeinabbau in Ihrem Körper: Wie viel mg Koffein aus Kaffee, Espresso, Cola oder Energy Drinks ist zur Schlafenszeit noch aktiv?',
     h1: 'Koffein Rechner – Halbwertszeit & Koffeinabbau berechnen',
-    shortDescription: 'Ermittelt den Restkoffeingehalt im Blut zur Schlafenszeit nach Kaffeekonsum mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Restkoffeingehalt im Blut zur Schlafenszeit nach Kaffeekonsum.',
     searchKeywords: ['koffein rechner halbwertszeit', 'kaffee halbwertszeit schlaf', 'koffeinabbau stunden rechner', 'wie viel koffein espresso red bull'],
     inputs: [
       {
@@ -1262,7 +1262,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Puls-Trainingszonen Rechner – Fettverbrennung, aerob & anaerob',
     metaDescription: 'Berechnen Sie die 5 Herzfrequenz-Trainingsbereiche für Ihr Ausdauertraining: Von aktiver Regeneration über Fettverbrennung bis zum Schwellentraining.',
     h1: 'Puls-Trainingszonen Rechner – Herzfrequenzzonen für Ausdauertraining',
-    shortDescription: 'Berechnet die 5 Herzfrequenzzonen für gezieltes Lauftraining und Radsport mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die 5 Herzfrequenzzonen für gezieltes Lauftraining und Radsport.',
     searchKeywords: ['puls trainingszonen rechner', 'herzfrequenz zonen rechner ausdauer', 'fettverbrennungszone puls berechnen', 'aerobe schwelle herzfrequenz berechnen'],
     inputs: [
       { id: 'maxHeartRate', label: 'Ihre maximale Herzfrequenz (HFmax) in bpm', type: 'number', defaultValue: 185, min: 140, max: 225, step: 1, unit: 'bpm' },
@@ -1321,7 +1321,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Schwimmen Kalorienverbrauch Rechner – Brust, Kraul, Bahnen',
     metaDescription: 'Berechnen Sie den Kalorienverbrauch beim Schwimmen: Kraulen, Brustschwimmen, Rückenschwimmen und Delphin nach Körpergewicht, Bahnen und Schwimmdauer.',
     h1: 'Schwimmen Kalorienverbrauch Rechner – Kalorien beim Schwimmen ermitteln',
-    shortDescription: 'Kalkuliert den Kalorienverbrauch für verschiedene Schwimmstile mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert den Kalorienverbrauch für verschiedene Schwimmstile.',
     searchKeywords: ['schwimmen kalorienverbrauch rechner', 'wie viele kalorien verbrennt kraulen brustschwimmen', 'bahnen schwimmen kalorien', 'schwimmen abnehmen kalorienbedarf'],
     inputs: [
       { id: 'bodyWeightKg', label: 'Körpergewicht in kg', type: 'number', defaultValue: 72, min: 40, max: 200, step: 1, unit: 'kg' },
@@ -1396,7 +1396,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Radfahren Kalorien & Watt Rechner – Kalorienverbrauch Fahrrad',
     metaDescription: 'Berechnen Sie den Kalorienverbrauch beim Radfahren nach Geschwindigkeit, Steigung oder getretenen Watt auf dem Ergometer / Rennrad.',
     h1: 'Radfahren Kalorien Rechner – Kalorienverbrauch auf dem Fahrrad berechnen',
-    shortDescription: 'Ermittelt den Energieverbrauch beim Radeln nach Tempo oder Watt-Leistung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Energieverbrauch beim Radeln nach Tempo oder Watt-Leistung.',
     searchKeywords: ['radfahren kalorien rechner', 'watt in kalorien fahrrad umrechnen', 'kalorienverbrauch fahrrad 20 kmh', 'ergometer kalorienverbrauch berechnen'],
     inputs: [
       { id: 'bodyWeightKg', label: 'Körpergewicht in kg', type: 'number', defaultValue: 75, min: 40, max: 200, step: 1, unit: 'kg' },
@@ -1766,7 +1766,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Unterhaltsvorschuss-Rechner 2026: Beträge nach UVG',
     metaDescription: 'Berechnen Sie den gesetzlichen Unterhaltsvorschuss nach dem Unterhaltsvorschussgesetz (UVG) für Kinder von 0 bis 17 Jahren.',
     h1: 'Unterhaltsvorschuss Rechner – Gesetzlicher Vorschuss nach UVG',
-    shortDescription: 'Ermittelt den staatlichen Unterhaltsvorschuss nach den Altersstufen des UVG mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den staatlichen Unterhaltsvorschuss nach den Altersstufen des UVG.',
     searchKeywords: ['unterhaltsvorschuss rechner 2026', 'unterhaltsvorschuss tabelle altersstufen', 'uvg betraege alleinerziehende', 'unterhalt jugendamt vorschuss'],
     inputs: [
       {
@@ -1840,7 +1840,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Düsseldorfer Tabelle 2026: Kindesunterhalt berechnen',
     metaDescription: 'Berechnen Sie den monatlichen Kindesunterhalt nach der Düsseldorfer Tabelle 2026 nach bereinigtem Nettoeinkommen des Unterhaltspflichtigen und Altersstufe des Kindes.',
     h1: 'Düsseldorfer Tabelle Rechner – Kindesunterhalt berechnen',
-    shortDescription: 'Ermittelt den Zahlbetrag für Kindesunterhalt nach der Düsseldorfer Tabelle mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Zahlbetrag für Kindesunterhalt nach der Düsseldorfer Tabelle.',
     searchKeywords: ['duesseldorfer tabelle rechner 2026', 'kindesunterhalt berechnen netto zahlbetrag', 'selbstbehalt duesseldorfer tabelle', 'kindergeld halbe anrechnung unterhalt'],
     inputs: [
       { id: 'netIncomeAdjusted', label: 'Bereinigtes monatliches Nettoeinkommen des Barunterhaltspflichtigen', type: 'number', defaultValue: 2700, min: 1000, step: 100, unit: '€' },
@@ -1950,7 +1950,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Trennungsunterhalt-Rechner: Unterhalt nach 3/7-Methode',
     metaDescription: 'Berechnen Sie den gesetzlichen Trennungsunterhalt nach § 1361 BGB nach der anerkannten 3/7-Methode (45 % Erwerbstätigenbonus) aus der Differenz der bereinigten Nettoeinkommen.',
     h1: 'Trennungsunterhalt Rechner – Unterhalt bei Trennung kalkulieren',
-    shortDescription: 'Ermittelt den Unterhaltsanspruch des wirtschaftlich schwächeren Ehepartners nach Trennung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Unterhaltsanspruch des wirtschaftlich schwächeren Ehepartners nach Trennung.',
     searchKeywords: ['trennungsunterhalt rechner 3 7 methode', 'ehegattenunterhalt berechnen einkommensdifferenz', 'paragraph 1361 bgb trennungsunterhalt formel', 'selbstbehalt ehegatte unterhalt'],
     inputs: [
       { id: 'netIncomePartner1', label: 'Bereinigtes Nettoeinkommen des Besserverdienenden (nach Kindesunterhalt)', type: 'number', defaultValue: 3200, min: 1000, step: 100, unit: '€' },
@@ -2010,7 +2010,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'SSW Rechner – Aktuelle Schwangerschaftswoche',
     metaDescription: 'Ermitteln Sie Ihre genaue Schwangerschaftswoche (SSW z. B. 14+3), das Trimester und wichtige Meilensteine nach dem ersten Tag der letzten Periode.',
     h1: 'SSW Rechner – Aktuelle Schwangerschaftswoche & Tage berechnen',
-    shortDescription: 'Berechnet die exakte Schwangerschaftswoche im Format SSW + Tage mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die exakte Schwangerschaftswoche im Format SSW + Tage.',
     searchKeywords: ['ssw rechner aktuelle woche tage', 'schwangerschaftswoche berechnen letzte periode', 'in welcher ssw bin ich heute', 'trimester schwangerschaft rechner'],
     inputs: [
       { id: 'daysSinceLmp', label: 'Tage seit dem 1. Tag der letzten Periode', type: 'number', defaultValue: 105, min: 1, max: 300, step: 1, unit: 'Tage' },
@@ -2066,7 +2066,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Mutterschutz-Rechner: Schutzfristen vor & nach der Geburt',
     metaDescription: 'Berechnen Sie Beginn und Ende Ihrer gesetzlichen Mutterschutzfrist (6 Wochen vor der Geburt und 8 bis 12 Wochen nach der Entbindung) nach § 3 MuSchG.',
     h1: 'Mutterschutz Rechner – Schutzfristen nach Mutterschutzgesetz',
-    shortDescription: 'Ermittelt die gesetzlichen Beschäftigungsverbotsfristen vor und nach der Geburt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt die gesetzlichen Beschäftigungsverbotsfristen vor und nach der Geburt.',
     searchKeywords: ['mutterschutz rechner fristen', 'wann beginnt der mutterschutz rechner', 'mutterschutzgesetz 6 wochen vor et', 'schutzfrist nach der entbindung'],
     inputs: [
       { id: 'daysUntilDue', label: 'Tage bis zum errechneten Geburtstermin (ET)', type: 'number', defaultValue: 60, min: 1, max: 280, step: 1, unit: 'Tage' },
@@ -2132,7 +2132,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Zyklusrechner – Eisprung & fruchtbare Tage berechnen',
     metaDescription: 'Berechnen Sie den genauen Eisprungtag (Ovulation) und das fruchtbare Fenster für Zykluslängen von 21 bis 40 Tagen anhand der stabilen Lutealphase (14.',
     h1: 'Zyklusrechner – Eisprungtag & fruchtbares Fenster bestimmen',
-    shortDescription: 'Kalkuliert Ovulation und fruchtbare Tage für individuelle Zykluslängen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert Ovulation und fruchtbare Tage für individuelle Zykluslängen.',
     searchKeywords: ['zyklusrechner eisprung unregelmaessig', 'ovulation berechnen zykluslaenge 32 tage', 'lutealphase eisprung vor naechster periode', 'fruchtbarkeitstest ovulationstag'],
     inputs: [
       { id: 'cycleLengthDays', label: 'Ihre durchschnittliche Zykluslänge in Tagen (Standard: 28 Tage)', type: 'number', defaultValue: 28, min: 21, max: 45, step: 1, unit: 'Tage' },
@@ -2186,7 +2186,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Chinesischer Empfängniskalender: Junge oder Mädchen?',
     metaDescription: 'Ermitteln Sie das Geschlecht Ihres Babys (Junge oder Mädchen) nach dem traditionellen chinesischen Mondkalender anhand von Mondalter der Mutter und Empfängnismonat – zur Unterhaltung, keine medizinische Vorhersage.',
     h1: 'Chinesischer Empfängniskalender – Geschlecht des Babys prognostizieren',
-    shortDescription: 'Traditioneller Mondkalender zur spielerischen Vorhersage von Junge oder Mädchen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Traditioneller Mondkalender zur spielerischen Vorhersage von Junge oder Mädchen.',
     searchKeywords: ['chinesischer empfaengniskalender rechner', 'junge oder maedchen vorhersage rechner', 'chinesischer mondkalender baby geschlecht', 'mondalter mutter berechnen'],
     inputs: [
       { id: 'maternalAgeAtConception', label: 'Alter der Mutter bei Empfängnis in Jahren', type: 'number', defaultValue: 28, min: 18, max: 45, step: 1, unit: 'Jahre' },
@@ -2307,7 +2307,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Kindersitz Rechner – Richtige Kindersitzgruppe nach i-Size',
     metaDescription: 'Finden Sie den passenden Kindersitz nach neuer i-Size-Norm (UN ECE R129 nach Körpergröße) und klassischer ECE R44/04 nach Alter und Gewicht.',
     h1: 'Kindersitz Rechner – Passenden Kindersitz nach i-Size ermitteln',
-    shortDescription: 'Bestimmt die vorgeschriebene Kindersitzkategorie nach Größe, Gewicht und Alter mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Bestimmt die vorgeschriebene Kindersitzkategorie nach Größe, Gewicht und Alter.',
     searchKeywords: ['kindersitz rechner i size norm', 'kindersitz gruppe 1 2 3 gewicht groesse', 'ab wann reboarder vorwaerts fahren', 'kindersitzpflicht deutschland alter'],
     inputs: [
       { id: 'childHeightCm', label: 'Körpergröße des Kindes in cm', type: 'number', defaultValue: 95, min: 40, max: 160, step: 1, unit: 'cm' },
@@ -2436,7 +2436,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Erstausstattung Baby: Kosten-Rechner & Budgetplan',
     metaDescription: 'Planen Sie die Kosten für die Baby-Erstausstattung: Kinderwagen, Babybett, Wickelkommode, Kleidung und Babyschale im Vergleich Neu vs. Gebraucht.',
     h1: 'Erstausstattung Baby Rechner – Kosten für die Erstausstattung planen',
-    shortDescription: 'Kalkuliert die Anschaffungskosten für die Ankunft des ersten Kindes mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert die Anschaffungskosten für die Ankunft des ersten Kindes.',
     searchKeywords: ['erstausstattung baby rechner', 'was kostet erstausstattung baby durchschnitt', 'baby erstausstattung liste kosten', 'kinderwagen babybett kosten budget'],
     inputs: [
       {
@@ -2500,7 +2500,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Kita-Gebühren Rechner – Elternbeiträge nach Einkommen',
     metaDescription: 'Ermitteln Sie die monatlichen Kita-Kosten für Krippe oder Kindergarten nach Familieneinkommen, Betreuungsstunden und Bundesland-Beitragsfreiheit.',
     h1: 'Kita-Gebühren Rechner – Monatliche Kita-Kosten ermitteln',
-    shortDescription: 'Schätzt die einkommensabhängigen Elternbeiträge für die Kinderbetreuung mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Schätzt die einkommensabhängigen Elternbeiträge für die Kinderbetreuung.',
     searchKeywords: ['kita gebuehren rechner einkommen', 'kindergarten kosten pro monat tabelle', 'beitragsfreie kita bundeslaender', 'elternbeitrag krippe rechner'],
     inputs: [
       { id: 'familyGrossIncome', label: 'Gemeinsames jährliches Familienbruttoeinkommen', type: 'number', defaultValue: 65000, min: 20000, max: 200000, step: 5000, unit: '€' },
@@ -2755,7 +2755,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Kinderkrankengeld Rechner 2026 – Tage',
     metaDescription: 'Berechnen Sie Anspruch auf Kinderkrankentage (15 Tage pro Elternteil, 30 Tage für Alleinerziehende) und die Auszahlungshöhe des Kinderkrankengeldes (ca.',
     h1: 'Kinderkrankengeld Rechner – Freistellung & Krankengeld bei Kindeserkrankung',
-    shortDescription: 'Ermittelt Freistellungstage und Krankengeldhöhe bei Pflege eines erkrankten Kindes mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Freistellungstage und Krankengeldhöhe bei Pflege eines erkrankten Kindes.',
     searchKeywords: ['kinderkrankengeld rechner sgb v', 'kinderkrankentage 2026 wie viele tage', 'kind krank lohnfortzahlung wie viel netto', 'paragraph 45 sgb v kinderkrankengeld'],
     inputs: [
       { id: 'monthlyNetIncome', label: 'Ihr monatliches Nettogehalt', type: 'number', defaultValue: 2400, min: 500, step: 100, unit: '€' },
@@ -2820,7 +2820,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Großelternzeit-Rechner: Anspruch auf Freistellung prüfen',
     metaDescription: 'Prüfen Sie die Voraussetzungen und Fristen für Großelternzeit: Gesetzliche Freistellung von der Arbeit zur Betreuung des Enkelkindes.',
     h1: 'Großelternzeit Rechner – Freistellung für Oma & Opa ermitteln',
-    shortDescription: 'Prüft die rechtlichen Voraussetzungen für die Freistellung von Großeltern mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Prüft die rechtlichen Voraussetzungen für die Freistellung von Großeltern.',
     searchKeywords: ['grosselternzeit rechner beeg', 'grosselternzeit voraussetzungen paragraph 15 beeg', 'koennen grosseltern elternzeit nehmen', 'kuendigungsschutz grosselternzeit'],
     inputs: [
       {
@@ -2893,7 +2893,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Unterhalt volljährige Kinder Rechner 2026 – Studium',
     metaDescription: 'Berechnen Sie den Unterhaltsanspruch volljähriger Kinder in Studium oder Ausbildung nach der Düsseldorfer Tabelle 2026 (990 € Bedarf bei eigener Wohnung).',
     h1: 'Unterhalt für volljährige Kinder – Studentenunterhalt berechnen',
-    shortDescription: 'Ermittelt den Unterhaltsbedarf von volljährigen Kindern mit eigenem Hausstand mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den Unterhaltsbedarf von volljährigen Kindern mit eigenem Hausstand.',
     searchKeywords: ['unterhalt volljaehrige kinder rechner', 'studentenunterhalt 990 euro duesseldorfer tabelle', 'unterhalt student eigene wohnung berechnen', 'haftungsquote eltern volljahrigenunterhalt'],
     inputs: [
       {
@@ -2971,7 +2971,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Ausbildungsunterhalt-Rechner: Azubi-Gehalt anrechnen',
     metaDescription: 'Berechnen Sie, wie viel der Ausbildungsvergütung auf den Kindesunterhalt angerechnet wird (nach Abzug von 100 € ausbildungsbedingtem Mehrbedarf).',
     h1: 'Ausbildungsunterhalt Rechner – Azubi-Vergütung auf Unterhalt anrechnen',
-    shortDescription: 'Kalkuliert die Minderung des Kindesunterhalts durch eigenes Azubi-Gehalt mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Kalkuliert die Minderung des Kindesunterhalts durch eigenes Azubi-Gehalt.',
     searchKeywords: ['ausbildungsunterhalt rechner azubigehalt', 'anrechnung lehrlingsentschaedigung unterhalt', 'ausbildungsbedingter mehrbedarf 100 euro', 'wie viel unterhalt bekommt azubi von eltern'],
     inputs: [
       { id: 'netApprenticeSalary', label: 'Netto-Ausbildungsvergütung des Kindes im Monat', type: 'number', defaultValue: 750, min: 200, max: 1500, step: 25, unit: '€' },
@@ -3050,7 +3050,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Kinderbetreuungskosten Rechner – Kita, Hort',
     metaDescription: 'Berechnen Sie Ihre Steuerersparnis durch Kinderbetreuungskosten: 2/3 der Kosten bis maximal 4.000 Euro pro Kind und Jahr als Sonderausgaben abziehbar.',
     h1: 'Kinderbetreuungskosten Rechner – Steuerersparnis für Kita & Hort',
-    shortDescription: 'Ermittelt den steuerlichen Sonderausgabenabzug für Betreuungsaufwendungen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt den steuerlichen Sonderausgabenabzug für Betreuungsaufwendungen.',
     searchKeywords: ['kinderbetreuungskosten absetzen rechner', 'paragraph 10 estg sonderausgaben kinderbetreuung 4000 euro', 'tagesmutter steuerlich absetzbar rechner', 'kita kosten steuerersparnis'],
     inputs: [
       { id: 'actualCareCostsYearly', label: 'Tatsächliche Betreuungskosten pro Kind im Jahr (ohne Essensgeld)', type: 'number', defaultValue: 3600, min: 200, step: 200, unit: '€' },

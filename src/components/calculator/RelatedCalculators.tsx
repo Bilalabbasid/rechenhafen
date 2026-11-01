@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { CalculatorDefinition } from '@/types/calculator';
+import { getCategoryBySlug } from '@/data/categories';
 import CalculatorCard from '@/components/common/CalculatorCard';
 import cardsStyles from '@/styles/cards.module.css';
 import { ArrowRight } from 'lucide-react';
@@ -69,7 +70,7 @@ export default function RelatedCalculators({ calculators, categoryName, category
             shortName={calc.shortName}
             shortDescription={calc.shortDescription}
             category={calc.category}
-            categoryName={categoryName}
+            categoryName={getCategoryBySlug(calc.category)?.name || categoryName}
             fromSlug={fromSlug}
           />
         ))}

@@ -419,7 +419,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Altersunterschied Rechner – Abstand zweier Geburtsdaten',
     metaDescription: 'Ermitteln Sie den genauen Altersunterschied zwischen zwei Personen in Jahren, Monaten, Tagen und Wochen.',
     h1: 'Altersunterschied zwischen zwei Personen berechnen',
-    shortDescription: 'Vergleicht zwei Geburtsdaten und berechnet die exakte zeitliche Differenz mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Vergleicht zwei Geburtsdaten und berechnet die exakte zeitliche Differenz.',
     searchKeywords: ['altersunterschied rechner', 'altersabstand berechnen', 'wer ist älter', 'differenz geburtsdatum'],
     inputs: [
       { id: 'datePerson1', label: 'Geburtsdatum Person 1', type: 'date', defaultValue: '1988-04-12' },
@@ -585,7 +585,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Monate zwischen zwei Daten Rechner – Kalendermonate ermitteln',
     metaDescription: 'Berechnen Sie die vollendeten Monate und Tage zwischen zwei Terminen. Perfekt für Kündigungsfristen und Mietverträge.',
     h1: 'Monate zwischen zwei Daten berechnen',
-    shortDescription: 'Berechnet die Anzahl ganzer Kalendermonate und verbleibender Tage mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet die Anzahl ganzer Kalendermonate und verbleibender Tage.',
     searchKeywords: ['monate zwischen zwei daten', 'anzahl monate berechnen', 'monatsdifferenz rechner'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-01-15' },
@@ -1066,7 +1066,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Datum plus Tage Rechner – Welches Datum ist in X Tagen?',
     metaDescription: 'Addieren Sie Tage zu einem Datum und erfahren Sie sofort das Zieldatum, den Wochentag und die Kalenderwoche.',
     h1: 'Datum plus Tage berechnen',
-    shortDescription: 'Addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum.',
     searchKeywords: ['datum plus tage', 'datum addieren', 'welches datum ist in 30 tagen', 'tage dazurechnen'],
     inputs: [
       { id: 'startDate', label: 'Ausgangsdatum', type: 'date', defaultValue: '2026-03-01' },
@@ -1101,7 +1101,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Datum minus Tage Rechner – Welches Datum war vor X Tagen?',
     metaDescription: 'Ziehen Sie Tage von einem Datum ab. Finden Sie schnell heraus, welches Datum vor 14, 30 oder 90 Tagen war.',
     h1: 'Datum minus Tage berechnen',
-    shortDescription: 'Subtrahiert Tage von einem Datum in die Vergangenheit mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Subtrahiert Tage von einem Datum in die Vergangenheit.',
     searchKeywords: ['datum minus tage', 'datum subtrahieren', 'welches datum war vor 30 tagen'],
     inputs: [
       { id: 'startDate', label: 'Ausgangsdatum', type: 'date', defaultValue: '2026-05-01' },
@@ -1274,7 +1274,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     category: 'datum-zeit',
     subcategory: 'Uhrzeit & Zeiteinheiten',
     metaTitle: 'Countdown Rechner – Tage, Stunden & Minuten bis zum Event',
-    metaDescription: 'Erstellen Sie einen genauen Countdown zu jedem beliebigen Zieldatum (Hochzeit, Urlaub, Rente, Neujahr).',
+    metaDescription: 'Erstellen Sie einen sekundengenauen Countdown zu jedem beliebigen Zieldatum (Hochzeit, Urlaub, Rente, Neujahr) mit Aufschlüsselung in Tage, Wochen und Stunden.',
     h1: 'Countdown Rechner zu jedem Zieldatum',
     shortDescription: 'Zählt die Tage, Stunden und Minuten bis zu einem zukünftigen Ereignis.',
     searchKeywords: ['countdown rechner', 'tage bis countdown', 'tage bis urlaub rechner', 'tage bis silvester'],
@@ -1304,21 +1304,33 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
         summaryText: `Bis zum ${formatDateDe(target)} verbleiben noch ${days} Tage und ${hours} Stunden.`,
       };
     },
-    formula: 'Verbleibende Zeit = Zieldatum - Jetzt',
-    formulaExplanation: 'Differenz in Millisekunden umgerechnet in Tage, Stunden und Wochen.',
+    formula: 'Verbleibende Zeit = Zieldatum (UTC) - Aktueller Zeitpunkt (UTC)',
+    formulaExplanation: 'Die Zeitdifferenz wird millisekundengenau ermittelt und hierarchisch in volle Wochen, verbleibende Tage und Stunden zerlegt.',
     workedExample: {
       title: 'Beispiel: Countdown bis Jahresende 2026',
-      description: 'Zählt die verbleibenden Kalendertage bis zum 31.12.2026.',
+      description: 'Zählt die verbleibenden Kalendertage und Stunden bis zum Stichtag 31.12.2026 um 00:00 Uhr.',
       inputs: { targetDate: '2026-12-31' },
-      resultSummary: 'Exakte Tages- und Stundenzahl',
+      resultSummary: 'Verbleibende Kalendertage, Wochen und Gesamtstunden',
     },
     content: {
       intro: 'Dieser Countdown-Timer misst die verbleibende Restzeit bis zu einem festen Stichtag sekundengenau herunter.',
-      details: 'Rechnet die Zeitdifferenz in Tage, Stunden, Minuten und Sekunden um. Nützlich für Produkt-Launches, Neujahr, Jubiläen oder Projekt-Deadlines.',
+      details: 'Ein Countdown berechnet die exakte Differenz zwischen dem aktuellen Systemzeitpunkt und einem definierten Zieltermin. Die Differenz wird standardmäßig auf Basis der koordinierten Weltzeit (UTC) ermittelt und anschließend in Tage, volle Wochen und verbleibende Stunden zerlegt. Dies erleichtert die Fristenkontrolle bei behördlichen Abgabeterminen, geschäftlichen Projektmeilensteinen, Produkt-Launches oder persönlichen Anlässen wie runden Geburtstagen, Urlaubsreisen und Hochzeiten. Bei Zeiträumen über mehrere Monate hinweg fließen dabei auch Kalenderschwankungen wie Schaltjahre präzise in die Berechnung ein.',
+      sections: [
+        {
+          title: 'Typische Einsatzbereiche für Stichtags-Countdowns',
+          content: 'Countdowns kommen im Berufs- und Alltagsleben bei vielen Gelegenheiten zum Einsatz:\n\n- **Fristenüberwachung:** Gesetzliche Kündigungsfristen, Steuerabgabetermine und gerichtliche Einspruchsfristen.\n- **Projektmanagement:** Sprint-Deadlines, Release-Termine und vertragliche Lieferdaten.\n- **Private Ereignisse:** Urlaubsantritt, Geburts- und Jubiläumstage, Hochzeiten oder Renteneintritt.\n\nDurch die modulare Aufteilung in Tage, Wochen und Stunden erhalten Sie jederzeit eine klare zeitliche Orientierung.',
+        },
+        {
+          title: 'Praxistipps für präzise Frist- und Terminberechnungen',
+          content: 'Beachten Sie bei der Planung von Fristen und wichtigen Ereignissen folgende Besonderheiten:\n\n- **Kalendertage vs. Werktage:** Ein Countdown zählt alle fortlaufenden 24-Stunden-Tage. Für gesetzliche Kündigungsfristen oder Bankarbeitstage nutzen Sie bitte unseren [Werktage-Rechner](/rechner/werktage-rechner/).\n- **Zeitzonendifferenzen:** Bei internationalen Events richtet sich der Countdown stets nach der Systemzeit Ihres Endgeräts.\n- **Schaltjahre:** Der 29. Februar in Schaltjahren wird von unserem Kalenderalgorithmus vollautomatisch als vollwertiger 86.400-Sekunden-Tag eingerechnet.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie viele Sekunden hat ein Tag?', answer: 'Ein regulärer Kalendertag hat exakt 24 × 60 × 60 = 86.400 Sekunden.' },
-      { question: 'Was passiert mit dem Countdown bei Zeitumstellung?', answer: 'Bei Zeitstempeln mit lokaler Zeitzone verschiebt sich die Stundendifferenz am Tag der Zeitumstellung um genau 1 Stunde.' },
+      { question: 'Wie viele Sekunden hat ein regulärer Kalendertag?', answer: 'Ein regulärer Kalendertag hat exakt 24 Stunden × 60 Minuten × 60 Sekunden = 86.400 Sekunden.' },
+      { question: 'Was passiert mit dem Countdown bei einer Zeitumstellung?', answer: 'Bei Zeitstempeln mit lokaler Zeitzone verschiebt sich die Stundendifferenz am Tag der Umstellung zwischen Winterzeit (MEZ) und Sommerzeit (MESZ) um genau eine Stunde.' },
+      { question: 'Wie werden Fristen rechtlich in Deutschland gezählt (§ 187 BGB)?', answer: 'Im deutschen Zivilrecht (§ 187 Abs. 1 BGB) wird der Tag, in den das fristauslösende Ereignis fällt, bei der Fristberechnung grundsätzlich nicht mitgezählt. Die Frist beginnt erst mit dem darauffolgenden Tag. Fällt das Fristende auf einen Samstag, Sonntag oder gesetzlichen Feiertag, verlängert sich die Frist nach § 193 BGB auf den nächsten Werktag.' },
+      { question: 'Wie beeinflussen unterschiedliche Zeitzonen einen Countdown?', answer: 'Wenn das Zieldatum in einer anderen Zeitzone liegt (z. B. Silvester in Sydney oder New York), muss die Zeitverschiebung gegenüber der mitteleuropäischen Zeit berücksichtigt werden. Unser Rechner orientiert sich an Ihrer lokalen Systemuhrzeit.' },
     ],
     relatedSlugs: ['tage-bis-geburtstag', 'tage-zwischen-zwei-daten', 'wochenrechner'],
   },

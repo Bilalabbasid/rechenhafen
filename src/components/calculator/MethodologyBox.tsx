@@ -25,6 +25,22 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
     : false;
   const isFinance = ['finanzen', 'kredit-schulden'].includes(category);
   const hasFootnotes = Boolean(legalFootnotes && legalFootnotes.length > 0);
+  const hasDinRounding = ['finanzen', 'kredit-schulden', 'steuern-gehalt', 'arbeit-gehalt', 'mathematik', 'physik', 'bauen-renovieren'].includes(category);
+
+  let sectionTitle = 'Berechnungsgrundlagen & Verlässlichkeit';
+  if (hasFootnotes) {
+    sectionTitle = 'Rechtsgrundlagen, Quellen und Berechnungsannahmen';
+  } else if (isHealth) {
+    sectionTitle = 'Biometrische Grundlagen & Orientierungshinweis';
+  } else if (isLegalOrTax) {
+    sectionTitle = 'Gesetzliche Grundlagen & Berechnungsannahmen';
+  } else if (isFinance) {
+    sectionTitle = 'Finanzmathematische Annahmen & Modellgrenzen';
+  } else if (category === 'kochen-backen') {
+    sectionTitle = 'Zubereitungshinweise, Quellen & Verlässlichkeit';
+  } else if (category === 'mathematik' || category === 'physik') {
+    sectionTitle = 'Wissenschaftliche Grundlagen & Verlässlichkeit';
+  }
 
   return (
     <section
@@ -43,7 +59,7 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Scale size={20} style={{ color: 'var(--color-primary)' }} />
           <h2 id="methodik-transparenz-heading" style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-primary)' }}>
-            {hasFootnotes ? 'Rechtsgrundlagen, Quellen und Berechnungsannahmen' : 'Berechnungsmethodik, Annahmen & Verlässlichkeit'}
+            {sectionTitle}
           </h2>
         </div>
         {timeSensitiveMeta && (
@@ -221,10 +237,21 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
       )}
 
       <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-3)', marginTop: 'var(--space-3)', fontSize: '0.825rem', color: 'var(--color-text-muted)' }}>
-        Rundung nach <strong>DIN 1333</strong>. Alle Rechenregeln, Prüfpipelines und die vollständige Referenztabelle finden Sie in unserer transparenten{' '}
-        <Link href="/methodik/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-          Berechnungsmethodik & Datenquellen 2026 →
-        </Link>
+        {hasDinRounding ? (
+          <>
+            Rundung kaufmännisch nach <strong>DIN 1333</strong>. Alle Details zur Qualitätssicherung und den Berechnungsmodellen finden Sie in unserer{' '}
+            <Link href="/ueber-uns/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+              Redaktionsmethodik & Prüfpipeline →
+            </Link>
+          </>
+        ) : (
+          <>
+            Transparenz & Qualitätssicherung: Alle Berechnungsgrundlagen werden redaktionell geprüft. Weitere Details in unserer{' '}
+            <Link href="/ueber-uns/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+              Methodik & Qualitätssicherung →
+            </Link>
+          </>
+        )}
       </div>
     </section>
   );

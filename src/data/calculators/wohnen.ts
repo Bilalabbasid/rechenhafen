@@ -137,7 +137,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Immobilienrendite Rechner – Brutto-',
     metaDescription: 'Berechnen Sie die Mietrendite Ihrer Kapitalanlage: Jahreskaltmiete, Kaufpreis, Nebenkosten und nicht umlegbare Bewirtschaftungskosten.',
     h1: 'Immobilienrendite Rechner (Mietrendite)',
-    shortDescription: 'Ermittelt Brutto- und Nettomietrendite sowie den Kaufpreisfaktor für Kapitalanlage-Immobilien mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Ermittelt Brutto- und Nettomietrendite sowie den Kaufpreisfaktor für Kapitalanlage-Immobilien.',
     searchKeywords: ['immobilienrendite rechner', 'mietrendite berechnen kapitalanlage', 'nettomietrendite formel', 'kaufpreisfaktor rechner'],
     inputs: [
       { id: 'purchasePrice', label: 'Kaufpreis der Immobilie', type: 'number', defaultValue: 240000, unit: '€' },
@@ -209,7 +209,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Mietbudget Rechner – Wie viel Miete kann ich mir leisten?',
     metaDescription: 'Ermitteln Sie Ihr maximales Mietbudget anhand Ihres monatlichen Nettoeinkommens. Prüfen Sie die 30%- und 40%-Grenzen für Warm- und Kaltmiete.',
     h1: 'Mietbudget Rechner – Wie viel Miete kann ich mir leisten?',
-    shortDescription: 'Berechnet das empfohlene monatliche Mietbudget basierend auf dem Haushaltsnettoeinkommen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
+    shortDescription: 'Berechnet das empfohlene monatliche Mietbudget basierend auf dem Haushaltsnettoeinkommen.',
     searchKeywords: ['mietbudget rechner', 'wie viel miete kann ich mir leisten', 'miethöhe berechnen netto', 'maximale miete berechnen'],
     inputs: [
       { id: 'netIncome', label: 'Monatliches Haushaltsnettoeinkommen', type: 'number', defaultValue: 3000, min: 100, step: 50, unit: '€' },
