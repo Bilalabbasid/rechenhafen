@@ -2,33 +2,24 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 
 export const BATCH_5_SLUGS = [
-  // Group 1: Core Haushalt & Energie (6)
   'stromkostenrechner',
   'standby-kosten-rechner',
   'gaskostenrechner',
   'led-ersparnis-rechner',
   'stromkosten-geraete-rechner',
   'gasverbrauch-kwh-m3-rechner',
-
-  // Group 2: Extra Haushalt & Wohnen (8)
   'kuehlschrank-stromkosten-rechner',
   'trockner-kosten-rechner',
   'fernseher-stromkosten-rechner',
-  'led-sparrechner',
   'oelheizung-verbrauch-rechner',
   'klimaanlage-stromkosten-rechner',
-  'e-auto-ladekosten-zuhause-rechner',
+  'elektroauto-ladekosten-rechner',
   'lebensmittelbudget-rechner',
-
-  // Group 3: Core Auto & Mobilität (6)
   'spritkostenrechner',
   'kraftstoffverbrauch-rechner',
   'pendlerpauschale-rechner',
   'fahrtkostenrechner',
-  'elektroauto-ladekosten-rechner',
   'fahrzeit-rechner',
-
-  // Group 4: Extra Auto & Mobilität (17)
   'kfz-steuer-rechner',
   'dienstwagen-1-prozent-rechner',
   'fahrtenbuch-vs-1-prozent-rechner',
@@ -46,8 +37,6 @@ export const BATCH_5_SLUGS = [
   'autobahn-maut-rechner-vignette',
   'motorrad-unterhaltskosten-rechner',
   'lkw-maut-deutschland-rechner',
-
-  // Group 5: Core & Extra Einheiten & Physik (13)
   'energie-arbeit-umrechner',
   'leistung-umrechner',
   'elektrische-ladung-kapazitaet-rechner',
@@ -64,8 +53,8 @@ export const BATCH_5_SLUGS = [
 ];
 
 describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
-  it('contains exactly 50 calculators assigned to Batch 5', () => {
-    expect(BATCH_5_SLUGS.length).toBe(50);
+  it('contains exactly 48 calculators assigned to Batch 5', () => {
+    expect(BATCH_5_SLUGS.length).toBe(48);
   });
 
   describe('1. Registry Resolution & Metadata Quality', () => {

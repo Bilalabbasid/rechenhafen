@@ -2189,7 +2189,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       { question: 'Wie viele Stunden pro Tag kann ein Dienstleister durchschnittlich fakturieren?', answer: 'In der Realität selten mehr als 5 bis 6 Stunden pro Tag; die restliche Zeit entfällt zwingend auf Akquise, Kundenberatung, Buchhaltung, Weiterbildung und Büroorganisation.' },
       { question: 'Warum führt die Formel "Gehalt durch 160 Stunden" bei Selbstständigen in den Ruin?', answer: 'Weil sie ignoriert, dass Selbstständige keinen Arbeitgeberzuschuss zur Kranken- und Rentenversicherung erhalten, Urlaub und Feiertage unbezahlt sind und administrative Zeiten nicht abgerechnet werden können.' },
     ],
-    relatedSlugs: ['brutto-stundensatz-freiberufler-rechner', 'teilzeit-gehaltsrechner', 'deckungsbeitrag-rechner', 'umsatzrentabilitaet-rechner'],
+    relatedSlugs: ['stundensatz-kalkulation-freiberufler-rechner', 'teilzeit-gehaltsrechner', 'deckungsbeitrag-rechner', 'umsatzrentabilitaet-rechner'],
   },
   {
     id: "mittelwert-median-modus-rechner",
@@ -2297,109 +2297,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       { question: 'Was ist ein multimodaler Datensatz?', answer: 'Ein Datensatz, bei dem zwei oder mehr verschiedene Werte gleich oft mit der höchsten Häufigkeit auftreten (z. B. bimodal mit zwei Peaks).' },
     ],
     relatedSlugs: ['standardabweichung-rechner', 'notendurchschnitt-rechner', 'variationskoeffizient-rechner', 'geometrisches-mittel-rechner', 'harmonisches-mittel-rechner'],
-  },
-  {
-    id: "varianz-standardabweichung-stichprobe-rechner",
-    slug: "varianz-standardabweichung-stichprobe-rechner",
-    name: "Varianz- & Standardabweichungs-Rechner",
-    shortName: "Varianz & Streuung",
-    category: "statistik-wissenschaft",
-    subcategory: "Deskriptive Statistik",
-    metaTitle: 'Stichprobenvarianz Rechner – Standardabweichung s (n-1)',
-    metaDescription: 'Ermitteln Sie die erwartungstreue Stichprobenvarianz s² und Standardabweichung s mit Bessel-Korrektur (n-1) für empirische Studien.',
-    h1: 'Stichprobenvarianz Rechner – Bessel-Korrektur (n-1) nutzen',
-    shortDescription: 'Ermittelt die empirische Stichprobenvarianz und Standardabweichung mit Bessel-Korrektur (n-1) für wissenschaftliche Datensätze.',
-    searchKeywords: ['stichprobenvarianz rechner', 'varianz rechner', 'stichprobenvarianz', 'populationsvarianz berechnen', 'streuungsmaße formel', 'standardabweichung stichprobe'],
-    inputs: [
-          {
-                "id": "v1",
-                "label": "Messwert 1",
-                "type": "number",
-                "defaultValue": 12,
-                "step": 0.1
-          },
-          {
-                "id": "v2",
-                "label": "Messwert 2",
-                "type": "number",
-                "defaultValue": 15,
-                "step": 0.1
-          },
-          {
-                "id": "v3",
-                "label": "Messwert 3",
-                "type": "number",
-                "defaultValue": 18,
-                "step": 0.1
-          },
-          {
-                "id": "v4",
-                "label": "Messwert 4",
-                "type": "number",
-                "defaultValue": 21,
-                "step": 0.1
-          },
-          {
-                "id": "v5",
-                "label": "Messwert 5",
-                "type": "number",
-                "defaultValue": 24,
-                "step": 0.1
-          }
-    ],
-    calculate: (inputs: Record<string, any>) => {
-      
-            const arr = [
-              Number(inputs.v1) || 0,
-              Number(inputs.v2) || 0,
-              Number(inputs.v3) || 0,
-              Number(inputs.v4) || 0,
-              Number(inputs.v5) || 0,
-            ];
-            const n = arr.length;
-            const mean = arr.reduce((a, b) => a + b, 0) / n;
-            const ss = arr.reduce((acc, x) => acc + Math.pow(x - mean, 2), 0);
-            const varSample = ss / (n - 1);
-            const sdSample = Math.sqrt(varSample);
-            const varPop = ss / n;
-            const sdPop = Math.sqrt(varPop);
-            return {
-              primary: { label: 'Stichproben-Standardabweichung (s)', value: sdSample, formattedValue: formatNumber(sdSample, 3), unit: '' },
-              details: [
-                { label: 'Stichprobenvarianz (s²)', value: varSample, formattedValue: formatNumber(varSample, 3) },
-                { label: 'Populations-Standardabweichung (σ)', value: sdPop, formattedValue: formatNumber(sdPop, 3) },
-                { label: 'Populationsvarianz (σ²)', value: varPop, formattedValue: formatNumber(varPop, 3) },
-                { label: 'Mittelwert (x̄)', value: mean, formattedValue: formatNumber(mean, 2) },
-                { label: 'Quadratsumme (SS)', value: ss, formattedValue: formatNumber(ss, 2) },
-              ],
-            };
-          
-    },
-    formula: "s² = Σ(xi - x̄)² / (n - 1) | σ² = Σ(xi - μ)² / n",
-    formulaExplanation: "Die Stichprobenvarianz teilt durch n - 1 (Bessel-Korrektur), um eine unverzerrte Schätzung der wahren Varianz der Grundgesamtheit zu liefern.",
-    workedExample: {
-          "title": "Beispiel: 12, 15, 18, 21, 24",
-          "description": "Mittelwert = 18,0. Quadratsumme = 90,0. Stichprobenvarianz s² = 90/4 = 22,50. s = 4,743. Populationsvarianz σ² = 90/5 = 18,00. σ = 4,243.",
-          "inputs": {
-                "v1": 12,
-                "v2": 15,
-                "v3": 18,
-                "v4": 21,
-                "v5": 24
-          },
-          "resultSummary": "s = 4,743 | s² = 22,500"
-    },
-    content: {
-      intro: 'Dieser Streumaßrechner berechnet die Varianz (mittlere quadratische Abweichung) und Standardabweichung für Grundgesamtheiten (Teilung durch N) und Stichproben (Teilung durch n-1).',
-      details: 'Varianz s² = (1 / (n-1)) · Summe(x_i - Mittelwert)². Die Varianz hat die quadrierte Einheit der Messgröße (z. B. Euro²); erst das Ziehen der Quadratwurzel liefert die Standardabweichung in der ursprünglichen Maßeinheit (z. B. Euro).',
-    },
-    faqs: [
-      { question: 'Warum quadriert man die Differenzen bei der Varianz?', answer: 'Damit sich positive und negative Abweichungen vom Mittelwert nicht gegenseitig zu null aufheben und größere Ausreißer mathematisch stärker gewichtet werden.' },
-      { question: 'Was misst die empirische Varianz im Portfolio-Management?', answer: 'Die Volatilität (Schwankungsintensität) der Kursrenditen und bildet das fundamentale Risikomaß in der modernen Portfoliotheorie nach Markowitz.' },
-    ],
-    relatedSlugs: ['standardabweichung-rechner', 'mittelwert-median-modus-rechner', 'konfidenzintervall-rechner'],
-  },
-  {
+  },  {
     id: "korrelationskoeffizient-rechner",
     slug: "korrelationskoeffizient-rechner",
     name: "Korrelationskoeffizient-Rechner (Pearson r)",
@@ -3697,7 +3595,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       { question: 'Kann man die Streuung von Elefanten- und Mäusegewichten fair vergleichen?', answer: 'Ja, über den Variationskoeffizienten: Während die absolute Standardabweichung bei Elefanten in hunderten Kilogramm und bei Mäusen in Gramm gemessen wird, zeigt der CV das relative Risiko unabhängig vom Maßstab.' },
       { question: 'Wann darf der Variationskoeffizient nicht angewendet werden?', answer: 'Er ist nur für verhältnisskalierte Daten mit absolutem Nullpunkt sinnvoll; bei Intervallskalen (wie Celsius-Temperaturen, wo der Nullpunkt willkürlich ist) verliert der CV seine mathematische Gültigkeit.' },
     ],
-    relatedSlugs: ['standardabweichung-rechner', 'mittelwert-median-modus-rechner', 'varianz-standardabweichung-stichprobe-rechner'],
+    relatedSlugs: ['standardabweichung-rechner', 'mittelwert-median-modus-rechner', 'standardabweichung-rechner'],
   },
   {
     id: "geometrisches-mittel-rechner",

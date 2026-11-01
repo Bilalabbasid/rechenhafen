@@ -42,7 +42,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie viele Arbeitsstunden hat ein Monat im Durchschnitt bei 40 Stunden?', answer: 'Bei einer 40-Stunden-Woche hat ein Monat im Jahresdurchschnitt genau 173,33 Arbeitsstunden (40 × 13 / 3).' },
       { question: 'Wie hoch ist der gesetzliche Mindestlohn in Deutschland?', answer: 'In Deutschland gilt das Mindestlohngesetz (MiLoG); der gesetzliche Mindestlohn wird regelmäßig durch die Mindestlohnkommission überprüft und angepasst.' },
     ],
-    relatedSlugs: ['brutto-stundensatz-freiberufler-rechner', 'nachtzuschlag-sonntagszuschlag-rechner', 'teilzeit-gehaltsrechner', 'gehaltserhoehung-rechner', 'arbeitstage-rechner', 'jahresgehalt-in-monatsgehalt-rechner'],
+    relatedSlugs: ['stundensatz-kalkulation-freiberufler-rechner', 'nachtzuschlag-sonntagszuschlag-rechner', 'teilzeit-gehaltsrechner', 'gehaltserhoehung-rechner', 'arbeitstage-rechner', 'jahresgehalt-in-monatsgehalt-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: GERMAN_DATA_2026.mindestlohn_stunde.year,
@@ -93,7 +93,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was ist die Brückenteilzeit nach § 9a TzBfG?', answer: 'Das Recht, die Arbeitszeit für einen im Voraus bestimmten Zeitraum von einem bis fünf Jahren zu verringern und danach automatisch zur ursprünglichen Vollzeit zurückzukehren (in Unternehmen mit mehr als 45 Beschäftigten).' },
       { question: 'Darf der Arbeitgeber bei Teilzeit den Stundenlohn kürzen?', answer: 'Nein, nach § 4 TzBfG gilt ein striktes Diskriminierungsverbot. Der vertragliche oder tarifliche Stundenlohn muss bei gleicher Tätigkeit identisch bleiben.' },
     ],
-    relatedSlugs: ['stundenlohnrechner', 'gehaltserhoehung-rechner', 'vermoegenswirksame-leistungen-rechner', 'arbeitstage-rechner', 'firmenwagen-geldwerter-vorteil-rechner', 'kirchensteuer-rechner'],
+    relatedSlugs: ['stundenlohnrechner', 'gehaltserhoehung-rechner', 'vermoegenswirksame-leistungen-rechner', 'arbeitstage-rechner', 'dienstwagen-1-prozent-rechner', 'kirchensteuer-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

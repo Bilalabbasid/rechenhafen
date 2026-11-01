@@ -27,7 +27,7 @@ describe('CalculatorCard icons and accents', () => {
 
   it('avoids known keyword collisions', () => {
     const cat = (slug: string) => ALL_CALCULATORS.find((c) => c.slug === slug)?.category;
-    expect(resolveIcon('schokolade-temperieren-rechner', cat('schokolade-temperieren-rechner'))).not.toBe(resolveIcon('e-auto-ladekosten-zuhause-rechner'));
+    expect(resolveIcon('schokolade-temperieren-rechner', cat('schokolade-temperieren-rechner'))).not.toBe(resolveIcon('elektroauto-ladekosten-rechner'));
     expect(resolveIcon('motorrad-unterhaltskosten-rechner')).not.toBe(resolveIcon('unterhaltsvorschuss-rechner'));
     expect(resolveIcon('mietrendite-brutto-netto-rechner')).not.toBe(resolveIcon('brutto-netto-rechner'));
   });

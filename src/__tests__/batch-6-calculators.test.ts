@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 
 export const BATCH_6_SLUGS = [
-  // Gesundheit & Fitness (25)
   'bmi-rechner',
   'kalorienbedarf-rechner',
   'wasserbedarf-rechner',
@@ -28,8 +27,6 @@ export const BATCH_6_SLUGS = [
   'puls-trainingszonen-rechner',
   'schwimmen-kalorienverbrauch-rechner',
   'radfahren-kalorien-watt-rechner',
-
-  // Familie & Schwangerschaft (25)
   'geburtstermin-rechner',
   'fruchtbare-tage-rechner',
   'elterngeld-basis-plus-rechner',

@@ -522,7 +522,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Welche Steuervergünstigung gilt für Elektro- und Hybrid-Dienstwagen?', answer: 'Für reine Elektroautos mit Bruttolistenpreis bis 70.000 € gilt die 0,25-%-Regel; für teurere E-Autos und qualifizierte Plug-in-Hybride (mind. 80 km elektrische Reichweite) gilt die 0,5-%-Regelung.' },
       { question: 'Gilt der Rabatt des Händlers auch für den Bruttolistenpreis?', answer: 'Nein, maßgeblich ist ausnahmslos die offizielle unverbindliche Preisempfehlung (UVP) des Herstellers zum Zeitpunkt der Erstzulassung, selbst wenn der Wagen mit 30 % Rabatt erworben wurde.' },
     ],
-    relatedSlugs: ['firmenwagen-geldwerter-vorteil-rechner', 'hybrid-auto-kosten-rechner', 'fahrtenbuch-vs-1-prozent-rechner', 'pendlerpauschale-rechner', 'kfz-steuer-rechner', 'dienstfahrrad-jobrad-rechner'],
+    relatedSlugs: ['dienstwagen-1-prozent-rechner', 'hybrid-auto-kosten-rechner', 'fahrtenbuch-vs-1-prozent-rechner', 'pendlerpauschale-rechner', 'kfz-steuer-rechner', 'dienstfahrrad-jobrad-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -1217,7 +1217,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Müssen Privatpersonen die THG-Quote versteuern?', answer: 'Nein, nach Verfügung des Bundesfinanzministeriums (BMF) sind Einnahmen aus der Veräußerung der THG-Quote bei im Privatvermögen gehaltenen Elektroautos vollkommen steuerfrei.' },
       { question: 'Kann man die THG-Prämie auch für geleaste E-Autos beantragen?', answer: 'Ja, berechtigt ist derjenige, der im Fahrzeugschein (Zulassungsbescheinigung Teil I) als Fahrzeughalter eingetragen ist – bei Leasingverträgen ist das fast immer der Leasingnehmer.' },
     ],
-    relatedSlugs: ['elektroauto-ladekosten-rechner', 'e-auto-ladekosten-zuhause-rechner', 'kfz-steuer-rechner'],
+    relatedSlugs: ['elektroauto-ladekosten-rechner', 'elektroauto-ladekosten-rechner', 'kfz-steuer-rechner'],
   },
 
   {
@@ -1392,7 +1392,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           content: 'Dieser Rechner arbeitet vollständig anbieterunabhängig auf Basis des deutschen Steuerrechts (§ 6 Abs. 1 Nr. 4 Satz 6 EStG i. V. m. amtlichen BMF-Erlassen). Das Berechnungsprinzip der Gehaltsumwandlung gilt einheitlich für alle deutschen Leasinggesellschaften – darunter JobRad GmbH, Deutsche Dienstrad, Bikeleasing-Service, BusinessBike, Lease a Bike und KazenMaier. RechenHafen steht in keinem geschäftlichen oder gesellschaftsrechtlichen Verhältnis zu diesen Marken.',
         },
       ],
-      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie BMF LStH 2025 Anhang 24 IV Nr. 4 zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Versicherungskennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung). Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/firmenwagen-geldwerter-vorteil-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/). Unverbindliche Modellrechnung – keine Steuerberatung.',
+      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie BMF LStH 2025 Anhang 24 IV Nr. 4 zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Versicherungskennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung). Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/dienstwagen-1-prozent-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/). Unverbindliche Modellrechnung – keine Steuerberatung.',
     },
     faqs: [
       { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung (LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: Die Brutto-UVP wird geviertelt (25 %), dieses Viertel wird auf volle 100 Euro nach unten abgerundet und davon wird monatlich 1 Prozent als geldwerter Vorteil angesetzt. Bei 3.500 € UVP: 3.500 € ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil.' },
@@ -1419,7 +1419,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         reviewedDate: '2026-10-09',
       },
     ],
-    relatedSlugs: ['brutto-netto-rechner', 'pendlerpauschale-rechner', 'fahrtkostenrechner', 'firmenwagen-geldwerter-vorteil-rechner', 'einkommensteuerrechner', 'stromkostenrechner'],
+    relatedSlugs: ['brutto-netto-rechner', 'pendlerpauschale-rechner', 'fahrtkostenrechner', 'dienstwagen-1-prozent-rechner', 'einkommensteuerrechner', 'stromkostenrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -2013,235 +2013,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       lastVerified: '2026-01-15',
     },
   },
-
-  {
-    id: 'minijob-midijob-rechner',
-    slug: 'minijob-midijob-rechner',
-    name: 'Minijob- & Midijob-Rechner (Übergangsbereich bis 2.000 €)',
-    shortName: 'Minijob & Midijob',
-    category: 'arbeit-gehalt',
-    subcategory: 'Gehalt & Netto',
-    metaTitle: 'Minijob & Midijob Rechner 2026: Abzüge & Netto berechnen',
-    metaDescription: 'Berechnen Sie Abzüge und Nettoverdienst 2026 im Minijob (603 € Grenze) und im Midijob (Übergangsbereich 603,01 € bis 2.000 €) nach § 20 SGB IV.',
-    h1: 'Minijob & Midijob Rechner – Abzüge im Übergangsbereich berechnen',
-    shortDescription: 'Ermittelt die gleitenden Sozialversicherungsbeiträge im Übergangsbereich (Midijob) mit der amtlichen Formel nach § 20 Abs. 2a SGB IV und dem Faktor F 2026.',
-    searchKeywords: ['minijob rechner 603 euro netto', 'minijob grenze 2026', 'midijob rechner uebergangsbereich 2000 euro', 'paragraph 20 sgb iv gleitzone rechner', 'sozialversicherung midijob abzug'],
-    inputs: [
-      { id: 'monthlyGross', label: 'Monatlicher Bruttolohn', type: 'number', defaultValue: 850, min: 0, max: 2500, step: 25, unit: '€' },
-      {
-        id: 'pensionOptOut',
-        label: 'Rentenversicherungspflicht im Minijob (nur relevant bis 603 €)',
-        type: 'select',
-        defaultValue: 'keep',
-        options: [
-          { value: 'keep', label: 'Beitragspflichtig bleiben (3,6 % Eigenanteil zur Rentenversicherung)' },
-          { value: 'exempt', label: 'Befreiungsantrag stellen (0 % Abzug)' },
-        ],
-      },
-    ],
-    calculate: (inputs) => {
-      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 850;
-      const optOut = inputs.pensionOptOut === 'exempt';
-      const config = getTaxConfig(2026);
-      const minijobGrenze = config.minijobGrenze; // 603 € (2026)
-      const obergrenze = config.midijobObergrenze; // 2.000 €
-      const anRate = (config.beitragssatzRentenversicherung + config.beitragssatzArbeitslosenversicherung
-        + config.beitragssatzKrankenversicherungAllgemein + config.zusatzbeitragKrankenversicherungDurchschnitt
-        + config.beitragssatzPflegeversicherung) / 2;
-      // Vereinfachte Lohnsteuer-Schätzung (Steuerklasse I, Arbeitnehmer-Pauschbetrag), wie im Midijob-Rechner
-      const lohnsteuer = (sv: number) => computeEStSingle(Math.max(0, (gross - sv) * 12 - 1230), config) / 12;
-
-      // 1. Minijob (bis 603 €, § 8 Abs. 1a SGB IV)
-      if (gross <= minijobGrenze) {
-        const rvDeduction = optOut ? 0 : gross * config.minijobRvEigenanteil;
-        const net = gross - rvDeduction;
-        // Minijob-Zentrale 2026: KV 13 % + RV 15 % + Pauschsteuer 2 % + U1 0,8 % + U2 0,22 % + Insolvenzgeldumlage 0,15 % = 31,17 %
-        const employerCosts = gross * (config.minijobPauschaleKv + config.minijobPauschaleRv + config.minijobPauschsteuer
-          + config.minijobUmlageU1 + config.minijobUmlageU2 + config.minijobInsolvenzgeldumlage);
-        return {
-          primary: { id: 'net', label: 'Nettolohn im Minijob', value: net, formattedValue: formatCurrency(net), highlight: true },
-          secondary: [
-            { id: 'rvDeduction', label: 'Eigenanteil Rentenversicherung', value: rvDeduction, formattedValue: formatCurrency(rvDeduction) },
-            { id: 'jobType', label: 'Beschäftigungsart', value: 0, formattedValue: `Geringfügige Beschäftigung (Minijob bis ${formatCurrency(minijobGrenze)})` },
-            { id: 'employerCosts', label: 'Pauschalabgaben Arbeitgeber (höchstens 31,17 %)', value: employerCosts, formattedValue: formatCurrency(employerCosts) },
-          ],
-          summaryText: `Bei ${formatCurrency(gross)} Brutto im Minijob erhalten Sie ${formatCurrency(net)} netto ausgezahlt (${optOut ? 'ohne Abzüge' : 'abzgl. 3,6 % Rentenbeitrag zur Sicherung von Rentenansprüchen'}).`,
-        };
-      }
-
-      // 2. Midijob / Übergangsbereich (603,01 € bis 2.000,00 €, § 20 Abs. 2a SGB IV)
-      if (gross <= obergrenze) {
-        const { beArbeitnehmer, anBeitrag, agBeitrag } = computeUebergangsbereich(gross, config);
-        const taxEstimate = lohnsteuer(anBeitrag);
-        const net = gross - anBeitrag - taxEstimate;
-        const employeeRate = anBeitrag / gross;
-
-        return {
-          primary: { id: 'net', label: 'Nettolohn im Midijob', value: net, formattedValue: formatCurrency(net), highlight: true },
-          secondary: [
-            { id: 'svDeduction', label: 'Ermäßigte Sozialversicherungsbeiträge (Arbeitnehmer)', value: anBeitrag, formattedValue: formatCurrency(anBeitrag) },
-            { id: 'rateEffective', label: 'Effektiver SV-Beitragssatz Arbeitnehmer', value: employeeRate * 100, formattedValue: formatPercent(employeeRate * 100, 1) },
-            { id: 'beArbeitnehmer', label: 'Beitragspflichtige Einnahme Arbeitnehmer (§ 20 Abs. 2a SGB IV)', value: beArbeitnehmer, formattedValue: formatCurrency(beArbeitnehmer) },
-            { id: 'taxEstimate', label: 'Geschätzte Lohnsteuer (Steuerklasse I)', value: taxEstimate, formattedValue: formatCurrency(taxEstimate) },
-            { id: 'employerContribution', label: 'Arbeitgeberanteil Sozialversicherung', value: agBeitrag, formattedValue: formatCurrency(agBeitrag) },
-            { id: 'jobType', label: 'Beschäftigungsart', value: 0, formattedValue: 'Übergangsbereich (Midijob)' },
-          ],
-          summaryText: `Im Midijob bei ${formatCurrency(gross)} Brutto zahlen Sie ermäßigte Sozialversicherungsbeiträge von ${formatPercent(employeeRate * 100, 1)} (${formatCurrency(anBeitrag)}). Sie erhalten ca. ${formatCurrency(net)} netto.`,
-        };
-      }
-
-      // 3. Regulärer Job (> 2.000 €): voller Arbeitnehmeranteil
-      const svNormal = gross * anRate;
-      const taxNormal = lohnsteuer(svNormal);
-      const netNormal = gross - svNormal - taxNormal;
-      return {
-        primary: { id: 'netNormal', label: 'Nettolohn (reguläre Beschäftigung)', value: netNormal, formattedValue: formatCurrency(netNormal), highlight: true },
-        secondary: [
-          { id: 'svNormal', label: `Volle Sozialversicherungsbeiträge (${formatPercent(anRate * 100, 2)})`, value: svNormal, formattedValue: formatCurrency(svNormal) },
-          { id: 'taxNormal', label: 'Geschätzte Lohnsteuer (Steuerklasse I)', value: taxNormal, formattedValue: formatCurrency(taxNormal) },
-        ],
-        summaryText: `Über 2.000 € greift der reguläre Sozialversicherungssatz. Bei ${formatCurrency(gross)} Brutto verbleiben ca. ${formatCurrency(netNormal)} netto.`,
-      };
-    },
-    formula: 'Beitragspflichtige Einnahme AN = 2.000 ÷ (2.000 − 603) × (Brutto − 603); Gesamt = F × 603 + (2.000 ÷ 1.397 − 603 ÷ 1.397 × F) × (Brutto − 603), F = 0,6619 (2026)',
-    formulaExplanation: 'Im Übergangsbereich (früher Gleitzone) zwischen 603,01 € und 2.000,00 € zahlen Arbeitnehmer Sozialversicherungsbeiträge nur auf eine reduzierte beitragspflichtige Einnahme (§ 20 Abs. 2a SGB IV), erwerben aber dennoch volle Rentenansprüche. Der Arbeitgeberanteil ergibt sich aus dem Gesamtbeitrag auf die mit dem Faktor F 2026 (0,6619) berechnete Einnahme abzüglich des Arbeitnehmeranteils. Annahmen: Steuerklasse I, ohne Kirchensteuer, Pflegeversicherung ohne Kinderlosenzuschlag, durchschnittlicher Zusatzbeitrag der Krankenkassen.',
-    workedExample: {
-      title: 'Beispiel: 850 € Midijob (2026)',
-      inputValues: [{ label: 'Brutto', value: '850 €' }],
-      steps: [
-        'Übergangsbereich greift (603,01 € bis 2.000 €)',
-        'Beitragspflichtige Einnahme AN: 2.000 ÷ 1.397 × (850 − 603) = 353,61 €',
-        'Arbeitnehmeranteil SV: 353,61 € × 21,15 % (½ von 42,3 % inkl. Ø-Zusatzbeitrag 2,9 %) = 74,79 € (effektiv ca. 8,8 %)',
-        'Lohnsteuer in Steuerklasse I: 0 €',
-      ],
-      result: 'ca. 775,21 € Netto',
-    },
-    content: {
-      intro: 'Dieser Rechner ermittelt Abgaben und Nettobeträge 2026 im Minijob (bis 603 € monatlich) und im Übergangsbereich (Midijob von 603,01 € bis 2.000 €). Die Minijob-Grenze ist an den Mindestlohn gekoppelt: 13,90 € × 130 ÷ 3 = 602,33 €, aufgerundet 603 € (§ 8 Abs. 1a SGB IV).',
-      details: 'Im Minijob zahlt der Arbeitnehmer bei Befreiung von der Rentenversicherungspflicht keine Abgaben (603 € brutto = netto). Im Midijob steigt der Arbeitnehmeranteil zur Sozialversicherung gleitend von 0 € knapp oberhalb der Minijob-Grenze auf den vollen Anteil von 21,15 % bei 2.000 € (RV 9,3 %, ALV 1,3 %, KV 7,3 % + ½ des durchschnittlichen Zusatzbeitrags 2026 von 2,9 %, PV 1,8 % ohne Kinderlosenzuschlag).',
-    },
-    faqs: [
-      { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Der Eigenanteil beträgt nur 3,6 % (bei 603 € rund 21,71 € im Monat); dafür sichern Sie sich vollwertige Beitragsmonate für Reha-Ansprüche, Erwerbsminderungsrente und frühere Altersrenten.' },
-      { question: 'Wie viele Stunden darf man im Minijob beim gesetzlichen Mindestlohn arbeiten?', answer: 'Teilen Sie die Minijob-Grenze durch den Mindestlohn: Bei 603 € und 13,90 € Mindestlohn (2026) liegt die Höchstarbeitszeit bei rund 43 Stunden pro Kalendermonat.' },
-      { question: 'Wie hoch ist die Minijob-Grenze 2027?', answer: 'Zum 1. Januar 2027 steigt der Mindestlohn auf 14,60 € (MiLoV5). Daraus ergibt sich eine Minijob-Grenze von 14,60 € × 130 ÷ 3 = 632,67 €, aufgerundet 633 € im Monat. Dieser Rechner verwendet die Werte für 2026.' },
-    ],
-    legalFootnotes: [
-      {
-        citation: '§ 8 Abs. 1a SGB IV',
-        text: 'Geringfügigkeitsgrenze = Mindestlohn × 130 ÷ 3, auf volle Euro aufgerundet: 13,90 € × 130 ÷ 3 = 602,33 € → 603 € monatlich (Minijob-Zentrale; Deutsche Rentenversicherung, Meldung vom 23.02.2026).',
-        url: 'https://www.gesetze-im-internet.de/sgb_4/__8.html',
-        effectiveDate: '01.01.2026',
-        reviewedDate: '2026-10-25',
-      },
-      {
-        citation: 'MiLoV5, BGBl. 2025 I Nr. 268',
-        text: 'Fünfte Mindestlohnanpassungsverordnung vom 5. November 2025: Mindestlohn 13,90 € brutto je Stunde ab 01.01.2026, 14,60 € ab 01.01.2027.',
-        url: 'https://www.gesetze-im-internet.de/milov5/BJNR10C0A0025.html',
-        effectiveDate: '01.01.2026',
-        reviewedDate: '2026-10-25',
-      },
-      {
-        citation: '§ 20 Abs. 2, 2a SGB IV; BMAS-Bekanntmachung vom 25.11.2025 (BAnz AT 18.12.2025 B5)',
-        text: 'Übergangsbereich 603,01 € bis 2.000 €. Faktor F 2026 = 28 % ÷ Gesamtsozialversicherungsbeitragssatz 42,3 % = 0,6619.',
-        url: 'https://www.gesetze-im-internet.de/sgb_4/__20.html',
-        effectiveDate: '01.01.2026',
-        reviewedDate: '2026-10-25',
-      },
-      {
-        citation: '§ 242a Abs. 2 SGB V; BMG-Bekanntmachung vom 7. November 2025 (BAnz AT 10.11.2025 B7)',
-        text: 'Durchschnittlicher Zusatzbeitragssatz 2026: 2,9 %. Er ist Teil des Gesamtsozialversicherungsbeitragssatzes von 42,3 % (18,6 + 2,6 + 14,6 + 2,9 + 3,6) und wird im Rechner für die Midijob-Beiträge angesetzt.',
-        url: 'https://www.bundesanzeiger.de/pub/publication/oUJYVk8GYRXybnb9Y4h/content/oUJYVk8GYRXybnb9Y4h/BAnz%20AT%2010.11.2025%20B7.pdf',
-        effectiveDate: '01.01.2026',
-        reviewedDate: '2026-10-25',
-      },
-      {
-        citation: 'Minijob-Zentrale: Abgaben im gewerblichen Minijob',
-        text: 'Arbeitgeber zahlen höchstens 31,17 % (KV 13 %, RV 15 %, Pauschsteuer 2 %, U1 0,8 %, U2 0,22 %, Insolvenzgeldumlage 0,15 %); Eigenanteil des Minijobbers zur Rentenversicherung 3,6 %.',
-        url: 'https://www.minijob-zentrale.de/DE/fuer-gewerbetreibende/abgaben-und-steuern/abgaben-und-steuern_node.html',
-        effectiveDate: '01.01.2026',
-        reviewedDate: '2026-10-25',
-      },
-    ],
-    relatedSlugs: ['teilzeit-gehaltsrechner', 'arbeitgeberanteil-sozialversicherung-rechner', 'stundenlohnrechner'],
-    isTimeSensitive: true,
-    timeSensitiveMeta: {
-      year: 2026,
-      source: 'Minijob-Zentrale / Deutsche Rentenversicherung (§ 8 Abs. 1a, § 20 SGB IV), MiLoV5 (BGBl. 2025 I Nr. 268), BMAS-Bekanntmachung Faktor F 2026',
-      sourceUrl: 'https://www.minijob-zentrale.de/DE/fuer-gewerbetreibende/abgaben-und-steuern/abgaben-und-steuern_node.html',
-      lastVerified: '2026-10-25',
-    }
-  },
-
-  {
-    id: 'arbeitgeberanteil-sozialversicherung-rechner',
-    slug: 'arbeitgeberanteil-sozialversicherung-rechner',
-    name: 'Arbeitgeber-Gesamtkosten-Rechner (Lohnnebenkosten)',
-    shortName: 'Arbeitgeberbelastung',
-    category: 'arbeit-gehalt',
-    subcategory: 'Gehalt & Netto',
-    metaTitle: 'Arbeitgeberanteil Rechner – Lohnnebenkosten',
-    metaDescription: 'Berechnen Sie die echten Gesamtkosten eines Mitarbeiters für Arbeitgeber: Bruttogehalt zzgl. AG-Anteile zur Sozialversicherung (ca.',
-    h1: 'Arbeitgeberanteil Rechner – Gesamte Personalkosten berechnen',
-    shortDescription: 'Ermittelt den Arbeitgeber-Gesamtaufwand inklusive Sozialversicherungsbeiträgen und gesetzlichen Umlagen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['arbeitgeberanteil rechner', 'lohnnebenkosten arbeitgeber prozent 2026', 'personalkosten rechner brutto', 'arbeitgeberanteil sozialversicherung formel'],
-    inputs: [
-      { id: 'monthlyGross', label: 'Vereinbartes monatliches Bruttogehalt des Mitarbeiters', type: 'number', defaultValue: 4000, min: 0, step: 100, unit: '€' },
-      { id: 'healthAddOnPct', label: 'Zusatzbeitrag der Krankenkasse (gesamt, z. B. 1,7 %)', type: 'number', defaultValue: 1.7, min: 0, max: 3.5, step: 0.1, unit: '%', helpText: 'Kassenindividueller Zusatzbeitrag (0 % bei Kassen ohne Zusatzbeitrag)' },
-      { id: 'umlagenPct', label: 'Umlagen U1 (Krankheit), U2 (Mutterschaft), U3 (Insolvenzgeld) ca.', type: 'number', defaultValue: 2.2, min: 0, max: 5.0, step: 0.1, unit: '%' },
-    ],
-    calculate: (inputs) => {
-      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 4000;
-      const addOn = inputs.healthAddOnPct !== undefined && inputs.healthAddOnPct !== '' ? Math.max(0, parseFloat(inputs.healthAddOnPct) || 0) : 1.7;
-      const umlagen = inputs.umlagenPct !== undefined && inputs.umlagenPct !== '' ? Math.max(0, parseFloat(inputs.umlagenPct) || 0) : 2.2;
-
-      // Beitragsbemessungsgrenzen 2026 beachten (grob):
-      const bbzKv = 5175; // KV/PV
-      const bbzRv = 7550; // RV/AV
-
-      const kvGross = Math.min(gross, bbzKv);
-      const rvGross = Math.min(gross, bbzRv);
-
-      // AG-Beitragssätze:
-      const agKv = kvGross * ((14.6 + addOn) / 2 / 100); // 7,3% + halber Zusatzbeitrag
-      const agPv = kvGross * 0.022; // 2,2%
-      const agRv = rvGross * 0.093; // 9,3%
-      const agAv = rvGross * 0.013; // 1,3%
-      const agUmlagen = gross * (umlagen / 100);
-
-      const agSocialTotal = agKv + agPv + agRv + agAv;
-      const totalAgCost = gross + agSocialTotal + agUmlagen;
-      const markupPct = gross > 0 ? ((totalAgCost - gross) / gross) * 100 : 0;
-
-      return {
-        primary: { id: 'totalAgCost', label: 'Monatliche Arbeitgeber-Gesamtkosten', value: totalAgCost, formattedValue: formatCurrency(totalAgCost), highlight: true },
-        secondary: [
-          { id: 'agSocialTotal', label: 'Arbeitgeberanteil Sozialversicherung', value: agSocialTotal, formattedValue: formatCurrency(agSocialTotal) },
-          { id: 'agUmlagen', label: 'Umlagen U1, U2, U3 & Berufsgenossenschaft', value: agUmlagen, formattedValue: formatCurrency(agUmlagen) },
-          { id: 'markupPct', label: 'Lohnnebenkosten-Aufschlag', value: markupPct, formattedValue: formatPercent(markupPct, 1) },
-          { id: 'yearlyAgCost', label: 'Gesamtkosten pro Jahr', value: totalAgCost * 12, formattedValue: formatCurrency(totalAgCost * 12) },
-        ],
-        summaryText: `Ein Mitarbeiter mit ${formatCurrency(gross)} Bruttogehalt kostet den Arbeitgeber insgesamt ca. ${formatCurrency(totalAgCost)} monatlich (Aufschlag von ${formatPercent(markupPct, 1)} Lohnnebenkosten).`,
-      };
-    },
-    formula: 'AG-Kosten = Bruttolohn + AG-KV + AG-PV + AG-RV + AG-AV + Umlagen (U1/U2/U3)',
-    formulaExplanation: 'Arbeitgeber tragen rund 21 % des Bruttolohns zusätzlich für Sozialversicherungen sowie verpflichtende Umlagen für Entgeltfortzahlung und Mutterschutz.',
-    workedExample: {
-      title: 'Beispiel: 4.000 € Bruttogehalt',
-      inputValues: [{ label: 'Brutto', value: '4.000 €' }],
-      steps: ['AG-Sozialversicherung ≈ 804 € (20,1 %)', 'Umlagen U1-U3 ≈ 88 € (2,2 %)', 'Gesamtkosten = 4.892 € monatlich'],
-      result: 'ca. 4.892,00 € Arbeitgeberkosten',
-    },
-    content: {
-      intro: 'Die Lohnnebenkosten (Arbeitgeberbrutto) erfassen alle gesetzlichen Sozialversicherungsbeiträge und Umlagen, die der Arbeitgeber zusätzlich zum Bruttolohn trägt.',
-      details: 'Zu den rund 20–21 % Arbeitgeberanteil (Kranken-, Pflege-, Renten- und Arbeitslosenversicherung) kommen die Umlagen U1 (Lohnfortzahlung bei Krankheit), U2 (Mutterschutz), U3 (Insolvenzgeld) und der Unfallversicherungsbeitrag zur Berufsgenossenschaft.',
-    },
-    faqs: [
-      { question: 'Wie viel kostet ein Mitarbeiter den Arbeitgeber insgesamt?', answer: 'Als Faustregel gilt: Das Arbeitgeberbrutto liegt ca. 20 bis 23 Prozent über dem vereinbarten Bruttogehalt des Mitarbeiters.' },
-      { question: 'Wer zahlt die Umlage U1?', answer: 'Nur Betriebe mit in der Regel nicht mehr als 30 Vollzeitbeschäftigten; größere Unternehmen tragen das Entgeltfortzahlungsrisiko im Krankheitsfall komplett selbst.' },
-    ],
-    relatedSlugs: ['teilzeit-gehaltsrechner', 'minijob-midijob-rechner', 'stundenlohnrechner'],
-  },
-
+
   {
     id: 'kuendigungsfrist-arbeitnehmer-rechner',
     slug: 'kuendigungsfrist-arbeitnehmer-rechner',
@@ -2396,93 +2168,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     ],
     relatedSlugs: ['nachtzuschlag-sonntagszuschlag-rechner', 'stundenlohnrechner', 'teilzeit-gehaltsrechner'],
   },
-
-  {
-    id: 'firmenwagen-geldwerter-vorteil-rechner',
-    slug: 'firmenwagen-geldwerter-vorteil-rechner',
-    name: 'Firmenwagen-Rechner (Geldwerter Vorteil) (Lohnabrechnung)',
-    shortName: 'Geldwerter Vorteil Dienstwagen',
-    category: 'arbeit-gehalt',
-    subcategory: 'Gehalt & Netto',
-    metaTitle: 'Geldwerter Vorteil Firmenwagen: Auswirkung aufs Netto',
-    metaDescription: 'Ermitteln Sie die genaue Auswirkung des Dienstwagens auf Ihr Nettogehalt: Geldwerter Vorteil für Privatnutzung und Fahrten zwischen Wohnung und erster Tätigkeitsstätte.',
-    h1: 'Geldwerter Vorteil Rechner – Firmenwagen auf der Gehaltsabrechnung',
-    shortDescription: 'Zeigt die exakten steuerlichen Auswirkungen des Dienstwagens auf dem monatlichen Gehaltszettel.',
-    searchKeywords: ['geldwerter vorteil firmenwagen rechner lohnabrechnung', 'firmenwagen netto abzug berechnen', '1 prozent regelung gehaltszettel', 'dienstwagen geldwerter vorteil'],
-    inputs: [
-      { id: 'monthlyGross', label: 'Monatliches Grundgehalt (vor Firmenwagen)', type: 'number', defaultValue: 4500, min: 0, step: 100, unit: '€' },
-      { id: 'grossListPrice', label: 'Bruttolistenpreis des Autos (UVP)', type: 'number', defaultValue: 45000, min: 0, step: 1000, unit: '€' },
-      { id: 'distanceWorkKm', label: 'Einfache Entfernung zur Arbeit in km', type: 'number', defaultValue: 15, min: 0, max: 150, step: 1, unit: 'km' },
-      {
-        id: 'engineType',
-        label: 'Antriebsart des Firmenwagens',
-        type: 'select',
-        defaultValue: 'combustion',
-        options: [
-          { value: 'combustion', label: 'Verbrenner (1 % + 0,03 % je km)' },
-          { value: 'hybrid', label: 'Plug-in-Hybrid (0,5 % + 0,015 % je km)' },
-          { value: 'electric', label: 'Elektroauto (0,25 % + 0,0075 % je km)' },
-        ],
-      },
-    ],
-    calculate: (inputs) => {
-      const gross = inputs.monthlyGross !== undefined && inputs.monthlyGross !== '' ? Math.max(0, parseFloat(inputs.monthlyGross) || 0) : 4500;
-      const blp = inputs.grossListPrice !== undefined && inputs.grossListPrice !== '' ? Math.max(0, parseFloat(inputs.grossListPrice) || 0) : 45000;
-      const km = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? Math.max(0, parseFloat(inputs.distanceWorkKm) || 0) : 15;
-      const type = inputs.engineType || 'combustion';
-
-      let pRate = 0.01;
-      let cRate = 0.0003;
-      if (type === 'hybrid') { pRate = 0.005; cRate = 0.00015; }
-      if (type === 'electric') { pRate = 0.0025; cRate = 0.000075; }
-
-      const vorteilPrivat = blp * pRate;
-      const vorteilArbeitsweg = blp * cRate * km;
-      const totalVorteil = vorteilPrivat + vorteilArbeitsweg;
-      const newGrossForTax = gross + totalVorteil;
-
-      // Netto ohne Firmenwagen (ca. 60 %) vs. Netto mit Firmenwagen
-      const oldNet = gross * 0.60;
-      // Steuer und SV auf neues Steuerbrutto, danach Abzug des Sachbezugs
-      const estimatedDeduction = totalVorteil * 0.45;
-      const newNet = oldNet - estimatedDeduction;
-
-      return {
-        primary: { id: 'estimatedDeduction', label: 'Tatsächliche monatliche Netto-Minderung', value: estimatedDeduction, formattedValue: formatCurrency(estimatedDeduction), highlight: true },
-        secondary: [
-          { id: 'totalVorteil', label: 'Geldwerter Vorteil gesamt (Hinzurechnungsbetrag)', value: totalVorteil, formattedValue: formatCurrency(totalVorteil) },
-          { id: 'newGrossForTax', label: 'Neues Steuerbrutto auf dem Gehaltszettel', value: newGrossForTax, formattedValue: formatCurrency(newGrossForTax) },
-          { id: 'newNet', label: 'Verbleibendes Netto nach Firmenwagen', value: newNet, formattedValue: formatCurrency(newNet) },
-        ],
-        summaryText: `Durch den Firmenwagen erhöht sich Ihr Steuerbrutto um ${formatCurrency(totalVorteil)}. Ihr monatliches Nettogehalt sinkt um ca. ${formatCurrency(estimatedDeduction)} auf ${formatCurrency(newNet)}.`,
-      };
-    },
-    formula: 'Geldwerter Vorteil = 1 % BLP + (0,03 % BLP × Entfernungskilometer)',
-    formulaExplanation: 'Der geldwerte Vorteil wird auf der Gehaltsabrechnung dem Brutto zugerechnet, versteuert und anschließend als Sachbezug wieder vom Netto abgezogen.',
-    workedExample: {
-      title: 'Beispiel: 4.500 € Gehalt, 45.000 € Verbrenner, 15 km Arbeitsweg',
-      inputValues: [{ label: 'Gehalt', value: '4.500 €' }, { label: 'BLP', value: '45.000 €' }, { label: 'Entfernung', value: '15 km' }],
-      steps: ['Privatanteil: 450,00 €', 'Arbeitsweganteil: 45.000 € × 0,0003 × 15 = 202,50 €', 'Vorteil gesamt: 652,50 €', 'Nettominderung ≈ 293,63 €/Monat'],
-      result: 'ca. 293,63 € Netto-Minderung',
-    },
-    content: {
-      intro: 'Dieser Rechner quantifiziert die steuerlichen Auswirkungen der Dienstwagennutzung auf Ihr monatliches Nettoeinkommen.',
-      details: 'Der geldwerte Vorteil (1-%-Regel plus 0,03 % pro Entfernungskilometer) erhöht das steuerpflichtige Bruttogehalt, wird nach Abzug der Steuern jedoch als Sachbezug wieder netto einbehalten.',
-    },
-    faqs: [
-      { question: 'Warum sinkt das monatliche Netto durch einen Firmenwagen?', answer: 'Weil Sie Steuern und Sozialabgaben auf den Sachbezug zahlen müssen, der Wagen selbst aber kein Bargeld ist, sondern Ihnen als Sachleistung zur Verfügung steht.' },
-      { question: 'Kann man eigene Zuzahlungen zum Dienstwagen steuermindernd geltend machen?', answer: 'Ja, Eigenbeteiligungen an den Anschaffungskosten oder laufende monatliche Zuzahlungen zur Leasingrate mindern den zu versteuernden geldwerten Vorteil Euro für Euro.' },
-    ],
-    relatedSlugs: ['dienstwagen-1-prozent-rechner', 'teilzeit-gehaltsrechner', 'pendlerpauschale-rechner'],
-    isTimeSensitive: true,
-    timeSensitiveMeta: {
-      year: 2026,
-      source: 'Einkommensteuergesetz (§ 8 Abs. 2 EStG)',
-      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__8.html',
-      lastVerified: '2026-01-15',
-    },
-  },
-
+
   {
     id: 'krankengeld-rechner',
     slug: 'krankengeld-rechner',
@@ -3089,74 +2775,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     ],
     relatedSlugs: ['stundenlohnrechner', 'teilzeit-gehaltsrechner', 'gehaltserhoehung-rechner'],
   },
-
-  {
-    id: 'brutto-stundensatz-freiberufler-rechner',
-    slug: 'brutto-stundensatz-freiberufler-rechner',
-    name: 'Stundensatz-Rechner für Freiberufler & Selbstständige',
-    shortName: 'Freiberufler Stundensatz',
-    category: 'arbeit-gehalt',
-    subcategory: 'Gehalt & Netto',
-    metaTitle: 'Stundensatz-Rechner für Freelancer & Selbstständige',
-    metaDescription: 'Berechnen Sie den erforderlichen Mindeststundensatz für Freelancer und Selbstständige unter Einbezug von Urlaub, Krankheit, Akquise und Fixkosten.',
-    h1: 'Stundensatz Rechner – Honorar für Freelancer & Selbstständige',
-    shortDescription: 'Kalkuliert den kostendeckenden Stundensatz auf Basis des gewünschten Nettoeinkommens mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['stundensatz rechner freiberufler', 'freelancer stundensatz kalkulieren', 'mindesthonorar selbststaendige berechnen', 'honorarsatz kalkulation formel'],
-    inputs: [
-      { id: 'desiredNetMonthly', label: 'Gewünschtes monatliches Nettoeinkommen zum Leben', type: 'number', defaultValue: 3200, min: 0, step: 200, unit: '€' },
-      { id: 'monthlyBusinessCosts', label: 'Betriebliche Fixkosten pro Monat (Büro, Software, Steuerberater)', type: 'number', defaultValue: 650, min: 0, step: 50, unit: '€', helpText: 'Betriebliche Monatskosten (0 € bei Home-Office ohne Zusatzkosten)' },
-      { id: 'privateHealthInsurance', label: 'Private/Freiwillige Kranken- & Pflegeversicherung pro Monat', type: 'number', defaultValue: 550, min: 0, max: 1200, step: 50, unit: '€' },
-      { id: 'pensionSavingsMonthly', label: 'Rücklage für Altersvorsorge pro Monat', type: 'number', defaultValue: 500, min: 0, step: 50, unit: '€' },
-      { id: 'billableHoursPct', label: 'Fakturierbare Arbeitszeit (üblich ca. 50 % - 65 % wegen Akquise/Büro)', type: 'number', defaultValue: 60, min: 10, max: 90, step: 5, unit: '%' },
-    ],
-    calculate: (inputs) => {
-      const netLife = inputs.desiredNetMonthly !== undefined && inputs.desiredNetMonthly !== '' ? Math.max(0, parseFloat(inputs.desiredNetMonthly) || 0) : 3200;
-      const bizCost = inputs.monthlyBusinessCosts !== undefined && inputs.monthlyBusinessCosts !== '' ? Math.max(0, parseFloat(inputs.monthlyBusinessCosts) || 0) : 650;
-      const pkv = inputs.privateHealthInsurance !== undefined && inputs.privateHealthInsurance !== '' ? Math.max(0, parseFloat(inputs.privateHealthInsurance) || 0) : 550;
-      const pension = inputs.pensionSavingsMonthly !== undefined && inputs.pensionSavingsMonthly !== '' ? Math.max(0, parseFloat(inputs.pensionSavingsMonthly) || 0) : 500;
-      const rawBillable = inputs.billableHoursPct !== undefined && inputs.billableHoursPct !== '' ? parseFloat(inputs.billableHoursPct) : 60;
-      const billablePct = Math.max(0.05, (!isNaN(rawBillable) && rawBillable > 0 ? rawBillable : 60) / 100);
-
-      // Steuerpuffer ca. 28-35% Einkommensteuer auf den Gewinn
-      const totalNeededMonthlyPreTax = ((netLife + pkv + pension) / 0.70) + bizCost;
-      const totalNeededYearly = totalNeededMonthlyPreTax * 12;
-
-      // Reale Arbeitstage: 250 Werktage - 30 Tage Urlaub/Fortbildung - 10 Tage Krankheit = 210 Tage
-      const productiveDays = 210;
-      const totalWorkHours = productiveDays * 8; // 1.680 Stunden
-      const billableHoursYearly = totalWorkHours * billablePct; // z. B. ca. 1.000 Stunden
-
-      const requiredHourlyRate = totalNeededYearly / billableHoursYearly;
-
-      return {
-        primary: { id: 'requiredHourlyRate', label: 'Empfohlener Mindest-Stundensatz (netto)', value: requiredHourlyRate, formattedValue: `${formatCurrency(requiredHourlyRate)}/Std.`, highlight: true },
-        secondary: [
-          { id: 'billableHoursYearly', label: 'Fakturierbare Stunden pro Jahr', value: billableHoursYearly, formattedValue: `ca. ${formatNumber(billableHoursYearly, 0)} Std.` },
-          { id: 'dailyRate', label: 'Empfohlener Tagessatz (8 Std.)', value: requiredHourlyRate * 8, formattedValue: formatCurrency(requiredHourlyRate * 8) },
-          { id: 'totalNeededYearly', label: 'Benötigter Jahresumsatz (netto)', value: totalNeededYearly, formattedValue: formatCurrency(totalNeededYearly) },
-        ],
-        summaryText: `Um ${formatCurrency(netLife)} Netto zu leben, benötigen Sie bei ${formatPercent(billablePct * 100, 0)} abrechenbarer Zeit einen Mindeststundensatz von ${formatCurrency(requiredHourlyRate)} (Tagessatz: ${formatCurrency(requiredHourlyRate * 8)}).`,
-      };
-    },
-    formula: 'Stundensatz = Benötigter Jahresumsatz / Abrechenbare Projektstunden',
-    formulaExplanation: 'Freelancer können selten mehr als 55 % bis 65 % ihrer Arbeitszeit direkt an Kunden fakturieren. Der Rest entfällt auf Akquise, Buchhaltung, Fortbildung, Krankheit und Urlaub.',
-    workedExample: {
-      title: 'Beispiel: 3.200 € Nettoziel bei 1.000 abrechenbaren Stunden/Jahr',
-      inputValues: [{ label: 'Nettoziel', value: '3.200 €/Monat' }, { label: 'Fixkosten & Vorsorge', value: '1.700 €/Monat' }],
-      steps: ['Benötigter Jahresumsatz ca. 85.000 €', 'Abrechenbare Stunden = 1.008 h', 'Stundensatz = 85.000 € / 1.008 h ≈ 84,30 €/Std.'],
-      result: 'ca. 85,00 € Netto-Stundensatz',
-    },
-    content: {
-      intro: 'Dieser Kalkulator ermittelt den kostendeckenden Mindeststundensatz für Selbstständige, Freelancer und Freiberufler.',
-      details: 'Ein Freiberufler muss aus seinem Stundensatz alle privaten Ausgaben, Krankenversicherung (100 % allein!), Altersvorsorge, Betriebsausgaben, unbezahlte Urlaubs- und Krankheitstage sowie Akquisezeiten erwirtschaften. Formel: Stundensatz = Jahresgesamtkosten / abrechenbare Jahresstunden.',
-    },
-    faqs: [
-      { question: 'Wie viele Stunden im Jahr kann ein Freelancer tatsächlich abrechnen?', answer: 'Bei rund 220 Arbeitstagen und Abzug von Urlaub, Krankheit, Buchhaltung und Vertrieb können die meisten Freiberufler nur rund 1.000 bis 1.200 Stunden pro Jahr fakturieren.' },
-      { question: 'Warum reicht ein Stundensatz von 50 Euro für Freelancer in Deutschland meist nicht aus?', answer: 'Nach Abzug von ca. 18 % Kranken/Pflegeversicherung, 20 % Altersvorsorge, Büro- und Softwarekosten sowie Einkommensteuer bleibt netto oft weniger als der Mindestlohn eines Festangestellten übrig.' },
-    ],
-    relatedSlugs: ['stundenlohnrechner', 'teilzeit-gehaltsrechner', 'jahresgehalt-in-monatsgehalt-rechner'],
-  },
-
+
   {
     id: 'urlaubsabgeltung-rechner',
     slug: 'urlaubsabgeltung-rechner',
@@ -3735,7 +3354,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Können Übungsleiterpauschale und Ehrenamtspauschale kombiniert werden?', answer: 'Ja, aber nur für unterschiedliche Tätigkeiten: Wer im selben Verein als Vorstand (Ehrenamt: bis 840 €) und als Jugendtrainer (Übungsleiter: bis 3.000 €) arbeitet, kann beide Freibeträge nebeneinander ausschöpfen.' },
       { question: 'Müssen Einnahmen unterhalb des Freibetrags in der Steuererklärung angegeben werden?', answer: 'Ja, sie gehören in die Anlage N oder S, werden dort jedoch über die Steuerbefreiung nach § 3 Nr. 26/26a EStG steuerlich wieder neutralisiert.' },
     ],
-    relatedSlugs: ['minijob-midijob-rechner', 'teilzeit-gehaltsrechner', 'dienstjubilaeum-steuerfrei-rechner'],
+    relatedSlugs: ['minijob-rechner', 'teilzeit-gehaltsrechner', 'dienstjubilaeum-steuerfrei-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

@@ -52,7 +52,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was ist das Annuitätenprinzip?', answer: 'Bei einem Annuitätendarlehen bleibt die monatliche Gesamtüberweisung (Rate) über die gesamte Zinsbindungsfrist hinweg konstant, während sich die Anteile von Zins und Tilgung Monat für Monat verschieben.' },
       { question: 'Kann ein Konsumentenkredit jederzeit vorzeitig getilgt werden?', answer: 'Ja, nach § 500 Abs. 2 BGB haben Verbraucher das Recht, Verbraucherdarlehen jederzeit ganz oder teilweise vorzeitig zurückzuzahlen.' },
     ],
-    relatedSlugs: ['zwischenfinanzierung-rechner', 'privatkredit-rechner', 'effektivzins-kredit-rechner', 'vorfaelligkeitsentschaedigung-rechner', 'gesamtzinsbelastung-rechner', 'modernisierungskredit-rechner'],
+    relatedSlugs: ['zwischenfinanzierung-rechner', 'ratenkreditrechner', 'effektivzins-kredit-rechner', 'vorfaelligkeitsentschaedigung-rechner', 'gesamtzinsbelastung-rechner', 'modernisierungskredit-rechner'],
   },
   {
     id: 'ratenkreditrechner',
@@ -317,6 +317,6 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was geschieht mit der Restschuld am Ende der Zinsbindung?', answer: 'Die finanzierende Bank unterbreitet ein Angebot zur Verlängerung (Prolongation); alternativ kann der Betrag auf eine günstigere Fremdbank umgeschuldet oder bar getilgt werden.' },
       { question: 'Welches Risiko birgt eine hohe Restschuld?', answer: 'Das Zinsänderungsrisiko: Liegen die Marktzinsen am Ende der Zinsbindung höher als bei Abschluss, steigt die künftige Monatsbelastung für die Anschlussfinanzierung spürbar.' },
     ],
-    relatedSlugs: ['tilgungsrechner', 'kreditrechner', 'sondertilgungsrechner', 'kredit-restschuld-stichtag-rechner'],
+    relatedSlugs: ['tilgungsrechner', 'kreditrechner', 'sondertilgungsrechner', 'restschuld-rechner'],
   },
 ];

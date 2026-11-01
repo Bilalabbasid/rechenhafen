@@ -2009,155 +2009,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Muss die Fassade vor dem Anstrich grundiert werden?', answer: 'Ja, ein Tiefengrund festigt sandende Bestandsputze, egalisiert die Saugfähigkeit und verhindert streifige Farbunterschiede.' },
     ],
     relatedSlugs: ['farbmengen-rechner', 'daemmung-u-wert-rechner', 'dachflaeche-rechner'],
-  },
-  {
-    id: "parkett-laminat-rechner",
-    slug: "parkett-laminat-rechner",
-    name: "Parkett- & Laminat-Rechner (Paketanzahl & Verschnitt nach Raummaß)",
-    shortName: "Parkett & Laminat",
-    category: "bauen-renovieren",
-    subcategory: "Rohbau & Boden",
-    metaTitle: 'Parkett & Laminat Rechner – Pakete, Quadratmeter',
-    metaDescription: 'Berechnen Sie den genauen Bedarf an Laminat, Parkett oder Klick-Vinyl: Quadratmeter, Paketanzahl, Verschnitt (5-15 %) und Sockelleisten in Metern.',
-    h1: 'Parkett & Laminat Rechner – Paketanzahl & Fußleisten ermitteln',
-    shortDescription: 'Ermittelt Quadratmeter, Pakete und Sockelleisten für Bodenbeläge mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["laminat rechner pakete m2","parkett bedarf berechnen verschnitt","sockelleisten meter berechnen","klick vinyl quadratmeter pakete"],
-    inputs: [
-          {
-                "id": "roomLength",
-                "label": "Raumlänge",
-                "type": "number",
-                "defaultValue": 5.5,
-                "min": 1,
-                "max": 50,
-                "step": 0.1,
-                "unit": "m"
-          },
-          {
-                "id": "roomWidth",
-                "label": "Raumbreite",
-                "type": "number",
-                "defaultValue": 4.2,
-                "min": 1,
-                "max": 50,
-                "step": 0.1,
-                "unit": "m"
-          },
-          {
-                "id": "packSizeM2",
-                "label": "Packungsinhalt in m² laut Hersteller",
-                "type": "number",
-                "defaultValue": 2.22,
-                "min": 0.5,
-                "max": 10,
-                "step": 0.01,
-                "unit": "m²"
-          },
-          {
-                "id": "layingPattern",
-                "label": "Verlegemuster & Verschnitt",
-                "type": "select",
-                "defaultValue": "straight",
-                "options": [
-                      {
-                            "value": "straight",
-                            "label": "Gerade Verlegung / wilder Verband (ca. 7 % Verschnitt)"
-                      },
-                      {
-                            "value": "diagonal",
-                            "label": "Diagonale Verlegung (ca. 12 % Verschnitt)"
-                      },
-                      {
-                            "value": "herringbone",
-                            "label": "Fischgrätmuster (ca. 15 % Verschnitt)"
-                      }
-                ]
-          },
-          {
-                "id": "doorsCount",
-                "label": "Anzahl Türen (Abzug für Sockelleisten)",
-                "type": "number",
-                "defaultValue": 1,
-                "min": 0,
-                "max": 10,
-                "step": 1,
-                "unit": "Stück"
-          }
-    ],
-    calculate: (inputs: Record<string, any>) => {
-      const l = Number(inputs.roomLength) || 0;
-      const w = Number(inputs.roomWidth) || 0;
-
-      if (l <= 0 || w <= 0) {
-        return {
-          primary: { id: 'packs', label: 'Benötigte Pakete Bodenbelag', value: 0, formattedValue: '0 Pakete (0,00 m²)', highlight: true },
-          secondary: [
-            { id: 'netArea', label: 'Reine Bodenfläche (Netto)', value: 0, formattedValue: '0,00 m²' },
-            { id: 'orderArea', label: 'Mindest-Bedarfsfläche inkl. Verschnitt', value: 0, formattedValue: '0,00 m²' },
-            { id: 'skirting', label: 'Sockelleisten (inkl. Gehrungsverschnitt)', value: 0, formattedValue: '0,0 lfd. Meter' },
-          ],
-          summaryText: 'Bitte positive Raummaße (Länge und Breite) eingeben.',
-          error: 'Raumlänge und Raumbreite müssen größer als 0 sein.',
-        };
-      }
-
-      const netArea = l * w;
-      let wastePercent = 7;
-      if (inputs.layingPattern === 'diagonal') wastePercent = 12;
-      else if (inputs.layingPattern === 'herringbone') wastePercent = 15;
-      
-      const orderArea = netArea * (1 + wastePercent / 100);
-      const packM2 = Number(inputs.packSizeM2) || 2.22;
-      const packs = packM2 > 0 ? Math.ceil(orderArea / packM2) : 0;
-      const actualBoughtArea = packs * packM2;
-      
-      // Sockelleisten: Umfang abzüglich ca. 0.9 m je Tür
-      const doors = Number(inputs.doorsCount) || 0;
-      const perimeter = 2 * (l + w);
-      const skirtingM = Math.max(0, perimeter - (doors * 0.9)) * 1.05; // 5 % Gehrungsschnitt-Puffer
-      
-      return {
-        primary: { id: 'packs', label: 'Benötigte Pakete Bodenbelag', value: packs, formattedValue: packs + ' Pakete (' + formatNumber(actualBoughtArea, 2) + ' m²)', highlight: true },
-        secondary: [
-          { id: 'netArea', label: 'Reine Bodenfläche (Netto)', value: netArea, formattedValue: formatNumber(netArea, 2) + ' m²' },
-          { id: 'orderArea', label: 'Mindest-Bedarfsfläche inkl. Verschnitt', value: orderArea, formattedValue: formatNumber(orderArea, 2) + ' m²' },
-          { id: 'skirting', label: 'Sockelleisten (inkl. Gehrungsverschnitt)', value: skirtingM, formattedValue: formatNumber(skirtingM, 1) + ' lfd. Meter' },
-        ],
-        summaryText: 'Für ' + formatNumber(netArea, 2) + ' m² Wohnfläche benötigen Sie ' + packs + ' Pakete (' + formatNumber(actualBoughtArea, 2) + ' m²) sowie ca. ' + formatNumber(skirtingM, 1) + ' m Sockelleisten.',
-      };
-    },
-    formula: "Pakete = ceil((Raumlänge × Raumbreite × (1 + Verschnitt/100)) / Packungsinhalt)",
-    formulaExplanation: "Rundungsregel: Bei Bodenbelägen immer auf volle Pakete aufrunden, da angebrochene Dielen vom Verschnitt nicht immer wiederverwendet werden können.",
-    workedExample: {
-          "title": "Beispiel: 23,1 m² Wohnzimmer, Pakete à 2,22 m² (7 % Verschnitt)",
-          "inputValues": [
-                {
-                      "label": "Raum",
-                      "value": "5,5 m × 4,2 m (23,1 m²)"
-                },
-                {
-                      "label": "Packung",
-                      "value": "2,22 m²"
-                }
-          ],
-          "steps": [
-                "Bedarf = 23,1 × 1,07 = 24,717 m²",
-                "Pakete = 24,717 / 2,22 = 11,13 -> 12 Pakete",
-                "Gekauft: 12 × 2,22 = 26,64 m²"
-          ],
-          "result": "12 Pakete Laminat/Parkett"
-    },
-    content: {
-      intro: 'Dieser Rechner plant den Bedarf an Parkett-, Laminat- oder Korkdielen, Trittschalldämmung und Fußleisten für Ihre Wohnräume.',
-      details: 'Fläche = Raumlänge · Raumbreite plus 5 bis 8 % Verschnitt. Bei Verlegung auf mineralischem Untergrund (Estrich) ist nach DIN 18202 zwingend eine Dampfbremsfolie (PE-Folie mit SD-Wert > 100 m) vorgeschrieben.',
-    },
-    faqs: [
-      { question: 'Wie berechnet man die laufenden Meter für Sockelleisten?', answer: 'Umfang des Raumes = 2 · (Länge + Breite) abzüglich aller Türöffnungen plus ca. 10 Prozent Verschnitt für Gehrungsschnitte.' },
-      { question: 'Warum ist eine Dehnungsfuge an den Wänden unverzichtbar?', answer: 'Holz und Laminat dehnen sich bei feuchter Raumluft aus; ohne Dehnungsfuge von mindestens 10 bis 15 mm zu Wänden und Rohren wölbt sich der Boden auf.' },
-    ],
-    relatedSlugs: ['treppen-stufen-rechner', 'bodenbelag-rechner', 'estrich-rechner', 'farbmengen-rechner'],
-  },
-  {
+  },  {
     id: "tapetenrollen-rechner",
     slug: "tapetenrollen-rechner",
     name: "Tapeten-Bedarfsrechner (Euro-Rollen Bedarf nach Raumumfang & Rapport)",
@@ -2298,7 +2150,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Was bedeutet die Angabe "Versetzter Ansatz 64/32 cm" auf der Tapete?', answer: 'Das Muster wiederholt sich alle 64 cm und muss bei jeder zweiten Bahn um 32 cm in der Höhe versetzt geklebt werden; dies erfordert ca. 1 bis 2 Rollen Mehrbedarf.' },
       { question: 'Werden Fenster und Türen von der Tapetenfläche abgezogen?', answer: 'Bei Standardfenstern und Türen zieht man die Flächen meist nicht ab, da die Abschnitte über und unter Fenstern aus den Rollenresten geschnitten werden.' },
     ],
-    relatedSlugs: ['farbmengen-rechner', 'bodenbelag-rechner', 'parkett-laminat-rechner'],
+    relatedSlugs: ['farbmengen-rechner', 'bodenbelag-rechner', 'bodenbelag-rechner'],
   },
   {
     id: "brennholz-raummeter-rechner",
@@ -3027,7 +2879,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Ersetzt der Rechner den statischen oder normativen Nachweis nach DIN 18065?', answer: 'Nein. Der Rechner ist eine ergonomische Planungshilfe basierend auf der Schrittmaßformel. Eine vollständige Prüfung nach DIN 18065 und Landesbauordnung umfasst zusätzlich Mindestlaufbreiten, Absturzsicherungen, Geländerhöhen, Rutschklassen und Brandschutzauflagen.' },
       { question: 'Welcher Neigungswinkel gilt bei Wohnhaustreppen als optimal?', answer: 'Ein Steigungswinkel zwischen 30° und 37° gilt im Wohnungsbau als ergonomisch ausgewogen und sicher zu begehen.' },
     ],
-    relatedSlugs: ['parkett-laminat-rechner', 'estrich-rechner', 'bodenbelag-rechner'],
+    relatedSlugs: ['bodenbelag-rechner', 'estrich-rechner', 'bodenbelag-rechner'],
   },
   {
     id: "kies-splitt-rechner",
@@ -4158,7 +4010,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Gilt die Formel A = 1/2 · g · h auch bei stumpfwinkligen Dreiecken?', answer: 'Ja, uneingeschränkt: Bei stumpfwinkligen Dreiecken liegt der Höhenfußpunkt außerhalb des Dreiecks auf der verlängerten Grundlinie.' },
       { question: 'Wie lautet die Trigonometrie-Formel für die Dreiecksfläche?', answer: 'A = 1/2 · a · b · sin(gamma). Sie benötigt lediglich zwei Seitenlängen und den von ihnen eingeschlossenen Innenwinkel.' },
     ],
-    relatedSlugs: ['dreiecks-hoehen-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'rechteckrechner', 'satz-des-pythagoras-rechner', 'bogenmass-grad-rechner'],
+    relatedSlugs: ['dreiecks-hoehen-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'rechteckrechner', 'pythagoras-rechner', 'bogenmass-grad-rechner'],
   },
   {
     id: "kreis-umfang-rechner",
@@ -5580,156 +5432,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Welchem Bogenmaß entsprechen 90° und 180°?', answer: '90° entsprechen exakt pi/2 Radiant (ca. 1,5708 rad); 180° entsprechen exakt pi Radiant (ca. 3,1416 rad).' },
     ],
     relatedSlugs: ['kreissegment-rechner', 'dreieck-flaeche-rechner', 'kreis-umfang-rechner', 'sinussatz-kosinussatz-rechner'],
-  },
-  {
-    id: "satz-des-pythagoras-rechner",
-    slug: "satz-des-pythagoras-rechner",
-    name: "Satz-des-Pythagoras-Rechner (a² + b² = c² & Kathetensatz)",
-    shortName: "Pythagoras-Rechner",
-    category: "geometrie",
-    subcategory: "Ebene Figuren",
-    metaTitle: 'Satz des Pythagoras Rechner – a² + b² = c² Katheten',
-    metaDescription: 'Berechnen Sie Hypotenuse c oder Kathete a/b im rechtwinkligen Dreieck nach dem Satz des Pythagoras a² + b² = c² inklusive Höhen- und Kathetensatz.',
-    h1: 'Satz des Pythagoras Rechner – a² + b² = c² sofort berechnen',
-    shortDescription: 'Berechnet Hypotenuse oder Kathete im rechtwinkligen Dreieck mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ["satz des pythagoras rechner formel","a2 plus b2 gleich c2 rechner","hypotenuse berechnen rechtwinkliges dreieck","kathete a b pythagoras formel"],
-    inputs: [
-          {
-                "id": "calcMode",
-                "label": "Gesuchte Seite",
-                "type": "select",
-                "defaultValue": "c",
-                "options": [
-                      {
-                            "value": "c",
-                            "label": "Hypotenuse c gesucht (Katheten a und b gegeben)"
-                      },
-                      {
-                            "value": "a",
-                            "label": "Kathete a gesucht (Kathete b und Hypotenuse c gegeben)"
-                      },
-                      {
-                            "value": "b",
-                            "label": "Kathete b gesucht (Kathete a und Hypotenuse c gegeben)"
-                      }
-                ]
-          },
-          {
-                "id": "val1",
-                "label": "Erster gegebener Wert",
-                "type": "number",
-                "defaultValue": 3,
-                "min": 0.1,
-                "max": 10000,
-                "step": 0.1,
-                "unit": "cm"
-          },
-          {
-                "id": "val2",
-                "label": "Zweiter gegebener Wert",
-                "type": "number",
-                "defaultValue": 4,
-                "min": 0.1,
-                "max": 10000,
-                "step": 0.1,
-                "unit": "cm"
-          }
-    ],
-    calculate: (inputs: Record<string, any>) => {
-      const mode = inputs.calcMode;
-      const v1 = Number(inputs.val1) || 0;
-      const v2 = Number(inputs.val2) || 0;
-
-      if (v1 <= 0 || v2 <= 0) {
-        return {
-          primary: { id: 'resultSide', label: mode === 'c' ? 'Hypotenuse c' : mode === 'a' ? 'Kathete a' : 'Kathete b', value: 0, formattedValue: '0,00 cm', highlight: true },
-          secondary: [
-            { id: 'area', label: 'Dreiecksfläche (A = 1/2 · a · b)', value: 0, formattedValue: '0,00 cm²' },
-            { id: 'perimeter', label: 'Umfang (U = a + b + c)', value: 0, formattedValue: '0,00 cm' },
-            { id: 'heightC', label: 'Höhe auf Hypotenuse (h_c)', value: 0, formattedValue: '0,00 cm' },
-          ],
-          summaryText: 'Bitte positive Seitenlängen eingeben.',
-          error: 'Die Seitenlängen müssen größer als 0 sein.',
-        };
-      }
-
-      if ((mode === 'a' || mode === 'b') && v2 <= v1) {
-        return {
-          primary: { id: 'resultSide', label: mode === 'a' ? 'Kathete a' : 'Kathete b', value: 0, formattedValue: '0,00 cm', highlight: true },
-          secondary: [
-            { id: 'area', label: 'Dreiecksfläche (A = 1/2 · a · b)', value: 0, formattedValue: '0,00 cm²' },
-            { id: 'perimeter', label: 'Umfang (U = a + b + c)', value: 0, formattedValue: '0,00 cm' },
-            { id: 'heightC', label: 'Höhe auf Hypotenuse (h_c)', value: 0, formattedValue: '0,00 cm' },
-          ],
-          summaryText: 'Die Hypotenuse c muss länger als die gegebene Kathete sein.',
-          error: 'Die Hypotenuse c muss größer als die Kathete sein.',
-        };
-      }
-      
-      let a = 0;
-      let b = 0;
-      let c = 0;
-      
-      if (mode === 'c') {
-        a = v1;
-        b = v2;
-        c = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-      } else if (mode === 'a') {
-        b = v1;
-        c = v2;
-        a = c > b ? Math.sqrt(Math.pow(c, 2) - Math.pow(b, 2)) : 0;
-      } else {
-        a = v1;
-        c = v2;
-        b = c > a ? Math.sqrt(Math.pow(c, 2) - Math.pow(a, 2)) : 0;
-      }
-      
-      const area = 0.5 * a * b;
-      const perimeter = a + b + c;
-      // Höhe auf Hypotenuse c: h_c = (a * b) / c
-      const hc = c > 0 ? (a * b) / c : 0;
-      
-      return {
-        primary: { id: 'resultSide', label: mode === 'c' ? 'Hypotenuse c' : mode === 'a' ? 'Kathete a' : 'Kathete b', value: mode === 'c' ? c : mode === 'a' ? a : b, formattedValue: formatNumber(mode === 'c' ? c : mode === 'a' ? a : b, 2) + ' cm', highlight: true },
-        secondary: [
-          { id: 'area', label: 'Dreiecksfläche (A = 1/2 · a · b)', value: area, formattedValue: formatNumber(area, 2) + ' cm²' },
-          { id: 'perimeter', label: 'Umfang (U = a + b + c)', value: perimeter, formattedValue: formatNumber(perimeter, 2) + ' cm' },
-          { id: 'heightC', label: 'Höhe auf Hypotenuse (h_c)', value: hc, formattedValue: formatNumber(hc, 2) + ' cm' },
-        ],
-        summaryText: 'Im rechtwinkligen Dreieck mit Katheten ' + formatNumber(a, 2) + ' cm und ' + formatNumber(b, 2) + ' cm beträgt die Hypotenuse ' + formatNumber(c, 2) + ' cm (Fläche ' + formatNumber(area, 2) + ' cm²).',
-      };
-    },
-    formula: "c = √(a² + b²); a = √(c² - b²); b = √(c² - a²)",
-    formulaExplanation: "In jedem rechtwinkligen Dreieck ist die Summe der Flächeninhalte der beiden Kathetenquadrate gleich dem Flächeninhalt des Hypotenusenquadrats.",
-    workedExample: {
-          "title": "Beispiel: Klassisches pythagoreisches Tripel (3, 4, 5)",
-          "inputValues": [
-                {
-                      "label": "Kathete a",
-                      "value": "3 cm"
-                },
-                {
-                      "label": "Kathete b",
-                      "value": "4 cm"
-                }
-          ],
-          "steps": [
-                "c² = 3² + 4² = 9 + 16 = 25",
-                "c = √25 = 5 cm"
-          ],
-          "result": "c = 5 cm Hypotenuse"
-    },
-    content: {
-      intro: 'Dieser Geometrierechner berechnet Katheten und Hypotenuse rechtwinkliger Dreiecke und prüft Dreiecke auf Rechtwinkligkeit (Kehrsatz des Pythagoras).',
-      details: 'Hypotenuse c = Wurzel(a² + b²); Kathete a = Wurzel(c² - b²). Gilt a² + b² = c², ist der eingeschlossene Winkel gamma garantiert exakt 90 Grad.',
-    },
-    faqs: [
-      { question: 'Wie prüften schon die alten Ägypter rechte Winkel auf Feldern?', answer: 'Mit einer Zwölfknotenschnur mit den Knotenabständen 3, 4 und 5 Einheiten; aufgespannt bildet sie zwingend einen perfekten 90-Grad-Winkel.' },
-      { question: 'Welche Kathetenlänge hat ein gleichschenklig-rechtwinkliges Dreieck mit c = 10 cm?', answer: 'a = b = c / Wurzel(2) = 10 / 1,4142 ≈ 7,07 cm.' },
-    ],
-    relatedSlugs: ['dreiecks-hoehen-rechner', 'vektor-skalarprodukt-rechner', 'dreieck-flaeche-rechner', 'sinussatz-kosinussatz-rechner', 'rechteckrechner'],
-  },
-  {
+  },  {
     id: "sinussatz-kosinussatz-rechner",
     slug: "sinussatz-kosinussatz-rechner",
     name: "Sinussatz- & Kosinussatz-Rechner (Allgemeines Dreieck lösen)",
@@ -5852,7 +5555,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Wann wendet man den Sinussatz und wann den Kosinussatz an?', answer: 'Kosinussatz: Wenn alle drei Seiten (SSS) oder zwei Seiten und der eingeschlossene Winkel (SWS) gegeben sind. Sinussatz: Wenn eine Seite und zwei Winkel (WSW/SWW) oder zwei Seiten und der Gegenwinkel gegeben sind.' },
       { question: 'Was ist der mehrdeutige Fall (SSW) beim Sinussatz?', answer: 'Wenn der gegebene Winkel der kleineren der beiden Seiten gegenüberliegt; in diesem Fall kann es zwei mathematisch gültige Dreiecke (spitz- und stumpfwinklig) geben.' },
     ],
-    relatedSlugs: ['vektor-skalarprodukt-rechner', 'satz-des-pythagoras-rechner', 'dreieck-flaeche-rechner', 'bogenmass-grad-rechner'],
+    relatedSlugs: ['vektor-skalarprodukt-rechner', 'pythagoras-rechner', 'dreieck-flaeche-rechner', 'bogenmass-grad-rechner'],
   },
   {
     id: "vektor-skalarprodukt-rechner",
@@ -5990,7 +5693,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Wie berechnet man den Schnittwinkel zwischen zwei Vektoren?', answer: 'cos(phi) = (a · b) / (|a| · |b|). Man teilt das Skalarprodukt durch das Produkt der beiden Vektorlängen (Beträge) und wendet den Arkuskosinus (arccos) an.' },
       { question: 'Was ist der Unterschied zwischen Skalarprodukt und Kreuzprodukt?', answer: 'Das Skalarprodukt liefert als Ergebnis eine reelle Zahl (Skalar); das Vektorprodukt (Kreuzprodukt) liefert einen neuen dreidimensionalen Vektor, der senkrecht auf beiden Ausgangsvektoren steht.' },
     ],
-    relatedSlugs: ['satz-des-pythagoras-rechner', 'sinussatz-kosinussatz-rechner', 'quader-volumen-rechner'],
+    relatedSlugs: ['pythagoras-rechner', 'sinussatz-kosinussatz-rechner', 'quader-volumen-rechner'],
   },
   {
     id: "torus-volumen-rechner",
@@ -6310,7 +6013,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Wann liegt der Höhenschnittpunkt außerhalb des Dreiecks?', answer: 'Bei jedem stumpfwinkligen Dreieck liegt der Höhenschnittpunkt H im Außenbereich jenseits der stumpfen Ecke.' },
       { question: 'Wo liegt der Höhenschnittpunkt bei einem rechtwinkligen Dreieck?', answer: 'Exakt im Scheitelpunkt des rechten 90-Grad-Winkels, da die beiden Katheten gleichzeitig als Höhen aufeinander fungieren.' },
     ],
-    relatedSlugs: ['dreieck-flaeche-rechner', 'satz-des-pythagoras-rechner', 'sinussatz-kosinussatz-rechner'],
+    relatedSlugs: ['dreieck-flaeche-rechner', 'pythagoras-rechner', 'sinussatz-kosinussatz-rechner'],
   },
   {
     id: "goldener-schnitt-rechner",

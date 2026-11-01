@@ -2,27 +2,18 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 
 export const BATCH_4_SLUGS = [
-  // Group 1: Core Bauen & Bodenbeläge (3)
   'farbmengen-rechner',
   'bodenbelag-rechner',
   'betonrechner',
-
-  // Group 2: Core Geometrie (3)
   'kreisrechner',
   'zylinderrechner',
   'rechteckrechner',
-
-  // Group 3: Core Einheiten (1)
   'laengen-umrechner',
-
-  // Group 4: Extra Einheiten & Formate (5)
   'flaeche-umrechner',
   'volumen-umrechner',
   'zoll-in-cm-rechner',
   'papierformat-din-rechner',
   'dichte-umrechner',
-
-  // Group 5: Extra Bauen & Renovieren (16)
   'estrich-rechner',
   'dachflaeche-rechner',
   'bausteine-mauerwerk-rechner',
@@ -32,15 +23,12 @@ export const BATCH_4_SLUGS = [
   'trockenbau-gipskarton-rechner',
   'fundament-rechner',
   'fassadenfarbe-rechner',
-  'parkett-laminat-rechner',
   'tapetenrollen-rechner',
   'putz-rechner',
   'zaun-pfosten-rechner',
   'treppen-stufen-rechner',
   'holz-balken-durchbiegung-rechner',
   'beton-mischungsverhaeltnis-rechner',
-
-  // Group 6: Extra Geometrie (22)
   'dreieck-flaeche-rechner',
   'kreis-umfang-rechner',
   'kegel-volumen-rechner',
@@ -56,7 +44,7 @@ export const BATCH_4_SLUGS = [
   'ellipse-flaeche-rechner',
   'kreissegment-rechner',
   'bogenmass-grad-rechner',
-  'satz-des-pythagoras-rechner',
+  'pythagoras-rechner',
   'sinussatz-kosinussatz-rechner',
   'vektor-skalarprodukt-rechner',
   'torus-volumen-rechner',
@@ -66,8 +54,8 @@ export const BATCH_4_SLUGS = [
 ];
 
 describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
-  it('contains exactly 50 calculators assigned to Batch 4', () => {
-    expect(BATCH_4_SLUGS.length).toBe(50);
+  it('contains exactly 49 calculators assigned to Batch 4', () => {
+    expect(BATCH_4_SLUGS.length).toBe(49);
   });
 
   describe('1. Registry Resolution & Metadata Quality', () => {
@@ -252,14 +240,14 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
       expect(resZero.secondary?.find((s) => s.id === 'ratio')?.formattedValue).not.toContain('NaN');
     });
 
-    // satz-des-pythagoras-rechner: validates hypotenuse > kathete
+    // satz-des-pythagoras-rechner (merged into pythagoras-rechner): validates hypotenuse > kathete
     it('satz-des-pythagoras-rechner validates hypotenuse greater than kathete', () => {
-      const calc = getCalculatorBySlug('satz-des-pythagoras-rechner')!;
-      const resInvalid = calc.calculate({ calcMode: 'a', val1: 10, val2: 8 }); // c = 8, b = 10 -> impossible
+      const calc = getCalculatorBySlug('pythagoras-rechner')!;
+      const resInvalid = calc.calculate({ target: 'a', sideC: 8, sideB: 10 }); // c = 8, b = 10 -> impossible
       expect(resInvalid.error).toBeDefined();
       expect(resInvalid.primary.value).toBe(0);
 
-      const resValid = calc.calculate({ calcMode: 'c', val1: 3, val2: 4 });
+      const resValid = calc.calculate({ target: 'c', sideA: 3, sideB: 4 });
       expect(resValid.primary.value).toBe(5);
       expect(resValid.error).toBeUndefined();
     });
@@ -289,10 +277,10 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
       expect(resValid.primary.value).toBeGreaterThan(0);
     });
 
-    // parkett-laminat-rechner: validates room dimensions
+    // parkett-laminat-rechner (merged to bodenbelag-rechner): validates room dimensions
     it('parkett-laminat-rechner rejects 0 room dimensions', () => {
-      const calc = getCalculatorBySlug('parkett-laminat-rechner')!;
-      const resZero = calc.calculate({ roomLength: 0, roomWidth: 4 });
+      const calc = getCalculatorBySlug('bodenbelag-rechner')!;
+      const resZero = calc.calculate({ length: 0, width: 4 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
     });

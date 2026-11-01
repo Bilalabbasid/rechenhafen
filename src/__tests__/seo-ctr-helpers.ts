@@ -26,7 +26,7 @@ export const RANKING_GAP_SLUGS = ['abfindungsrechner', 'lkw-maut-deutschland-rec
  * and the Unterhalt pages (Düsseldorfer Tabelle 2026, Mindestunterhalt 486/558/653 €, UVG 227/299/394 €).
  */
 export const LASTMOD_2026_10_25_DATA_REVIEW_SLUGS = [
-  'minijob-midijob-rechner',
+  'minijob-rechner',
   'minijob-rechner',
   'midijob-rechner',
   'stundenlohnrechner',

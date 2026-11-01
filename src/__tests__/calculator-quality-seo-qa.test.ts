@@ -108,7 +108,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   describe('Calculator Registry & Route Smoke Tests', () => {
     it('discovers all registered calculators from real registry with self-referencing canonicals and exactly one H1', async () => {
       // 424 → 423: abfindung-fuenftelregelung-rechner per 301 in abfindungsrechner zusammengeführt
-      expect(ALL_CALCULATORS.length).toBe(424);
+      expect(ALL_CALCULATORS.length).toBe(408);
 
       for (const calc of ALL_CALCULATORS) {
         // Self-referencing canonical
@@ -849,9 +849,9 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
       expect(calc!.metaDescription).toContain('Berechne die voraussichtliche Gewerbesteuer');
       expect(calc!.content?.intro).toContain('kostenlosen Gewerbesteuerrechner');
       expect(calc!.content?.details).toContain('/rechner/einkommensteuerrechner/');
-      expect(calc!.content?.details).toContain('/rechner/umsatzsteuerrechner/');
+      expect(calc!.content?.details).toContain('/rechner/mwst-rechner/');
       expect(calc!.relatedSlugs).toContain('einkommensteuerrechner');
-      expect(calc!.relatedSlugs).toContain('umsatzsteuerrechner');
+      expect(calc!.relatedSlugs).toContain('mwst-rechner');
 
       const sectionTitles = (calc!.content?.sections || []).map((s) => s.title);
       expect(sectionTitles).toContain('Was der Gewerbeertrag bedeutet (Unterschied zum Gewinn)');

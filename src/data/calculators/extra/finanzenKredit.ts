@@ -99,7 +99,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Wie sicher ist Tagesgeld bei Banken in der EU?', answer: 'Über die gesetzliche Einlagensicherung (EdB in Deutschland) sind Einlagen bis 100.000 € pro Person und Kreditinstitut gesetzlich garantiert abgesichert.' },
       { question: 'Was ist der Unterschied zwischen Aktionszins und Bestandskundenzins?', answer: 'Banken locken Neukunden oft mit zeitlich befristeten Zinsgarantien (z. B. für 3 bis 6 Monate); danach fällt der Zins auf das variable Niveau für Bestandskunden zurück.' },
     ],
-    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'liquiditaetsreserve-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'notgroschen-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
   },
   {
     id: 'festgeld-rechner',
@@ -1266,73 +1266,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Wie viel Prozent seines Gehalts sollte man mindestens sparen?', answer: 'Finanzexperten empfehlen als Faustregel die 50/30/20-Regel: 50 % für Fixkosten, 30 % für Freizeit und Konsum, mindestens 20 % für Sparen und Vermögensaufbau.' },
     ],
     relatedSlugs: ['sparrechner', 'sparzielrechner', 'zinseszinsrechner', 'etf-sparplan-rechner', 'notgroschen-rechner'],
-  },
-  {
-    id: 'liquiditaetsreserve-rechner',
-    slug: 'liquiditaetsreserve-rechner',
-    name: 'Liquiditätsreserve-Rechner (Eiserne Notreserve)',
-    shortName: 'Liquiditätsreserve',
-    category: 'finanzen',
-    subcategory: 'Sparen & Vermögensaufbau',
-    metaTitle: 'Liquiditätsreserve Rechner für Selbstständige & Haushalte',
-    metaDescription: 'Berechnen Sie die notwendige Liquiditätsreserve für Selbstständige und Unternehmer zur Absicherung von Steuern und Fixkosten.',
-    h1: 'Liquiditätsreserve Rechner – Puffer für Steuern & Fixkosten',
-    shortDescription: 'Kalkuliert die erforderliche Liquiditätsreserve für Freiberufler und Gewerbetreibende zur Absicherung von Steuerrücklagen.',
-    searchKeywords: ['liquiditaetsreserve rechner', 'notgroschen rechner', 'wie viel notgroschen tagesgeld', 'liquiditaetsreserve berechnen', 'finanzielle sicherheit polster'],
-    inputs: [
-      { id: 'monthlyExpenses', label: 'Monatliche feste Lebenshaltungskosten', type: 'number', defaultValue: 1800, min: 200, step: 50, unit: '€' },
-      {
-        id: 'jobType',
-        label: 'Berufliche Situation',
-        type: 'select',
-        defaultValue: 'employee',
-        options: [
-          { value: 'civil', label: 'Beamter / Unkündbar (2 - 3 Monatsausgaben)' },
-          { value: 'employee', label: 'Angestellter im festen Arbeitsverhältnis (3 Monatsausgaben)' },
-          { value: 'family', label: 'Familie mit Kindern / Hauseigentümer (4 - 5 Monatsausgaben)' },
-          { value: 'freelance', label: 'Selbstständig / Freiberufler (6 Monatsausgaben)' },
-        ],
-      },
-    ],
-    calculate: (inputs) => {
-      const rawExp = inputs.monthlyExpenses !== undefined && inputs.monthlyExpenses !== null && String(inputs.monthlyExpenses).trim() !== ''
-        ? parseFloat(inputs.monthlyExpenses)
-        : 1800;
-      const exp = !isNaN(rawExp) ? Math.max(0, rawExp) : 1800;
-      const type = inputs.jobType || 'employee';
-      let mult = 3;
-      if (type === 'civil') mult = 2.5;
-      if (type === 'family') mult = 4.5;
-      if (type === 'freelance') mult = 6;
-      const target = exp * mult;
-      return {
-        primary: { id: 'target', label: 'Empfohlener Notgroschen', value: target, formattedValue: formatCurrency(target), highlight: true },
-        secondary: [
-          { id: 'mult', label: 'Empfohlene Monatsausgaben', value: mult, formattedValue: `${formatNumber(mult, 1)} Monate` },
-          { id: 'min', label: 'Absolutes Minimum (2 Monate)', value: exp * 2, formattedValue: formatCurrency(exp * 2) },
-        ],
-        summaryText: `Bei Fixkosten von ${formatCurrency(exp)} sollten Sie ca. ${formatCurrency(target)} auf dem Tagesgeldkonto als Notgroschen halten.`,
-      };
-    },
-    formula: 'Notgroschen = Monatliche Fixkosten × Multiplikator (3 bis 6)',
-    formulaExplanation: 'Verbraucherzentralen empfehlen 3 bis 6 Nettomonatsausgaben als Puffer.',
-    workedExample: {
-      title: 'Beispiel: Angestellter mit 1.800 € Fixkosten',
-      description: '1.800 € × 3 Monate = 5.400 € empfohlener Notgroschen.',
-      inputs: { monthlyExpenses: 1800, jobType: 'employee' },
-      resultSummary: 'ca. 5.400 € Notgroschen',
-    },
-    content: {
-      intro: 'Die Liquiditätsreserve ermittelt den optimalen Puffer auf Giro- und Tagesgeldkonten zur Abdeckung fixer Zahlungsverpflichtungen und kurzfristiger Risiken.',
-      details: 'Zur Berechnung werden alle regelmäßigen Fixkosten (Miete, Versicherungen, Kredite, Abos) erfasst. Eine gesunde Reserve verhindert teure Rücklastschriften und Verzugszinsen.',
-    },
-    faqs: [
-      { question: 'Wie viel Geld sollte maximal auf dem Girokonto verbleiben?', answer: 'Empfohlen wird ein Puffer von 1 bis 1,5 Monatsgehältern auf dem Girokonto; alle darüber hinausgehenden Beträge gehören aufs verzinste Tagesgeld oder in Anlageprodukte.' },
-      { question: 'Warum schadet eine zu große Liquiditätsreserve dem Vermögensaufbau?', answer: 'Überschüssige Barbestände unterliegen der Cash-Drag: Das Geld verliert real durch Inflation an Kaufkraft, statt an den Ertragschancen der Kapitalmärkte teilzuhaben.' },
-    ],
-    relatedSlugs: ['tagesgeld-rechner', 'sparrate-rechner', 'spardauer-rechner'],
-  },
-  {
+  },  {
     id: 'verdopplungszeit-rechner',
     slug: 'verdopplungszeit-rechner',
     name: 'Verdopplungszeit-Rechner (Exakte 72er-Regel)',
@@ -2588,86 +2522,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Muss die Bank vertragliche Sondertilgungsrechte berücksichtigen?', answer: 'Ja, nach ständiger BGH-Rechtsprechung müssen vereinbarte, noch nicht genutzte Sondertilgungen schadensmindernd in die Entschädigungsberechnung einfließen.' },
     ],
     relatedSlugs: ['umschuldung-rechner', 'kreditrechner', 'restschuld-rechner'],
-  },
-  {
-    id: 'schuldentilgungsdauer-rechner',
-    slug: 'schuldentilgungsdauer-rechner',
-    name: 'Schuldentilgungsdauer-Rechner (Wann bin ich schuldenfrei?)',
-    shortName: 'Schuldentilgungsdauer',
-    category: 'kredit-schulden',
-    subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Schuldentilgung: Wann bin ich schuldenfrei? Rechner',
-    metaDescription: 'Berechnen Sie, wie viele Monate Sie bei einer festen monatlichen Rate benötigen, um Ihre bestehenden Schulden vollständig zu tilgen.',
-    h1: 'Schuldentilgungsdauer Rechner (Schuldenfreiheit planen)',
-    shortDescription: 'Kalkuliert die exakte Monatsanzahl bis zur vollständigen Entschuldung bei fester Monatsrate.',
-    searchKeywords: ['schuldentilgungsdauer rechner', 'wann bin ich schuldenfrei rechner', 'schulden tilgen zeit berechnen', 'schuldenabbau monatsrate'],
-    inputs: [
-      { id: 'currentDebt', label: 'Aktuelle Gesamtschulden', type: 'number', defaultValue: 8000, min: 100, step: 250, unit: '€' },
-      { id: 'monthlyPayment', label: 'Mögliche monatliche Tilgungsrate', type: 'number', defaultValue: 300, min: 20, step: 20, unit: '€' },
-      { id: 'interestRate', label: 'Durchschnittlicher Zinssatz p.a.', type: 'number', defaultValue: 6.5, min: 0, step: 0.1, unit: '%' },
-    ],
-    calculate: (inputs) => {
-      const rawDebt = inputs.currentDebt !== undefined && inputs.currentDebt !== null && String(inputs.currentDebt).trim() !== ''
-        ? parseFloat(inputs.currentDebt)
-        : 8000;
-      const debt = !isNaN(rawDebt) ? Math.max(0, rawDebt) : 8000;
-      const rawPay = inputs.monthlyPayment !== undefined && inputs.monthlyPayment !== null && String(inputs.monthlyPayment).trim() !== ''
-        ? parseFloat(inputs.monthlyPayment)
-        : 300;
-      const pay = !isNaN(rawPay) ? rawPay : 300;
-      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
-        ? parseFloat(inputs.interestRate)
-        : 6.5;
-      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 6.5;
-      if (debt <= 0) {
-        return {
-          primary: { id: 'time', label: 'Zeit bis zur Schuldenfreiheit', value: 0, formattedValue: 'Bereits schuldenfrei', highlight: true },
-          secondary: [
-            { id: 'months', label: 'Anzahl Monatsraten', value: 0, formattedValue: '0 Raten' },
-            { id: 'interest', label: 'Zinsen bis Schuldenfreiheit', value: 0, formattedValue: '0,00 €' },
-          ],
-          summaryText: 'Keine Restschulden vorhanden.',
-        };
-      }
-      if (pay <= 0) {
-        return {
-          primary: { id: 'time', label: 'Dauer', value: 0, formattedValue: 'Nie schuldenfrei' },
-          error: 'Die monatliche Rate muss positiv sein.',
-        };
-      }
-      const r = (z / 100) / 12;
-      if (r > 0 && pay <= debt * r) return { primary: { id: 'time', label: 'Dauer', value: 0, formattedValue: 'Nie schuldenfrei' }, error: 'Monatsrate deckt nicht einmal die Zinsen.' };
-      const m = r > 0 ? Math.ceil(-Math.log(1 - (debt * r) / pay) / Math.log(1 + r)) : Math.ceil(debt / pay);
-      const y = Math.floor(m / 12);
-      const remM = m % 12;
-      return {
-        primary: { id: 'time', label: 'Zeit bis zur Schuldenfreiheit', value: m / 12, formattedValue: `${y} Jahre und ${remM} Monate`, highlight: true },
-        secondary: [
-          { id: 'months', label: 'Anzahl Monatsraten', value: m, formattedValue: `${m} Raten` },
-          { id: 'interest', label: 'Zinsen bis Schuldenfreiheit', value: (pay * m) - debt, formattedValue: formatCurrency((pay * m) - debt) },
-        ],
-        summaryText: `Bei ${formatCurrency(pay)} Monatsrate sind Ihre Schulden in ${y} Jahren und ${remM} Monaten getilgt.`,
-      };
-    },
-    formula: 'Monate = -ln(1 - (Schulden × r / Rate)) / ln(1 + r)',
-    formulaExplanation: 'Laufzeitbestimmung unter Berücksichtigung laufender Zinsen.',
-    workedExample: {
-      title: 'Beispiel: 8.000 € Schulden bei 300 € Rate zu 6,5 %',
-      description: 'Dauer: ca. 30 Monate (2,5 Jahre). Gesamtzinsen: ca. 687 €.',
-      inputs: { currentDebt: 8000, monthlyPayment: 300, interestRate: 6.5 },
-      resultSummary: 'ca. 30 Monate (2,5 Jahre)',
-    },
-    content: {
-      intro: 'Dieser Entschuldungsrechner ermittelt die verbleibende Zeitdauer in Jahren und Monaten, bis bestehende Verbindlichkeiten bei einer festgelegten Monatsrate vollständig getilgt sind.',
-      details: 'Formel: Laufzeit n = -ln(1 - (Kreditsumme · Monatszins) / Rate) / ln(1 + Monatszins). Reicht die gewählte Monatsrate nicht einmal zur Deckung der Zinsen aus, tritt eine theoretisch unendliche Verschuldung ein.',
-    },
-    faqs: [
-      { question: 'Was ist die Mindestrate zur Vermeidung einer Zinsfalle?', answer: 'Die Monatsrate muss zwingend höher sein als die monatlich auflaufenden Zinsen (Kreditsumme × Jahreszins / 12), da der Schuldenstand andernfalls Monat für Monat anwächst.' },
-      { question: 'Welche Methode empfiehlt sich bei mehreren Krediten (Schneeball vs. Lawine)?', answer: 'Die Lawinen-Methode tilgt zuerst den Kredit mit dem höchsten Zinssatz (finanziell optimal); die Schneeball-Methode tilgt zuerst den kleinsten Betrag (schnelle psychologische Erfolge).' },
-    ],
-    relatedSlugs: ['kreditlaufzeit-rechner', 'dispozins-rechner', 'umschuldung-rechner'],
-  },
-  {
+  },  {
     id: 'forward-darlehen-rechner',
     slug: 'forward-darlehen-rechner',
     name: 'Forward-Darlehen-Rechner (Zinsen für die Zukunft sichern)',
@@ -2804,79 +2659,8 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Wie wirkt sich eine Erhöhung der Monatsrate um 50 € aus?', answer: 'Bei einem 20.000-€-Kredit zu 6 % Zinsen verkürzt eine Erhöhung der Rate von 300 € auf 350 € die Gesamtlaufzeit um mehr als 14 Monate und spart hunderte Euro Zinsen.' },
       { question: 'Welche Laufzeit ist für Konsumentenkredite wirtschaftlich sinnvoll?', answer: 'Die Laufzeit sollte die Lebensdauer des finanzierten Konsumguts keinesfalls überschreiten (z. B. Smartphone maximal 24 Monate, Auto maximal 60 Monate).' },
     ],
-    relatedSlugs: ['privatkredit-rechner', 'kreditrechner', 'schuldentilgungsdauer-rechner', 'tilgungsrechner'],
-  },
-  {
-    id: 'kredit-restschuld-stichtag-rechner',
-    slug: 'kredit-restschuld-stichtag-rechner',
-    name: 'Kredit-Restschuld Stichtagsrechner (Restsumme)',
-    shortName: 'Restschuld zum Stichtag',
-    category: 'kredit-schulden',
-    subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Restschuld zum Stichtag Rechner – Exakte Kreditschuld ermitteln',
-    metaDescription: 'Ermitteln Sie die exakte Darlehensrestschuld zu einem beliebigen Wunsch-Stichtag für Kündigung, Ablösung oder Sondertilgung.',
-    h1: 'Restschuld zum Stichtag Rechner – Kreditsaldo taggenau berechnen',
-    shortDescription: 'Berechnet den exakten Kreditsaldo zu einem individuellen Kalenderstichtag für Umschuldung oder vorzeitige Darlehensablösung.',
-    searchKeywords: ['restschuld stichtag rechner', 'restschuld rechner', 'kredit restschuld berechnen', 'darlehen restschuld stichtag', 'tilgungsplan restbetrag'],
-    inputs: [
-      { id: 'loanAmount', label: 'Ursprüngliche Kreditsumme', type: 'number', defaultValue: 150000, min: 1000, step: 2500, unit: '€' },
-      { id: 'interestRate', label: 'Zinssatz p.a.', type: 'number', defaultValue: 3.8, min: 0.1, step: 0.1, unit: '%' },
-      { id: 'monthlyPayment', label: 'Monatliche Kreditrate', type: 'number', defaultValue: 800, min: 50, step: 25, unit: '€' },
-      { id: 'elapsedYears', label: 'Laufzeit bis zum Stichtag in Jahren', type: 'number', defaultValue: 10, min: 1, max: 35, step: 1, unit: 'Jahre' },
-    ],
-    calculate: (inputs) => {
-      const rawLoan = inputs.loanAmount !== undefined && inputs.loanAmount !== null && String(inputs.loanAmount).trim() !== ''
-        ? parseFloat(inputs.loanAmount)
-        : 150000;
-      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 150000;
-      const rawZ = inputs.interestRate !== undefined && inputs.interestRate !== null && String(inputs.interestRate).trim() !== ''
-        ? parseFloat(inputs.interestRate)
-        : 3.8;
-      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 3.8;
-      const rawPay = inputs.monthlyPayment !== undefined && inputs.monthlyPayment !== null && String(inputs.monthlyPayment).trim() !== ''
-        ? parseFloat(inputs.monthlyPayment)
-        : 800;
-      const pay = !isNaN(rawPay) ? Math.max(0, rawPay) : 800;
-      const rawY = inputs.elapsedYears !== undefined && inputs.elapsedYears !== null && String(inputs.elapsedYears).trim() !== ''
-        ? parseInt(inputs.elapsedYears, 10)
-        : 10;
-      const y = !isNaN(rawY) ? Math.max(0, rawY) : 10;
-      const r = (z / 100) / 12;
-      let balance = loan;
-      for (let i = 0; i < y * 12; i++) {
-        balance -= (pay - balance * r);
-        if (balance <= 0) { balance = 0; break; }
-      }
-      const repaid = loan - balance;
-      const repaidPct = loan > 0 ? (repaid / loan) * 100 : 0;
-      return {
-        primary: { id: 'rest', label: `Restschuld nach ${y} Jahren`, value: balance, formattedValue: formatCurrency(balance), highlight: true },
-        secondary: [
-          { id: 'repaid', label: 'Bisher getilgter Betrag', value: repaid, formattedValue: formatCurrency(repaid) },
-          { id: 'repaidPct', label: 'Getilgter Anteil', value: repaidPct, formattedValue: formatPercent(repaidPct, 1) },
-        ],
-        summaryText: `Nach ${y} Jahren verbleibt eine Restschuld von ${formatCurrency(balance)} (${formatPercent(repaidPct, 1)} getilgt).`,
-      };
-    },
-    formula: 'Restschuld nach Tilgungsplan',
-    formulaExplanation: 'Berechnet den Schuldenstand nach Abzug aller Tilgungsanteile.',
-    workedExample: {
-      title: 'Beispiel: 150.000 € zu 3,8 %, 800 € Rate nach 10 Jahren',
-      description: 'Restschuld nach 10 Jahren: ca. 98.450 €.',
-      inputs: { loanAmount: 150000, interestRate: 3.8, monthlyPayment: 800, elapsedYears: 10 },
-      resultSummary: 'ca. 98.450 € Restschuld',
-    },
-    content: {
-      intro: 'Dieser Stichtagsrechner beziffert die exakte verbleibende Kreditschuld zu einem ganz bestimmten Kalenderdatum in der Zukunft.',
-      details: 'Wichtig für Steuererklärungen, Vermögensaufstellungen, Scheidungsvereinbarungen oder Verhandlungen über vorzeitige Sondertilgungen.',
-    },
-    faqs: [
-      { question: 'Wie berechnet man den Zins- und Tilgungsanteil zu einem bestimmten Monat?', answer: 'Der Monatszins errechnet sich aus der Restschuld des Vormonats mal Monatszinssatz; die Differenz zur vereinbarten festen Monatsrate ist die Tilgung dieses Monats.' },
-      { question: 'Woher erhält man den offiziellen Restschuldsaldo für das Finanzamt?', answer: 'Banken versenden zu Jahresbeginn eine gesetzlich vorgeschriebene Jahresbescheinigung mit dem Restschuldsaldo zum 31. Dezember des Vorjahres.' },
-    ],
-    relatedSlugs: ['vorfaelligkeitsentschaedigung-baufinanzierung-rechner', 'kreditrechner', 'baufinanzierung-rechner', 'tilgungsrechner', 'restschuld-rechner'],
-  },
-  {
+    relatedSlugs: ['ratenkreditrechner', 'kreditrechner', 'restschuld-rechner', 'tilgungsrechner'],
+  },  {
     id: 'kreditrechner-ohne-eigenkapital',
     slug: 'kreditrechner-ohne-eigenkapital',
     name: 'Kreditrechner ohne Eigenkapital (100 % & 110 % Baufinanzierung)',
@@ -3014,78 +2798,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Warum weicht der Effektivzins vom Sollzins ab?', answer: 'Weil Zinsen meist monatlich nachschüssig verrechnet werden (unterjährige Zinsverrechnung) und eventuelle Nebenkosten oder Disagios eingerechnet werden.' },
     ],
     relatedSlugs: ['kreditrechner', 'kreditvergleich-rechner', 'umschuldung-rechner'],
-  },
-  {
-    id: 'privatkredit-rechner',
-    slug: 'privatkredit-rechner',
-    name: 'Privatkredit-Rechner (Kredit von privat an privat)',
-    shortName: 'Privatkredit',
-    category: 'kredit-schulden',
-    subcategory: 'Ratenkredit',
-    metaTitle: 'Privatkredit Rechner – Konsumentenkredit zur freien Verwendung',
-    metaDescription: 'Ermitteln Sie Monatsrate und Kreditkosten für einen Privatkredit zur freien Verwendung für Möbel, Renovierung oder Anschaffungen.',
-    h1: 'Privatkredit Rechner – Konsumentenkredit online planen',
-    shortDescription: 'Kalkuliert die monatliche Kreditbelastung für freie Privatdarlehen ohne Zweckbindung mit flexiblen Laufzeiten.',
-    searchKeywords: ['privatkredit rechner', 'darlehen familie zinsen rechner', 'privatdarlehen schenkungssteuer zinsen', 'kredit unter freunden vertrag'],
-    inputs: [
-      { id: 'loan', label: 'Geliehener Betrag', type: 'number', defaultValue: 10000, min: 100, step: 500, unit: '€' },
-      { id: 'rate', label: 'Vereinbarter Zinssatz (z. B. 0 % oder marktüblich)', type: 'number', defaultValue: 2.0, min: 0, step: 0.5, unit: '%' },
-      { id: 'months', label: 'Rückzahlungsdauer in Monaten', type: 'number', defaultValue: 36, min: 1, max: 120, step: 6, unit: 'Monate' },
-    ],
-    calculate: (inputs) => {
-      const rawLoan = inputs.loan !== undefined && inputs.loan !== null && String(inputs.loan).trim() !== ''
-        ? parseFloat(inputs.loan)
-        : 10000;
-      const loan = !isNaN(rawLoan) ? Math.max(0, rawLoan) : 10000;
-      const rawZ = inputs.rate !== undefined && inputs.rate !== null && String(inputs.rate).trim() !== ''
-        ? parseFloat(inputs.rate)
-        : 2.0;
-      const z = !isNaN(rawZ) ? Math.max(0, rawZ) : 2.0;
-      const rawM = inputs.months !== undefined && inputs.months !== null && String(inputs.months).trim() !== ''
-        ? parseInt(inputs.months, 10)
-        : 36;
-      if (isNaN(rawM) || rawM <= 0) {
-        return {
-          primary: { id: 'rate', label: 'Monatliche Rückzahlungsrate', value: 0, formattedValue: '0,00 €', highlight: true },
-          error: 'Die Laufzeit muss mindestens 1 Monat betragen.',
-        };
-      }
-      const m = rawM;
-      let monthly = loan / m;
-      let totalInterest = 0;
-      if (z > 0) {
-        const r = (z / 100) / 12;
-        monthly = loan * (r / (1 - Math.pow(1 + r, -m)));
-        totalInterest = (monthly * m) - loan;
-      }
-      return {
-        primary: { id: 'rate', label: 'Monatliche Rückzahlungsrate', value: monthly, formattedValue: formatCurrency(monthly), highlight: true },
-        secondary: [
-          { id: 'interest', label: 'Gesamter Zinsbetrag', value: totalInterest, formattedValue: formatCurrency(totalInterest) },
-          { id: 'total', label: 'Gesamtrückzahlung', value: loan + totalInterest, formattedValue: formatCurrency(loan + totalInterest) },
-        ],
-        summaryText: `Bei einem Privatdarlehen über ${formatCurrency(loan)} zahlen Sie monatlich ${formatCurrency(monthly)} an den Darlehensgeber zurück.`,
-      };
-    },
-    formula: 'Monatsrate = Kreditsumme / Monate (bei 0 %) bzw. Annuitätenformel',
-    formulaExplanation: 'Ein schriftlicher Darlehensvertrag schützt beide Seiten vor Missverständnissen.',
-    workedExample: {
-      title: 'Beispiel: 10.000 € zu 2 % Zinsen über 36 Monate',
-      description: 'Monatliche Rückzahlung: 286,43 €. Gesamtzinsen: ca. 311 €.',
-      inputs: { loan: 10000, rate: 2.0, months: 36 },
-      resultSummary: '286,43 € monatlich',
-    },
-    content: {
-      intro: 'Ein privater Darlehensvertrag zwischen Verwandten, Freunden oder Geschäftspartnern schafft rechtliche Klarheit bei Zinsen, Rückzahlung und Fälligkeiten.',
-      details: 'Aus steuerlicher Sicht (§ 7 Abs. 1 Nr. 1 ErbStG) kann ein zinsloses oder extrem niedrig verzinstes Darlehen vom Finanzamt als steuerpflichtige Schenkung gewertet werden, wenn es den marktüblichen Zinssatz unterschreitet.',
-    },
-    faqs: [
-      { question: 'Welcher Mindestzinssatz schützt bei Privatkrediten vor Schenkungsteuer?', answer: 'Die Finanzverwaltung verlangt nach § 15 BewG in der Regel eine Verzinsung von mindestens 5,5 Prozent p.a., wenn kein anderer marktüblicher Zins nachgewiesen wird.' },
-      { question: 'Sollte ein Darlehen unter Verwandten schriftlich fixiert werden?', answer: 'Unbedingt: Ein schriftlicher Darlehensvertrag mit exakter Kreditsumme, Zinssatz, Tilgungsplan und Kündigungsmodalitäten verhindert familiäre Streitigkeiten und dient als Nachweis gegenüber dem Finanzamt.' },
-    ],
-    relatedSlugs: ['kreditrechner', 'kreditlaufzeit-rechner', 'schuldentilgungsdauer-rechner'],
-  },
-  {
+  },  {
     id: 'zwischenfinanzierung-rechner',
     slug: 'zwischenfinanzierung-rechner',
     name: 'Zwischenfinanzierung-Rechner (Kurzfristiges Darlehen)',

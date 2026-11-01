@@ -15,18 +15,16 @@ const BATCH_1_SLUGS = [
   'bonus-netto-rechner',
   'abfindungsrechner',
   'renten-brutto-netto-rechner',
-  'umsatzsteuerrechner',
+  'mwst-rechner',
   'gewerbesteuer-rechner',
   'stundenlohnrechner',
   'teilzeit-gehaltsrechner',
   'gehaltserhoehung-rechner',
   'urlaubstage-rechner',
   'kurzarbeitergeld-rechner',
-  'minijob-midijob-rechner',
-  'arbeitgeberanteil-sozialversicherung-rechner',
   'kuendigungsfrist-arbeitnehmer-rechner',
   'ueberstunden-auszahlung-rechner',
-  'firmenwagen-geldwerter-vorteil-rechner',
+  'dienstwagen-1-prozent-rechner',
   'krankengeld-rechner',
   'mutterschaftsgeld-rechner',
   'elternzeit-teilzeit-rechner',
@@ -34,14 +32,13 @@ const BATCH_1_SLUGS = [
   'vermoegenswirksame-leistungen-rechner',
   'betriebliche-altersvorsorge-rechner',
   'jahresgehalt-in-monatsgehalt-rechner',
-  'brutto-stundensatz-freiberufler-rechner',
+  'stundensatz-kalkulation-freiberufler-rechner',
   'urlaubsabgeltung-rechner',
   'arbeitslosengeld-1-rechner',
   'dienstjubilaeum-steuerfrei-rechner',
   'buergergeld-anspruch-rechner',
   'sabbatical-rechner',
   'dienstaufwandsentschaedigung-rechner',
-  'mwst-rechner',
   'rabattrechner',
   'skontorechner',
   'marge-rechner',
@@ -49,14 +46,13 @@ const BATCH_1_SLUGS = [
   'skonto-jahreszins-rechner',
   'wareneinsatzquote-rechner',
   'lagerumschlagshaeufigkeit-rechner',
-  'stundensatz-kalkulation-freiberufler-rechner',
   'umsatzrentabilitaet-rechner',
 ];
 
 describe('Batch 1 Calculators Comprehensive QA Suite (50 Calculators)', () => {
-  it('contains exactly 50 calculators assigned to Batch 1', () => {
+  it('contains exactly 45 calculators assigned to Batch 1', () => {
     // 50 → 49: abfindung-fuenftelregelung-rechner wurde in abfindungsrechner zusammengeführt (301)
-    expect(BATCH_1_SLUGS.length).toBe(49);
+    expect(BATCH_1_SLUGS.length).toBe(45);
   });
 
   describe('1. Registry Resolution & Metadata Quality', () => {

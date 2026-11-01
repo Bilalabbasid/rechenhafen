@@ -5,17 +5,12 @@ import { calculateGradeAverage, calculateStandardDeviation } from '@/lib/calcula
 import { calculateAverage } from '@/lib/calculators/mathematik';
 
 export const BATCH_7_SLUGS = [
-  // Core Kochen (3)
   'portionsrechner',
   'backform-umrechner',
   'gramm-in-ml-rechner',
-
-  // Core Statistik & Mathematik (3)
   'notendurchschnitt-rechner',
   'standardabweichung-rechner',
   'durchschnittsrechner',
-
-  // Extra Kochen & Einheiten (30)
   'hefe-umrechner',
   'essloeffel-teeloeffel-gramm-rechner',
   'cups-in-gramm-rechner',
@@ -46,13 +41,10 @@ export const BATCH_7_SLUGS = [
   'datenrate-bandbreite-umrechner',
   'roemische-zahlen-umrechner',
   'binaer-hex-dezimal-umrechner',
-
-  // Extra Business & Statistik (14)
   'customer-lifetime-value-clv-rechner',
   'churn-rate-rechner',
   'lead-conversion-rate-rechner',
   'mittelwert-median-modus-rechner',
-  'varianz-standardabweichung-stichprobe-rechner',
   'quartile-box-plot-rechner',
   'perzentil-rechner',
   'korrelationskoeffizient-rechner',
@@ -65,10 +57,10 @@ export const BATCH_7_SLUGS = [
 ];
 
 describe('Batch 7 Calculators Quality and Regression Suite', () => {
-  it('contains exactly 50 assigned calculators in Batch 7', () => {
-    expect(BATCH_7_SLUGS.length).toBe(50);
+  it('contains exactly 49 assigned calculators in Batch 7 (1 duplicate merged)', () => {
+    expect(BATCH_7_SLUGS.length).toBe(49);
     const uniqueSlugs = new Set(BATCH_7_SLUGS);
-    expect(uniqueSlugs.size).toBe(50);
+    expect(uniqueSlugs.size).toBe(49);
   });
 
   it('all 50 calculators resolve in registry and have complete required metadata', () => {

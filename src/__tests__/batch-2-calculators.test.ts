@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 
 export const BATCH_2_SLUGS = [
-  // Group 1: Core Finanzen (7)
   'zinseszinsrechner',
   'etf-sparplan-rechner',
   'sparrechner',
@@ -10,24 +9,18 @@ export const BATCH_2_SLUGS = [
   'inflationsrechner',
   'renditerechner',
   'notgroschen-rechner',
-
-  // Group 2: Core Kredit (6)
   'kreditrechner',
   'ratenkreditrechner',
   'autokreditrechner',
   'tilgungsrechner',
   'sondertilgungsrechner',
   'restschuld-rechner',
-
-  // Group 3: Business Statistik (6)
   'cashflow-rechner',
   'ebit-ebitda-rechner',
   'eigenkapitalrentabilitaet-rechner',
   'gesamtkapitalrentabilitaet-rechner',
   'liquiditaetsgrad-rechner',
   'working-capital-rechner',
-
-  // Group 4: Extra Finanzen & Kredit (31)
   'ballonfinanzierung-rechner',
   'depotgebuehren-rechner',
   'dispozins-rechner',
@@ -42,16 +35,12 @@ export const BATCH_2_SLUGS = [
   'gold-rendite-rechner',
   'kapitalertragsteuer-rechner',
   'kaufkraftverlust-rechner',
-  'kredit-restschuld-stichtag-rechner',
   'kreditlaufzeit-rechner',
   'kreditvergleich-rechner',
-  'liquiditaetsreserve-rechner',
   'maximaler-kredit-rechner',
   'modernisierungskredit-rechner',
-  'privatkredit-rechner',
   'realzins-rechner',
   'rentenluecke-rechner',
-  'schuldentilgungsdauer-rechner',
   'spardauer-rechner',
   'sparrate-rechner',
   'tagesgeld-rechner',
@@ -62,8 +51,8 @@ export const BATCH_2_SLUGS = [
 ];
 
 describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
-  it('contains exactly 50 calculators assigned to Batch 2', () => {
-    expect(BATCH_2_SLUGS.length).toBe(50);
+  it('contains exactly 46 calculators assigned to Batch 2', () => {
+    expect(BATCH_2_SLUGS.length).toBe(46);
   });
 
   describe('1. Registry Resolution & Metadata Quality', () => {
@@ -248,18 +237,18 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
       expect(result.secondary?.find((s) => s.id === 'profit')?.value).toBe(0);
     });
 
-    it('privatkredit-rechner handles 0 % interest (family loan) cleanly', () => {
-      const calc = getCalculatorBySlug('privatkredit-rechner')!;
-      const result = calc.calculate({ loan: 12000, rate: 0, months: 24 });
+    it('privatkredit-rechner (merged to ratenkreditrechner) handles 0 % interest (family loan) cleanly', () => {
+      const calc = getCalculatorBySlug('ratenkreditrechner')!;
+      const result = calc.calculate({ loanAmount: 12000, annualInterest: 0, termMonths: 24 });
       expect(result.primary.value).toBe(500); // 12000 / 24
-      expect(result.secondary?.find((s) => s.id === 'interest')?.value).toBe(0);
+      expect(result.secondary?.find((s) => s.id === 'totalInterest')?.value).toBe(0);
     });
 
-    it('schuldentilgungsdauer-rechner handles already debt-free state (0 € debt)', () => {
-      const calc = getCalculatorBySlug('schuldentilgungsdauer-rechner')!;
-      const result = calc.calculate({ currentDebt: 0, monthlyPayment: 300, interestRate: 5 });
+    it('schuldentilgungsdauer-rechner (merged to kreditlaufzeit-rechner) handles already debt-free state (0 € debt)', () => {
+      const calc = getCalculatorBySlug('kreditlaufzeit-rechner')!;
+      const result = calc.calculate({ loan: 0, monthlyRate: 300, interestRate: 5 });
       expect(result.primary.value).toBe(0);
-      expect(result.primary.formattedValue).toBe('Bereits schuldenfrei');
+      expect(result.primary.formattedValue).toBe('0 Monate');
     });
 
     it('dispozins-rechner handles 0 € overdraft or 0 days without NaN or false fallback', () => {

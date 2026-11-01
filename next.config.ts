@@ -69,6 +69,167 @@ const nextConfig: NextConfig = {
         destination: '/rechner/abfindungsrechner/',
         permanent: true,
       },
+      // Phase 2: Duplicate Intent Merges (301 Permanent Redirects)
+      {
+        source: '/rechner/satz-des-pythagoras-rechner',
+        destination: '/rechner/pythagoras-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/satz-des-pythagoras-rechner/',
+        destination: '/rechner/pythagoras-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/led-sparrechner',
+        destination: '/rechner/led-ersparnis-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/led-sparrechner/',
+        destination: '/rechner/led-ersparnis-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/minijob-midijob-rechner',
+        destination: '/rechner/minijob-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/minijob-midijob-rechner/',
+        destination: '/rechner/minijob-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/brutto-stundensatz-freiberufler-rechner',
+        destination: '/rechner/stundensatz-kalkulation-freiberufler-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/brutto-stundensatz-freiberufler-rechner/',
+        destination: '/rechner/stundensatz-kalkulation-freiberufler-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/varianz-standardabweichung-stichprobe-rechner',
+        destination: '/rechner/standardabweichung-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/varianz-standardabweichung-stichprobe-rechner/',
+        destination: '/rechner/standardabweichung-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/privatkredit-rechner',
+        destination: '/rechner/ratenkreditrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/privatkredit-rechner/',
+        destination: '/rechner/ratenkreditrechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/arbeitgeberanteil-sozialversicherung-rechner',
+        destination: '/rechner/arbeitgeberkosten-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/arbeitgeberanteil-sozialversicherung-rechner/',
+        destination: '/rechner/arbeitgeberkosten-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/e-auto-ladekosten-zuhause-rechner',
+        destination: '/rechner/elektroauto-ladekosten-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/e-auto-ladekosten-zuhause-rechner/',
+        destination: '/rechner/elektroauto-ladekosten-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/firmenwagen-geldwerter-vorteil-rechner',
+        destination: '/rechner/dienstwagen-1-prozent-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/firmenwagen-geldwerter-vorteil-rechner/',
+        destination: '/rechner/dienstwagen-1-prozent-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/liquiditaetsreserve-rechner',
+        destination: '/rechner/notgroschen-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/liquiditaetsreserve-rechner/',
+        destination: '/rechner/notgroschen-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/parkett-laminat-rechner',
+        destination: '/rechner/bodenbelag-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/parkett-laminat-rechner/',
+        destination: '/rechner/bodenbelag-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/umsatzsteuerrechner',
+        destination: '/rechner/mwst-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/umsatzsteuerrechner/',
+        destination: '/rechner/mwst-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/schuldentilgungsdauer-rechner',
+        destination: '/rechner/kreditlaufzeit-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/schuldentilgungsdauer-rechner/',
+        destination: '/rechner/kreditlaufzeit-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/kredit-restschuld-stichtag-rechner',
+        destination: '/rechner/restschuld-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/kredit-restschuld-stichtag-rechner/',
+        destination: '/rechner/restschuld-rechner/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/datumsdifferenz',
+        destination: '/rechner/tage-zwischen-zwei-daten/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/datumsdifferenz/',
+        destination: '/rechner/tage-zwischen-zwei-daten/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/kalendertage-rechner',
+        destination: '/rechner/tage-zwischen-zwei-daten/',
+        permanent: true,
+      },
+      {
+        source: '/rechner/kalendertage-rechner/',
+        destination: '/rechner/tage-zwischen-zwei-daten/',
+        permanent: true,
+      },
       {
         source: '/rechner/abfindung-fuenftelregelung-rechner/',
         destination: '/rechner/abfindungsrechner/',

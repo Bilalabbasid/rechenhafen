@@ -23,7 +23,6 @@ import {
 } from '@/lib/calculators/mathematik';
 
 export const BATCH_8_SLUGS = [
-  // Datum, Zeit & Kalender (26)
   'altersrechner',
   'alter-in-tagen',
   'lebenszeit-in-stunden',
@@ -32,12 +31,10 @@ export const BATCH_8_SLUGS = [
   'altersunterschied',
   'geburtstagsrechner',
   'tage-bis-geburtstag',
-  'datumsdifferenz',
+  'tage-zwischen-zwei-daten',
   'wochen-zwischen-daten',
   'monate-zwischen-daten',
-  'kalendertage-rechner',
   'arbeitszeitrechner',
-  'tage-zwischen-zwei-daten',
   'tage-bis-weihnachten',
   'arbeitstage-rechner',
   'werktage-rechner',
@@ -50,8 +47,6 @@ export const BATCH_8_SLUGS = [
   'countdown-rechner',
   'renteneintritt-rechner',
   'dienstjubilaeum-rechner',
-
-  // Prozent, Dreisatz & Basis-Geometrie (11)
   'prozentrechner',
   'prozentuale-veraenderung',
   'grundwert-rechner',
@@ -63,8 +58,6 @@ export const BATCH_8_SLUGS = [
   'ggt-rechner',
   'kgv-rechner',
   'quadratwurzel-rechner',
-
-  // Extra Arithmetik & Zahlen (13)
   'prozentualer-unterschied-rechner',
   'prozent-von-prozent-rechner',
   'promillerechner',
@@ -81,10 +74,10 @@ export const BATCH_8_SLUGS = [
 ];
 
 describe('Batch 8 Calculators Quality and Regression Suite', () => {
-  it('contains exactly 50 assigned calculators in Batch 8', () => {
-    expect(BATCH_8_SLUGS.length).toBe(50);
+  it('contains exactly 48 assigned calculators in Batch 8 (2 duplicates merged)', () => {
+    expect(BATCH_8_SLUGS.length).toBe(48);
     const uniqueSlugs = new Set(BATCH_8_SLUGS);
-    expect(uniqueSlugs.size).toBe(50);
+    expect(uniqueSlugs.size).toBe(48);
   });
 
   it('all 50 calculators resolve in registry and have complete required metadata', () => {

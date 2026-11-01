@@ -791,7 +791,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Minijob-Rechner',
     category: 'steuern-gehalt',
     subcategory: 'Sonderzahlungen & Minijob',
-    metaTitle: 'Minijob Rechner 2026 & 2025 – Verdienst, Abgaben & RV-Befreiung',
+    metaTitle: 'Minijob Rechner 2026 (603 €) – Abgaben & Netto berechnen',
     metaDescription: 'Berechnen Sie Nettoverdienst und Arbeitgeberkosten für geringfügige Beschäftigung bei der gesetzlichen Minijob-Grenze (603 € in 2026 / 556 € in 2025).',
     h1: 'Minijob-Rechner – Geringfügige Beschäftigung berechnen',
     shortDescription: 'Ermittelt den Auszahlungsbetrag für Minijobber mit und ohne Befreiung von der Rentenversicherungspflicht sowie die Pauschalabgaben des Arbeitgebers.',
@@ -1231,77 +1231,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     ],
   },
 
-  // 14. UMSATZSTEUERRECHNER
-  {
-    id: 'umsatzsteuerrechner',
-    slug: 'umsatzsteuerrechner',
-    name: 'Umsatzsteuerrechner (Vorsteuer & Umsatzsteuer nach § 12 UStG)',
-    shortName: 'Umsatzsteuerrechner',
-    category: 'steuern-gehalt',
-    subcategory: 'Einkommensteuer & Tarif',
-    metaTitle: 'Umsatzsteuerrechner 2026 – 19 % & 7 % USt exakt berechnen',
-    metaDescription: 'Umsatzsteuer und Vorsteuer online berechnen: Netto zu Brutto oder Brutto zu Netto mit 19 % Regelsteuersatz und 7 % ermäßigtem Satz nach § 12 UStG.',
-    h1: 'Umsatzsteuerrechner – Vorsteuer & Umsatzsteuer berechnen',
-    shortDescription: 'Ermittelt die gesetzliche Umsatzsteuer, den Vorsteuerabzug und wandelt Beträge präzise zwischen Netto und Brutto um.',
-    searchKeywords: ['umsatzsteuerrechner', 'vorsteuer berechnen', 'umsatzsteuerzahllast rechner', '19 prozent umsatzsteuer', 'ustg rechner'],
-    inputs: [
-      {
-        id: 'amount',
-        label: 'Ausgangsbetrag',
-        type: 'number',
-        defaultValue: 119,
-        min: 0,
-        step: 1,
-        unit: '€',
-      },
-      {
-        id: 'mode',
-        label: 'Berechnungsrichtung',
-        type: 'select',
-        defaultValue: 'grossToNet',
-        options: [
-          { value: 'grossToNet', label: 'Brutto zu Netto (Mehrwertsteuer herausrechnen)' },
-          { value: 'netToGross', label: 'Netto zu Brutto (Mehrwertsteuer aufschlagen)' },
-        ],
-      },
-      {
-        id: 'rate',
-        label: 'Mehrwertsteuersatz',
-        type: 'select',
-        defaultValue: '19',
-        options: [
-          { value: '19', label: '19 % (Regulärer Satz nach § 12 Abs. 1 UStG)' },
-          { value: '7', label: '7 % (Ermäßigter Satz nach § 12 Abs. 2 UStG)' },
-        ],
-      },
-    ],
-    calculate: calculateMwSt,
-    formula: 'Netto = Brutto / (1 + Satz) | Brutto = Netto · (1 + Satz) | MwSt = |Brutto - Netto|',
-    formulaExplanation: 'Vorsicht bei Brutto zu Netto: Bei 19 % MwSt entspricht die Steuer nicht 19 % des Bruttos, sondern 15,97 % (19 / 119) des Bruttobetrags.',
-    workedExample: {
-      title: 'Beispiel: 119,00 € Brutto bei 19 % Mehrwertsteuer',
-      description: 'Nettobetrag: 100,00 €. Enthaltene Mehrwertsteuer: 19,00 €.',
-      inputs: { amount: 119, mode: 'grossToNet', rate: '19' },
-      resultSummary: '100,00 € Netto (19,00 € MwSt)',
-    },
-    content: {
-      intro: 'Egal ob für Rechnungen, Handwerkerangebote oder den Einkauf: Der Mehrwertsteuerrechner ermittelt in beide Richtungen exakt Nettobetrag, Bruttobetrag und Steueranteil.',
-      details: 'In Deutschland gilt der reguläre Steuersatz von 19 % für die meisten Waren und Dienstleistungen. Der ermäßigte Satz von 7 % greift insbesondere für Grundnahrungsmittel, Bücher, Zeitschriften und Kunst.',
-    },
-    faqs: [
-      { question: 'Wie zieht man 19 % Mehrwertsteuer aus einem Bruttobetrag ab?', answer: 'Man teilt den Bruttobetrag durch 1,19. Beispiel: 119 € / 1,19 = 100 € netto. Die Steuer beträgt 19 €.' },
-      { question: 'Was ist der Unterschied zwischen Mehrwertsteuer und Umsatzsteuer?', answer: 'Es gibt im deutschen Steuerrecht keinen inhaltlichen Unterschied. Das Gesetz spricht von Umsatzsteuer (USt), umgangssprachlich wird der Begriff Mehrwertsteuer (MwSt) synonym verwendet.' },
-    ],
-    relatedSlugs: ['brutto-netto-rechner', 'einkommensteuerrechner'],
-    isTimeSensitive: true,
-    timeSensitiveMeta: {
-      year: 2026,
-      source: '§ 12 Umsatzsteuergesetz (UStG)',
-      sourceUrl: 'https://www.gesetze-im-internet.de/ustg_1980/__12.html',
-      lastVerified: '2026-01-15',
-    },
-  },
-  // 15. GEWERBESTEUERRECHNER
+  // 14. UMSATZSTEUERRECHNER  // 15. GEWERBESTEUERRECHNER
   {
     id: 'gewerbesteuer-rechner',
     slug: 'gewerbesteuer-rechner',
@@ -1404,7 +1334,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
           content: 'Für natürliche Personen und Mitunternehmer von Personengesellschaften mildert das Einkommensteuerrecht die Gewerbesteuerbelastung durch die Steuerermäßigung nach § 35 EStG ab:\n- Das bis zu **4,0-fache des Gewerbesteuermessbetrags** kann unter bestimmten Voraussetzungen auf die persönliche Einkommensteuer angerechnet werden.\n- **Wichtig**: Diese Anrechnung mindert nicht die Gewerbesteuer, die Sie an die Stadtkasse zahlen müssen! Die Gewerbesteuer ist in voller Höhe fällig. Die Entlastung greift erst im Rahmen Ihres persönlichen Einkommensteuerbescheids und ist auf die tatsächlich auf die gewerblichen Einkünfte entfallende tarifliche Einkommensteuer begrenzt.',
         },
       ],
-      details: 'Möchten Sie weitere Steuern und Firmenkennzahlen ermitteln? Nutzen Sie unseren [Einkommensteuerrechner](/rechner/einkommensteuerrechner/), den [Umsatzsteuerrechner](/rechner/umsatzsteuerrechner/) sowie den [Deckungsbeitragsrechner](/rechner/deckungsbeitrag-rechner/).',
+      details: 'Möchten Sie weitere Steuern und Firmenkennzahlen ermitteln? Nutzen Sie unseren [Einkommensteuerrechner](/rechner/einkommensteuerrechner/), den [Umsatzsteuerrechner](/rechner/mwst-rechner/) sowie den [Deckungsbeitragsrechner](/rechner/deckungsbeitrag-rechner/).',
     },
     faqs: [
       { question: 'Müssen Freiberufler Gewerbesteuer zahlen?', answer: 'Nein. Einkünfte aus freiberuflicher Tätigkeit (§ 18 EStG, z. B. Ärzte, Zahnärzte, Rechtsanwälte, Notare, Steuerberater, Architekten, Journalisten, Dolmetscher) sowie Einkünfte aus Land- und Forstwirtschaft (§ 13 EStG) unterliegen nicht der Gewerbesteuer.' },
@@ -1413,7 +1343,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Ist die Gewerbesteuer als Betriebsausgabe abziehbar?', answer: 'Nein. Seit dem Veranlagungszeitraum 2008 gilt nach § 4 Abs. 5b EStG ein striktes Abzugsverbot: Die Gewerbesteuer und die darauf entfallenden Nebenleistungen stellen keine abziehbaren Betriebsausgaben dar.' },
       { question: 'Wie wirkt sich die Gewerbesteueranrechnung nach § 35 EStG aus?', answer: 'Einzelunternehmer und Gesellschafter von Personengesellschaften können das 4,0-fache des Gewerbesteuermessbetrags (maximal die tatsächlich gezahlte Gewerbesteuer) von ihrer persönlichen Einkommensteuerschuld abziehen. Bei einem Hebesatz von rund 400 Prozent wird die Gewerbesteuer dadurch im Regelfall nahezu vollständig kompensiert, sofern ausreichend Einkommensteuer anfällt.' },
     ],
-    relatedSlugs: ['einkommensteuerrechner', 'umsatzsteuerrechner', 'deckungsbeitrag-rechner', 'break-even-rechner'],
+    relatedSlugs: ['einkommensteuerrechner', 'mwst-rechner', 'deckungsbeitrag-rechner', 'break-even-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

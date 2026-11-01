@@ -2,38 +2,27 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 
 export const BATCH_3_SLUGS = [
-  // Group 1: Core Wohnen & Immobilien (6)
   'mietbelastungsquote-rechner',
   'kaufnebenkosten-rechner',
   'immobilienrendite-rechner',
   'quadratmeterpreis-rechner',
   'mietbudget-rechner',
   'mieterhoehung-rechner',
-
-  // Group 2: Core Business (1)
   'break-even-rechner',
-
-  // Group 3: Business Statistik (4)
   'deckungsbeitrag-rechner',
   'roi-rechner',
   'roas-rechner',
   'kundengewinnungskosten-cac-rechner',
-
-  // Group 4: Bauen & Geometrie (5)
   'daemmung-u-wert-rechner',
   'regenwasser-zisterne-rechner',
   'brennholz-raummeter-rechner',
   'drainage-gefaelle-rechner',
   'baugrund-tragfaehigkeit-rechner',
-
-  // Group 5: Finanzen & Kredit (5)
   'baufinanzierung-rechner',
   'volltilger-darlehen-rechner',
   'kreditrechner-ohne-eigenkapital',
   'zwischenfinanzierung-rechner',
   'zinsbindung-rechner',
-
-  // Group 6: Extra Wohnen & Haushalt (29)
   'mietminderung-rechner',
   'staffelmiete-rechner',
   'indexmiete-rechner',

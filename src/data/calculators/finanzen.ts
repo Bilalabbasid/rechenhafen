@@ -213,7 +213,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Warum ist ein früher Sparbeginn so wirksam?', answer: 'Weil die Zinseszins-Kurve exponentiell verläuft: Die letzten 10 Jahre eines 30-jährigen Sparplans bringen oft mehr Zinsertrag als die ersten 20 Jahre zusammen.' },
       { question: 'Sollte man Sparraten dynamisch anpassen?', answer: 'Ja, eine jährliche Dynamisierung der Sparrate um z. B. 2 bis 3 Prozent gleicht den schleichenden Kaufkraftverlust der Einzahlungsbeträge durch Inflation aus.' },
     ],
-    relatedSlugs: ['zinseszinsrechner', 'sparzielrechner', 'sparrate-rechner', 'etf-sparplan-rechner', 'inflationsrechner', 'liquiditaetsreserve-rechner'],
+    relatedSlugs: ['zinseszinsrechner', 'sparzielrechner', 'sparrate-rechner', 'etf-sparplan-rechner', 'inflationsrechner', 'notgroschen-rechner'],
   },
   {
     id: 'sparzielrechner',
@@ -369,6 +369,6 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Gehören Notgroschen-Gelder in ETFs oder Aktien?', answer: 'Nein, der Notgroschen muss zu 100 % vor Kursschwankungen geschützt und innerhalb von 1–2 Werktagen uneingeschränkt verfügbar sein (Tagesgeld).' },
       { question: 'Wann reichen 3 Monatsausgaben, wann braucht man 6?', answer: 'Angestellte mit Kündigungsschutz und gesichertem Einkommen genügen oft 3 Monatsausgaben; Selbstständige, Freiberufler oder Familien mit Eigenheim und älteren Autos sollten 6 Monatsausgaben vorhalten.' },
     ],
-    relatedSlugs: ['sparrechner', 'sparzielrechner', 'zinseszinsrechner', 'liquiditaetsreserve-rechner'],
+    relatedSlugs: ['sparrechner', 'sparzielrechner', 'zinseszinsrechner', 'notgroschen-rechner'],
   },
 ];

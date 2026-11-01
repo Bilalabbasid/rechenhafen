@@ -1427,7 +1427,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Kann die Vorfälligkeitsentschädigung bei Immobilienverkauf vermieden werden?', answer: 'Ja, wenn der Käufer der Immobilie das bestehende Darlehen zu den alten Konditionen übernimmt (Schuldnerwechsel) und die Bank zustimmt.' },
       { question: 'Darf die Bank nach 10 Jahren noch eine Entschädigung verlangen?', answer: 'Nein, nach § 489 Abs. 1 Nr. 2 BGB steht Darlehensnehmern nach Ablauf von 10 Jahren ein gesetzliches, gebührenfreies Kündigungsrecht mit 6 Monaten Frist zu.' },
     ],
-    relatedSlugs: ['kredit-restschuld-stichtag-rechner', 'tilgungsrechner', 'sondertilgungsrechner'],
+    relatedSlugs: ['restschuld-rechner', 'tilgungsrechner', 'sondertilgungsrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -2236,7 +2236,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Welches Haushaltsgerät verbraucht im Jahr am meisten Strom?', answer: 'In der Regel Kühl- und Gefriergeräte (durch den Dauerbetrieb 24/7), gefolgt von elektrischer Warmwasserbereitung, Wäschetrocknern und Gaming-PCs.' },
       { question: 'Wie misst man den echten Stromverbrauch einzelner Geräte?', answer: 'Mit einem digitalen Energiekosten-Messgerät für die Steckdose, das die tatsächliche Leistungsaufnahme über mehrere Tage und Betriebszyklen aufzeichnet.' },
     ],
-    relatedSlugs: ['klimaanlage-stromkosten-rechner', 'fernseher-stromkosten-rechner', 'stromkostenrechner', 'gasverbrauch-kwh-m3-rechner', 'led-sparrechner'],
+    relatedSlugs: ['klimaanlage-stromkosten-rechner', 'fernseher-stromkosten-rechner', 'stromkostenrechner', 'gasverbrauch-kwh-m3-rechner', 'led-ersparnis-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -2599,7 +2599,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wie hoch ist die EEG-Einspeisevergütung für Überschusseinspeisung?', answer: 'Für Neuanlagen bis 10 kWp liegt die gesetzliche Einspeisevergütung bei rund 8 Cent je kWh, garantiert fest über 20 Kalenderjahre plus Inbetriebnahmejahr.' },
       { question: 'Gilt auf Photovoltaikanlagen die Mehrwertsteuerbefreiung?', answer: 'Ja, nach § 12 Abs. 3 UStG gilt für den Kauf und die Installation von PV-Anlagen und Heimspeichern auf Wohngebäuden ein Nullsteuersatz (0 % Mehrwertsteuer).' },
     ],
-    relatedSlugs: ['klimaanlage-stromkosten-rechner', 'balkonkraftwerk-ertrag-rechner', 'waermepumpe-stromkosten-rechner', 'e-auto-ladekosten-zuhause-rechner'],
+    relatedSlugs: ['klimaanlage-stromkosten-rechner', 'balkonkraftwerk-ertrag-rechner', 'waermepumpe-stromkosten-rechner', 'elektroauto-ladekosten-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -3232,65 +3232,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Verbraucht HDR (High Dynamic Range) mehr Strom als Standard-Inhalte (SDR)?', answer: 'Ja, bei HDR-Wiedergabe regeln Hintergrundbeleuchtung und OLED-Pixel auf Spitzenhelligkeiten hoch, was die Leistungsaufnahme oft um 30 bis 60 Prozent steigert.' },
       { question: 'Welche Display-Technologie ist am energieeffizientesten?', answer: 'Standard-LED-LCDs sind meist etwas sparsamer als OLEDs bei hellen Bildern; OLEDs sind hingegen bei dunklen Filmszenen extrem sparsam, da schwarze Pixel komplett abgeschaltet werden.' },
     ],
-    relatedSlugs: ['stromkosten-geraete-rechner', 'led-sparrechner', 'kuehlschrank-stromkosten-rechner'],
-  },
-
-  {
-    id: 'led-sparrechner',
-    slug: 'led-sparrechner',
-    name: 'LED Spartool (Glühbirne vs. LED Watt & Ersparnis)',
-    shortName: 'LED-Rechner',
-    category: 'haushalt-energie',
-    subcategory: 'Strom & Sparen',
-    metaTitle: 'LED Rechner – Ersparnis beim Tausch alter Glühbirnen gegen LED',
-    metaDescription: 'Berechnen Sie, wie viel Euro Sie durch den Austausch alter 60W-Glühbirnen oder Halogenstrahler gegen moderne LED-Leuchtmittel sparen.',
-    h1: 'LED Spartool – Stromersparnis durch LED-Leuchtmittel berechnen',
-    shortDescription: 'Vergleicht den Stromverbrauch traditioneller Glühlampen mit energiesparenden LED-Lampen mit präziser Formelberechnung und verlässlichen Ergebnissen für Ihre Planung.',
-    searchKeywords: ['led rechner stromersparnis', 'gluehbirne durch led ersetzen rechner', 'watt vergleich led halogen', 'led amortisation berechnen'],
-    inputs: [
-      { id: 'lampCount', label: 'Anzahl der ausgetauschten Leuchtmittel', type: 'number', defaultValue: 10, min: 1, max: 100, step: 1 },
-      { id: 'oldWatts', label: 'Leistung der alten Lampe in Watt (z. B. 60 W)', type: 'number', defaultValue: 60, min: 15, max: 150, step: 5, unit: 'W' },
-      { id: 'newWatts', label: 'Leistung der neuen LED in Watt (z. B. 8 W)', type: 'number', defaultValue: 8, min: 1, max: 30, step: 1, unit: 'W' },
-      { id: 'burnHoursPerDay', label: 'Brenndauer pro Tag in Stunden', type: 'number', defaultValue: 3.5, min: 0.5, max: 24, step: 0.5, unit: 'Std./Tag' },
-      { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
-    ],
-    calculate: (inputs) => {
-      const count = inputs.lampCount !== undefined && inputs.lampCount !== '' ? Math.max(0, parseInt(inputs.lampCount, 10) || 0) : 10;
-      const oldW = inputs.oldWatts !== undefined && inputs.oldWatts !== '' ? Math.max(0, parseFloat(inputs.oldWatts) || 0) : 60;
-      const newW = inputs.newWatts !== undefined && inputs.newWatts !== '' ? Math.max(0, parseFloat(inputs.newWatts) || 0) : 8;
-      const hours = inputs.burnHoursPerDay !== undefined && inputs.burnHoursPerDay !== '' ? Math.max(0, parseFloat(inputs.burnHoursPerDay) || 0) : 3.5;
-      const priceCent = inputs.electricityPrice !== undefined && inputs.electricityPrice !== '' ? Math.max(0, parseFloat(inputs.electricityPrice) || 0) : 36;
-      const savedWattsPerLamp = Math.max(0, oldW - newW);
-      const savedKwhYear = (savedWattsPerLamp * hours * 365 * count) / 1000;
-      const yearlySaving = (savedKwhYear * priceCent) / 100;
-      const pctSaved = oldW > 0 ? (savedWattsPerLamp / oldW) * 100 : 0;
-      return {
-        primary: { id: 'yearlySaving', label: 'Jährliche Stromersparnis', value: yearlySaving, formattedValue: formatCurrency(yearlySaving), highlight: true },
-        secondary: [
-          { id: 'savedKwhYear', label: 'Eingesparter Strom pro Jahr', value: savedKwhYear, formattedValue: `${formatNumber(savedKwhYear, 0)} kWh` },
-          { id: 'pctSaved', label: 'Energieersparnis Beleuchtung', value: pctSaved, formattedValue: formatPercent(pctSaved, 0) },
-          { id: 'saving5Years', label: 'Ersparnis über 5 Jahre', value: yearlySaving * 5, formattedValue: formatCurrency(yearlySaving * 5) },
-        ],
-        summaryText: `Durch den Tausch von ${count} Lampen sparen Sie ${formatPercent(pctSaved, 0)} Beleuchtungsstrom ein. Das spart jährlich ${formatCurrency(yearlySaving)} (${formatNumber(savedKwhYear, 0)} kWh).`,
-      };
-    },
-    formula: 'Ersparnis = Lampenanzahl × (Watt_alt - Watt_neu) × Stunden/Tag × 365 / 1000 × Strompreis',
-    formulaExplanation: 'LED-Lampen wandeln Energie zu rund 80 % bis 90 % in sichtbares Licht um, während alte Glühbirnen bis zu 95 % als ungenutzte Wärme abgeben.',
-    workedExample: {
-      title: 'Beispiel: 10 Lampen von 60 W auf 8 W getauscht (3,5 Std./Tag bei 36 ct/kWh)',
-      inputValues: [{ label: 'Lampen', value: '10 Stück' }, { label: 'Einsparung', value: '52 W je Lampe' }, { label: 'Brenndauer', value: '3,5 Std.' }],
-      steps: ['Wattdifferenz gesamt = 10 × 52 W = 520 W', 'kWh/Jahr = (520 × 3,5 × 365) / 1000 = 664,3 kWh', 'Ersparnis = 664,3 kWh × 0,36 € = 239,15 € pro Jahr'],
-      result: '239,15 € Ersparnis jedes Jahr',
-    },
-    content: {
-      intro: 'Dieser Rechner quantifiziert die Strom- und Kostenersparnis beim Austausch eines gesamten Leuchtenbestands im Haus oder Unternehmen gegen LED-Leuchtmittel.',
-      details: 'Er berechnet die kumulierte Energieeinsparung, die vermiedenen CO₂-Emissionen und die exakte Amortisationszeit der neuen Leuchtmittel inklusive Beschaffungskosten.',
-    },
-    faqs: [
-      { question: 'Lohnt sich der Austausch von funktionierenden Energiesparlampen gegen LED?', answer: 'Ja, moderne LEDs verbrauchen nochmals etwa 50 % weniger Strom als alte Kompaktleuchtstofflampen, leuchten sofort mit voller Helligkeit und enthalten kein giftiges Quecksilber.' },
-      { question: 'Welche Lichtfarbe eignet sich für Wohnräume?', answer: 'Für Wohn- und Schlafzimmer empfiehlt sich Warmweiß (2.700 bis 3.000 Kelvin); für Arbeitszimmer, Küche und Bad Neutralweiß (4.000 Kelvin) zur Steigerung der Konzentration.' },
-    ],
-    relatedSlugs: ['fernseher-stromkosten-rechner', 'stromkosten-geraete-rechner', 'stromkostenrechner', 'balkonkraftwerk-ertrag-rechner'],
+    relatedSlugs: ['stromkosten-geraete-rechner', 'led-ersparnis-rechner', 'kuehlschrank-stromkosten-rechner'],
   },
 
   {
@@ -3838,63 +3780,6 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Kann eine moderne Split-Klimaanlage im Winter auch heizen?', answer: 'Ja, moderne Split-Klimageräte sind Luft-Luft-Wärmepumpen: Durch Umkehr des Kältekreislaufs können sie im Übergangsmonaten hocheffizient und kostengünstig heizen.' },
     ],
     relatedSlugs: ['stromkosten-geraete-rechner', 'photovoltaik-amortisation-rechner', 'balkonkraftwerk-ertrag-rechner'],
-  },
-
-  {
-    id: 'e-auto-ladekosten-zuhause-rechner',
-    slug: 'e-auto-ladekosten-zuhause-rechner',
-    name: 'E-Auto Ladekosten-Rechner (Wallbox vs. Öffentliche Ladesäule)',
-    shortName: 'E-Auto Ladekosten',
-    category: 'haushalt-energie',
-    subcategory: 'Strom & Sparen',
-    metaTitle: 'E-Auto Ladekosten-Rechner: Wallbox vs. Ladesäule',
-    metaDescription: 'Berechnen Sie die Strom- und Ladekosten für Ihr Elektroauto auf 100 km und pro Jahr: Wallbox zuhause im Vergleich zu öffentlichen Ladesäulen.',
-    h1: 'E-Auto Ladekosten Rechner – Ladekosten zuhause & unterwegs',
-    shortDescription: 'Vergleicht die Ladekosten an der heimischen Wallbox mit öffentlichen AC- und DC-Ladesäulen.',
-    searchKeywords: ['e auto ladekosten rechner', 'was kostet eine akkuladung e auto', 'wallbox stromkosten 100 km', 'oeffentlich laden vs zuhause kosten'],
-    inputs: [
-      { id: 'consumptionKwhPer100Km', label: 'Durchschnittsverbrauch in kWh pro 100 km (inkl. Ladeverlusten)', type: 'number', defaultValue: 18.5, min: 10, max: 35, step: 0.5, unit: 'kWh/100km' },
-      { id: 'yearlyMileageKm', label: 'Jährliche Fahrleistung in km', type: 'number', defaultValue: 15000, min: 1000, step: 1000, unit: 'km' },
-      { id: 'homePowerPriceCent', label: 'Strompreis Wallbox Zuhause in Cent pro kWh', type: 'number', defaultValue: 32, min: 15, max: 55, step: 1, unit: 'ct/kWh' },
-      { id: 'publicPriceCent', label: 'Öffentlicher Schnelllade-Tarif (DC/HPC) in Cent pro kWh', type: 'number', defaultValue: 59, min: 35, max: 90, step: 1, unit: 'ct/kWh' },
-    ],
-    calculate: (inputs) => {
-      const consumption = inputs.consumptionKwhPer100Km !== undefined && inputs.consumptionKwhPer100Km !== '' ? Math.max(0, parseFloat(inputs.consumptionKwhPer100Km) || 0) : 18.5;
-      const km = inputs.yearlyMileageKm !== undefined && inputs.yearlyMileageKm !== '' ? Math.max(0, parseFloat(inputs.yearlyMileageKm) || 0) : 15000;
-      const homeCent = inputs.homePowerPriceCent !== undefined && inputs.homePowerPriceCent !== '' ? Math.max(0, parseFloat(inputs.homePowerPriceCent) || 0) : 32;
-      const publicCent = inputs.publicPriceCent !== undefined && inputs.publicPriceCent !== '' ? Math.max(0, parseFloat(inputs.publicPriceCent) || 0) : 59;
-      const homeCost100 = (consumption * homeCent) / 100;
-      const publicCost100 = (consumption * publicCent) / 100;
-      const homeYearly = (km / 100) * homeCost100;
-      const publicYearly = (km / 100) * publicCost100;
-      const yearlySaving = publicYearly - homeYearly;
-      return {
-        primary: { id: 'homeCost100', label: 'Ladekosten auf 100 km (Zuhause)', value: homeCost100, formattedValue: formatCurrency(homeCost100), highlight: true },
-        secondary: [
-          { id: 'homeYearly', label: `Jährliche Ladekosten Zuhause (${formatNumber(km, 0)} km)`, value: homeYearly, formattedValue: formatCurrency(homeYearly) },
-          { id: 'publicCost100', label: 'Kosten auf 100 km öffentlich (DC)', value: publicCost100, formattedValue: formatCurrency(publicCost100) },
-          { id: 'yearlySaving', label: 'Ersparnis durch Wallbox Zuhause', value: yearlySaving, formattedValue: formatCurrency(yearlySaving) },
-        ],
-        summaryText: `An der eigenen Wallbox zahlen Sie ${formatCurrency(homeCost100)} pro 100 km (öffentlich: ${formatCurrency(publicCost100)}). Bei ${formatNumber(km, 0)} km sparen Sie jährlich ${formatCurrency(yearlySaving)}.`,
-      };
-    },
-    formula: 'Kosten auf 100 km = Verbrauch (kWh/100km) × Strompreis pro kWh',
-    formulaExplanation: 'Laden an der eigenen Wallbox ist meist 40 % bis 50 % günstiger als an öffentlichen High-Power-Charging-Stationen (HPC).',
-    workedExample: {
-      title: 'Beispiel: 18,5 kWh/100 km bei 32 ct/kWh zuhause vs. 59 ct/kWh öffentlich',
-      inputValues: [{ label: 'Verbrauch', value: '18,5 kWh/100 km' }, { label: 'Zuhause', value: '32 ct/kWh' }, { label: 'Öffentlich', value: '59 ct/kWh' }],
-      steps: ['Zuhause: 18,5 × 0,32 € = 5,92 € / 100 km', 'Öffentlich: 18,5 × 0,59 € = 10,92 € / 100 km', 'Ersparnis bei 15.000 km = 150 × 5,00 € = 750,00 € pro Jahr'],
-      result: '5,92 € pro 100 km zuhause (750 € Ersparnis/Jahr)',
-    },
-    content: {
-      intro: 'Dieser Rechner vergleicht die Kosten für das Laden des Elektroautos an der eigenen Wallbox mit einer Photovoltaik-Eigenverbrauchsanlage und dem Netzstromtarif.',
-      details: 'Wer Solarstrom vom eigenen Dach lädt (Gestehungskosten ca. 8 bis 11 Cent/kWh), fährt für rund 1,50 bis 2,00 Euro pro 100 Kilometer – bei reinem Netzstrombezug liegen die Kosten bei ca. 5,00 bis 6,50 Euro.',
-    },
-    faqs: [
-      { question: 'Muss eine 11-kW-Wallbox beim Netzbetreiber genehmigt werden?', answer: 'Eine Wallbox mit bis zu 11 kW Ladeleistung ist nach § 19 NAV beim Netzbetreiber anmeldepflichtig, bedarf aber keiner Genehmigung. Erst ab 22 kW ist eine vorherige Genehmigung erforderlich.' },
-      { question: 'Was ist PV-Überschussladen?', answer: 'Ein intelligentes Ladesystem regelt die Ladeleistung dynamisch so, dass das Auto nur dann geladen wird, wenn die Solaranlage mehr Strom erzeugt, als das Haus im selben Moment verbraucht.' },
-    ],
-    relatedSlugs: ['thg-quote-rechner', 'photovoltaik-amortisation-rechner', 'stromkosten-geraete-rechner', 'stromkostenrechner', 'hybrid-auto-kosten-rechner'],
   },
 
     {
