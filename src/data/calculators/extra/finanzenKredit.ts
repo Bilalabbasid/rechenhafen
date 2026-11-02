@@ -99,7 +99,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Wie sicher ist Tagesgeld bei Banken in der EU?', answer: 'Über die gesetzliche Einlagensicherung (EdB in Deutschland) sind Einlagen bis 100.000 € pro Person und Kreditinstitut gesetzlich garantiert abgesichert.' },
       { question: 'Was ist der Unterschied zwischen Aktionszins und Bestandskundenzins?', answer: 'Banken locken Neukunden oft mit zeitlich befristeten Zinsgarantien (z. B. für 3 bis 6 Monate); danach fällt der Zins auf das variable Niveau für Bestandskunden zurück.' },
     ],
-    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'notgroschen-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'notgroschen-rechner', 'zinseszinsrechner', 'festgeld-rechner', 'etf-sparplan-rechner', 'verdopplungszeit-rechner'],
   },
   {
     id: 'festgeld-rechner',
@@ -1443,7 +1443,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Wie viel Prozent des letzten Nettoeinkommens benötigt man im Ruhestand?', answer: 'Finanzplaner kalkulieren in der Regel mit 75 bis 85 Prozent des letzten Nettoeinkommens, da Berufsaufwendungen (Pendeln, Arbeitskleidung) entfallen, aber Gesundheits- und Freizeitkosten steigen können.' },
       { question: 'Wird die gesetzliche Rente in voller Höhe versteuert?', answer: 'Für Neurentner steigt der Besteuerungsanteil der Rente jährlich schrittweise an; ab dem Jahrgang 2058 (bzw. nach geplanten Reformen 2040) wird die Rente zu 100 % der Einkommensteuer unterliegen.' },
     ],
-    relatedSlugs: ['renteneintritt-rechner', 'spardauer-rechner', 'etf-sparplan-rechner', 'betriebliche-altersvorsorge-rechner'],
+    relatedSlugs: ['renteneintritt-rechner', 'spardauer-rechner', 'etf-sparplan-rechner', 'betriebliche-altersvorsorge-rechner', 'ewige-rente-rechner', 'finanzielle-freiheit-rechner'],
   },
   {
     id: 'gold-rendite-rechner',

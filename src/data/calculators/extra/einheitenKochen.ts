@@ -337,7 +337,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Welcher Reifendruck ist in PSI angegeben und was entspricht 32 PSI in Bar?', answer: 'Viele US- und Fahrradreifen nutzen PSI: 32 PSI geteilt durch 14,5038 ergibt ca. 2,21 bar Reifendruck.' },
       { question: 'Was bedeutet der Blutdruckwert "120 zu 80" in echten Druckeinheiten?', answer: 'Es handelt sich um Millimeter Quecksilbersäule (mmHg): 120 mmHg entsprechen ca. 160 hPa oder 0,16 bar Druck.' },
     ],
-    relatedSlugs: ['dezibel-schalldruck-umrechner', 'viskositaet-umrechner', 'temperatur-umrechner', 'kraft-umrechner', 'geschwindigkeit-umrechner'],
+    relatedSlugs: ['dezibel-schalldruck-umrechner', 'viskositaet-umrechner', 'temperatur-umrechner', 'kraft-umrechner', 'geschwindigkeit-umrechner', 'radioaktivitaet-strahlendosis-rechner'],
   },
   {
     id: "geschwindigkeit-umrechner",
@@ -1664,7 +1664,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Welche Maße hat ein 55-Zoll-Fernseher in cm?', answer: 'Ein 55-Zoll-Fernseher hat eine Diagonale von 139,7 cm. Bei einem Standard-Seitenverhältnis von 16:9 ist das reine Display ohne Gehäuserahmen etwa 121,8 cm breit und 68,5 cm hoch.' },
       { question: 'Was ist der Unterschied zwischen Zoll und Inch?', answer: 'Es gibt keinen Unterschied: „Inch“ ist die englische Bezeichnung und „Zoll“ das deutsche Wort für dieselbe Maßeinheit von exakt 2,54 cm (Einheitenzeichen in bzw. Anführungszeichen ").' },
     ],
-    relatedSlugs: ['laengen-umrechner', 'meilen-km-umrechner', 'papierformat-din-rechner', 'rechteckrechner'],
+    relatedSlugs: ['laengen-umrechner', 'meilen-km-umrechner', 'papierformat-din-rechner', 'rechteckrechner', 'flaeche-umrechner'],
   },
   {
     id: "zeit-umrechner",
@@ -2479,7 +2479,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Warum fallen Schuhgrößen verschiedener Hersteller so unterschiedlich aus?', answer: 'Weil Hersteller unterschiedliche Leistenformen verwenden und US/UK-Größen oft mit gerundeten Umrechnungsfaktoren in EU-Größen übersetzen.' },
       { question: 'Was ist das Mondopoint-System?', answer: 'Das internationale ISO-9407-Normsystem für Schuhe (z. B. bei Skischuhen und Bundeswehr): Es gibt schlicht die reale Fußlänge und Fußbreite direkt in Millimetern an.' },
     ],
-    relatedSlugs: ['laengen-umrechner', 'zoll-in-cm-rechner', 'gewicht-masse-umrechner'],
+    relatedSlugs: ['laengen-umrechner', 'zoll-in-cm-rechner', 'gewicht-masse-umrechner', 'ringgroesse-umrechner'],
   },
   {
     id: "papierformat-din-rechner",
@@ -2706,7 +2706,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Zu welcher Tageszeit sollte man die Ringgröße am besten messen?', answer: 'Am späten Nachmittag oder Abend bei normaler Zimmertemperatur; morgens oder bei Kälte sind die Finger meist etwas dünner, bei Sommerhitze geschwollen.' },
       { question: 'Wie misst man die Ringgröße heimlich für einen Heiratsantrag?', answer: 'Nehmen Sie einen gut sitzenden Ring der Partnerin und messen Sie mit einem präzisen Messschieber den inneren Durchmesser auf den Zehntelmillimeter genau ab.' },
     ],
-    relatedSlugs: ['kreis-umfang-rechner', 'laengen-umrechner', 'zoll-in-cm-rechner'],
+    relatedSlugs: ['kreis-umfang-rechner', 'laengen-umrechner', 'zoll-in-cm-rechner', 'schuhe-kleidergroessen-umrechner'],
   },
   {
     id: "dezibel-schalldruck-umrechner",
@@ -4188,7 +4188,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Dürfen Kinder Gerichte essen, die mit Wein oder Bier zubereitet wurden?', answer: 'Nein. Da auch nach längerer Kochzeit nennenswerte Mengen Ethanol in der Sauce verbleiben und sich Kinder zudem an den typischen Alkoholgeschmack gewöhnen können, sollten Gerichte für Kinder, Schwangere und abstinente Personen stets komplett alkoholfrei zubereitet werden (z. B. mit Brühe, Traubensaft und Balsamico).' },
       { question: 'Warum verdampft Alkohol bei 78 °C nicht sofort aus der Sauce?', answer: 'Wasser und Ethanol bilden ein azeotropes Gemisch mit wechselseitigen molekularen Bindungen. Dadurch liegt die gemeinsame Siedetemperatur höher als 78 °C, und der Alkohol entweicht erst nach und nach zusammen mit dem aufsteigenden Wasserdampf.' },
     ],
-    relatedSlugs: ['cocktail-alkoholgehalt-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'portionsrechner'],
+    relatedSlugs: ['cocktail-alkoholgehalt-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'portionsrechner', 'wasser-reis-verhaeltnis-rechner'],
     trustMeta: {
       lastReviewed: '2026-10-07',
       sourceName: 'USDA Nutrient Data Laboratory (Ethanol Retention in Food Preparation)',
@@ -4522,7 +4522,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         answer: "Die angegebenen Verhältnisse beziehen sich auf das Verhältnis von Gramm Trockenreis zu Milliliter Wasser (1 g Wasser entspricht 1 ml). Wenn Sie mit Tassen messen, beachten Sie, dass 1 Tasse Reis (ca. 180–200 g) ein anderes Raumgewicht als 1 Tasse Wasser (ca. 240 ml) hat."
       }
     ],
-    relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'gramm-in-ml-rechner'],
+    relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'gramm-in-ml-rechner', 'alkohol-verkochungs-rechner'],
   },
   {
     id: "nudeln-rohmaerk-gewicht-rechner",
@@ -5492,7 +5492,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Welche Wassertemperatur ist für Filterkaffee optimal?', answer: 'Zwischen 92 °C und 96 °C; kochendes Wasser (100 °C) verbrennt Kaffeebestandteile und löst bittere Gerbstoffe, zu kaltes Wasser (< 90 °C) führt zu säuerlichem, unterextrahiertem Kaffee.' },
       { question: 'Warum wiegt man Kaffee in Gramm statt Esslöffeln?', answer: 'Weil verschiedene Röstungen (helle vs. dunkle Röstung) und Bohnengrößen stark unterschiedliche Schüttdichten aufweisen.' },
     ],
-    relatedSlugs: ['tee-ziehzeit-temperatur-rechner', 'essloeffel-teeloeffel-gramm-rechner', 'portionsrechner'],
+    relatedSlugs: ['tee-ziehzeit-temperatur-rechner', 'essloeffel-teeloeffel-gramm-rechner', 'portionsrechner', 'cocktail-alkoholgehalt-rechner'],
   },
   {
     id: "cocktail-alkoholgehalt-rechner",
@@ -5628,7 +5628,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Wie viel Alkohol hat ein klassischer Gin Tonic?', answer: '40 ml Gin (40 Vol.-%) gemischt mit 160 ml Tonic Water ergibt ca. 8,0 Vol.-% Alkohol im 200-ml-Glas.' },
       { question: 'Was ist der Unterschied zwischen Shaken und Rühren (Stirring)?', answer: 'Klare Spirituosen-Cocktails (Martini, Manhattan) werden gerührt, um die Textur klar und samtig ohne Trübung zu halten; Cocktails mit Zitrussäften oder Sahne werden kräftig geschüttelt.' },
     ],
-    relatedSlugs: ['alkohol-verkochungs-rechner', 'promillerechner', 'portionsrechner'],
+    relatedSlugs: ['alkohol-verkochungs-rechner', 'promillerechner', 'portionsrechner', 'kaffee-wasser-verhaeltnis-rechner', 'tee-ziehzeit-temperatur-rechner'],
   },
   {
     id: "salz-lake-poekel-rechner",
@@ -5742,7 +5742,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Wie lange muss Fleisch in der Lake reifen?', answer: 'Als Richtwert gilt ca. 1 Tag Pökelzeit pro Zentimeter Fleischdicke an der dicksten Stelle bei konstanter Kühlschranktemperatur von 4 bis 6 °C.' },
       { question: 'Wie viel Salz benötigt man für eine 10-prozentige Pökellake mit 5 Litern Wasser?', answer: 'Auf 5.000 g Wasser kommen 555 Gramm Salz (denn 555 / 5555 ≈ 10,0 %).' },
     ],
-    relatedSlugs: ['fleisch-kerntemperatur-garzeit-rechner', 'kuehlschrank-haltbarkeit-rechner', 'portionsrechner'],
+    relatedSlugs: ['fleisch-kerntemperatur-garzeit-rechner', 'kuehlschrank-haltbarkeit-rechner', 'portionsrechner', 'marmelade-geliermittel-rechner'],
   },
   {
     id: "frittieroel-temperatur-rauchpunkt-rechner",
@@ -6375,7 +6375,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       { question: 'Warum wiegt das fertige Gericht weniger als die Summe der rohen Zutaten?', answer: 'Beim Braten und Backen verdampft Wasser; die Kalorienkonzentration pro 100 Gramm Fertiggericht steigt dadurch an, während die Gesamtkalorienzahl unverändert bleibt.' },
       { question: 'Müssen Gewürze bei der Kalorienberechnung mitgezählt werden?', answer: 'Salz, Pfeffer und getrocknete Kräuter in üblichen Haushaltsmengen haben vernachlässigbar geringe Kalorienwerte; Bratfette und Zucker müssen jedoch grammgenau erfasst werden.' },
     ],
-    relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'zucker-ersatz-rechner'],
+    relatedSlugs: ['portionsrechner', 'nudeln-rohmaerk-gewicht-rechner', 'zucker-ersatz-rechner', 'eiweiss-eigelb-ersatz-rechner'],
   },
   {
     id: "schokolade-temperieren-rechner",

@@ -52,7 +52,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was ist das Annuitätenprinzip?', answer: 'Bei einem Annuitätendarlehen bleibt die monatliche Gesamtüberweisung (Rate) über die gesamte Zinsbindungsfrist hinweg konstant, während sich die Anteile von Zins und Tilgung Monat für Monat verschieben.' },
       { question: 'Kann ein Konsumentenkredit jederzeit vorzeitig getilgt werden?', answer: 'Ja, nach § 500 Abs. 2 BGB haben Verbraucher das Recht, Verbraucherdarlehen jederzeit ganz oder teilweise vorzeitig zurückzuzahlen.' },
     ],
-    relatedSlugs: ['zwischenfinanzierung-rechner', 'ratenkreditrechner', 'effektivzins-kredit-rechner', 'vorfaelligkeitsentschaedigung-rechner', 'gesamtzinsbelastung-rechner', 'modernisierungskredit-rechner'],
+    relatedSlugs: ['zwischenfinanzierung-rechner', 'ratenkreditrechner', 'effektivzins-kredit-rechner', 'vorfaelligkeitsentschaedigung-rechner', 'gesamtzinsbelastung-rechner', 'modernisierungskredit-rechner', 'dispozins-rechner', 'maximaler-kredit-rechner'],
   },
   {
     id: 'ratenkreditrechner',
@@ -235,7 +235,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Warum sollte die Tilgungsrate bei niedrigen Zinsen höher gewählt werden?', answer: 'Weil die Zinsersparnis pro Monat geringer ist und der Tilgungsanteil dadurch langsamer wächst. Bei 1 % Zins und 1 % Tilgung würde die Rückzahlung über 60 Jahre dauern.' },
       { question: 'Gibt es ein gesetzliches Sonderkündigungsrecht nach 10 Jahren?', answer: 'Ja, nach § 489 Abs. 1 Nr. 2 BGB kann jedes Festzinsdarlehen nach Ablauf von 10 Jahren nach vollständiger Auszahlung mit einer Frist von 6 Monaten ohne Vorfälligkeitsentschädigung gekündigt werden.' },
     ],
-    relatedSlugs: ['vorfaelligkeitsentschaedigung-baufinanzierung-rechner', 'gesamtzinsbelastung-rechner', 'volltilger-darlehen-rechner', 'kreditrechner', 'sondertilgungsrechner', 'restschuld-rechner'],
+    relatedSlugs: ['vorfaelligkeitsentschaedigung-baufinanzierung-rechner', 'gesamtzinsbelastung-rechner', 'volltilger-darlehen-rechner', 'kreditrechner', 'sondertilgungsrechner', 'restschuld-rechner', 'zinsbindung-rechner', 'kreditlaufzeit-rechner'],
   },
   {
     id: 'sondertilgungsrechner',
@@ -317,6 +317,6 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was geschieht mit der Restschuld am Ende der Zinsbindung?', answer: 'Die finanzierende Bank unterbreitet ein Angebot zur Verlängerung (Prolongation); alternativ kann der Betrag auf eine günstigere Fremdbank umgeschuldet oder bar getilgt werden.' },
       { question: 'Welches Risiko birgt eine hohe Restschuld?', answer: 'Das Zinsänderungsrisiko: Liegen die Marktzinsen am Ende der Zinsbindung höher als bei Abschluss, steigt die künftige Monatsbelastung für die Anschlussfinanzierung spürbar.' },
     ],
-    relatedSlugs: ['tilgungsrechner', 'kreditrechner', 'sondertilgungsrechner', 'restschuld-rechner'],
+    relatedSlugs: ['tilgungsrechner', 'kreditrechner', 'sondertilgungsrechner', 'restschuld-rechner', 'kreditlaufzeit-rechner'],
   },
 ];

@@ -592,7 +592,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Was bedeutet das Mauerwerksmaß nach DIN 4172 (Achtelmeter)?', answer: 'Das deutsche Bauraster basiert auf dem Modul von 12,5 cm (Achtelmeter: 12,5 cm, 25 cm, 37,5 cm etc.), um Bauten ohne aufwendiges Zerschneiden von Steinen zu planen.' },
       { question: 'Wie viel Mörtel benötigt man für 1 m² Mauerwerk?', answer: 'Bei Dickbettmörtel ca. 30 bis 40 Liter Mörtel pro m² Wand; bei Plansteinen mit Dünnbettmörtel werden nur rund 3 bis 5 kg Trockenkleber benötigt.' },
     ],
-    relatedSlugs: ['betonrechner', 'estrich-rechner', 'putz-rechner'],
+    relatedSlugs: ['betonrechner', 'estrich-rechner', 'putz-rechner', 'fliesenkleber-rechner'],
   },
   {
     id: "fliesenkleber-rechner",
@@ -1141,7 +1141,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Welche Plattenart gehört in Feuchträume (Bad)?', answer: 'Immer imprägnierte Gipskartonplatten (grün, Typ GKBI / DIN EN 520 Typ H2), die Feuchtigkeitsaufnahme und Schimmelbildung hemmen.' },
       { question: 'Wie viele Schrauben benötigt man pro Quadratmeter Gipskarton?', answer: 'Bei einfacher Beplankung ca. 15 bis 20 Schnellbauschrauben pro m²; bei Doppelbeplankung ca. 30 Schrauben pro m² mit versetzten Fugen.' },
     ],
-    relatedSlugs: ['farbmengen-rechner', 'daemmung-u-wert-rechner', 'bausteine-mauerwerk-rechner'],
+    relatedSlugs: ['farbmengen-rechner', 'daemmung-u-wert-rechner', 'bausteine-mauerwerk-rechner', 'putz-rechner', 'treppen-stufen-rechner'],
   },
   {
     id: "fundament-rechner",
@@ -4010,7 +4010,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Gilt die Formel A = 1/2 · g · h auch bei stumpfwinkligen Dreiecken?', answer: 'Ja, uneingeschränkt: Bei stumpfwinkligen Dreiecken liegt der Höhenfußpunkt außerhalb des Dreiecks auf der verlängerten Grundlinie.' },
       { question: 'Wie lautet die Trigonometrie-Formel für die Dreiecksfläche?', answer: 'A = 1/2 · a · b · sin(gamma). Sie benötigt lediglich zwei Seitenlängen und den von ihnen eingeschlossenen Innenwinkel.' },
     ],
-    relatedSlugs: ['dreiecks-hoehen-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'rechteckrechner', 'pythagoras-rechner', 'bogenmass-grad-rechner'],
+    relatedSlugs: ['dreiecks-hoehen-rechner', 'sechseck-polygon-rechner', 'kreisrechner', 'rechteckrechner', 'pythagoras-rechner', 'bogenmass-grad-rechner', 'rhombus-raute-rechner'],
   },
   {
     id: "kreis-umfang-rechner",
@@ -4106,7 +4106,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Wie viel Umzäunung braucht ein rundes Gartenbeet?', answer: 'Messen Sie den Durchmesser des Beets quer durch die Mitte und multiplizieren Sie das Maß mit 3,1416. Bei einem Beet-Durchmesser von 4 Metern benötigen Sie ca. 12,57 Meter Beeteinfassung oder Zaun.' },
       { question: 'Was ist der Unterschied zwischen Kreisumfang und Kreisfläche?', answer: 'Der Umfang (U) beschreibt die eindimensionale Länge der Begrenzungslinie (Einheit: cm, m), während die Fläche (A = π · r²) das zweidimensionale Areal im Inneren des Kreises beziffert (Einheit: cm², m²).' },
     ],
-    relatedSlugs: ['kreisrechner', 'zylinderrechner', 'kreissegment-rechner', 'ringgroesse-umrechner', 'ellipse-flaeche-rechner'],
+    relatedSlugs: ['kreisrechner', 'zylinderrechner', 'kreissegment-rechner', 'ringgroesse-umrechner', 'ellipse-flaeche-rechner', 'sechseck-polygon-rechner', 'dreiecks-hoehen-rechner'],
   },
   {
     id: "kegel-volumen-rechner",
@@ -4197,7 +4197,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Wie berechnet man das Volumen eines aufgeschütteten Sandkegels?', answer: 'Messen Sie den Bodenumfang zur Bestimmung des Radius r und die Höhe h des Schüttkegels an der Spitze: V = 1/3 · pi · r² · h.' },
       { question: 'Wie lautet die Formel für die gekrümmte Mantelfläche des Kegels?', answer: 'Mantelfläche M = pi · r · s, wobei s die schräge Mantellinie von der Grundkreiskante bis zur Spitze ist.' },
     ],
-    relatedSlugs: ['stumpf-kegel-rechner', 'zylinderrechner', 'kugel-oberflaeche-rechner', 'pyramide-volumen-rechner'],
+    relatedSlugs: ['stumpf-kegel-rechner', 'zylinderrechner', 'kugel-oberflaeche-rechner', 'pyramide-volumen-rechner', 'hohlzylinder-rohr-rechner'],
   },
   {
     id: "hohlzylinder-rohr-rechner",

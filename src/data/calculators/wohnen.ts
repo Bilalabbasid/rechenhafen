@@ -49,7 +49,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Gilt die 30-Prozent-Regel für Warm- oder Kaltmiete?', answer: 'Vermieter und Banken prüfen stets die Warmmiete (Gesamtwohnkosten inklusive Heizung und Nebenkosten), da dieser Gesamtbetrag monatlich vom Konto abfließt.' },
       { question: 'Was fordern Vermieter typischerweise an Mindesteinkommen?', answer: 'Viele Vermieter verlangen, dass das monatliche Nettoeinkommen mindestens das Dreifache der Warmmiete beträgt (entspricht einer Mietbelastung von ca. 33 %).' },
     ],
-    relatedSlugs: ['warmmiete-rechner', 'mietbudget-rechner', 'kaufnebenkosten-rechner', 'stromkostenrechner'],
+    relatedSlugs: ['warmmiete-rechner', 'mietbudget-rechner', 'kaufnebenkosten-rechner', 'stromkostenrechner', 'mieterhoehung-rechner'],
   },
   {
     id: 'kaufnebenkosten-rechner',
@@ -119,7 +119,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Welches Bundesland hat die niedrigste Grunderwerbsteuer?', answer: 'Bayern hat mit 3,5 Prozent den bundesweit niedrigsten Steuersatz; die meisten anderen Bundesländer liegen bei 5,0 bis 6,5 Prozent.' },
       { question: 'Können Kaufnebenkosten steuerlich abgesetzt werden?', answer: 'Bei selbstgenutzten Immobilien nicht; bei vermieteten Objekten werden Grunderwerbsteuer, Notar und Makler anteilig auf Gebäude und Grund und Boden verteilt und über die Gebäude-AfA abgeschrieben.' },
     ],
-    relatedSlugs: ['kreditrechner-ohne-eigenkapital', 'tilgungsrechner', 'kreditrechner', 'immobilienrendite-rechner', 'quadratmeterpreis-rechner', 'spekulationssteuer-immobilien-rechner'],
+    relatedSlugs: ['kreditrechner-ohne-eigenkapital', 'tilgungsrechner', 'kreditrechner', 'immobilienrendite-rechner', 'quadratmeterpreis-rechner', 'spekulationssteuer-immobilien-rechner', 'wohnflaeche-din-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -243,7 +243,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie hoch sind die Nebenkosten pro Quadratmeter im Durchschnitt?', answer: 'Nach dem Betriebskostenspiegel des Deutschen Mieterbundes betragen die Gesamtwarmnebenkosten (Heizung, Wasser, Müll, Hausmeister etc.) durchschnittlich 2,80 bis 3,50 € pro Quadratmeter Wohnfläche.' },
       { question: 'Was tun, wenn die Wunschwohnung über 40 % des Einkommens kostet?', answer: 'In solchen Fällen fordern Vermieter häufig eine Mietbürgschaft (z. B. der Eltern) oder die Aufnahme eines zweiten solventen Hauptmieters in den Mietvertrag.' },
     ],
-    relatedSlugs: ['kaufpreis-faktor-rechner', 'erbbaurecht-erbbauzins-rechner', 'mietbelastungsquote-rechner', 'kaufnebenkosten-rechner', 'stromkostenrechner'],
+    relatedSlugs: ['kaufpreis-faktor-rechner', 'erbbaurecht-erbbauzins-rechner', 'mietbelastungsquote-rechner', 'kaufnebenkosten-rechner', 'stromkostenrechner', 'mieterhoehung-rechner'],
   },
   {
     id: 'mieterhoehung-rechner',

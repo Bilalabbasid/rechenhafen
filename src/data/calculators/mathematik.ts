@@ -57,7 +57,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie rechnet man Prozente schnell im Kopf aus?', answer: 'Zerlegen Sie den Prozentsatz in einfache Teilbeträge wie 10 % (Komma um eine Stelle nach links verschieben), 1 % (zwei Stellen) oder 50 % (halbieren).' },
       { question: 'Was ist der Unterschied zwischen Prozentwert und Prozentsatz?', answer: 'Der Prozentsatz (p %) ist die relative Verhältniszahl mit dem Prozentzeichen, während der Prozentwert (W) die konkrete absolute Zahl in Euro, Kilogramm oder Einheiten darstellt.' },
     ],
-    relatedSlugs: ['antiproportionaler-dreisatz-rechner', 'prozentualer-unterschied-rechner', 'prozentuale-veraenderung', 'grundwert-rechner', 'dreisatzrechner', 'bruchrechner'],
+    relatedSlugs: ['antiproportionaler-dreisatz-rechner', 'prozentualer-unterschied-rechner', 'prozentuale-veraenderung', 'grundwert-rechner', 'dreisatzrechner', 'bruchrechner', 'prozent-von-prozent-rechner'],
   },
   {
     id: 'prozentuale-veraenderung',
@@ -316,7 +316,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie findet man den kleinsten gemeinsamen Hauptnenner zweier Brüche?', answer: 'Der Hauptnenner ist das kleinste gemeinsame Vielfache (kgV) der beiden Nenner. Bei 1/4 und 1/6 ist das kgV(4, 6) = 12.' },
       { question: 'Warum wird bei der Division durch einen Bruch mit dem Kehrwert multipliziert?', answer: 'Weil das Teilen durch einen Bruchteil a/b logisch gleichbedeutend ist mit der Multiplikation mit dessen Umkehrwert b/a.' },
     ],
-    relatedSlugs: ['ggt-rechner', 'kgv-rechner', 'prozentrechner'],
+    relatedSlugs: ['ggt-rechner', 'kgv-rechner', 'prozentrechner', 'bruch-in-dezimal-rechner', 'dezimal-in-bruch-rechner'],
   },
   {
     id: 'dreieckrechner',
@@ -398,7 +398,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wann sollte man den Median statt des Durchschnitts verwenden?', answer: 'Bei stark verzerrten Verteilungen wie Gehältern oder Vermögen spiegelt der Median die typische Mitte besser wider, da Milliardäre den Durchschnitt künstlich verzerren.' },
       { question: 'Wie berechnet man einen gewichteten Notendurchschnitt?', answer: 'Multiplizieren Sie jede Note mit ihren ECTS-Punkten, summieren Sie diese Produkte und teilen Sie die Summe durch die Gesamtzahl aller ECTS-Punkte.' },
     ],
-    relatedSlugs: ['ohmsches-gesetz-rechner', 'dreisatzrechner', 'pythagoras-rechner', 'geometrisches-mittel-rechner', 'harmonisches-mittel-rechner'],
+    relatedSlugs: ['ohmsches-gesetz-rechner', 'dreisatzrechner', 'pythagoras-rechner', 'geometrisches-mittel-rechner', 'harmonisches-mittel-rechner', 'dreieckrechner'],
   },
   {
     id: 'pythagoras-rechner',

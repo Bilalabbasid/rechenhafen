@@ -76,7 +76,7 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie viel Prozent Verschnitt bzw. Sicherheitsreserve sollte man bei Farbe einplanen?', answer: 'Planen Sie ca. 10 bis 15 Prozent Reserve für Ecken, Kanten, Walzenverluste und spätere Ausbesserungsarbeiten ein.' },
       { question: 'Was bedeuten die Deckkraftklassen (Klasse 1 bis 4 nach DIN EN 13300)?', answer: 'Klasse 1 deckt bei vorgegebener Ergiebigkeit mindestens 99,5 % des Untergrunds ab (oft reicht 1 Anstrich); Klasse 2 deckt 98 bis 99,5 %; Klasse 3 und 4 erfordern fast immer Mehrfachanstrich.' },
     ],
-    relatedSlugs: ['tapetenrollen-rechner', 'fassadenfarbe-rechner', 'trockenbau-gipskarton-rechner', 'bodenbelag-rechner', 'betonrechner', 'rechteckrechner'],
+    relatedSlugs: ['tapetenrollen-rechner', 'fassadenfarbe-rechner', 'trockenbau-gipskarton-rechner', 'bodenbelag-rechner', 'betonrechner', 'rechteckrechner', 'brennholz-raummeter-rechner'],
   },
   {
     id: 'bodenbelag-rechner',
@@ -113,7 +113,7 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Muss Bodenbelag vor der Verlegung akklimatisiert werden?', answer: 'Ja, Parkett, Laminat und Klick-Vinyl sollten mindestens 48 Stunden ungeöffnet flach liegend im Verlegeraum bei normaler Raumtemperatur gelagert werden.' },
       { question: 'Wie rechnet man die benötigte Paketanzahl aus?', answer: 'Teilen Sie die Gesamtfläche inklusive Verschnitt durch den m²-Inhalt eines Pakets und runden Sie immer auf die nächste volle Packung auf.' },
     ],
-    relatedSlugs: ['tapetenrollen-rechner', 'farbmengen-rechner', 'betonrechner', 'rechteckrechner'],
+    relatedSlugs: ['tapetenrollen-rechner', 'farbmengen-rechner', 'betonrechner', 'rechteckrechner', 'brennholz-raummeter-rechner'],
   },
   {
     id: 'betonrechner',

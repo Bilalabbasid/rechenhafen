@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { CATEGORIES, getCategoryBySlug } from '@/data/categories';
 import { getCalculatorsByCategory } from '@/data/calculators';
-import { getArticlesByCategory } from '@/data/ratgeber/articles';
+import { getArticlesByCategory, getArticleBySlug } from '@/data/ratgeber/articles';
+import { RatgeberArticle } from '@/types/ratgeber';
 import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import CategoryIcon from '@/components/common/CategoryIcon';
 import CategoryCard from '@/components/common/CategoryCard';
@@ -145,15 +146,23 @@ export default async function CategoryPage({ params }: PageProps) {
           </div>
         </div>
 
-        <p style={{
-          fontSize: '1.05rem',
-          lineHeight: 1.6,
+        <div style={{
+          fontSize: '1.02rem',
+          lineHeight: 1.7,
           color: 'var(--color-text-secondary)',
-          maxWidth: '780px',
+          maxWidth: '840px',
           margin: 0
         }}>
-          {cat.description}
-        </p>
+          {cat.introText ? (
+            cat.introText.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} style={{ margin: '0 0 var(--space-4)' }}>
+                {paragraph}
+              </p>
+            ))
+          ) : (
+            <p style={{ margin: 0 }}>{cat.description}</p>
+          )}
+        </div>
       </section>
 
       {/* Beliebte Datumsrechner auf der Datum & Zeit Themen-Hubseite */}
@@ -178,8 +187,17 @@ export default async function CategoryPage({ params }: PageProps) {
 
       {/* Passende Fachartikel & Ratgeber zur Kategorie */}
       {(() => {
-        const catArticles = getArticlesByCategory(cat.slug);
+        let catArticles: RatgeberArticle[] = [];
+        if (cat.relevantArticleSlugs && cat.relevantArticleSlugs.length > 0) {
+          catArticles = cat.relevantArticleSlugs
+            .map((slug) => getArticleBySlug(slug))
+            .filter((a): a is RatgeberArticle => Boolean(a));
+        }
+        if (catArticles.length === 0) {
+          catArticles = getArticlesByCategory(cat.slug);
+        }
         if (catArticles.length === 0) return null;
+        const displayArticles = catArticles.slice(0, 3);
         return (
           <section
             style={{
@@ -211,7 +229,7 @@ export default async function CategoryPage({ params }: PageProps) {
                 gap: 'var(--space-4)',
               }}
             >
-              {catArticles.map((art) => (
+              {displayArticles.map((art) => (
                 <Link
                   key={art.slug}
                   href={`/ratgeber/${art.slug}/`}

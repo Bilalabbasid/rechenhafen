@@ -38,7 +38,7 @@ export const FAMILIE_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie berechnet man den Termin bei bekanntem Empfängnisdatum (Zeugungstag)?', answer: 'Bei bekanntem Eisprung oder Inseminationstag rechnet man: Empfängnistag + 266 Tage (38 Wochen reale Tragzeit).' },
       { question: 'Ab wann gilt ein Baby medizinisch als termingerecht geboren?', answer: 'Alle Geburten zwischen der vollendeten 37. Schwangerschaftswoche (37+0 SSW) und der 42. Woche (41+6 SSW) gelten als voll ausgetragene Reifgeburten.' },
     ],
-    relatedSlugs: ['chinesischer-empfaengniskalender-rechner', 'fruchtbare-tage-rechner', 'altersrechner'],
+    relatedSlugs: ['chinesischer-empfaengniskalender-rechner', 'fruchtbare-tage-rechner', 'altersrechner', 'mutterschutzfristen-rechner'],
   },
   {
     id: 'fruchtbare-tage-rechner',

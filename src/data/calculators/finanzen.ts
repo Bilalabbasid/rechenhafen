@@ -68,7 +68,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie wirkt sich die Häufigkeit der Zinsgutschrift aus?', answer: 'Je häufiger Zinsen gutgeschrieben werden (monatlich oder vierteljährlich statt jährlich), desto schneller entfaltet der Zinseszins seine Wirkung, da unterjährige Zinsen bereits in den Folgemonaten mitverzinst werden (effektiver Jahreszins steigt).' },
       { question: 'Werden Steuern auf die erwirtschafteten Zinsen automatisch abgezogen?', answer: 'In diesem Rechner werden Brutto-Ergebnisse vor Steuern dargestellt. In der Praxis führt die depotführende Bank in Deutschland bei Überschreiten des Sparer-Pauschbetrags 25 % Abgeltungsteuer plus 5,5 % Soli (zusammen 26,375 %) automatisch an das Finanzamt ab. Berechnen Sie Ihren exakten Steuerabzug und Netto-Zinsertrag mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und verwalten Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).' },
     ],
-    relatedSlugs: ['sparrechner', 'sparzielrechner', 'etf-sparplan-rechner', 'kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'renditerechner', 'inflationsrechner'],
+    relatedSlugs: ['sparrechner', 'sparzielrechner', 'etf-sparplan-rechner', 'kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'renditerechner', 'inflationsrechner', 'verdopplungszeit-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -286,7 +286,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was ist der Unterschied zwischen gefühlter und statistischer Inflation?', answer: 'Der offizielle VPI basiert auf einem repräsentativen Warenkorb. Produkte des täglichen Bedarfs (Lebensmittel, Energie), die häufig gekauft werden, prägen die gefühlte Inflation stärker als langlebige Güter.' },
       { question: 'Wie schützt man sein Erspartes vor Inflation?', answer: 'Sachwerte wie Aktien, ETFs und Immobilien bieten langfristig historisch den besten Schutz, da Unternehmensgewinne und Mieten tendenziell mit den Preisen steigen.' },
     ],
-    relatedSlugs: ['zinseszinsrechner', 'sparrechner', 'renditerechner', 'sparzielrechner', 'gold-rendite-rechner', 'etf-sparplan-rechner'],
+    relatedSlugs: ['zinseszinsrechner', 'sparrechner', 'renditerechner', 'sparzielrechner', 'gold-rendite-rechner', 'etf-sparplan-rechner', 'realzins-rechner', 'thesaurierend-vs-ausschuettend-rechner'],
   },
   {
     id: 'renditerechner',
@@ -322,7 +322,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Warum ist die durchschnittliche arithmetische Rendite irreführend?', answer: 'Macht ein Portfolio im ersten Jahr +100 % und im zweiten Jahr -50 %, ist der arithmetische Durchschnitt +25 %, das reale Kapital liegt jedoch wieder exakt beim Ausgangswert (reale CAGR = 0 %).' },
       { question: 'Was ist der Unterschied zwischen Brutto- und Nettorendite?', answer: 'Die Bruttorendite ignoriert Steuern und Handelskosten; erst die Nettorendite nach Abzug von Abgeltungsteuer, Solidaritätszuschlag und Depotgebühren zeigt den echten Zuwachs.' },
     ],
-    relatedSlugs: ['zinseszinsrechner', 'etf-sparplan-rechner', 'sparzielrechner', 'inflationsrechner', 'immobilienrendite-rechner', 'depotgebuehren-rechner'],
+    relatedSlugs: ['zinseszinsrechner', 'etf-sparplan-rechner', 'sparzielrechner', 'inflationsrechner', 'immobilienrendite-rechner', 'depotgebuehren-rechner', 'gold-rendite-rechner'],
   },
   {
     id: 'notgroschen-rechner',

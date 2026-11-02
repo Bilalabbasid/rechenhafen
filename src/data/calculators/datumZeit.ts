@@ -79,7 +79,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wann vollenden am 29. Februar Geborene in Nicht-Schaltjahren ihr Lebensjahr?', answer: 'Nach deutschem Zivilrecht (§ 188 Abs. 3 BGB) gilt das Lebensjahr mit Ablauf des 28. Februars (24:00 Uhr) als vollendet, sodass der Geburtstag am 1. März gefeiert wird.' },
       { question: 'Wie berechnet man das Alter auf den Tag genau im Kopf?', answer: 'Man zieht zunächst das Geburtsjahr vom aktuellen Jahr ab. Liegt der Geburtstag im laufenden Jahr noch in der Zukunft, zieht man ein ganzes Jahr ab und berechnet die verbleibenden Monate und Resttage zum Vormonat.' },
     ],
-    relatedSlugs: ['alter-in-tagen', 'geburtstagsrechner', 'tage-zwischen-zwei-daten', 'arbeitstage-rechner', 'altersunterschied'],
+    relatedSlugs: ['alter-in-tagen', 'geburtstagsrechner', 'tage-zwischen-zwei-daten', 'arbeitstage-rechner', 'altersunterschied', 'lebenszeit-in-stunden', 'alter-in-monaten'],
   },
   {
     id: 'alter-in-tagen',
@@ -114,7 +114,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Werden Schalttage bei der Tageszählung vollständig berücksichtigt?', answer: 'Ja, alle 29. Februare, die zwischen dem Geburtsdatum und dem Stichtag liegen, werden voll als Einzeltage mitgezählt.' },
       { question: 'Wird der Geburtstag selbst als ganzer Tag mitgezählt?', answer: 'In der Zeitrechnung zählt der Geburtstag als Tag 0; nach Vollendung von 24 Stunden ist der erste Lebenstag abgeschlossen.' },
     ],
-    relatedSlugs: ['tage-zwischen-zwei-daten', 'datum-plus-tage', 'dienstjubilaeum-rechner', 'altersrechner', 'geburtstagsrechner'],
+    relatedSlugs: ['tage-zwischen-zwei-daten', 'datum-plus-tage', 'dienstjubilaeum-rechner', 'altersrechner', 'geburtstagsrechner', 'altersunterschied'],
   },
   {
     id: 'lebenszeit-in-stunden',
@@ -815,8 +815,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
         answer: 'Weil Kalendermonate zwischen 28 und 31 Tage lang sind. Eine pauschale Division durch 30 oder 30,44 führt bei längeren Zeiträumen zu Fehlern von mehreren Tagen. Unser Rechner nutzt echte Kalenderarithmetik.',
       },
     ],
-    relatedSlugs: [
-      'datum-plus-tage',
+    relatedSlugs: ['datum-plus-tage',
       'dienstjubilaeum-rechner',
       'alter-in-tagen',
       'tage-bis-weihnachten',
@@ -825,8 +824,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       'datum-minus-tage',
       'altersrechner',
       'tage-bis-geburtstag',
-      'schaltjahr-rechner',
-    ],
+      'schaltjahr-rechner', 'wochen-zwischen-daten', 'monate-zwischen-daten'],
   },
   {
     id: 'tage-bis-weihnachten',

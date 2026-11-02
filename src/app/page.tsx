@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { CATEGORIES } from '@/data/categories';
 import { ALL_CALCULATORS, getCalculatorsByCategory } from '@/data/calculators';
 import { getAllArticles } from '@/data/ratgeber/articles';
+import { POPULAR_CALCULATOR_SLUGS, POPULAR_SEARCH_CHIPS } from '@/data/popularSearches';
 import SearchBar from '@/components/common/SearchBar';
 import CalculatorCard from '@/components/common/CalculatorCard';
 import CategoryCard from '@/components/common/CategoryCard';
@@ -48,38 +49,10 @@ export const metadata: Metadata = {
   },
 };
 
-const POPULAR_SLUGS = [
-  'brutto-netto-rechner',
-  'prozentrechner',
-  'tage-zwischen-zwei-daten',
-  'altersrechner',
-  'bmi-rechner',
-  'spritkostenrechner',
-  'kreditrechner',
-  'zinseszinsrechner',
-  'stundenlohnrechner',
-  'inflationsrechner',
-];
-
-const POPULAR_CHIPS = [
-  { label: 'Brutto-Netto', slug: 'brutto-netto-rechner' },
-  { label: 'Tagerechner', slug: 'tage-zwischen-zwei-daten' },
-  { label: 'Gaskosten', slug: 'gaskostenrechner' },
-  { label: 'JobRad', slug: 'dienstfahrrad-jobrad-rechner' },
-  { label: 'Schalungssteine', slug: 'schalungssteine-rechner' },
-  { label: 'Prozent', slug: 'prozentrechner' },
-  { label: 'Alter', slug: 'altersrechner' },
-  { label: 'BMI', slug: 'bmi-rechner' },
-  { label: 'Spritkosten', slug: 'spritkostenrechner' },
-  { label: 'Kredit', slug: 'kreditrechner' },
-  { label: 'Zinseszins', slug: 'zinseszinsrechner' },
-  { label: 'Stundenlohn', slug: 'stundenlohnrechner' },
-];
-
 export default function HomePage() {
   const totalCalculators = ALL_CALCULATORS.length;
 
-  const popularCalculators = POPULAR_SLUGS.map((slug) =>
+  const popularCalculators = POPULAR_CALCULATOR_SLUGS.map((slug) =>
     ALL_CALCULATORS.find((c) => c.slug === slug)
   ).filter(Boolean);
 
@@ -121,7 +94,7 @@ export default function HomePage() {
           <span className={styles.quickChipsLabel}>
             Häufig gesucht:
           </span>
-          {POPULAR_CHIPS.map((chip) => (
+          {POPULAR_SEARCH_CHIPS.map((chip) => (
             <Link
               key={chip.slug}
               href={`/rechner/${chip.slug}/`}

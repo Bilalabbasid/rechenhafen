@@ -39,7 +39,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie berechnet man den Radius, wenn nur die Fläche bekannt ist?', answer: 'Man teilt den Flächeninhalt durch Pi und zieht aus dem Zwischenergebnis die Quadratwurzel: r = Wurzel(A / pi).' },
       { question: 'Woher stammt die Kreiszahl Pi?', answer: 'Pi ist das konstante Verhältnis des Umfangs eines beliebigen Kreises zu seinem Durchmesser, eine irrationale und transzendente mathematische Konstante.' },
     ],
-    relatedSlugs: ['goldener-schnitt-rechner', 'ellipse-flaeche-rechner', 'zylinderrechner', 'rechteckrechner', 'pythagoras-rechner'],
+    relatedSlugs: ['goldener-schnitt-rechner', 'ellipse-flaeche-rechner', 'zylinderrechner', 'rechteckrechner', 'pythagoras-rechner', 'vektor-skalarprodukt-rechner'],
   },
   {
     id: 'zylinderrechner',

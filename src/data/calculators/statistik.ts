@@ -102,7 +102,7 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Warum teilt man bei Stichproben durch n-1 statt durch n?', answer: 'Die Bessel-Korrektur gleicht den systematischen Schätzfehler (Bias) aus, da der Mittelwert der Stichprobe bereits einen Freiheitsgrad verbraucht hat.' },
       { question: 'Was besagt die 68-95-99,7-Regel bei Normalverteilung?', answer: 'Bei normalverteilten Daten liegen rund 68,3 % aller Messwerte innerhalb von ±1 Standardabweichung um den Mittelwert; 95,4 % innerhalb von ±2 Sigma und 99,7 % innerhalb von ±3 Sigma.' },
     ],
-    relatedSlugs: ['durchschnittsrechner', 'notendurchschnitt-rechner', 'ohmsches-gesetz-rechner'],
+    relatedSlugs: ['durchschnittsrechner', 'notendurchschnitt-rechner', 'ohmsches-gesetz-rechner', 'quartile-box-plot-rechner', 'variationskoeffizient-rechner', 'perzentil-rechner'],
   },
   {
     id: 'ohmsches-gesetz-rechner',

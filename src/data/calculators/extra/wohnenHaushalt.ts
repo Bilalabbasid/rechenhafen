@@ -151,7 +151,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Wird die Minderung von der Kaltmiete oder Warmmiete berechnet?', answer: 'Nach ständiger Rechtsprechung des Bundesgerichtshofs (BGH, Az. XII ZR 225/03) ist die Bruttomiete (Warmmiete inklusive Nebenkostenvorauszahlungen) die zwingende Bemessungsgrundlage.' },
       { question: 'Darf man die Miete ohne Mängelanzeige sofort kürzen?', answer: 'Nein, nach § 536c BGB muss der Mangel dem Vermieter unverzüglich schriftlich angezeigt und eine angemessene Frist zur Beseitigung gesetzt werden; erst ab Zugang der Anzeige darf gemindert werden.' },
     ],
-    relatedSlugs: ['untermiete-rechner', 'mietbelastungsquote-rechner', 'mietkaution-zinsen-rechner', 'mietrendite-brutto-netto-rechner'],
+    relatedSlugs: ['untermiete-rechner', 'mietbelastungsquote-rechner', 'mietkaution-zinsen-rechner', 'mietrendite-brutto-netto-rechner', 'abstandszahlung-rechner'],
   },
 
   {
@@ -2436,7 +2436,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { question: 'Was bedeuten Brennwert (Hs) und Zustandszahl (z)?', answer: 'Der Brennwert (Hs in kWh/m³) gibt an, wie viel nutzbare Wärmeenergie in einem Normkubikmeter Gas enthalten ist. Die Zustandszahl (z) gleicht den lokalen Gasdruck und die Umgebungstemperatur an Ihrer Abnahmestelle an den Normzustand an. Beide Faktoren sind amtlich geprüft und stehen auf Ihrer Jahresabrechnung.' },
       { question: 'Bietet RechenHafen Live-Tarife oder einen Gaspreis-Vergleich an?', answer: 'Nein. RechenHafen bietet transparente, datenschutzfreundliche Berechnungswerkzeuge für Ihre persönlichen Rechnungs- und Zählerdaten, betreibt jedoch keinen kommerziellen Tarifvergleich mit Live-Marktdaten.' },
     ],
-    relatedSlugs: ['gaskostenrechner', 'heizkostenvergleich-rechner', 'oelheizung-verbrauch-rechner', 'stromkostenrechner', 'waermepumpe-stromkosten-rechner'],
+    relatedSlugs: ['gaskostenrechner', 'heizkostenvergleich-rechner', 'oelheizung-verbrauch-rechner', 'stromkostenrechner', 'waermepumpe-stromkosten-rechner', 'warmwasserkosten-rechner', 'pelletheizung-verbrauch-rechner', 'co2-abgabe-vermieter-mieter-rechner', 'energieeffizienzklasse-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

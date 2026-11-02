@@ -367,7 +367,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { question: 'Was ist ein typisches Beispiel für antiproportionale Zuordnungen?', answer: 'Pumpen, die ein Becken leeren: 2 Pumpen brauchen 6 Stunden (Produkt = 12). 3 Pumpen schaffen es in 12 / 3 = 4 Stunden.' },
       { question: 'Wann versagt das mathematische Modell in der Praxis?', answer: 'Wenn physikalische Grenzen erreicht werden (z. B. behindern sich zu viele Arbeiter auf engem Raum gegenseitig, Gesetz des abnehmenden Ertrags).' },
     ],
-    relatedSlugs: ['dreisatzrechner', 'prozentrechner', 'bruchrechner'],
+    relatedSlugs: ['dreisatzrechner', 'prozentrechner', 'bruchrechner', 'verhaeltnis-rechner'],
   },
   {
     id: 'bruch-in-dezimal-rechner',

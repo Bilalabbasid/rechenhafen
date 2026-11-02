@@ -214,14 +214,12 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Warum weicht der Nettolohn 2026 vom Vorjahr 2025 ab?', answer: 'Im Steuerjahr 2026 wurde der steuerliche Grundfreibetrag auf 12.348 € angehoben (Vorjahr: 12.096 €), wodurch die Lohnsteuer bei gleichem Bruttoverdienst sinkt. Gleichzeitig stieg der durchschnittliche Zusatzbeitrag der Krankenkassen von 2,5 % auf 2,9 %, was den Krankenversicherungsbeitrag erhöht. Bei 3.800 € Monatsbrutto verbleiben im Tarif 2026 ca. 2.492,25 € Netto gegenüber ca. 2.489,35 € im Tarif 2025.' },
       { question: 'Bleiben meine Gehaltsdaten privat?', answer: 'Ja. Die gesamte Gehaltsberechnung läuft ausschließlich lokal in Ihrem Webbrowser (Client-side). Es werden keinerlei Gehalts- oder Personendaten an Server übertragen.' },
     ],
-    relatedSlugs: [
-      'netto-brutto-rechner',
+    relatedSlugs: ['netto-brutto-rechner',
       'einkommensteuerrechner',
       'sozialabgaben-rechner',
       'stundenlohnrechner',
       'teilzeit-gehaltsrechner',
-      'arbeitgeberkosten-rechner',
-    ],
+      'arbeitgeberkosten-rechner', 'renten-brutto-netto-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -401,7 +399,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was bringt das Ehegattensplitting?', answer: 'Beim Splittingverfahren (§ 32a Abs. 5 EStG) wird das gemeinsame Einkommen beider Partner halbiert, die Steuer für die Hälfte berechnet und anschließend verdoppelt. Das bringt den größten Steuervorteil, wenn ein Partner deutlich mehr verdient als der andere.' },
       { question: 'Gilt der Spitzensteuersatz von 42 % für mein gesamtes Einkommen?', answer: 'Nein, das ist ein weit verbreiteter Irrtum. Der Spitzensteuersatz ist ein Grenzsteuersatz. Er fällt nur für den Betrag an, der die Tarifgrenze (69.879 € im Jahr 2026) übersteigt. Alle Einkommensbestandteile darunter werden mit den niedrigeren Zonensätzen besteuert.' },
     ],
-    relatedSlugs: ['grenzsteuersatz-rechner', 'brutto-netto-rechner', 'solidaritaetszuschlag-rechner', 'kirchensteuer-rechner', 'kapitalertragsteuer-rechner'],
+    relatedSlugs: ['grenzsteuersatz-rechner', 'brutto-netto-rechner', 'solidaritaetszuschlag-rechner', 'kirchensteuer-rechner', 'kapitalertragsteuer-rechner', 'gewerbesteuer-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -477,7 +475,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was bedeutet kalte Progression?', answer: 'Kalte Progression beschreibt den Effekt, wenn eine Gehaltserhöhung lediglich die Inflation ausgleicht, der Arbeitnehmer durch den progressiven Steuertarif aber prozentual höher besteuert wird und die reale Kaufkraft sinkt. Der Gesetzgeber passt die Tarifgrenzen daher regelmäßig an.' },
       { question: 'Kann eine Gehaltserhöhung dazu führen, dass man netto weniger hat als vorher?', answer: 'Nein, bei regulären Arbeitslöhnen im deutschen Steuertarif ist das mathematisch ausgeschlossen, weil der Grenzsteuersatz nie 100 % erreicht (Höchstsatz 45 %). Man behält von jedem Mehr-Euro immer mindestens 55 Cent netto.' },
     ],
-    relatedSlugs: ['einkommensteuerrechner', 'brutto-netto-rechner', 'gehaltserhoehung-rechner'],
+    relatedSlugs: ['einkommensteuerrechner', 'brutto-netto-rechner', 'gehaltserhoehung-rechner', 'gewerbesteuer-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -713,7 +711,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Was ist die Beitragsbemessungsgrenze (BBG)?', answer: 'Die BBG ist der maximale Bruttobetrag, von dem Sozialversicherungsbeiträge berechnet werden. Einkommen oberhalb dieser Grenze ist beitragsfrei.' },
     ],
-    relatedSlugs: ['brutto-netto-rechner', 'arbeitgeberkosten-rechner', 'midijob-rechner'],
+    relatedSlugs: ['brutto-netto-rechner', 'arbeitgeberkosten-rechner', 'midijob-rechner', 'renten-brutto-netto-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -773,7 +771,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Was sind die Umlagen U1, U2 und U3?', answer: 'Die Umlage U1 finanziert die Erstattung von Arbeitgeberkosten bei Krankheit (für Betriebe bis 30 Mitarbeiter). Die Umlage U2 erstattet Mutterschutzaufwendungen. Die Umlage U3 (Insolvenzgeldumlage) sichert das Insolvenzgeld; ihr Satz beträgt 2026 gesetzlich 0,15 % (§ 360 SGB III). U1 und U2 legt jede Krankenkasse in ihrer Satzung selbst fest, der Rechner setzt dafür Durchschnittswerte an.' },
     ],
-    relatedSlugs: ['brutto-netto-rechner', 'sozialabgaben-rechner', 'stundenlohnrechner'],
+    relatedSlugs: ['brutto-netto-rechner', 'sozialabgaben-rechner', 'stundenlohnrechner', 'netto-brutto-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -844,7 +842,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Für Studierende oder Personen ohne sonstige Pflichtversicherung kann sich das Einzahlen lohnen, da mit geringem Eigenbeitrag Beitragsmonate für die Altersrente und der Anspruch auf Erwerbsminderungsrente gesichert werden.' },
     ],
-    relatedSlugs: ['midijob-rechner', 'brutto-netto-rechner', 'stundenlohnrechner'],
+    relatedSlugs: ['midijob-rechner', 'brutto-netto-rechner', 'stundenlohnrechner', 'bonus-netto-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

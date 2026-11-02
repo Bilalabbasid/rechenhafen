@@ -137,7 +137,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       { question: 'Was ist die mehrstufige Deckungsbeitragsrechnung?', answer: 'Sie spaltet die Fixkosten hierarchisch auf: Zuerst Erzeugnisfixkosten, dann Produktgruppenfixkosten, Bereichsfixkosten und schließlich Unternehmensfixkosten, um echte Verlustbringer aufzudecken.' },
       { question: 'Was bedeutet die absolute Preisuntergrenze?', answer: 'Die kurzfristige Preisuntergrenze entspricht genau den variablen Stückkosten (DB = 0); zu diesem Preis darf ein Zusatzauftrag bei freien Kapazitäten kurzfristig angenommen werden.' },
     ],
-    relatedSlugs: ['stundensatz-kalkulation-freiberufler-rechner', 'break-even-rechner', 'marge-rechner', 'roi-rechner'],
+    relatedSlugs: ['stundensatz-kalkulation-freiberufler-rechner', 'break-even-rechner', 'marge-rechner', 'roi-rechner', 'wareneinsatzquote-rechner'],
   },
   {
     id: "roas-rechner",
@@ -2597,7 +2597,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       { question: 'Bedeutet ein p-Wert von 0,03, dass die Hypothese zu 97 % wahr ist?', answer: 'Nein, das ist der häufigste Fehlschluss: Der p-Wert ist nicht die Wahrscheinlichkeit der Hypothese, sondern P(Daten | H0), also die Wahrscheinlichkeit der Daten unter der Annahme, H0 stimme.' },
       { question: 'Was ist ein Fehler 1. Art (Alpha-Fehler)?', answer: 'Die irrtümliche Ablehnung einer in Wahrheit richtigen Nullhypothese (falsch-positiver Befund); die Wahrscheinlichkeit dafür wird durch das Signifikanzniveau alpha gedeckelt.' },
     ],
-    relatedSlugs: ['chi-quadrat-unabhaengigkeitstest-rechner', 'z-score-normalverteilung-rechner', 't-test-rechner', 'konfidenzintervall-rechner', 'stichprobengroesse-rechner'],
+    relatedSlugs: ['chi-quadrat-unabhaengigkeitstest-rechner', 'z-score-normalverteilung-rechner', 't-test-rechner', 'konfidenzintervall-rechner', 'stichprobengroesse-rechner', 'effektstaerke-cohens-d-rechner'],
   },
   {
     id: "t-test-rechner",

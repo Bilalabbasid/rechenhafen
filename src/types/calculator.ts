@@ -162,4 +162,6 @@ export interface CategoryDefinition {
   subcategories: string[];
   metaTitle: string;
   metaDescription: string;
+  introText?: string;
+  relevantArticleSlugs?: string[];
 }

@@ -76,7 +76,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Darf man bei einer Diät weniger Kalorien als den Grundumsatz essen?', answer: 'Dauerhaft keinesfalls: Eine Kalorienzufuhr unterhalb des Grundumsatzes signalisiert dem Körper akute Hungersnot, schädigt das Immunsystem und forciert Muskelabbau.' },
       { question: 'Wie kann man seinen Grundumsatz langfristig steigern?', answer: 'Durch gezielten Muskelaufbau (Krafttraining): Jedes Kilogramm aktive Muskelmasse verbrennt auch im Ruhezustand kontinuierlich mehr Energie als Fettgewebe.' },
     ],
-    relatedSlugs: ['kalorienbedarf-rechner', 'bmi-rechner', 'koerperfettanteil-navy-rechner', 'makronaehrstoff-verteilung-rechner', 'proteinbedarf-sportler-rechner'],
+    relatedSlugs: ['kalorienbedarf-rechner', 'bmi-rechner', 'koerperfettanteil-navy-rechner', 'makronaehrstoff-verteilung-rechner', 'proteinbedarf-sportler-rechner', 'leistungsumsatz-pal-rechner', 'intervallfasten-16-8-rechner'],
   },
 
   {
@@ -223,7 +223,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wie viel Gramm Protein benötigt man beim Muskelaufbau?', answer: 'Sportmediziner und Ernährungsgesellschaften empfehlen für Trainierende 1,6 bis 2,2 Gramm Protein pro Kilogramm Körpergewicht am Tag.' },
       { question: 'Warum sind Fette für den Hormonhaushalt unverzichtbar?', answer: 'Essenzielle Fettsäuren bilden die molekulare Grundsubstanz für körpereigene Steroidhormone (Testosteron, Östrogen) und ermöglichen die Aufnahme fettlöslicher Vitamine (A, D, E, K).' },
     ],
-    relatedSlugs: ['kalorienbedarf-rechner', 'proteinbedarf-sportler-rechner', 'grundumsatz-bmr-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner'],
+    relatedSlugs: ['kalorienbedarf-rechner', 'proteinbedarf-sportler-rechner', 'grundumsatz-bmr-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner', 'leistungsumsatz-pal-rechner'],
   },
 
   {
@@ -297,7 +297,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wie bestimmt man den eigenen Skelettbau (Handgelenk-Umfang)?', answer: 'Messen Sie den Handgelenksumfang an der schmalsten Stelle: Bei Männern gilt unter 16,5 cm als schmal, über 19 cm als breitknochig; bei Frauen unter 14 cm als schmal, über 16,5 cm als breit.' },
       { question: 'Warum steigt das Idealgewicht nach Creff mit dem Alter leicht an?', answer: 'Weil ein moderater BMI-Anstieg im höheren Alter (BMI 24–27 bei Senioren) statistisch mit einer geringeren Gesamtmortalität und besseren Überlebenschancen bei Krankheiten einhergeht.' },
     ],
-    relatedSlugs: ['bmi-rechner', 'koerperfettanteil-navy-rechner', 'waist-to-height-ratio-rechner'],
+    relatedSlugs: ['bmi-rechner', 'koerperfettanteil-navy-rechner', 'waist-to-height-ratio-rechner', 'waist-to-hip-ratio-rechner'],
   },
 
   {
@@ -387,7 +387,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wo genau muss das Maßband für den Navy-Test angelegt werden?', answer: 'Taille: Bei Männern auf Nabelhöhe, bei Frauen an der schmalsten Stelle; Nacken: Direkt unterhalb des Kehlkopfs; Hüfte (nur Frauen): An der breitesten Stelle des Gesäßes.' },
       { question: 'Welcher Körperfettanteil gilt als gesund und sportlich?', answer: 'Bei Männern: 10 bis 14 % (sportlich/definiert), 15 bis 19 % (normal/gesund); bei Frauen: 18 bis 22 % (sportlich), 23 bis 27 % (normal/gesund).' },
     ],
-    relatedSlugs: ['bmi-rechner', 'kalorienbedarf-rechner', 'grundumsatz-bmr-rechner', 'proteinbedarf-sportler-rechner', 'makronaehrstoff-verteilung-rechner'],
+    relatedSlugs: ['bmi-rechner', 'kalorienbedarf-rechner', 'grundumsatz-bmr-rechner', 'proteinbedarf-sportler-rechner', 'makronaehrstoff-verteilung-rechner', 'idealgewicht-creff-rechner'],
   },
 
   {
@@ -450,7 +450,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Warum ist Bauchfett (viszerales Fett) so viel gefährlicher als Unterhautfett?', answer: 'Viszerales Fett umhüllt innere Organe und ist hochgradig stoffwechselaktiv: Es schüttet entzündungsfördernde Botenstoffe aus, fördert Arteriosklerose, Bluthochdruck und Typ-2-Diabetes.' },
       { question: 'Wie misst man den Taillenumfang korrekt?', answer: 'Morgens vor dem Frühstück stehend, entspannt ausgeatmet, genau in der Mitte zwischen dem unteren Rippenbogen und der Oberkante des Beckenkamms.' },
     ],
-    relatedSlugs: ['waist-to-height-ratio-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner'],
+    relatedSlugs: ['waist-to-height-ratio-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner', 'idealgewicht-creff-rechner'],
   },
 
   {
@@ -584,7 +584,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Bedeutet eine niedrigere Maximalpuls-Zahl schlechtere Fitness?', answer: 'Nein, die HFmax ist eine individuelle biologische Konstante; erst der Ruhepuls (z. B. 45–55 bpm bei Ausdauersportlern) signalisiert ein vergrößertes Schlagvolumen und hohe Fitness.' },
       { question: 'Wie ermittelt man die HFmax sportmedizinisch exakt?', answer: 'Über eine professionelle Leistungsdiagnostik mit Stufentest auf dem Fahrradergometer oder Laufband bis zur willentlichen Erschöpfung (Spiroergometrie).' },
     ],
-    relatedSlugs: ['blutdruck-klassifikation-rechner', 'laufpace-rechner', 'vo2max-cooper-test-rechner', 'puls-trainingszonen-rechner'],
+    relatedSlugs: ['blutdruck-klassifikation-rechner', 'laufpace-rechner', 'vo2max-cooper-test-rechner', 'puls-trainingszonen-rechner', 'one-rep-max-rechner', 'schwimmen-kalorienverbrauch-rechner'],
   },
 
   {
@@ -646,7 +646,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Welche VO₂max-Werte haben trainierte Ausdauersportler?', answer: 'Untrainierte Erwachsene liegen meist bei 30 bis 40 ml/kg/min; ambitionierte Hobbyläufer erreichen 45 bis 55 ml/kg/min; Weltklasse-Marathonläufer und Skilangläufer erzielen 75 bis 85+ ml/kg/min.' },
       { question: 'Lässt sich die VO₂max durch Training steigern?', answer: 'Ja, hochintensives Intervalltraining (HIIT) im Bereich von 90–95 % der HFmax kann die VO₂max innerhalb weniger Monate um 10 bis 20 Prozent verbessern.' },
     ],
-    relatedSlugs: ['laufpace-rechner', 'maximalpuls-hfmax-rechner', 'schritt-distanz-kalorien-rechner'],
+    relatedSlugs: ['laufpace-rechner', 'maximalpuls-hfmax-rechner', 'schritt-distanz-kalorien-rechner', 'one-rep-max-rechner', 'puls-trainingszonen-rechner'],
   },
 
   {
@@ -838,7 +838,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wie viele Schlafzyklen benötigt ein Erwachsener pro Nacht?', answer: 'In der Regel 5 bis 6 Zyklen, was einer optimalen Schlafzeit von 7,5 bis 9 Stunden entspricht; weniger als 6 Stunden führt langfristig zu kognitiven Defiziten.' },
       { question: 'Wie lange braucht ein gesunder Mensch im Schnitt zum Einschlafen?', answer: 'Die normale Einschlaflatenz liegt bei 10 bis 20 Minuten; diese Zeitspanne wird bei der Rückwärtsplanung der Schlafenszeit addiert.' },
     ],
-    relatedSlugs: ['koffein-halbwertszeit-rechner', 'intervallfasten-16-8-rechner', 'wasserbedarf-rechner'],
+    relatedSlugs: ['koffein-halbwertszeit-rechner', 'intervallfasten-16-8-rechner', 'wasserbedarf-rechner', 'nikotin-rauchstopp-ersparnis-rechner', 'blutdruck-klassifikation-rechner'],
   },
 
   {
@@ -1531,7 +1531,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Was ist der Partnerschaftsbonus beim Elterngeld?', answer: 'Arbeiten beide Elternteile gleichzeitig für 2 bis 4 aufeinanderfolgende Monate in Teilzeit (24 bis 32 Wochenstunden), erhält jeder Elternteil bis zu 4 zusätzliche ElterngeldPlus-Monate.' },
       { question: 'Welche Monate zählen für das Bemessungseinkommen vor der Geburt?', answer: 'Die letzten 12 Kalendermonate vor der Geburt (bei Angestellten vor dem Monat des Mutterschutzbeginns); Monate mit Elterngeldbezug für ältere Kinder können ausgeklammert werden.' },
     ],
-    relatedSlugs: ['betreuungsgeld-familiengeld-rechner', 'elternzeit-teilzeit-rechner', 'mutterschaftsgeld-rechner', 'kindergeld-rechner-2026'],
+    relatedSlugs: ['betreuungsgeld-familiengeld-rechner', 'elternzeit-teilzeit-rechner', 'mutterschaftsgeld-rechner', 'kindergeld-rechner-2026', 'ehegattenunterhalt-trennungsunterhalt-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -2294,7 +2294,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Welche Umweltfaktoren beeinflussen die Endgröße neben den Genen?', answer: 'Ausgewogene Ernährung (Protein, Kalzium, Zink, Vitamin D), ausreichender Schlaf (Wachstumshormon Somatotropin wird überwiegend im Tiefschlaf ausgeschüttet) und das Ausbleiben schwerer chronischer Krankheiten.' },
       { question: 'Wie lässt sich die Endgröße medizinisch exakter bestimmen?', answer: 'Über ein Röntgenbild der linken Handwurzelknochen: Ein Radiologe oder Endokrinologe beurteilt den Verknöcherungsgrad der Wachstumsfugen (Epiphysenfugen).' },
     ],
-    relatedSlugs: ['kindersitz-groesse-i-size-rechner', 'geburtstermin-rechner', 'schwangerschaftswoche-ssw-rechner'],
+    relatedSlugs: ['kindersitz-groesse-i-size-rechner', 'geburtstermin-rechner', 'schwangerschaftswoche-ssw-rechner', 'windelbudget-rechner'],
   },
 
   {
@@ -2423,7 +2423,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wie viele Windeln benötigt ein Neugeborenes pro Tag?', answer: 'In den ersten Lebenswochen werden durchschnittlich 7 bis 10 Windeln in 24 Stunden benötigt; ab dem 6. Monat sinkt der Bedarf auf ca. 4 bis 6 Windeln täglich.' },
       { question: 'Gibt es von manchen Gemeinden Zuschüsse für Windeln?', answer: 'Ja, viele Städte und Landkreise zahlen Familien einen Windelzuschuss oder geben kostenlose Müllsäcke (Windelsäcke) für die Windelentsorgung aus.' },
     ],
-    relatedSlugs: ['erstausstattung-baby-rechner', 'lebensmittelbudget-rechner', 'kindergeld-rechner-2026'],
+    relatedSlugs: ['erstausstattung-baby-rechner', 'lebensmittelbudget-rechner', 'kindergeld-rechner-2026', 'kindes-endgroesse-rechner'],
   },
 
   {
@@ -2558,7 +2558,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Sind Geschwisterkinder von Kita-Beiträgen befreit?', answer: 'In den allermeisten kommunalen Satzungen ist das zweite Kind beitragsermäßigt (meist 50 % Ersparnis) und das dritte Kind vollkommen gebührenfrei.' },
       { question: 'Kann man Kita-Kosten von der Steuer absetzen?', answer: 'Ja, nach § 10 Abs. 1 Nr. 5 EStG können zwei Drittel der reinen Betreuungskosten (ohne Verpflegung), maximal 4.000 € pro Kind und Jahr, als Sonderausgaben geltend gemacht werden.' },
     ],
-    relatedSlugs: ['kinderbetreuungskosten-absetzen-rechner', 'kindergeld-rechner-2026', 'teilzeit-gehaltsrechner'],
+    relatedSlugs: ['kinderbetreuungskosten-absetzen-rechner', 'kindergeld-rechner-2026', 'teilzeit-gehaltsrechner', 'taschengeld-empfehlung-rechner'],
   },
 
   {
@@ -2678,7 +2678,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Wofür sollte das reguläre Taschengeld verwendet werden?', answer: 'Für persönliche Freizeitwünsche (Süßigkeiten, Zeitschriften, Spielzeug); notwendige Schulsachen, Grundkleidung und Hauptmahlzeiten müssen zwingend die Eltern bezahlen.' },
       { question: 'Darf Taschengeld als Strafe gekürzt oder gestrichen werden?', answer: 'Pädagogen und Jugendämter raten dringend davon ab: Taschengeld ist ein pädagogisches Lernmittel für den Umgang mit Geld und sollte nicht als Erziehungsstrafe instrumentalisiert werden.' },
     ],
-    relatedSlugs: ['lebensmittelbudget-rechner', 'kindergeld-rechner-2026', 'schulbedarfspaket-bu-t-rechner'],
+    relatedSlugs: ['lebensmittelbudget-rechner', 'kindergeld-rechner-2026', 'schulbedarfspaket-bu-t-rechner', 'kita-gebuehren-rechner', 'kinderbetreuungskosten-absetzen-rechner'],
   },
 
   {

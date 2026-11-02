@@ -397,7 +397,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Wie wird die KFZ-Steuer gesetzlich gerundet?', answer: 'Nach § 11 Abs. 5 KraftStG ist die zu entrichtende Jahressteuer zwingend auf volle Euro nach unten abzurunden (z. B. werden 108,50 € gesetzlich auf 108,00 € abgerundet).' },
       { question: 'Wie werden Plug-in-Hybride (PHEV) bei der KFZ-Steuer behandelt?', answer: 'Plug-in-Hybride gelten steuerlich nicht als reine Elektroautos. Sie werden wie herkömmliche Verbrenner nach Hubraum (Benzin oder Diesel) plus CO₂-Ausstoß besteuert, profitieren aber durch den Elektromotor meist von einem geringeren offiziellen CO₂-Wert.' },
     ],
-    relatedSlugs: ['motorrad-unterhaltskosten-rechner', 'co2-auto-rechner', 'dienstwagen-1-prozent-rechner', 'spritkostenrechner', 'auto-wertverlust-rechner', 'autokreditrechner'],
+    relatedSlugs: ['motorrad-unterhaltskosten-rechner', 'co2-auto-rechner', 'dienstwagen-1-prozent-rechner', 'spritkostenrechner', 'auto-wertverlust-rechner', 'autokreditrechner', 'fahrtenbuch-vs-1-prozent-rechner', 'thg-quote-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -865,7 +865,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Warum vervierfacht sich der Bremsweg bei Verdopplung der Geschwindigkeit?', answer: 'Weil die kinetische Bewegungsenergie quadratisch mit der Geschwindigkeit wächst (E_kin = 1/2 · m · v²); doppelte Geschwindigkeit erfordert die vierfache Bremsarbeit.' },
       { question: 'Wie lang ist der Anhalteweg bei Tempo 100 km/h (Normalbremsung)?', answer: 'Reaktionsweg (30 m) + Bremsweg (100 m) = 130 Meter Anhalteweg.' },
     ],
-    relatedSlugs: ['anhaenger-stuetzlast-rechner', 'fahrzeit-rechner', 'promillerechner-widmark', 'bussgeld-rechner-geschwindigkeit'],
+    relatedSlugs: ['anhaenger-stuetzlast-rechner', 'fahrzeit-rechner', 'promillerechner-widmark', 'bussgeld-rechner-geschwindigkeit', 'reifen-abrollumfang-rechner', 'fahrgemeinschaft-sprit-rechner'],
   },
 
   {
@@ -952,7 +952,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Wie hoch ist der Toleranzabzug bei Geschwindigkeitsmessungen?', answer: 'Bei stationären und mobilen Blitzern werden bei Geschwindigkeiten bis 100 km/h in der Regel 3 km/h abgezogen; bei über 100 km/h werden 3 Prozent der gemessenen Geschwindigkeit toleriert.' },
       { question: 'Was ist die Wiederholungstäter-Regel beim Fahrverbot?', answer: 'Wer innerhalb eines Jahres zweimal mit einer Geschwindigkeitsüberschreitung von 26 km/h oder mehr geblitzt wird, erhält nach § 4 Abs. 2 BKatV in der Regel ein einmonatiges Fahrverbot.' },
     ],
-    relatedSlugs: ['promillerechner-widmark', 'bremsweg-rechner', 'fahrzeit-rechner'],
+    relatedSlugs: ['promillerechner-widmark', 'bremsweg-rechner', 'fahrzeit-rechner', 'anhaenger-stuetzlast-rechner', 'fahrgemeinschaft-sprit-rechner'],
   },
 
   {
@@ -2004,7 +2004,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Werden während der Kurzarbeit Sozialversicherungsbeiträge fällig?', answer: 'Ja, für das tatsächlich erzielte Entgelt tragen Arbeitgeber und Arbeitnehmer die Beiträge normal; für den Ausfall zahlt der Arbeitgeber Beiträge auf Basis von 80 Prozent des ausgefallenen Entgelts.' },
       { question: 'Unterliegt das Kurzarbeitergeld dem Progressionsvorbehalt?', answer: 'Ja, Kurzarbeitergeld selbst ist steuerfrei, wird aber dem zu versteuernden Einkommen zur Ermittlung des Steuersatzes hinzugerechnet (§ 32b EStG); dies führt zur Abgabepflicht der Steuererklärung.' },
     ],
-    relatedSlugs: ['arbeitslosengeld-1-rechner', 'teilzeit-gehaltsrechner', 'stundenlohnrechner'],
+    relatedSlugs: ['arbeitslosengeld-1-rechner', 'teilzeit-gehaltsrechner', 'stundenlohnrechner', 'dienstjubilaeum-steuerfrei-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
@@ -2104,7 +2104,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Gilt die verlängerte Kündigungsfrist automatisch auch für den Arbeitnehmer?', answer: 'Nein, nach § 622 Abs. 2 BGB gilt die Staffelung nur für Kündigungen durch den Arbeitgeber, es sei denn, im Arbeitsvertrag wurde ausdrücklich dieselbe Verlängerung für beide Seiten vereinbart.' },
       { question: 'Bis wann muss eine Kündigung zugehen?', answer: 'Die Kündigung muss dem Empfänger spätestens am letzten Tag vor Beginn der Kündigungsfrist nachweisbar zugegangen sein (Schriftformerfordernis mit Originalunterschrift, § 623 BGB).' },
     ],
-    relatedSlugs: ['abfindungsrechner', 'urlaubsabgeltung-rechner', 'arbeitslosengeld-1-rechner'],
+    relatedSlugs: ['abfindungsrechner', 'urlaubsabgeltung-rechner', 'arbeitslosengeld-1-rechner', 'ueberstunden-auszahlung-rechner', 'sabbatical-rechner'],
   },
 
   {
@@ -2166,7 +2166,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Darf der Arbeitgeber Überstunden mit dem Grundgehalt pauschal abgelten?', answer: 'Pauschale Klauseln wie "Überstunden sind mit dem Gehalt abgegolten" sind nach ständiger BAG-Rechtsprechung unwirksam, wenn keine genaue Obergrenze (z. B. bis zu 10 % der Monatsarbeitszeit) vereinbart ist.' },
       { question: 'Sind Zuschläge für Überstunden steuerfrei?', answer: 'Reine Mehrarbeitszuschläge sind voll steuerpflichtig; nur Zuschläge für tatsächliche Sonntags-, Feiertags- oder Nachtarbeit sind nach § 3b EStG unter bestimmten Bedingungen steuerfrei.' },
     ],
-    relatedSlugs: ['nachtzuschlag-sonntagszuschlag-rechner', 'stundenlohnrechner', 'teilzeit-gehaltsrechner'],
+    relatedSlugs: ['nachtzuschlag-sonntagszuschlag-rechner', 'stundenlohnrechner', 'teilzeit-gehaltsrechner', 'urlaubsabgeltung-rechner'],
   },
 
   {
@@ -2303,7 +2303,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { question: 'Verlängert sich die Schutzfrist bei Früh- oder Mehrlingsgeburten?', answer: 'Ja, bei Mehrlings- und Frühgeburten verlängert sich die Mutterschutzfrist nach der Entbindung auf 12 Wochen.' },
       { question: 'Erhält der Arbeitgeber den Zuschuss zum Mutterschaftsgeld erstattet?', answer: 'Ja, über das U2-Umlageverfahren der gesetzlichen Krankenkassen erhält der Arbeitgeber den gezahlten Zuschuss zu 100 Prozent erstattet.' },
     ],
-    relatedSlugs: ['elternzeit-teilzeit-rechner', 'teilzeit-gehaltsrechner', 'urlaubstage-rechner'],
+    relatedSlugs: ['elternzeit-teilzeit-rechner', 'teilzeit-gehaltsrechner', 'urlaubstage-rechner', 'dienstaufwandsentschaedigung-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

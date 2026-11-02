@@ -88,7 +88,7 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Wie rechnet man Kilometer in Meilen um?', answer: 'Teilen Sie die Kilometer durch 1,609344 oder multiplizieren Sie mit ca. 0,621371. Beispiel: 100 km ÷ 1,609344 ≈ 62,14 Meilen.' },
       { question: 'Wie rechne ich Fuß in Meter um?', answer: '1 Fuß (Foot) entspricht exakt 0,3048 Metern (30,48 cm). 6 Fuß Körpergröße entsprechen somit 6 × 0,3048 = 1,8288 Metern (ca. 1,83 m).' },
     ],
-    relatedSlugs: ['zoll-in-cm-rechner', 'meilen-km-umrechner', 'geschwindigkeit-umrechner', 'temperatur-umrechner', 'gewicht-masse-umrechner'],
+    relatedSlugs: ['zoll-in-cm-rechner', 'meilen-km-umrechner', 'geschwindigkeit-umrechner', 'temperatur-umrechner', 'gewicht-masse-umrechner', 'schuhe-kleidergroessen-umrechner'],
   },
   {
     id: 'meilen-km-umrechner',
