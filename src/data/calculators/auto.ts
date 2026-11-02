@@ -89,7 +89,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Verbrauch l/100km',
     category: 'auto-verkehr',
     subcategory: 'Sprit & Verbrauch',
-    metaTitle: 'Kraftstoffverbrauch Rechner – Liter auf 100 km genau ermitteln',
+    metaTitle: 'Kraftstoffverbrauch Rechner – Liter auf 100 km berechnen',
     metaDescription: 'Berechnen Sie den echten Durchschnittsverbrauch Ihres Autos nach dem Tanken: Getankte Liter geteilt durch gefahrene Kilometer.',
     h1: 'Kraftstoffverbrauch berechnen (l/100 km)',
     shortDescription: 'Ermittelt den realen Spritverbrauch Ihres Autos aus getankter Menge und Tageskilometerstand.',

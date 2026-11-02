@@ -8,18 +8,6 @@ interface AdSlotProps {
 }
 
 export default function AdSlot({ format, slotId, className }: AdSlotProps) {
-  const containerClass = format === 'top-banner' ? styles.topBanner : styles.inContent;
-
-  return (
-    <div
-      className={`${styles.adWrapper} ${className || ''}`}
-      aria-label="Werbebereich"
-      id={`ad-slot-${slotId}`}
-    >
-      <span className={styles.adLabel}>Anzeige</span>
-      <div className={containerClass}>
-        <span className={styles.adPlaceholderText}>RechenHafen Werbefläche</span>
-      </div>
-    </div>
-  );
+  // Empty ad placeholders are hidden until live to eliminate CLS and maintain clean UX
+  return null;
 }

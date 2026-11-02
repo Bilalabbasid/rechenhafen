@@ -2682,7 +2682,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'Heizkostenvergleich',
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
-    metaTitle: 'Heizkostenvergleich Rechner – Wärmepumpe, Gas, Öl, Pellets & Fernwärme',
+    metaTitle: 'Heizkostenvergleich Rechner – Wärmepumpe, Gas & Pellets',
     metaDescription: 'Vergleichen Sie die jährlichen Brennstoffkosten, Wartungsausgaben und CO2-Emissionen moderner Heizsysteme bei identischem Nutzwärmebedarf.',
     h1: 'Heizkostenvergleich Rechner – Heizsysteme, Kosten & CO2 vergleichen',
     shortDescription: 'Vergleicht die jährlichen Brennstoff- und Betriebskosten sowie die CO2-Emissionen von Wärmepumpe, Gas, Öl, Pellets und Fernwärme bei gleichem Nutzwärmebedarf.',

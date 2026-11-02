@@ -8,6 +8,5 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ['/api/'],
     },
     sitemap: 'https://rechenhafen.de/sitemap.xml',
-    host: 'https://rechenhafen.de',
   };
 }

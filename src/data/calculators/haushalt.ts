@@ -43,7 +43,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Stromkosten Haushalt',
     category: 'haushalt-energie',
     subcategory: 'Strom & Sparen',
-    metaTitle: 'Stromkostenrechner 2026: Stromkosten für Haushalt & kWh berechnen',
+    metaTitle: 'Stromkostenrechner 2026 – Stromkosten & kWh berechnen',
     metaDescription: 'Berechnen Sie die jährlichen Stromkosten Ihres Haushalts: kWh-Verbrauch, Arbeitspreis und Grundpreis eingeben, Gesamtkosten und monatlichen Abschlag ermitteln.',
     h1: 'Stromkostenrechner – Stromkosten für Ihren Haushalt berechnen',
     shortDescription: 'Kalkuliert die jährlichen Gesamtstromkosten und den monatlichen Abschlag aus kWh-Verbrauch, Arbeitspreis und Grundpreis.',

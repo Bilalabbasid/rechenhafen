@@ -295,7 +295,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Renditerechner',
     category: 'finanzen',
     subcategory: 'Inflation & Rendite',
-    metaTitle: 'Renditerechner – Gesamtrendite & annualisierte Rendite (CAGR)',
+    metaTitle: 'Renditerechner – Gesamtrendite & Rendite (CAGR)',
     metaDescription: 'Berechnen Sie den Gewinn und die jährliche Durchschnittsrendite (CAGR) von Aktien, ETFs, Immobilien oder Wertpapieren.',
     h1: 'Renditerechner – Exakte Rendite online berechnen',
     shortDescription: 'Berechnet absolute Gewinne, Gesamtrenditen in Prozent und die jährliche Wachstumsrate (CAGR).',

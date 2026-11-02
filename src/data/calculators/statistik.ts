@@ -13,7 +13,7 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Notendurchschnitt',
     category: 'statistik-wissenschaft',
     subcategory: 'Schulnoten & Studium',
-    metaTitle: 'Notendurchschnitt berechnen – Rechner für Schule & Uni (mit ECTS)',
+    metaTitle: 'Notendurchschnitt Rechner – Noten für Schule & Uni',
     metaDescription: 'Notendurchschnitt einfach oder gewichtet berechnen: Für Schulnoten (1–6), Abitur und Uni-Module mit ECTS. Mit transparenter Schritt-für-Schritt-Aufschlüsselung.',
     h1: 'Notendurchschnitt berechnen (Schule, Zeugnis & Uni)',
     shortDescription: 'Ermittelt das arithmetische Mittel oder den gewichteten Schnitt (nach ECTS-Credits / Prüfungsfaktoren) für Schule, Abitur, Ausbildung und Universität.',

@@ -122,7 +122,7 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Beton berechnen',
     category: 'bauen-renovieren',
     subcategory: 'Baustoffe & Beton',
-    metaTitle: 'Betonrechner – Betonvolumen (m³) & Fertigbeton-Säcke berechnen',
+    metaTitle: 'Betonrechner – Betonvolumen (m³) & Säcke berechnen',
     metaDescription: 'Ermitteln Sie das benötigte Betonvolumen in Kubikmetern und die Anzahl der Fertigbeton-Säcke (25 kg/40 kg) für Fundamente und Platten.',
     h1: 'Betonrechner für Fundamente, Platten & Estrich',
     shortDescription: 'Berechnet das Betonvolumen in Kubikmetern und die Anzahl an Trockenbeton-Säcken.',

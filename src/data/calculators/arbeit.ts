@@ -177,7 +177,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Urlaubsanspruch',
     category: 'arbeit-gehalt',
     subcategory: 'Urlaub & Überstunden',
-    metaTitle: 'Urlaubstage Rechner – Urlaubsanspruch bei Teilzeit (§ 3 BUrlG)',
+    metaTitle: 'Urlaubstage Rechner – Urlaubsanspruch bei Teilzeit',
     metaDescription: 'Berechnen Sie Ihren Urlaubsanspruch bei Wechsel in Teilzeit nach dem Bundesurlaubsgesetz. Exakte Tage & Wochen Freizeit.',
     h1: 'Urlaubsanspruch Rechner bei Teilzeit nach § 3 BUrlG',
     shortDescription: 'Berechnet den genauen Urlaubsanspruch anhand der wöchentlichen Arbeitstage.',
