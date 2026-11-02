@@ -61,3 +61,4 @@ The following 16 duplicate-intent pages are removed from the active calculator r
 14. `/rechner/kredit-restschuld-stichtag-rechner/` → `/rechner/restschuld-rechner/`
 15. `/rechner/datumsdifferenz/` → `/rechner/tage-zwischen-zwei-daten/`
 16. `/rechner/kalendertage-rechner/` → `/rechner/tage-zwischen-zwei-daten/`
+

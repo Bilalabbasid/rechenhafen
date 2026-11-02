@@ -50,3 +50,4 @@ Dieses Dokument erfasst alle geprüften und bereinigten inhaltlichen Widersprüc
   - *Kalendarischer Rechenweg & Zeitlogik* (Datum & Uhrzeit)
   - *Gesetzliche Berechnungsgrundlage & Rechenweg* (Steuern, Arbeit & Recht)
 - Der DIN 1333-Rundungshinweis wird nur noch auf Rechnern mit echten quantitativen Rundungsstandards (Finanzen, Steuern, Bauen, Mathematik) dargestellt.
+

@@ -206,3 +206,4 @@ Um den Googlebot unverzüglich auf die signifikanten Qualitätsverbesserungen au
 - **Crawling-Statistiken:** Unter *Einstellungen* → *Crawling-Statistiken* prüfen, ob die täglichen Host-Abfragen wieder steigen.
 - **Seiten-Indexierung:** Unter *Indexierung* → *Seiten* überwachen, dass die 16 alten URLs den Status *„Seite mit Weiterleitung“* erhalten und die 463 kanonischen URLs fehlerfrei im Index bleiben.
 - **Core Web Vitals:** Unter *Nutzerfreundlichkeit* sicherstellen, dass LCP (< 2,5 s), INP (< 200 ms) und CLS (< 0,1) im grünen Bereich bleiben.
+

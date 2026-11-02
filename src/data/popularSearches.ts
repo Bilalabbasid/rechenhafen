@@ -42,3 +42,4 @@ export const POPULAR_SEARCH_CHIPS: PopularChip[] = [
   { label: 'Zinseszins', slug: 'zinseszinsrechner' },
   { label: 'Stundenlohn', slug: 'stundenlohnrechner' },
 ];
+
