@@ -1,91 +1,82 @@
 import { TaxYearConfig } from './types';
+import { LEGAL_VALUES_2025 } from '@/legal/de/2025';
 
 /**
- * Offizielle steuerliche und sozialversicherungsrechtliche Rechengrößen für Deutschland 2025
- * Quellen:
- * - Gesetz zur steuerlichen Freistellung des Existenzminimums 2024 / Steuerfortentwicklungsgesetz
- * - § 32a Einkommensteuergesetz (EStG) Veranlagungszeitraum 2025
- * - Sozialversicherungs-Rechengrößenverordnung 2025 (BGBl.)
- * - Solidaritätszuschlaggesetz (§ 3, § 4 SolzG)
+ * Steuerliche und sozialversicherungsrechtliche Rechengrößen für Deutschland 2025.
+ * Gespeist aus dem zentralen Rechtswerte-Modul src/legal/de/.
  */
 export const TAX_CONFIG_2025: TaxYearConfig = {
   year: 2025,
-  effectiveFrom: '2025-01-01',
+  effectiveFrom: LEGAL_VALUES_2025.grundfreibetrag.validFrom,
   source: 'Bundesministerium der Finanzen (BMF) / BMAS',
   sourceUrl: 'https://www.bundesfinanzministerium.de',
-  lastVerified: '2025-01-15',
+  lastVerified: LEGAL_VALUES_2025.grundfreibetrag.checkedAt,
 
   // Einkommensteuertarif 2025 (§ 32a Abs. 1 EStG)
-  grundfreibetrag: 12096,
-  zone2Limit: 17443,
-  zone3Limit: 68480,
-  zone4Limit: 277825,
-  zone5Limit: 277826,
+  grundfreibetrag: LEGAL_VALUES_2025.grundfreibetrag.value,
+  zone2Limit: LEGAL_VALUES_2025.zone2Limit.value,
+  zone3Limit: LEGAL_VALUES_2025.zone3Limit.value,
+  zone4Limit: LEGAL_VALUES_2025.zone4Limit.value,
+  zone5Limit: LEGAL_VALUES_2025.zone5Limit.value,
 
-  // § 32a Abs. 1 EStG 2025 Formel-Parameter:
-  // Zone 2 (12.097 bis 17.443 €): (932,30 * y + 1.400) * y
-  zone2Coeff: 932.30,
-  zone2Base: 1400,
-  // Zone 3 (17.444 bis 68.480 €): (176,64 * z + 2.397) * z + 1.015,13
-  zone3Coeff: 176.64,
-  zone3Base: 2397,
-  zone3Offset: 1015.13,
-  // Zone 4 (68.481 bis 277.825 €): 0,42 * zvE - 10.911,92
-  zone4Rate: 0.42,
-  zone4Offset: 10911.92,
-  // Zone 5 (ab 277.826 €): 0,45 * zvE - 19.246,67
-  zone5Rate: 0.45,
-  zone5Offset: 19246.67,
+  // § 32a Abs. 1 EStG 2025 Formel-Parameter
+  zone2Coeff: LEGAL_VALUES_2025.zone2Coeff.value,
+  zone2Base: LEGAL_VALUES_2025.zone2Base.value,
+  zone3Coeff: LEGAL_VALUES_2025.zone3Coeff.value,
+  zone3Base: LEGAL_VALUES_2025.zone3Base.value,
+  zone3Offset: LEGAL_VALUES_2025.zone3Offset.value,
+  zone4Rate: LEGAL_VALUES_2025.zone4Rate.value,
+  zone4Offset: LEGAL_VALUES_2025.zone4Offset.value,
+  zone5Rate: LEGAL_VALUES_2025.zone5Rate.value,
+  zone5Offset: LEGAL_VALUES_2025.zone5Offset.value,
 
   // Solidaritätszuschlag 2025
-  solzFreigrenzeSingle: 18720,
-  solzFreigrenzeMarried: 37440,
-  solzRate: 0.055,
-  solzMilderungRate: 0.119,
+  solzFreigrenzeSingle: LEGAL_VALUES_2025.solzFreigrenzeSingle.value,
+  solzFreigrenzeMarried: LEGAL_VALUES_2025.solzFreigrenzeMarried.value,
+  solzRate: LEGAL_VALUES_2025.solzRate.value,
+  solzMilderungRate: LEGAL_VALUES_2025.solzMilderungRate.value,
 
   // Freibeträge & Kindergeld
-  kinderfreibetragGesamt: 9540, // 6.612 € Kinderfreibetrag + 2.928 € BEA-Freibetrag
-  kindergeldMonat: 255,
+  kinderfreibetragGesamt: LEGAL_VALUES_2025.kinderfreibetragGesamt.value,
+  kindergeldMonat: LEGAL_VALUES_2025.kindergeldMonat.value,
 
-  // Sozialversicherung Beitragsbemessungsgrenzen 2025 (bundeseinheitlich)
-  bbgRentenversicherungMonat: 8050.00,
-  bbgRentenversicherungJahr: 96600.00,
-  bbgKrankenversicherungMonat: 5512.50,
-  bbgKrankenversicherungJahr: 66150.00,
-  jaegKrankenversicherungMonat: 6150.00,
-  jaegKrankenversicherungJahr: 73800.00,
+  // Sozialversicherung Beitragsbemessungsgrenzen 2025
+  bbgRentenversicherungMonat: LEGAL_VALUES_2025.bbgRentenversicherungMonat.value,
+  bbgRentenversicherungJahr: LEGAL_VALUES_2025.bbgRentenversicherungJahr.value,
+  bbgKrankenversicherungMonat: LEGAL_VALUES_2025.bbgKrankenversicherungMonat.value,
+  bbgKrankenversicherungJahr: LEGAL_VALUES_2025.bbgKrankenversicherungJahr.value,
+  jaegKrankenversicherungMonat: LEGAL_VALUES_2025.jaegKrankenversicherungMonat.value,
+  jaegKrankenversicherungJahr: LEGAL_VALUES_2025.jaegKrankenversicherungJahr.value,
 
   // Sozialversicherung Beitragssätze 2025
-  beitragssatzRentenversicherung: 0.186, // 18,6 % (AN 9,3 %, AG 9,3 %)
-  beitragssatzArbeitslosenversicherung: 0.026, // 2,6 % (AN 1,3 %, AG 1,3 %)
-  beitragssatzKrankenversicherungAllgemein: 0.146, // 14,6 % (AN 7,3 %, AG 7,3 %)
-  zusatzbeitragKrankenversicherungDurchschnitt: 0.025, // 2,5 % (AN 1,25 %, AG 1,25 %)
-  beitragssatzPflegeversicherung: 0.036, // 3,6 % (Standard)
-  pflegeZuschlagKinderlos: 0.006, // 0,6 % (AN allein)
-  pflegeAbschlagKind: 0.0025, // 0,25 % pro Kind ab 2. bis 5. Kind
+  beitragssatzRentenversicherung: LEGAL_VALUES_2025.beitragssatzRentenversicherung.value,
+  beitragssatzArbeitslosenversicherung: LEGAL_VALUES_2025.beitragssatzArbeitslosenversicherung.value,
+  beitragssatzKrankenversicherungAllgemein: LEGAL_VALUES_2025.beitragssatzKrankenversicherungAllgemein.value,
+  zusatzbeitragKrankenversicherungDurchschnitt: LEGAL_VALUES_2025.zusatzbeitragKrankenversicherungDurchschnitt.value,
+  beitragssatzPflegeversicherung: LEGAL_VALUES_2025.beitragssatzPflegeversicherung.value,
+  pflegeZuschlagKinderlos: LEGAL_VALUES_2025.pflegeZuschlagKinderlos.value,
+  pflegeAbschlagKind: LEGAL_VALUES_2025.pflegeAbschlagKind.value,
 
-  pflegeSachsenAnteilAN: 0.023, // 2,3 % in Sachsen
-  pflegeSachsenAnteilAG: 0.013, // 1,3 % in Sachsen
+  pflegeSachsenAnteilAN: LEGAL_VALUES_2025.pflegeSachsenAnteilAN.value,
+  pflegeSachsenAnteilAG: LEGAL_VALUES_2025.pflegeSachsenAnteilAG.value,
 
-  // Minijob & Midijob 2025 (korrigiert am 2026-10-25; 538 € war die Grenze 2024)
-  // Geringfügigkeitsgrenze: 12,82 € Mindestlohn × 130 ÷ 3 = 555,53 € → 556 € (§ 8 Abs. 1a SGB IV)
-  minijobGrenze: 556.00,
-  midijobObergrenze: 2000.00, // § 20 Abs. 2 SGB IV
-  midijobFaktorF: 0.6683, // 28 % ÷ Gesamtsozialversicherungsbeitragssatz 2025 von 41,9 %
+  // Minijob & Midijob 2025
+  minijobGrenze: LEGAL_VALUES_2025.minijobGrenze.value,
+  midijobObergrenze: LEGAL_VALUES_2025.midijobObergrenze.value,
+  midijobFaktorF: LEGAL_VALUES_2025.midijobFaktorF.value,
 
-  // Arbeitgeber-Umlagen (Standard-Schätzwerte für 2025)
-  umlageU1: 0.011, // ca. 1,1 %
-  umlageU2: 0.0035, // 0,35 % Mutterschutz
-  umlageU3Insolvenzgeld: 0.0006, // 0,06 %
-  berufsgenossenschaftDurchschnitt: 0.013, // 1,3 %
+  // Arbeitgeber-Umlagen
+  umlageU1: LEGAL_VALUES_2025.umlageU1.value,
+  umlageU2: LEGAL_VALUES_2025.umlageU2.value,
+  umlageU3Insolvenzgeld: LEGAL_VALUES_2025.umlageU3Insolvenzgeld.value,
+  berufsgenossenschaftDurchschnitt: LEGAL_VALUES_2025.berufsgenossenschaftDurchschnitt.value,
 
-  // Gewerbliche Minijobs 2025 (Minijob-Zentrale, "Minijob-Beiträge 2026", 16.12.2025: U1 sank zum 01.01.2026
-  // von 1,1 % auf 0,8 %, die übrigen Abgaben blieben unverändert)
-  minijobPauschaleKv: 0.13, // § 249b SGB V
-  minijobPauschaleRv: 0.15, // § 172 Abs. 3 SGB VI
-  minijobPauschsteuer: 0.02, // § 40a Abs. 2 EStG
-  minijobRvEigenanteil: 0.036, // 18,6 % − 15 %
-  minijobUmlageU1: 0.011, // 1,1 %
-  minijobUmlageU2: 0.0022, // 0,22 %
-  minijobInsolvenzgeldumlage: 0.0015, // 0,15 % (§ 360 SGB III, ab 2025 wieder gesetzlicher Satz)
+  // Gewerbliche Minijobs 2025
+  minijobPauschaleKv: LEGAL_VALUES_2025.minijobPauschaleKv.value,
+  minijobPauschaleRv: LEGAL_VALUES_2025.minijobPauschaleRv.value,
+  minijobPauschsteuer: LEGAL_VALUES_2025.minijobPauschsteuer.value,
+  minijobRvEigenanteil: LEGAL_VALUES_2025.minijobRvEigenanteil.value,
+  minijobUmlageU1: LEGAL_VALUES_2025.minijobUmlageU1.value,
+  minijobUmlageU2: LEGAL_VALUES_2025.minijobUmlageU2.value,
+  minijobInsolvenzgeldumlage: LEGAL_VALUES_2025.minijobInsolvenzgeldumlage.value,
 };
