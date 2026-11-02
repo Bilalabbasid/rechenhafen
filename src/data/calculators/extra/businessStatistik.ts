@@ -2524,6 +2524,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     faqs: [
       { question: 'Wie liest man Wahrscheinlichkeiten aus der Z-Tabelle ab?', answer: 'Die Standardnormalverteilungstabelle (Phi(z)) gibt die Wahrscheinlichkeit an, dass eine Standardnormalvariable einen Wert kleiner oder gleich z annimmt.' },
       { question: 'Welchem IQ-Wert entspricht ein Z-Score von +1,0?', answer: 'Bei Standard-IQ-Tests (Mittelwert 100, Standardabweichung 15) entspricht z = +1,0 einem IQ von genau 115 (überdurchschnittlich).' },
+      { question: 'Was bedeutet ein negativer Z-Score in der Praxis?', answer: 'Ein negativer Z-Score (z < 0) zeigt an, dass der gemessene Wert unterhalb des arithmetischen Mittels der Referenzpopulation liegt. Ein Wert von z = -1,96 markiert beispielsweise die untere 2,5-%-Signifikanzgrenze einer zweiseitigen Standardnormalverteilung.' },
     ],
     relatedSlugs: ['standardabweichung-rechner', 'konfidenzintervall-rechner', 'p-wert-hypothesentest-rechner'],
   },

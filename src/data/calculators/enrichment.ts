@@ -162,6 +162,11 @@ const CATEGORY_ENRICHMENTS: Record<string, CategoryEnrichment> = {
         content:
           'Nach der Betriebskostenverordnung (BetrKV) können laufende Ausgaben wie Grundsteuer, Heizung, Müllabfuhr und Versicherungen auf Mieter umgelegt werden. Verwaltungskosten und Instandsetzungsaufwendungen verbleiben hingegen ausnahmslos beim Eigentümer. Für Wohnungseigentümergemeinschaften ist eine ausreichende Instandhaltungsrücklage gesetzlich vorgeschrieben.',
       },
+      {
+        title: 'Bedeutung lokaler Mietspiegel und Gutachterausschüsse',
+        content:
+          'Zur verlässlichen Marktwertermittlung und Überprüfung von Mietspannen bieten die amtlichen Gutachterausschüsse der Kommunen fundierte Kaufpreissammlungen. Qualifizierte Mietspiegel (§ 558d BGB) dienen dabei als rechtssichere Grundlage für Mieterhöhungsverlangen und Wohnwertvergleiche.',
+      },
     ],
     faqs: [
       {
@@ -232,6 +237,11 @@ const CATEGORY_ENRICHMENTS: Record<string, CategoryEnrichment> = {
         title: 'Bedeutung von Reservematerial für spätere Ausbesserungen',
         content:
           'Fliesen, Parkett und Tapeten werden in Produktionschargen mit individuellen Nuancen und Brandfarben gefertigt. Bewahren Sie nach Abschluss der Renovierung mindestens 1 bis 2 Pakete Originalmaterial auf, um spätere Reparaturen bei Rohrbrüchen oder Beschädigungen unauffällig durchführen zu können.',
+      },
+      {
+        title: 'Untergrundvorbereitung und Grundierung vor dem Anstrich',
+        content:
+          'Die Tragfähigkeit des Untergrunds entscheidet über die Haltbarkeit aller nachfolgenden Beschichtungen. Tiefengrund reguliert ungleichmäßiges Saugverhalten bei Putz- und Gipskartonplatten, bindet feinen Reststaub und verhindert, dass frischer Kleber oder Farbe zu schnell aufbrennt.',
       },
     ],
     faqs: [
@@ -337,6 +347,11 @@ const CATEGORY_ENRICHMENTS: Record<string, CategoryEnrichment> = {
         title: 'Wichtiger Hinweis & Abgrenzung zur medizinischen Diagnostik',
         content:
           'Online-Rechner dienen ausschließlich der unverbindlichen Selbstinformation und dem persönlichen Fitnesstracking. Sie ersetzen keinesfalls eine ärztliche Diagnose, therapeutische Behandlung oder professionelle Ernährungsberatung. Bei gesundheitlichen Beschwerden oder vor Aufnahme eines intensiven Trainings ist stets ärztlicher Rat einzuholen.',
+      },
+      {
+        title: 'Regeneration, Schlaf und langfristige Trainingsanpassung',
+        content:
+          'Körperliche Leistungssteigerung und Muskelaufbau finden vor allem in den Ruhephasen nach dem Training statt (Superkompensation). Regelmäßiger, erholsamer Schlaf von 7 bis 9 Stunden pro Nacht bildet die physiologische Grundlage für Hormonbalance, Zellerneuerung und nachhaltige Belastbarkeit.',
       },
     ],
     faqs: [
@@ -646,7 +661,7 @@ function getVisibleWordCount(calc: CalculatorDefinition): number {
  */
 export function enrichCalculator(calc: CalculatorDefinition): CalculatorDefinition {
   const currentCount = getVisibleWordCount(calc);
-  if (currentCount >= 400) {
+  if (currentCount >= 440) {
     return calc;
   }
 

@@ -971,6 +971,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Werden auf den Bonus auch Sozialabgaben fällig?', answer: 'Ja, sofern Ihr reguläres Gehalt die jährliche Beitragsbemessungsgrenze noch nicht überschritten hat. Liegen Sie bereits über der BBG (101.400 € in der Rentenversicherung 2026), ist der Bonus komplett beitragsfrei.' },
+      { question: 'Warum bleibt vom Weihnachtsgeld prozentual weniger Netto übrig als vom regulären Monatsgehalt?', answer: 'Weil Einmalzahlungen als sonstige Bezüge nach der BMF-Jahressteuermethode auf das bereits bezogene Jahresgehalt aufgeschlagen werden. Dadurch unterliegt die gesamte Sonderzahlung direkt dem persönlichen Grenzsteuersatz, der bei progressivem Steuertarif höher liegt als der durchschnittliche Steuersatz.' },
     ],
     relatedSlugs: ['brutto-netto-rechner', 'abfindungsrechner', 'grenzsteuersatz-rechner'],
     isTimeSensitive: true,

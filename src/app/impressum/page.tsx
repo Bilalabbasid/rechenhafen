@@ -50,7 +50,7 @@ export default function ImpressumPage() {
           </h2>
           <p>
             Verantwortlich gemäß § 18 Abs. 2 MStV:<br />
-            <strong>[FILL: natural person's name]</strong><br />
+            <strong>[FILL: natural person name]</strong><br />
             [FILL: street + number, postcode, city, country]
           </p>
         </section>
