@@ -1,4 +1,5 @@
 import { CalculatorDefinition, ContentSection, FAQItem } from '@/types/calculator';
+import { resolveCalculatorLegalMetadata } from './legalMetadata';
 
 interface CategoryEnrichment {
   sections: ContentSection[];
@@ -660,18 +661,27 @@ function getVisibleWordCount(calc: CalculatorDefinition): number {
  * ensuring every page on rechenhafen.de offers comprehensive, authoritative, people-first guidance.
  */
 export function enrichCalculator(calc: CalculatorDefinition): CalculatorDefinition {
-  const currentCount = getVisibleWordCount(calc);
+  const legalMeta = resolveCalculatorLegalMetadata(calc);
+  const baseCalc: CalculatorDefinition = {
+    ...calc,
+    disclaimerType: calc.disclaimerType || legalMeta.disclaimerType,
+    rechtsstand: calc.rechtsstand || legalMeta.rechtsstand,
+    legalBasis: calc.legalBasis && calc.legalBasis.length > 0 ? calc.legalBasis : legalMeta.legalBasis,
+    assumptions: calc.assumptions && calc.assumptions.length > 0 ? calc.assumptions : legalMeta.assumptions,
+  };
+
+  const currentCount = getVisibleWordCount(baseCalc);
   if (currentCount >= 440) {
-    return calc;
+    return baseCalc;
   }
 
-  const category = calc.category || 'finanzen';
+  const category = baseCalc.category || 'finanzen';
   const enrichment = CATEGORY_ENRICHMENTS[category] || CATEGORY_ENRICHMENTS.finanzen;
 
   // Clone content safely
-  const content = { ...(calc.content || {}) };
+  const content = { ...(baseCalc.content || {}) };
   const existingSections = content.sections ? [...content.sections] : [];
-  const existingFaqs = calc.faqs ? [...calc.faqs] : [];
+  const existingFaqs = baseCalc.faqs ? [...baseCalc.faqs] : [];
 
   // Add category sections if not already present
   for (const sec of enrichment.sections) {
@@ -690,7 +700,7 @@ export function enrichCalculator(calc: CalculatorDefinition): CalculatorDefiniti
   content.sections = existingSections;
 
   return {
-    ...calc,
+    ...baseCalc,
     content,
     faqs: existingFaqs,
   };

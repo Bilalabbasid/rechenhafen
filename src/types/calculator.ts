@@ -113,6 +113,25 @@ export interface ContentSection {
   content: string;
 }
 
+export type DisclaimerType =
+  | 'steuer'
+  | 'gehalt-sozialversicherung'
+  | 'recht'
+  | 'sozialleistung'
+  | 'finanzen'
+  | 'immobilien'
+  | 'gesundheit'
+  | 'schwangerschaft'
+  | 'alkohol-verkehr'
+  | 'verkehr-bussgeld'
+  | 'bauen'
+  | 'allgemein';
+
+export interface LegalBasisLink {
+  label: string;
+  url: string;
+}
+
 export interface CalculatorDefinition {
   id: string;
   slug: string;
@@ -150,6 +169,10 @@ export interface CalculatorDefinition {
   };
   trustMeta?: TrustMetadata;
   legalFootnotes?: LegalFootnote[];
+  disclaimerType?: DisclaimerType;
+  rechtsstand?: string;
+  legalBasis?: LegalBasisLink[];
+  assumptions?: string[];
 }
 
 export interface CategoryDefinition {
