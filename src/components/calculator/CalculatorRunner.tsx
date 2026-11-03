@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef, useId } from 'react';
 import Link from 'next/link';
-import { CalculatorInput, CalculationResult, SelectOption } from '@/types/calculator';
+import { CalculatorInput, CalculationResult, SelectOption, DisclaimerType, LegalBasisLink } from '@/types/calculator';
 import styles from '@/styles/calculator.module.css';
 import { AlertCircle, AlertTriangle, Copy, Check, RotateCcw, ShieldCheck, Plus, Trash2, Moon, Calendar, Share2, Sparkles, Info, Bookmark, BookmarkCheck, ArrowUpDown } from 'lucide-react';
+import ResultDisclaimer from './ResultDisclaimer';
 import { loadCalculatorEngine } from '@/lib/calculators/dynamic-loader';
 import { formatDateDe, formatNumber } from '@/lib/formatters';
 import { getUpcomingEasterDateString, parseDateParts } from '@/lib/calculators/dateMath';
@@ -72,6 +73,10 @@ interface Props {
     lastVerified: string;
   };
   shortDescription?: string;
+  disclaimerType?: DisclaimerType;
+  rechtsstand?: string;
+  legalBasis?: LegalBasisLink[];
+  assumptions?: string[];
 }
 
 export default function CalculatorRunner({
@@ -83,6 +88,10 @@ export default function CalculatorRunner({
   isTimeSensitive,
   timeSensitiveMeta,
   shortDescription,
+  disclaimerType,
+  rechtsstand,
+  legalBasis,
+  assumptions,
 }: Props) {
   const formId = useId();
 
@@ -739,7 +748,7 @@ export default function CalculatorRunner({
       );
       textToCopy += `\n\nDetails:\n${secLines.join('\n')}`;
     }
-    textToCopy += `\n\nBerechnet auf RechenHafen.de`;
+    textToCopy += `\n\nUnverbindliche Berechnung von rechenhafen.de, keine Steuer-/Rechts-/Finanzberatung.`;
 
     try {
       await navigator.clipboard.writeText(textToCopy);
@@ -1372,6 +1381,14 @@ export default function CalculatorRunner({
                     Berechnung basiert auf der Zeitzone Europe/Berlin (MEZ/MESZ) unter Berücksichtigung von Schaltjahren und Feiertagsgesetzen.
                   </div>
                 )}
+
+                {/* Rechtlicher Transparenz- und Ergebnisdisclaimer */}
+                <ResultDisclaimer
+                  disclaimerType={disclaimerType}
+                  rechtsstand={rechtsstand}
+                  legalBasis={legalBasis}
+                  assumptions={assumptions}
+                />
 
               {/* Actions Bar */}
               <div className={styles.resultActionsBar}>

@@ -326,6 +326,10 @@ export default async function CalculatorPage({ params }: PageProps) {
         isTimeSensitive={calc.isTimeSensitive}
         timeSensitiveMeta={calc.timeSensitiveMeta}
         shortDescription={calc.shortDescription}
+        disclaimerType={calc.disclaimerType}
+        rechtsstand={calc.rechtsstand}
+        legalBasis={calc.legalBasis}
+        assumptions={calc.assumptions}
       />
 
       {/* Kurzreferenz direkt unter dem Rechner (nur für Rechner mit quickReference) */}
