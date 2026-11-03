@@ -656,18 +656,71 @@ function getVisibleWordCount(calc: CalculatorDefinition): number {
   return words.length;
 }
 
+function getAuthorityByDisclaimerType(type?: string): string {
+  switch (type) {
+    case 'steuer':
+      return 'das zuständige Finanzamt, eine Steuerberaterin oder einen Steuerberater';
+    case 'gehalt-sozialversicherung':
+      return 'Ihre Krankenkasse, die Deutsche Rentenversicherung oder Ihren Arbeitgeber';
+    case 'recht':
+      return 'eine Rechtsanwältin oder einen Rechtsanwalt';
+    case 'sozialleistung':
+      return 'die zuständige Behörde (z. B. Jobcenter, Familienkasse, Wohngeldstelle oder Jugendamt)';
+    case 'finanzen':
+      return 'Ihre Bank oder eine zertifizierte Finanzberatung';
+    case 'immobilien':
+      return 'das zuständige Finanzamt, Notariat oder eine Finanzierungsberatung';
+    case 'verkehr-bussgeld':
+    case 'alkohol-verkehr':
+      return 'die zuständige Bußgeldstelle';
+    default:
+      return 'die zuständige Fachstelle oder Behörde';
+  }
+}
+
 /**
  * Enriches a calculator definition if its visible editorial content is thin (< 400 words),
  * ensuring every page on rechenhafen.de offers comprehensive, authoritative, people-first guidance.
  */
 export function enrichCalculator(calc: CalculatorDefinition): CalculatorDefinition {
   const legalMeta = resolveCalculatorLegalMetadata(calc);
+  const disclaimerType = calc.disclaimerType || legalMeta.disclaimerType;
+  const rechtsstand = calc.rechtsstand || legalMeta.rechtsstand;
+  const legalBasis = calc.legalBasis && calc.legalBasis.length > 0 ? calc.legalBasis : legalMeta.legalBasis;
+  const assumptions = calc.assumptions && calc.assumptions.length > 0 ? calc.assumptions : legalMeta.assumptions;
+
+  // Bindingness FAQ für alle Rechner mit Rechtsstand
+  const faqs = calc.faqs ? [...calc.faqs] : [];
+  if (rechtsstand) {
+    const jahr = rechtsstand;
+    const authority = getAuthorityByDisclaimerType(disclaimerType);
+    const bindingQuestion = 'Ist das Ergebnis dieses Rechners verbindlich?';
+    const bindingAnswer = `Nein. Der Rechner nutzt die allgemeinen gesetzlichen Werte für ${jahr} und Ihre Eingaben. Ihre tatsächliche Abrechnung bzw. Ihr Bescheid kann abweichen, etwa durch individuelle Freibeträge, regionale Besonderheiten oder Sonderregelungen. Für eine verbindliche Auskunft wenden Sie sich an ${authority}.`;
+
+    const existingIdx = faqs.findIndex(
+      (f) => f.question === bindingQuestion || f.question.toLowerCase().includes('verbindlich')
+    );
+
+    if (existingIdx >= 0) {
+      faqs[existingIdx] = {
+        question: bindingQuestion,
+        answer: bindingAnswer,
+      };
+    } else {
+      faqs.push({
+        question: bindingQuestion,
+        answer: bindingAnswer,
+      });
+    }
+  }
+
   const baseCalc: CalculatorDefinition = {
     ...calc,
-    disclaimerType: calc.disclaimerType || legalMeta.disclaimerType,
-    rechtsstand: calc.rechtsstand || legalMeta.rechtsstand,
-    legalBasis: calc.legalBasis && calc.legalBasis.length > 0 ? calc.legalBasis : legalMeta.legalBasis,
-    assumptions: calc.assumptions && calc.assumptions.length > 0 ? calc.assumptions : legalMeta.assumptions,
+    disclaimerType,
+    rechtsstand,
+    legalBasis,
+    assumptions,
+    faqs,
   };
 
   const currentCount = getVisibleWordCount(baseCalc);
@@ -681,7 +734,7 @@ export function enrichCalculator(calc: CalculatorDefinition): CalculatorDefiniti
   // Clone content safely
   const content = { ...(baseCalc.content || {}) };
   const existingSections = content.sections ? [...content.sections] : [];
-  const existingFaqs = baseCalc.faqs ? [...baseCalc.faqs] : [];
+  const existingFaqs = [...baseCalc.faqs];
 
   // Add category sections if not already present
   for (const sec of enrichment.sections) {

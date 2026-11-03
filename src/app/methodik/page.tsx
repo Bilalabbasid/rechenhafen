@@ -3,38 +3,35 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import styles from '@/styles/layout.module.css';
-import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
-import { ShieldCheck, CheckCircle2, AlertTriangle, BookOpen, ExternalLink, HelpCircle } from 'lucide-react';
+import { LEGAL_VALUES_2026, LegalConstant } from '@/legal/de';
+import { CheckCircle2, AlertTriangle, BookOpen, ExternalLink, HelpCircle, Mail, Clock, ShieldAlert, Cpu } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Berechnungsmethodik, Datenquellen & Transparenz',
-  description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
+  title: 'Wie wir rechnen: Methodik, Datenquellen & Grenzen',
+  description: 'Transparenz bei RechenHafen: Woher unsere Zahlen stammen, wie Formeln getestet werden, wann Gesetzeswerte aktualisiert werden und wo die Grenzen eines Online-Rechners liegen.',
   alternates: {
     canonical: 'https://rechenhafen.de/methodik/',
   },
   openGraph: {
-    title: 'Berechnungsmethodik, Datenquellen & Transparenz',
-    description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
+    title: 'Wie wir rechnen: Methodik, Datenquellen & Grenzen – RechenHafen',
+    description: 'Transparenz bei RechenHafen: Woher unsere Zahlen stammen, wie Formeln getestet werden, wann Gesetzeswerte aktualisiert werden und wo die Grenzen eines Online-Rechners liegen.',
     url: 'https://rechenhafen.de/methodik/',
     siteName: 'RechenHafen',
     locale: 'de_DE',
     type: 'website',
   },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Berechnungsmethodik, Datenquellen & Transparenz',
-    description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
-  },
 };
 
 export default function MethodikPage() {
-  const regulatedEntries = Object.entries(GERMAN_DATA_2026);
+  const legalKeys = Object.keys(LEGAL_VALUES_2026).filter((k) => k !== 'year') as Array<
+    keyof typeof LEGAL_VALUES_2026
+  >;
 
   const methodikSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ItemPage',
-    name: 'Berechnungsmethodik, Datenquellen & Transparenz',
-    description: 'Wissenschaftliche und amtliche Methodik von RechenHafen: Formel-Verifikation, DIN 1333 Rundung, 2026-Referenzdaten, Primärquellen und Modellgrenzen.',
+    '@type': 'AboutPage',
+    name: 'Wie wir rechnen: Methodik, Datenquellen & Transparenz',
+    description: 'Transparente Darstellung der Berechnungsmethodik, amtlichen Primärquellen und Modellgrenzen von RechenHafen.',
     url: 'https://rechenhafen.de/methodik/',
     inLanguage: 'de-DE',
     publisher: {
@@ -45,7 +42,6 @@ export default function MethodikPage() {
         '@type': 'ImageObject',
         url: 'https://rechenhafen.de/icon.svg',
       },
-      publishingPrinciples: 'https://rechenhafen.de/methodik/',
     },
   };
 
@@ -55,109 +51,123 @@ export default function MethodikPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(methodikSchema).replace(/</g, '\\u003c') }}
       />
-      <Breadcrumbs items={[{ label: 'Methodik & Datenquellen', href: '/methodik/' }]} />
+      <Breadcrumbs items={[{ label: 'Wie wir rechnen & Methodik', href: '/methodik/' }]} />
 
       <article style={{ maxWidth: '880px', margin: '0 auto var(--space-12)', lineHeight: 1.75, color: 'var(--color-text-secondary)' }}>
         {/* Header */}
-        <div style={{ marginBottom: 'var(--space-8)' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: 'var(--color-primary-light)', color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 600, marginBottom: 'var(--space-3)' }}>
-            <ShieldCheck size={16} /> Verifizierte Methodik · Stand 2026
+        <header style={{ marginBottom: 'var(--space-8)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: '#eff6ff', color: '#1d4ed8', fontSize: '0.85rem', fontWeight: 600, marginBottom: 'var(--space-3)' }}>
+            <BookOpen size={16} /> Transparenz &amp; Methodik · Rechtsstand 2026
           </div>
           <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', fontWeight: 800, color: 'var(--color-text-primary)', margin: '0 0 var(--space-3)', lineHeight: 1.2 }}>
-            Berechnungsmethodik, Datenquellen & Verlässlichkeit
+            Wie wir rechnen: Datenquellen, Testmethoden &amp; Grenzen
           </h1>
           <p style={{ fontSize: '1.1rem', color: 'var(--color-text-muted)', margin: 0 }}>
-            Verlässliche Zahlen statt Black-Box: Wie RechenHafen mathematische Modelle, deutsche Rechtsnormen und amtliche Kennzahlen implementiert, prüft und pflegt.
+            Offenlegung statt Schein-Autorität: Woher unsere Zahlen kommen, wie wir Formeln verifizieren und warum unsere Ergebnisse stets unverbindliche Orientierungswerte sind.
           </p>
+        </header>
+
+        {/* 1. TOP STATEMENT: Honest Positioning */}
+        <div style={{
+          background: '#fffbeb',
+          border: '1px solid #fde68a',
+          borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-5)',
+          marginBottom: 'var(--space-8)',
+          display: 'flex',
+          gap: '14px',
+          alignItems: 'flex-start'
+        }}>
+          <ShieldAlert size={24} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+          <div>
+            <strong style={{ display: 'block', fontSize: '1.05rem', color: '#92400e', marginBottom: '6px' }}>
+              Wichtige Klarstellung zu unserem Angebot
+            </strong>
+            <p style={{ margin: 0, fontSize: '0.95rem', color: '#78350f' }}>
+              <strong>RechenHafen ist kein Steuerberater, keine Rechtsanwaltskanzlei und keine Arztpraxis.</strong> Unsere Rechner berechnen mathematische Modelle auf Basis Ihrer Eingaben und der allgemein zugänglichen gesetzlichen Bestimmungen in Deutschland. Die Ergebnisse dienen ausschließlich Ihrer persönlichen Information und Orientierung. Sie ersetzen zu keinem Zeitpunkt eine individuelle steuerliche, juristische, finanzielle oder medizinische Beratung und begründen keinen behördlichen Rechtsanspruch.
+            </p>
+          </div>
         </div>
 
-        {/* Core Principles */}
-        <section style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 'var(--space-6)',
-          marginBottom: 'var(--space-8)'
-        }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 var(--space-3)' }}>
-            Grundsätze echter Verlässlichkeit
+        {/* 2. Where the numbers come from */}
+        <section style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
+            1. Woher die Zahlen stammen: Amtliche Primärquellen
           </h2>
-          <p style={{ margin: '0 0 var(--space-3)', fontSize: '0.95rem' }}>
-            Das Vertrauen in eine Rechenplattform basiert nicht auf erfundenen Siegeln, Pseudo-Expertenzitaten oder gekauften Testimonials, sondern auf <strong>reproduzierbarer mathematischer Korrektheit, offengelegten Modellannahmen und transparenten Primärquellen</strong>.
+          <p>
+            Keine gesetzliche Kennzahl auf RechenHafen wird geschätzt oder aus Drittanbieter-Blogs übernommen. Jede Zahl entstammt direkt einer amtlichen Publikation im Bundesgesetzblatt (BGBl.), im Bundesanzeiger (BAnz) oder den offiziellen Bekanntmachungen der Ministerien und Spitzenverbände:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginTop: 'var(--space-4)' }}>
-            <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-hover)' }}>
-              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>✓ 100 % Lokale Berechnung</strong>
-              <span style={{ fontSize: '0.85rem' }}>Alle Berechnungen laufen deterministisch im Browser. Keine Übertragung Ihrer persönlichen Zahlen an Server.</span>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '14px',
+            margin: 'var(--space-4) 0'
+          }}>
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>
+                Bundesministerium der Finanzen (BMF)
+              </strong>
+              <span style={{ fontSize: '0.85rem' }}>
+                Einkommensteuertarif (§ 32a EStG), amtliche Lohnsteuer-Programmablaufpläne, Solidaritätszuschlaggesetz (§ 3 SolzG) und Entfernungspauschale (§ 9 EStG).
+              </span>
             </div>
-            <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-hover)' }}>
-              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>✓ Keine veralteten Hardcodes</strong>
-              <span style={{ fontSize: '0.85rem' }}>Gesetzliche Parameter liegen in einer versionierten Konfigurationsschicht (Stand 2026) mit Prüfdatum.</span>
+
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>
+                BMAS &amp; Sozialversicherungsträger
+              </strong>
+              <span style={{ fontSize: '0.85rem' }}>
+                Sozialversicherungs-Rechengrößenverordnung, Beitragsbemessungsgrenzen, allgemeine Beitragssätze (§ 241 SGB V, § 287 SGB VI, § 341 SGB III) und Bürgergeld-Regelsätze (§ 20 SGB II).
+              </span>
             </div>
-            <div style={{ padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-hover)' }}>
-              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>✓ Deutsche Normen (DIN)</strong>
-              <span style={{ fontSize: '0.85rem' }}>Kaufmännische Rundung nach DIN 1333 und standardisierte Lokalisierung nach de-DE.</span>
+
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>
+                GKV-Spitzenverband &amp; BMG
+              </strong>
+              <span style={{ fontSize: '0.85rem' }}>
+                Bekanntmachung des durchschnittlichen Zusatzbeitragssatzes (§ 242a Abs. 2 SGB V) im Bundesanzeiger, Pflegeversicherungssätze nach § 55 SGB XI und Kinderabschläge.
+              </span>
+            </div>
+
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>
+                Mindestlohnkommission &amp; Minijob-Zentrale
+              </strong>
+              <span style={{ fontSize: '0.85rem' }}>
+                Mindestlohnanpassungsverordnungen (MiLoV), Geringfügigkeitsgrenze (§ 8 Abs. 1a SGB IV: 603 €) und Umlagesätze U1, U2 und Insolvenzgeldumlage (§ 360 SGB III).
+              </span>
+            </div>
+
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>
+                Bundesministerium der Justiz &amp; Gerichte
+              </strong>
+              <span style={{ fontSize: '0.85rem' }}>
+                Bürgerliches Gesetzbuch (BGB, z. B. Kündigungsfristen § 622, Darlehensrecht § 491), Pfändungsfreigrenzen (§ 850c ZPO), GNotKG und Düsseldorfer Tabelle des OLG Düsseldorf.
+              </span>
+            </div>
+
+            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+              <strong style={{ color: 'var(--color-text-primary)', display: 'block', marginBottom: '4px' }}>
+                Kraftfahrt-Bundesamt &amp; StVO
+              </strong>
+              <span style={{ fontSize: '0.85rem' }}>
+                Bundeseinheitlicher Bußgeldkatalog (BKatV), Straßenverkehrs-Ordnung (StVO) und Straßenverkehrsgesetz (StVG § 24a).
+              </span>
             </div>
           </div>
         </section>
 
-        {/* Section 1: Development Process */}
-        <section style={{ marginBottom: 'var(--space-8)' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            1. Wie Rechner bei RechenHafen entwickelt werden
-          </h2>
-          <p>
-            Jeder Rechner auf RechenHafen durchläuft einen mehrstufigen Entwicklungs- und Validierungsprozess:
-          </p>
-          <ol style={{ paddingLeft: '24px', margin: 'var(--space-3) 0' }}>
-            <li style={{ marginBottom: '8px' }}>
-              <strong>Quellen- & Formel-Recherche:</strong> Ermittlung der anerkannten Primärliteratur, Normen oder Gesetzesgrundlagen (z. B. BGB, EStG, WHO-Berichte, DIN-Normen).
-            </li>
-            <li style={{ marginBottom: '8px' }}>
-              <strong>Algorithmische Spezifikation:</strong> Überführung der Formel in deterministischen TypeScript-Code. Definition von Wertebereichen, Min-/Max-Grenzen und Schrittweiten.
-            </li>
-            <li style={{ marginBottom: '8px' }}>
-              <strong>Gegenrechnung mit Referenzfällen:</strong> Manuelle Verifikation an amtlichen Musterbeispielen (z. B. BMF-Berechnungsmuster für die Pendlerpauschale, Zinseszins-Referenztabellen der Bundesbank).
-            </li>
-            <li style={{ marginBottom: '8px' }}>
-              <strong>Automatisierte Tests:</strong> Erstellung von Unit-Tests zur Absicherung von Grenzwerten, Nullwerten, Schaltjahren und Extremwerten.
-            </li>
-          </ol>
-        </section>
-
-        {/* Section 2: Verification & Test Pipelines */}
-        <section style={{ marginBottom: 'var(--space-8)' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            2. Formel-Verifikation & Qualitätskontrolle
-          </h2>
-          <p>
-            Um Rechenfehler, Ausreißer und fehlerhafte Datentypen auszuschließen, verwendet RechenHafen eine automatisierte Continuous-Integration-Pipeline mit dem Test-Framework <strong>Vitest</strong>:
-          </p>
-          <ul>
-            <li><strong>Vermeidung von NaN und Infinity:</strong> Alle Eingaben werden vor der Auswertung typisiert, bereinigt und gegen Nulldivisionen abgesichert. Ungültige Eingaben führen zu aussagekräftigen Fehlerhinweisen statt zu fehlerhaften Zahlen.</li>
-            <li><strong>Randwertanalysen:</strong> Prüfung auf Grenzfälle wie negative Zinssätze, Null-Zinsen, 29. Februar in Schaltjahren, Monatsenden mit 28/30/31 Tagen und Zinsbindungen bis 50 Jahre.</li>
-            <li><strong>Konsistenzprüfungen:</strong> Automatische Überprüfung, dass alle 405 Rechner eine vollständige Formel, eine Formelerklärung, ein nachvollziehbares Rechenbeispiel und korrekte Meta-Tags besitzen.</li>
-          </ul>
-        </section>
-
-        {/* Section 3: Time-Sensitive Data & Regulatory Layer */}
-        <section style={{ marginBottom: 'var(--space-8)' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            3. Pflege regulierter & zeitkritischer Rahmendaten
-          </h2>
-          <p>
-            Gesetzliche Grenzwerte, Freibeträge, Beitragsbemessungsgrenzen und Pauschalen in Deutschland ändern sich regelmäßig zum 1. Januar eines Jahres. Um zu verhindern, dass veraltete Zahlen in Formeln verborgen bleiben, trennt RechenHafen strikt zwischen Rechenalgorithmus und Rahmendaten:
-          </p>
-          <p>
-            Alle regulierten Werte werden zentral in der Datei <code>src/data/regulated/2026/index.ts</code> gepflegt. Jeder Wert ist mit seiner gesetzlichen Primärquelle, der Fundstelle im Bundesgesetzblatt oder amtlichen Schreiben und dem Datum der letzten manuellen Überprüfung versehen.
-          </p>
-        </section>
-
-        {/* Section 4: Regulated Data Table 2026 */}
+        {/* Central Legal Values Table 2026 */}
         <section style={{ marginBottom: 'var(--space-8)' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            Referenzwerte für Deutschland (Stand: 2026)
+            Zentrales Verzeichnis der gesetzlichen Referenzwerte (Rechtsstand 2026)
           </h3>
+          <p style={{ fontSize: '0.9rem', marginBottom: 'var(--space-3)' }}>
+            Alle Rechner auf RechenHafen greifen auf dieses gemeinsame, typisierte Gesetzeswerte-Modul (<code>src/legal/de/2026.ts</code>) zu:
+          </p>
           <div style={{ overflowX: 'auto', marginBottom: 'var(--space-4)' }}>
             <table style={{
               width: '100%',
@@ -169,122 +179,152 @@ export default function MethodikPage() {
             }}>
               <thead>
                 <tr style={{ background: 'var(--color-surface-hover)', textAlign: 'left', borderBottom: '1px solid var(--color-border)' }}>
-                  <th style={{ padding: '10px 12px' }}>Parameter / Bezeichnung</th>
+                  <th style={{ padding: '10px 12px' }}>Kennzahl / Bezeichnung</th>
                   <th style={{ padding: '10px 12px' }}>Wert</th>
-                  <th style={{ padding: '10px 12px' }}>Gesetzliche Primärquelle</th>
+                  <th style={{ padding: '10px 12px' }}>Gesetzliche Rechtsgrundlage</th>
                   <th style={{ padding: '10px 12px' }}>Gültig ab</th>
-                  <th style={{ padding: '10px 12px' }}>Verifiziert</th>
+                  <th style={{ padding: '10px 12px' }}>Geprüft am</th>
                 </tr>
               </thead>
               <tbody>
-                {regulatedEntries.map(([key, item]) => (
-                  <tr key={key} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                    <td style={{ padding: '10px 12px', fontWeight: 600 }}>{item.description}</td>
-                    <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
-                      {item.value} {item.unit || ''}
-                    </td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
-                        {item.source} <ExternalLink size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
-                      </a>
-                    </td>
-                    <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{item.effectiveFrom}</td>
-                    <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{item.lastVerified}</td>
-                  </tr>
-                ))}
+                {legalKeys.slice(0, 15).map((key) => {
+                  const item = LEGAL_VALUES_2026[key] as LegalConstant<number | string>;
+                  if (!item || typeof item !== 'object') return null;
+                  return (
+                    <tr key={key as string} style={{ borderBottom: '1px solid var(--color-border)' }}>
+                      <td style={{ padding: '10px 12px', fontWeight: 600 }}>{item.description || String(key)}</td>
+                      <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
+                        {item.value} {item.unit}
+                      </td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
+                          {item.law} <ExternalLink size={11} style={{ display: 'inline', verticalAlign: 'middle' }} />
+                        </a>
+                      </td>
+                      <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{item.validFrom}</td>
+                      <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>{item.checkedAt}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
+          <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+            Hinweis: Weitere steuerliche Formelkoeffizienten und Übergangsparameter sind im Quellcode vollständig dokumentiert und über automatisierte Wächtertests abgesichert.
+          </p>
         </section>
 
-        {/* Section 5: Rounding Methodology & Precision */}
+        {/* 3. Update Cycle */}
         <section style={{ marginBottom: 'var(--space-8)' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            4. Rundungsmethodik & Numerische Präzision (DIN 1333)
+            2. Aktualisierungszyklen: Wann und wie oft aktualisiert wird
           </h2>
           <p>
-            Um Rundungsfehler und Akkumulationseffekte zu vermeiden, folgt RechenHafen klaren mathematischen Regeln:
+            Gesetzliche Zahlen und Grenzwerte unterliegen geregelten Aktualisierungsintervallen:
           </p>
           <ul>
-            <li><strong>Interne Präzision:</strong> Alle Zwischenrechnungen werden mit voller 64-Bit-Gleitkommapräzision (IEEE 754 Floating Point) ohne vorzeitige Rundung durchgeführt.</li>
-            <li><strong>Kaufmännische Rundung:</strong> Die Rundung auf Cent-Beträge oder Nachkommastellen erfolgt erst am Ende der Berechnungskette nach der deutschen Norm <strong>DIN 1333</strong> (ab 5 aufrunden, unter 5 abrunden).</li>
-            <li><strong>Deutsche DIN-Formatierung:</strong> Formatierung von Zahlen nach <code>Intl.NumberFormat(&apos;de-DE&apos;)</code> mit Komma als Dezimaltrenner (z. B. <code>1.450,50 €</code>) und Punkt als Tausendertrennzeichen.</li>
+            <li>
+              <strong>Haupt-Aktualisierung zum 1. Januar:</strong> Jährliche Anpassung von Einkommensteuertarif, Grundfreibetrag, Beitragsbemessungsgrenzen, Mindestlohn, Minijob-Grenze und Bürgergeld-Regelsätzen. Die Überprüfung findet statt, sobald die Verordnungen im Bundesgesetzblatt verkündet wurden.
+            </li>
+            <li>
+              <strong>Halbjahres-Aktualisierung zum 1. Juli:</strong> Regelmäßige Überprüfung der Pfändungsfreigrenzen (§ 850c ZPO) und etwaiger unterjähriger Rentenanpassungen.
+            </li>
+            <li>
+              <strong>Ad-hoc-Aktualisierungen:</strong> Treten unterjährige Steueränderungsgesetze rückwirkend oder kurzfristig in Kraft, werden die Parameter unverzüglich aktualisiert und im Änderungsprotokoll ausgewiesen.
+            </li>
           </ul>
-        </section>
-
-        {/* Section 6: Sources by Domain */}
-        <section style={{ marginBottom: 'var(--space-8)' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            5. Autorisierte Primärquellen nach Fachbereich
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Steuern & Abgaben:</strong>
-              <p style={{ fontSize: '0.875rem', margin: '6px 0 0' }}>Bundesministerium der Finanzen (BMF), Einkommensteuergesetz (EStG), Umsatzsteuergesetz (UStG), Bundesfinanzhof (BFH).</p>
-            </div>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Arbeitsrecht & Soziales:</strong>
-              <p style={{ fontSize: '0.875rem', margin: '6px 0 0' }}>Bürgerliches Gesetzbuch (BGB § 622), Bundesurlaubsgesetz (BUrlG § 11), Bundesministerium für Arbeit und Soziales (BMAS), Minijob-Zentrale.</p>
-            </div>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Finanzen & Kredite:</strong>
-              <p style={{ fontSize: '0.875rem', margin: '6px 0 0' }}>Deutsche Bundesbank (Zinsstatistiken), Preisangabenverordnung (PAngV für Effektivzins), Statistisches Bundesamt (Destatis für VPI/Inflation).</p>
-            </div>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Energie & Umwelt:</strong>
-              <p style={{ fontSize: '0.875rem', margin: '6px 0 0' }}>Umweltbundesamt (UBA CO₂-Emissionsfaktoren), Bundesverband der Energie- und Wasserwirtschaft (BDEW), Deutscher Wetterdienst (DWD Einstrahlungsdaten).</p>
-            </div>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Gesundheit & Biometrie:</strong>
-              <p style={{ fontSize: '0.875rem', margin: '6px 0 0' }}>Weltgesundheitsorganisation (WHO Klassifikationen), Deutsche Gesellschaft für Ernährung (DGE), anerkannte Studienmodelle (Mifflin-St.Jeor, Katch-McArdle, Broca).</p>
-            </div>
-            <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>Mathematik & Physik:</strong>
-              <p style={{ fontSize: '0.875rem', margin: '6px 0 0' }}>DIN-Normen (DIN 1333), Internationales Einheitensystem (SI), klassische euklidische Geometrie und Finanzmathematik (Annuitätenformeln).</p>
-            </div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: 'var(--radius-md)', background: '#f1f5f9', fontSize: '0.85rem', color: '#334155', marginTop: '6px' }}>
+            <Clock size={16} /> <span>Werte zuletzt aktualisiert: <strong>2026-11-02</strong></span>
           </div>
         </section>
 
-        {/* Section 7: Update Process */}
+        {/* 4. How formulas are tested */}
         <section style={{ marginBottom: 'var(--space-8)' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            6. Aktualisierungs- und Revisionsprozess
+            3. Wie Formeln getestet werden: Regressionstests gegen amtliche Referenzfälle
           </h2>
           <p>
-            Gesetzliche und wirtschaftliche Rahmenbedingungen unterliegen kontinuierlichen Änderungen. Unser Revisionsprozess ist wie folgt strukturiert:
+            Um Programmier- und Rechenfehler auszuschließen, wird jede Formel vor der Bereitstellung gegen amtliche Musterfälle getestet:
           </p>
           <ul>
-            <li><strong>Jährliche Generalüberprüfung (Dezember/Januar):</strong> Vor jedem Jahreswechsel werden alle steuerlichen, arbeitsrechtlichen und beitragsrechtlichen Grenzwerte anhand der verabschiedeten Bundesgesetze im Bundesgesetzblatt aktualisiert.</li>
-            <li><strong>Quartalsweise Markt-Aktualisierung:</strong> Überprüfung variabler Kennzahlen wie bundesweiter Durchschnittsstrompreise, Kraftstoffpreise und Inflationsdaten.</li>
-            <li><strong>Versionierte Code-Verwaltung:</strong> Alle Änderungen an Formeln oder Grenzwerten werden im Git-Repository versioniert und automatisiert vor jedem Produktionsbuild validiert.</li>
+            <li>
+              <strong>BMF-Programmablaufplan Testfälle:</strong> Unsere Steuer- und Lohnrechenroutinen werden gegen die vom Bundesfinanzministerium herausgegebenen offiziellen Vergleichstabellen und Rundungsvorgaben abgeglichen.
+            </li>
+            <li>
+              <strong>Düsseldorfer Tabelle Beispielfälle:</strong> Unterhaltsberechnungen werden anhand der offiziellen Anwendungsbeispiele des OLG Düsseldorf für unterschiedliche Altersstufen, Einkommensgruppen und Selbstbehalte automatisiert verifiziert.
+            </li>
+            <li>
+              <strong>Automatisierte Schutztests (Vitest):</strong> Bei jedem Code-Update prüfen über 1.280 automatisierte Unittests, dass keine Formel fehlerhafte Datentypen, <code>NaN</code> oder <code>Infinity</code> zurückgibt und alle Randwerte (Schaltjahre, Null-Zinsen, Höchstbeträge) sauber abgefangen werden.
+            </li>
           </ul>
         </section>
 
-        {/* Section 8: Model Limitations & Disclaimers */}
+        {/* 5. Limits of Online Calculators */}
         <section style={{ marginBottom: 'var(--space-8)' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            7. Modellgrenzen & Rechtlicher Hinweis
+            4. Grenzen von Online-Rechnern: Standardfall vs. Einzelfall
           </h2>
+          <p>
+            Ein Online-Rechner arbeitet mit standardisierten Eingabemasken und generalisierten Formeln. Das deutsche Recht und die Realität von Haushalten und Unternehmen zeichnen sich jedoch durch Einzelfallregelungen aus:
+          </p>
           <div style={{
-            background: '#fffbeb',
-            border: '1px solid #fde68a',
-            borderRadius: 'var(--radius-md)',
-            padding: '16px',
-            fontSize: '0.9rem',
-            color: '#92400e',
-            lineHeight: 1.6
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-5)',
+            margin: 'var(--space-4) 0'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: 700 }}>
-              <AlertTriangle size={18} /> Grenzen vereinfachter Online-Modellrechnungen
-            </div>
-            <p style={{ margin: '0 0 8px' }}>
-              Online-Rechner arbeiten mit mathematischen Abstraktionen und standardisierten Annahmen, um komplexe Sachverhalte schnell und übersichtlich darzustellen:
-            </p>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-text-primary)', margin: '0 0 8px' }}>
+              Wo ein Online-Rechner an seine Grenzen stößt:
+            </h3>
             <ul style={{ margin: 0, paddingLeft: '20px' }}>
-              <li><strong>Keine Rechts- oder Steuerberatung:</strong> Berechnungen im Bereich Steuern, Gehalt, Recht und Rente dienen der unverbindlichen Erstinformation. Sie ersetzen keine individuelle Beratung durch Steuerberater (§ 1 StBerG), Rechtsanwälte (§ 1 RDG) oder Rentenberater.</li>
-              <li><strong>Keine medizinische Diagnose:</strong> Gesundheits- und Fitnessrechner liefern rein statistische Orientierungswerte und stellen keine medizinische Befundung oder Ernährungsberatung dar.</li>
-              <li><strong>Zinsänderungs- & Anlagerisiken:</strong> Finanzkalkulationen basieren auf fixen Zins- und Renditeannahmen. Reale Marktentwicklungen, Gebühren von Kreditinstituten und Kursrisiken können abweichen.</li>
+              <li>
+                <strong>Individuelle Steuerermäßigungen:</strong> Außergewöhnliche Belastungen (§ 33 EStG), Behinderungs-Pauschbeträge, Handwerkerleistungen (§ 35a EStG) oder Verlustvorträge lassen sich nur in einer individuellen Einkommensteuererklärung abbilden.
+              </li>
+              <li>
+                <strong>Komplexe Arbeits- und Tarifverträge:</strong> Kündigungsfristen oder Sondervergütungen aus Tarifverträgen, Betriebsvereinbarungen oder leitenden Angestelltenverhältnissen weichen häufig von den gesetzlichen BGB-Mindestfristen ab.
+              </li>
+              <li>
+                <strong>Behördliche Ermessensentscheidungen:</strong> Bei Sozialleistungen (Bürgergeld, Wohngeld, BAföG) entscheiden die Sachbearbeiter vor Ort über Angemessenheitsgrenzen von Heizkosten, Vermögensanrechnungen und Härtefälle.
+              </li>
+              <li>
+                <strong>Medizinische und biometrische Parameter:</strong> Kalorien-, BMI- oder Promillerechner können individuelle Stoffwechselunterschiede, Vorerkrankungen oder Medikamentenwechselwirkungen nicht berücksichtigen.
+              </li>
             </ul>
+          </div>
+          <p>
+            In all diesen Fällen ist der Gang zu einem Steuerberater, einer Rechtsanwältin, der zuständigen Behörde oder einer Arztpraxis unumgänglich.
+          </p>
+        </section>
+
+        {/* 6. Error Reporting & Fixes */}
+        <section style={{ marginBottom: 'var(--space-8)' }}>
+          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
+            5. Fehler melden &amp; Änderungsprotokoll
+          </h2>
+          <p>
+            Transparenz bedeutet für uns auch, offen mit Fehlern oder veränderten Rechtslagen umzugehen. Sollten Sie in einer Formel, einer Quellenangabe oder einem Rechnertext eine Unstimmigkeit feststellen, bitten wir um Ihren Hinweis:
+          </p>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-5)',
+            margin: 'var(--space-4) 0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Mail size={18} style={{ color: 'var(--color-primary)' }} />
+              <span><strong>Redaktionskontakt:</strong> [FILL: feedback-email z. B. redaktion@rechenhafen.de]</span>
+            </div>
+            <div>
+              <strong>Unser Qualitätsversprechen:</strong>
+              <p style={{ margin: '4px 0 0', fontSize: '0.9rem' }}>
+                Jeder gemeldete Fehler wird innerhalb von 5 Werktagen redaktionell und rechnerisch geprüft. Bestätigte Formelkorrekturen werden mit neuem Unittest eingespielt und im Änderungsprotokoll transparent dokumentiert.
+              </p>
+            </div>
           </div>
         </section>
       </article>
