@@ -61,7 +61,7 @@ export default function ImpressumPage() {
           </h2>
           <p>
             Als Diensteanbieter sind wir gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.
-            Alle Online-Rechner und Ratgebertexte auf RechenHafen wurden mit größter Sorgfalt und anhand amtlicher Quellen (z. B. BMF, Bundesgesetze, DIN-Normen) implementiert und fortlaufend geprüft.
+            Alle Online-Rechner und Ratgebertexte auf RechenHafen wurden mit größter Sorgfalt und anhand amtlicher Quellen (z. B. BMF, Bundesgesetze, DIN-Normen) implementiert und regelmäßig aktualisiert.
           </p>
           <p style={{ marginTop: 'var(--space-2)' }}>
             Die bereitgestellten Rechenergebnisse dienen ausschließlich der unverbindlichen Orientierung und allgemeinen Information.

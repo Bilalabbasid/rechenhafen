@@ -15,7 +15,7 @@ export type SupportedLegalYear = (typeof SUPPORTED_LEGAL_YEARS)[number];
 export const LEGAL_VALUES = LEGAL_VALUES_2026;
 
 /**
- * Holt das rechtsgeprüfte Gesetzeswerte-Set für das angegebene Jahr.
+ * Holt das Gesetzeswerte-Set für das angegebene Jahr.
  */
 export function getLegalValues(year?: number | string): GermanLegalValues {
   const parsedYear = typeof year === 'string' ? parseInt(year, 10) : year;

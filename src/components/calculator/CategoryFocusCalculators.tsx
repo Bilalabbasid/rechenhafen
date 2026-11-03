@@ -77,7 +77,7 @@ const CATEGORY_FOCUS_MAP: Record<string, { title: string; subtitle: string; item
       {
         slug: 'betonrechner',
         name: 'Betonrechner',
-        shortDesc: 'Verlässliche Kubikmeter- und Tonnageberechnung für Platten, Fundamente und Bauteile.',
+        shortDesc: 'Praktische Kubikmeter- und Tonnageberechnung für Platten, Fundamente und Bauteile.',
       },
       {
         slug: 'fundament-rechner',

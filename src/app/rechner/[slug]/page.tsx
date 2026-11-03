@@ -245,7 +245,7 @@ export default async function CalculatorPage({ params }: PageProps) {
               alignItems: 'center',
               gap: '4px'
             }}>
-              <ShieldCheck size={12} /> Stand: {calc.timeSensitiveMeta.year} (geprüft)
+              <Info size={12} /> Rechtsstand {calc.timeSensitiveMeta.year}
             </span>
           )}
         </div>
@@ -281,7 +281,7 @@ export default async function CalculatorPage({ params }: PageProps) {
           {lastModified && (
             <>
               <span>•</span>
-              <span>Geprüfter Stand: {lastModified}</span>
+              <span>Stand: {lastModified}</span>
             </>
           )}
         </div>
@@ -306,12 +306,12 @@ export default async function CalculatorPage({ params }: PageProps) {
             {calc.category === 'steuern-gehalt' || calc.slug.includes('steuer') || calc.slug.includes('gehalt')
               ? 'Unverbindlicher Orientierungswert – ersetzt keine steuerliche Beratung.'
               : calc.category === 'gesundheit-fitness'
-              ? 'Biometrischer Näherungswert – dient der Orientierung und ersetzt keine ärztliche Diagnose oder Beratung.'
-              : calc.category === 'familie-schwangerschaft'
-              ? 'Rechnerischer Orientierungswert – ersetzt keine ärztliche oder hebammenfachliche Betreuung.'
-              : calc.category === 'finanzen' || calc.category === 'kredit-schulden'
-              ? 'Finanzmathematischer Modellwert – ersetzt keine Anlage-, Bank- oder Kreditberatung.'
-              : 'Rechtlicher bzw. rechnerischer Orientierungswert – ersetzt keine individuelle Rechtsberatung.'}
+                ? 'Biometrischer Näherungswert – dient der Orientierung und ersetzt keine ärztliche Diagnose oder Beratung.'
+                : calc.category === 'familie-schwangerschaft'
+                  ? 'Rechnerischer Orientierungswert – ersetzt keine ärztliche oder hebammenfachliche Betreuung.'
+                  : calc.category === 'finanzen' || calc.category === 'kredit-schulden'
+                    ? 'Finanzmathematischer Modellwert – ersetzt keine Anlage-, Bank- oder Kreditberatung.'
+                    : 'Rechtlicher bzw. rechnerischer Orientierungswert – ersetzt keine individuelle Rechtsberatung.'}
           </span>
         </div>
       )}
@@ -326,10 +326,6 @@ export default async function CalculatorPage({ params }: PageProps) {
         isTimeSensitive={calc.isTimeSensitive}
         timeSensitiveMeta={calc.timeSensitiveMeta}
         shortDescription={calc.shortDescription}
-        disclaimerType={calc.disclaimerType}
-        rechtsstand={calc.rechtsstand}
-        legalBasis={calc.legalBasis}
-        assumptions={calc.assumptions}
       />
 
       {/* Kurzreferenz direkt unter dem Rechner (nur für Rechner mit quickReference) */}

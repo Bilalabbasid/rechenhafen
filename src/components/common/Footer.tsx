@@ -21,10 +21,10 @@ export default function Footer() {
             </div>
           </div>
           <p className={styles.footerText}>
-            RechenHafen ist die verlässliche deutsche Online-Plattform mit Hunderten präzisen Rechnern für Finanzen, Mobilität, Immobilien, Alltag, Mathematik und Gesundheit.
+            RechenHafen bietet kostenlose Online-Rechner für Finanzen, Mobilität, Immobilien, Alltag, Mathematik und Gesundheit zur rechnerischen Orientierung.
           </p>
           <div className={styles.privacyBadge}>
-            <ShieldCheck size={16} /> 100 % Lokale Berechnung – Keine Eingabedaten verlassen Ihren Browser
+            <ShieldCheck size={16} /> Lokale Berechnung im Browser – Keine Eingabedaten verlassen Ihr Endgerät
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export default function Footer() {
 
       <div className={`container ${styles.footerBottom}`}>
         <span>© {new Date().getFullYear()} RechenHafen.de – Alle Rechte vorbehalten.</span>
-        <span>Berechnungen erfolgen nach anerkannten Normen und Gesetzen.</span>
+        <span>Alle Berechnungen sind unverbindliche Orientierungswerte und ersetzen keine Steuer-, Rechts-, Finanz- oder medizinische Beratung.</span>
       </div>
     </footer>
   );

@@ -73,7 +73,7 @@ export default function UeberUnsPage() {
             Über RechenHafen
           </h1>
           <p style={{ fontSize: '1.15rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
-            Transparente Online-Rechner für Deutschland – verlässlich, datenschutzfreundlich und quellengestützt.
+            Transparente Online-Rechner für Deutschland – datenschutzfreundlich, quellengestützt und nachvollziehbar.
           </p>
         </header>
 
@@ -89,17 +89,17 @@ export default function UeberUnsPage() {
             <em>[FILL: founder name + 2–3 sentences of real background, z. B. beruflicher Hintergrund in Softwareentwicklung, Wirtschaftsmathematik oder Datenanalyse, Motivation zur Gründung der Plattform und Vision einer barrierefreien, datenschutzfreundlichen Rechner-Sammlung für Deutschland].</em>
           </p>
           <p style={{ marginTop: 'var(--space-2)' }}>
-            <strong>Warum RechenHafen existiert:</strong> Viele bestehende Rechner im deutschsprachigen Internet sind mit aufdringlicher Werbung überladen, verlangen unnötige Kontaktdaten für einfache Rechenergebnisse oder basieren auf veralteten Gesetzesständen. RechenHafen wurde geschaffen, um allen Bürgern, Selbstständigen und Fachkräften einen verlässlichen Anker zu bieten: kostenlose, transparente Berechnungen direkt im Browser, ohne Datenspeicherung und mit klar nachvollziehbaren Formeln.
+            <strong>Warum RechenHafen existiert:</strong> Viele bestehende Rechner im deutschsprachigen Internet sind mit aufdringlicher Werbung überladen, verlangen unnötige Kontaktdaten für einfache Rechenergebnisse oder basieren auf veralteten Gesetzesständen. RechenHafen wurde geschaffen, um allen Bürgern, Selbstständigen und Fachkräften eine verlässliche Orientierung zu bieten: kostenlose, transparente Berechnungen direkt im Browser, ohne Datenspeicherung und mit klar nachvollziehbaren Formeln.
           </p>
         </section>
 
         {/* 2. How calculators are built */}
         <section id="methodik" style={{ marginBottom: 'var(--space-8)' }}>
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
-            Wie unsere Rechner entstehen und geprüft werden
+            Wie unsere Rechner entstehen und gepflegt werden
           </h2>
           <p>
-            Verlässlichkeit ist der Kern unserer Arbeit. Jeder Rechner auf RechenHafen durchläuft ein striktes Entwicklungs- und Prüfverfahren:
+            Sorgfalt und Transparenz sind der Kern unserer Arbeit. Jeder Rechner auf RechenHafen durchläuft ein mehrstufiges Entwicklungs- und Testverfahren:
           </p>
 
           <div style={{
@@ -124,7 +124,7 @@ export default function UeberUnsPage() {
                 Automatisierte Unit-Tests
               </h3>
               <p style={{ fontSize: '0.9rem', margin: 0 }}>
-                Jede Rechenfunktion ist mit automatisierten Regressionstests abgesichert. Rechenbeispiele und Grenzfälle werden kontinuierlich auf exakte Übereinstimmung mit behördlichen Vergleichswerten und Prüftabellen kontrolliert.
+                Jede Rechenfunktion ist mit automatisierten Regressionstests abgesichert. Rechenbeispiele und Grenzfälle werden kontinuierlich anhand behördlicher Vergleichsfälle und Berechnungsmuster getestet.
               </p>
             </div>
 

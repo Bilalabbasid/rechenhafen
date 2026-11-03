@@ -60,7 +60,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Brutto-Netto-Rechner 2026: Was bleibt vom Gehalt?',
     metaDescription: 'Ermitteln Sie aus Ihrem Monatsbrutto das Nettogehalt nach Steuerklasse, Bundesland und Krankenkasse. Mit Vorsorgepauschale nach § 39b EStG und Sozialabgaben 2026.',
     h1: 'Brutto-Netto-Rechner – Ihr Nettogehalt für 2026 & 2025',
-    shortDescription: 'Ermittelt Ihr exaktes Nettogehalt aus dem Bruttoverdienst inklusive Lohnsteuer, Solidaritätszuschlag, Kirchensteuer und aller Sozialabgaben.',
+    shortDescription: 'Berechnet Ihr voraussichtliches Nettogehalt aus dem Bruttoverdienst inklusive Lohnsteuer, Solidaritätszuschlag, Kirchensteuer und aller Sozialabgaben.',
     searchKeywords: [
       'brutto netto rechner',
       'gehaltsrechner',
@@ -240,7 +240,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Netto-Brutto-Rechner 2026 – Brutto für Wunsch-Netto',
     metaDescription: 'Ermitteln Sie präzise das erforderliche Bruttogehalt für Ihr Ziel-Nettoeinkommen. Perfekt für Gehaltsverhandlungen und Arbeitsverträge.',
     h1: 'Netto-Brutto-Rechner – Erforderliches Bruttogehalt berechnen',
-    shortDescription: 'Berechnet durch exakte mathematische Inversion, wie viel Brutto Sie verdienen müssen, um ein gewünschtes Nettogehalt ausgezahlt zu bekommen.',
+    shortDescription: 'Berechnet durch mathematische Näherung, wie viel Brutto Sie verdienen müssen, um ein gewünschtes Nettogehalt ausgezahlt zu bekommen.',
     searchKeywords: [
       'netto brutto rechner',
       'wie viel brutto brauche ich für 3000 netto',
@@ -294,7 +294,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     ],
     calculate: calculateNettoBrutto,
     formula: 'Brutto = Inversion(BruttoNetto(Nettoziel, Steuerklasse, Jahr))',
-    formulaExplanation: 'Da der deutsche Steuertarif progressiv verläuft und nicht linear umkehrbar ist, ermittelt ein numerisches Bisektionsverfahren das exakte Bruttogehalt auf den Cent genau.',
+    formulaExplanation: 'Da der deutsche Steuertarif progressiv verläuft und nicht linear umkehrbar ist, ermittelt ein numerisches Bisektionsverfahren das voraussichtlich benötigte Bruttogehalt rechnerisch.',
     workedExample: {
       title: 'Beispiel: 2.500 € Wunsch-Netto in Steuerklasse 1 (2026)',
       description: 'Um 2.500 € netto ausgezahlt zu bekommen, ist bei Steuerklasse 1 (kinderlos, durchschnittlicher Zusatzbeitrag 2026 von 2,9 %) ein monatliches Bruttogehalt von rund 3.814 € erforderlich.',
@@ -327,7 +327,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Einkommensteuerrechner',
     category: 'steuern-gehalt',
     subcategory: 'Einkommensteuer & Tarif',
-    metaTitle: 'Einkommensteuerrechner 2026 & 2025 – Tarif § 32a EStG exakt',
+    metaTitle: 'Einkommensteuerrechner 2026 & 2025 – Tarif nach § 32a EStG',
     metaDescription: 'Berechnen Sie Ihre tarifliche Einkommensteuer, den Grenzsteuersatz und den Durchschnittssteuersatz nach den offiziellen Formeln des § 32a EStG.',
     h1: 'Einkommensteuerrechner – Tarifliche Steuer nach § 32a EStG',
     shortDescription: 'Ermittelt die tarifliche Einkommensteuer, den Durchschnittssteuersatz und den Grenzsteuersatz für Alleinstehende (Grundtarif) und Verheiratete (Splittingtarif).',
@@ -420,7 +420,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     metaTitle: 'Grenzsteuersatz Rechner 2026 – Steuerprogression verstehen',
     metaDescription: 'Wie viel Cent Steuer kostet der nächste verdiente Euro? Grenzsteuersatz und Durchschnittssteuersatz nach § 32a EStG berechnen.',
     h1: 'Grenzsteuersatz-Rechner – Steuerprogression & Mehrbelastung',
-    shortDescription: 'Zeigt exakt, in welcher Progressionszone Ihr Einkommen liegt und wie hoch die Steuerbelastung auf eine Gehaltserhöhung oder zusätzliche Einnahmen ausfällt.',
+    shortDescription: 'Zeigt anschaulich, in welcher Progressionszone Ihr Einkommen liegt und wie hoch die Steuerbelastung auf eine Gehaltserhöhung oder zusätzliche Einnahmen ausfällt.',
     searchKeywords: [
       'grenzsteuersatz rechner',
       'durchschnittssteuersatz rechner',
@@ -494,7 +494,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     category: 'steuern-gehalt',
     subcategory: 'Einkommensteuer & Tarif',
     metaTitle: 'Solidaritätszuschlag Rechner 2026 – Freigrenze prüfen',
-    metaDescription: 'Prüfen Sie, ob Sie 2026 oder 2025 noch Solidaritätszuschlag zahlen müssen. Exakte Berechnung mit amtlicher Freigrenze und Milderungszone.',
+    metaDescription: 'Prüfen Sie, ob Sie 2026 oder 2025 noch Solidaritätszuschlag zahlen müssen. Berechnung mit amtlicher Freigrenze und Milderungszone.',
     h1: 'Solidaritätszuschlag-Rechner – Freigrenzen nach SolzG prüfen',
     shortDescription: 'Berechnet den Solidaritätszuschlag nach den gesetzlichen Freigrenzen (§ 3 SolzG) und der Milderungszone (§ 4 SolzG).',
     searchKeywords: ['solidaritätszuschlag rechner', 'solz rechner 2026', 'solz freigrenze', 'muss ich noch solz zahlen'],
@@ -566,7 +566,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     subcategory: 'Einkommensteuer & Tarif',
     metaTitle: 'Kirchensteuer Rechner 2026 – Bundesländer & Nettobelastung',
     metaDescription: 'Berechnen Sie Ihre Kirchensteuer für alle deutschen Bundesländer (8 % oder 9 %) inklusive der Ersparnis durch den Sonderausgabenabzug.',
-    h1: 'Kirchensteuer-Rechner – Kirchenlohnsteuer exakt berechnen',
+    h1: 'Kirchensteuer-Rechner – Kirchenlohnsteuer berechnen',
     shortDescription: 'Ermittelt die Kirchensteuer anhand Ihrer Einkommensteuer oder Lohnsteuer und berücksichtigt den steuermindernden Sonderausgabenabzug.',
     searchKeywords: ['kirchensteuer rechner', 'wie viel kirchensteuer zahle ich', 'kirchensteuer bayern', 'kirchensteuer sonderausgaben'],
     inputs: [

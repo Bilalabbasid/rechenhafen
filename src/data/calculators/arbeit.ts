@@ -108,7 +108,7 @@ export const ARBEIT_CALCULATORS: CalculatorDefinition[] = [
         'Reguläres Beschäftigungsverhältnis in Deutschland',
       ],
       limitations: [
-        'Berechnet den Brutto-Gehaltsanspruch. Für das exakte Nettogehalt sind individuelle Steuerklasse, Kinderfreibeträge und Krankenkassen-Zusatzbeiträge maßgebend.',
+        'Berechnet den Brutto-Gehaltsanspruch. Für das tatsächliche Nettogehalt sind individuelle Steuerklasse, Kinderfreibeträge und Krankenkassen-Zusatzbeiträge maßgebend.',
         'Überstundenvergütungen, Schichtzulagen und vermögenswirksame Leistungen sind gesondert zu prüfen.',
       ],
       sourceName: 'Bundesministerium für Arbeit und Soziales (BMAS) / Gesetze im Internet',

@@ -208,7 +208,7 @@ export default function HomePage() {
               <Link href="/steuern-gehalt/" style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>Alle ansehen →</Link>
             </div>
             <p style={{ fontSize: '0.825rem', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)', lineHeight: 1.45 }}>
-              BMF-konforme Berechnungen nach deutschem Steuer- und Sozialversicherungsrecht (2025/2026).
+              Berechnungen gemäß Programmablaufplan des BMF und Sozialversicherungsrecht (2025/2026).
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
               {taxCalcs.map((c) => (
@@ -423,7 +423,7 @@ export default function HomePage() {
           </div>
           <div>
             <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-              100 % Lokale Berechnung
+              Lokale Berechnung im Browser
             </strong>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, display: 'block' }}>
               Keine Eingaben verlassen Ihren Webbrowser. Maximale Datensicherheit für private Finanzen und Gehaltsdaten.
@@ -443,7 +443,7 @@ export default function HomePage() {
           </div>
           <div>
             <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-              Rechtskonforme Berechnungsgrundlagen
+              Aktuelle Gesetzeswerte 2026
             </strong>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', lineHeight: 1.5, display: 'block' }}>
               Gesetzliche und steuerliche Rechner basieren auf aktuellen amtlichen Primärquellen (wie EStG, BMF-Vorgaben und SGB) für das jeweilige Berechnungsjahr.

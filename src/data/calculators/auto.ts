@@ -65,7 +65,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     content: {
-      intro: 'Unser kostenloser Spritkostenrechner ermittelt die reinen Treibstoffausgaben für Einzelfahrten, Urlaubsreisen oder die tägliche Fahrt zur Arbeit auf den Cent genau.',
+      intro: 'Unser kostenloser Spritkostenrechner ermittelt die reinen Treibstoffausgaben für Einzelfahrten, Urlaubsreisen oder die tägliche Fahrt zur Arbeit auf Basis Ihrer Angaben.',
       details: 'Die Berechnung basiert auf der physikalischen Grundformel: Spritkosten = (Distanz / 100) · Verbrauch (l/100km) · Literpreis. Dieser Rechner fokussiert sich bewusst auf die reinen Kraftstoffausgaben. Möchten Sie die vollständigen Reiseausgaben inklusive Autobahnmaut, Parkgebühren und einer freiwilligen Fahrzeug-Verschleißpauschale auf Mitfahrer aufteilen, nutzen Sie unseren erweiterten [Fahrtkostenrechner](/rechner/fahrtkostenrechner/). Für die steuerliche Geltendmachung beim Finanzamt nutzen Sie unseren [Pendlerpauschale-Rechner](/rechner/pendlerpauschale-rechner/) und für die Vollkosten Ihres Autos den [Auto-Gesamtkosten-Rechner](/rechner/auto-gesamtkosten-rechner/).',
     },
     faqs: [

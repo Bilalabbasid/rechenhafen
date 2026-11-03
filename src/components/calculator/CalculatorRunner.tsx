@@ -1453,7 +1453,7 @@ export default function CalculatorRunner({
                 Stand: {timeSensitiveMeta.year}
               </span>
               <span>
-                Quelle: {timeSensitiveMeta.source} (geprüft am {timeSensitiveMeta.lastVerified})
+                Quelle: {timeSensitiveMeta.source} (Stand: {timeSensitiveMeta.lastVerified})
               </span>
             </div>
           )}
