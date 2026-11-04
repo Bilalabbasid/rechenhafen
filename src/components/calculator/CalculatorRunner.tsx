@@ -151,6 +151,8 @@ export default function CalculatorRunner({
   const engineRef = useRef<((inp: Record<string, any>) => CalculationResult) | null>(null);
   const trackTimerRef = useRef<NodeJS.Timeout | null>(null);
   const hasTrackedStartRef = useRef(false);
+  // Remembers the value before a unit switch, so switching back restores it exactly (no rounding drift).
+  const unitOriginRef = useRef<Record<string, { option: string; value: unknown; converted: unknown }>>({});
 
   // Sync favorites state locally
   useEffect(() => {
@@ -331,7 +333,17 @@ export default function CalculatorRunner({
     if (inputs[id] !== value) {
       for (const dep of inputDefs) {
         if (dep.convertOnChange?.field === id) {
-          updatedInputs[dep.id] = convertFieldValue(dep, updatedInputs[dep.id], String(inputs[id]), String(value));
+          const current = updatedInputs[dep.id];
+          const origin = unitOriginRef.current[dep.id];
+          const untouched = origin && String(origin.converted) === String(current);
+          if (untouched && origin.option === String(value)) {
+            updatedInputs[dep.id] = origin.value;
+            delete unitOriginRef.current[dep.id];
+          } else {
+            const converted = convertFieldValue(dep, current, String(inputs[id]), String(value));
+            updatedInputs[dep.id] = converted;
+            unitOriginRef.current[dep.id] = { option: String(inputs[id]), value: current, converted };
+          }
           convertedIds.push(dep.id);
         }
       }
