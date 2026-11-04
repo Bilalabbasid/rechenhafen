@@ -132,3 +132,33 @@ describe('formatMeasure keeps tiny values visible', () => {
     }
   });
 });
+
+describe('answer sentences use German decimals and real unit symbols', () => {
+  it('normalizeResultText fixes decimals and upper-cased codes but keeps dates and thousands', async () => {
+    const { normalizeResultText } = await import('@/lib/resultText');
+    const { c } = defaultsOf('druck-umrechner');
+    const r = normalizeResultText(
+      { primary: { label: 'x', value: 1 }, summaryText: '2.5 PA entsprechen 0,000025 bar. Am 01.03.2026 und 01.03. kosten 10.000 € je 1.5 Std.' },
+      c.inputs,
+    );
+    expect(r.summaryText).toBe('2,5 Pa entsprechen 0,000025 bar. Am 01.03.2026 und 01.03. kosten 10.000 € je 1,5 Std.');
+  });
+
+  it('no calculator answer sentence shows an English decimal point after clean-up', async () => {
+    const { normalizeResultText } = await import('@/lib/resultText');
+    const offenders: string[] = [];
+    for (const c of ALL_CALCULATORS) {
+      const nums = c.inputs.filter((i) => i.type === 'number');
+      if (!nums.length) continue;
+      const d: Record<string, any> = {};
+      for (const i of c.inputs) d[i.id] = i.defaultValue;
+      d[nums[0].id] = (Number(d[nums[0].id]) || 1) + 0.5;
+      let r;
+      try { r = c.calculate(d); } catch { continue; }
+      if (r.error) continue;
+      const text = [normalizeResultText(r, c.inputs).summaryText, normalizeResultText(r, c.inputs).directAnswer].join(' ');
+      if (/(^|[^\d.,])\d+\.\d{1,2}(?![\d.])/.test(text)) offenders.push(`${c.slug}: ${text.slice(0, 80)}`);
+    }
+    expect(offenders).toEqual([]);
+  });
+});

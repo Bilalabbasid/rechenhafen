@@ -25,6 +25,7 @@ import {
 } from '@/lib/storage/favorites';
 import ContextualNextSteps from './ContextualNextSteps';
 import { renderInlineMarkdown } from '@/components/common/FormattedContent';
+import { normalizeResultText } from '@/lib/resultText';
 
 export const resolveFieldLabel = (def: CalculatorInput, currentInputs: Record<string, any>): string => {
   if (def.conditionalLabels) {
@@ -139,7 +140,9 @@ export default function CalculatorRunner({
   });
 
   // Result state initialized with prerendered server result (Zero Layout Shift)
-  const [result, setResult] = useState<CalculationResult>(initialResult);
+  const [result, setResultRaw] = useState<CalculationResult>(() => normalizeResultText(initialResult, inputDefs));
+  // Every result passes through the German text clean-up (decimal commas, unit symbols).
+  const setResult = (next: CalculationResult) => setResultRaw(normalizeResultText(next, inputDefs));
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -283,7 +286,7 @@ export default function CalculatorRunner({
               const merged = { ...prev, ...updated };
               try {
                 const newRes = fn(merged);
-                setResult(newRes);
+                setResultRaw(normalizeResultText(newRes, inputDefs));
               } catch {}
               return merged;
             });

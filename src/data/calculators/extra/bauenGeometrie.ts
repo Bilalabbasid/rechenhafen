@@ -5351,7 +5351,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     searchKeywords: ["winkel umrechnen grad rad radiant","bogenmass in grad umrechnen pi","neugrad gon grad rechner","sinus kosinus winkel berechnen"],
     inputs: [
           {
-                "id": "angleVal",
+                "id": "angleVal", unitFromField: { field: 'unit', units: {"deg": "Grad", "rad": "rad", "gon": "gon"} },
                 "label": "Winkelwert",
                 "type": "number",
                 "defaultValue": 180,
