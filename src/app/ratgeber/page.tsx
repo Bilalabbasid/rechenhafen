@@ -7,7 +7,7 @@ import styles from '@/styles/ratgeber.module.css';
 import { BookOpen, Clock, Calendar, ArrowRight, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Ratgeber & Rechenhilfen – Wissen & Formeln verständlich erklärt',
+  title: 'Ratgeber: Formeln & Rechenwege erklärt',
   description:
     'Fundierte Ratgeber, gesetzliche Hintergründe und nachvollziehbare Rechenbeispiele zu Finanzen, Steuern, Gehalt, Wohnen, Energie und Arbeitstagen.',
   alternates: {

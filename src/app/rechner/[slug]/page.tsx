@@ -20,7 +20,7 @@ import FormattedContent, { renderInlineMarkdown } from '@/components/common/Form
 import styles from '@/styles/layout.module.css';
 import { ShieldCheck, Info, AlertCircle } from 'lucide-react';
 
-import { formatMetaTitle } from '@/lib/seo/title';
+import { brandedTitle, formatMetaTitle } from '@/lib/seo/title';
 import { AUTHOR_DISPLAY_NAME, authorSchema } from '@/config/site-owner';
 import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 import { isEmbeddable } from '@/data/embed';
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const cleanTitle = formatMetaTitle(calc.metaTitle);
 
   return {
-    title: cleanTitle,
+    title: brandedTitle(cleanTitle),
     description: calc.metaDescription,
     alternates: {
       canonical: canonicalUrl,

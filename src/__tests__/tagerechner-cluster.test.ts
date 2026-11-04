@@ -270,15 +270,18 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
 
     it('verifies no duplicate title suffix "| RechenHafen | RechenHafen"', async () => {
       const template = '%s | RechenHafen';
+      // Long titles are rendered without the brand suffix (brandedTitle, 60-character limit).
+      const render = (t: unknown) =>
+        typeof t === 'object' && t !== null && 'absolute' in t ? String((t as { absolute: string }).absolute) : template.replace('%s', String(t));
 
       const metaTage = await generateCalcMetadata({ params: Promise.resolve({ slug: 'tage-zwischen-zwei-daten' }) });
-      const renderedTage = template.replace('%s', metaTage.title as string);
-      expect(renderedTage).toBe('Tagerechner: Tage, Wochen & Monate zwischen zwei Daten | RechenHafen');
+      const renderedTage = render(metaTage.title);
+      expect(renderedTage).toBe('Tagerechner: Tage, Wochen & Monate zwischen zwei Daten');
       expect(renderedTage).not.toContain('RechenHafen | RechenHafen');
 
       const metaXmas = await generateCalcMetadata({ params: Promise.resolve({ slug: 'tage-bis-weihnachten' }) });
-      const renderedXmas = template.replace('%s', metaXmas.title as string);
-      expect(renderedXmas).toBe('Wie viele Tage bis Weihnachten? Countdown & Wochen | RechenHafen');
+      const renderedXmas = render(metaXmas.title);
+      expect(renderedXmas).toBe('Wie viele Tage bis Weihnachten? Countdown & Wochen');
       expect(renderedXmas).not.toContain('RechenHafen | RechenHafen');
     });
 

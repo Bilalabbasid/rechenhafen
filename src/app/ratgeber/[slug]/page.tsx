@@ -26,7 +26,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
-import { formatMetaTitle } from '@/lib/seo/title';
+import { brandedTitle, formatMetaTitle } from '@/lib/seo/title';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : undefined;
 
   return {
-    title: cleanTitle,
+    title: brandedTitle(cleanTitle),
     description: article.metaDescription,
     alternates: {
       canonical: canonicalUrl,

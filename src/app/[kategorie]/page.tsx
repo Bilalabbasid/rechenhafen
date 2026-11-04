@@ -16,7 +16,7 @@ import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
 import cardsStyles from '@/styles/cards.module.css';
 
-import { formatMetaTitle } from '@/lib/seo/title';
+import { brandedTitle, formatMetaTitle } from '@/lib/seo/title';
 
 interface PageProps {
   params: Promise<{ kategorie: string }>;
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const cleanTitle = formatMetaTitle(cat.metaTitle);
 
   return {
-    title: cleanTitle,
+    title: brandedTitle(cleanTitle),
     description: cat.metaDescription,
     alternates: {
       canonical: canonicalUrl,

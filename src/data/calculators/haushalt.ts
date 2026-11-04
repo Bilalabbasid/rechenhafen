@@ -138,7 +138,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
     category: 'haushalt-energie',
     subcategory: 'Gas & Heizung',
     metaTitle: 'Gaskostenrechner: kWh, m³, Grundpreis & Monatskosten',
-    metaDescription: 'Gaskosten aus kWh-Verbrauch oder Zählerständen in m³ berechnen. Arbeitspreis, Grundpreis, Jahreskosten und monatlichen Durchschnitt transparent nachvollziehen.',
+    metaDescription: 'Gaskosten kostenlos berechnen: 14.000 kWh × 10 ct + 120 € Grundpreis = 1.520 € im Jahr (127 € im Monat). Auch aus Zählerständen in m³.',
     h1: 'Gaskosten berechnen: Jahreskosten, Grundpreis und Monatsdurchschnitt',
     shortDescription: 'Berechnet aus Ihrem Verbrauch (kWh oder zwei Zählerstände in m³), dem Arbeitspreis und dem Grundpreis die jährlichen Gaskosten und den monatlichen Durchschnitt. Brennwert und Zustandszahl Ihrer Gasabrechnung bestimmen dabei die Umrechnung von m³ in kWh.',
     searchKeywords: [

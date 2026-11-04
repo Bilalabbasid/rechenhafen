@@ -143,3 +143,14 @@ describe('Google SEO Starter Guide Compliance & Quality Suite', () => {
     });
   });
 });
+
+describe('brandedTitle keeps rendered titles within 60 characters where possible', () => {
+  it('adds the brand only when it fits', async () => {
+    const { brandedTitle } = await import('@/lib/seo/title');
+    expect(brandedTitle('BMI Rechner')).toBe('BMI Rechner');
+    expect(brandedTitle('Tagerechner: Tage, Wochen & Monate zwischen zwei Daten')).toEqual({
+      absolute: 'Tagerechner: Tage, Wochen & Monate zwischen zwei Daten',
+    });
+    expect(brandedTitle('Gaskostenrechner | RechenHafen')).toBe('Gaskostenrechner');
+  });
+});
