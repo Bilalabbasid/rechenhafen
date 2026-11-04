@@ -1,4 +1,13 @@
 import type { NextConfig } from 'next';
+import retiredCalculators from './src/data/seo/retired-calculators.json';
+
+// Calculators retired for zero search demand (see src/data/seo/retired-calculators.ts)
+const retiredCalculatorRedirects = Object.entries(retiredCalculators as Record<string, string>).flatMap(
+  ([slug, destination]) => [
+    { source: `/rechner/${slug}`, destination, permanent: true },
+    { source: `/rechner/${slug}/`, destination, permanent: true },
+  ],
+);
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
@@ -395,6 +404,7 @@ const nextConfig: NextConfig = {
         destination: '/rechner/maximaler-kredit-rechner/',
         permanent: true,
       },
+      ...retiredCalculatorRedirects,
     ];
   },
 };

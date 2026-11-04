@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug as getCalculatorBySlug } from '@/data/calculators';
 import { TAX_CONFIG_2025, TAX_CONFIG_2026 } from '@/data/regulated/tax';
 import {
   calculateArbeitgeberkosten,

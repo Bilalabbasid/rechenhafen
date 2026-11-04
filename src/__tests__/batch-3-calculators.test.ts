@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 
 export const BATCH_3_SLUGS = [
   'mietbelastungsquote-rechner',
@@ -62,7 +62,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('1. Registry Resolution & Metadata Quality', () => {
     for (const slug of BATCH_3_SLUGS) {
       it(`resolves ${slug} with valid metadata and calculation function`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
         expect(calc.id).toBe(slug);
@@ -80,7 +80,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('2. Default Calculation Execution & German Formatting', () => {
     for (const slug of BATCH_3_SLUGS) {
       it(`calculates valid default outputs without NaN for ${slug}`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
 
@@ -112,7 +112,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('3. High-Confidence Audit Findings & Zero-Value Preservation', () => {
     // Finding #5: quadratmeterpreis-rechner
     it('quadratmeterpreis-rechner validates 0 area gracefully without division-by-zero', () => {
-      const calc = getCalculatorBySlug('quadratmeterpreis-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('quadratmeterpreis-rechner')!;
       const resZero = calc.calculate({ totalPrice: 300000, livingArea: 0 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
@@ -124,7 +124,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding #6: staffelmiete-rechner
     it('staffelmiete-rechner preserves 0 start rent without false fallback', () => {
-      const calc = getCalculatorBySlug('staffelmiete-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('staffelmiete-rechner')!;
       const resZero = calc.calculate({ startRent: 0, increaseAmount: 0, intervalMonths: 12, totalYears: 3 });
       expect(resZero.primary.value).toBe(0);
       expect(resZero.summaryText).toContain('0,00');
@@ -135,7 +135,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding #7: spekulationssteuer-immobilien-rechner
     it('spekulationssteuer-immobilien-rechner preserves claimedDepreciation = 0 and taxRate = 0', () => {
-      const calc = getCalculatorBySlug('spekulationssteuer-immobilien-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('spekulationssteuer-immobilien-rechner')!;
       const resZero = calc.calculate({
         purchaseCost: 400000,
         salePrice: 500000,
@@ -158,7 +158,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // break-even-rechner: zero variable costs preserved
     it('break-even-rechner supports 0 variable costs for digital products and guards price <= variableCost', () => {
-      const calc = getCalculatorBySlug('break-even-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('break-even-rechner')!;
       const resDigital = calc.calculate({ fixedCosts: 10000, pricePerUnit: 50, variableCostPerUnit: 0 });
       expect(resDigital.primary.value).toBe(200); // 10000 / 50 = 200 units
       expect(resDigital.error).toBeUndefined();
@@ -170,7 +170,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // deckungsbeitrag-rechner: 0 variable costs
     it('deckungsbeitrag-rechner preserves 0 variable costs', () => {
-      const calc = getCalculatorBySlug('deckungsbeitrag-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('deckungsbeitrag-rechner')!;
       const res = calc.calculate({ pricePerUnit: 100, variableCostPerUnit: 0, unitsSold: 50, fixedCostsTotal: 2000 });
       expect(res.primary.value).toBe(5000); // 50 * 100
       expect(res.secondary?.find((s) => s.id === 'unitDb')?.value).toBe(100);
@@ -179,18 +179,18 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // roas-rechner & roi-rechner: division guards
     it('roas-rechner and roi-rechner guard against zero ad spend / cost', () => {
-      const roasCalc = getCalculatorBySlug('roas-rechner')!;
+      const roasCalc = getCalculatorDefinitionBySlug('roas-rechner')!;
       const roasRes = roasCalc.calculate({ revenue: 5000, adSpend: 0 });
       expect(roasRes.error).toBeDefined();
 
-      const roiCalc = getCalculatorBySlug('roi-rechner')!;
+      const roiCalc = getCalculatorDefinitionBySlug('roi-rechner')!;
       const roiRes = roiCalc.calculate({ gain: 10000, cost: 0 });
       expect(roiRes.error).toBeDefined();
     });
 
     // kundengewinnungskosten-cac-rechner: zero customers guard
     it('kundengewinnungskosten-cac-rechner guards against 0 new customers', () => {
-      const calc = getCalculatorBySlug('kundengewinnungskosten-cac-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('kundengewinnungskosten-cac-rechner')!;
       const res = calc.calculate({ marketingCosts: 5000, salesCosts: 3000, newCustomers: 0 });
       expect(res.error).toBeDefined();
       expect(res.primary.value).toBe(0);
@@ -198,7 +198,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // daemmung-u-wert-rechner: zero thickness validation
     it('daemmung-u-wert-rechner guards against 0 insulation thickness', () => {
-      const calc = getCalculatorBySlug('daemmung-u-wert-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('daemmung-u-wert-rechner')!;
       const res = calc.calculate({ thickness: 0, wlg: '035', component: 'wall' });
       expect(res.error).toBeDefined();
       expect(res.primary.value).toBe(0);
@@ -206,7 +206,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // notar-grundbuch-kosten-rechner: cash buyers
     it('notar-grundbuch-kosten-rechner preserves mortgageAmount = 0 for cash buyers', () => {
-      const calc = getCalculatorBySlug('notar-grundbuch-kosten-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('notar-grundbuch-kosten-rechner')!;
       const resCash = calc.calculate({ purchasePrice: 400000, mortgageAmount: 0 });
       const resFinanced = calc.calculate({ purchasePrice: 400000, mortgageAmount: 300000 });
       expect(Number(resCash.primary.value)).toBeLessThan(Number(resFinanced.primary.value));
@@ -215,7 +215,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // instandhaltungsruecklage-rechner: 0 area handled
     it('instandhaltungsruecklage-rechner handles 0 area without error or division-by-zero', () => {
-      const calc = getCalculatorBySlug('instandhaltungsruecklage-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('instandhaltungsruecklage-rechner')!;
       const res = calc.calculate({ livingArea: 0, reconstructionCost: 2400, buildingAgeYears: 25 });
       expect(res.primary.value).toBe(0);
       expect(res.secondary?.find((s) => s.id === 'monthlyPerSqm')?.value).toBe(0);
@@ -223,7 +223,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // modernisierungsumlage-rechner: maintenanceShare = 0 preserved
     it('modernisierungsumlage-rechner preserves maintenanceShare = 0 without false fallback', () => {
-      const calc = getCalculatorBySlug('modernisierungsumlage-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('modernisierungsumlage-rechner')!;
       const resZero = calc.calculate({ modernizationCost: 20000, maintenanceShare: 0, totalArea: 100, apartmentArea: 100 });
       const resMaint = calc.calculate({ modernizationCost: 20000, maintenanceShare: 5000, totalArea: 100, apartmentArea: 100 });
       expect(Number(resZero.primary.value)).toBeGreaterThan(Number(resMaint.primary.value));
@@ -231,7 +231,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // mietkaution-zinsen-rechner: 0% interest preserved
     it('mietkaution-zinsen-rechner preserves 0% interest rate during low-interest phase', () => {
-      const calc = getCalculatorBySlug('mietkaution-zinsen-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('mietkaution-zinsen-rechner')!;
       const res = calc.calculate({ depositAmount: 2000, avgInterestRate: 0, rentalYears: 5 });
       expect(res.primary.value).toBe(2000); // full deposit returned
       expect(res.secondary?.find((s) => s.id === 'totalInterest')?.value).toBe(0); // 0 interest earned
@@ -239,7 +239,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // abschreibung-immobilien-rechner: 0% land share (Erbbaurecht) & 0% tax rate
     it('abschreibung-immobilien-rechner preserves 0% land share (Erbbaurecht) and 0% tax rate', () => {
-      const calc = getCalculatorBySlug('abschreibung-immobilien-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('abschreibung-immobilien-rechner')!;
       const res = calc.calculate({ totalCost: 500000, landSharePct: 0, afaType: 'newBuild', taxRate: 0 });
       expect(res.primary.value).toBe(0); // 0 tax saving with 0% tax rate
       expect(res.secondary?.find((s) => s.id === 'yearlyAfa')?.value).toBe(15000); // 3% of 500k
@@ -247,7 +247,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // mietrendite-brutto-netto-rechner: 0 closing costs & non-apportionable
     it('mietrendite-brutto-netto-rechner preserves 0 closing costs and non-apportionable costs', () => {
-      const calc = getCalculatorBySlug('mietrendite-brutto-netto-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('mietrendite-brutto-netto-rechner')!;
       const res = calc.calculate({ purchasePrice: 300000, closingCosts: 0, monthlyColdRent: 1000, yearlyNonApportionable: 0 });
       expect(res.primary.value).toBe(4.0);
       expect(res.secondary?.find((s) => s.id === 'grossYield')?.value).toBe(4.0);
@@ -255,7 +255,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // balkonkraftwerk-ertrag-rechner: 0 savings amortisation guard
     it('balkonkraftwerk-ertrag-rechner handles 0 savings without Infinity', () => {
-      const calc = getCalculatorBySlug('balkonkraftwerk-ertrag-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('balkonkraftwerk-ertrag-rechner')!;
       const res = calc.calculate({ modulePowerWp: 0, systemCost: 500, ownConsumptionPct: 0, electricityPrice: 0 });
       expect(res.primary.value).toBe(0);
       expect(Number.isFinite(res.secondary?.find((s) => s.id === 'amortYears')?.value)).toBe(true);
@@ -264,7 +264,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // photovoltaik-amortisation-rechner: 0 benefit amortisation guard
     it('photovoltaik-amortisation-rechner handles 0 benefit without Infinity', () => {
-      const calc = getCalculatorBySlug('photovoltaik-amortisation-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('photovoltaik-amortisation-rechner')!;
       const res = calc.calculate({ peakPowerKwp: 0, totalCost: 15000, householdDemandKwh: 0, selfConsumptionPct: 0, feedInTariffCent: 0, gridPriceCent: 0 });
       expect(res.primary.value).toBe(0);
       expect(Number.isFinite(res.secondary?.find((s) => s.id === 'amortYears')?.value)).toBe(true);
@@ -273,7 +273,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // waermepumpe-stromkosten-rechner: JAZ <= 0 guarded
     it('waermepumpe-stromkosten-rechner guards JAZ <= 0 against division by zero', () => {
-      const calc = getCalculatorBySlug('waermepumpe-stromkosten-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('waermepumpe-stromkosten-rechner')!;
       const res = calc.calculate({ heatDemandKwh: 15000, jaz: 0, heatElectricityPriceCent: 28 });
       expect(Number.isFinite(res.primary.value)).toBe(true);
       expect(res.primary.value).toBeGreaterThan(0);
@@ -281,14 +281,14 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // heizkostenvergleich-rechner: JAZ <= 0 guarded
     it('heizkostenvergleich-rechner guards JAZ <= 0 against division by zero', () => {
-      const calc = getCalculatorBySlug('heizkostenvergleich-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('heizkostenvergleich-rechner')!;
       const res = calc.calculate({ heatDemandKwh: 18000, gasPriceCent: 11, oilPricePerLiter: 1.05, pelletPricePerTon: 320, heatPumpJaz: 0, heatPumpPowerPrice: 28 });
       expect(Number.isFinite(res.primary.value)).toBe(true);
     });
 
     // warmwasserkosten-rechner: 0 persons / 0 minutes
     it('warmwasserkosten-rechner handles 0 persons or 0 minutes gracefully', () => {
-      const calc = getCalculatorBySlug('warmwasserkosten-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('warmwasserkosten-rechner')!;
       const res = calc.calculate({ persons: 0, showerMinutesPerPerson: 0, powerKw: 21, electricityPrice: 36 });
       expect(res.primary.value).toBe(0);
       expect(res.secondary?.find((s) => s.id === 'costPerShower')?.value).toBe(0);
@@ -296,7 +296,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // co2-abgabe-vermieter-mieter-rechner: 0 kg emission / 0 cost
     it('co2-abgabe-vermieter-mieter-rechner handles 0 kg emission (Stufe 1, 0% landlord)', () => {
-      const calc = getCalculatorBySlug('co2-abgabe-vermieter-mieter-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('co2-abgabe-vermieter-mieter-rechner')!;
       const res = calc.calculate({ livingArea: 80, co2CostTotal: 100, co2EmissionKgPerSqm: 0 });
       expect(res.primary.value).toBe(0); // landlord share is 0
       expect(res.secondary?.find((s) => s.id === 'tenantShare')?.value).toBe(100);
@@ -305,7 +305,7 @@ describe('Batch 3 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // energieeffizienzklasse-rechner: 0 kWh/m²a
     it('energieeffizienzklasse-rechner categorizes 0 kWh/m²a as Klasse A+', () => {
-      const calc = getCalculatorBySlug('energieeffizienzklasse-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('energieeffizienzklasse-rechner')!;
       const res = calc.calculate({ endenergieKwh: 0 });
       expect(res.primary.formattedValue).toBe('Klasse A+');
     });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 
 export const BATCH_2_SLUGS = [
   'zinseszinsrechner',
@@ -58,7 +58,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('1. Registry Resolution & Metadata Quality', () => {
     for (const slug of BATCH_2_SLUGS) {
       it(`resolves ${slug} with valid metadata and calculation function`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
         expect(calc.id).toBe(slug);
@@ -76,7 +76,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('2. Default Calculation Execution & German Formatting', () => {
     for (const slug of BATCH_2_SLUGS) {
       it(`calculates valid default outputs without NaN for ${slug}`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
 
@@ -107,7 +107,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
   describe('3. High-Confidence Audit Findings & Zero-Value Preservation', () => {
     it('sondertilgungsrechner preserves yearlySpecialRepayment = 0 without false fallback to 5000', () => {
-      const calc = getCalculatorBySlug('sondertilgungsrechner')!;
+      const calc = getCalculatorDefinitionBySlug('sondertilgungsrechner')!;
       const resZero = calc.calculate({
         loanAmount: 200000,
         interestRate: 3.5,
@@ -128,7 +128,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('zinseszinsrechner preserves 0 € initial amount and 0 € dynamic increase', () => {
-      const calc = getCalculatorBySlug('zinseszinsrechner')!;
+      const calc = getCalculatorDefinitionBySlug('zinseszinsrechner')!;
       const result = calc.calculate({
         initialAmount: 0,
         monthlyContribution: 250,
@@ -142,7 +142,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('finanzielle-freiheit-rechner preserves 0 € currentAssets (FIRE start from scratch)', () => {
-      const calc = getCalculatorBySlug('finanzielle-freiheit-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('finanzielle-freiheit-rechner')!;
       const resZero = calc.calculate({ monthlyExpenses: 2000, withdrawalRate: 4.0, currentAssets: 0 });
       const resExisting = calc.calculate({ monthlyExpenses: 2000, withdrawalRate: 4.0, currentAssets: 100000 });
       expect(resZero.primary.value).toBe(600000); // 24000 / 0.04
@@ -151,7 +151,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('working-capital-rechner handles 0 liabilities gracefully without division by zero', () => {
-      const calc = getCalculatorBySlug('working-capital-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('working-capital-rechner')!;
       const result = calc.calculate({ currentAssets: 50000, currentLiabilities: 0 });
       expect(result.error).toBeDefined();
       expect(result.primary.value).toBe(0);
@@ -162,7 +162,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('liquiditaetsgrad-rechner handles 0 liabilities gracefully without division by zero', () => {
-      const calc = getCalculatorBySlug('liquiditaetsgrad-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('liquiditaetsgrad-rechner')!;
       const result = calc.calculate({
         cashAndBanks: 10000,
         shortTermReceivables: 5000,
@@ -174,17 +174,17 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('eigenkapitalrentabilitaet-rechner and gesamtkapitalrentabilitaet-rechner protect against zero capital division', () => {
-      const ekCalc = getCalculatorBySlug('eigenkapitalrentabilitaet-rechner')!;
+      const ekCalc = getCalculatorDefinitionBySlug('eigenkapitalrentabilitaet-rechner')!;
       const ekRes = ekCalc.calculate({ netIncome: 50000, equity: 0 });
       expect(ekRes.error).toBeDefined();
 
-      const gkCalc = getCalculatorBySlug('gesamtkapitalrentabilitaet-rechner')!;
+      const gkCalc = getCalculatorDefinitionBySlug('gesamtkapitalrentabilitaet-rechner')!;
       const gkRes = gkCalc.calculate({ netIncome: 50000, interestExpenses: 5000, totalCapital: 0 });
       expect(gkRes.error).toBeDefined();
     });
 
     it('ebit-ebitda-rechner handles valid zero interest, taxes, and depreciation', () => {
-      const calc = getCalculatorBySlug('ebit-ebitda-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('ebit-ebitda-rechner')!;
       const result = calc.calculate({
         revenue: 100000,
         materialExpense: 0,
@@ -197,7 +197,7 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('autokreditrechner preserves 0 € down payment without falling back to 5000', () => {
-      const calc = getCalculatorBySlug('autokreditrechner')!;
+      const calc = getCalculatorDefinitionBySlug('autokreditrechner')!;
       const resZero = calc.calculate({ carPrice: 30000, downPayment: 0, termMonths: 48, annualInterest: 4.5 });
       const resDown = calc.calculate({ carPrice: 30000, downPayment: 6000, termMonths: 48, annualInterest: 4.5 });
       expect(resZero.secondary?.find((s) => s.id === 'loanNeeded')?.value).toBe(30000);
@@ -206,53 +206,53 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('kreditrechner and tilgungsrechner correctly calculate with 0 % interest rate', () => {
-      const kCalc = getCalculatorBySlug('kreditrechner')!;
+      const kCalc = getCalculatorDefinitionBySlug('kreditrechner')!;
       const kRes = kCalc.calculate({ loanAmount: 12000, annualInterest: 0, termMonths: 12 });
       expect(kRes.primary.value).toBe(1000); // 12000 / 12 months = 1000 €/month
       expect(kRes.secondary?.find((s) => s.id === 'totalInterest')?.value).toBe(0);
 
-      const tCalc = getCalculatorBySlug('tilgungsrechner')!;
+      const tCalc = getCalculatorDefinitionBySlug('tilgungsrechner')!;
       const tRes = tCalc.calculate({ loanAmount: 120000, annualInterest: 0, initialRepayment: 2.0, fixedYears: 10 });
       expect(tRes.primary.value).toBe(200); // 120000 * 2% / 12 = 200 €/month
     });
 
     it('freistellungsauftrag-rechner handles 0 € annual gains without falling back to 1500', () => {
-      const calc = getCalculatorBySlug('freistellungsauftrag-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('freistellungsauftrag-rechner')!;
       const result = calc.calculate({ annualGains: 0, status: 'single', churchTax: false });
       expect(result.primary.value).toBe(0);
       expect(result.secondary?.find((s) => s.id === 'taxable')?.value).toBe(0);
     });
 
     it('sparrate-rechner handles 0 € monthly savings without falling back to 640', () => {
-      const calc = getCalculatorBySlug('sparrate-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('sparrate-rechner')!;
       const result = calc.calculate({ netIncome: 3000, monthlySavings: 0 });
       expect(result.primary.value).toBe(0);
       expect(result.primary.formattedValue).toBe('0 %');
     });
 
     it('thesaurierend-vs-ausschuettend-rechner protects against 0 % total return division', () => {
-      const calc = getCalculatorBySlug('thesaurierend-vs-ausschuettend-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('thesaurierend-vs-ausschuettend-rechner')!;
       const result = calc.calculate({ monthlyRate: 200, years: 10, growthRate: 0, dividendRate: 0 });
       expect(result.primary.value).toBe(24000); // 200 * 120
       expect(result.secondary?.find((s) => s.id === 'profit')?.value).toBe(0);
     });
 
     it('privatkredit-rechner (merged to ratenkreditrechner) handles 0 % interest (family loan) cleanly', () => {
-      const calc = getCalculatorBySlug('ratenkreditrechner')!;
+      const calc = getCalculatorDefinitionBySlug('ratenkreditrechner')!;
       const result = calc.calculate({ loanAmount: 12000, annualInterest: 0, termMonths: 24 });
       expect(result.primary.value).toBe(500); // 12000 / 24
       expect(result.secondary?.find((s) => s.id === 'totalInterest')?.value).toBe(0);
     });
 
     it('schuldentilgungsdauer-rechner (merged to kreditlaufzeit-rechner) handles already debt-free state (0 € debt)', () => {
-      const calc = getCalculatorBySlug('kreditlaufzeit-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('kreditlaufzeit-rechner')!;
       const result = calc.calculate({ loan: 0, monthlyRate: 300, interestRate: 5 });
       expect(result.primary.value).toBe(0);
       expect(result.primary.formattedValue).toBe('0 Monate');
     });
 
     it('dispozins-rechner handles 0 € overdraft or 0 days without NaN or false fallback', () => {
-      const calc = getCalculatorBySlug('dispozins-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('dispozins-rechner')!;
       const resZeroAmount = calc.calculate({ overdraftAmount: 0, dispoRate: 12, days: 30 });
       expect(resZeroAmount.primary.value).toBe(0);
 
@@ -262,14 +262,14 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
     });
 
     it('verdopplungszeit-rechner returns error for non-positive interest rate', () => {
-      const calc = getCalculatorBySlug('verdopplungszeit-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('verdopplungszeit-rechner')!;
       const result = calc.calculate({ interestRate: 0, initialAmount: 10000 });
       expect(result.error).toBeDefined();
       expect(result.primary.formattedValue).toBe('Nie');
     });
 
     it('maximaler-kredit-rechner validates termYears and returns error if <= 0', () => {
-      const calc = getCalculatorBySlug('maximaler-kredit-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('maximaler-kredit-rechner')!;
       const result = calc.calculate({ netIncome: 3500, fixedExpenses: 1800, termYears: 0 });
       expect(result.error).toBeDefined();
       expect(result.primary.value).toBe(0);

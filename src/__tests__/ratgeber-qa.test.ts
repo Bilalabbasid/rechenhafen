@@ -1,7 +1,7 @@
 import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
 import { describe, it, expect } from 'vitest';
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorBySlug, getCalculatorDefinitionBySlug } from '@/data/calculators';
 import sitemap from '@/app/sitemap';
 
 describe('RechenHafen Ratgeber / Blog QA Verification', () => {
@@ -50,7 +50,8 @@ describe('RechenHafen Ratgeber / Blog QA Verification', () => {
 
       if (a.secondaryCalculators) {
         for (const sec of a.secondaryCalculators) {
-          const secCalc = getCalculatorBySlug(sec.slug);
+          // Retired secondary calculators are filtered out at render time; the definition must still exist.
+          const secCalc = getCalculatorDefinitionBySlug(sec.slug);
           expect(secCalc).toBeDefined();
         }
       }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 
 export const BATCH_6_SLUGS = [
   'bmi-rechner',
@@ -63,7 +63,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
 
   it('resolves every Batch 6 calculator from registry with comprehensive metadata', () => {
     for (const slug of BATCH_6_SLUGS) {
-      const calc = getCalculatorBySlug(slug);
+      const calc = getCalculatorDefinitionBySlug(slug);
       expect(calc, `Calculator with slug "${slug}" should exist`).toBeDefined();
       if (!calc) continue;
 
@@ -81,7 +81,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
 
   it('calculates valid default outputs without NaN for all 50 calculators', () => {
     for (const slug of BATCH_6_SLUGS) {
-      const calc = getCalculatorBySlug(slug);
+      const calc = getCalculatorDefinitionBySlug(slug);
       expect(calc).toBeDefined();
       if (!calc) continue;
 
@@ -110,12 +110,12 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
 
   describe('Specific Calculations and Edge-Case Hardening', () => {
     it('idealgewicht-creff-rechner has correct id without character corruption', () => {
-      const calc = getCalculatorBySlug('idealgewicht-creff-rechner');
+      const calc = getCalculatorDefinitionBySlug('idealgewicht-creff-rechner');
       expect(calc?.id).toBe('idealgewicht-creff-rechner');
     });
 
     it('ehegattenunterhalt preserves netIncomePartner2 = 0 without defaulting to 1200 €', () => {
-      const calc = getCalculatorBySlug('ehegattenunterhalt-trennungsunterhalt-rechner');
+      const calc = getCalculatorDefinitionBySlug('ehegattenunterhalt-trennungsunterhalt-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         netIncomePartner1: '3200',
@@ -128,7 +128,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('schlafbedarfs-rechner preserves wakeHour: 0 (midnight) and wakeMinute: 0', () => {
-      const calc = getCalculatorBySlug('schlafbedarfs-rechner');
+      const calc = getCalculatorDefinitionBySlug('schlafbedarfs-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         wakeHour: '0',
@@ -141,7 +141,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('intervallfasten-16-8-rechner preserves firstMealHour: 0', () => {
-      const calc = getCalculatorBySlug('intervallfasten-16-8-rechner');
+      const calc = getCalculatorDefinitionBySlug('intervallfasten-16-8-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         firstMealHour: '0',
@@ -152,7 +152,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('elterngeld-basis-plus-rechner handles 0 € net income with minimum 300 € Basiselterngeld', () => {
-      const calc = getCalculatorBySlug('elterngeld-basis-plus-rechner');
+      const calc = getCalculatorDefinitionBySlug('elterngeld-basis-plus-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         avgNetMonthly: '0',
@@ -163,7 +163,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('vo2max-cooper-test-rechner safely handles 0 or 1 meter distance without division-by-zero', () => {
-      const calc = getCalculatorBySlug('vo2max-cooper-test-rechner');
+      const calc = getCalculatorDefinitionBySlug('vo2max-cooper-test-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         distanceMeters: '1',
@@ -174,7 +174,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('one-rep-max-rechner clamps reps safely to avoid division by zero in Brzycki formula', () => {
-      const calc = getCalculatorBySlug('one-rep-max-rechner');
+      const calc = getCalculatorDefinitionBySlug('one-rep-max-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         liftedWeightKg: '100',
@@ -186,7 +186,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('schritt-distanz-kalorien-rechner handles stepsCount = 0 cleanly', () => {
-      const calc = getCalculatorBySlug('schritt-distanz-kalorien-rechner');
+      const calc = getCalculatorDefinitionBySlug('schritt-distanz-kalorien-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         stepsCount: '0',
@@ -198,7 +198,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('nikotin-rauchstopp-ersparnis-rechner preserves cigsPerDay = 0', () => {
-      const calc = getCalculatorBySlug('nikotin-rauchstopp-ersparnis-rechner');
+      const calc = getCalculatorDefinitionBySlug('nikotin-rauchstopp-ersparnis-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         cigsPerDay: '0',
@@ -210,7 +210,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('alkohol-abbau-rechner preserves pureAlcoholGrams = 0', () => {
-      const calc = getCalculatorBySlug('alkohol-abbau-rechner');
+      const calc = getCalculatorDefinitionBySlug('alkohol-abbau-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         pureAlcoholGrams: '0',
@@ -221,7 +221,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('windelbudget-rechner preserves costPerDiaper = 0', () => {
-      const calc = getCalculatorBySlug('windelbudget-rechner');
+      const calc = getCalculatorDefinitionBySlug('windelbudget-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         diapersPerDayYear1: '7',
@@ -233,7 +233,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('leistungsumsatz-pal-rechner preserves sportKcalPerDay = 0 without defaulting to 200', () => {
-      const calc = getCalculatorBySlug('leistungsumsatz-pal-rechner');
+      const calc = getCalculatorDefinitionBySlug('leistungsumsatz-pal-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         bmrKcal: '1500',
@@ -246,7 +246,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('kindergeld-rechner-2026 handles childrenCount = 0 with 0 € output', () => {
-      const calc = getCalculatorBySlug('kindergeld-rechner-2026');
+      const calc = getCalculatorDefinitionBySlug('kindergeld-rechner-2026');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         childrenCount: '0',
@@ -257,7 +257,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('erstausstattung-baby-rechner preserves hasPresentsBudget = 0', () => {
-      const calc = getCalculatorBySlug('erstausstattung-baby-rechner');
+      const calc = getCalculatorDefinitionBySlug('erstausstattung-baby-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         equipmentStandard: 'smart_mix', // 1650 gross
@@ -268,7 +268,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('kita-gebuehren-rechner preserves lunchCateringMonthly = 0', () => {
-      const calc = getCalculatorBySlug('kita-gebuehren-rechner');
+      const calc = getCalculatorDefinitionBySlug('kita-gebuehren-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         familyGrossIncome: '60000',
@@ -282,7 +282,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('unterhalt-volljaehrige-kinder-rechner handles childOwnIncome = 0 without error', () => {
-      const calc = getCalculatorBySlug('unterhalt-volljaehrige-kinder-rechner');
+      const calc = getCalculatorDefinitionBySlug('unterhalt-volljaehrige-kinder-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         livingArrangement: 'own_household',
@@ -294,7 +294,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('ausbildungsunterhalt-bedarfskontrollbetrag-rechner preserves salary = 0', () => {
-      const calc = getCalculatorBySlug('ausbildungsunterhalt-bedarfskontrollbetrag-rechner');
+      const calc = getCalculatorDefinitionBySlug('ausbildungsunterhalt-bedarfskontrollbetrag-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         netApprenticeSalary: '0',
@@ -305,7 +305,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('kinderbetreuungskosten-absetzen-rechner preserves actualCareCostsYearly = 0', () => {
-      const calc = getCalculatorBySlug('kinderbetreuungskosten-absetzen-rechner');
+      const calc = getCalculatorDefinitionBySlug('kinderbetreuungskosten-absetzen-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         actualCareCostsYearly: '0',
@@ -316,7 +316,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('kinderkrankentage-kinderkrankengeld-rechner preserves sickDaysClaimed = 0', () => {
-      const calc = getCalculatorBySlug('kinderkrankentage-kinderkrankengeld-rechner');
+      const calc = getCalculatorDefinitionBySlug('kinderkrankentage-kinderkrankengeld-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         monthlyNetIncome: '2400',
@@ -328,7 +328,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('betreuungsgeld-familiengeld-rechner preserves monthsClaimed = 0', () => {
-      const calc = getCalculatorBySlug('betreuungsgeld-familiengeld-rechner');
+      const calc = getCalculatorDefinitionBySlug('betreuungsgeld-familiengeld-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         childOrder: 'first_second',
@@ -339,7 +339,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('schulbedarfspaket-bu-t-rechner preserves schoolKidsCount = 0', () => {
-      const calc = getCalculatorBySlug('schulbedarfspaket-bu-t-rechner');
+      const calc = getCalculatorDefinitionBySlug('schulbedarfspaket-bu-t-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         schoolKidsCount: '0',
@@ -349,7 +349,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('waist-to-hip-ratio-rechner guards against hipCm = 0', () => {
-      const calc = getCalculatorBySlug('waist-to-hip-ratio-rechner');
+      const calc = getCalculatorDefinitionBySlug('waist-to-hip-ratio-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         waistCm: '75',
@@ -361,7 +361,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('waist-to-height-ratio-rechner guards against heightCm = 0', () => {
-      const calc = getCalculatorBySlug('waist-to-height-ratio-rechner');
+      const calc = getCalculatorDefinitionBySlug('waist-to-height-ratio-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         waistCm: '80',
@@ -373,7 +373,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('geburtstermin-rechner returns clean validation error on extreme cycle days', () => {
-      const calc = getCalculatorBySlug('geburtstermin-rechner');
+      const calc = getCalculatorDefinitionBySlug('geburtstermin-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         lastPeriodDate: '2026-05-01',
@@ -383,7 +383,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('bmi-rechner returns clean error on weight = 0', () => {
-      const calc = getCalculatorBySlug('bmi-rechner');
+      const calc = getCalculatorDefinitionBySlug('bmi-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         weight: '0',
@@ -393,7 +393,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('wasserbedarf-rechner preserves sportsMinutes = 0 on rest days', () => {
-      const calc = getCalculatorBySlug('wasserbedarf-rechner');
+      const calc = getCalculatorDefinitionBySlug('wasserbedarf-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         weight: '70',
@@ -407,7 +407,7 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
     });
 
     it('laufpace-rechner handles 0 hours cleanly', () => {
-      const calc = getCalculatorBySlug('laufpace-rechner');
+      const calc = getCalculatorDefinitionBySlug('laufpace-rechner');
       expect(calc).toBeDefined();
       const res = calc?.calculate({
         distanceKm: '10',

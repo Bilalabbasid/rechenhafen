@@ -18,6 +18,8 @@ import { STATISTIK_CALCULATORS } from './statistik';
 import { STEUERN_GEHALT_CALCULATORS } from './steuernGehalt';
 import { EXTRA_CALCULATORS } from './extra';
 import { enrichCalculator } from './enrichment';
+import { isCalculatorRetired, RETIRED_CALCULATORS } from '@/data/seo/retired-calculators';
+import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 
 const RAW_CALCULATORS: CalculatorDefinition[] = [
   ...DATUM_ZEIT_CALCULATORS,
@@ -40,7 +42,36 @@ const RAW_CALCULATORS: CalculatorDefinition[] = [
   ...EXTRA_CALCULATORS,
 ];
 
-export const ALL_CALCULATORS: CalculatorDefinition[] = RAW_CALCULATORS.map(enrichCalculator);
+/** Every calculator definition, including retired ones (used by engine/math tests). */
+export const ALL_CALCULATOR_DEFINITIONS: CalculatorDefinition[] = RAW_CALCULATORS.map(enrichCalculator);
+
+/** Live calculators: everything the site renders, lists, searches and links to. */
+export const ALL_CALCULATORS: CalculatorDefinition[] = ALL_CALCULATOR_DEFINITIONS.filter(
+  (c) => !isCalculatorRetired(c.slug),
+).map((c) => ({ ...c, relatedSlugs: liveRelatedSlugs(c) }));
+
+/** Replaces retired related calculators with their redirect target calculator (if any), without duplicates or self-links. */
+function liveRelatedSlugs(calc: CalculatorDefinition): string[] {
+  const out: string[] = [];
+  for (const slug of calc.relatedSlugs) {
+    const target = isCalculatorRetired(slug)
+      ? RETIRED_CALCULATORS[slug].match(/^\/rechner\/([^/]+)\/$/)?.[1]
+      : slug;
+    if (target && target !== calc.slug && !out.includes(target)) out.push(target);
+  }
+  return out;
+}
+
+const DEFINITION_MAP = new Map<string, CalculatorDefinition>();
+for (const calc of ALL_CALCULATOR_DEFINITIONS) {
+  DEFINITION_MAP.set(calc.slug, calc);
+  DEFINITION_MAP.set(calc.id, calc);
+}
+
+/** Looks up any definition, retired or live. Pages must use getCalculatorBySlug instead. */
+export function getCalculatorDefinitionBySlug(slug: string): CalculatorDefinition | undefined {
+  return DEFINITION_MAP.get(slug);
+}
 
 // Schnelle O(1) Lookup Map
 const SLUG_MAP = new Map<string, CalculatorDefinition>();
@@ -57,6 +88,12 @@ export function getCalculatorsByCategory(categorySlug: string): CalculatorDefini
   return ALL_CALCULATORS.filter((c) => c.category === categorySlug);
 }
 
+/** Live calculators with indexable pages first, so automatic related links point at pages Google counts. */
+const CALCULATORS_INDEXABLE_FIRST: CalculatorDefinition[] = [
+  ...ALL_CALCULATORS.filter((c) => isCalculatorIndexable(c.slug)),
+  ...ALL_CALCULATORS.filter((c) => !isCalculatorIndexable(c.slug)),
+];
+
 export function getRelatedCalculators(calc: CalculatorDefinition, limit = 4): CalculatorDefinition[] {
   const result: CalculatorDefinition[] = [];
   const addedSlugs = new Set<string>([calc.slug]);
@@ -71,9 +108,9 @@ export function getRelatedCalculators(calc: CalculatorDefinition, limit = 4): Ca
     }
   }
 
-  // 2. Fülle mit weiteren Rechnern derselben Subkategorie auf
+  // 2. Fülle mit weiteren Rechnern derselben Subkategorie auf (indexierte Seiten zuerst)
   if (calc.subcategory) {
-    for (const c of ALL_CALCULATORS) {
+    for (const c of CALCULATORS_INDEXABLE_FIRST) {
       if (c.subcategory === calc.subcategory && !addedSlugs.has(c.slug)) {
         result.push(c);
         addedSlugs.add(c.slug);
@@ -82,8 +119,8 @@ export function getRelatedCalculators(calc: CalculatorDefinition, limit = 4): Ca
     }
   }
 
-  // 3. Fülle mit Rechnern derselben Hauptkategorie auf
-  for (const c of ALL_CALCULATORS) {
+  // 3. Fülle mit Rechnern derselben Hauptkategorie auf (indexierte Seiten zuerst)
+  for (const c of CALCULATORS_INDEXABLE_FIRST) {
     if (c.category === calc.category && !addedSlugs.has(c.slug)) {
       result.push(c);
       addedSlugs.add(c.slug);

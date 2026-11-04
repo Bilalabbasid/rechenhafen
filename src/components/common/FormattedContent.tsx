@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { resolveRetiredHref } from '@/data/seo/retired-calculators';
 
 /**
  * Strips common Markdown tokens to produce clean plain text for schema.org,
@@ -71,7 +72,8 @@ export function renderInlineMarkdown(text: string, keyPrefix = 'inline'): React.
     } else if (token.startsWith('[') && token.includes('](')) {
       const linkMatch = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(token);
       if (linkMatch) {
-        const [, label, href] = linkMatch;
+        const [, label, rawHref] = linkMatch;
+        const href = resolveRetiredHref(rawHref);
         const isExternal = href.startsWith('http://') || href.startsWith('https://');
         if (isExternal) {
           elements.push(

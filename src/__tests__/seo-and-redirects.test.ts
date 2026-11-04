@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import nextConfig from '../../next.config';
-import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
+import { ALL_CALCULATORS, getCalculatorBySlug, getCalculatorDefinitionBySlug } from '@/data/calculators';
+import { RETIRED_CALCULATORS } from '@/data/seo/retired-calculators';
+
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
 import sitemap from '@/app/sitemap';
 import { INDEXABLE_CALCULATOR_SLUGS, isCalculatorIndexable } from '@/data/seo/indexable-calculators';
@@ -98,7 +100,10 @@ describe('SEO & 301 Redirects Verification', () => {
   });
 
   it('verifies Gewinnschwelle / Break-Even Rechner owns the queries without duplicate URL', () => {
-    const calc = getCalculatorBySlug('break-even-rechner');
+    // Retired 5 Nov 2026 (zero impressions); content is kept and the URL 301s to the Deckungsbeitrag page.
+    expect(RETIRED_CALCULATORS['break-even-rechner']).toBe('/rechner/deckungsbeitrag-rechner/');
+    expect(getCalculatorBySlug('break-even-rechner')).toBeUndefined();
+    const calc = getCalculatorDefinitionBySlug('break-even-rechner');
     expect(calc).toBeDefined();
     expect(calc?.slug).toBe('break-even-rechner');
     expect(calc?.metaTitle).toBe('Gewinnschwelle berechnen: Break-Even-Rechner & Formel');
@@ -112,7 +117,7 @@ describe('SEO & 301 Redirects Verification', () => {
     // Related slugs only to business calculators
     expect(calc?.relatedSlugs).toEqual(['marge-rechner', 'skontorechner', 'rabattrechner', 'mwst-rechner']);
     for (const slug of calc?.relatedSlugs || []) {
-      const relCalc = getCalculatorBySlug(slug);
+      const relCalc = getCalculatorDefinitionBySlug(slug);
       expect(relCalc).toBeDefined();
       expect(relCalc?.category).toBe('business');
     }
@@ -178,7 +183,7 @@ describe('SEO & 301 Redirects Verification', () => {
     expect(rente?.faqs.length).toBeGreaterThanOrEqual(4);
 
     // 6. Autokredit
-    const auto = getCalculatorBySlug('autokreditrechner');
+    const auto = getCalculatorDefinitionBySlug('autokreditrechner'); // retired page, content kept
     expect(auto?.metaTitle).toBe('Autokreditrechner: Kfz-Monatsrate & Autofinanzierung berechnen');
     expect(auto?.h1).toBe('Autokreditrechner – Monatliche Rate für Ihren Autokauf berechnen');
     expect(auto?.content?.details).toContain('Ballonfinanzierung');

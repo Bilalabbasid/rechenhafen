@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 
 export const BATCH_4_SLUGS = [
   'farbmengen-rechner',
@@ -61,7 +61,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('1. Registry Resolution & Metadata Quality', () => {
     for (const slug of BATCH_4_SLUGS) {
       it(`resolves ${slug} with valid metadata and calculation function`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
         expect(calc.id).toBe(slug);
@@ -79,7 +79,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('2. Default Calculation Execution & German Formatting', () => {
     for (const slug of BATCH_4_SLUGS) {
       it(`calculates valid default outputs without NaN for ${slug}`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
 
@@ -115,7 +115,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('3. High-Confidence Audit Findings & Zero-Value Preservation', () => {
     // Finding: bausteine-mauerwerk-rechner (High Confidence finding in audit report)
     it('bausteine-mauerwerk-rechner preserves openingsArea = 0 and validates non-positive dimensions', () => {
-      const calc = getCalculatorBySlug('bausteine-mauerwerk-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('bausteine-mauerwerk-rechner')!;
       // Zero openings
       const resZeroOpen = calc.calculate({
         wallLength: 6,
@@ -137,7 +137,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // farbmengen-rechner: zero deduction & zero reserve preserved
     it('farbmengen-rechner preserves openingDeductionSqm = 0 and wasteReservePercent = 0', () => {
-      const calc = getCalculatorBySlug('farbmengen-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('farbmengen-rechner')!;
       const resZero = calc.calculate({
         roomLength: 5,
         roomWidth: 4,
@@ -158,7 +158,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // bodenbelag-rechner: wastePercent = 0 preserved
     it('bodenbelag-rechner preserves wastePercent = 0 and validates dimensions', () => {
-      const calc = getCalculatorBySlug('bodenbelag-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('bodenbelag-rechner')!;
       const resExact = calc.calculate({ length: 5, width: 4, wastePercent: 0, packSizeSqm: 2 });
       // 5 * 4 = 20 m²
       expect(resExact.primary.value).toBe(20);
@@ -172,7 +172,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // betonrechner: validates dimensions
     it('betonrechner handles invalid dimensions gracefully', () => {
-      const calc = getCalculatorBySlug('betonrechner')!;
+      const calc = getCalculatorDefinitionBySlug('betonrechner')!;
       const resInvalid = calc.calculate({ lengthM: 0, widthM: 3, depthCm: 15 });
       expect(resInvalid.error).toBeDefined();
       expect(resInvalid.primary.value).toBe(0);
@@ -184,7 +184,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // laengen-umrechner: value = 0 yields 0 (not 1)
     it('laengen-umrechner converts 0 meters to 0 feet without defaulting to 1', () => {
-      const calc = getCalculatorBySlug('laengen-umrechner')!;
+      const calc = getCalculatorDefinitionBySlug('laengen-umrechner')!;
       const resZero = calc.calculate({ value: 0, fromUnit: 'm', toUnit: 'ft' });
       expect(resZero.primary.value).toBe(0);
       expect(resZero.primary.formattedValue).toContain('0');
@@ -193,7 +193,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // papierformat-din-rechner: sheetCount = 0 yields 0 weight
     it('papierformat-din-rechner preserves sheetCount = 0', () => {
-      const calc = getCalculatorBySlug('papierformat-din-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('papierformat-din-rechner')!;
       const resZero = calc.calculate({ dinFormat: 'a4', grammage: 80, sheetCount: 0 });
       expect(resZero.secondary?.find((s) => s.id === 'totalWeight')?.value).toBe(0);
       expect(resZero.primary.value).toBe(210); // A4 width
@@ -201,7 +201,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // treppen-stufen-rechner: floorHeight = 0 does not produce NaN
     it('treppen-stufen-rechner guards against division-by-zero on floorHeight = 0', () => {
-      const calc = getCalculatorBySlug('treppen-stufen-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('treppen-stufen-rechner')!;
       const resZero = calc.calculate({ floorHeight: 0, idealStepHeight: 17.5, stepFormulaConstant: 63 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
@@ -212,7 +212,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // ellipse-flaeche-rechner: axisA = 0 does not produce NaN
     it('ellipse-flaeche-rechner guards against division-by-zero on axis = 0', () => {
-      const calc = getCalculatorBySlug('ellipse-flaeche-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('ellipse-flaeche-rechner')!;
       const resZero = calc.calculate({ axisA: 0, axisB: 0 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
@@ -222,7 +222,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // sinussatz-kosinussatz-rechner: sideB = 0 does not produce NaN
     it('sinussatz-kosinussatz-rechner guards against division-by-zero when side is 0', () => {
-      const calc = getCalculatorBySlug('sinussatz-kosinussatz-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('sinussatz-kosinussatz-rechner')!;
       const resZero = calc.calculate({ sideA: 8, sideB: 0, angleGamma: 50 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
@@ -232,7 +232,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // holz-balken-durchbiegung-rechner: spanMeters = 0 does not produce NaN
     it('holz-balken-durchbiegung-rechner guards against division-by-zero when span is 0', () => {
-      const calc = getCalculatorBySlug('holz-balken-durchbiegung-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('holz-balken-durchbiegung-rechner')!;
       const resZero = calc.calculate({ spanMeters: 0, beamWidthCm: 10, beamHeightCm: 20 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
@@ -242,7 +242,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // satz-des-pythagoras-rechner (merged into pythagoras-rechner): validates hypotenuse > kathete
     it('satz-des-pythagoras-rechner validates hypotenuse greater than kathete', () => {
-      const calc = getCalculatorBySlug('pythagoras-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('pythagoras-rechner')!;
       const resInvalid = calc.calculate({ target: 'a', sideC: 8, sideB: 10 }); // c = 8, b = 10 -> impossible
       expect(resInvalid.error).toBeDefined();
       expect(resInvalid.primary.value).toBe(0);
@@ -254,7 +254,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // dreiecks-hoehen-rechner: validates triangle inequality
     it('dreiecks-hoehen-rechner validates triangle inequality and provides dynamic summary', () => {
-      const calc = getCalculatorBySlug('dreiecks-hoehen-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('dreiecks-hoehen-rechner')!;
       const resDegenerate = calc.calculate({ sideA: 1, sideB: 2, sideC: 10 });
       expect(resDegenerate.error).toBeDefined();
       expect(resDegenerate.primary.value).toBe(0);
@@ -267,7 +267,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // dachflaeche-rechner: validates pitch < 89
     it('dachflaeche-rechner rejects pitch >= 89 and 0 dimensions', () => {
-      const calc = getCalculatorBySlug('dachflaeche-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('dachflaeche-rechner')!;
       const res90 = calc.calculate({ houseLength: 10, houseWidth: 8, roofPitchDeg: 90 });
       expect(res90.error).toBeDefined();
       expect(res90.primary.value).toBe(0);
@@ -279,7 +279,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // parkett-laminat-rechner (merged to bodenbelag-rechner): validates room dimensions
     it('parkett-laminat-rechner rejects 0 room dimensions', () => {
-      const calc = getCalculatorBySlug('bodenbelag-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('bodenbelag-rechner')!;
       const resZero = calc.calculate({ length: 0, width: 4 });
       expect(resZero.error).toBeDefined();
       expect(resZero.primary.value).toBe(0);
@@ -287,7 +287,7 @@ describe('Batch 4 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // tapetenrollen-rechner: rejects 0 room perimeter
     it('tapetenrollen-rechner rejects 0 perimeter and preserves 0 openings', () => {
-      const calc = getCalculatorBySlug('tapetenrollen-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('tapetenrollen-rechner')!;
       const resZeroPerim = calc.calculate({ perimeter: 0, roomHeight: 2.5 });
       expect(resZeroPerim.error).toBeDefined();
       expect(resZeroPerim.primary.value).toBe(0);

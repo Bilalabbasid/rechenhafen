@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 import { calculatePortions, calculateBakingPan, calculateGramsToMl } from '@/lib/calculators/kochen';
 import { calculateGradeAverage, calculateStandardDeviation } from '@/lib/calculators/statistik';
 import { calculateAverage } from '@/lib/calculators/mathematik';
@@ -65,7 +65,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
 
   it('all 50 calculators resolve in registry and have complete required metadata', () => {
     for (const slug of BATCH_7_SLUGS) {
-      const calc = getCalculatorBySlug(slug);
+      const calc = getCalculatorDefinitionBySlug(slug);
       expect(calc, `Calculator with slug ${slug} must be registered`).toBeDefined();
       expect(calc!.name, `Calculator ${slug} must have a name`).toBeTruthy();
       expect(calc!.shortDescription || calc!.metaDescription, `Calculator ${slug} must have description`).toBeTruthy();
@@ -76,7 +76,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
 
   it('all 50 calculators produce valid results with default inputs', () => {
     for (const slug of BATCH_7_SLUGS) {
-      const calc = getCalculatorBySlug(slug)!;
+      const calc = getCalculatorDefinitionBySlug(slug)!;
       const defaultInputs: Record<string, any> = {};
       for (const input of calc.inputs) {
         if (input.defaultValue !== undefined) {
@@ -230,7 +230,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
 
   describe('Extra Business & Statistik Hardened Logic', () => {
     it('customer-lifetime-value-clv-rechner preserves 0% margin as 0€ CLV', () => {
-      const calc = getCalculatorBySlug('customer-lifetime-value-clv-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('customer-lifetime-value-clv-rechner')!;
       const resZeroMargin = calc.calculate({
         avgOrderValue: 100,
         purchaseFrequencyPerYear: 2,
@@ -249,7 +249,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('churn-rate-rechner handles 0 churned customers correctly', () => {
-      const calc = getCalculatorBySlug('churn-rate-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('churn-rate-rechner')!;
       const res = calc.calculate({
         startCustomers: 1000,
         lostCustomers: 0,
@@ -259,7 +259,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('lead-conversion-rate-rechner handles 0 conversions without NaN', () => {
-      const calc = getCalculatorBySlug('lead-conversion-rate-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('lead-conversion-rate-rechner')!;
       const res = calc.calculate({
         totalVisitors: 1000,
         conversionsCount: 0,
@@ -269,7 +269,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('kombinatorik-n-ueber-k-rechner computes n over 0 as exactly 1 combination', () => {
-      const calc = getCalculatorBySlug('kombinatorik-n-ueber-k-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('kombinatorik-n-ueber-k-rechner')!;
       const resChooseZero = calc.calculate({
         totalN: 49,
         chooseK: 0,
@@ -285,7 +285,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('harmonisches-mittel-rechner computes harmonic mean and rejects non-positive speeds', () => {
-      const calc = getCalculatorBySlug('harmonisches-mittel-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('harmonisches-mittel-rechner')!;
       // 60 and 120 km/h -> harmonic mean = (2 * 60 * 120) / (60 + 120) = 14400 / 180 = 80 km/h
       const res = calc.calculate({
         valA: 60,
@@ -301,7 +301,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('perzentil-rechner handles 0th percentile rank correctly', () => {
-      const calc = getCalculatorBySlug('perzentil-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('perzentil-rechner')!;
       const resMin = calc.calculate({
         pRank: 0,
         d1: 10,
@@ -317,7 +317,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
 
   describe('Extra Kochen & Einheiten Hardened Logic', () => {
     it('pizza-teig-rechner computes dough proportions accurately and handles 0 pizzas', () => {
-      const calc = getCalculatorBySlug('pizza-teig-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('pizza-teig-rechner')!;
       const res = calc.calculate({
         ballsCount: 4,
         ballWeightG: 260,
@@ -337,7 +337,7 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('cocktail-alkoholgehalt-rechner preserves 0% liqueur and 0 spirits for virgin cocktails', () => {
-      const calc = getCalculatorBySlug('cocktail-alkoholgehalt-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('cocktail-alkoholgehalt-rechner')!;
       // Virgin mocktail (0 alcohol)
       const resVirgin = calc.calculate({
         spiritMl: 0,
@@ -362,11 +362,11 @@ describe('Batch 7 Calculators Quality and Regression Suite', () => {
     });
 
     it('ringgroesse-umrechner and schuhe-kleidergroessen-umrechner reject 0 sizes gracefully', () => {
-      const ringCalc = getCalculatorBySlug('ringgroesse-umrechner')!;
+      const ringCalc = getCalculatorDefinitionBySlug('ringgroesse-umrechner')!;
       const resRingZero = ringCalc.calculate({ euCircumferenceMm: 0 });
       expect(resRingZero.error).toBeDefined();
 
-      const shoeCalc = getCalculatorBySlug('schuhe-kleidergroessen-umrechner')!;
+      const shoeCalc = getCalculatorDefinitionBySlug('schuhe-kleidergroessen-umrechner')!;
       const resShoeZero = shoeCalc.calculate({ euSize: 0 });
       expect(resShoeZero.error).toBeDefined();
     });

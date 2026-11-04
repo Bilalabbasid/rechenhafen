@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 
 export const BATCH_5_SLUGS = [
   'stromkostenrechner',
@@ -60,7 +60,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('1. Registry Resolution & Metadata Quality', () => {
     for (const slug of BATCH_5_SLUGS) {
       it(`resolves ${slug} with valid metadata and calculation function`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
         expect(calc.id).toBe(slug);
@@ -78,7 +78,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('2. Default Calculation Execution & German Formatting', () => {
     for (const slug of BATCH_5_SLUGS) {
       it(`calculates valid default outputs without NaN for ${slug}`, () => {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
         if (!calc) return;
 
@@ -114,7 +114,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
   describe('3. Specific Discrepancy, Zero-Value & Edge-Case Verification', () => {
     // Finding 1: stromkostenrechner - basePricePerMonth = 0
     it('stromkostenrechner preserves basePricePerMonth = 0 for pure consumption tariffs', () => {
-      const calc = getCalculatorBySlug('stromkostenrechner')!;
+      const calc = getCalculatorDefinitionBySlug('stromkostenrechner')!;
       const res = calc.calculate({
         annualKwh: 3000,
         pricePerKwh: 0.30,
@@ -125,7 +125,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 2: auto-gesamtkosten-rechner - taxYearly = 0 (EV exemption under § 3d KraftStG)
     it('auto-gesamtkosten-rechner preserves taxYearly = 0 for electric vehicles', () => {
-      const calc = getCalculatorBySlug('auto-gesamtkosten-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('auto-gesamtkosten-rechner')!;
       const res = calc.calculate({
         purchasePrice: 30000,
         yearlyMileageKm: 15000,
@@ -153,7 +153,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 3: fahrgemeinschaft-sprit-rechner - wearSurchargePerKm = 0
     it('fahrgemeinschaft-sprit-rechner preserves wearSurchargePerKm = 0 for pure fuel sharing', () => {
-      const calc = getCalculatorBySlug('fahrgemeinschaft-sprit-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('fahrgemeinschaft-sprit-rechner')!;
       const res = calc.calculate({
         distanceOneWayKm: 30,
         workDaysPerMonth: 20,
@@ -172,7 +172,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 4: lebensmittelbudget-rechner - children = 0 & zero adults guard
     it('lebensmittelbudget-rechner handles children = 0 and zero total persons cleanly', () => {
-      const calc = getCalculatorBySlug('lebensmittelbudget-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('lebensmittelbudget-rechner')!;
       // Zero children
       const resZeroKids = calc.calculate({
         adults: 2,
@@ -197,7 +197,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 5: kraftstoffverbrauch-umrechner - non-positive inputs guard
     it('kraftstoffverbrauch-umrechner safely guards against zero or negative input values', () => {
-      const calc = getCalculatorBySlug('kraftstoffverbrauch-umrechner')!;
+      const calc = getCalculatorDefinitionBySlug('kraftstoffverbrauch-umrechner')!;
       const resZero = calc.calculate({
         inputValue: 0,
         inputUnit: 'l100km',
@@ -219,7 +219,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 6: temperatur-umrechner - 0 °C freezing point handling and Kelvin formatting
     it('temperatur-umrechner accurately converts 0 °C to 32 °F and 273.15 K without degree on K', () => {
-      const calc = getCalculatorBySlug('temperatur-umrechner')!;
+      const calc = getCalculatorDefinitionBySlug('temperatur-umrechner')!;
       const resZeroCelsius = calc.calculate({
         value: 0,
         fromUnit: 'C',
@@ -237,7 +237,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 7: kuehlschrank-stromkosten-rechner - newAppliancePrice = 0 amortization
     it('kuehlschrank-stromkosten-rechner handles newAppliancePrice = 0 without defaulting to 650', () => {
-      const calc = getCalculatorBySlug('kuehlschrank-stromkosten-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('kuehlschrank-stromkosten-rechner')!;
       const res = calc.calculate({
         oldConsumptionKwh: 350,
         newConsumptionKwh: 120,
@@ -252,7 +252,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 8: fahrzeit-rechner - breakMinutes = 0
     it('fahrzeit-rechner preserves breakMinutes = 0 without adding 30 minutes', () => {
-      const calc = getCalculatorBySlug('fahrzeit-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('fahrzeit-rechner')!;
       const res = calc.calculate({
         distance: 120,
         speed: 120,
@@ -266,7 +266,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 9: ohmsches-gesetz-rechner - zero voltage/current
     it('ohmsches-gesetz-rechner handles zero values without defaulting to 230 V', () => {
-      const calc = getCalculatorBySlug('ohmsches-gesetz-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('ohmsches-gesetz-rechner')!;
       const res = calc.calculate({
         calculationMode: 'calc_r',
         voltage: 0,
@@ -280,7 +280,7 @@ describe('Batch 5 Calculators Comprehensive QA Suite (50 Calculators)', () => {
 
     // Finding 10: standby-kosten-rechner - hoursPerDay = 0
     it('standby-kosten-rechner preserves hoursPerDay = 0 without defaulting to 20 hours', () => {
-      const calc = getCalculatorBySlug('standby-kosten-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('standby-kosten-rechner')!;
       const res = calc.calculate({
         totalWatt: 25,
         pricePerKwh: 0.35,

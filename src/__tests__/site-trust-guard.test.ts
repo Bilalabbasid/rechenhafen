@@ -52,3 +52,39 @@ describe('indexable calculator allowlist', () => {
     expect(new Set(calcUrls)).toEqual(new Set([...INDEXABLE_CALCULATOR_SLUGS]));
   });
 });
+
+describe('retired calculators', () => {
+  it('are gone from the live registry and the sitemap, and every one has a working 301 target', async () => {
+    const { RETIRED_CALCULATORS } = await import('@/data/seo/retired-calculators');
+    const { getCalculatorBySlug } = await import('@/data/calculators');
+    const { CATEGORIES } = await import('@/data/categories');
+    const nextConfig = (await import('../../next.config')).default;
+    const redirects = await nextConfig.redirects!();
+    const sitemapUrls = new Set(sitemap().map((e) => e.url));
+    const categoryPaths = new Set(CATEGORIES.map((c) => `/${c.slug}/`));
+
+    for (const [slug, target] of Object.entries(RETIRED_CALCULATORS)) {
+      expect(getCalculatorBySlug(slug), slug).toBeUndefined();
+      expect(sitemapUrls.has(`https://rechenhafen.de/rechner/${slug}/`), slug).toBe(false);
+      expect(INDEXABLE_CALCULATOR_SLUGS.has(slug), slug).toBe(false);
+
+      const targetSlug = target.match(/^\/rechner\/([^/]+)\/$/)?.[1];
+      if (targetSlug) expect(getCalculatorBySlug(targetSlug), `${slug} -> ${target}`).toBeDefined();
+      else expect(categoryPaths.has(target), `${slug} -> ${target}`).toBe(true);
+
+      for (const src of [`/rechner/${slug}`, `/rechner/${slug}/`]) {
+        const r = redirects.find((x) => x.source === src);
+        expect(r?.destination, src).toBe(target);
+        expect(r && 'permanent' in r && r.permanent, src).toBe(true);
+      }
+    }
+  });
+
+  it('no live calculator links to a retired one via relatedSlugs', async () => {
+    const { isCalculatorRetired } = await import('@/data/seo/retired-calculators');
+    const offenders = ALL_CALCULATORS.flatMap((c) =>
+      c.relatedSlugs.filter((s) => isCalculatorRetired(s)).map((s) => `${c.slug} -> ${s}`),
+    );
+    expect(offenders).toEqual([]);
+  });
+});

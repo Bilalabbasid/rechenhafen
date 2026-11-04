@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorDefinitionBySlug } from '@/data/calculators';
 import {
   calculateAge,
   calculateAgeInDays,
@@ -82,7 +82,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
 
   it('all 50 calculators resolve in registry and have complete required metadata', () => {
     for (const slug of BATCH_8_SLUGS) {
-      const calc = getCalculatorBySlug(slug);
+      const calc = getCalculatorDefinitionBySlug(slug);
       expect(calc, `Calculator with slug ${slug} must be registered`).toBeDefined();
       expect(calc!.name, `Calculator ${slug} must have a name`).toBeTruthy();
       expect(calc!.shortDescription || calc!.metaDescription, `Calculator ${slug} must have description`).toBeTruthy();
@@ -93,7 +93,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
 
   it('all 50 calculators produce valid results with default inputs', () => {
     for (const slug of BATCH_8_SLUGS) {
-      const calc = getCalculatorBySlug(slug)!;
+      const calc = getCalculatorDefinitionBySlug(slug)!;
       const defaultInputs: Record<string, any> = {};
       for (const input of calc.inputs) {
         if (input.defaultValue !== undefined) {
@@ -365,7 +365,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
 
   describe('Hardened Batch 8 Calculators Edge Cases', () => {
     it('bruchrechner preserves 0 inputs and guards zero denominator', () => {
-      const calc = getCalculatorBySlug('bruchrechner')!;
+      const calc = getCalculatorDefinitionBySlug('bruchrechner')!;
       
       // 1/4 + 2/4 = 3/4 = 0.75
       const resNormal = calc.calculate({
@@ -411,7 +411,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('verhaeltnis-rechner preserves 0 values and guards zero base', () => {
-      const calc = getCalculatorBySlug('verhaeltnis-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('verhaeltnis-rechner')!;
 
       // 16:9 ratio, given width 1920 -> height 1080
       const res = calc.calculate({
@@ -439,7 +439,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('dreieckrechner calculates area from baseG and heightH, rejecting 0', () => {
-      const calc = getCalculatorBySlug('dreieckrechner')!;
+      const calc = getCalculatorDefinitionBySlug('dreieckrechner')!;
 
       // Valid: baseG = 10, heightH = 6 -> area = (10 * 6) / 2 = 30
       const res = calc.calculate({
@@ -458,7 +458,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('modulo-rechner computes remainder correctly and handles divisor 0', () => {
-      const calc = getCalculatorBySlug('modulo-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('modulo-rechner')!;
 
       // 29 mod 7 = 1
       const res = calc.calculate({ dividend: 29, divisor: 7 });
@@ -474,7 +474,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('quersumme-rechner calculates digit sum of 0 as 0 without defaulting to 9475', () => {
-      const calc = getCalculatorBySlug('quersumme-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('quersumme-rechner')!;
 
       // Quersumme of 0 is 0
       const resZero = calc.calculate({ num: '0' });
@@ -486,7 +486,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('teiler-vielfache-rechner handles 60 and rejects 0', () => {
-      const calc = getCalculatorBySlug('teiler-vielfache-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('teiler-vielfache-rechner')!;
 
       // 60 has 12 divisors
       const res60 = calc.calculate({ num: 60 });
@@ -499,7 +499,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('hexadezimal-rechner converts hex to decimal and handles valid/invalid input', () => {
-      const calc = getCalculatorBySlug('hexadezimal-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('hexadezimal-rechner')!;
 
       // Hex FF -> Dec 255
       const resHex = calc.calculate({ hexVal: 'FF' });
@@ -515,7 +515,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('zehnerpotenzen-rechner converts scientific notation preserving 0', () => {
-      const calc = getCalculatorBySlug('zehnerpotenzen-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('zehnerpotenzen-rechner')!;
 
       // 2500000 -> 2.5 * 10^6
       const res = calc.calculate({ numberVal: 2500000 });
@@ -529,7 +529,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('renteneintritt-rechner determines German standard retirement year and age', () => {
-      const calc = getCalculatorBySlug('renteneintritt-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('renteneintritt-rechner')!;
 
       // Born 1970 -> standard retirement at age 67 in 2037
       const res = calc.calculate({ birthYear: 1970, birthMonth: 5 });
@@ -538,7 +538,7 @@ describe('Batch 8 Calculators Quality and Regression Suite', () => {
     });
 
     it('antiproportionaler-dreisatz-rechner handles inverse rule of three', () => {
-      const calc = getCalculatorBySlug('antiproportionaler-dreisatz-rechner')!;
+      const calc = getCalculatorDefinitionBySlug('antiproportionaler-dreisatz-rechner')!;
 
       // 4 workers take 6 hours -> 8 workers take 3 hours
       const res = calc.calculate({ a1: 4, b1: 6, a2: 8 });

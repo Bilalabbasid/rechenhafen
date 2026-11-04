@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
+import { ALL_CALCULATORS, ALL_CALCULATOR_DEFINITIONS, getCalculatorBySlug, getCalculatorDefinitionBySlug } from '@/data/calculators';
+import { RETIRED_CALCULATORS } from '@/data/seo/retired-calculators';
+
 import { CATEGORIES, getCategoryBySlug } from '@/data/categories';
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
 import { generateMetadata as generateCalcMetadata } from '@/app/rechner/[slug]/page';
@@ -108,7 +110,8 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   describe('Calculator Registry & Route Smoke Tests', () => {
     it('discovers all registered calculators from real registry with self-referencing canonicals and exactly one H1', async () => {
       // 424 → 423: abfindung-fuenftelregelung-rechner per 301 in abfindungsrechner zusammengeführt
-      expect(ALL_CALCULATORS.length).toBe(408);
+      expect(ALL_CALCULATOR_DEFINITIONS.length).toBe(408);
+    expect(ALL_CALCULATORS.length).toBe(408 - Object.keys(RETIRED_CALCULATORS).length);
 
       for (const calc of ALL_CALCULATORS) {
         // Self-referencing canonical
@@ -148,7 +151,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   describe('Independent Known-Answer Test Fixtures', () => {
     // 1. Gaskostenrechner
     it('fixture: Gaskostenrechner matches independent mathematical calculation for kWh and m³', () => {
-      const calc = getCalculatorBySlug('gaskostenrechner');
+      const calc = getCalculatorDefinitionBySlug('gaskostenrechner');
       expect(calc).toBeDefined();
 
       // Case 1: kWh input (14000 kWh, 0.11 €/kWh, 12 €/month base)
@@ -183,7 +186,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 2. Kreisumfang
     it('fixture: Kreisumfang matches independent trigonometric/pi calculation', () => {
-      const calc = getCalculatorBySlug('kreis-umfang-rechner');
+      const calc = getCalculatorDefinitionBySlug('kreis-umfang-rechner');
       expect(calc).toBeDefined();
 
       // Case A: radius = 7 cm
@@ -202,7 +205,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 3. Kalorienbedarf (Mifflin-St Jeor)
     it('fixture: Kalorienbedarf matches independent Mifflin-St Jeor formula', () => {
-      const calc = getCalculatorBySlug('kalorienbedarf-rechner');
+      const calc = getCalculatorDefinitionBySlug('kalorienbedarf-rechner');
       expect(calc).toBeDefined();
 
       // Case A: Male, 32 years, 75 kg, 178 cm, PAL 1.4
@@ -238,7 +241,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 4. Spritkosten
     it('fixture: Spritkosten matches independent fuel calculation', () => {
-      const calc = getCalculatorBySlug('spritkostenrechner');
+      const calc = getCalculatorDefinitionBySlug('spritkostenrechner');
       expect(calc).toBeDefined();
 
       // 150 km, 6.5 l/100km, 1.80 €/Liter, 1 passenger
@@ -274,7 +277,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 5. Sabbatical
     it('fixture: Sabbatical matches independent salary smoothing model and contains trust disclaimers', () => {
-      const calc = getCalculatorBySlug('sabbatical-rechner');
+      const calc = getCalculatorDefinitionBySlug('sabbatical-rechner');
       expect(calc).toBeDefined();
 
       // 3000 € net, 18 months work, 6 months leave (total 24 months)
@@ -300,7 +303,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 6. KFZ-Steuer
     it('fixture: KFZ-Steuer matches independent § 9 KraftStG calculation', () => {
-      const calc = getCalculatorBySlug('kfz-steuer-rechner');
+      const calc = getCalculatorDefinitionBySlug('kfz-steuer-rechner');
       expect(calc).toBeDefined();
 
       // Case A: Benziner 1998 cm³, 135 g/km CO2
@@ -335,7 +338,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 7. Schalungssteine
     it('fixture: Schalungssteine matches acceptance fixture for 96 base stones, 101 reserve stones, 1.56 m³ and 1.638 m³ concrete', () => {
-      const calc = getCalculatorBySlug('schalungssteine-rechner');
+      const calc = getCalculatorDefinitionBySlug('schalungssteine-rechner');
       expect(calc).toBeDefined();
 
       const defaults = {
@@ -374,7 +377,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 8. Arbeitszeitrechner: required test cases & legal guidance
     it('fixture: Arbeitszeitrechner matches all required test cases (day shift, overnight shift, multiple breaks, validation)', () => {
-      const calc = getCalculatorBySlug('arbeitszeitrechner');
+      const calc = getCalculatorDefinitionBySlug('arbeitszeitrechner');
       expect(calc).toBeDefined();
 
       // Required Case 1: 08:00–16:30 with 60 min break = 7 h 30 min / 7.5 hours
@@ -465,7 +468,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 9. Gaskosten worked examples
     it('fixture: Gaskostenrechner matches worked examples for apartment and house exactly', () => {
-      const calc = getCalculatorBySlug('gaskostenrechner');
+      const calc = getCalculatorDefinitionBySlug('gaskostenrechner');
       expect(calc).toBeDefined();
 
       // Apartment: 10,000 kWh × 0.10 €/kWh + 10 €/month base = 1,120 €/year
@@ -495,7 +498,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 10. Sabbatical worked example
     it('fixture: Sabbatical matches worked example with 2800 € net, 12m work + 12m leave = 1400 € monthly', () => {
-      const calc = getCalculatorBySlug('sabbatical-rechner');
+      const calc = getCalculatorDefinitionBySlug('sabbatical-rechner');
       expect(calc).toBeDefined();
 
       const res = calc!.calculate({
@@ -512,7 +515,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 11. Mieterhöhungsrechner
     it('fixture: Mieterhöhungsrechner accurately calculates caps, comparable rents, dates, and excluded increase modes', () => {
-      const calc = getCalculatorBySlug('mieterhoehung-rechner');
+      const calc = getCalculatorDefinitionBySlug('mieterhoehung-rechner');
       expect(calc).toBeDefined();
 
       // Case A: Prompt worked example (Current 800 €, Rent 3 yrs ago 800 €, Proposed 1000 €, Comparable 950 €, Cap 20%)
@@ -665,7 +668,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
 
     // 12. Gewerbesteuerrechner
     it('fixture: Gewerbesteuerrechner matches prompt examples for individual and GmbH, rounding and allowances', () => {
-      const calc = getCalculatorBySlug('gewerbesteuer-rechner');
+      const calc = getCalculatorDefinitionBySlug('gewerbesteuer-rechner');
       expect(calc).toBeDefined();
 
       // Case A: Prompt worked example - Einzelunternehmen with 50,000 € Gewerbeertrag, 400 % Hebesatz
@@ -772,7 +775,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   // =========================================================================
   describe('Content Improvements QA', () => {
     it('verifies Gaskostenrechner includes decision guidance and cross-links without duplicate URL', () => {
-      const calc = getCalculatorBySlug('gaskostenrechner');
+      const calc = getCalculatorDefinitionBySlug('gaskostenrechner');
       expect(calc).toBeDefined();
       expect(calc!.content?.intro).toContain('Welchen Ausgangswert haben Sie zur Hand?');
       expect(calc!.content?.intro).toContain('Ich kenne meinen Verbrauch in kWh');
@@ -792,7 +795,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
     });
 
     it('verifies Dienstfahrrad Rechner has natural non-brand positioning and neutral explanatory JobRad note', () => {
-      const calc = getCalculatorBySlug('dienstfahrrad-jobrad-rechner');
+      const calc = getCalculatorDefinitionBySlug('dienstfahrrad-jobrad-rechner');
       expect(calc).toBeDefined();
       expect(calc!.metaTitle).toBe('JobRad Rechner: Dienstfahrrad-Leasing berechnen');
       expect(calc!.h1).toBe('JobRad Rechner: Dienstfahrrad-Leasing berechnen');
@@ -803,11 +806,11 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
       expect(hasJobRadFaq).toBe(true);
 
       // Verify no duplicate slug was created
-      expect(getCalculatorBySlug('jobrad-rechner')).toBeUndefined();
+      expect(getCalculatorDefinitionBySlug('jobrad-rechner')).toBeUndefined();
     });
 
     it('verifies Ringgröße calculator provides quick-answer FAQ for 70 mm circumference derived from formula', () => {
-      const calc = getCalculatorBySlug('ringgroesse-umrechner');
+      const calc = getCalculatorDefinitionBySlug('ringgroesse-umrechner');
       expect(calc).toBeDefined();
       const faq70 = calc!.faqs.find((f) => f.question.includes('70 mm'));
       expect(faq70).toBeDefined();
@@ -818,7 +821,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
     });
 
     it('verifies Mieterhöhungsrechner metadata, H1, description, kostenlos intro, and contextual links', () => {
-      const calc = getCalculatorBySlug('mieterhoehung-rechner');
+      const calc = getCalculatorDefinitionBySlug('mieterhoehung-rechner');
       expect(calc).toBeDefined();
       expect(calc!.metaTitle).toBe('Mieterhöhungsrechner: Mieterhöhung & Kappungsgrenze prüfen');
       expect(calc!.h1).toBe('Mieterhöhungsrechner: vorgeschlagene Mieterhöhung prüfen');
@@ -842,7 +845,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
     });
 
     it('verifies Gewerbesteuerrechner metadata, H1, description, kostenlos intro, and contextual links', () => {
-      const calc = getCalculatorBySlug('gewerbesteuer-rechner');
+      const calc = getCalculatorDefinitionBySlug('gewerbesteuer-rechner');
       expect(calc).toBeDefined();
       expect(calc!.metaTitle).toBe('Gewerbesteuerrechner: Gewerbesteuer mit Hebesatz berechnen');
       expect(calc!.h1).toBe('Gewerbesteuerrechner für Unternehmen in Deutschland');
@@ -883,7 +886,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
       ];
 
       for (const slug of keySlugs) {
-        const calc = getCalculatorBySlug(slug);
+        const calc = getCalculatorDefinitionBySlug(slug);
         expect(calc).toBeDefined();
 
         // Empty inputs

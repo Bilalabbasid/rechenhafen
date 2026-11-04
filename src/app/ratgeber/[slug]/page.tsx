@@ -11,6 +11,7 @@ import TableOfContents from '@/components/ratgeber/TableOfContents';
 import GasClusterLinks from '@/components/calculator/GasClusterLinks';
 import styles from '@/styles/ratgeber.module.css';
 import { authorSchema } from '@/config/site-owner';
+import { isCalculatorRetired } from '@/data/seo/retired-calculators';
 import {
   Calendar,
   Clock,
@@ -368,7 +369,7 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
                         Verwandte Rechner für dieses Thema
                       </h3>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
-                        {article.secondaryCalculators.map((secCalc) => (
+                        {article.secondaryCalculators.filter((secCalc) => !isCalculatorRetired(secCalc.slug)).map((secCalc) => (
                           <CalculatorCta key={secCalc.slug} calc={secCalc} variant="sidebar" />
                         ))}
                       </div>
