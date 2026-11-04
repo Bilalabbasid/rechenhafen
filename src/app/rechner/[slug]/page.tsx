@@ -23,6 +23,7 @@ import { ShieldCheck, Info, AlertCircle } from 'lucide-react';
 import { formatMetaTitle } from '@/lib/seo/title';
 import { AUTHOR_DISPLAY_NAME, authorSchema } from '@/config/site-owner';
 import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
+import { isEmbeddable } from '@/data/embed';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -330,6 +331,14 @@ export default async function CalculatorPage({ params }: PageProps) {
         timeSensitiveMeta={calc.timeSensitiveMeta}
         shortDescription={calc.shortDescription}
       />
+
+      {isEmbeddable(calc.slug) && (
+        <p style={{ margin: 'var(--space-2) 0 0', fontSize: '0.85rem', textAlign: 'right' }}>
+          <Link href={`/rechner-einbinden/#${calc.slug}`} style={{ color: 'var(--color-primary)' }}>
+            Diesen Rechner kostenlos auf Ihrer Website einbinden →
+          </Link>
+        </p>
+      )}
 
       {/* Kurzreferenz direkt unter dem Rechner (nur für Rechner mit quickReference) */}
       {calc.quickReference?.map((sec, qIdx) => (

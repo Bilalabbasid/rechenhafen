@@ -5,6 +5,7 @@ import Footer from '@/components/common/Footer';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import CookieConsentBanner from '@/components/common/CookieConsentBanner';
 import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
+import SiteOnly from '@/components/common/SiteOnly';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -111,22 +112,28 @@ export default function RootLayout({
       <head>
         <meta name="google" content="notranslate" />
         <meta name="google-adsense-account" content="ca-pub-4789347477675358" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4789347477675358"
-          crossOrigin="anonymous"
-        />
+        <SiteOnly>
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4789347477675358"
+            crossOrigin="anonymous"
+          />
+        </SiteOnly>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema).replace(/</g, '\\u003c') }}
         />
       </head>
       <body>
-        <GoogleAnalytics />
-        <Header />
+        <SiteOnly>
+          <GoogleAnalytics />
+          <Header />
+        </SiteOnly>
         <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
-        <CookieConsentBanner />
+        <SiteOnly>
+          <Footer />
+          <CookieConsentBanner />
+        </SiteOnly>
       </body>
     </html>
   );

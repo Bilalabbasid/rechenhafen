@@ -39,6 +39,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/datenschutz/`,
       lastModified: platformUpdateDate,
     },
+    {
+      url: `${baseUrl}/rechner-einbinden/`,
+      lastModified: new Date('2026-11-05T00:00:00.000Z'),
+    },
   ];
 
   // 17 Kategorieseiten

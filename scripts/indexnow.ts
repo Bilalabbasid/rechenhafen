@@ -22,7 +22,7 @@ import { RETIRED_CALCULATORS } from '../src/data/seo/retired-calculators';
 const HOST = 'rechenhafen.de';
 const ORIGIN = `https://${HOST}`;
 const ENDPOINT = 'https://api.indexnow.org/indexnow';
-const STATIC_PATHS = ['/', '/rechner/', '/ratgeber/', '/ueber-uns/', '/methodik/', '/impressum/', '/datenschutz/'];
+const STATIC_PATHS = ['/', '/rechner/', '/ratgeber/', '/ueber-uns/', '/methodik/', '/impressum/', '/datenschutz/', '/rechner-einbinden/'];
 
 function findKey(): string {
   const publicDir = path.join(__dirname, '..', 'public');

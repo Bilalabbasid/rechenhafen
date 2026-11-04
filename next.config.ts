@@ -24,7 +24,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        // Every page except the embeddable calculators (/embed/...) refuses to be framed.
+        source: '/((?!embed/).*)',
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
@@ -53,6 +54,18 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: https://*.google-analytics.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://pagead2.googlesyndication.com https://*.googlesyndication.com https://googleads.g.doubleclick.net; frame-src 'self' https://googleads.g.doubleclick.net https://*.googlesyndication.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';",
+          },
+        ],
+      },
+      {
+        // Embeddable calculators: may be framed by any site; no ad or tracking sources.
+        source: '/embed/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'none'; frame-ancestors *; object-src 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },

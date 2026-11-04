@@ -394,7 +394,7 @@ describe('SEO & 301 Redirects Verification', () => {
     }
 
     // 5. Total count exact match (7 static + 17 categories + 421 calculators + 16 articles = 461)
-    const expectedTotal = 7 + CATEGORIES.length + INDEXABLE_CALCULATOR_SLUGS.size + articles.length;
+    const expectedTotal = 8 + CATEGORIES.length + INDEXABLE_CALCULATOR_SLUGS.size + articles.length;
     expect(sitemapEntries.length).toBe(expectedTotal);
     expect(sitemapSet.size).toBe(expectedTotal);
 
