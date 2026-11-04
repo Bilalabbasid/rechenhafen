@@ -507,3 +507,29 @@ describe('Engine-Funktion calculateTriangle direkt', () => {
     expect(calculateTriangle({}).primary.value).toBeCloseTo(24, 10);
   });
 });
+
+describe('Quadratwurzel: "Exakt" only for real exact roots (live bug 05.11.2026)', () => {
+  const calc = getCalculatorBySlug('quadratwurzel-rechner')!;
+  const type = (value: number, degree: number) => {
+    const r = calc.calculate({ value, degree });
+    return { type: String(r.secondary?.find((x) => x.id === 'type')?.formattedValue), summary: String(r.summaryText), primary: Number(r.primary.value) };
+  };
+
+  it('irrational roots are labelled as rounded, never "genau"', () => {
+    for (const [v, n] of [[200, 3], [2, 2], [10, 3], [50, 2], [7, 5], [1000, 4]] as const) {
+      const t = type(v, n);
+      expect(t.type, `${n}. Wurzel aus ${v}`).not.toMatch(/^Exakt/);
+      expect(t.summary, `${n}. Wurzel aus ${v}`).not.toContain(' ist genau ');
+    }
+    expect(type(200, 3).primary).toBeCloseTo(5.848035476, 8);
+  });
+
+  it('exact roots stay exact, including terminating decimals and negatives with odd n', () => {
+    expect(type(144, 2).type).toBe('Exakt (ganze Zahl)');
+    expect(type(81, 4).type).toBe('Exakt (ganze Zahl)');
+    expect(type(27, 3).type).toBe('Exakt (ganze Zahl)');
+    expect(type(2.25, 2).type).toBe('Exakt');
+    expect(type(0.0625, 2).type).toBe('Exakt');
+    expect(type(-32, 5).type).toBe('Exakt (ganze Zahl)');
+  });
+});

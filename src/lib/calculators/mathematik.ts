@@ -539,6 +539,28 @@ function rootError(message: string, formattedValue = 'Nicht definiert'): Calcula
  * Eingaben: value (Radikand), degree (Wurzelexponent n, optional, Standard 2).
  * Ungerade ganzzahlige n erlauben negative Radikanden (⁵√−32 = −2), gerade n nicht.
  */
+/**
+ * True only if r is exactly the n-th root of abs, checked with integer (BigInt) arithmetic on
+ * the decimal representations. A float round-trip (Math.pow(r, n) === abs) is not enough:
+ * e.g. Math.cbrt(200) ** 3 === 200 in IEEE doubles although the cube root of 200 is irrational.
+ */
+function isExactRoot(r: number, n: number, abs: number): boolean {
+  if (!Number.isInteger(n) || n < 1 || n > 64) return false;
+  const toFraction = (v: number, maxDecimals: number): [bigint, number] | null => {
+    const str = v.toFixed(maxDecimals).replace(/0+$/, '').replace(/\.$/, '');
+    if (!/^\d+(\.\d+)?$/.test(str) || Number(str) !== v) return null;
+    const [int, frac = ''] = str.split('.');
+    return [BigInt(int + frac), frac.length];
+  };
+  const root = toFraction(r, 6); // the result is shown with at most 6 decimals
+  const rad = toFraction(abs, 12);
+  if (!root || !rad) return false;
+  const [k, d] = root;
+  const [a, e] = rad;
+  // (k / 10^d)^n === a / 10^e  <=>  k^n · 10^e === a · 10^(d·n)
+  return k ** BigInt(n) * 10n ** BigInt(e) === a * 10n ** BigInt(d * n);
+}
+
 export function calculateRoot(inputs: Record<string, any>): CalculationResult {
   const rawValue = inputs.value;
   if (rawValue === undefined || rawValue === null || String(rawValue).trim() === '') {
@@ -585,7 +607,7 @@ export function calculateRoot(inputs: Record<string, any>): CalculationResult {
   const xStr = formatNumber(x, 10);
   const xTerm = x < 0 ? `(${xStr})` : xStr;
   const resStr = formatNumber(result, 6);
-  const exact = nIsInt && Math.pow(r, n) === abs;
+  const exact = nIsInt && isExactRoot(r, n, abs);
   const integerRadicand = Number.isSafeInteger(abs) && abs <= 1e12;
 
   const secondary: CalculationResult['secondary'] = [];
