@@ -10,7 +10,8 @@
     "lint": "eslint src --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "audit": "tsx scripts/audit-calculators.ts"
+    "audit": "tsx scripts/audit-calculators.ts",
+    "indexnow": "tsx scripts/indexnow.ts"
   },
   "dependencies": {
     "next": "^15.2.1",
