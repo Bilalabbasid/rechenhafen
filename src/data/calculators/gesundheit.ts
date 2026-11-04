@@ -44,7 +44,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
         ],
       },
       {
-        id: 'weight',
+        id: 'weight', convertOnChange: { field: 'unitSystem', factors: { metric: 1, imperial: 2.20462 }, decimals: 1 },
         label: 'Körpergewicht',
         type: 'number',
         defaultValue: 78,
@@ -55,7 +55,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
         conditionalLabels: [{ condition: { field: 'unitSystem', value: 'imperial' }, label: 'Körpergewicht', unit: 'lbs' }],
       },
       {
-        id: 'height',
+        id: 'height', convertOnChange: { field: 'unitSystem', factors: { metric: 1, imperial: 0.393701 }, decimals: 1 },
         label: 'Körpergröße',
         type: 'number',
         defaultValue: 180,

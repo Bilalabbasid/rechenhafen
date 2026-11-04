@@ -31,6 +31,17 @@ export interface CalculatorInput {
   conditionalOptions?: ConditionalOptionGroup[];
   conditionalLabels?: ConditionalLabelGroup[];
   dependsOn?: { field: string; value: any | any[] };
+  /**
+   * Show the unit that belongs to the option currently chosen in another select, e.g. the
+   * converter's "inputUnit": { field: 'inputUnit', units: { kg: 'kg', lbs: 'lbs' } }.
+   */
+  unitFromField?: { field: string; units: Record<string, string> };
+  /**
+   * When the select `field` switches (e.g. metric → imperial), convert this value so the
+   * quantity stays the same. factors[option] = amount in that option's unit per 1 base unit
+   * (the base option has factor 1). min/max are given in the base unit and scaled the same way.
+   */
+  convertOnChange?: { field: string; factors: Record<string, number>; decimals?: number };
 }
 
 export interface ResultItem {

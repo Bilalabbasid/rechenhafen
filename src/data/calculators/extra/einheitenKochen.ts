@@ -1,5 +1,5 @@
 import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
-import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+import { formatMeasure, formatCurrency, formatPercent } from '@/lib/formatters';
 import { calculateZollCmConversion, calculateTimeConversion } from '@/lib/calculators/einheiten';
 
 // ---------------------------------------------------------------------------
@@ -31,14 +31,14 @@ function buildPastaQuickReference(): string {
     .map(([label, key]) => {
       const d = PASTA_PORTIONS_G.dry[key];
       const f = PASTA_PORTIONS_G.fresh[key];
-      return `| ${label} | ${d} g → ca. ${formatNumber(pastaCookedG(d, dryF), 0)} g | ${f} g → ca. ${formatNumber(pastaCookedG(f, freshF), 0)} g |`;
+      return `| ${label} | ${d} g → ca. ${formatMeasure(pastaCookedG(d, dryF), 0)} g | ${f} g → ca. ${formatMeasure(pastaCookedG(f, freshF), 0)} g |`;
     })
     .join('\n');
   const groups = [2, 4, 6, 8]
     .map((p) => {
       const d = p * PASTA_PORTIONS_G.dry.mainDish;
       const f = p * PASTA_PORTIONS_G.fresh.mainDish;
-      return `| ${p} Personen | ${formatNumber(d, 0)} g → ca. ${formatNumber(pastaCookedG(d, dryF), 0)} g | ${formatNumber(f, 0)} g → ca. ${formatNumber(pastaCookedG(f, freshF), 0)} g |`;
+      return `| ${p} Personen | ${formatMeasure(d, 0)} g → ca. ${formatMeasure(pastaCookedG(d, dryF), 0)} g | ${formatMeasure(f, 0)} g → ca. ${formatMeasure(pastaCookedG(f, freshF), 0)} g |`;
     })
     .join('\n');
   const dMain = PASTA_PORTIONS_G.dry.mainDish;
@@ -68,7 +68,7 @@ function buildPastaConversionTable(): string {
   const lines = rows
     .map(([g, note]) => {
       const water = pastaWaterL(g);
-      return `- **${g} g trocken:** ca. ${formatNumber(pastaCookedG(g, f), 0)} g gekocht (${formatNumber(water, 1, 1)} l Wasser, ${Math.round(water * 10)} g Salz – ${note})`;
+      return `- **${g} g trocken:** ca. ${formatMeasure(pastaCookedG(g, f), 0)} g gekocht (${formatMeasure(water, 1, 1)} l Wasser, ${Math.round(water * 10)} g Salz – ${note})`;
     })
     .join('\n');
   return `Die folgende Übersicht zeigt das gekochte Serviergewicht sowie die benötigte Kochwassermenge für gängige Trockennudelmengen bei Standard-Hartweizen:\n\n${lines}`;
@@ -84,16 +84,16 @@ function buildErythritQuickReference(): string {
     .map((g) => {
       const exact = g * ERYTHRIT_SWEETNESS;
       const rounded = erythritToSugarG(g);
-      const exactNote = Number.isInteger(Math.round(exact * 100) / 100) ? '' : ` (rechnerisch ${formatNumber(exact, 2)} g)`;
+      const exactNote = Number.isInteger(Math.round(exact * 100) / 100) ? '' : ` (rechnerisch ${formatMeasure(exact, 2)} g)`;
       return `| ${g} g Erythrit | ${rounded} g Zucker${exactNote} |`;
     })
     .join('\n');
   const sugarRows = [50, 100, 120, 150, 200, 250]
-    .map((g) => `| ${g} g Zucker | ${sugarToErythritG(g)} g Erythrit (rechnerisch ${formatNumber(g / ERYTHRIT_SWEETNESS, 2, 2)} g) |`)
+    .map((g) => `| ${g} g Zucker | ${sugarToErythritG(g)} g Erythrit (rechnerisch ${formatMeasure(g / ERYTHRIT_SWEETNESS, 2, 2)} g) |`)
     .join('\n');
   const pct = Math.round(ERYTHRIT_SWEETNESS * 100);
   return [
-    `Die Tabellen nutzen dieselbe Annahme wie der Rechner: Reines Erythrit hat ca. ${pct} % der Süßkraft von Haushaltszucker. **Erythrit → Zucker:** Erythrit × ${formatNumber(ERYTHRIT_SWEETNESS, 2, 2)}. **Zucker → Erythrit:** Zucker ÷ ${formatNumber(ERYTHRIT_SWEETNESS, 2, 2)}. Der Rechner rundet auf ganze Gramm.`,
+    `Die Tabellen nutzen dieselbe Annahme wie der Rechner: Reines Erythrit hat ca. ${pct} % der Süßkraft von Haushaltszucker. **Erythrit → Zucker:** Erythrit × ${formatMeasure(ERYTHRIT_SWEETNESS, 2, 2)}. **Zucker → Erythrit:** Zucker ÷ ${formatMeasure(ERYTHRIT_SWEETNESS, 2, 2)}. Der Rechner rundet auf ganze Gramm.`,
     `**Wie viel Zucker entspricht Erythrit?**`,
     `| Erythrit | entspricht an Süße ca. |\n| --- | --- |\n${eryRows}`,
     `**Wie viel Erythrit ersetzt Zucker?**`,
@@ -108,11 +108,11 @@ const jamSugarG = (fruitG: number, ratio: string) => Math.round(fruitG * (JAM_SU
 
 function buildJamRatioReference(): string {
   const rows = [500, 750, 1000, 1500, 2000]
-    .map((g) => `| ${formatNumber(g, 0)} g | ${formatNumber(jamSugarG(g, '1_1'), 0)} g | ${formatNumber(jamSugarG(g, '2_1'), 0)} g | ${formatNumber(jamSugarG(g, '3_1'), 0)} g |`)
+    .map((g) => `| ${formatMeasure(g, 0)} g | ${formatMeasure(jamSugarG(g, '1_1'), 0)} g | ${formatMeasure(jamSugarG(g, '2_1'), 0)} g | ${formatMeasure(jamSugarG(g, '3_1'), 0)} g |`)
     .join('\n');
   return [
     'Die Zahl auf der Gelierzucker-Packung beschreibt das Gewichtsverhältnis **Frucht : Gelierzucker**. Der Rechner teilt das Fruchtgewicht deshalb durch die erste Zahl des Verhältnisses:',
-    `- **1:1** – 1 Teil Frucht auf 1 Teil Gelierzucker: 1.000 g Frucht → ${formatNumber(jamSugarG(1000, '1_1'), 0)} g Gelierzucker\n- **2:1** – 2 Teile Frucht auf 1 Teil Gelierzucker: 1.000 g Frucht → ${jamSugarG(1000, '2_1')} g Gelierzucker\n- **3:1** – 3 Teile Frucht auf 1 Teil Gelierzucker: 1.500 g Frucht → ${jamSugarG(1500, '3_1')} g Gelierzucker (1.000 g Frucht → ca. ${jamSugarG(1000, '3_1')} g)`,
+    `- **1:1** – 1 Teil Frucht auf 1 Teil Gelierzucker: 1.000 g Frucht → ${formatMeasure(jamSugarG(1000, '1_1'), 0)} g Gelierzucker\n- **2:1** – 2 Teile Frucht auf 1 Teil Gelierzucker: 1.000 g Frucht → ${jamSugarG(1000, '2_1')} g Gelierzucker\n- **3:1** – 3 Teile Frucht auf 1 Teil Gelierzucker: 1.500 g Frucht → ${jamSugarG(1500, '3_1')} g Gelierzucker (1.000 g Frucht → ca. ${jamSugarG(1000, '3_1')} g)`,
     '**Benötigter Gelierzucker je Verhältnis:**',
     `| Früchte | 1:1 | 2:1 | 3:1 |\n| --- | --- | --- | --- |\n${rows}`,
     'Je höher die erste Zahl, desto weniger Zucker kommt ins Glas. Damit die Masse trotzdem fest wird, enthalten 2:1- und 3:1-Gelierzucker anteilig mehr Geliermittel. Produkte unterscheiden sich in Zusammensetzung, Kochzeit und Zitronensäureanteil – richten Sie sich beim Kochen zusätzlich nach der Anleitung auf Ihrer Packung.',
@@ -367,14 +367,14 @@ const SPOON_TYPE_NAMES: Record<string, string> = {
 
 function buildSpoonWeightTable(): string {
   const rows = Object.values(SPOON_WEIGHTS_G)
-    .map((w) => `| ${w.name} | ${formatNumber(w.elLevel, 1)} g | ${formatNumber(w.elHeaped, 1)} g | ${formatNumber(w.tlLevel, 1)} g | ${formatNumber(w.tlHeaped, 1)} g |`)
+    .map((w) => `| ${w.name} | ${formatMeasure(w.elLevel, 1)} g | ${formatMeasure(w.elHeaped, 1)} g | ${formatMeasure(w.tlLevel, 1)} g | ${formatMeasure(w.tlHeaped, 1)} g |`)
     .join('\n');
   return `| Zutat | 1 EL gestrichen | 1 EL gehäuft | 1 TL gestrichen | 1 TL gehäuft |\n| --- | --- | --- | --- | --- |\n${rows}`;
 }
 
 function buildDensityTable(): string {
   const rows = Object.values(KITCHEN_DENSITIES)
-    .map((d) => `| ${d.name} | ${formatNumber(d.density, 2)} g/ml | ${formatNumber(100 / d.density, 0)} ml | ${formatNumber(100 * d.density, 0)} g |`)
+    .map((d) => `| ${d.name} | ${formatMeasure(d.density, 2)} g/ml | ${formatMeasure(100 / d.density, 0)} ml | ${formatMeasure(100 * d.density, 0)} g |`)
     .join('\n');
   return `| Zutat | Dichte | 100 g entsprechen | 100 ml wiegen |\n| --- | --- | --- | --- |\n${rows}`;
 }
@@ -402,18 +402,18 @@ function calculateKitchenMeasures(inputs: Record<string, any>): CalculationResul
       if (!Number.isFinite(grams)) return fail('volumeMl', 'Bitte geben Sie das Gewicht als gültige Zahl ein.');
       if (grams < 0) return fail('volumeMl', 'Das Gewicht darf nicht negativ sein.');
       const ml = grams / ing.density;
-      const text = `${formatNumber(grams, 1)} g ${ing.name} entsprechen bei einer Dichte von ${formatNumber(ing.density, 2)} g/ml ${formatNumber(ml, 1)} ml.`;
+      const text = `${formatMeasure(grams, 1)} g ${ing.name} entsprechen bei einer Dichte von ${formatMeasure(ing.density, 2)} g/ml ${formatMeasure(ml, 1)} ml.`;
       return {
-        primary: { id: 'volumeMl', label: `Volumen ${ing.name}`, value: ml, formattedValue: `${formatNumber(ml, 1)} ml`, highlight: true },
+        primary: { id: 'volumeMl', label: `Volumen ${ing.name}`, value: ml, formattedValue: `${formatMeasure(ml, 1)} ml`, highlight: true },
         secondary: [
-          { id: 'tablespoons', label: 'Entspricht Esslöffeln (je 15 ml)', value: ml / 15, formattedValue: `ca. ${formatNumber(ml / 15, 1)} EL` },
-          { id: 'teaspoons', label: 'Entspricht Teelöffeln (je 5 ml)', value: ml / 5, formattedValue: `ca. ${formatNumber(ml / 5, 1)} TL` },
-          { id: 'liters', label: 'In Litern', value: ml / 1000, formattedValue: `${formatNumber(ml / 1000, 3)} l` },
-          { id: 'densityUsed', label: 'Zugrunde gelegte Dichte', value: ing.density, formattedValue: `${formatNumber(ing.density, 2)} g/ml` },
+          { id: 'tablespoons', label: 'Entspricht Esslöffeln (je 15 ml)', value: ml / 15, formattedValue: `ca. ${formatMeasure(ml / 15, 1)} EL` },
+          { id: 'teaspoons', label: 'Entspricht Teelöffeln (je 5 ml)', value: ml / 5, formattedValue: `ca. ${formatMeasure(ml / 5, 1)} TL` },
+          { id: 'liters', label: 'In Litern', value: ml / 1000, formattedValue: `${formatMeasure(ml / 1000, 3)} l` },
+          { id: 'densityUsed', label: 'Zugrunde gelegte Dichte', value: ing.density, formattedValue: `${formatMeasure(ing.density, 2)} g/ml` },
         ],
         summaryText: text,
         directAnswer: text,
-        calculationSteps: [`${formatNumber(grams, 1)} g ÷ ${formatNumber(ing.density, 2)} g/ml = ${formatNumber(ml, 1)} ml`],
+        calculationSteps: [`${formatMeasure(grams, 1)} g ÷ ${formatMeasure(ing.density, 2)} g/ml = ${formatMeasure(ml, 1)} ml`],
         qualifications: ['Richtwert: Bei Pulvern wie Mehl oder Zucker hängt das Volumen davon ab, wie locker die Zutat im Messbecher liegt. Für genaues Backen ist eine Waage besser.'],
       };
     }
@@ -422,18 +422,18 @@ function calculateKitchenMeasures(inputs: Record<string, any>): CalculationResul
     if (!Number.isFinite(ml)) return fail('grams', 'Bitte geben Sie das Volumen als gültige Zahl ein.');
     if (ml < 0) return fail('grams', 'Das Volumen darf nicht negativ sein.');
     const grams = ml * ing.density;
-    const text = `${formatNumber(ml, 1)} ml ${ing.name} wiegen bei einer Dichte von ${formatNumber(ing.density, 2)} g/ml ${formatNumber(grams, 1)} g.`;
+    const text = `${formatMeasure(ml, 1)} ml ${ing.name} wiegen bei einer Dichte von ${formatMeasure(ing.density, 2)} g/ml ${formatMeasure(grams, 1)} g.`;
     return {
-      primary: { id: 'grams', label: `Gewicht ${ing.name}`, value: grams, formattedValue: `${formatNumber(grams, 1)} g`, highlight: true },
+      primary: { id: 'grams', label: `Gewicht ${ing.name}`, value: grams, formattedValue: `${formatMeasure(grams, 1)} g`, highlight: true },
       secondary: [
-        { id: 'tablespoons', label: 'Volumen in Esslöffeln (je 15 ml)', value: ml / 15, formattedValue: `ca. ${formatNumber(ml / 15, 1)} EL` },
-        { id: 'teaspoons', label: 'Volumen in Teelöffeln (je 5 ml)', value: ml / 5, formattedValue: `ca. ${formatNumber(ml / 5, 1)} TL` },
-        { id: 'kilograms', label: 'In Kilogramm', value: grams / 1000, formattedValue: `${formatNumber(grams / 1000, 3)} kg` },
-        { id: 'densityUsed', label: 'Zugrunde gelegte Dichte', value: ing.density, formattedValue: `${formatNumber(ing.density, 2)} g/ml` },
+        { id: 'tablespoons', label: 'Volumen in Esslöffeln (je 15 ml)', value: ml / 15, formattedValue: `ca. ${formatMeasure(ml / 15, 1)} EL` },
+        { id: 'teaspoons', label: 'Volumen in Teelöffeln (je 5 ml)', value: ml / 5, formattedValue: `ca. ${formatMeasure(ml / 5, 1)} TL` },
+        { id: 'kilograms', label: 'In Kilogramm', value: grams / 1000, formattedValue: `${formatMeasure(grams / 1000, 3)} kg` },
+        { id: 'densityUsed', label: 'Zugrunde gelegte Dichte', value: ing.density, formattedValue: `${formatMeasure(ing.density, 2)} g/ml` },
       ],
       summaryText: text,
       directAnswer: text,
-      calculationSteps: [`${formatNumber(ml, 1)} ml × ${formatNumber(ing.density, 2)} g/ml = ${formatNumber(grams, 1)} g`],
+      calculationSteps: [`${formatMeasure(ml, 1)} ml × ${formatMeasure(ing.density, 2)} g/ml = ${formatMeasure(grams, 1)} g`],
       qualifications: ['Richtwert: Bei Pulvern wie Mehl oder Zucker hängt das Gewicht davon ab, wie locker die Zutat im Messbecher liegt. Für genaues Backen ist eine Waage besser.'],
     };
   }
@@ -450,16 +450,16 @@ function calculateKitchenMeasures(inputs: Record<string, any>): CalculationResul
   const totalGrams = count * gramPerSpoon;
   const isEl = spoonKey.startsWith('el');
   const mlVol = count * (isEl ? 15 : 5);
-  const text = `${formatNumber(count, 2)} ${SPOON_TYPE_NAMES[spoonKey]} ${ing.name} wiegen etwa ${formatNumber(totalGrams, 1)} g (${formatNumber(gramPerSpoon, 1)} g pro Löffel).`;
+  const text = `${formatMeasure(count, 2)} ${SPOON_TYPE_NAMES[spoonKey]} ${ing.name} wiegen etwa ${formatMeasure(totalGrams, 1)} g (${formatMeasure(gramPerSpoon, 1)} g pro Löffel).`;
   return {
-    primary: { id: 'grams', label: 'Gewicht in Gramm', value: totalGrams, formattedValue: `${formatNumber(totalGrams, 1)} g`, highlight: true },
+    primary: { id: 'grams', label: 'Gewicht in Gramm', value: totalGrams, formattedValue: `${formatMeasure(totalGrams, 1)} g`, highlight: true },
     secondary: [
-      { id: 'perSpoon', label: 'Gewicht pro Löffel', value: gramPerSpoon, formattedValue: `${formatNumber(gramPerSpoon, 1)} g` },
-      { id: 'mlVol', label: 'Löffelvolumen (gestrichen)', value: mlVol, formattedValue: `${formatNumber(mlVol, 1)} ml` },
+      { id: 'perSpoon', label: 'Gewicht pro Löffel', value: gramPerSpoon, formattedValue: `${formatMeasure(gramPerSpoon, 1)} g` },
+      { id: 'mlVol', label: 'Löffelvolumen (gestrichen)', value: mlVol, formattedValue: `${formatMeasure(mlVol, 1)} ml` },
     ],
     summaryText: text,
     directAnswer: text,
-    calculationSteps: [`${formatNumber(count, 2)} × ${formatNumber(gramPerSpoon, 1)} g = ${formatNumber(totalGrams, 1)} g`],
+    calculationSteps: [`${formatMeasure(count, 2)} × ${formatMeasure(gramPerSpoon, 1)} g = ${formatMeasure(totalGrams, 1)} g`],
     qualifications: ['Richtwerte für haushaltsübliche Löffel. Löffelgröße und Füllhöhe schwanken – für Backrezepte mit wenig Spielraum ist eine Feinwaage genauer.'],
   };
 }
@@ -479,7 +479,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["gewicht umrechner kg in lbs","pfund in kilogramm umrechnen formel","unzen oz in gramm umrechner","tonnen in kilogramm berechnen"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"kg": "kg", "g": "g", "mg": "mg", "t": "t", "lbs": "lbs", "oz": "oz"} },
                 "label": "Gewichtswert",
                 "type": "number",
                 "defaultValue": 10,
@@ -539,14 +539,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const t = kg / 1000;
       
       return {
-        primary: { id: 'kg', label: 'Masse in Kilogramm (kg)', value: kg, formattedValue: formatNumber(kg, 4) + ' kg', highlight: true },
+        primary: { id: 'kg', label: 'Masse in Kilogramm (kg)', value: kg, formattedValue: formatMeasure(kg, 4) + ' kg', highlight: true },
         secondary: [
-          { id: 'g', label: 'Gramm (g)', value: g, formattedValue: formatNumber(g, 2) + ' g' },
-          { id: 'lbs', label: 'Englisches Pfund (lbs)', value: lbs, formattedValue: formatNumber(lbs, 3) + ' lbs' },
-          { id: 'oz', label: 'Unzen (oz)', value: oz, formattedValue: formatNumber(oz, 2) + ' oz' },
-          { id: 'tonnes', label: 'Tonnen (t)', value: t, formattedValue: formatNumber(t, 6) + ' t' },
+          { id: 'g', label: 'Gramm (g)', value: g, formattedValue: formatMeasure(g, 2) + ' g' },
+          { id: 'lbs', label: 'Englisches Pfund (lbs)', value: lbs, formattedValue: formatMeasure(lbs, 3) + ' lbs' },
+          { id: 'oz', label: 'Unzen (oz)', value: oz, formattedValue: formatMeasure(oz, 2) + ' oz' },
+          { id: 'tonnes', label: 'Tonnen (t)', value: t, formattedValue: formatMeasure(t, 6) + ' t' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(kg, 3) + ' kg (' + formatNumber(g, 1) + ' g, ' + formatNumber(lbs, 2) + ' lbs oder ' + formatNumber(oz, 1) + ' oz).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(kg, 3) + ' kg (' + formatMeasure(g, 1) + ' g, ' + formatMeasure(lbs, 2) + ' lbs oder ' + formatMeasure(oz, 1) + ' oz).',
       };
     },
     formula: "1 lb = 0,45359237 kg; 1 oz = 28,3495 g; 1 t = 1.000 kg",
@@ -588,7 +588,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["druck umrechner bar psi","psi in bar umrechnen formel reifendruck","pascal in bar hpa mbar","bar in torr mmhg rechner"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"bar": "bar", "psi": "PSI", "pa": "Pa", "hpa": "hPa", "mpa": "MPa", "torr": "Torr"} },
                 "label": "Druckwert",
                 "type": "number",
                 "defaultValue": 2.5,
@@ -649,14 +649,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const mpa = pa / 1000000;
       
       return {
-        primary: { id: 'bar', label: 'Druck in Bar (bar)', value: bar, formattedValue: formatNumber(bar, 4) + ' bar', highlight: true },
+        primary: { id: 'bar', label: 'Druck in Bar (bar)', value: bar, formattedValue: formatMeasure(bar, 4) + ' bar', highlight: true },
         secondary: [
-          { id: 'psi', label: 'Pound-force per sq inch (PSI)', value: psi, formattedValue: formatNumber(psi, 2) + ' PSI' },
-          { id: 'hpa', label: 'Hektopascal / Millibar (hPa/mbar)', value: hpa, formattedValue: formatNumber(hpa, 1) + ' hPa' },
-          { id: 'mpa', label: 'Megapascal (MPa = N/mm²)', value: mpa, formattedValue: formatNumber(mpa, 4) + ' MPa' },
-          { id: 'torr', label: 'Torr / mm Quecksilbersäule (mmHg)', value: torr, formattedValue: formatNumber(torr, 1) + ' Torr' },
+          { id: 'psi', label: 'Pound-force per sq inch (PSI)', value: psi, formattedValue: formatMeasure(psi, 2) + ' PSI' },
+          { id: 'hpa', label: 'Hektopascal / Millibar (hPa/mbar)', value: hpa, formattedValue: formatMeasure(hpa, 1) + ' hPa' },
+          { id: 'mpa', label: 'Megapascal (MPa = N/mm²)', value: mpa, formattedValue: formatMeasure(mpa, 4) + ' MPa' },
+          { id: 'torr', label: 'Torr / mm Quecksilbersäule (mmHg)', value: torr, formattedValue: formatMeasure(torr, 1) + ' Torr' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(bar, 3) + ' bar bzw. ' + formatNumber(psi, 2) + ' PSI (' + formatNumber(hpa, 0) + ' hPa).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(bar, 3) + ' bar bzw. ' + formatMeasure(psi, 2) + ' PSI (' + formatMeasure(hpa, 0) + ' hPa).',
       };
     },
     formula: "1 bar = 100.000 Pa = 14,5038 PSI; 1 PSI ≈ 0,068947 bar; 1 bar = 750,06 Torr",
@@ -698,7 +698,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["geschwindigkeit umrechnen kmh ms formel", "mph in kmh umrechnen meilen pro stunde", "knoten in kmh seemeilen umrechner", "meter pro sekunde in kmh teilen 3 6", "geschwindigkeit umrechner knoten"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"kmh": "km/h", "ms": "m/s", "mph": "mph", "kn": "kn", "mach": "Mach"} },
                 "label": "Geschwindigkeitswert",
                 "type": "number",
                 "defaultValue": 100,
@@ -753,14 +753,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const mach = ms / 343;
       
       return {
-        primary: { id: 'kmh', label: 'Geschwindigkeit in km/h', value: kmh, formattedValue: formatNumber(kmh, 2) + ' km/h', highlight: true },
+        primary: { id: 'kmh', label: 'Geschwindigkeit in km/h', value: kmh, formattedValue: formatMeasure(kmh, 2) + ' km/h', highlight: true },
         secondary: [
-          { id: 'ms', label: 'Meter pro Sekunde (m/s)', value: ms, formattedValue: formatNumber(ms, 2) + ' m/s' },
-          { id: 'mph', label: 'Meilen pro Stunde (mph)', value: mph, formattedValue: formatNumber(mph, 2) + ' mph' },
-          { id: 'kn', label: 'Knoten (Seemeilen/h)', value: kn, formattedValue: formatNumber(kn, 2) + ' kn' },
-          { id: 'mach', label: 'Machzahl (Schallgeschwindigkeit)', value: mach, formattedValue: 'Mach ' + formatNumber(mach, 3) },
+          { id: 'ms', label: 'Meter pro Sekunde (m/s)', value: ms, formattedValue: formatMeasure(ms, 2) + ' m/s' },
+          { id: 'mph', label: 'Meilen pro Stunde (mph)', value: mph, formattedValue: formatMeasure(mph, 2) + ' mph' },
+          { id: 'kn', label: 'Knoten (Seemeilen/h)', value: kn, formattedValue: formatMeasure(kn, 2) + ' kn' },
+          { id: 'mach', label: 'Machzahl (Schallgeschwindigkeit)', value: mach, formattedValue: 'Mach ' + formatMeasure(mach, 3) },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatNumber(kmh, 1) + ' km/h, ' + formatNumber(ms, 2) + ' m/s, ' + formatNumber(mph, 1) + ' mph und ' + formatNumber(kn, 1) + ' Knoten.',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatMeasure(kmh, 1) + ' km/h, ' + formatMeasure(ms, 2) + ' m/s, ' + formatMeasure(mph, 1) + ' mph und ' + formatMeasure(kn, 1) + ' Knoten.',
       };
     },
     formula: "km/h = m/s × 3,6; m/s = km/h / 3,6; 1 mph = 1,609344 km/h; 1 Knoten = 1,852 km/h",
@@ -805,7 +805,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["volumen umrechner liter m3 gallonen","us gallon in liter umrechnen formel","kubikmeter in liter m3","fluid ounces fl oz in ml"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"l": "l", "ml": "ml", "m3": "m³", "usgal": "US gal", "ukgal": "UK gal", "floz": "fl oz"} },
                 "label": "Volumenwert",
                 "type": "number",
                 "defaultValue": 10,
@@ -866,14 +866,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const floz = (liters * 1000) / 29.5735295625;
       
       return {
-        primary: { id: 'liters', label: 'Volumen in Litern (l)', value: liters, formattedValue: formatNumber(liters, 3) + ' Liter', highlight: true },
+        primary: { id: 'liters', label: 'Volumen in Litern (l)', value: liters, formattedValue: formatMeasure(liters, 3) + ' Liter', highlight: true },
         secondary: [
-          { id: 'm3', label: 'Kubikmeter (m³)', value: m3, formattedValue: formatNumber(m3, 4) + ' m³' },
-          { id: 'ml', label: 'Milliliter (ml)', value: ml, formattedValue: formatNumber(ml, 1) + ' ml' },
-          { id: 'usgal', label: 'US Gallonen (gal)', value: usgal, formattedValue: formatNumber(usgal, 2) + ' gal' },
-          { id: 'floz', label: 'US Fluid Ounces (fl oz)', value: floz, formattedValue: formatNumber(floz, 1) + ' fl oz' },
+          { id: 'm3', label: 'Kubikmeter (m³)', value: m3, formattedValue: formatMeasure(m3, 4) + ' m³' },
+          { id: 'ml', label: 'Milliliter (ml)', value: ml, formattedValue: formatMeasure(ml, 1) + ' ml' },
+          { id: 'usgal', label: 'US Gallonen (gal)', value: usgal, formattedValue: formatMeasure(usgal, 2) + ' gal' },
+          { id: 'floz', label: 'US Fluid Ounces (fl oz)', value: floz, formattedValue: formatMeasure(floz, 1) + ' fl oz' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(liters, 2) + ' Litern (' + formatNumber(m3, 3) + ' m³ bzw. ' + formatNumber(usgal, 2) + ' US-Gallonen).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(liters, 2) + ' Litern (' + formatMeasure(m3, 3) + ' m³ bzw. ' + formatMeasure(usgal, 2) + ' US-Gallonen).',
       };
     },
     formula: "1 m³ = 1.000 l; 1 US gal = 3,78541 l; 1 UK gal = 4,54609 l; 1 US fl oz = 29,5735 ml",
@@ -915,7 +915,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["flaechen umrechner m2 hektar","hektar in quadratmeter umrechnen 10000","ar in m2 umrechner","acre in hektar quadratmeter"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"ha": "ha", "m2": "m²", "km2": "km²", "a": "a", "acre": "ac", "sqft": "ft²"} },
                 "label": "Flächenwert",
                 "type": "number",
                 "defaultValue": 1,
@@ -976,14 +976,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const sqft = m2 / 0.09290304;
       
       return {
-        primary: { id: 'm2', label: 'Fläche in Quadratmetern (m²)', value: m2, formattedValue: formatNumber(m2, 2) + ' m²', highlight: true },
+        primary: { id: 'm2', label: 'Fläche in Quadratmetern (m²)', value: m2, formattedValue: formatMeasure(m2, 2) + ' m²', highlight: true },
         secondary: [
-          { id: 'ha', label: 'Hektar (ha)', value: ha, formattedValue: formatNumber(ha, 4) + ' ha' },
-          { id: 'a', label: 'Ar (a)', value: a, formattedValue: formatNumber(a, 2) + ' a' },
-          { id: 'acre', label: 'Acres (ac)', value: acre, formattedValue: formatNumber(acre, 3) + ' Acres' },
-          { id: 'km2', label: 'Quadratkilometer (km²)', value: km2, formattedValue: formatNumber(km2, 6) + ' km²' },
+          { id: 'ha', label: 'Hektar (ha)', value: ha, formattedValue: formatMeasure(ha, 4) + ' ha' },
+          { id: 'a', label: 'Ar (a)', value: a, formattedValue: formatMeasure(a, 2) + ' a' },
+          { id: 'acre', label: 'Acres (ac)', value: acre, formattedValue: formatMeasure(acre, 3) + ' Acres' },
+          { id: 'km2', label: 'Quadratkilometer (km²)', value: km2, formattedValue: formatMeasure(km2, 6) + ' km²' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(m2, 1) + ' m² (' + formatNumber(ha, 2) + ' ha bzw. ' + formatNumber(acre, 2) + ' Acres).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(m2, 1) + ' m² (' + formatMeasure(ha, 2) + ' ha bzw. ' + formatMeasure(acre, 2) + ' Acres).',
       };
     },
     formula: "1 ha = 10.000 m² = 100 Ar; 1 km² = 100 ha = 1.000.000 m²; 1 Acre ≈ 4.046,86 m²",
@@ -1025,7 +1025,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["energie umrechner joule kwh formel","kwh in joule megajoule umrechnen","kilokalorien in kwh berechnen heizung","btu in wattstunden joule rechner"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"kwh": "kWh", "j": "J", "kj": "kJ", "mj": "MJ", "kcal": "kcal", "btu": "BTU"} },
                 "label": "Energiewert",
                 "type": "number",
                 "defaultValue": 100,
@@ -1086,14 +1086,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const btu = joule / 1055.05585;
       
       return {
-        primary: { id: 'kwh', label: 'Energie in Kilowattstunden (kWh)', value: kwh, formattedValue: formatNumber(kwh, 4) + ' kWh', highlight: true },
+        primary: { id: 'kwh', label: 'Energie in Kilowattstunden (kWh)', value: kwh, formattedValue: formatMeasure(kwh, 4) + ' kWh', highlight: true },
         secondary: [
-          { id: 'mj', label: 'Megajoule (MJ)', value: mj, formattedValue: formatNumber(mj, 3) + ' MJ' },
-          { id: 'kj', label: 'Kilojoule (kJ)', value: kj, formattedValue: formatNumber(kj, 1) + ' kJ' },
-          { id: 'kcal', label: 'Kilokalorien (kcal)', value: kcal, formattedValue: formatNumber(kcal, 1) + ' kcal' },
-          { id: 'btu', label: 'British Thermal Units (BTU)', value: btu, formattedValue: formatNumber(btu, 1) + ' BTU' },
+          { id: 'mj', label: 'Megajoule (MJ)', value: mj, formattedValue: formatMeasure(mj, 3) + ' MJ' },
+          { id: 'kj', label: 'Kilojoule (kJ)', value: kj, formattedValue: formatMeasure(kj, 1) + ' kJ' },
+          { id: 'kcal', label: 'Kilokalorien (kcal)', value: kcal, formattedValue: formatMeasure(kcal, 1) + ' kcal' },
+          { id: 'btu', label: 'British Thermal Units (BTU)', value: btu, formattedValue: formatMeasure(btu, 1) + ' BTU' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(kwh, 3) + ' kWh (' + formatNumber(mj, 2) + ' MJ bzw. ' + formatNumber(kcal, 0) + ' kcal).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(kwh, 3) + ' kWh (' + formatMeasure(mj, 2) + ' MJ bzw. ' + formatMeasure(kcal, 0) + ' kcal).',
       };
     },
     formula: "1 kWh = 3,6 MJ = 3.600.000 J; 1 kcal = 4.184 J; 1 BTU ≈ 1.055 J",
@@ -1136,7 +1136,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["leistung umrechner kw in ps formel 1 36","ps in kw umrechnen auto","horsepower hp in kw rechner","watt in kilowatt pferdestaerke"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"ps": "PS", "kw": "kW", "w": "W", "hp": "hp"} },
                 "label": "Leistungswert",
                 "type": "number",
                 "defaultValue": 150,
@@ -1185,13 +1185,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const hp = kw / 0.74569987;
       
       return {
-        primary: { id: 'kw', label: 'Leistung in Kilowatt (kW)', value: kw, formattedValue: formatNumber(kw, 2) + ' kW', highlight: true },
+        primary: { id: 'kw', label: 'Leistung in Kilowatt (kW)', value: kw, formattedValue: formatMeasure(kw, 2) + ' kW', highlight: true },
         secondary: [
-          { id: 'ps', label: 'Metrische Pferdestärke (PS)', value: ps, formattedValue: formatNumber(ps, 1) + ' PS' },
-          { id: 'hp', label: 'Mechanical Horsepower (hp)', value: hp, formattedValue: formatNumber(hp, 1) + ' hp' },
-          { id: 'watt', label: 'Watt (W)', value: w, formattedValue: formatNumber(w, 0) + ' W' },
+          { id: 'ps', label: 'Metrische Pferdestärke (PS)', value: ps, formattedValue: formatMeasure(ps, 1) + ' PS' },
+          { id: 'hp', label: 'Mechanical Horsepower (hp)', value: hp, formattedValue: formatMeasure(hp, 1) + ' hp' },
+          { id: 'watt', label: 'Watt (W)', value: w, formattedValue: formatMeasure(w, 0) + ' W' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(kw, 2) + ' kW bzw. ' + formatNumber(ps, 1) + ' PS (' + formatNumber(hp, 1) + ' hp).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(kw, 2) + ' kW bzw. ' + formatMeasure(ps, 1) + ' PS (' + formatMeasure(hp, 1) + ' hp).',
       };
     },
     formula: "1 kW ≈ 1,35962 PS; 1 PS = 735,49875 Watt; 1 hp ≈ 1,01387 PS",
@@ -1294,14 +1294,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const tib = bytes / Math.pow(1024, 4);
       
       return {
-        primary: { id: 'gb', label: 'Gigabyte dezimal (GB)', value: gb, formattedValue: formatNumber(gb, 3) + ' GB', highlight: true },
+        primary: { id: 'gb', label: 'Gigabyte dezimal (GB)', value: gb, formattedValue: formatMeasure(gb, 3) + ' GB', highlight: true },
         secondary: [
-          { id: 'gib', label: 'Gibibyte binär (GiB – echte Windows-Anzeige)', value: gib, formattedValue: formatNumber(gib, 3) + ' GiB' },
-          { id: 'mb', label: 'Megabyte (MB)', value: mb, formattedValue: formatNumber(mb, 1) + ' MB' },
-          { id: 'tb', label: 'Terabyte (TB)', value: tb, formattedValue: formatNumber(tb, 4) + ' TB' },
-          { id: 'bits', label: 'Bits Gesamtanzahl', value: bytes * 8, formattedValue: formatNumber(bytes * 8, 0) + ' Bits' },
+          { id: 'gib', label: 'Gibibyte binär (GiB – echte Windows-Anzeige)', value: gib, formattedValue: formatMeasure(gib, 3) + ' GiB' },
+          { id: 'mb', label: 'Megabyte (MB)', value: mb, formattedValue: formatMeasure(mb, 1) + ' MB' },
+          { id: 'tb', label: 'Terabyte (TB)', value: tb, formattedValue: formatMeasure(tb, 4) + ' TB' },
+          { id: 'bits', label: 'Bits Gesamtanzahl', value: bytes * 8, formattedValue: formatMeasure(bytes * 8, 0) + ' Bits' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatNumber(gb, 2) + ' GB dezimal (Herstellerangabe) bzw. ' + formatNumber(gib, 2) + ' GiB im Betriebssystem Windows.',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatMeasure(gb, 2) + ' GB dezimal (Herstellerangabe) bzw. ' + formatMeasure(gib, 2) + ' GiB im Betriebssystem Windows.',
       };
     },
     formula: "Dezimal (SI): 1 GB = 1.000 MB = 10⁹ Byte; Binär (IEC): 1 GiB = 1.024 MiB = 2³⁰ Byte",
@@ -1419,11 +1419,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       return {
         primary: { id: 'duration', label: 'Voraussichtliche Download-Dauer', value: durationSeconds, formattedValue: durationText, highlight: true },
         secondary: [
-          { id: 'effectiveSpeed', label: 'Effektive Download-Geschwindigkeit', value: effectiveMbs, formattedValue: formatNumber(effectiveMbs, 2) + ' MB/s' },
-          { id: 'theoreticalSpeed', label: 'Theoretisches Maximum', value: theoreticalMbs, formattedValue: formatNumber(theoreticalMbs, 2) + ' MB/s' },
-          { id: 'fileSize', label: 'Dateigröße in Megabyte', value: totalMegabytes, formattedValue: formatNumber(totalMegabytes, 0) + ' MB' },
+          { id: 'effectiveSpeed', label: 'Effektive Download-Geschwindigkeit', value: effectiveMbs, formattedValue: formatMeasure(effectiveMbs, 2) + ' MB/s' },
+          { id: 'theoreticalSpeed', label: 'Theoretisches Maximum', value: theoreticalMbs, formattedValue: formatMeasure(theoreticalMbs, 2) + ' MB/s' },
+          { id: 'fileSize', label: 'Dateigröße in Megabyte', value: totalMegabytes, formattedValue: formatMeasure(totalMegabytes, 0) + ' MB' },
         ],
-        summaryText: 'Ein Download von ' + sizeGb + ' GB bei ' + speedMbits + ' Mbit/s Leitung (effektiv ca. ' + formatNumber(effectiveMbs, 1) + ' MB/s) dauert rund ' + durationText + '.',
+        summaryText: 'Ein Download von ' + sizeGb + ' GB bei ' + speedMbits + ' Mbit/s Leitung (effektiv ca. ' + formatMeasure(effectiveMbs, 1) + ' MB/s) dauert rund ' + durationText + '.',
       };
     },
     formula: "Downloadzeit (s) = (Dateigröße in MB) / (Bandbreite in Mbit/s / 8 × Overheadfaktor)",
@@ -1470,7 +1470,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["drehmoment umrechner nm in ft lb","newtonmeter in foot pounds umrechnen","drehmomentschluessel tabelle nm in lb","drehmoment kpm newtonmeter"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"nm": "Nm", "ftlb": "ft-lb", "inlb": "in-lb", "kpm": "kpm"} },
                 "label": "Drehmomentwert",
                 "type": "number",
                 "defaultValue": 120,
@@ -1519,13 +1519,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const kpm = nm / 9.80665;
       
       return {
-        primary: { id: 'nm', label: 'Drehmoment in Newtonmetern (Nm)', value: nm, formattedValue: formatNumber(nm, 2) + ' Nm', highlight: true },
+        primary: { id: 'nm', label: 'Drehmoment in Newtonmetern (Nm)', value: nm, formattedValue: formatMeasure(nm, 2) + ' Nm', highlight: true },
         secondary: [
-          { id: 'ftlb', label: 'Foot-Pounds (ft-lb)', value: ftlb, formattedValue: formatNumber(ftlb, 2) + ' ft-lb' },
-          { id: 'inlb', label: 'Inch-Pounds (in-lb)', value: inlb, formattedValue: formatNumber(inlb, 1) + ' in-lb' },
-          { id: 'kpm', label: 'Kilopondmeter (kpm)', value: kpm, formattedValue: formatNumber(kpm, 2) + ' kpm' },
+          { id: 'ftlb', label: 'Foot-Pounds (ft-lb)', value: ftlb, formattedValue: formatMeasure(ftlb, 2) + ' ft-lb' },
+          { id: 'inlb', label: 'Inch-Pounds (in-lb)', value: inlb, formattedValue: formatMeasure(inlb, 1) + ' in-lb' },
+          { id: 'kpm', label: 'Kilopondmeter (kpm)', value: kpm, formattedValue: formatMeasure(kpm, 2) + ' kpm' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(nm, 2) + ' Nm bzw. ' + formatNumber(ftlb, 2) + ' ft-lb.',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(nm, 2) + ' Nm bzw. ' + formatMeasure(ftlb, 2) + ' ft-lb.',
       };
     },
     formula: "1 Nm ≈ 0,737562 ft-lb; 1 ft-lb ≈ 1,35582 Nm; 1 kpm ≈ 9,80665 Nm",
@@ -1567,7 +1567,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["kraft umrechner newton kilonewton kn","kilonewton in tonnen umrechnen fahrstuhllast","kilopond kp in newton n","pound force lbf in newton rechner"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"kn": "kN", "n": "N", "mn": "MN", "kp": "kp", "lbf": "lbf"} },
                 "label": "Kraftwert",
                 "type": "number",
                 "defaultValue": 10,
@@ -1622,14 +1622,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const tonnesWeight = n / 9806.65; // Entsprechende Erd-Gewichtsmasse
       
       return {
-        primary: { id: 'kn', label: 'Kraft in Kilonewton (kN)', value: kn, formattedValue: formatNumber(kn, 3) + ' kN', highlight: true },
+        primary: { id: 'kn', label: 'Kraft in Kilonewton (kN)', value: kn, formattedValue: formatMeasure(kn, 3) + ' kN', highlight: true },
         secondary: [
-          { id: 'n', label: 'Newton (N)', value: n, formattedValue: formatNumber(n, 1) + ' N' },
-          { id: 'tonnes', label: 'Entsprechende Masse auf der Erde (g = 9,81 m/s²)', value: tonnesWeight, formattedValue: 'ca. ' + formatNumber(tonnesWeight, 3) + ' Tonnen' },
-          { id: 'lbf', label: 'Pound-force (lbf)', value: lbf, formattedValue: formatNumber(lbf, 2) + ' lbf' },
-          { id: 'kp', label: 'Kilopond (kp)', value: kp, formattedValue: formatNumber(kp, 2) + ' kp' },
+          { id: 'n', label: 'Newton (N)', value: n, formattedValue: formatMeasure(n, 1) + ' N' },
+          { id: 'tonnes', label: 'Entsprechende Masse auf der Erde (g = 9,81 m/s²)', value: tonnesWeight, formattedValue: 'ca. ' + formatMeasure(tonnesWeight, 3) + ' Tonnen' },
+          { id: 'lbf', label: 'Pound-force (lbf)', value: lbf, formattedValue: formatMeasure(lbf, 2) + ' lbf' },
+          { id: 'kp', label: 'Kilopond (kp)', value: kp, formattedValue: formatMeasure(kp, 2) + ' kp' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(kn, 2) + ' kN (' + formatNumber(n, 0) + ' N). Dies entspricht der Gewichtskraft von ca. ' + formatNumber(tonnesWeight, 2) + ' Tonnen.',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(kn, 2) + ' kN (' + formatMeasure(n, 0) + ' N). Dies entspricht der Gewichtskraft von ca. ' + formatMeasure(tonnesWeight, 2) + ' Tonnen.',
       };
     },
     formula: "1 N = 1 kg × m/s²; 1 kN = 1.000 N; 1 kp = 9,80665 N; 1 lbf ≈ 4,44822 N",
@@ -1733,13 +1733,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const kml = l100km > 0 ? 100 / l100km : 0;
 
       return {
-        primary: { id: 'l100km', label: 'Verbrauch in Liter pro 100 km', value: l100km, formattedValue: formatNumber(l100km, 2) + ' l/100km', highlight: true },
+        primary: { id: 'l100km', label: 'Verbrauch in Liter pro 100 km', value: l100km, formattedValue: formatMeasure(l100km, 2) + ' l/100km', highlight: true },
         secondary: [
-          { id: 'usmpg', label: 'US Miles per Gallon (MPG)', value: usmpg, formattedValue: formatNumber(usmpg, 1) + ' MPG (US)' },
-          { id: 'ukmpg', label: 'UK Miles per Gallon (MPG)', value: ukmpg, formattedValue: formatNumber(ukmpg, 1) + ' MPG (UK)' },
-          { id: 'kml', label: 'Reichweite pro Liter', value: kml, formattedValue: formatNumber(kml, 2) + ' km/l' },
+          { id: 'usmpg', label: 'US Miles per Gallon (MPG)', value: usmpg, formattedValue: formatMeasure(usmpg, 1) + ' MPG (US)' },
+          { id: 'ukmpg', label: 'UK Miles per Gallon (MPG)', value: ukmpg, formattedValue: formatMeasure(ukmpg, 1) + ' MPG (UK)' },
+          { id: 'kml', label: 'Reichweite pro Liter', value: kml, formattedValue: formatMeasure(kml, 2) + ' km/l' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(l100km, 2) + ' l/100km (' + formatNumber(usmpg, 1) + ' US MPG bzw. ' + formatNumber(kml, 2) + ' km pro Liter).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(l100km, 2) + ' l/100km (' + formatMeasure(usmpg, 1) + ' US MPG bzw. ' + formatMeasure(kml, 2) + ' km pro Liter).',
       };
     },
     formula: "US MPG = 235,215 / (l/100km); l/100km = 235,215 / US MPG; km/l = 100 / (l/100km)",
@@ -2124,7 +2124,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["zeit umrechner sekunden minuten stunden tage","stunden in sekunden umrechnen 3600","dezimalstunden in stunden und minuten","tage in stunden umrechnen rechner","zeit umrechnen jahre sekunden"],
     inputs: [
       {
-        id: "value",
+        id: "value", unitFromField: { field: 'fromUnit', units: {"seconds": "s", "minutes": "min", "hours": "h", "days": "Tage", "weeks": "Wochen", "years": "Jahre"} },
         label: "Eingabewert",
         type: "number",
         defaultValue: 90,
@@ -2213,7 +2213,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["dichte umrechner g cm3 in kg m3","spezifisches gewicht dichte wasser 1 g cm3","dichte umrechnen kg pro liter","density converter lb cu ft"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"gcm3": "g/cm³", "kgm3": "kg/m³", "lbcuft": "lb/ft³", "lbcuin": "lb/in³"} },
                 "label": "Dichtewert",
                 "type": "number",
                 "defaultValue": 1,
@@ -2262,13 +2262,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const kgl = gcm3;
       
       return {
-        primary: { id: 'gcm3', label: 'Dichte in g/cm³ (bzw. kg/l)', value: gcm3, formattedValue: formatNumber(gcm3, 4) + ' g/cm³', highlight: true },
+        primary: { id: 'gcm3', label: 'Dichte in g/cm³ (bzw. kg/l)', value: gcm3, formattedValue: formatMeasure(gcm3, 4) + ' g/cm³', highlight: true },
         secondary: [
-          { id: 'kgm3', label: 'SI-Einheit (kg/m³)', value: kgm3, formattedValue: formatNumber(kgm3, 1) + ' kg/m³' },
-          { id: 'lbcuft', label: 'Pounds per cubic foot (lb/ft³)', value: lbcuft, formattedValue: formatNumber(lbcuft, 2) + ' lb/cu ft' },
-          { id: 'waterComp', label: 'Vergleich zu flüssigem Wasser (1,0 g/cm³)', value: gcm3, formattedValue: gcm3 > 1.0 ? formatNumber(gcm3, 2) + '-mal schwerer als Wasser (sinkt)' : 'leichter als Wasser (schwimmt)' },
+          { id: 'kgm3', label: 'SI-Einheit (kg/m³)', value: kgm3, formattedValue: formatMeasure(kgm3, 1) + ' kg/m³' },
+          { id: 'lbcuft', label: 'Pounds per cubic foot (lb/ft³)', value: lbcuft, formattedValue: formatMeasure(lbcuft, 2) + ' lb/cu ft' },
+          { id: 'waterComp', label: 'Vergleich zu flüssigem Wasser (1,0 g/cm³)', value: gcm3, formattedValue: gcm3 > 1.0 ? formatMeasure(gcm3, 2) + '-mal schwerer als Wasser (sinkt)' : 'leichter als Wasser (schwimmt)' },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatNumber(gcm3, 3) + ' g/cm³ bzw. ' + formatNumber(kgm3, 0) + ' kg/m³ (' + formatNumber(lbcuft, 1) + ' lb/cu ft).',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen genau ' + formatMeasure(gcm3, 3) + ' g/cm³ bzw. ' + formatMeasure(kgm3, 0) + ' kg/m³ (' + formatMeasure(lbcuft, 1) + ' lb/cu ft).',
       };
     },
     formula: "1 g/cm³ = 1.000 kg/m³ = 1 kg/l = 62,428 lb/cu ft; ρ = m / V",
@@ -2344,13 +2344,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const omega = (2 * Math.PI * n) / 60;
 
       return {
-        primary: { id: 'vc', label: 'Schnittgeschwindigkeit (v_c)', value: vMMin, formattedValue: formatNumber(vMMin, 1) + ' m/min', highlight: true },
+        primary: { id: 'vc', label: 'Schnittgeschwindigkeit (v_c)', value: vMMin, formattedValue: formatMeasure(vMMin, 1) + ' m/min', highlight: true },
         secondary: [
-          { id: 'vms', label: 'Umfangsgeschwindigkeit in m/s', value: vMS, formattedValue: formatNumber(vMS, 2) + ' m/s' },
-          { id: 'vkmh', label: 'Umfangsgeschwindigkeit in km/h', value: vKmh, formattedValue: formatNumber(vKmh, 1) + ' km/h' },
-          { id: 'omega', label: 'Winkelgeschwindigkeit (ω)', value: omega, formattedValue: formatNumber(omega, 1) + ' rad/s' },
+          { id: 'vms', label: 'Umfangsgeschwindigkeit in m/s', value: vMS, formattedValue: formatMeasure(vMS, 2) + ' m/s' },
+          { id: 'vkmh', label: 'Umfangsgeschwindigkeit in km/h', value: vKmh, formattedValue: formatMeasure(vKmh, 1) + ' km/h' },
+          { id: 'omega', label: 'Winkelgeschwindigkeit (ω)', value: omega, formattedValue: formatMeasure(omega, 1) + ' rad/s' },
         ],
-        summaryText: 'Bei ' + dMm + ' mm Durchmesser und ' + n + ' U/min rotiert der Außenrand mit einer Schnittgeschwindigkeit von ' + formatNumber(vMMin, 1) + ' m/min (' + formatNumber(vMS, 1) + ' m/s bzw. ' + formatNumber(vKmh, 0) + ' km/h).',
+        summaryText: 'Bei ' + dMm + ' mm Durchmesser und ' + n + ' U/min rotiert der Außenrand mit einer Schnittgeschwindigkeit von ' + formatMeasure(vMMin, 1) + ' m/min (' + formatMeasure(vMS, 1) + ' m/s bzw. ' + formatMeasure(vKmh, 0) + ' km/h).',
       };
     },
     formula: "v = (π × d × n) / 1.000 (m/min); v (m/s) = v / 60; ω = 2π × (n / 60)",
@@ -2457,13 +2457,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const lampsCount800lm = Math.ceil(totalLumenReq / 806); // 806 lm ≈ klassische 60W Glühbirne
 
       return {
-        primary: { id: 'lumen', label: 'Empfohlener Gesamt-Lichtstrom', value: totalLumenReq, formattedValue: formatNumber(totalLumenReq, 0) + ' Lumen (lm)', highlight: true },
+        primary: { id: 'lumen', label: 'Empfohlener Gesamt-Lichtstrom', value: totalLumenReq, formattedValue: formatMeasure(totalLumenReq, 0) + ' Lumen (lm)', highlight: true },
         secondary: [
           { id: 'ledWatts', label: 'Elektrische LED-Leistung ca.', value: ledWatts, formattedValue: 'ca. ' + ledWatts + ' Watt' },
           { id: 'standardBulbs', label: 'Entspricht LED-Leuchtmitteln (à 806 lm / 60W)', value: lampsCount800lm, formattedValue: lampsCount800lm + ' Lampen' },
           { id: 'luxLevel', label: 'Ziel-Beleuchtungsstärke', value: luxReq, formattedValue: luxReq + ' Lux (lx = lm/m²)' },
         ],
-        summaryText: 'Für ' + a + ' m² Fläche (' + luxReq + ' Lux Ziel) benötigen Sie insgesamt rund ' + formatNumber(totalLumenReq, 0) + ' Lumen Lichtstrom, was ca. ' + ledWatts + ' W moderner LED-Beleuchtung entspricht.',
+        summaryText: 'Für ' + a + ' m² Fläche (' + luxReq + ' Lux Ziel) benötigen Sie insgesamt rund ' + formatMeasure(totalLumenReq, 0) + ' Lumen Lichtstrom, was ca. ' + ledWatts + ' W moderner LED-Beleuchtung entspricht.',
       };
     },
     formula: "Lumen (lm) = (Fläche in m² × Beleuchtungsstärke in Lux) / Nutzungsgrad; 1 Lux = 1 Lumen / m²",
@@ -2566,13 +2566,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const planeAllowed = wh <= 100;
       
       return {
-        primary: { id: 'wh', label: 'Energieinhalt in Wattstunden (Wh)', value: wh, formattedValue: formatNumber(wh, 2) + ' Wh', highlight: true },
+        primary: { id: 'wh', label: 'Energieinhalt in Wattstunden (Wh)', value: wh, formattedValue: formatMeasure(wh, 2) + ' Wh', highlight: true },
         secondary: [
-          { id: 'ah', label: 'Kapazität in Amperestunden (Ah)', value: ah, formattedValue: formatNumber(ah, 3) + ' Ah' },
-          { id: 'coulomb', label: 'Elektrische Ladung in Coulomb (C)', value: coulomb, formattedValue: formatNumber(coulomb, 0) + ' C (A·s)' },
+          { id: 'ah', label: 'Kapazität in Amperestunden (Ah)', value: ah, formattedValue: formatMeasure(ah, 3) + ' Ah' },
+          { id: 'coulomb', label: 'Elektrische Ladung in Coulomb (C)', value: coulomb, formattedValue: formatMeasure(coulomb, 0) + ' C (A·s)' },
           { id: 'flightCheck', label: 'Handgepäck im Flugzeug erlaubt?', value: planeAllowed ? 1 : 0, formattedValue: planeAllowed ? 'Ja (unter 100 Wh IATA-Limit)' : 'Nur mit Sondergenehmigung (> 100 Wh)' },
         ],
-        summaryText: 'Ein Akku mit ' + formatNumber(mah, 0) + ' mAh bei ' + v + ' V speichert genau ' + formatNumber(wh, 2) + ' Wh Energie (' + formatNumber(ah, 2) + ' Ah bzw. ' + formatNumber(coulomb, 0) + ' Coulomb).',
+        summaryText: 'Ein Akku mit ' + formatMeasure(mah, 0) + ' mAh bei ' + v + ' V speichert genau ' + formatMeasure(wh, 2) + ' Wh Energie (' + formatMeasure(ah, 2) + ' Ah bzw. ' + formatMeasure(coulomb, 0) + ' Coulomb).',
       };
     },
     formula: "Wh = (mAh / 1.000) × Volt; Ah = mAh / 1.000; 1 Coulomb = 1 A × 1 s",
@@ -2677,14 +2677,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       else comparison = 'Sehr hohe Dosis (ab 1.000 mSv akute Strahlenkrankheit)';
       
       return {
-        primary: { id: 'msv', label: 'Äquivalentdosis in Millisievert (mSv)', value: msv, formattedValue: formatNumber(msv, 4) + ' mSv', highlight: true },
+        primary: { id: 'msv', label: 'Äquivalentdosis in Millisievert (mSv)', value: msv, formattedValue: formatMeasure(msv, 4) + ' mSv', highlight: true },
         secondary: [
-          { id: 'usv', label: 'Mikrosievert (µSv)', value: usv, formattedValue: formatNumber(usv, 2) + ' µSv' },
-          { id: 'sv', label: 'Sievert (Sv)', value: sv, formattedValue: formatNumber(sv, 6) + ' Sv' },
-          { id: 'rem', label: 'Rem (historisch)', value: rem, formattedValue: formatNumber(rem, 3) + ' rem' },
+          { id: 'usv', label: 'Mikrosievert (µSv)', value: usv, formattedValue: formatMeasure(usv, 2) + ' µSv' },
+          { id: 'sv', label: 'Sievert (Sv)', value: sv, formattedValue: formatMeasure(sv, 6) + ' Sv' },
+          { id: 'rem', label: 'Rem (historisch)', value: rem, formattedValue: formatMeasure(rem, 3) + ' rem' },
           { id: 'context', label: 'Medizinische & alltägliche Einordnung', value: 0, formattedValue: comparison },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatNumber(msv, 3) + ' mSv (' + formatNumber(usv, 1) + ' µSv). ' + comparison + '.',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatMeasure(msv, 3) + ' mSv (' + formatMeasure(usv, 1) + ' µSv). ' + comparison + '.',
       };
     },
     formula: "1 Sv = 1.000 mSv = 1.000.000 µSv = 100 rem; 1 Bq = 1 Zerfall/s; 1 Ci = 3,7 × 10¹⁰ Bq",
@@ -2726,7 +2726,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["viskositaet umrechner mpa s centipoise cp","kinematische viskositaet centistokes cst mm2 s","viskositaet motoroel getriebeoel wasser","pascal sekunden in centipoise umrechnen"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"mpas": "mPa·s", "pas": "Pa·s", "cp": "cP", "poise": "P"} },
                 "label": "Viskositätswert",
                 "type": "number",
                 "defaultValue": 100,
@@ -2783,13 +2783,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       else example = 'Vergleichbar mit Erdnussbutter oder Zahnpasta (> 30.000 mPa·s)';
       
       return {
-        primary: { id: 'mpas', label: 'Dynamische Viskosität in mPa·s', value: mpas, formattedValue: formatNumber(mpas, 2) + ' mPa·s', highlight: true },
+        primary: { id: 'mpas', label: 'Dynamische Viskosität in mPa·s', value: mpas, formattedValue: formatMeasure(mpas, 2) + ' mPa·s', highlight: true },
         secondary: [
-          { id: 'cp', label: 'Centipoise (cP = mPa·s)', value: cp, formattedValue: formatNumber(cp, 2) + ' cP' },
-          { id: 'pas', label: 'Pascalsekunden (Pa·s)', value: pas, formattedValue: formatNumber(pas, 4) + ' Pa·s' },
+          { id: 'cp', label: 'Centipoise (cP = mPa·s)', value: cp, formattedValue: formatMeasure(cp, 2) + ' cP' },
+          { id: 'pas', label: 'Pascalsekunden (Pa·s)', value: pas, formattedValue: formatMeasure(pas, 4) + ' Pa·s' },
           { id: 'comparison', label: 'Praktischer Alltagsvergleich', value: 0, formattedValue: example },
         ],
-        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatNumber(mpas, 1) + ' mPa·s (exakt gleich ' + formatNumber(cp, 1) + ' Centipoise). ' + example + '.',
+        summaryText: val + ' ' + String(unit || '').toUpperCase() + ' entsprechen ' + formatMeasure(mpas, 1) + ' mPa·s (exakt gleich ' + formatMeasure(cp, 1) + ' Centipoise). ' + example + '.',
       };
     },
     formula: "1 mPa·s = 1 cP (Centipoise); 1 Pa·s = 1.000 mPa·s = 10 Poise; ν = η / ρ",
@@ -2885,13 +2885,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const usResult = isMen ? usMen : usWomen;
       
       return {
-        primary: { id: 'usSize', label: isMen ? 'US Herren Größe' : 'US Damen Größe', value: usResult, formattedValue: 'US ' + formatNumber(usResult, 1), highlight: true },
+        primary: { id: 'usSize', label: isMen ? 'US Herren Größe' : 'US Damen Größe', value: usResult, formattedValue: 'US ' + formatMeasure(usResult, 1), highlight: true },
         secondary: [
-          { id: 'ukSize', label: 'UK Größe', value: uk, formattedValue: 'UK ' + formatNumber(uk, 1) },
-          { id: 'footCm', label: 'Empfohlene Fußlänge (Mondopoint)', value: footLengthCm, formattedValue: formatNumber(footLengthCm, 1) + ' cm' },
+          { id: 'ukSize', label: 'UK Größe', value: uk, formattedValue: 'UK ' + formatMeasure(uk, 1) },
+          { id: 'footCm', label: 'Empfohlene Fußlänge (Mondopoint)', value: footLengthCm, formattedValue: formatMeasure(footLengthCm, 1) + ' cm' },
           { id: 'parisPoint', label: 'Pariser Stich (EU-Maß)', value: eu, formattedValue: 'EU ' + eu },
         ],
-        summaryText: 'EU-Schuhgröße ' + eu + ' entspricht bei ' + (isMen ? 'Herren' : 'Damen') + ' ca. US ' + formatNumber(usResult, 1) + ', UK ' + formatNumber(uk, 1) + ' und einer Fußlänge von ca. ' + formatNumber(footLengthCm, 1) + ' cm.',
+        summaryText: 'EU-Schuhgröße ' + eu + ' entspricht bei ' + (isMen ? 'Herren' : 'Damen') + ' ca. US ' + formatMeasure(usResult, 1) + ', UK ' + formatMeasure(uk, 1) + ' und einer Fußlänge von ca. ' + formatMeasure(footLengthCm, 1) + ' cm.',
       };
     },
     formula: "Fußlänge (cm) ≈ (EU - 1,5) × 2/3; US Men ≈ (EU - 31,5) × 0,75 + 0,5",
@@ -3023,11 +3023,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       return {
         primary: { id: 'dimensions', label: 'Abmessungen Breite × Höhe', value: wMm, formattedValue: wMm + ' × ' + hMm + ' mm (' + (wMm/10) + ' × ' + (hMm/10) + ' cm)', highlight: true },
         secondary: [
-          { id: 'sheetWeight', label: 'Gewicht pro Einzelblatt', value: singleSheetWeightG, formattedValue: formatNumber(singleSheetWeightG, 2) + ' g' },
-          { id: 'totalWeight', label: 'Gesamtgewicht (' + sheets + ' Blätter)', value: totalWeightG, formattedValue: formatNumber(totalWeightG, 1) + ' g (' + formatNumber(totalWeightG / 1000, 3) + ' kg)' },
+          { id: 'sheetWeight', label: 'Gewicht pro Einzelblatt', value: singleSheetWeightG, formattedValue: formatMeasure(singleSheetWeightG, 2) + ' g' },
+          { id: 'totalWeight', label: 'Gesamtgewicht (' + sheets + ' Blätter)', value: totalWeightG, formattedValue: formatMeasure(totalWeightG, 1) + ' g (' + formatMeasure(totalWeightG / 1000, 3) + ' kg)' },
           { id: 'letterCheck', label: 'Porto-Richtwert Deutsche Post', value: 0, formattedValue: (totalWeightG + 5) <= 20 ? 'Standardbrief bis 20g' : (totalWeightG + 5) <= 50 ? 'Kompaktbrief bis 50g' : 'Großbrief bis 500g' },
         ],
-        summaryText: String(fmt || 'A4').toUpperCase() + ' misst genau ' + wMm + ' × ' + hMm + ' mm. ' + sheets + ' Blatt (' + gM2 + ' g/m²) wiegen ca. ' + formatNumber(totalWeightG, 1) + ' Gramm.',
+        summaryText: String(fmt || 'A4').toUpperCase() + ' misst genau ' + wMm + ' × ' + hMm + ' mm. ' + sheets + ' Blatt (' + gM2 + ' g/m²) wiegen ca. ' + formatMeasure(totalWeightG, 1) + ' Gramm.',
       };
     },
     formula: "Breite / Höhe = 1 : √2 ≈ 1 : 1,4142; Fläche A0 = genau 1 m²; A4 = 1/16 m²",
@@ -3115,13 +3115,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
       
       return {
-        primary: { id: 'diameter', label: 'Innendurchmesser des Rings', value: diameterMm, formattedValue: formatNumber(diameterMm, 1) + ' mm', highlight: true },
+        primary: { id: 'diameter', label: 'Innendurchmesser des Rings', value: diameterMm, formattedValue: formatMeasure(diameterMm, 1) + ' mm', highlight: true },
         secondary: [
-          { id: 'usSize', label: 'US Ringgröße', value: usSize, formattedValue: 'US ' + formatNumber(usSize, 1) },
+          { id: 'usSize', label: 'US Ringgröße', value: usSize, formattedValue: 'US ' + formatMeasure(usSize, 1) },
           { id: 'ukSize', label: 'UK Ringgröße (Buchstabe)', value: 0, formattedValue: 'UK ' + ukLetter },
           { id: 'euCirc', label: 'Deutscher Innenumfang', value: circ, formattedValue: circ + ' mm (Größe ' + circ + ')' },
         ],
-        summaryText: 'Ringgröße ' + circ + ' entspricht einem Innendurchmesser von ' + formatNumber(diameterMm, 1) + ' mm, einer US-Größe von ca. ' + formatNumber(usSize, 1) + ' und der britischen Größe ' + ukLetter + '.',
+        summaryText: 'Ringgröße ' + circ + ' entspricht einem Innendurchmesser von ' + formatMeasure(diameterMm, 1) + ' mm, einer US-Größe von ca. ' + formatMeasure(usSize, 1) + ' und der britischen Größe ' + ukLetter + '.',
       };
     },
     formula: "Innendurchmesser (mm) = EU-Ringgröße (mm) / π; US ≈ (Innendurchmesser in mm - 11,63) / 0,8128",
@@ -3201,13 +3201,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       else example = 'Extrem gesundheitsgefährdend (akutes Knalltrauma)';
       
       return {
-        primary: { id: 'pressure', label: 'Effektiver Schalldruck', value: soundPressurePa, formattedValue: formatNumber(soundPressurePa, 4) + ' Pa (N/m²)', highlight: true },
+        primary: { id: 'pressure', label: 'Effektiver Schalldruck', value: soundPressurePa, formattedValue: formatMeasure(soundPressurePa, 4) + ' Pa (N/m²)', highlight: true },
         secondary: [
-          { id: 'perceived', label: 'Empfundene Lautstärke (vgl. zu 0 dB)', value: perceivedLoudnessRatio, formattedValue: formatNumber(perceivedLoudnessRatio, 0) + '-fach lauter' },
-          { id: 'energy', label: 'Physikalische Schallenergie', value: energyRatio, formattedValue: formatNumber(energyRatio, 0) + '-fache Energie' },
+          { id: 'perceived', label: 'Empfundene Lautstärke (vgl. zu 0 dB)', value: perceivedLoudnessRatio, formattedValue: formatMeasure(perceivedLoudnessRatio, 0) + '-fach lauter' },
+          { id: 'energy', label: 'Physikalische Schallenergie', value: energyRatio, formattedValue: formatMeasure(energyRatio, 0) + '-fache Energie' },
           { id: 'context', label: 'Vergleichbare Lärmquelle', value: 0, formattedValue: example },
         ],
-        summaryText: db + ' dB(A) erzeugen einen Schalldruck von ' + formatNumber(soundPressurePa, 4) + ' Pascal. Das entspricht etwa: ' + example + '.',
+        summaryText: db + ' dB(A) erzeugen einen Schalldruck von ' + formatMeasure(soundPressurePa, 4) + ' Pascal. Das entspricht etwa: ' + example + '.',
       };
     },
     formula: "L_p = 20 × log₁₀(p / p₀); p₀ = 20 µPa (Hörschwelle); +3 dB = doppelte Schallenergie; +10 dB = doppelte empfundene Lautstärke",
@@ -3250,7 +3250,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     searchKeywords: ["hefe umrechner frisch in trockenhefe","1 wuerfel hefe wieviel trockenhefe 42g","trockenhefe in frische hefe umrechnen","hefemenge pro 500g mehl pizza brot"],
     inputs: [
           {
-                "id": "inputValue",
+                "id": "inputValue", unitFromField: { field: 'inputUnit', units: {"cube": "Würfel", "freshG": "g frische Hefe", "dryBags": "Päckchen", "dryG": "g Trockenhefe"} },
                 "label": "Menge Hefe",
                 "type": "number",
                 "defaultValue": 1,
@@ -3301,13 +3301,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const flourG = freshG * (1000 / 42);
       
       return {
-        primary: { id: 'dryBags', label: 'Trockenhefe (Päckchen à 7 g)', value: dryBags, formattedValue: formatNumber(dryBags, 1) + ' Päckchen (' + formatNumber(dryG, 1) + ' g)', highlight: true },
+        primary: { id: 'dryBags', label: 'Trockenhefe (Päckchen à 7 g)', value: dryBags, formattedValue: formatMeasure(dryBags, 1) + ' Päckchen (' + formatMeasure(dryG, 1) + ' g)', highlight: true },
         secondary: [
-          { id: 'freshG', label: 'Frische Hefe (Gramm)', value: freshG, formattedValue: formatNumber(freshG, 1) + ' g' },
-          { id: 'cubes', label: 'Frische Hefe (Würfel à 42 g)', value: cubes, formattedValue: formatNumber(cubes, 2) + ' Würfel' },
-          { id: 'flour', label: 'Standard-Mehlmenge (Faustformel)', value: flourG, formattedValue: 'ca. ' + formatNumber(flourG, 0) + ' g Mehl' },
+          { id: 'freshG', label: 'Frische Hefe (Gramm)', value: freshG, formattedValue: formatMeasure(freshG, 1) + ' g' },
+          { id: 'cubes', label: 'Frische Hefe (Würfel à 42 g)', value: cubes, formattedValue: formatMeasure(cubes, 2) + ' Würfel' },
+          { id: 'flour', label: 'Standard-Mehlmenge (Faustformel)', value: flourG, formattedValue: 'ca. ' + formatMeasure(flourG, 0) + ' g Mehl' },
         ],
-        summaryText: val + ' ' + (unit === 'cube' ? 'Würfel Hefe' : 'Einheiten') + ' entsprechen genau ' + formatNumber(freshG, 0) + ' g frischer Hefe bzw. ' + formatNumber(dryG, 1) + ' g Trockenhefe (' + formatNumber(dryBags, 1) + ' Päckchen).',
+        summaryText: val + ' ' + (unit === 'cube' ? 'Würfel Hefe' : 'Einheiten') + ' entsprechen genau ' + formatMeasure(freshG, 0) + ' g frischer Hefe bzw. ' + formatMeasure(dryG, 1) + ' g Trockenhefe (' + formatMeasure(dryBags, 1) + ' Päckchen).',
       };
     },
     formula: "Verhältnis: 1 g Trockenhefe = 3 g frische Hefe; 1 Würfel frisch (42 g) = 2 Päckchen trocken (14 g)",
@@ -3621,7 +3621,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           id: 'grams',
           label: 'Gewicht in Gramm (g)',
           value: totalGrams,
-          formattedValue: formatNumber(totalGrams, 1) + ' g',
+          formattedValue: formatMeasure(totalGrams, 1) + ' g',
           highlight: true,
         },
         secondary: [
@@ -3629,16 +3629,16 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'volumeMl',
             label: 'Volumen (ml)',
             value: totalMl,
-            formattedValue: formatNumber(totalMl, 1) + ' ml',
+            formattedValue: formatMeasure(totalMl, 1) + ' ml',
           },
           {
             id: 'perCup',
             label: 'Gewicht je Cup',
             value: Math.round(gPerCup * 10) / 10,
-            formattedValue: `ca. ${formatNumber(gPerCup, 1)} g / Cup`,
+            formattedValue: `ca. ${formatMeasure(gPerCup, 1)} g / Cup`,
           },
         ],
-        summaryText: `${formatNumber(cups, 2)} Cup(s) ${data.name} (${conventionName}) entsprechen ungefähr ${formatNumber(totalGrams, 1)} Gramm (Volumen ca. ${formatNumber(totalMl, 0)} ml). Annahme: Richtwert für die Küchenpraxis.`,
+        summaryText: `${formatMeasure(cups, 2)} Cup(s) ${data.name} (${conventionName}) entsprechen ungefähr ${formatMeasure(totalGrams, 1)} Gramm (Volumen ca. ${formatMeasure(totalMl, 0)} ml). Annahme: Richtwert für die Küchenpraxis.`,
       };
     },
     formula: "Gewicht (g) = Cups × Volumen je Cup (ml) × Dichte (g/ml); 1 US Customary Cup = ca. 236,6 ml",
@@ -3790,7 +3790,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'sugarEquivalent',
             label: 'Entsprechende Süßkraft in Zucker',
             value: sugarEquivalent,
-            formattedValue: `${formatNumber(sugarEquivalent, 0)} g Zucker`,
+            formattedValue: `${formatMeasure(sugarEquivalent, 0)} g Zucker`,
             highlight: true,
           },
           secondary: [
@@ -3798,7 +3798,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'erythritInput',
               label: 'Ausgangsmenge Erythrit',
               value: erythritG,
-              formattedValue: `${formatNumber(erythritG, 0)} g`,
+              formattedValue: `${formatMeasure(erythritG, 0)} g`,
             },
             {
               id: 'sweetnessFactor',
@@ -3810,10 +3810,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'caloricComparison',
               label: 'Rechnerischer Brennwert',
               value: 0,
-              formattedValue: `${formatNumber(erythritG, 0)} g Erythrit (0 kcal) vs. ca. ${formatNumber(sugarEquivalent * 4, 0)} kcal bei Zucker`,
+              formattedValue: `${formatMeasure(erythritG, 0)} g Erythrit (0 kcal) vs. ca. ${formatMeasure(sugarEquivalent * 4, 0)} kcal bei Zucker`,
             },
           ],
-          summaryText: `Bei einer angenommenen Süßkraft von 70 % entsprechen ${formatNumber(erythritG, 0)} g reinem Erythrit rechnerisch etwa ${formatNumber(sugarEquivalent, 0)} g Haushaltszucker. Die Umrechnung vergleicht die Süße – sie garantiert nicht identische Back- oder Volumeneigenschaften.`,
+          summaryText: `Bei einer angenommenen Süßkraft von 70 % entsprechen ${formatMeasure(erythritG, 0)} g reinem Erythrit rechnerisch etwa ${formatMeasure(sugarEquivalent, 0)} g Haushaltszucker. Die Umrechnung vergleicht die Süße – sie garantiert nicht identische Back- oder Volumeneigenschaften.`,
         };
       }
 
@@ -3883,7 +3883,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           id: 'subGrams',
           label: `Benötigte Menge ${subName}`,
           value: subGrams,
-          formattedValue: `${formatNumber(subGrams, 0)} g`,
+          formattedValue: `${formatMeasure(subGrams, 0)} g`,
           highlight: true,
         },
         secondary: [
@@ -3891,24 +3891,24 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'originalSugar',
             label: 'Ausgangszucker im Rezept',
             value: sugarG,
-            formattedValue: `${formatNumber(sugarG, 0)} g`,
+            formattedValue: `${formatMeasure(sugarG, 0)} g`,
           },
           {
             id: 'savedCalories',
             label: 'Kaloriendifferenz',
             value: savedKcal,
-            formattedValue: `ca. ${formatNumber(Math.round(savedKcal), 0)} kcal Differenz`,
+            formattedValue: `ca. ${formatMeasure(Math.round(savedKcal), 0)} kcal Differenz`,
           },
           {
             id: 'liquidTip',
             label: 'Flüssigkeitsanpassung',
             value: liquidReductionMl,
             formattedValue: liquidReductionMl > 0
-              ? `Richtwert: Teigflüssigkeit um ca. ${formatNumber(Math.round(liquidReductionMl), 0)} ml je 100 g Zucker reduzieren (rezeptabhängig)`
+              ? `Richtwert: Teigflüssigkeit um ca. ${formatMeasure(Math.round(liquidReductionMl), 0)} ml je 100 g Zucker reduzieren (rezeptabhängig)`
               : 'Der Rechner berechnet keine Anpassung der Teigflüssigkeit. Beachten Sie die Hinweise Ihres Rezepts.',
           },
         ],
-        summaryText: `Für ${formatNumber(sugarG, 0)} g Haushaltszucker benötigen Sie rechnerisch ca. ${formatNumber(subGrams, 0)} g ${subName}. Die Süßkraftangabe ist eine Modellannahme; bei Mischprodukten und Fertigsüßen stets die Herstellerangaben auf der Packung beachten.`,
+        summaryText: `Für ${formatMeasure(sugarG, 0)} g Haushaltszucker benötigen Sie rechnerisch ca. ${formatMeasure(subGrams, 0)} g ${subName}. Die Süßkraftangabe ist eine Modellannahme; bei Mischprodukten und Fertigsüßen stets die Herstellerangaben auf der Packung beachten.`,
       };
     },
     formula: "Erythrit = Zucker ÷ 0,70; Agavendicksaft = Zucker ÷ 1,25; Honig = Zucker ÷ 1,20; Xylit = Zucker × 1,0; Zucker-Äquivalent = Erythrit × 0,70",
@@ -4331,14 +4331,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const dryYeastG = freshYeastG / 3;
       
       return {
-        primary: { id: 'flour', label: 'Mehl (Tipo 00 oder W300)', value: flourG, formattedValue: formatNumber(flourG, 0) + ' g', highlight: true },
+        primary: { id: 'flour', label: 'Mehl (Tipo 00 oder W300)', value: flourG, formattedValue: formatMeasure(flourG, 0) + ' g', highlight: true },
         secondary: [
-          { id: 'water', label: 'Wasser (kalt)', value: waterG, formattedValue: formatNumber(waterG, 0) + ' g (ml)', highlight: true },
-          { id: 'salt', label: 'Meersalz fein', value: saltG, formattedValue: formatNumber(saltG, 1) + ' g' },
-          { id: 'freshYeast', label: 'Frische Hefe (für 24h Gare)', value: freshYeastG, formattedValue: formatNumber(freshYeastG, 2) + ' g (trocken: ' + formatNumber(dryYeastG, 2) + ' g)' },
+          { id: 'water', label: 'Wasser (kalt)', value: waterG, formattedValue: formatMeasure(waterG, 0) + ' g (ml)', highlight: true },
+          { id: 'salt', label: 'Meersalz fein', value: saltG, formattedValue: formatMeasure(saltG, 1) + ' g' },
+          { id: 'freshYeast', label: 'Frische Hefe (für 24h Gare)', value: freshYeastG, formattedValue: formatMeasure(freshYeastG, 2) + ' g (trocken: ' + formatMeasure(dryYeastG, 2) + ' g)' },
           { id: 'totalDough', label: 'Gesamtteiggewicht', value: totalDoughWeight, formattedValue: totalDoughWeight + ' g (' + count + ' Ballen à ' + ballWeight + ' g)' },
         ],
-        summaryText: 'Für ' + count + ' Pizzen à ' + ballWeight + ' g (Hydratation ' + hydrVal + ' %) benötigen Sie ' + formatNumber(flourG, 0) + ' g Mehl, ' + formatNumber(waterG, 0) + ' g Wasser, ' + formatNumber(saltG, 1) + ' g Salz und ' + formatNumber(freshYeastG, 1) + ' g frische Hefe.',
+        summaryText: 'Für ' + count + ' Pizzen à ' + ballWeight + ' g (Hydratation ' + hydrVal + ' %) benötigen Sie ' + formatMeasure(flourG, 0) + ' g Mehl, ' + formatMeasure(waterG, 0) + ' g Wasser, ' + formatMeasure(saltG, 1) + ' g Salz und ' + formatMeasure(freshYeastG, 1) + ' g frische Hefe.',
       };
     },
     formula: "Mehl = Gesamtteig / (1 + Hydratation + Salzfaktor + Hefefaktor); Wasser = Mehl × Hydratation",
@@ -4447,14 +4447,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const ta = 100 + (waterPct * 100);
       
       return {
-        primary: { id: 'flour', label: 'Hauptmehl (100 %)', value: flourG, formattedValue: formatNumber(flourG, 0) + ' g', highlight: true },
+        primary: { id: 'flour', label: 'Hauptmehl (100 %)', value: flourG, formattedValue: formatMeasure(flourG, 0) + ' g', highlight: true },
         secondary: [
-          { id: 'water', label: 'Schüttwasser', value: waterG, formattedValue: formatNumber(waterG, 0) + ' g (ml)', highlight: true },
-          { id: 'salt', label: 'Salz', value: saltG, formattedValue: formatNumber(saltG, 1) + ' g' },
-          { id: 'sourdough', label: 'Sauerteig / Vorteig', value: sourdoughG, formattedValue: formatNumber(sourdoughG, 0) + ' g' },
+          { id: 'water', label: 'Schüttwasser', value: waterG, formattedValue: formatMeasure(waterG, 0) + ' g (ml)', highlight: true },
+          { id: 'salt', label: 'Salz', value: saltG, formattedValue: formatMeasure(saltG, 1) + ' g' },
+          { id: 'sourdough', label: 'Sauerteig / Vorteig', value: sourdoughG, formattedValue: formatMeasure(sourdoughG, 0) + ' g' },
           { id: 'taValue', label: 'Teigausbeute (TA)', value: ta, formattedValue: 'TA ' + Math.round(ta) },
         ],
-        summaryText: 'Für einen ' + totalG + ' g Teigling bei TA ' + Math.round(ta) + ' benötigen Sie ' + formatNumber(flourG, 0) + ' g Mehl, ' + formatNumber(waterG, 0) + ' g Wasser, ' + formatNumber(sourdoughG, 0) + ' g Sauerteig und ' + formatNumber(saltG, 1) + ' g Salz.',
+        summaryText: 'Für einen ' + totalG + ' g Teigling bei TA ' + Math.round(ta) + ' benötigen Sie ' + formatMeasure(flourG, 0) + ' g Mehl, ' + formatMeasure(waterG, 0) + ' g Wasser, ' + formatMeasure(sourdoughG, 0) + ' g Sauerteig und ' + formatMeasure(saltG, 1) + ' g Salz.',
       };
     },
     formula: "Bäckerprozente: Zutat (%) = (Gewicht Zutat / Gewicht Mehl) × 100; Teigausbeute TA = (Teigmasse / Mehlmasse) × 100",
@@ -4593,9 +4593,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const remainingPerPortionG = portions > 0 ? remainingAlcoholGrams / portions : 0;
       
       return {
-        primary: { id: 'remainingGrams', label: 'Verbleibender Alkohol im Gericht gesamt', value: remainingAlcoholGrams, formattedValue: formatNumber(remainingAlcoholGrams, 1) + ' g reiner Alkohol', highlight: true },
+        primary: { id: 'remainingGrams', label: 'Verbleibender Alkohol im Gericht gesamt', value: remainingAlcoholGrams, formattedValue: formatMeasure(remainingAlcoholGrams, 1) + ' g reiner Alkohol', highlight: true },
         secondary: [
-          { id: 'perPortion', label: 'Alkoholmenge je Portion', value: remainingPerPortionG, formattedValue: formatNumber(remainingPerPortionG, 2) + ' g je Portion' },
+          { id: 'perPortion', label: 'Alkoholmenge je Portion', value: remainingPerPortionG, formattedValue: formatMeasure(remainingPerPortionG, 2) + ' g je Portion' },
           { id: 'retentionPct', label: 'Verbliebener Anteil des Ausgangsalkohols', value: retentionRate * 100, formattedValue: (retentionRate * 100) + ' %' },
           { id: 'safetyHint', label: 'Eignung für Kinder & Schwangere', value: 0, formattedValue: remainingPerPortionG < 0.2 ? 'Spuren (vergleichbar mit reifem Fruchtsaft)' : 'Nicht empfohlen für Schwangere & Kinder' },
         ],
@@ -4607,11 +4607,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         basisSummary: [
           { label: 'Zugegebene Flüssigkeitsmenge', value: `${ml} ml` },
           { label: 'Alkoholgehalt der Zutat', value: `${vol} Vol.-%` },
-          { label: 'Ausgangsalkohol reines Ethanol', value: `${formatNumber(pureAlcoholGramsInitial, 1)} g` },
+          { label: 'Ausgangsalkohol reines Ethanol', value: `${formatMeasure(pureAlcoholGramsInitial, 1)} g` },
           { label: 'Portionsanzahl', value: `${portions} Portionen` },
         ],
-        directAnswer: 'Von ursprünglich ' + formatNumber(pureAlcoholGramsInitial, 1) + ' g reinem Alkohol verbleiben nach dem Kochen noch ca. ' + formatNumber(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im gesamten Gericht bzw. ' + formatNumber(remainingPerPortionG, 2) + ' g je Portion. Wichtiger Sicherheitshinweis: Nicht zur Beurteilung von Fahrtüchtigkeit oder Verkehrssicherheit geeignet.',
-        summaryText: 'Von ursprünglich ' + formatNumber(pureAlcoholGramsInitial, 1) + ' g reinem Alkohol verbleiben nach dem Garen noch rund ' + formatNumber(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im Essen – das sind ca. ' + formatNumber(remainingPerPortionG, 2) + ' g pro Portion. Hinweis: Dient rein küchentechnischen Zwecken, keine Aussage über Fahrtüchtigkeit.',
+        directAnswer: 'Von ursprünglich ' + formatMeasure(pureAlcoholGramsInitial, 1) + ' g reinem Alkohol verbleiben nach dem Kochen noch ca. ' + formatMeasure(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im gesamten Gericht bzw. ' + formatMeasure(remainingPerPortionG, 2) + ' g je Portion. Wichtiger Sicherheitshinweis: Nicht zur Beurteilung von Fahrtüchtigkeit oder Verkehrssicherheit geeignet.',
+        summaryText: 'Von ursprünglich ' + formatMeasure(pureAlcoholGramsInitial, 1) + ' g reinem Alkohol verbleiben nach dem Garen noch rund ' + formatMeasure(remainingAlcoholGrams, 1) + ' g (' + (retentionRate * 100) + ' %) im Essen – das sind ca. ' + formatMeasure(remainingPerPortionG, 2) + ' g pro Portion. Hinweis: Dient rein küchentechnischen Zwecken, keine Aussage über Fahrtüchtigkeit.',
       };
     },
     formula: "Verbleibender Alkohol = Zugegebene Menge × Vol.-% × 0,789 × Rückhaltefaktor",
@@ -4863,7 +4863,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       if (riceG < 45) {
         const fracSide = Number((riceG / 65).toFixed(1));
         const fracMain = Number((riceG / 115).toFixed(1));
-        portionsFormatted = `ca. ${formatNumber(fracSide, 1)} Portionen (Beilage: ca. 65 g p.P.) / ca. ${formatNumber(fracMain, 1)} Portionen (Hauptgericht: ca. 115 g p.P.)`;
+        portionsFormatted = `ca. ${formatMeasure(fracSide, 1)} Portionen (Beilage: ca. 65 g p.P.) / ca. ${formatMeasure(fracMain, 1)} Portionen (Hauptgericht: ca. 115 g p.P.)`;
       } else {
         const portionsAsSide = Math.round(riceG / 65);
         const portionsAsMain = Math.max(1, Math.round(riceG / 115));
@@ -4877,9 +4877,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       if (type === 'risotto') {
         saltGuidance = 'Brühe ist in der Regel bereits gewürzt und gesalzen; bei Bedarf erst nach dem Garen abschmecken.';
       } else if (saltGrams < 2.5) {
-        saltGuidance = `ca. ${formatNumber(saltGrams, 1)} g (ca. 1 Prise bis 1/2 gestr. TL; Annahme: ca. 5 g je gestr. TL, optional)`;
+        saltGuidance = `ca. ${formatMeasure(saltGrams, 1)} g (ca. 1 Prise bis 1/2 gestr. TL; Annahme: ca. 5 g je gestr. TL, optional)`;
       } else {
-        saltGuidance = `ca. ${formatNumber(saltGrams, 0)} g (ca. ${formatNumber(tspEquiv, 1)} gestr. TL; Annahme: ca. 5 g je gestr. TL, optional nach Geschmack)`;
+        saltGuidance = `ca. ${formatMeasure(saltGrams, 0)} g (ca. ${formatMeasure(tspEquiv, 1)} gestr. TL; Annahme: ca. 5 g je gestr. TL, optional nach Geschmack)`;
       }
 
       const liquidFormatted = waterMl + ' ml ' + liquidLabel;
@@ -4903,7 +4903,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'cookedYield',
             label: 'Ergibt gekochten Reis',
             value: cookedWeightG,
-            formattedValue: 'ca. ' + formatNumber(cookedWeightG, 0) + ' g (Richtwert)'
+            formattedValue: 'ca. ' + formatMeasure(cookedWeightG, 0) + ' g (Richtwert)'
           },
           {
             id: 'portions',
@@ -4919,7 +4919,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           }
         ],
         directAnswer: 'Für ' + riceG + ' g Reis benötigen Sie ' + liquidFormatted + ' bei einer Kochzeit von ca. ' + cookMins + ' Minuten.',
-        summaryText: 'Für ' + riceG + ' g Reis (' + (type === 'risotto' ? 'Risotto-Methode' : 'Quellmethode 1 : ' + waterRatio.toFixed(1).replace('.', ',')) + ') benötigen Sie ' + liquidFormatted + '. Nach dem Garen erhalten Sie ca. ' + formatNumber(cookedWeightG, 0) + ' g fertigen Reis.',
+        summaryText: 'Für ' + riceG + ' g Reis (' + (type === 'risotto' ? 'Risotto-Methode' : 'Quellmethode 1 : ' + waterRatio.toFixed(1).replace('.', ',')) + ') benötigen Sie ' + liquidFormatted + '. Nach dem Garen erhalten Sie ca. ' + formatMeasure(cookedWeightG, 0) + ' g fertigen Reis.',
         qualifications: [
           methodNote,
           'Wasseraufnahme: Die Quellmethode basiert auf dem Gewichtsverhältnis (Gramm Reis zu Milliliter Wasser; 1 g Wasser = 1 ml). Beim Abmessen mit Tassen beachten, dass 1 Tasse Reis ca. 180–200 g wiegt, 1 Tasse Wasser jedoch ca. 240 ml.',
@@ -5250,7 +5250,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         const saltG = Math.round(waterLiters * 10);
         const recommendedPotLiters = Math.max(2, Math.ceil(waterLiters * 1.25));
 
-        const packages500g = (!isFresh && totalRawG >= 500) ? ' (ca. ' + formatNumber(totalRawG / 500, 1) + ' Packungen à 500 g)' : '';
+        const packages500g = (!isFresh && totalRawG >= 500) ? ' (ca. ' + formatMeasure(totalRawG / 500, 1) + ' Packungen à 500 g)' : '';
 
         return {
           primary: {
@@ -5265,13 +5265,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'cookedPasta',
               label: 'Ergibt gekochte Pasta (ca.)',
               value: totalCookedG,
-              formattedValue: formatNumber(totalCookedG, 0) + ' g gekocht'
+              formattedValue: formatMeasure(totalCookedG, 0) + ' g gekocht'
             },
             {
               id: 'waterReq',
               label: 'Kochwasser (Empfehlung: ca. 1 l je 100 g)',
               value: waterLiters,
-              formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
+              formattedValue: formatMeasure(waterLiters, 1) + ' Liter Wasser'
             },
             {
               id: 'saltReq',
@@ -5304,12 +5304,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           ],
           calculationSteps: [
             `Portionsannahme: ${persons} Personen × ${rawPerPersonG} g ${rawTerm} p.P. = ${totalRawG} g ${rawTerm} (Rohgewicht)`,
-            `Gekochte Ausbeute: ${totalRawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatNumber(totalCookedG, 0)} g gekochte Pasta`,
-            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatNumber(waterLiters, 1)} Liter Wasser`,
-            `Salzempfehlung (ca. 10 g je Liter): ${formatNumber(waterLiters, 1)} l × 10 g = ${saltG} g Salz`
+            `Gekochte Ausbeute: ${totalRawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatMeasure(totalCookedG, 0)} g gekochte Pasta`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
+            `Salzempfehlung (ca. 10 g je Liter): ${formatMeasure(waterLiters, 1)} l × 10 g = ${saltG} g Salz`
           ],
-          directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalRawG + ' g ' + rawTerm + ', was bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertiger Pasta entspricht.',
-          summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalRawG + ' g ' + rawTerm + ' (' + rawPerPersonG + ' g p.P.). Beim Kochen saugt die Pasta Wasser auf und ergibt bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln.',
+          directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalRawG + ' g ' + rawTerm + ', was bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g servierfertiger Pasta entspricht.',
+          summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalRawG + ' g ' + rawTerm + ' (' + rawPerPersonG + ' g p.P.). Beim Kochen saugt die Pasta Wasser auf und ergibt bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g fertige Nudeln.',
           qualifications: [
             'Empfohlene Topfgröße: Mindestens ' + recommendedPotLiters + ' Liter Topfvolumen, damit das Kochwasser nach dem Hineingeben der Pasta ausreichend Raum hat.',
             isFresh
@@ -5344,7 +5344,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'cookedPasta',
             label: 'Gekochtes Nudelgewicht',
             value: totalCookedG,
-            formattedValue: formatNumber(totalCookedG, 0) + ' g gekocht',
+            formattedValue: formatMeasure(totalCookedG, 0) + ' g gekocht',
             highlight: true
           },
           secondary: [
@@ -5364,7 +5364,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'waterReq',
               label: 'Kochwasser (Empfehlung: ca. 1 l je 100 g)',
               value: waterLiters,
-              formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
+              formattedValue: formatMeasure(waterLiters, 1) + ' Liter Wasser'
             },
             {
               id: 'saltReq',
@@ -5392,17 +5392,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                         : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
             },
             { label: isFresh ? 'Ausgangsgewicht (frische Pasta)' : 'Ausgangsgewicht (Trockennudeln)', value: `${rawG} g ${rawTerm}` },
-            { label: 'Ergebnis (gekocht)', value: `ca. ${formatNumber(totalCookedG, 0)} g gekocht` }
+            { label: 'Ergebnis (gekocht)', value: `ca. ${formatMeasure(totalCookedG, 0)} g gekocht` }
           ],
           calculationSteps: [
             `Ausgangsgewicht: ${rawG} g ${rawTerm}`,
-            `Gekochte Ausbeute: ${rawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatNumber(totalCookedG, 0)} g gekochte Pasta`,
-            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${rawG} g ÷ 100 × 1,0 l = ${formatNumber(waterLiters, 1)} Liter Wasser`,
-            `Salzempfehlung: ${formatNumber(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
+            `Gekochte Ausbeute: ${rawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatMeasure(totalCookedG, 0)} g gekochte Pasta`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${rawG} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
+            `Salzempfehlung: ${formatMeasure(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
             `Portionen-Richtwert: ${rawG} g ÷ ${portionRef} g p.P. = ca. ${portions} Portionen`
           ],
-          directAnswer: rawG + ' g ' + rawTerm + ' ergeben bei ' + factorLabel + ' ca. ' + formatNumber(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
-          summaryText: rawG + ' g ' + rawTerm + ' ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatNumber(totalCookedG, 0) + ' g fertige Nudeln. Empfohlen werden ca. ' + formatNumber(waterLiters, 1) + ' l Kochwasser und ' + saltG + ' g Salz.',
+          directAnswer: rawG + ' g ' + rawTerm + ' ergeben bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
+          summaryText: rawG + ' g ' + rawTerm + ' ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatMeasure(totalCookedG, 0) + ' g fertige Nudeln. Empfohlen werden ca. ' + formatMeasure(waterLiters, 1) + ' l Kochwasser und ' + saltG + ' g Salz.',
           qualifications: [
             'Wasseraufnahme variiert je nach Nudelform und Kochzeit: Al-dente-Biss ergibt ca. Faktor 2,2 bis 2,3; weicher gekochte Nudeln bis zu 2,5. Frische Pasta nimmt durch Eigenfeuchte nur ca. Faktor 1,5 auf.',
             'Herstellerhinweise auf der Verpackung haben Vorrang vor rechnerischen Richtwerten.'
@@ -5443,7 +5443,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'cookedPasta',
               label: 'Gewünschte Fertigmenge (gekocht)',
               value: cookedG,
-              formattedValue: formatNumber(cookedG, 0) + ' g gekocht'
+              formattedValue: formatMeasure(cookedG, 0) + ' g gekocht'
             },
             {
               id: 'estimatedPortions',
@@ -5455,7 +5455,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'waterReq',
               label: 'Kochwasser (Empfehlung: ca. 1 l je 100 g)',
               value: waterLiters,
-              formattedValue: formatNumber(waterLiters, 1) + ' Liter Wasser'
+              formattedValue: formatMeasure(waterLiters, 1) + ' Liter Wasser'
             },
             {
               id: 'saltReq',
@@ -5482,18 +5482,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                         ? `Benutzerdefinierter Quellfaktor (Faktor ${factor.toFixed(1).replace('.', ',')})`
                         : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
             },
-            { label: 'Gewünschte Fertigmenge (gekocht)', value: `${formatNumber(cookedG, 0)} g gekocht` },
+            { label: 'Gewünschte Fertigmenge (gekocht)', value: `${formatMeasure(cookedG, 0)} g gekocht` },
             { label: isFresh ? 'Ergebnis Rohgewicht (frische Pasta)' : 'Ergebnis Rohgewicht (Trockennudeln)', value: `${totalRawG} g ${rawTerm}` }
           ],
           calculationSteps: [
-            `Gewünschte Fertigmenge: ${formatNumber(cookedG, 0)} g gekochte Pasta`,
-            `Rückrechnung Rohgewicht: ${formatNumber(cookedG, 0)} g ÷ ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${totalRawG} g ${rawTerm}`,
-            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatNumber(waterLiters, 1)} Liter Wasser`,
-            `Salzempfehlung: ${formatNumber(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
+            `Gewünschte Fertigmenge: ${formatMeasure(cookedG, 0)} g gekochte Pasta`,
+            `Rückrechnung Rohgewicht: ${formatMeasure(cookedG, 0)} g ÷ ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${totalRawG} g ${rawTerm}`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
+            `Salzempfehlung: ${formatMeasure(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
             `Portionen-Richtwert: ${totalRawG} g ÷ ${portionRef} g p.P. = ca. ${portions} Portionen`
           ],
-          directAnswer: 'Für ' + formatNumber(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalRawG + ' g ' + rawTerm + ' ab (bei ' + factorLabel + ').',
-          summaryText: 'Um ca. ' + formatNumber(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalRawG + ' g ' + rawTerm + ' ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
+          directAnswer: 'Für ' + formatMeasure(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalRawG + ' g ' + rawTerm + ' ab (bei ' + factorLabel + ').',
+          summaryText: 'Um ca. ' + formatMeasure(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalRawG + ' g ' + rawTerm + ' ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
           qualifications: [
             `Rückrechnung: Rohgewicht = Gekochtes Gewicht ÷ Quellfaktor (${factor.toFixed(1).replace('.', ',')}).`,
             'Der Quellfaktor ist ein Richtwert; Garzeit und Teigbeschaffenheit beeinflussen die tatsächliche Ausbeute.'
@@ -5777,7 +5777,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         secondary: [
           { id: 'jars', label: 'Benötigte Schraubgläser (à ' + jarMl + ' ml)', value: jarsCount, formattedValue: jarsCount + ' Gläser' },
           { id: 'lemon', label: 'Zitronensaft / Zitronensäure', value: lemonJuiceMl, formattedValue: 'ca. ' + lemonJuiceMl + ' ml (1-2 EL)' },
-          { id: 'yield', label: 'Fertige Marmeladenmenge ca.', value: finalJamG, formattedValue: formatNumber(finalJamG, 0) + ' g' },
+          { id: 'yield', label: 'Fertige Marmeladenmenge ca.', value: finalJamG, formattedValue: formatMeasure(finalJamG, 0) + ' g' },
         ],
         summaryText: 'Für ' + fruitG + ' g Früchte benötigen Sie ' + sugarG + ' g Gelierzucker ' + (String(sugarType || '2_1').replace('_', ':')) + ' und ca. ' + lemonJuiceMl + ' ml Zitronensaft. Ergibt rund ' + jarsCount + ' Gläser à ' + jarMl + ' ml.',
       };
@@ -5907,13 +5907,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const spoonsCount = Math.round((coffeeGrams / 7) * 10) / 10; // Kaffeelot / gehäufter EL ca. 7g
       
       return {
-        primary: { id: 'coffeeG', label: 'Benötigtes Kaffeemehl', value: coffeeGrams, formattedValue: formatNumber(coffeeGrams, 1) + ' g', highlight: true },
+        primary: { id: 'coffeeG', label: 'Benötigtes Kaffeemehl', value: coffeeGrams, formattedValue: formatMeasure(coffeeGrams, 1) + ' g', highlight: true },
         secondary: [
-          { id: 'waterMl', label: 'Gesamte Wassermenge', value: totalWaterMl, formattedValue: totalWaterMl + ' ml (' + formatNumber(totalWaterMl / 1000, 2) + ' Liter)' },
+          { id: 'waterMl', label: 'Gesamte Wassermenge', value: totalWaterMl, formattedValue: totalWaterMl + ' ml (' + formatMeasure(totalWaterMl / 1000, 2) + ' Liter)' },
           { id: 'coffeeSpoons', label: 'Kaffeelote / gehäufte EL (ca. 7g)', value: spoonsCount, formattedValue: 'ca. ' + spoonsCount + ' Lote' },
           { id: 'waterTemp', label: 'Optimale Wassertemperatur', value: 94, formattedValue: '92 °C bis 96 °C (nicht kochend!)' },
         ],
-        summaryText: 'Für ' + cups + ' Tassen Kaffee (' + totalWaterMl + ' ml Wasser) benötigen Sie exakt ' + formatNumber(coffeeGrams, 1) + ' g frisch gemahlenes Kaffeemehl (ca. ' + spoonsCount + ' Kaffeelote).',
+        summaryText: 'Für ' + cups + ' Tassen Kaffee (' + totalWaterMl + ' ml Wasser) benötigen Sie exakt ' + formatMeasure(coffeeGrams, 1) + ' g frisch gemahlenes Kaffeemehl (ca. ' + spoonsCount + ' Kaffeelote).',
       };
     },
     formula: "Kaffeemehl (g) = (Wassermenge in ml / 1.000) × Brühverhältnis (55 bis 65 g/l)",
@@ -6038,13 +6038,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const beerBottles = pureGrams / 13.0;
       
       return {
-        primary: { id: 'finalVol', label: 'Alkoholgehalt des fertigen Drinks', value: volPercentFinal, formattedValue: formatNumber(volPercentFinal, 1) + ' Vol.-%', highlight: true },
+        primary: { id: 'finalVol', label: 'Alkoholgehalt des fertigen Drinks', value: volPercentFinal, formattedValue: formatMeasure(volPercentFinal, 1) + ' Vol.-%', highlight: true },
         secondary: [
-          { id: 'pureAlcohol', label: 'Reiner Alkohol im Glas', value: pureGrams, formattedValue: formatNumber(pureGrams, 1) + ' g Ethanol' },
+          { id: 'pureAlcohol', label: 'Reiner Alkohol im Glas', value: pureGrams, formattedValue: formatMeasure(pureGrams, 1) + ' g Ethanol' },
           { id: 'drinkSize', label: 'Gesamtvolumen des Drinks', value: totalDrinkVolumeMl, formattedValue: totalDrinkVolumeMl + ' ml' },
-          { id: 'beerEquiv', label: 'Entspricht etwa Bier (0,33l Flaschen)', value: beerBottles, formattedValue: 'ca. ' + formatNumber(beerBottles, 1) + ' Flaschen Bier' },
+          { id: 'beerEquiv', label: 'Entspricht etwa Bier (0,33l Flaschen)', value: beerBottles, formattedValue: 'ca. ' + formatMeasure(beerBottles, 1) + ' Flaschen Bier' },
         ],
-        summaryText: 'Ihr Cocktail (Gesamtvolumen ' + totalDrinkVolumeMl + ' ml) hat einen Alkoholgehalt von ca. ' + formatNumber(volPercentFinal, 1) + ' Vol.-% und enthält ' + formatNumber(pureGrams, 1) + ' g reinen Alkohol (entspricht ca. ' + formatNumber(beerBottles, 1) + ' Flaschen Bier).',
+        summaryText: 'Ihr Cocktail (Gesamtvolumen ' + totalDrinkVolumeMl + ' ml) hat einen Alkoholgehalt von ca. ' + formatMeasure(volPercentFinal, 1) + ' Vol.-% und enthält ' + formatMeasure(pureGrams, 1) + ' g reinen Alkohol (entspricht ca. ' + formatMeasure(beerBottles, 1) + ' Flaschen Bier).',
       };
     },
     formula: "Vol.-% = (Σ (Menge_i × Vol%_i)) / Gesamtvolumen; Reiner Alkohol (g) = Reines Ethanol (ml) × 0,789",
@@ -6161,7 +6161,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         secondary: [
           { id: 'waterAmount', label: 'Wasser', value: waterL, formattedValue: waterL + ' Liter (' + waterG + ' g)' },
           { id: 'spoons', label: 'Entspricht Esslöffeln Salz', value: spoonsCount, formattedValue: 'ca. ' + spoonsCount + ' gestr. EL' },
-          { id: 'densityHint', label: 'Gesamtmasse der Salzlake', value: totalLakeWeightG, formattedValue: formatNumber(totalLakeWeightG / 1000, 2) + ' kg' },
+          { id: 'densityHint', label: 'Gesamtmasse der Salzlake', value: totalLakeWeightG, formattedValue: formatMeasure(totalLakeWeightG / 1000, 2) + ' kg' },
         ],
         summaryText: 'Für ' + waterL + ' Liter Wasser bei ' + pct + ' % Salzkonzentration benötigen Sie genau ' + saltGrams + ' g Salz (ca. ' + spoonsCount + ' Esslöffel).',
       };
@@ -6400,14 +6400,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const totalBaguettes = Math.ceil((totalEaters * breadPerPersonG) / 250); // 250g Stange
       
       return {
-        primary: { id: 'cheese', label: style === 'meatFondue' ? 'Fleisch Gesamtmenge' : 'Raclette- / Fonduekäse Gesamt', value: style === 'meatFondue' ? totalMeatG : totalCheeseG, formattedValue: (style === 'meatFondue' ? totalMeatG : totalCheeseG) + ' g (' + formatNumber((style === 'meatFondue' ? totalMeatG : totalCheeseG) / 1000, 2) + ' kg)', highlight: true },
+        primary: { id: 'cheese', label: style === 'meatFondue' ? 'Fleisch Gesamtmenge' : 'Raclette- / Fonduekäse Gesamt', value: style === 'meatFondue' ? totalMeatG : totalCheeseG, formattedValue: (style === 'meatFondue' ? totalMeatG : totalCheeseG) + ' g (' + formatMeasure((style === 'meatFondue' ? totalMeatG : totalCheeseG) / 1000, 2) + ' kg)', highlight: true },
         secondary: [
-          { id: 'meat', label: 'Fleisch für Tischgrill / Fondue', value: totalMeatG, formattedValue: totalMeatG > 0 ? totalMeatG + ' g (' + formatNumber(totalMeatG / 1000, 2) + ' kg)' : 'Nicht ausgewählt' },
-          { id: 'potatoes', label: 'Pellkartoffeln (Drillinge / festkochend)', value: totalPotatoesG, formattedValue: totalPotatoesG + ' g (' + formatNumber(totalPotatoesG / 1000, 2) + ' kg)' },
+          { id: 'meat', label: 'Fleisch für Tischgrill / Fondue', value: totalMeatG, formattedValue: totalMeatG > 0 ? totalMeatG + ' g (' + formatMeasure(totalMeatG / 1000, 2) + ' kg)' : 'Nicht ausgewählt' },
+          { id: 'potatoes', label: 'Pellkartoffeln (Drillinge / festkochend)', value: totalPotatoesG, formattedValue: totalPotatoesG + ' g (' + formatMeasure(totalPotatoesG / 1000, 2) + ' kg)' },
           { id: 'baguettes', label: 'Baguette-Stangen (à 250 g)', value: totalBaguettes, formattedValue: totalBaguettes + ' Stange(n)' },
           { id: 'eaters', label: 'Berechnungsgrundlage Esser', value: totalEaters, formattedValue: totalEaters + ' Vollportionen' },
         ],
-        summaryText: 'Für ' + adults + ' Erwachsene und ' + kids + ' Kinder (' + totalEaters + ' Portionen) benötigen Sie ca. ' + (style === 'meatFondue' ? formatNumber(totalMeatG / 1000, 2) + ' kg Fleisch' : formatNumber(totalCheeseG / 1000, 2) + ' kg Käse') + ', ' + formatNumber(totalPotatoesG / 1000, 2) + ' kg Kartoffeln und ' + totalBaguettes + ' Baguettes.',
+        summaryText: 'Für ' + adults + ' Erwachsene und ' + kids + ' Kinder (' + totalEaters + ' Portionen) benötigen Sie ca. ' + (style === 'meatFondue' ? formatMeasure(totalMeatG / 1000, 2) + ' kg Fleisch' : formatMeasure(totalCheeseG / 1000, 2) + ' kg Käse') + ', ' + formatMeasure(totalPotatoesG / 1000, 2) + ' kg Kartoffeln und ' + totalBaguettes + ' Baguettes.',
       };
     },
     formula: "Käse = Portionen × 200 bis 250 g; Fleisch = Portionen × 200 bis 250 g; Kartoffeln = Portionen × 150 bis 200 g",
@@ -6670,10 +6670,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         primary: { id: 'brewTime', label: 'Optimale Ziehzeit', value: brewMins, formattedValue: brewMins > 0 ? brewMins + ' Minuten' : 'Sofort schaumig schlagen (Matcha)', highlight: true },
         secondary: [
           { id: 'temperature', label: 'Optimale Wassertemperatur', value: temp, formattedValue: temp + ' °C' },
-          { id: 'teaLeaves', label: 'Teeblätter-Menge', value: teaLeavesGrams, formattedValue: formatNumber(teaLeavesGrams, 1) + ' g (ca. ' + teabagsEquiv + ' Beutel bzw. TL)' },
+          { id: 'teaLeaves', label: 'Teeblätter-Menge', value: teaLeavesGrams, formattedValue: formatMeasure(teaLeavesGrams, 1) + ' g (ca. ' + teabagsEquiv + ' Beutel bzw. TL)' },
           { id: 'effectInfo', label: 'Geschmack & Wirkung', value: 0, formattedValue: effect },
         ],
-        summaryText: 'Für ' + waterMl + ' ml Wasser benötigen Sie ca. ' + formatNumber(teaLeavesGrams, 1) + ' g Teeblätter. Wasser auf ' + temp + ' °C temperieren und ' + (brewMins > 0 ? brewMins + ' Minuten ziehen lassen' : 'schaumig schlagen') + '. ' + effect,
+        summaryText: 'Für ' + waterMl + ' ml Wasser benötigen Sie ca. ' + formatMeasure(teaLeavesGrams, 1) + ' g Teeblätter. Wasser auf ' + temp + ' °C temperieren und ' + (brewMins > 0 ? brewMins + ' Minuten ziehen lassen' : 'schaumig schlagen') + '. ' + effect,
       };
     },
     formula: "Teemenge (g) = (Wasservolumen / 1.000) × 12 g; Echte Tees (Camellia sinensis): 60 bis 95 °C; Kräuter- & Früchtetee: 100 °C",
@@ -6781,14 +6781,14 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const fatPerPortion = fat / portions;
       
       return {
-        primary: { id: 'kcalPortion', label: 'Kalorien pro Portion', value: kcalPerPortion, formattedValue: formatNumber(kcalPerPortion, 0) + ' kcal', highlight: true },
+        primary: { id: 'kcalPortion', label: 'Kalorien pro Portion', value: kcalPerPortion, formattedValue: formatMeasure(kcalPerPortion, 0) + ' kcal', highlight: true },
         secondary: [
-          { id: 'totalKcal', label: 'Gesamtkalorien des Rezepts', value: totalKcal, formattedValue: formatNumber(totalKcal, 0) + ' kcal (' + formatNumber(totalKj, 0) + ' kJ)' },
-          { id: 'carbsP', label: 'Kohlenhydrate p.P.', value: carbsPerPortion, formattedValue: formatNumber(carbsPerPortion, 1) + ' g' },
-          { id: 'proteinP', label: 'Eiweiß p.P.', value: proteinPerPortion, formattedValue: formatNumber(proteinPerPortion, 1) + ' g' },
-          { id: 'fatP', label: 'Fett p.P.', value: fatPerPortion, formattedValue: formatNumber(fatPerPortion, 1) + ' g' },
+          { id: 'totalKcal', label: 'Gesamtkalorien des Rezepts', value: totalKcal, formattedValue: formatMeasure(totalKcal, 0) + ' kcal (' + formatMeasure(totalKj, 0) + ' kJ)' },
+          { id: 'carbsP', label: 'Kohlenhydrate p.P.', value: carbsPerPortion, formattedValue: formatMeasure(carbsPerPortion, 1) + ' g' },
+          { id: 'proteinP', label: 'Eiweiß p.P.', value: proteinPerPortion, formattedValue: formatMeasure(proteinPerPortion, 1) + ' g' },
+          { id: 'fatP', label: 'Fett p.P.', value: fatPerPortion, formattedValue: formatMeasure(fatPerPortion, 1) + ' g' },
         ],
-        summaryText: 'Das gesamte Rezept liefert ' + formatNumber(totalKcal, 0) + ' kcal. Aufgeteilt auf ' + portions + ' Portionen sind das genau ' + formatNumber(kcalPerPortion, 0) + ' kcal pro Portion (KH: ' + formatNumber(carbsPerPortion, 1) + ' g, EW: ' + formatNumber(proteinPerPortion, 1) + ' g, Fett: ' + formatNumber(fatPerPortion, 1) + ' g).',
+        summaryText: 'Das gesamte Rezept liefert ' + formatMeasure(totalKcal, 0) + ' kcal. Aufgeteilt auf ' + portions + ' Portionen sind das genau ' + formatMeasure(kcalPerPortion, 0) + ' kcal pro Portion (KH: ' + formatMeasure(carbsPerPortion, 1) + ' g, EW: ' + formatMeasure(proteinPerPortion, 1) + ' g, Fett: ' + formatMeasure(fatPerPortion, 1) + ' g).',
       };
     },
     formula: "kcal = (Kohlenhydrate × 4,1) + (Eiweiß × 4,1) + (Fett × 9,3); kcal p.P. = Gesamtkalorien / Portionen",

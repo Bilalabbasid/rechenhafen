@@ -171,7 +171,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
       },
       { id: 'distanceKm', label: 'Gefahrene Kilometer seit letztem Volltanken', type: 'number', defaultValue: 620, min: 1, unit: 'km', dependsOn: { field: 'mode', value: 'tanken' } },
       { id: 'litersFueled', label: 'Nachgetankte Liter (voll)', type: 'number', defaultValue: 42.5, min: 0.1, step: 0.1, unit: 'Liter', dependsOn: { field: 'mode', value: 'tanken' } },
-      { id: 'inputValue', label: 'Verbrauchswert', type: 'number', defaultValue: 6.5, min: 0.1, step: 0.1, helpText: 'Zahl in der Einheit, die Sie darunter auswählen.', dependsOn: { field: 'mode', value: 'umrechnen' } },
+      { id: 'inputValue', unitFromField: { field: 'inputUnit', units: {"l100km": "l/100 km", "kml": "km/l", "usmpg": "MPG (US)", "ukmpg": "MPG (UK)"} }, label: 'Verbrauchswert', type: 'number', defaultValue: 6.5, min: 0.1, step: 0.1, helpText: 'Zahl in der Einheit, die Sie darunter auswählen.', dependsOn: { field: 'mode', value: 'umrechnen' } },
       {
         id: 'inputUnit',
         label: 'Einheit des Verbrauchswerts',
@@ -589,8 +589,8 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
         ],
       },
       {
-        id: 'consumption',
-        label: 'Verbrauch (l/100 km bzw. kWh/100 km)',
+        id: 'consumption', unitFromField: { field: 'fuelType', units: { benzin: 'l/100 km', diesel: 'l/100 km', electric: 'kWh/100 km' } },
+        label: 'Verbrauch',
         type: 'number',
         defaultValue: 7.0,
         min: 0.1,

@@ -21,7 +21,7 @@ export const KOCHEN_CALCULATORS: CalculatorDefinition[] = [
     inputs: [
       { id: 'originalPortions', label: 'Ursprüngliche Portionen (laut Rezept)', type: 'number', defaultValue: 4, min: 1, step: 1 },
       { id: 'targetPortions', label: 'Gewünschte Portionen (Ziel)', type: 'number', defaultValue: 6, min: 1, step: 1 },
-      { id: 'originalAmount', label: 'Menge der Zutat', type: 'number', defaultValue: 500, min: 0.1, step: 1 },
+      { id: 'originalAmount', unitFromField: { field: 'unit', units: {"g": "g", "ml": "ml", "kg": "kg", "EL": "EL", "TL": "TL", "Stück": "Stück"} }, label: 'Menge der Zutat', type: 'number', defaultValue: 500, min: 0.1, step: 1 },
       {
         id: 'unit',
         label: 'Einheit',

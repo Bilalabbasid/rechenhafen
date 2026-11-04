@@ -2166,7 +2166,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     searchKeywords: ["brennholz umrechner srm rm fm","schuettraummeter in raummeter umrechnen","heizwert buche fichte kwh raummeter","brennholz heizoel aequivalent"],
     inputs: [
           {
-                "id": "amount",
+                "id": "amount", unitFromField: { field: 'inputUnit', units: {"srm": "SRM", "rm": "RM (Ster)", "fm": "FM"} },
                 "label": "Holzmenge",
                 "type": "number",
                 "defaultValue": 5,

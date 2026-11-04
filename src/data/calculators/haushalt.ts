@@ -235,7 +235,8 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         ],
       },
       {
-        id: 'pricePerKwh',
+        id: 'pricePerKwh', conditionalLabels: [{ condition: { field: 'priceUnit', value: 'ct' }, label: 'Arbeitspreis laut Gasvertrag', unit: 'ct/kWh' }],
+        convertOnChange: { field: 'priceUnit', factors: { eur: 1, ct: 100 }, decimals: 3 },
         label: 'Arbeitspreis laut Gasvertrag',
         type: 'number',
         defaultValue: 0.10,
@@ -567,7 +568,7 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         helpText: 'Wählen Sie, ob Sie von einer bekannten CO₂-Menge oder von einem Brennstoffverbrauch ausgehen möchten.',
       },
       {
-        id: 'emissionsAmount',
+        id: 'emissionsAmount', unitFromField: { field: 'emissionsUnit', units: {"kg": "kg CO₂", "tonnes": "t CO₂"} },
         label: 'Bekannte CO₂-Emissionsmenge',
         type: 'number',
         defaultValue: 2000,
@@ -627,8 +628,8 @@ export const HAUSHALT_CALCULATORS: CalculatorDefinition[] = [
         helpText: 'Wählen Sie Ihren Energieträger für Heizung oder Mobilität.',
       },
       {
-        id: 'amount',
-        label: 'Verbrauchsmenge (in kWh, Liter bzw. kg)',
+        id: 'amount', unitFromField: { field: 'fuel', units: {"gas": "kWh", "heizoel": "Liter", "benzin": "Liter", "diesel": "Liter", "lpg": "kg"} },
+        label: 'Verbrauchsmenge',
         type: 'number',
         defaultValue: 15000,
         min: 0,

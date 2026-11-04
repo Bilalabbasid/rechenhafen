@@ -19,7 +19,7 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um.',
     searchKeywords: ['längenumrechner', 'zoll in cm umrechnen', 'inch in cm rechner', 'fuß in meter', 'meilen in km', 'km in meilen', 'meilen km umrechner', 'seemeilen umrechnen'],
     inputs: [
-      { id: 'value', label: 'Eingabewert', type: 'number', defaultValue: 1, step: 0.1 },
+      { id: 'value', unitFromField: { field: 'fromUnit', units: {"in": "in", "cm": "cm", "m": "m", "ft": "ft", "km": "km", "mi": "mi", "nm": "NM", "mm": "mm", "yd": "yd"} }, label: 'Eingabewert', type: 'number', defaultValue: 1, step: 0.1 },
       {
         id: 'fromUnit',
         label: 'Ausgangseinheit (Von)',

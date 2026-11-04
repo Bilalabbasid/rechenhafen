@@ -37,7 +37,15 @@ export const resolveFieldLabel = (def: CalculatorInput, currentInputs: Record<st
   return def.label;
 };
 
-export const resolveFieldUnit = (def: CalculatorInput, currentInputs: Record<string, any>): string | undefined => {
+export const resolveFieldUnit = (
+  def: CalculatorInput,
+  currentInputs: Record<string, any>,
+  allDefs?: CalculatorInput[],
+): string | undefined => {
+  if (def.unitFromField) {
+    const unit = def.unitFromField.units[String(currentInputs[def.unitFromField.field])];
+    if (unit) return unit;
+  }
   if (def.conditionalLabels) {
     for (const item of def.conditionalLabels) {
       if (currentInputs[item.condition.field] === item.condition.value && item.unit !== undefined) {
@@ -46,6 +54,29 @@ export const resolveFieldUnit = (def: CalculatorInput, currentInputs: Record<str
     }
   }
   return def.unit;
+};
+
+/** min/max of a field in the unit currently selected (see CalculatorInput.convertOnChange). */
+export const resolveFieldRange = (
+  def: CalculatorInput,
+  currentInputs: Record<string, any>,
+): { min?: number; max?: number } => {
+  const factor = def.convertOnChange ? def.convertOnChange.factors[currentInputs[def.convertOnChange.field]] ?? 1 : 1;
+  const scale = (v?: number) => (v === undefined ? undefined : Math.round(v * factor * 100) / 100);
+  return { min: scale(def.min), max: scale(def.max) };
+};
+
+/** Converts a value from one option's unit to another's, rounded for display. */
+export const convertFieldValue = (def: CalculatorInput, value: unknown, fromOption: string, toOption: string): unknown => {
+  if (!def.convertOnChange) return value;
+  const num = parseFloat(String(value ?? '').trim().replace(',', '.'));
+  const fFrom = def.convertOnChange.factors[fromOption] ?? 1;
+  const fTo = def.convertOnChange.factors[toOption] ?? 1;
+  if (!Number.isFinite(num) || fFrom === fTo) return value;
+  const converted = (num / fFrom) * fTo;
+  const decimals = def.convertOnChange.decimals ?? (Math.abs(converted) >= 100 ? 0 : Math.abs(converted) >= 10 ? 1 : 2);
+  const p = 10 ** decimals;
+  return Math.round(converted * p) / p;
 };
 
 export const resolveFieldOptions = (def: CalculatorInput, currentInputs: Record<string, any>): SelectOption[] | undefined => {
@@ -180,8 +211,11 @@ export default function CalculatorRunner({
                   const parsed = parseFloat(sanitized);
                   if (Number.isFinite(parsed)) {
                     let val = parsed;
-                    if (inp.min !== undefined && val < inp.min) val = inp.min;
-                    if (inp.max !== undefined && val > inp.max) val = inp.max;
+                    const ctrlField = inp.convertOnChange?.field;
+                    const unitInputs = ctrlField && params.has(ctrlField) ? { [ctrlField]: params.get(ctrlField) } : {};
+                    const range = resolveFieldRange(inp, unitInputs);
+                    if (range.min !== undefined && val < range.min) val = range.min;
+                    if (range.max !== undefined && val > range.max) val = range.max;
                     updated[inp.id] = val;
                     changed = true;
                   }
@@ -292,6 +326,17 @@ export default function CalculatorRunner({
 
     let updatedInputs = { ...inputs, [id]: value };
 
+    // Unit-system switch (e.g. metric → imperial): convert dependent values so the quantity stays the same.
+    const convertedIds: string[] = [];
+    if (inputs[id] !== value) {
+      for (const dep of inputDefs) {
+        if (dep.convertOnChange?.field === id) {
+          updatedInputs[dep.id] = convertFieldValue(dep, updatedInputs[dep.id], String(inputs[id]), String(value));
+          convertedIds.push(dep.id);
+        }
+      }
+    }
+
     // Bidirectional sync for Zoll ↔ cm
     if (slug === 'zoll-in-cm-rechner') {
       if (id === 'inches') {
@@ -332,7 +377,11 @@ export default function CalculatorRunner({
     // Track input validation errors and update inline field errors
     const newFieldErrors = { ...fieldErrors };
     const fieldDef = inputDefs.find((inp) => inp.id === id);
+    // Converted values are valid by construction; drop stale errors on them.
+    for (const cid of convertedIds) delete newFieldErrors[cid];
     if (fieldDef && fieldDef.type === 'number') {
+      const range = resolveFieldRange(fieldDef, updatedInputs);
+      const unitLabel = resolveFieldUnit(fieldDef, updatedInputs, inputDefs);
       const valStr = String(value ?? '').trim().replace(',', '.');
       if (valStr === '') {
         newFieldErrors[id] = 'Bitte geben Sie einen Wert ein.';
@@ -342,11 +391,11 @@ export default function CalculatorRunner({
         if (isNaN(numVal)) {
           newFieldErrors[id] = 'Bitte eine gültige Zahl eingeben.';
           trackValidationError(slug, 'invalid_number', id);
-        } else if (fieldDef.min !== undefined && numVal < fieldDef.min) {
-          newFieldErrors[id] = `Mindestwert: ${fieldDef.min}${fieldDef.unit ? ' ' + fieldDef.unit : ''}`;
+        } else if (range.min !== undefined && numVal < range.min) {
+          newFieldErrors[id] = `Mindestwert: ${range.min}${unitLabel ? ' ' + unitLabel : ''}`;
           trackValidationError(slug, 'range_underflow', id);
-        } else if (fieldDef.max !== undefined && numVal > fieldDef.max) {
-          newFieldErrors[id] = `Maximalwert: ${fieldDef.max}${fieldDef.unit ? ' ' + fieldDef.unit : ''}`;
+        } else if (range.max !== undefined && numVal > range.max) {
+          newFieldErrors[id] = `Maximalwert: ${range.max}${unitLabel ? ' ' + unitLabel : ''}`;
           trackValidationError(slug, 'range_overflow', id);
         } else {
           delete newFieldErrors[id];
@@ -976,7 +1025,8 @@ export default function CalculatorRunner({
               }
 
               const fieldLabel = resolveFieldLabel(field, inputs);
-              const fieldUnit = resolveFieldUnit(field, inputs);
+              const fieldUnit = resolveFieldUnit(field, inputs, inputDefs);
+              const fieldRange = resolveFieldRange(field, inputs);
               const fieldOptions = resolveFieldOptions(field, inputs);
 
               return (
@@ -1024,7 +1074,9 @@ export default function CalculatorRunner({
                     </div>
                   )}
                   <div className={styles.inputGroup}>
-                    <label htmlFor={inputId} className={styles.label}>
+                    {/* key = text: when label or unit changes, React remounts the node. Browser page
+                        translation (e.g. Chrome) replaces text nodes and would otherwise freeze the old text. */}
+                    <label key={`${fieldLabel}|${fieldUnit ?? ''}`} htmlFor={inputId} className={styles.label}>
                       {fieldLabel}
                       {fieldUnit && <span className={styles.unitBadge}>({fieldUnit})</span>}
                     </label>
@@ -1088,8 +1140,8 @@ export default function CalculatorRunner({
                       type="number"
                       inputMode="decimal"
                       step={field.step || 'any'}
-                      min={field.min}
-                      max={field.max}
+                      min={fieldRange.min}
+                      max={fieldRange.max}
                       placeholder={field.placeholder}
                       className={`${styles.input} ${fieldErrors[field.id] ? styles.inputInvalid : ''}`}
                       aria-invalid={Boolean(fieldErrors[field.id])}
@@ -1315,7 +1367,7 @@ export default function CalculatorRunner({
                           return '–';
                         }
                         const options = resolveFieldOptions(def, inputs);
-                        const unit = resolveFieldUnit(def, inputs);
+                        const unit = resolveFieldUnit(def, inputs, inputDefs);
                         if (def.type === 'select') {
                           const matchedOption = options?.find((opt) => String(opt.value) === String(rawVal));
                           return matchedOption ? matchedOption.label : String(rawVal);
