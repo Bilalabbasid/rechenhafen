@@ -33,3 +33,4 @@ Gemäß den Richtlinien für ehrliche Angaben und Vertrauenswürdigkeit wurden a
 | `src/data/categories.ts` | 117 | `Präzise deutsche Steuer- und Gehaltsrechner` | `Kostenlose deutsche Steuer- und Gehaltsrechner` | Keine Übertreibung |
 | `src/data/categories.ts` | 118 | `exakt ein... Ermitteln Sie centgenau... absolute Klarheit` | `nach den gesetzlichen Werten ein... voraussichtliches... klaren Überblick` | Ehrliche Einordnung von Steuermodellwerten |
 | `src/data/categories.ts` | 196 | `verlässliche Einkaufs- und Mengenangaben` | `praktische Einkaufs- und Mengenangaben` | Neutrale Alltagssprache |
+

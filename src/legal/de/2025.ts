@@ -578,3 +578,4 @@ export const LEGAL_VALUES_2025: GermanLegalValues = {
     checkedAt: '2025-01-15',
   },
 };
+

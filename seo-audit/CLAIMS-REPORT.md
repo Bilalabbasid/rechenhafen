@@ -161,3 +161,4 @@ Gemäß den Vorgaben wurden keine Kontaktdaten oder Gründernamen frei erfunden.
 
 ---
 *Bericht erstellt am 2026-11-02.*
+

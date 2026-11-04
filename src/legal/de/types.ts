@@ -125,3 +125,4 @@ export interface GermanLegalValues {
   minijobUmlageU2: LegalConstant<number>;
   minijobInsolvenzgeldumlage: LegalConstant<number>;
 }
+

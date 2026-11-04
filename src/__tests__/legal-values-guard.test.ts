@@ -83,3 +83,4 @@ describe('Legal Values Guard Test (Rechtsstand-Sicherheit)', () => {
     expect(getLegalValues('2025').year).toBe(2025);
   });
 });
+

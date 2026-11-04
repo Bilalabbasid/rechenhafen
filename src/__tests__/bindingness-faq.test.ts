@@ -27,3 +27,4 @@ describe('Bindingness FAQ on Legal Calculators (Phase 6)', () => {
     expect(missingBindingFaq).toEqual([]);
   });
 });
+

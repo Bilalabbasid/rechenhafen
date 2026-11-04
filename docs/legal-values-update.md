@@ -99,3 +99,4 @@ Zum 1. Juli ändern sich üblicherweise:
 5. **Änderungsprotokoll und Rechtsstand:**
    - `rechtsstand` in den betroffenen Rechnern aktualisieren.
    - Änderung im öffentlichen Änderungsprotokoll unter `/methodik/` vermerken.
+

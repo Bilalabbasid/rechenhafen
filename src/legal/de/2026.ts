@@ -628,3 +628,4 @@ export const LEGAL_VALUES_2026: GermanLegalValues = {
     description: 'Insolvenzgeldumlage für gewerbliche Minijobs (0,15 %)',
   },
 };
+
