@@ -203,14 +203,22 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
     id: 'mietbudget-rechner',
     slug: 'mietbudget-rechner',
     name: 'Mietbudget-Rechner (Wie viel Miete kann ich mir leisten?)',
-    shortName: 'Mietbudget berechnen',
+    shortName: 'Mietbudget & Mietbelastung',
     category: 'wohnen-immobilien',
     subcategory: 'Mieten & Nebenkosten',
-    metaTitle: 'Mietbudget Rechner – Wie viel Miete kann ich mir leisten?',
-    metaDescription: 'Ermitteln Sie Ihr maximales Mietbudget anhand Ihres monatlichen Nettoeinkommens. Prüfen Sie die 30%- und 40%-Grenzen für Warm- und Kaltmiete.',
-    h1: 'Mietbudget Rechner – Wie viel Miete kann ich mir leisten?',
-    shortDescription: 'Berechnet das empfohlene monatliche Mietbudget basierend auf dem Haushaltsnettoeinkommen.',
-    searchKeywords: ['mietbudget rechner', 'wie viel miete kann ich mir leisten', 'miethöhe berechnen netto', 'maximale miete berechnen'],
+    metaTitle: 'Mietbudget berechnen: Wie viel Miete kann ich mir leisten?',
+    metaDescription: 'Mietbudget nach der 30-%-Regel und Ihre Mietbelastungsquote kostenlos berechnen – mit Einschätzung, was Vermieter beim Einkommen erwarten.',
+    h1: 'Mietbudget-Rechner: Wie viel Miete kann ich mir leisten?',
+    shortDescription: 'Berechnet Ihr Mietbudget aus dem Haushaltsnettoeinkommen und prüft auf Wunsch, wie hoch Ihre aktuelle Mietbelastung ist.',
+    searchKeywords: [
+      'mietbudget rechner',
+      'wie viel miete kann ich mir leisten',
+      'maximale miete berechnen',
+      'mietbelastungsquote rechner',
+      'mietbelastung berechnen',
+      '30 prozent regel miete',
+      'mietanteil am nettoeinkommen',
+    ],
     inputs: [
       { id: 'netIncome', label: 'Monatliches Haushaltsnettoeinkommen', type: 'number', defaultValue: 3000, min: 100, step: 50, unit: '€' },
       {
@@ -220,30 +228,96 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
         defaultValue: '30',
         options: [
           { value: '25', label: 'Sparsam (25 % des Nettoeinkommens)' },
-          { value: '30', label: 'Empfohlen / Standard (30 % des Nettoeinkommens)' },
-          { value: '35', label: 'Erhöht / Großstadt (35 % des Nettoeinkommens)' },
-          { value: '40', label: 'Absolute Obergrenze (40 % des Nettoeinkommens)' },
+          { value: '30', label: 'Empfohlen (30 % des Nettoeinkommens)' },
+          { value: '35', label: 'Erhöht, z. B. Großstadt (35 %)' },
+          { value: '40', label: 'Obergrenze (40 % des Nettoeinkommens)' },
         ],
       },
+      {
+        id: 'warmRent',
+        label: 'Aktuelle oder geplante Warmmiete (optional)',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        step: 25,
+        unit: '€',
+        helpText: 'Kaltmiete plus Nebenkosten und Heizung. Tragen Sie einen Betrag ein, um Ihre Mietbelastungsquote zu prüfen – bei 0 € wird nur das Budget berechnet.',
+      },
     ],
-    calculate: calculateRentBudget,
-    formula: 'Maximales Mietbudget = Nettoeinkommen × (Mietquote / 100)',
-    formulaExplanation: 'Multiplikation des monatlichen Nettoeinkommens mit dem gewählten prozentualen Ausgabensatz für Wohnen.',
-    workedExample: {
-      title: 'Beispiel: 3.000 € Haushaltsnetto bei 30 % Mietquote',
-      description: '3.000 € × 30 % = 900 € Warmmiete. Verbleibendes Netto für Lebenshaltung: 2.100 €.',
-      inputs: { netIncome: 3000, targetPercent: '30' },
-      resultSummary: '900 € maximal empfohlene Warmmiete',
+    calculate: (inputs) => {
+      const budget = calculateRentBudget(inputs);
+      if (budget.error) return budget;
+      const rent = parseFloat(String(inputs.warmRent ?? '').replace(',', '.'));
+      if (!Number.isFinite(rent) || rent <= 0) return budget;
+
+      const burden = calculateRentBurden({ netIncome: inputs.netIncome, warmRent: rent });
+      if (burden.error) return burden;
+      const assessment = burden.secondary?.find((x) => x.id === 'assessment')?.formattedValue ?? '';
+      const ratio = Number(burden.primary.value);
+      const gap = Number(budget.primary.value) - rent;
+      return {
+        ...burden,
+        directAnswer: `Ihre Warmmiete von ${formatCurrency(rent)} entspricht ${formatPercent(ratio, 1)} Ihres Nettoeinkommens – ${assessment}.`,
+        secondary: [
+          ...(burden.secondary ?? []),
+          { ...budget.primary, highlight: false },
+          {
+            id: 'budgetGap',
+            label: gap >= 0 ? 'Luft bis zu Ihrem Mietbudget' : 'Über Ihrem Mietbudget',
+            value: Math.abs(gap),
+            formattedValue: formatCurrency(Math.abs(gap)),
+          },
+        ],
+        details: [...(budget.secondary ?? []), ...(burden.details ?? [])],
+      };
     },
+    formula: 'Mietbudget = Nettoeinkommen × Mietquote; Mietbelastungsquote = Warmmiete ÷ Nettoeinkommen × 100',
+    formulaExplanation: 'Das Budget ergibt sich aus dem gewählten Anteil am Haushaltsnetto. Geben Sie zusätzlich eine Miete ein, rechnet der Rechner umgekehrt aus, welchen Anteil Ihres Einkommens diese Miete bindet.',
+    workedExample: {
+      title: 'Budget: 3.000 € Haushaltsnetto bei 30 %',
+      description: '3.000 € × 30 % = 900 € Warmmiete. Für Lebenshaltung, Mobilität und Rücklagen bleiben 2.100 €.',
+      inputs: { netIncome: 3000, targetPercent: '30', warmRent: 0 },
+      resultSummary: '900 € empfohlene Warmmiete',
+      },
+    workedExamples: [
+      {
+        title: 'Budget: 3.000 € Haushaltsnetto bei 30 %',
+        description: '3.000 € × 30 % = 900 € Warmmiete. Für Lebenshaltung, Mobilität und Rücklagen bleiben 2.100 €.',
+        inputs: { netIncome: 3000, targetPercent: '30', warmRent: 0 },
+        resultSummary: '900 € empfohlene Warmmiete',
+      },
+      {
+        title: 'Prüfung: 1.150 € Warmmiete bei 3.200 € Netto',
+        description: '1.150 € ÷ 3.200 € × 100 = 35,9 %. Das liegt über der 30-%-Regel, aber noch unter der 40-%-Grenze. Bei 30 % wären 960 € tragbar.',
+        inputs: { netIncome: 3200, targetPercent: '30', warmRent: 1150 },
+        resultSummary: '35,9 % Mietbelastung (erhöht)',
+      },
+    ],
     content: {
-      intro: 'Dieser Budgetrechner ermittelt die maximal leistbare Kalt- und Warmmiete auf Basis Ihres Haushaltsnettoeinkommens.',
-      details: 'Die Berechnung staffelt das Budget nach der konservativen 30-%-Regel und der tolerierbaren 40-%-Belastungsgrenze abzüglich typischer Nebenkostenpauschalen.',
+      intro: 'Wie viel Miete Sie sich leisten können, hängt vor allem vom Haushaltsnettoeinkommen ab. Der Rechner zeigt Ihr Mietbudget nach der gängigen 30-%-Regel – und prüft auf Wunsch, wie stark eine konkrete Wohnung Ihr Einkommen belastet. Ihre Warmmiete können Sie vorab mit dem [Warmmiete-Rechner](/rechner/warmmiete-rechner/) ermitteln.',
+      sections: [
+        {
+          title: 'Die 30-%-Regel: Richtwert, kein Gesetz',
+          content: 'Als gesund gilt eine Warmmiete von höchstens 30 % des Haushaltsnettos. Bis 35 % ist in teuren Großstädten oft nicht zu vermeiden. Ab 40 % wird es eng: Dann bleibt meist zu wenig für Rücklagen, Auto oder unerwartete Ausgaben. Entscheidend ist die **Warmmiete**, denn Heizung und Nebenkosten fließen genauso jeden Monat vom Konto ab.',
+        },
+        {
+          title: 'Mietbelastungsquote: So lesen Sie das Ergebnis',
+          content: '- **unter 30 %**: komfortabel, es bleibt Spielraum zum Sparen.\n- **30 bis 40 %**: tragbar, aber prüfen Sie Ihre übrigen Fixkosten genau.\n- **über 40 %**: kritisch – suchen Sie eine günstigere Wohnung oder einen Mitmieter und prüfen Sie einen Anspruch auf Wohngeld.',
+        },
+        {
+          title: 'Was Vermieter beim Einkommen erwarten',
+          content: 'Viele Vermieter verlangen, dass das Nettoeinkommen mindestens das Dreifache der Warmmiete beträgt. Das entspricht einer Mietbelastung von rund 33 %. Liegt Ihre Quote darüber, helfen eine Mietbürgschaft oder ein zweiter Hauptmieter im Vertrag.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie hoch sind die Nebenkosten pro Quadratmeter im Durchschnitt?', answer: 'Nach dem Betriebskostenspiegel des Deutschen Mieterbundes betragen die Gesamtwarmnebenkosten (Heizung, Wasser, Müll, Hausmeister etc.) durchschnittlich 2,80 bis 3,50 € pro Quadratmeter Wohnfläche.' },
-      { question: 'Was tun, wenn die Wunschwohnung über 40 % des Einkommens kostet?', answer: 'In solchen Fällen fordern Vermieter häufig eine Mietbürgschaft (z. B. der Eltern) oder die Aufnahme eines zweiten solventen Hauptmieters in den Mietvertrag.' },
+      { question: 'Wie viel Miete kann ich mir bei 2.500 € netto leisten?', answer: 'Nach der 30-%-Regel sind es 750 € Warmmiete, mit 35 % wären es 875 €. Für die Kaltmiete ziehen Sie davon grob ein Viertel für Nebenkosten und Heizung ab.' },
+      { question: 'Gilt die 30-Prozent-Regel für Warm- oder Kaltmiete?', answer: 'Für die Warmmiete. Vermieter und Banken betrachten die gesamten monatlichen Wohnkosten einschließlich Heizung und Betriebskosten, weil genau dieser Betrag vom Konto abgeht.' },
+      { question: 'Ab wann ist die Mietbelastung zu hoch?', answer: 'Über 40 % des Nettoeinkommens gilt die Belastung als kritisch. Dann bleibt meist zu wenig Geld für Rücklagen und unerwartete Ausgaben. Zwischen 30 und 40 % ist sie tragbar, wenn Ihre übrigen Fixkosten niedrig sind.' },
+      { question: 'Was tun, wenn die Wunschwohnung über 40 % des Einkommens kostet?', answer: 'Vermieter fordern dann häufig eine Mietbürgschaft, etwa von den Eltern, oder einen zweiten Hauptmieter. Prüfen Sie außerdem, ob Ihnen Wohngeld zusteht.' },
+      { question: 'Wie hoch sind die Nebenkosten pro Quadratmeter?', answer: 'Nach dem Betriebskostenspiegel des Deutschen Mieterbundes liegen die Nebenkosten einschließlich Heizung im Schnitt bei rund 2,80 bis 3,50 € pro Quadratmeter und Monat.' },
     ],
-    relatedSlugs: ['kaufpreis-faktor-rechner', 'erbbaurecht-erbbauzins-rechner', 'mietbelastungsquote-rechner', 'kaufnebenkosten-rechner', 'stromkostenrechner', 'mieterhoehung-rechner'],
+    relatedSlugs: ['warmmiete-rechner', 'mieterhoehung-rechner', 'staffelmiete-rechner', 'notar-grundbuch-kosten-rechner', 'stromkostenrechner'],
   },
   {
     id: 'mieterhoehung-rechner',
@@ -415,7 +489,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
           content: 'Dieser Rechner führt eine reine arithmetische und fristbezogene Orientierungsberechnung durch. Er ersetzt keine Rechtsberatung und kann folgende formelle Wirksamkeitskriterien nicht überprüfen:\n- **Formvorschriften (§ 558a BGB)**: Das Mieterhöhungsverlangen muss in Textform verfasst und ordnungsgemäß begründet sein (z. B. durch konkrete Bezugnahme auf den Mietspiegel inklusive Baujahr, Lage und Ausstattungsklassen).\n- **Mietpreisspiegel-Einstufung**: Ob Merkmale wie Badmodernisierung, Balkon oder Schallschutzfenster zu korrekten Zu- oder Abschlägen geführt haben, muss im Mietspiegel nachgeschlagen werden.\n- **Zustimmungsanspruch**: Eine Mieterhöhung wird erst durch die schriftliche Zustimmung des Mieters oder ein gerichtliches Zustimmungsurteil wirksam.',
         },
       ],
-      details: 'Wichtig: Bei [Staffelmieten](/rechner/staffelmiete-rechner/) oder [Indexmieten](/rechner/indexmiete-rechner/) ist eine Mieterhöhung nach § 558 BGB gesetzlich ausgeschlossen. Für bauliche Modernisierungen nutzen Sie unseren [Modernisierungsumlage-Rechner](/rechner/modernisierungsumlage-rechner/). Prüfen Sie auch Ihre [Mietbelastungsquote](/rechner/mietbelastungsquote-rechner/).',
+      details: 'Wichtig: Bei [Staffelmieten](/rechner/staffelmiete-rechner/) oder [Indexmieten](/rechner/indexmiete-rechner/) ist eine Mieterhöhung nach § 558 BGB gesetzlich ausgeschlossen. Für bauliche Modernisierungen nutzen Sie unseren [Modernisierungsumlage-Rechner](/rechner/modernisierungsumlage-rechner/). Prüfen Sie auch Ihre [Mietbelastungsquote](/rechner/mietbudget-rechner/).',
     },
     faqs: [
       { question: 'Wie berechnet sich die 3-Jahres-Kappungsgrenze bei mehreren Mieterhöhungen?', answer: 'Für die Kappungsgrenze wird die Nettokaltmiete herangezogen, die genau 36 Monate vor dem geplanten Wirksamwerden der neuen Mieterhöhung galt. Alle in diesen 3 Jahren bereits erfolgten Erhöhungen (außer Modernisierungen nach § 559 BGB) werden auf die 15 % bzw. 20 % angerechnet.' },

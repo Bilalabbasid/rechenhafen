@@ -346,6 +346,16 @@ export function calculateCalendarDiff(
     m += 12;
   }
 
+  // Month-end case: the start day does not exist in the month before the end date
+  // (e.g. 31.01. -> 01.03. in a non-leap year). Borrowing would leave negative days,
+  // so use the clamped calendar span instead (31.01. + 1 Monat = 28.02., + 1 Tag = 01.03.).
+  if (d < 0) {
+    const span = calculateCalendarSpan(earlier, later);
+    y = span.years;
+    m = span.months;
+    d = span.days;
+  }
+
   if (includeStartDay) {
     d += 1;
     const daysInTargetMonth = getDaysInMonth(later.year, later.month);
@@ -377,11 +387,133 @@ export function calculateCalendarDiff(
 }
 
 /**
+ * Adds whole calendar months to a date. If the target month is shorter than the
+ * start day (e.g. 31.01. + 1 Monat), the result is clamped to the last day of that month.
+ */
+export function addMonthsClamped(date: DateParts, monthsToAdd: number): DateParts {
+  const monthIndex = date.year * 12 + (date.month - 1) + monthsToAdd;
+  const year = Math.floor(monthIndex / 12);
+  const month = monthIndex - year * 12 + 1;
+  return { year, month, day: Math.min(date.day, getDaysInMonth(year, month)) };
+}
+
+export interface CalendarSpan {
+  /** Vollständige Monate insgesamt (Jahre × 12 + Monate) */
+  totalMonths: number;
+  years: number;
+  months: number;
+  days: number;
+}
+
+/**
+ * Calendar-correct span between two dates (earlier <= later) in years, months and days.
+ * Rule: the largest number of whole months M with start + M months (clamped to month end) <= end,
+ * then the remaining days. Guarantees start + M months + D days = end and never yields negative days
+ * (e.g. 31.01. → 28.02. = 1 Monat, 31.01. → 01.03. = 1 Monat und 1 Tag).
+ */
+export function calculateCalendarSpan(earlier: DateParts, later: DateParts): CalendarSpan {
+  const laterNum = dateToDayNumber(later.year, later.month, later.day);
+  let totalMonths = (later.year - earlier.year) * 12 + (later.month - earlier.month);
+  if (totalMonths < 0) totalMonths = 0;
+  let anchor = addMonthsClamped(earlier, totalMonths);
+  if (totalMonths > 0 && dateToDayNumber(anchor.year, anchor.month, anchor.day) > laterNum) {
+    totalMonths -= 1;
+    anchor = addMonthsClamped(earlier, totalMonths);
+  }
+  const days = Math.max(0, laterNum - dateToDayNumber(anchor.year, anchor.month, anchor.day));
+  return {
+    totalMonths,
+    years: Math.floor(totalMonths / 12),
+    months: totalMonths % 12,
+    days,
+  };
+}
+
+/**
+ * Returns the UTC offset of Europe/Berlin (in minutes) at a given instant (60 = MEZ, 120 = MESZ).
+ */
+export function getBerlinOffsetMinutes(utcMs: number): number {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Berlin',
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+  const parts = dtf.formatToParts(new Date(utcMs));
+  const get = (type: string) => parseInt(parts.find((p) => p.type === type)?.value || '0', 10);
+  const asUtc = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour') % 24, get('minute'), get('second'));
+  const truncated = Math.floor(utcMs / 1000) * 1000;
+  return Math.round((asUtc - truncated) / 60000);
+}
+
+/**
+ * Converts a wall-clock time in Europe/Berlin to a UTC timestamp (DST-aware).
+ */
+export function berlinLocalToUtcMs(year: number, month: number, day: number, hour: number = 0, minute: number = 0): number {
+  const naive = Date.UTC(year, month - 1, day, hour, minute);
+  const firstGuess = naive - getBerlinOffsetMinutes(naive) * 60000;
+  return naive - getBerlinOffsetMinutes(firstGuess) * 60000;
+}
+
+export interface CountdownParts {
+  reached: boolean;
+  days: number;
+  hours: number;
+  minutes: number;
+  totalHours: number;
+  totalMinutes: number;
+}
+
+/**
+ * Splits the remaining time between now and a target instant into days, hours and minutes.
+ */
+export function splitCountdown(targetMs: number, nowMs: number): CountdownParts {
+  const diff = targetMs - nowMs;
+  if (!Number.isFinite(diff) || diff <= 0) {
+    return { reached: true, days: 0, hours: 0, minutes: 0, totalHours: 0, totalMinutes: 0 };
+  }
+  const totalMinutes = Math.floor(diff / 60000);
+  return {
+    reached: false,
+    days: Math.floor(totalMinutes / 1440),
+    hours: Math.floor((totalMinutes % 1440) / 60),
+    minutes: totalMinutes % 60,
+    totalHours: Math.floor(totalMinutes / 60),
+    totalMinutes,
+  };
+}
+
+const WEEKDAY_SHORT = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'] as const;
+
+function weekdayShort(parts: DateParts): string {
+  return WEEKDAY_SHORT[new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay()];
+}
+
+function unit(n: number, singular: string, plural: string): string {
+  return `${formatNumber(n, 0)} ${n === 1 ? singular : plural}`;
+}
+
+function parseTimeOfDay(raw: unknown): { hour: number; minute: number } | null {
+  if (raw === undefined || raw === null || String(raw).trim() === '') return { hour: 0, minute: 0 };
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(raw).trim());
+  if (!m) return null;
+  const hour = parseInt(m[1], 10);
+  const minute = parseInt(m[2], 10);
+  if (hour > 23 || minute > 59) return null;
+  return { hour, minute };
+}
+
+/**
  * Main Tagerechner Calculation Engine
  * Supports 3 modes:
  *  - 'between': Tage zwischen zwei Daten
- *  - 'until': Tage bis zu einem Datum (Startdatum = heute)
+ *  - 'until': Tage bis zu einem Datum (Startdatum = heute), inkl. Countdown in Stunden/Minuten ab jetzt
  *  - 'since': Tage seit einem Datum (Enddatum = heute)
+ * Results: Kalendertage, Wochen + Resttage, Monate + Resttage, Jahre/Monate/Tage, Stunden/Minuten.
  */
 export function calculateTagerechner(inputs: Record<string, any>): CalculationResult {
   const mode = inputs.mode || 'between';
@@ -414,9 +546,23 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
     };
   }
 
+  const targetTime = mode === 'until' ? parseTimeOfDay(inputs.targetTime) : { hour: 0, minute: 0 };
+  if (!targetTime) {
+    return {
+      primary: { id: 'error', label: 'Fehler', value: 0, formattedValue: 'Ungültige Uhrzeit' },
+      error: 'Bitte geben Sie die Uhrzeit im Format HH:MM ein (z. B. 18:30).',
+    };
+  }
+
   const startFormatted = formatDateGerman(diff.rawStart);
   const endFormatted = formatDateGerman(diff.rawEnd);
   const daysFormatted = formatNumber(diff.totalDays, 0);
+
+  // Calendar-correct months/years: count from the earlier date; with Starttag-Zählung one day is added at the end.
+  const laterForSpan = includeStartDay
+    ? dayNumberToDate(dateToDayNumber(diff.later.year, diff.later.month, diff.later.day) + 1)
+    : diff.later;
+  const span = calculateCalendarSpan(diff.earlier, laterForSpan);
 
   // Direction explanation sentence
   let directionSentence = '';
@@ -445,14 +591,84 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
     }
   }
 
-  const calendarBreakdown = `${diff.years} ${diff.years === 1 ? 'Jahr' : 'Jahre'}, ${diff.months} ${diff.months === 1 ? 'Monat' : 'Monate'} und ${diff.days} ${diff.days === 1 ? 'Tag' : 'Tage'}`;
-  const weeksBreakdown = `${formatNumber(diff.totalWeeks, 0)} ${diff.totalWeeks === 1 ? 'Woche' : 'Wochen'} und ${diff.remDays} ${diff.remDays === 1 ? 'Tag' : 'Tage'}`;
+  const calendarBreakdown = `${unit(span.years, 'Jahr', 'Jahre')}, ${unit(span.months, 'Monat', 'Monate')} und ${unit(span.days, 'Tag', 'Tage')}`;
+  const monthsBreakdown = `${unit(span.totalMonths, 'Monat', 'Monate')} und ${unit(span.days, 'Tag', 'Tage')}`;
+  const weeksBreakdown = `${unit(diff.totalWeeks, 'Woche', 'Wochen')} und ${unit(diff.remDays, 'Tag', 'Tage')}`;
+  const weeksDative = `${unit(diff.totalWeeks, 'Woche', 'Wochen')} und ${unit(diff.remDays, 'Tag', 'Tagen')}`;
+  const monthsDative = span.years > 0
+    ? `${unit(span.years, 'Jahr', 'Jahren')}, ${unit(span.months, 'Monat', 'Monaten')} und ${unit(span.days, 'Tag', 'Tagen')}`
+    : `${unit(span.totalMonths, 'Monat', 'Monaten')} und ${unit(span.days, 'Tag', 'Tagen')}`;
 
-  const startDayNote = includeStartDay
-    ? `Starttag (${startFormatted}) mitgezählt: Ja (+1 Tag, beidseitig inklusive)`
-    : `Starttag nicht mitgezählt (Standard: Differenz auf Kalendertagsbasis)`;
+  const totalHours = diff.totalDays * 24;
+  const totalMinutes = diff.totalDays * 1440;
 
-  const summary = `${directionSentence} Das entspricht ${weeksBreakdown} bzw. ${calendarBreakdown}. (${startDayNote})`;
+  const summary = `${directionSentence} Das entspricht ${weeksDative} bzw. ${monthsDative}.${includeStartDay ? ' (Start- und Endtag mitgezählt)' : ''}`;
+
+  const secondary: CalculationResult['secondary'] = [
+    {
+      id: 'weeksBreakdown',
+      label: 'Wochen und Tage',
+      value: diff.totalWeeks,
+      formattedValue: weeksBreakdown,
+    },
+    {
+      id: 'monthsBreakdown',
+      label: 'Monate und Tage',
+      value: span.totalMonths,
+      formattedValue: monthsBreakdown,
+    },
+    {
+      id: 'calendarBreakdown',
+      label: 'Jahre, Monate und Tage',
+      value: span.years,
+      formattedValue: calendarBreakdown,
+    },
+    {
+      id: 'hoursMinutes',
+      label: 'In Stunden und Minuten',
+      value: totalHours,
+      formattedValue: `${formatNumber(totalHours, 0)} Std. · ${formatNumber(totalMinutes, 0)} Min.`,
+      helpText: 'Rechnerisch 24 Stunden je Kalendertag.',
+    },
+  ];
+
+  let countdownStep = '';
+  if (mode === 'until') {
+    const targetParts = diff.rawEnd;
+    const targetMs = berlinLocalToUtcMs(targetParts.year, targetParts.month, targetParts.day, targetTime.hour, targetTime.minute);
+    const cd = splitCountdown(targetMs, Date.now());
+    const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+    const timeLabel = `${pad(targetTime.hour)}:${pad(targetTime.minute)} Uhr`;
+    secondary.push({
+      id: 'countdownNow',
+      label: 'Restzeit ab jetzt',
+      value: cd.totalMinutes,
+      formattedValue: cd.reached
+        ? 'Zeitpunkt erreicht'
+        : `${unit(cd.days, 'Tag', 'Tage')}, ${cd.hours} Std., ${cd.minutes} Min.`,
+      helpText: cd.reached
+        ? `Der ${endFormatted}, ${timeLabel}, liegt in der Vergangenheit.`
+        : `Bis ${endFormatted}, ${timeLabel} (deutsche Zeit) – insgesamt ${formatNumber(cd.totalHours, 0)} Stunden.`,
+    });
+    countdownStep = cd.reached
+      ? `Countdown: Der ${endFormatted}, ${timeLabel}, ist bereits erreicht.`
+      : `Countdown ab jetzt bis ${endFormatted}, ${timeLabel}: ${cd.days} Tage, ${cd.hours} Std. und ${cd.minutes} Min. (Sommer-/Winterzeit berücksichtigt).`;
+  }
+
+  secondary.push({
+    id: 'periodDirection',
+    label: 'Zeitraum',
+    value: diff.totalDays,
+    formattedValue: `${weekdayShort(diff.rawStart)} ${startFormatted} → ${weekdayShort(diff.rawEnd)} ${endFormatted}`,
+  });
+
+  const spanAnchor = addMonthsClamped(diff.earlier, span.totalMonths);
+  const calculationSteps = [
+    `Kalendertage: ${formatDateGerman(diff.earlier)} bis ${formatDateGerman(diff.later)} = ${formatNumber(diff.totalDays - (includeStartDay ? 1 : 0), 0)} Tage${includeStartDay ? ' + 1 Tag (Starttag mitgezählt) = ' + daysFormatted + ' Tage' : ''}.`,
+    `Wochen: ${daysFormatted} ÷ 7 = ${formatNumber(diff.totalWeeks, 0)} Wochen, Rest ${diff.remDays} ${diff.remDays === 1 ? 'Tag' : 'Tage'}.`,
+    `Monate: ${formatDateGerman(diff.earlier)} + ${unit(span.totalMonths, 'Monat', 'Monate')} = ${formatDateGerman(spanAnchor)}; danach noch ${unit(span.days, 'Tag', 'Tage')}.`,
+  ];
+  if (countdownStep) calculationSteps.push(countdownStep);
 
   return {
     primary: {
@@ -462,33 +678,119 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
       formattedValue: `${daysFormatted} ${diff.totalDays === 1 ? 'Tag' : 'Tage'}`,
       highlight: true,
     },
-    secondary: [
-      {
-        id: 'calendarBreakdown',
-        label: 'Kalendarische Aufteilung',
-        value: diff.totalDays,
-        formattedValue: calendarBreakdown,
-      },
-      {
-        id: 'weeksBreakdown',
-        label: 'Wochen & verbleibende Tage',
-        value: diff.totalWeeks,
-        formattedValue: weeksBreakdown,
-      },
-      {
-        id: 'startDayCounted',
-        label: 'Starttag-Zählung',
-        value: includeStartDay ? 1 : 0,
-        formattedValue: includeStartDay ? 'Ja (beidseitig inklusive)' : 'Nein (nur Differenztage)',
-      },
-      {
-        id: 'periodDirection',
-        label: 'Zeitraum',
-        value: diff.totalDays,
-        formattedValue: `${startFormatted} → ${endFormatted}`,
-      },
-    ],
+    secondary,
+    calculationSteps,
     summaryText: summary,
+  };
+}
+
+/**
+ * Tage bis zum nächsten Geburtstag – inkl. Wochentag der Geburt, Alter am nächsten Geburtstag
+ * und nächster runder Geburtstag. Ein 29. Februar wird in Nicht-Schaltjahren auf den 28. Februar gelegt.
+ * Optional `referenceDate` (YYYY-MM-DD) ersetzt "heute" (für Tests / Stichtagsrechnung).
+ */
+export function calculateTageBisGeburtstag(inputs: Record<string, any>): CalculationResult {
+  const errorResult = (message: string): CalculationResult => ({
+    primary: { id: 'days', label: 'Tage bis zum Geburtstag', value: 0, formattedValue: '–' },
+    error: message,
+  });
+
+  if (inputs.birthDate === undefined || inputs.birthDate === null || String(inputs.birthDate).trim() === '') {
+    return errorResult('Bitte geben Sie Ihr Geburtsdatum ein.');
+  }
+  const birth = parseDateParts(inputs.birthDate);
+  if (!birth) {
+    return errorResult('Bitte geben Sie ein gültiges Geburtsdatum ein (TT.MM.JJJJ). Einen 29. Februar gibt es nur in Schaltjahren.');
+  }
+
+  let today = getBerlinTodayParts();
+  if (inputs.referenceDate !== undefined && inputs.referenceDate !== null && String(inputs.referenceDate).trim() !== '') {
+    const ref = parseDateParts(inputs.referenceDate);
+    if (!ref) return errorResult('Bitte geben Sie einen gültigen Stichtag ein.');
+    today = ref;
+  }
+
+  const todayNum = dateToDayNumber(today.year, today.month, today.day);
+  const birthNum = dateToDayNumber(birth.year, birth.month, birth.day);
+  if (birthNum > todayNum) {
+    return errorResult('Das Geburtsdatum liegt in der Zukunft. Bitte prüfen Sie die Eingabe.');
+  }
+
+  const anniversaryNum = (age: number) => {
+    const a = calculateAnniversaryDate(birth.year, birth.month, birth.day, age);
+    return { parts: { year: a.year, month: a.month, day: a.day } as DateParts, num: dateToDayNumber(a.year, a.month, a.day), shifted: a.isLeapShiftedTo28 };
+  };
+
+  let ageNext = Math.max(1, today.year - birth.year);
+  let next = anniversaryNum(ageNext);
+  if (next.num < todayNum) {
+    ageNext += 1;
+    next = anniversaryNum(ageNext);
+  }
+
+  const isToday = next.num === todayNum;
+  const daysUntil = next.num - todayNum;
+  const weeks = Math.floor(daysUntil / 7);
+  const remDays = daysUntil % 7;
+  const currentAge = isToday ? ageNext : ageNext - 1;
+
+  const birthWeekday = getGermanWeekday(birth.year, birth.month, birth.day);
+  const nextWeekday = getGermanWeekday(next.parts.year, next.parts.month, next.parts.day);
+  const nextFormatted = formatDateGerman(next.parts);
+
+  const roundAge = Math.ceil(ageNext / 10) * 10;
+  const round = anniversaryNum(roundAge);
+  const daysToRound = round.num - todayNum;
+  const roundWeekday = getGermanWeekday(round.parts.year, round.parts.month, round.parts.day);
+
+  const leapNote = next.shifted
+    ? ` Da ${next.parts.year} kein Schaltjahr ist, zeigt der Rechner den 28.02. Rechtlich vollendet sich das Lebensjahr mit Ablauf des 28. Februar, das neue Alter gilt ab dem 01.03.${next.parts.year}.`
+    : '';
+  const legalNum = next.num + 1;
+  const legalParts = dayNumberToDate(legalNum);
+
+  const summaryText = isToday
+    ? `Heute ist Ihr Geburtstag: Sie werden ${ageNext} Jahre alt. Geboren wurden Sie an einem ${birthWeekday}.${leapNote}`
+    : `Bis zu Ihrem nächsten Geburtstag am ${nextWeekday}, ${nextFormatted}, sind es noch ${unit(daysUntil, 'Tag', 'Tage')} (${unit(weeks, 'Woche', 'Wochen')} und ${unit(remDays, 'Tag', 'Tage')}). Dann werden Sie ${ageNext} Jahre alt.${leapNote}`;
+
+  return {
+    primary: {
+      id: 'days',
+      label: isToday ? 'Ihr Geburtstag' : 'Tage bis zum nächsten Geburtstag',
+      value: daysUntil,
+      formattedValue: isToday ? 'Heute ist Ihr Geburtstag!' : `${formatNumber(daysUntil, 0)} ${daysUntil === 1 ? 'Tag' : 'Tage'}`,
+      highlight: true,
+      helpText: isToday ? undefined : `Das sind rund ${formatNumber(daysUntil * 24, 0)} Stunden (gerechnet ab heute 0 Uhr).`,
+    },
+    secondary: [
+      { id: 'nextDate', label: isToday ? 'Geburtstag' : 'Nächster Geburtstag', value: nextFormatted, formattedValue: `${nextWeekday}, ${nextFormatted}` },
+      { id: 'ageNext', label: isToday ? 'Neues Alter' : 'Alter am nächsten Geburtstag', value: ageNext, formattedValue: `${ageNext} Jahre` },
+      { id: 'weeks', label: 'In Wochen und Tagen', value: weeks, formattedValue: `${unit(weeks, 'Woche', 'Wochen')} und ${unit(remDays, 'Tag', 'Tage')}` },
+      { id: 'birthWeekday', label: 'Wochentag Ihrer Geburt', value: birthWeekday, formattedValue: `${birthWeekday}, ${formatDateGerman(birth)}` },
+      { id: 'currentAge', label: 'Aktuelles Alter', value: currentAge, formattedValue: `${currentAge} ${currentAge === 1 ? 'Jahr' : 'Jahre'}` },
+      {
+        id: 'roundBirthday',
+        label: 'Nächster runder Geburtstag',
+        value: roundAge,
+        formattedValue: `${roundAge}. am ${roundWeekday}, ${formatDateGerman(round.parts)}`,
+        helpText: daysToRound === 0 ? 'Das ist heute!' : `In ${formatNumber(daysToRound, 0)} ${daysToRound === 1 ? 'Tag' : 'Tagen'}.`,
+      },
+      ...(next.shifted
+        ? [{
+            id: 'legalAgeDate',
+            label: 'Rechtlich neues Alter ab',
+            value: formatDateGerman(legalParts),
+            formattedValue: `${getGermanWeekday(legalParts.year, legalParts.month, legalParts.day)}, ${formatDateGerman(legalParts)}`,
+            helpText: `In ${formatNumber(legalNum - todayNum, 0)} ${legalNum - todayNum === 1 ? 'Tag' : 'Tagen'} (Lebensjahr endet mit Ablauf des 28.02.).`,
+          }]
+        : []),
+    ],
+    calculationSteps: [
+      `Heute: ${formatDateGerman(today)}. Geburtstag in diesem Zyklus: ${nextFormatted}${next.shifted ? ' (29.02. → 28.02.)' : ''}.`,
+      `Tage: ${nextFormatted} − ${formatDateGerman(today)} = ${formatNumber(daysUntil, 0)} Tage = ${weeks} Wochen und ${remDays} Tage.`,
+      `Alter: ${next.parts.year} − ${birth.year} = ${ageNext} Jahre am nächsten Geburtstag.`,
+    ],
+    summaryText,
   };
 }
 

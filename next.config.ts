@@ -171,12 +171,12 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/rechner/liquiditaetsreserve-rechner',
-        destination: '/rechner/notgroschen-rechner/',
+        destination: '/finanzen/',
         permanent: true,
       },
       {
         source: '/rechner/liquiditaetsreserve-rechner/',
-        destination: '/rechner/notgroschen-rechner/',
+        destination: '/finanzen/',
         permanent: true,
       },
       {
@@ -201,22 +201,22 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/rechner/schuldentilgungsdauer-rechner',
-        destination: '/rechner/kreditlaufzeit-rechner/',
+        destination: '/rechner/ratenkreditrechner/',
         permanent: true,
       },
       {
         source: '/rechner/schuldentilgungsdauer-rechner/',
-        destination: '/rechner/kreditlaufzeit-rechner/',
+        destination: '/rechner/ratenkreditrechner/',
         permanent: true,
       },
       {
         source: '/rechner/kredit-restschuld-stichtag-rechner',
-        destination: '/rechner/restschuld-rechner/',
+        destination: '/rechner/tilgungsrechner/',
         permanent: true,
       },
       {
         source: '/rechner/kredit-restschuld-stichtag-rechner/',
-        destination: '/rechner/restschuld-rechner/',
+        destination: '/rechner/tilgungsrechner/',
         permanent: true,
       },
       {
@@ -246,22 +246,22 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/rechner/sparziel-rechner',
-        destination: '/rechner/spardauer-rechner/',
+        destination: '/rechner/sparrechner/',
         permanent: true,
       },
       {
         source: '/rechner/sparziel-rechner/',
-        destination: '/rechner/spardauer-rechner/',
+        destination: '/rechner/sparrechner/',
         permanent: true,
       },
       {
         source: '/rechner/autokredit-rechner',
-        destination: '/rechner/ballonfinanzierung-rechner/',
+        destination: '/rechner/ratenkreditrechner/',
         permanent: true,
       },
       {
         source: '/rechner/autokredit-rechner/',
-        destination: '/rechner/ballonfinanzierung-rechner/',
+        destination: '/rechner/ratenkreditrechner/',
         permanent: true,
       },
       {

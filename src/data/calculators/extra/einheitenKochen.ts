@@ -1,4 +1,4 @@
-import { CalculatorDefinition } from '@/types/calculator';
+import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { calculateZollCmConversion, calculateTimeConversion } from '@/lib/calculators/einheiten';
 
@@ -117,6 +117,351 @@ function buildJamRatioReference(): string {
     `| Früchte | 1:1 | 2:1 | 3:1 |\n| --- | --- | --- | --- |\n${rows}`,
     'Je höher die erste Zahl, desto weniger Zucker kommt ins Glas. Damit die Masse trotzdem fest wird, enthalten 2:1- und 3:1-Gelierzucker anteilig mehr Geliermittel. Produkte unterscheiden sich in Zusammensetzung, Kochzeit und Zitronensäureanteil – richten Sie sich beim Kochen zusätzlich nach der Anleitung auf Ihrer Packung.',
   ].join('\n\n');
+}
+
+// ---------------------------------------------------------------------------
+// Zahlensysteme-Umrechner (binaer-hex-dezimal-umrechner)
+// Eingabe in Basis 2, 8, 10 oder 16, Rechnen mit Hex-/Binärzahlen und
+// Hex-Farbcode ↔ RGB. BigInt sorgt für exakte Ergebnisse bis 256 Bit.
+// ---------------------------------------------------------------------------
+const NUMBER_BASES: Record<string, { base: number; name: string; prefix: string; pattern: RegExp; allowed: string }> = {
+  '2': { base: 2, name: 'Binärsystem', prefix: '0b', pattern: /^[01]+$/, allowed: '0 und 1' },
+  '8': { base: 8, name: 'Oktalsystem', prefix: '0o', pattern: /^[0-7]+$/, allowed: '0 bis 7' },
+  '10': { base: 10, name: 'Dezimalsystem', prefix: '', pattern: /^[0-9]+$/, allowed: '0 bis 9' },
+  '16': { base: 16, name: 'Hexadezimalsystem', prefix: '0x', pattern: /^[0-9A-F]+$/, allowed: '0 bis 9 und A bis F' },
+};
+const MAX_INPUT_BITS = BigInt(256);
+const MAX_INPUT_VALUE = BigInt(1) << MAX_INPUT_BITS;
+
+function parseBaseInteger(raw: unknown, baseKey: string, fieldName: string): { value: bigint } | { error: string } {
+  const spec = NUMBER_BASES[baseKey] ?? NUMBER_BASES['10'];
+  let s = raw === undefined || raw === null ? '' : String(raw).trim().replace(/[\s_]/g, '');
+  if (s === '') return { error: `Bitte geben Sie ${fieldName} ein.` };
+  let negative = false;
+  if (s.startsWith('-')) {
+    negative = true;
+    s = s.slice(1);
+  } else if (s.startsWith('+')) {
+    s = s.slice(1);
+  }
+  s = s.toUpperCase();
+  if (spec.prefix && s.startsWith(spec.prefix.toUpperCase()) && s.length > 2) s = s.slice(2);
+  if (spec.base === 16 && s.startsWith('#')) s = s.slice(1);
+  if (s === '') return { error: `Bitte geben Sie ${fieldName} ein.` };
+  if (!spec.pattern.test(s)) {
+    const bad = [...s].find((ch) => !spec.pattern.test(ch)) ?? s[0];
+    return { error: `Ungültige Ziffer „${bad}“ im ${spec.name}. Erlaubt sind ${spec.allowed}.` };
+  }
+  const prefix = spec.base === 10 ? '' : spec.prefix;
+  let value = BigInt(prefix + s);
+  if (value >= MAX_INPUT_VALUE) return { error: 'Die Zahl ist zu groß. Der Rechner verarbeitet Zahlen bis 256 Bit (64 Hex-Stellen).' };
+  if (negative) value = -value;
+  return { value };
+}
+
+function groupDecimal(v: bigint): string {
+  const neg = v < BigInt(0);
+  const digits = (neg ? -v : v).toString(10).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (neg ? '−' : '') + digits;
+}
+
+function formatInBase(v: bigint, base: number): string {
+  const neg = v < BigInt(0);
+  const abs = neg ? -v : v;
+  let out: string;
+  if (base === 2) {
+    const bin = abs.toString(2);
+    out = bin.padStart(Math.ceil(bin.length / 4) * 4, '0').match(/.{1,4}/g)!.join(' ');
+  } else if (base === 10) {
+    out = groupDecimal(abs);
+  } else {
+    out = abs.toString(base).toUpperCase();
+  }
+  return (neg ? '−' : '') + out;
+}
+
+function baseItems(v: bigint, skipBase?: number) {
+  const items = [
+    { id: 'decimal', base: 10, label: 'Dezimal (Basis 10)' },
+    { id: 'hex', base: 16, label: 'Hexadezimal (Basis 16)' },
+    { id: 'binary', base: 2, label: 'Binär / Dual (Basis 2)' },
+    { id: 'octal', base: 8, label: 'Oktal (Basis 8)' },
+  ];
+  return items
+    .filter((it) => it.base !== skipBase)
+    .map((it) => ({ id: it.id, label: it.label, value: Number(v), formattedValue: formatInBase(v, it.base) }));
+}
+
+const BASE_ERROR_RESULT = (error: string) => ({
+  primary: { id: 'result', label: 'Ergebnis', value: 0, formattedValue: '–' },
+  secondary: [],
+  error,
+});
+
+function calculateNumberSystems(inputs: Record<string, any>): CalculationResult {
+  const mode = String(inputs.mode ?? 'convert');
+
+  if (mode === 'color') {
+    const raw = String(inputs.colorValue ?? '#FF8000').trim();
+    if (raw === '') return BASE_ERROR_RESULT('Bitte geben Sie einen Farbcode ein, z. B. #FF8000 oder 255, 128, 0.');
+    let r: number, g: number, b: number;
+    let inputWasHex: boolean;
+    const hexMatch = raw.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/i);
+    const rgbMatch = raw.match(/^(?:rgb\s*\(\s*)?(\d{1,3})\s*[,;\s]\s*(\d{1,3})\s*[,;\s]\s*(\d{1,3})\s*\)?$/i);
+    if (hexMatch) {
+      let h = hexMatch[1].toUpperCase();
+      if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+      r = parseInt(h.slice(0, 2), 16);
+      g = parseInt(h.slice(2, 4), 16);
+      b = parseInt(h.slice(4, 6), 16);
+      inputWasHex = true;
+    } else if (rgbMatch) {
+      [r, g, b] = [rgbMatch[1], rgbMatch[2], rgbMatch[3]].map((x) => parseInt(x, 10));
+      if (r > 255 || g > 255 || b > 255) return BASE_ERROR_RESULT('RGB-Werte müssen zwischen 0 und 255 liegen.');
+      inputWasHex = false;
+    } else {
+      return BASE_ERROR_RESULT('Unbekanntes Farbformat. Erlaubt sind Hex-Codes wie #FF8000 oder #F80 und RGB-Werte wie 255, 128, 0.');
+    }
+    const pair = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
+    const hexCode = `#${pair(r)}${pair(g)}${pair(b)}`;
+    const rgbText = `rgb(${r}, ${g}, ${b})`;
+    const colorInt = r * 65536 + g * 256 + b;
+    const text = `Der Farbcode ${hexCode} entspricht ${rgbText}: Rot ${r} (${pair(r)}), Grün ${g} (${pair(g)}), Blau ${b} (${pair(b)}).`;
+    return {
+      primary: inputWasHex
+        ? { id: 'rgb', label: 'RGB-Wert', value: colorInt, formattedValue: rgbText, highlight: true }
+        : { id: 'hexColor', label: 'Hex-Farbcode', value: colorInt, formattedValue: hexCode, highlight: true },
+      secondary: [
+        inputWasHex
+          ? { id: 'hexColor', label: 'Hex-Farbcode (6-stellig)', value: colorInt, formattedValue: hexCode }
+          : { id: 'rgb', label: 'RGB-Wert', value: colorInt, formattedValue: rgbText },
+        { id: 'red', label: 'Rot', value: r, formattedValue: `${r} (Hex ${pair(r)})` },
+        { id: 'green', label: 'Grün', value: g, formattedValue: `${g} (Hex ${pair(g)})` },
+        { id: 'blue', label: 'Blau', value: b, formattedValue: `${b} (Hex ${pair(b)})` },
+        { id: 'colorDecimal', label: 'Farbwert als Dezimalzahl', value: colorInt, formattedValue: groupDecimal(BigInt(colorInt)) },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      calculationSteps: [
+        `${pair(r)} = ${r}, ${pair(g)} = ${g}, ${pair(b)} = ${b} (je zwei Hex-Stellen pro Farbkanal)`,
+        `Beispiel Rot: ${parseInt(pair(r)[0], 16)} × 16 + ${parseInt(pair(r)[1], 16)} = ${r}`,
+      ],
+    };
+  }
+
+  if (mode === 'arithmetic') {
+    const baseKey = String(inputs.arithBase ?? '16');
+    const spec = NUMBER_BASES[baseKey] ?? NUMBER_BASES['16'];
+    const a = parseBaseInteger(inputs.numberA ?? 'FF', baseKey, 'die erste Zahl');
+    if ('error' in a) return BASE_ERROR_RESULT(a.error);
+    const b = parseBaseInteger(inputs.numberB ?? '1A', baseKey, 'die zweite Zahl');
+    if ('error' in b) return BASE_ERROR_RESULT(b.error);
+    const op = String(inputs.operator ?? 'add');
+    const A = a.value;
+    const B = b.value;
+    const zero = BigInt(0);
+    const symbols: Record<string, string> = { add: '+', sub: '−', mul: '×', div: '÷', and: 'AND', or: 'OR', xor: 'XOR' };
+    if (!(op in symbols)) return BASE_ERROR_RESULT('Bitte wählen Sie eine Rechenart aus.');
+    if ((op === 'and' || op === 'or' || op === 'xor') && (A < zero || B < zero)) {
+      return BASE_ERROR_RESULT('Bitoperationen (AND, OR, XOR) sind nur für nicht-negative Zahlen möglich.');
+    }
+    if (op === 'div' && B === zero) return BASE_ERROR_RESULT('Division durch 0 ist nicht möglich.');
+    let result: bigint;
+    let remainder: bigint | null = null;
+    switch (op) {
+      case 'add': result = A + B; break;
+      case 'sub': result = A - B; break;
+      case 'mul': result = A * B; break;
+      case 'div': result = A / B; remainder = A % B; break;
+      case 'and': result = A & B; break;
+      case 'or': result = A | B; break;
+      default: result = A ^ B;
+    }
+    const fa = formatInBase(A, spec.base);
+    const fb = formatInBase(B, spec.base);
+    const fr = formatInBase(result, spec.base);
+    const remText = remainder !== null && remainder !== zero ? ` Rest ${formatInBase(remainder, spec.base)}` : '';
+    const text = `${fa} ${symbols[op]} ${fb} = ${fr}${remText} (${spec.name}). Dezimal: ${groupDecimal(A)} ${symbols[op]} ${groupDecimal(B)} = ${groupDecimal(result)}${remainder !== null && remainder !== zero ? ` Rest ${groupDecimal(remainder)}` : ''}.`;
+    const secondary = [
+      ...baseItems(result, spec.base).map((it) => ({ ...it, label: `Ergebnis ${it.label}` })),
+      { id: 'operandsDecimal', label: 'Rechnung im Dezimalsystem', value: Number(result), formattedValue: `${groupDecimal(A)} ${symbols[op]} ${groupDecimal(B)} = ${groupDecimal(result)}` },
+    ];
+    if (remainder !== null) {
+      secondary.push({ id: 'remainder', label: 'Rest der ganzzahligen Division', value: Number(remainder), formattedValue: `${formatInBase(remainder, spec.base)} (dezimal ${groupDecimal(remainder)})` });
+    }
+    return {
+      primary: { id: 'result', label: `Ergebnis (${spec.name})`, value: Number(result), formattedValue: fr + remText, highlight: true },
+      secondary,
+      summaryText: text,
+      directAnswer: text,
+      calculationSteps: [
+        `${fa} = ${groupDecimal(A)} (dezimal), ${fb} = ${groupDecimal(B)} (dezimal)`,
+        `${groupDecimal(A)} ${symbols[op]} ${groupDecimal(B)} = ${groupDecimal(result)}${remainder !== null && remainder !== zero ? ` Rest ${groupDecimal(remainder)}` : ''}`,
+        `${groupDecimal(result)} im ${spec.name}: ${fr}`,
+      ],
+    };
+  }
+
+  // Umrechnen (Standard)
+  const baseKey = inputs.numberValue === undefined && inputs.decimalNumber !== undefined ? '10' : String(inputs.inputBase ?? '10');
+  const spec = NUMBER_BASES[baseKey] ?? NUMBER_BASES['10'];
+  const rawValue = inputs.numberValue !== undefined ? inputs.numberValue : inputs.decimalNumber !== undefined ? inputs.decimalNumber : '255';
+  const parsed = parseBaseInteger(rawValue, String(spec.base), 'eine Zahl');
+  if ('error' in parsed) return BASE_ERROR_RESULT(parsed.error);
+  const v = parsed.value;
+  const abs = v < BigInt(0) ? -v : v;
+  const bits = abs === BigInt(0) ? 1 : abs.toString(2).length;
+  const primaryBase = spec.base === 10 ? 16 : 10;
+  const primaryLabel = primaryBase === 16 ? 'Hexadezimal (Basis 16)' : 'Dezimal (Basis 10)';
+  const text = `${formatInBase(v, spec.base)} (${spec.name}) = ${formatInBase(v, 10)} dezimal = ${formatInBase(v, 16)} hexadezimal = ${formatInBase(v, 2)} binär = ${formatInBase(v, 8)} oktal.`;
+  return {
+    primary: { id: primaryBase === 16 ? 'hex' : 'decimal', label: primaryLabel, value: Number(v), formattedValue: formatInBase(v, primaryBase), highlight: true },
+    secondary: [
+      ...baseItems(v, primaryBase),
+      { id: 'bitsCount', label: 'Benötigte Bits', value: bits, formattedValue: `${bits} Bit (${Math.ceil(bits / 8)} Byte)` },
+    ],
+    summaryText: text,
+    directAnswer: text,
+    qualifications: v < BigInt(0) ? ['Negative Zahlen werden mit Vorzeichen dargestellt, nicht im Zweierkomplement.'] : undefined,
+    calculationSteps: spec.base === 10
+      ? [`${groupDecimal(v)} wiederholt durch 16 teilen, die Reste von unten nach oben gelesen ergeben ${formatInBase(v, 16)}`]
+      : [`Jede Stelle mit ihrer Stellenwert-Potenz von ${spec.base} multiplizieren und addieren: ${formatInBase(v, spec.base)} = ${groupDecimal(v)}`],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Küchenmaße (essloeffel-teeloeffel-gramm-rechner)
+// Löffelgewichte je Zutat sowie Dichten (g/ml) für Gramm ↔ Milliliter.
+// Die Dichten stammen aus dem bisherigen Gramm-in-ml-Rechner.
+// ---------------------------------------------------------------------------
+const SPOON_WEIGHTS_G: Record<string, { name: string; elLevel: number; elHeaped: number; tlLevel: number; tlHeaped: number }> = {
+  sugar: { name: 'Zucker', elLevel: 15, elHeaped: 20, tlLevel: 5, tlHeaped: 8 },
+  flour: { name: 'Weizenmehl', elLevel: 10, elHeaped: 15, tlLevel: 3.5, tlHeaped: 6 },
+  salt: { name: 'Salz', elLevel: 18, elHeaped: 22, tlLevel: 6, tlHeaped: 9 },
+  oil: { name: 'Öl', elLevel: 14, elHeaped: 14, tlLevel: 4.5, tlHeaped: 4.5 },
+  butter: { name: 'Butter (weich)', elLevel: 15, elHeaped: 20, tlLevel: 5, tlHeaped: 8 },
+  honey: { name: 'Honig', elLevel: 20, elHeaped: 25, tlLevel: 7, tlHeaped: 10 },
+  bakingPowder: { name: 'Backpulver / Natron', elLevel: 12, elHeaped: 16, tlLevel: 4, tlHeaped: 6 },
+  cocoa: { name: 'Kakaopulver', elLevel: 8, elHeaped: 12, tlLevel: 3, tlHeaped: 5 },
+};
+
+const KITCHEN_DENSITIES: Record<string, { name: string; density: number }> = {
+  water: { name: 'Wasser', density: 1.0 },
+  milk: { name: 'Milch', density: 1.03 },
+  oil: { name: 'Speiseöl / Olivenöl', density: 0.92 },
+  butter: { name: 'Butter (geschmolzen)', density: 0.91 },
+  honey: { name: 'Honig / Sirup', density: 1.42 },
+  flour: { name: 'Weizenmehl', density: 0.53 },
+  sugar: { name: 'Zucker', density: 0.85 },
+  icingSugar: { name: 'Puderzucker', density: 0.55 },
+  rice: { name: 'Reis (ungekocht)', density: 0.85 },
+  oats: { name: 'Haferflocken', density: 0.45 },
+};
+
+const SPOON_TYPE_NAMES: Record<string, string> = {
+  elLevel: 'gestrichene Esslöffel',
+  elHeaped: 'gehäufte Esslöffel',
+  tlLevel: 'gestrichene Teelöffel',
+  tlHeaped: 'gehäufte Teelöffel',
+};
+
+function buildSpoonWeightTable(): string {
+  const rows = Object.values(SPOON_WEIGHTS_G)
+    .map((w) => `| ${w.name} | ${formatNumber(w.elLevel, 1)} g | ${formatNumber(w.elHeaped, 1)} g | ${formatNumber(w.tlLevel, 1)} g | ${formatNumber(w.tlHeaped, 1)} g |`)
+    .join('\n');
+  return `| Zutat | 1 EL gestrichen | 1 EL gehäuft | 1 TL gestrichen | 1 TL gehäuft |\n| --- | --- | --- | --- | --- |\n${rows}`;
+}
+
+function buildDensityTable(): string {
+  const rows = Object.values(KITCHEN_DENSITIES)
+    .map((d) => `| ${d.name} | ${formatNumber(d.density, 2)} g/ml | ${formatNumber(100 / d.density, 0)} ml | ${formatNumber(100 * d.density, 0)} g |`)
+    .join('\n');
+  return `| Zutat | Dichte | 100 g entsprechen | 100 ml wiegen |\n| --- | --- | --- | --- |\n${rows}`;
+}
+
+function calculateKitchenMeasures(inputs: Record<string, any>): CalculationResult {
+  const mode = String(inputs.mode ?? 'spoons');
+  const readAmount = (raw: unknown, fallback: number): number | null => {
+    if (raw === undefined || raw === null) return fallback;
+    const s = String(raw).trim().replace(',', '.');
+    return s === '' ? null : Number(s);
+  };
+  const fail = (id: string, error: string): CalculationResult => ({
+    primary: { id, label: 'Ergebnis', value: 0, formattedValue: '–' },
+    secondary: [],
+    error,
+  });
+
+  if (mode === 'gramsToMl' || mode === 'mlToGrams') {
+    const key = String(inputs.densityIngredient ?? 'flour');
+    const ing = KITCHEN_DENSITIES[key];
+    if (!ing) return fail(mode === 'gramsToMl' ? 'volumeMl' : 'grams', 'Bitte wählen Sie eine Zutat aus der Liste aus.');
+    if (mode === 'gramsToMl') {
+      const grams = readAmount(inputs.amountGrams, 200);
+      if (grams === null) return fail('volumeMl', 'Bitte geben Sie das Gewicht in Gramm ein.');
+      if (!Number.isFinite(grams)) return fail('volumeMl', 'Bitte geben Sie das Gewicht als gültige Zahl ein.');
+      if (grams < 0) return fail('volumeMl', 'Das Gewicht darf nicht negativ sein.');
+      const ml = grams / ing.density;
+      const text = `${formatNumber(grams, 1)} g ${ing.name} entsprechen bei einer Dichte von ${formatNumber(ing.density, 2)} g/ml ${formatNumber(ml, 1)} ml.`;
+      return {
+        primary: { id: 'volumeMl', label: `Volumen ${ing.name}`, value: ml, formattedValue: `${formatNumber(ml, 1)} ml`, highlight: true },
+        secondary: [
+          { id: 'tablespoons', label: 'Entspricht Esslöffeln (je 15 ml)', value: ml / 15, formattedValue: `ca. ${formatNumber(ml / 15, 1)} EL` },
+          { id: 'teaspoons', label: 'Entspricht Teelöffeln (je 5 ml)', value: ml / 5, formattedValue: `ca. ${formatNumber(ml / 5, 1)} TL` },
+          { id: 'liters', label: 'In Litern', value: ml / 1000, formattedValue: `${formatNumber(ml / 1000, 3)} l` },
+          { id: 'densityUsed', label: 'Zugrunde gelegte Dichte', value: ing.density, formattedValue: `${formatNumber(ing.density, 2)} g/ml` },
+        ],
+        summaryText: text,
+        directAnswer: text,
+        calculationSteps: [`${formatNumber(grams, 1)} g ÷ ${formatNumber(ing.density, 2)} g/ml = ${formatNumber(ml, 1)} ml`],
+        qualifications: ['Richtwert: Bei Pulvern wie Mehl oder Zucker hängt das Volumen davon ab, wie locker die Zutat im Messbecher liegt. Für genaues Backen ist eine Waage besser.'],
+      };
+    }
+    const ml = readAmount(inputs.amountMl, 250);
+    if (ml === null) return fail('grams', 'Bitte geben Sie das Volumen in Millilitern ein.');
+    if (!Number.isFinite(ml)) return fail('grams', 'Bitte geben Sie das Volumen als gültige Zahl ein.');
+    if (ml < 0) return fail('grams', 'Das Volumen darf nicht negativ sein.');
+    const grams = ml * ing.density;
+    const text = `${formatNumber(ml, 1)} ml ${ing.name} wiegen bei einer Dichte von ${formatNumber(ing.density, 2)} g/ml ${formatNumber(grams, 1)} g.`;
+    return {
+      primary: { id: 'grams', label: `Gewicht ${ing.name}`, value: grams, formattedValue: `${formatNumber(grams, 1)} g`, highlight: true },
+      secondary: [
+        { id: 'tablespoons', label: 'Volumen in Esslöffeln (je 15 ml)', value: ml / 15, formattedValue: `ca. ${formatNumber(ml / 15, 1)} EL` },
+        { id: 'teaspoons', label: 'Volumen in Teelöffeln (je 5 ml)', value: ml / 5, formattedValue: `ca. ${formatNumber(ml / 5, 1)} TL` },
+        { id: 'kilograms', label: 'In Kilogramm', value: grams / 1000, formattedValue: `${formatNumber(grams / 1000, 3)} kg` },
+        { id: 'densityUsed', label: 'Zugrunde gelegte Dichte', value: ing.density, formattedValue: `${formatNumber(ing.density, 2)} g/ml` },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      calculationSteps: [`${formatNumber(ml, 1)} ml × ${formatNumber(ing.density, 2)} g/ml = ${formatNumber(grams, 1)} g`],
+      qualifications: ['Richtwert: Bei Pulvern wie Mehl oder Zucker hängt das Gewicht davon ab, wie locker die Zutat im Messbecher liegt. Für genaues Backen ist eine Waage besser.'],
+    };
+  }
+
+  // Löffel in Gramm (Standard)
+  const count = readAmount(inputs.spoonsCount, 3);
+  if (count === null) return fail('grams', 'Bitte geben Sie die Anzahl der Löffel ein.');
+  if (!Number.isFinite(count)) return fail('grams', 'Bitte geben Sie die Anzahl der Löffel als gültige Zahl ein.');
+  if (count < 0) return fail('grams', 'Die Anzahl der Löffel darf nicht negativ sein.');
+  const sType = String(inputs.spoonType ?? 'elLevel');
+  const spoonKey = (sType in SPOON_TYPE_NAMES ? sType : 'elLevel') as 'elLevel' | 'elHeaped' | 'tlLevel' | 'tlHeaped';
+  const ing = SPOON_WEIGHTS_G[String(inputs.ingredient ?? 'sugar')] ?? SPOON_WEIGHTS_G.sugar;
+  const gramPerSpoon = ing[spoonKey];
+  const totalGrams = count * gramPerSpoon;
+  const isEl = spoonKey.startsWith('el');
+  const mlVol = count * (isEl ? 15 : 5);
+  const text = `${formatNumber(count, 2)} ${SPOON_TYPE_NAMES[spoonKey]} ${ing.name} wiegen etwa ${formatNumber(totalGrams, 1)} g (${formatNumber(gramPerSpoon, 1)} g pro Löffel).`;
+  return {
+    primary: { id: 'grams', label: 'Gewicht in Gramm', value: totalGrams, formattedValue: `${formatNumber(totalGrams, 1)} g`, highlight: true },
+    secondary: [
+      { id: 'perSpoon', label: 'Gewicht pro Löffel', value: gramPerSpoon, formattedValue: `${formatNumber(gramPerSpoon, 1)} g` },
+      { id: 'mlVol', label: 'Löffelvolumen (gestrichen)', value: mlVol, formattedValue: `${formatNumber(mlVol, 1)} ml` },
+    ],
+    summaryText: text,
+    directAnswer: text,
+    calculationSteps: [`${formatNumber(count, 2)} × ${formatNumber(gramPerSpoon, 1)} g = ${formatNumber(totalGrams, 1)} g`],
+    qualifications: ['Richtwerte für haushaltsübliche Löffel. Löffelgröße und Füllhöhe schwanken – für Backrezepte mit wenig Spielraum ist eine Feinwaage genauer.'],
+  };
 }
 
 export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
@@ -1517,73 +1862,172 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "binaer-hex-dezimal-umrechner",
     slug: "binaer-hex-dezimal-umrechner",
-    name: "Binär & Hexadezimal Umrechner (Dezimal, Dual & Hex-Code)",
+    name: "Zahlensysteme-Umrechner: Binär, Oktal, Dezimal & Hexadezimal (mit Hex-Rechner)",
     shortName: "Binär & Hex Umrechner",
     category: "einheiten",
     subcategory: "Zahlensysteme",
-    metaTitle: 'Binär & Hexadezimal Umrechner – Dezimal, Binär (Dual) & Hex',
-    metaDescription: 'Rechnen Sie Zahlen um zwischen Dezimalsystem (Basis 10), Binärsystem / Dualsystem (Basis 2), Hexadezimalsystem (Basis 16) und Oktalsystem (Basis 8).',
-    h1: 'Binär & Hexadezimal Umrechner – Zahlensysteme umrechnen',
-    shortDescription: 'Konvertiert Zahlen zwischen Dezimal, Binär, Hexadezimal und Oktal.',
-    searchKeywords: ["binaer umrechner dualsystem dezimal in binaer","hexadezimal in dezimal umrechnen hex rechner","binaer hex oktal umrechner basis 2 8 16","dezimal in dualzahl umwandeln"],
-    inputs: [
-          {
-                "id": "decimalNumber",
-                "label": "Ganze positive Zahl (Dezimal)",
-                "type": "number",
-                "defaultValue": 255,
-                "min": 0,
-                "max": 2147483647,
-                "step": 1,
-                "unit": ""
-          }
+    metaTitle: 'Binär Hex Dezimal Umrechner – mit Hex-Rechner & Farbcodes',
+    metaDescription: 'Zahlen kostenlos zwischen Binär, Oktal, Dezimal und Hexadezimal umrechnen – Eingabe in jeder Basis, mit Hex-Rechner und Farbcode in RGB.',
+    h1: 'Binär, Hex und Dezimal umrechnen – Zahlensysteme, Hex-Rechner und Farbcodes',
+    shortDescription: 'Rechnet Zahlen zwischen Binär (Basis 2), Oktal (8), Dezimal (10) und Hexadezimal (16) um – Sie können in jeder Basis eingeben. Dazu: Rechnen mit Hex- und Binärzahlen und Hex-Farbcodes in RGB.',
+    searchKeywords: [
+      "binär hex dezimal umrechner",
+      "hexadezimal umrechnen",
+      "hex in dezimal",
+      "dezimal in hex",
+      "binär in dezimal",
+      "dezimal in binär",
+      "dualzahl umrechnen",
+      "oktal umrechnen",
+      "hexadezimal rechner",
+      "hex rechner addieren",
+      "hex farbcode in rgb",
     ],
-    calculate: (inputs: Record<string, any>) => {
-      const num = Math.max(0, Math.round(Number(inputs.decimalNumber) || 0));
-      
-      const binary = num.toString(2);
-      const hex = num.toString(16).toUpperCase();
-      const octal = num.toString(8);
-      
-      // Binär mit 8-Bit-Gruppierung formatieren:
-      const paddedBin = binary.padStart(Math.ceil(binary.length / 8) * 8, '0');
-      const groupedBin = paddedBin.match(/.{1,4}/g)?.join(' ') || binary;
-      
-      return {
-        primary: { id: 'hex', label: 'Hexadezimal (Basis 16)', value: num, formattedValue: '0x' + hex, highlight: true },
-        secondary: [
-          { id: 'binary', label: 'Binär / Dual (Basis 2)', value: num, formattedValue: groupedBin + ' (binär)' },
-          { id: 'octal', label: 'Oktal (Basis 8)', value: num, formattedValue: '0o' + octal },
-          { id: 'bitsCount', label: 'Benötigte Bits (Stellen)', value: binary.length, formattedValue: binary.length + ' Bits' },
+    inputs: [
+      {
+        id: "mode",
+        label: "Was möchten Sie tun?",
+        type: "select",
+        defaultValue: "convert",
+        options: [
+          { value: "convert", label: "Zahl umrechnen (Binär, Oktal, Dezimal, Hex)" },
+          { value: "arithmetic", label: "Rechnen mit Hex-, Binär- oder Oktalzahlen" },
+          { value: "color", label: "Hex-Farbcode ↔ RGB umrechnen" },
         ],
-        summaryText: 'Die Zahl ' + num + ' lautet im Binärsystem ' + binary + ' (Dual), im Hexadezimalsystem 0x' + hex + ' und im Oktalsystem 0o' + octal + '.',
-      };
-    },
-    formula: "Dezimal = Σ (Ziffer × Basis^Position); Hexadezimal: 0-9, A(10), B(11), C(12), D(13), E(14), F(15)",
-    formulaExplanation: "Jede Hexadezimalstelle entspricht exakt 4 Binärstellen (Nibble/Halbbyte), weshalb Hexadezimalzahlen in der Informatik die bevorzugte kompakte Schreibweise für Binärdaten sind.",
+      },
+      {
+        id: "inputBase",
+        label: "Zahlensystem der Eingabe",
+        type: "select",
+        defaultValue: "10",
+        options: [
+          { value: "10", label: "Dezimal (Basis 10)" },
+          { value: "16", label: "Hexadezimal (Basis 16)" },
+          { value: "2", label: "Binär / Dual (Basis 2)" },
+          { value: "8", label: "Oktal (Basis 8)" },
+        ],
+        dependsOn: { field: "mode", value: "convert" },
+      },
+      {
+        id: "numberValue",
+        label: "Dezimalzahl",
+        type: "text",
+        defaultValue: "255",
+        helpText: "Ganze Zahl bis 256 Bit. Leerzeichen und ein Minuszeichen sind erlaubt.",
+        dependsOn: { field: "mode", value: "convert" },
+        conditionalLabels: [
+          { condition: { field: "inputBase", value: "16" }, label: "Hexadezimalzahl (z. B. FF, 1A3 oder 0x7F)" },
+          { condition: { field: "inputBase", value: "2" }, label: "Binärzahl (z. B. 1111 1111)" },
+          { condition: { field: "inputBase", value: "8" }, label: "Oktalzahl (z. B. 755)" },
+        ],
+      },
+      {
+        id: "arithBase",
+        label: "Zahlensystem der Rechnung",
+        type: "select",
+        defaultValue: "16",
+        options: [
+          { value: "16", label: "Hexadezimal (Basis 16)" },
+          { value: "2", label: "Binär / Dual (Basis 2)" },
+          { value: "8", label: "Oktal (Basis 8)" },
+          { value: "10", label: "Dezimal (Basis 10)" },
+        ],
+        dependsOn: { field: "mode", value: "arithmetic" },
+      },
+      { id: "numberA", label: "Erste Zahl", type: "text", defaultValue: "FF", dependsOn: { field: "mode", value: "arithmetic" } },
+      {
+        id: "operator",
+        label: "Rechenart",
+        type: "select",
+        defaultValue: "add",
+        options: [
+          { value: "add", label: "+ Addition" },
+          { value: "sub", label: "− Subtraktion" },
+          { value: "mul", label: "× Multiplikation" },
+          { value: "div", label: "÷ Ganzzahlige Division (mit Rest)" },
+          { value: "and", label: "AND (bitweises Und)" },
+          { value: "or", label: "OR (bitweises Oder)" },
+          { value: "xor", label: "XOR (bitweises exklusives Oder)" },
+        ],
+        dependsOn: { field: "mode", value: "arithmetic" },
+      },
+      { id: "numberB", label: "Zweite Zahl", type: "text", defaultValue: "1A", dependsOn: { field: "mode", value: "arithmetic" } },
+      {
+        id: "colorValue",
+        label: "Farbcode (Hex oder RGB)",
+        type: "text",
+        defaultValue: "#FF8000",
+        helpText: "Hex-Code wie #FF8000 oder #F80 – oder RGB-Werte wie 255, 128, 0.",
+        dependsOn: { field: "mode", value: "color" },
+      },
+    ],
+    calculate: calculateNumberSystems,
+    formula: "Dezimalwert = Σ Ziffer × Basis^Stelle; Hex-Ziffern: 0–9, A = 10, B = 11, C = 12, D = 13, E = 14, F = 15",
+    formulaExplanation: "Jede Stelle hat den Wert der Basis hoch ihrer Position, von rechts bei 0 beginnend. Für die Umrechnung ins Dezimalsystem multiplizieren Sie jede Ziffer mit ihrem Stellenwert und addieren. Umgekehrt teilen Sie die Dezimalzahl wiederholt durch die Basis und lesen die Reste von unten nach oben. Eine Hex-Stelle entspricht genau 4 Binärstellen, eine Oktalstelle genau 3.",
     workedExample: {
-          "title": "Beispiel: Die Zahl 255 (maximaler 8-Bit-Wert)",
-          "inputValues": [
-                {
-                      "label": "Dezimal",
-                      "value": "255"
-                }
-          ],
-          "steps": [
-                "Binär = 1111 1111 (8 Einsen)",
-                "Hexadezimal = FF (15 × 16¹ + 15 × 16⁰ = 240 + 15 = 255)"
-          ],
-          "result": "Binär: 11111111, Hex: 0xFF"
+      title: "Beispiel: Dezimal 255 in Hex, Binär und Oktal",
+      inputValues: [{ label: "Eingabe", value: "255 (dezimal)" }],
+      steps: ["255 ÷ 16 = 15 Rest 15 → F F", "Binär: 1111 1111 (8 Einsen)", "Oktal: 255 = 3 × 64 + 7 × 8 + 7 → 377"],
+      result: "Hex FF, Binär 1111 1111, Oktal 377",
+      inputs: { mode: "convert", inputBase: "10", numberValue: "255" },
     },
+    workedExamples: [
+      {
+        title: "Beispiel 1: Dezimal 255 in Hex, Binär und Oktal",
+        inputValues: [{ label: "Eingabe", value: "255 (dezimal)" }],
+        steps: ["255 ÷ 16 = 15 Rest 15 → F F", "Binär: 1111 1111 (8 Einsen)", "Oktal: 255 = 3 × 64 + 7 × 8 + 7 → 377"],
+        result: "Hex FF, Binär 1111 1111, Oktal 377",
+        inputs: { mode: "convert", inputBase: "10", numberValue: "255" },
+      },
+      {
+        title: "Beispiel 2: Hexadezimal 1A3 in Dezimal",
+        inputValues: [{ label: "Eingabe", value: "1A3 (hexadezimal)" }],
+        steps: ["1 × 16² = 256", "A (10) × 16¹ = 160", "3 × 16⁰ = 3", "256 + 160 + 3 = 419"],
+        result: "Dezimal 419, Binär 0001 1010 0011, Oktal 643",
+        inputs: { mode: "convert", inputBase: "16", numberValue: "1A3" },
+      },
+      {
+        title: "Beispiel 3: Hex-Addition FF + 1A",
+        inputValues: [{ label: "Rechnung", value: "FF + 1A (hexadezimal)" }],
+        steps: ["FF = 255, 1A = 26", "255 + 26 = 281", "281 = 1 × 256 + 1 × 16 + 9 → 119 (hex)"],
+        result: "FF + 1A = 119 (hex) = 281 (dezimal)",
+        inputs: { mode: "arithmetic", arithBase: "16", numberA: "FF", operator: "add", numberB: "1A" },
+      },
+      {
+        title: "Beispiel 4: Farbcode #FF8000 in RGB",
+        inputValues: [{ label: "Farbcode", value: "#FF8000" }],
+        steps: ["Rot: FF = 15 × 16 + 15 = 255", "Grün: 80 = 8 × 16 + 0 = 128", "Blau: 00 = 0"],
+        result: "rgb(255, 128, 0) – ein kräftiges Orange",
+        inputs: { mode: "color", colorValue: "#FF8000" },
+      },
+    ],
     content: {
-      intro: 'Dieser Zahlensystem-Konverter transformiert Zahlenwerte synchron zwischen dem Dezimalsystem (Basis 10), Binärsystem (Basis 2), Oktalsystem (Basis 8) und Hexadezimalsystem (Basis 16).',
-      details: 'In der Computertechnik entspricht eine Binärstelle einem Bit. Vier Bits (ein Nibble) lassen sich exakt durch eine einzige Hexadezimalziffer (0–9, A–F) darstellen: Die Binärzahl 1111 1111 entspricht im Hexadezimalsystem FF und dezimal 255.',
+      intro: 'Mit diesem Rechner rechnen Sie Zahlen kostenlos zwischen Binär-, Oktal-, Dezimal- und Hexadezimalsystem um. Sie können die Zahl in jeder dieser Basen eingeben und sehen sofort alle anderen Darstellungen. Zusätzlich rechnen Sie direkt mit Hex- oder Binärzahlen (+, −, ×, ÷, AND, OR, XOR) und wandeln Hex-Farbcodes in RGB-Werte um.',
+      sections: [
+        {
+          title: 'So funktionieren die Zahlensysteme',
+          content: 'Das Dezimalsystem nutzt 10 Ziffern, das Binärsystem 2, das Oktalsystem 8 und das Hexadezimalsystem 16 (0–9 und A–F). Jede Stelle steht für eine Potenz der Basis. Eine Hex-Ziffer fasst genau 4 Bit zusammen, zwei Hex-Ziffern ergeben ein Byte (00 bis FF).\n\n| Dezimal | Binär | Oktal | Hexadezimal |\n| --- | --- | --- | --- |\n| 0 | 0 | 0 | 0 |\n| 1 | 1 | 1 | 1 |\n| 2 | 10 | 2 | 2 |\n| 7 | 111 | 7 | 7 |\n| 8 | 1000 | 10 | 8 |\n| 10 | 1010 | 12 | A |\n| 15 | 1111 | 17 | F |\n| 16 | 1 0000 | 20 | 10 |\n| 255 | 1111 1111 | 377 | FF |\n| 256 | 1 0000 0000 | 400 | 100 |',
+        },
+        {
+          title: 'Rechnen mit Hex- und Binärzahlen',
+          content: 'Wählen Sie „Rechnen mit Hex-, Binär- oder Oktalzahlen“, das Zahlensystem und die Rechenart. Der Rechner zeigt das Ergebnis im gewählten System und zusätzlich in allen anderen. Die Division ist ganzzahlig und gibt den Rest mit aus, wie in Programmiersprachen üblich.\n\nAND, OR und XOR verknüpfen die Zahlen Bit für Bit. Das brauchen Sie etwa für Bitmasken: FF AND 0F ergibt 0F, weil nur die unteren 4 Bit in beiden Zahlen gesetzt sind. Für den Rest einer Division im Dezimalsystem gibt es außerdem den [Modulo-Rechner](/rechner/modulo-rechner/).',
+        },
+        {
+          title: 'Hex-Farbcodes in RGB umrechnen',
+          content: 'Ein Web-Farbcode wie #FF8000 besteht aus drei Hex-Paaren für Rot, Grün und Blau. Jedes Paar reicht von 00 (0) bis FF (255). #FF8000 bedeutet also Rot 255, Grün 128, Blau 0 – ein kräftiges Orange. Die Kurzform #F80 verdoppelt jede Ziffer und ist identisch mit #FF8800.\n\nDer Rechner arbeitet in beide Richtungen: Geben Sie einen Hex-Code ein, erhalten Sie die RGB-Werte. Geben Sie drei RGB-Werte ein, erhalten Sie den Hex-Code. Wie viele Byte, Kilobyte oder Gigabyte eine Datenmenge hat, rechnen Sie mit dem [Daten-Speicher-Umrechner](/rechner/daten-speicher-umrechner/) um.',
+        },
+      ],
+      details: 'Hex → Dezimal: 1A3 = 1 × 256 + 10 × 16 + 3 = 419. Dezimal → Binär: 13 ÷ 2 = 6 Rest 1, 6 ÷ 2 = 3 Rest 0, 3 ÷ 2 = 1 Rest 1, 1 ÷ 2 = 0 Rest 1 → von unten gelesen 1101.',
     },
     faqs: [
-      { question: 'Wie rechnet man die Binärzahl 10110 in eine Dezimalzahl um?', answer: 'Von rechts nach links: (0×1) + (1×2) + (1×4) + (0×8) + (1×16) = 0 + 2 + 4 + 0 + 16 = 22.' },
-      { question: 'Wofür wird das Oktalsystem (Basis 8) noch heute genutzt?', answer: 'Vor allem in Linux- und Unix-Dateisystemen zur Vergabe von Zugriffsrechten (z. B. chmod 755 oder 644).' },
+      { question: 'Wie rechnet man Hexadezimal in Dezimal um?', answer: 'Multiplizieren Sie jede Ziffer mit 16 hoch ihrer Stelle und addieren Sie. A bis F stehen für 10 bis 15. Beispiel: FF = 15 × 16 + 15 = 255.' },
+      { question: 'Wie rechnet man eine Dezimalzahl in Binär um?', answer: 'Teilen Sie die Zahl wiederholt durch 2 und notieren Sie jeden Rest. Die Reste von unten nach oben gelesen ergeben die Binärzahl. Beispiel: 13 ergibt die Reste 1, 0, 1, 1 – also 1101.' },
+      { question: 'Wie rechnet man die Binärzahl 10110 in eine Dezimalzahl um?', answer: 'Von rechts nach links haben die Stellen die Werte 1, 2, 4, 8 und 16. Addieren Sie die Werte der Einsen: 2 + 4 + 16 = 22.' },
+      { question: 'Wie rechnet man mit Hexadezimalzahlen?', answer: 'Am einfachsten über das Dezimalsystem: Umrechnen, rechnen, zurückrechnen. FF + 1A sind 255 + 26 = 281, und 281 ist hexadezimal 119. Der Rechner übernimmt alle drei Schritte.' },
+      { question: 'Wie wandelt man einen Hex-Farbcode in RGB um?', answer: 'Teilen Sie den Code in drei Paare und rechnen Sie jedes Paar in eine Dezimalzahl um. #FF8000 ergibt Rot FF = 255, Grün 80 = 128 und Blau 00 = 0, also rgb(255, 128, 0).' },
+      { question: 'Wofür wird das Oktalsystem heute genutzt?', answer: 'Vor allem für Dateirechte unter Linux und Unix. Bei chmod 755 steht jede Ziffer für 3 Bit: 7 = 111 (lesen, schreiben, ausführen), 5 = 101 (lesen, ausführen).' },
     ],
-    relatedSlugs: ['hexadezimal-rechner', 'daten-speicher-umrechner', 'roemische-zahlen-umrechner', 'datenrate-bandbreite-umrechner'],
+    relatedSlugs: ['daten-speicher-umrechner', 'datenrate-bandbreite-umrechner', 'modulo-rechner'],
   },
   {
     id: "zoll-in-cm-rechner",
@@ -2895,150 +3339,158 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "essloeffel-teeloeffel-gramm-rechner",
     slug: "essloeffel-teeloeffel-gramm-rechner",
-    name: "Esslöffel- & Teelöffel-in-Gramm-Rechner (EL, TL in g)",
-    shortName: "EL & TL in Gramm",
+    name: "Küchenmaße-Rechner: Esslöffel, Teelöffel, Gramm und Milliliter",
+    shortName: "EL, TL, Gramm & ml",
     category: "kochen-backen",
     subcategory: "Küchenmaße",
-    metaTitle: 'Esslöffel & Teelöffel in Gramm Rechner – EL',
-    metaDescription: 'Rechnen Sie Esslöffel (EL) und Teelöffel (TL) in Gramm um für Mehl, Zucker, Salz, Olivenöl, Butter, Backpulver, Honig und Kakaopulver.',
-    h1: 'Esslöffel & Teelöffel in Gramm Rechner – Zutaten ohne Waage wiegen',
-    shortDescription: 'Wandelt Esslöffel und Teelöffel in Gramm für beliebige Backzutaten um.',
-    searchKeywords: ["essloeffel in gramm rechner zucker mehl","teeloeffel in gramm el tl tabelle","1 el mehl wieviel gramm zucker","1 tl salz backpulver gramm wiegen"],
-    inputs: [
-          {
-                "id": "spoonsCount",
-                "label": "Anzahl Löffel",
-                "type": "number",
-                "defaultValue": 3,
-                "min": 0.25,
-                "max": 50,
-                "step": 0.5,
-                "unit": "Löffel"
-          },
-          {
-                "id": "spoonType",
-                "label": "Löffelart",
-                "type": "select",
-                "defaultValue": "elHeaped",
-                "options": [
-                      {
-                            "value": "elLevel",
-                            "label": "Esslöffel (EL gestrichen ≈ 15 ml)"
-                      },
-                      {
-                            "value": "elHeaped",
-                            "label": "Esslöffel (EL gehäuft)"
-                      },
-                      {
-                            "value": "tlLevel",
-                            "label": "Teelöffel (TL gestrichen ≈ 5 ml)"
-                      },
-                      {
-                            "value": "tlHeaped",
-                            "label": "Teelöffel (TL gehäuft)"
-                      }
-                ]
-          },
-          {
-                "id": "ingredient",
-                "label": "Zutat",
-                "type": "select",
-                "defaultValue": "sugar",
-                "options": [
-                      {
-                            "value": "sugar",
-                            "label": "Haushaltszucker (gestr. EL 15g, gehäuft 20g / TL 5g)"
-                      },
-                      {
-                            "value": "flour",
-                            "label": "Weizenmehl (gestr. EL 10g, gehäuft 15g / TL 4g)"
-                      },
-                      {
-                            "value": "salt",
-                            "label": "Speisesalz (gestr. EL 18g, gehäuft 22g / TL 6g)"
-                      },
-                      {
-                            "value": "oil",
-                            "label": "Speiseöl / Olivenöl (gestr. EL 14g / TL 5g)"
-                      },
-                      {
-                            "value": "butter",
-                            "label": "Butter weich (gestr. EL 15g, gehäuft 20g / TL 5g)"
-                      },
-                      {
-                            "value": "honey",
-                            "label": "Honig (gestr. EL 20g, gehäuft 25g / TL 7g)"
-                      },
-                      {
-                            "value": "bakingPowder",
-                            "label": "Backpulver / Natron (gestr. EL 12g / gestr. TL 4g)"
-                      },
-                      {
-                            "value": "cocoa",
-                            "label": "Kakaopulver (gestr. EL 8g, gehäuft 12g / TL 3g)"
-                      }
-                ]
-          }
+    metaTitle: 'Esslöffel in Gramm Rechner – EL, TL & Gramm in ml',
+    metaDescription: 'Esslöffel und Teelöffel kostenlos in Gramm umrechnen, dazu Gramm in ml und ml in Gramm für Mehl, Zucker, Milch, Öl oder Honig – je nach Zutat.',
+    h1: 'Esslöffel in Gramm und Gramm in ml umrechnen – Küchenmaße nach Zutat',
+    shortDescription: 'Rechnet gestrichene und gehäufte Esslöffel und Teelöffel in Gramm um. Außerdem wandelt er Gramm in Milliliter und Milliliter in Gramm um – mit der Dichte der jeweiligen Zutat.',
+    searchKeywords: [
+      "esslöffel in gramm",
+      "teelöffel in gramm",
+      "1 el mehl wieviel gramm",
+      "1 tl salz gramm",
+      "el tl tabelle",
+      "gramm in ml",
+      "gramm in ml umrechnen",
+      "ml in gramm",
+      "100 g mehl in ml",
+      "zucker gramm in ml",
+      "milch ml in gramm",
     ],
-    calculate: (inputs: Record<string, any>) => {
-      const count = Number(inputs.spoonsCount) || 0;
-      const sType = String(inputs.spoonType || 'elLevel');
-      const ing = String(inputs.ingredient || 'sugar');
-      
-      // Gewichte pro Löffel in Gramm [elLevel, elHeaped, tlLevel, tlHeaped]
-      const weights = {
-        sugar: { elLevel: 15, elHeaped: 20, tlLevel: 5, tlHeaped: 8 },
-        flour: { elLevel: 10, elHeaped: 15, tlLevel: 3.5, tlHeaped: 6 },
-        salt: { elLevel: 18, elHeaped: 22, tlLevel: 6, tlHeaped: 9 },
-        oil: { elLevel: 14, elHeaped: 14, tlLevel: 4.5, tlHeaped: 4.5 },
-        butter: { elLevel: 15, elHeaped: 20, tlLevel: 5, tlHeaped: 8 },
-        honey: { elLevel: 20, elHeaped: 25, tlLevel: 7, tlHeaped: 10 },
-        bakingPowder: { elLevel: 12, elHeaped: 16, tlLevel: 4, tlHeaped: 6 },
-        cocoa: { elLevel: 8, elHeaped: 12, tlLevel: 3, tlHeaped: 5 },
-      };
-      
-      const weightsMap: Record<string, any> = weights;
-      const gramPerSpoon = (weightsMap[ing] && weightsMap[ing][sType]) || 15;
-      const totalGrams = count * gramPerSpoon;
-      
-      return {
-        primary: { id: 'grams', label: 'Gewicht in Gramm (g)', value: totalGrams, formattedValue: formatNumber(totalGrams, 1) + ' g', highlight: true },
-        secondary: [
-          { id: 'perSpoon', label: 'Gewicht pro Löffel', value: gramPerSpoon, formattedValue: formatNumber(gramPerSpoon, 1) + ' g/Löffel' },
-          { id: 'mlVol', label: 'Flüssigkeitsvolumen ca.', value: String(sType || '').startsWith('el') ? count * 15 : count * 5, formattedValue: (String(sType || '').startsWith('el') ? count * 15 : count * 5) + ' ml' },
+    inputs: [
+      {
+        id: "mode",
+        label: "Was möchten Sie umrechnen?",
+        type: "select",
+        defaultValue: "spoons",
+        options: [
+          { value: "spoons", label: "Esslöffel / Teelöffel in Gramm" },
+          { value: "gramsToMl", label: "Gramm in Milliliter (g → ml)" },
+          { value: "mlToGrams", label: "Milliliter in Gramm (ml → g)" },
         ],
-        summaryText: count + ' ' + (sType.includes('el') ? 'Esslöffel' : 'Teelöffel') + ' dieser Zutat wiegen genau ' + formatNumber(totalGrams, 1) + ' Gramm.',
-      };
-    },
-    formula: "Gewicht (g) = Anzahl Löffel × Zutatendichte je Löffelart",
-    formulaExplanation: "Ein gestrichener Esslöffel fasst normiert genau 15 ml Flüssigkeit, ein Teelöffel genau 5 ml (3 TL = 1 EL). Das Gewicht hängt von der Schüttdichte der Zutat ab.",
+      },
+      { id: "spoonsCount", label: "Anzahl Löffel", type: "number", defaultValue: 3, min: 0, max: 100, step: 0.5, unit: "Löffel", dependsOn: { field: "mode", value: "spoons" } },
+      {
+        id: "spoonType",
+        label: "Löffelart",
+        type: "select",
+        defaultValue: "elHeaped",
+        options: [
+          { value: "elLevel", label: "Esslöffel gestrichen (≈ 15 ml)" },
+          { value: "elHeaped", label: "Esslöffel gehäuft" },
+          { value: "tlLevel", label: "Teelöffel gestrichen (≈ 5 ml)" },
+          { value: "tlHeaped", label: "Teelöffel gehäuft" },
+        ],
+        dependsOn: { field: "mode", value: "spoons" },
+      },
+      {
+        id: "ingredient",
+        label: "Zutat",
+        type: "select",
+        defaultValue: "sugar",
+        options: [
+          { value: "sugar", label: "Zucker" },
+          { value: "flour", label: "Weizenmehl" },
+          { value: "salt", label: "Salz" },
+          { value: "oil", label: "Speiseöl / Olivenöl" },
+          { value: "butter", label: "Butter (weich)" },
+          { value: "honey", label: "Honig" },
+          { value: "bakingPowder", label: "Backpulver / Natron" },
+          { value: "cocoa", label: "Kakaopulver" },
+        ],
+        dependsOn: { field: "mode", value: "spoons" },
+      },
+      { id: "amountGrams", label: "Gewicht in Gramm", type: "number", defaultValue: 200, min: 0, max: 100000, step: 5, unit: "g", dependsOn: { field: "mode", value: "gramsToMl" } },
+      { id: "amountMl", label: "Volumen in Millilitern", type: "number", defaultValue: 250, min: 0, max: 100000, step: 5, unit: "ml", dependsOn: { field: "mode", value: "mlToGrams" } },
+      {
+        id: "densityIngredient",
+        label: "Zutat",
+        type: "select",
+        defaultValue: "flour",
+        options: [
+          { value: "flour", label: "Weizenmehl (0,53 g/ml)" },
+          { value: "sugar", label: "Zucker (0,85 g/ml)" },
+          { value: "icingSugar", label: "Puderzucker (0,55 g/ml)" },
+          { value: "water", label: "Wasser (1,00 g/ml)" },
+          { value: "milk", label: "Milch (1,03 g/ml)" },
+          { value: "oil", label: "Speiseöl / Olivenöl (0,92 g/ml)" },
+          { value: "butter", label: "Butter, geschmolzen (0,91 g/ml)" },
+          { value: "honey", label: "Honig / Sirup (1,42 g/ml)" },
+          { value: "rice", label: "Reis, ungekocht (0,85 g/ml)" },
+          { value: "oats", label: "Haferflocken (0,45 g/ml)" },
+        ],
+        dependsOn: { field: "mode", value: ["gramsToMl", "mlToGrams"] },
+      },
+    ],
+    calculate: calculateKitchenMeasures,
+    formula: "Löffel: Gewicht = Anzahl × Gramm pro Löffel | Gramm in ml: ml = g ÷ Dichte | ml in Gramm: g = ml × Dichte",
+    formulaExplanation: "Ein gestrichener Esslöffel fasst etwa 15 ml, ein Teelöffel etwa 5 ml. Wie viel das wiegt, hängt von der Zutat ab. Für Gramm und Milliliter rechnet der Rechner mit der Dichte in g/ml: Wasser hat 1,0 g/ml, Mehl nur etwa 0,53 g/ml, Honig 1,42 g/ml.",
     workedExample: {
-          "title": "Beispiel: 3 gehäufte Esslöffel Mehl abmessen",
-          "inputValues": [
-                {
-                      "label": "Menge",
-                      "value": "3 gehäufte EL"
-                },
-                {
-                      "label": "Zutat",
-                      "value": "Weizenmehl"
-                }
-          ],
-          "steps": [
-                "1 gehäufter EL Mehl = ca. 15 g",
-                "3 EL × 15 g = 45 g Mehl"
-          ],
-          "result": "45 g Mehl"
+      title: "Beispiel: 3 gehäufte Esslöffel Mehl",
+      inputValues: [{ label: "Menge", value: "3 EL gehäuft" }, { label: "Zutat", value: "Weizenmehl" }],
+      steps: ["1 gehäufter EL Mehl ≈ 15 g", "3 × 15 g = 45 g"],
+      result: "45 g Mehl",
+      inputs: { mode: "spoons", spoonsCount: 3, spoonType: "elHeaped", ingredient: "flour" },
     },
+    workedExamples: [
+      {
+        title: "Beispiel 1: 3 gehäufte Esslöffel Mehl",
+        inputValues: [{ label: "Menge", value: "3 EL gehäuft" }, { label: "Zutat", value: "Weizenmehl" }],
+        steps: ["1 gehäufter EL Mehl ≈ 15 g", "3 × 15 g = 45 g"],
+        result: "45 g Mehl",
+        inputs: { mode: "spoons", spoonsCount: 3, spoonType: "elHeaped", ingredient: "flour" },
+      },
+      {
+        title: "Beispiel 2: 2 gestrichene Teelöffel Salz",
+        inputValues: [{ label: "Menge", value: "2 TL gestrichen" }, { label: "Zutat", value: "Salz" }],
+        steps: ["1 gestrichener TL Salz ≈ 6 g", "2 × 6 g = 12 g"],
+        result: "12 g Salz",
+        inputs: { mode: "spoons", spoonsCount: 2, spoonType: "tlLevel", ingredient: "salt" },
+      },
+      {
+        title: "Beispiel 3: 200 g Mehl in Milliliter",
+        inputValues: [{ label: "Gewicht", value: "200 g" }, { label: "Zutat", value: "Weizenmehl (0,53 g/ml)" }],
+        steps: ["ml = g ÷ Dichte", "200 g ÷ 0,53 g/ml = 377,4 ml"],
+        result: "ca. 377 ml Mehl im Messbecher",
+        inputs: { mode: "gramsToMl", amountGrams: 200, densityIngredient: "flour" },
+      },
+      {
+        title: "Beispiel 4: 250 ml Milch in Gramm",
+        inputValues: [{ label: "Volumen", value: "250 ml" }, { label: "Zutat", value: "Milch (1,03 g/ml)" }],
+        steps: ["g = ml × Dichte", "250 ml × 1,03 g/ml = 257,5 g"],
+        result: "257,5 g Milch",
+        inputs: { mode: "mlToGrams", amountMl: 250, densityIngredient: "milk" },
+      },
+    ],
     content: {
-      intro: 'Dieser Löffelrechner transformiert gestrichene und gehäufte Esslöffel (EL) und Teelöffel (TL) in exakte Gramm-Gewichte für Salz, Zucker, Mehl, Öl und Backpulver.',
-      details: 'Volumina nach DIN: 1 gestrichener TL fasst ca. 5 ml; 1 gestrichener EL fasst ca. 15 ml. 1 gestrichener TL Salz wiegt ca. 5 g, Zucker ca. 4 g, Mehl ca. 3 g. 1 EL Öl wiegt ca. 12 g, Honig ca. 20 g.',
+      intro: 'Mit diesem Rechner rechnen Sie Küchenmaße kostenlos um: Esslöffel und Teelöffel in Gramm, Gramm in Milliliter und Milliliter in Gramm. Wählen Sie oben, was Sie umrechnen möchten, und die Zutat. Der Rechner berücksichtigt, dass ein Löffel Mehl leichter ist als ein Löffel Salz und 100 ml Honig schwerer als 100 ml Wasser.',
+      sections: [
+        {
+          title: 'Wie viel Gramm passen in einen Esslöffel und Teelöffel?',
+          content: `Ein gestrichener Esslöffel fasst etwa 15 ml, ein gestrichener Teelöffel etwa 5 ml – 3 TL ergeben also 1 EL. Das Gewicht hängt von der Zutat ab:\n\n${buildSpoonWeightTable()}\n\nDie Werte sind Richtwerte für haushaltsübliche Löffel. Gehäufte Löffel schwanken stärker, weil jeder unterschiedlich viel auflädt. Bei Öl macht „gehäuft“ keinen Unterschied.`,
+        },
+        {
+          title: 'Gramm in Milliliter: Warum die Zutat entscheidet',
+          content: `Gramm messen das Gewicht, Milliliter das Volumen. Umrechnen lässt sich das nur über die Dichte: ml = g ÷ Dichte und g = ml × Dichte. Nur bei Wasser sind 100 g genau 100 ml. Mehl ist locker und braucht für 100 g fast doppelt so viel Platz.\n\n${buildDensityTable()}\n\nBei Pulvern wie Mehl, Zucker oder Haferflocken hängt das Volumen davon ab, wie fest die Zutat im Messbecher liegt. Für Rezepte, die genau sein müssen, ist eine Küchenwaage verlässlicher als der Messbecher.`,
+        },
+        {
+          title: 'US-Cups und weitere Küchenrechner',
+          content: 'Amerikanische Rezepte messen in Cups. Dafür gibt es den eigenen [Cups-in-Gramm-Rechner](/rechner/cups-in-gramm-rechner/) mit den üblichen Cup-Größen. Wenn Sie ein Rezept für mehr oder weniger Personen anpassen möchten, hilft der [Portionsrechner](/rechner/portionsrechner/). Frische Hefe und Trockenhefe rechnen Sie mit dem [Hefe-Umrechner](/rechner/hefe-umrechner/) um.',
+        },
+      ],
+      details: '1 EL ≈ 15 ml, 1 TL ≈ 5 ml. Gramm in Milliliter: ml = g ÷ Dichte. Milliliter in Gramm: g = ml × Dichte. Beispiel: 100 g Mehl ÷ 0,53 g/ml ≈ 189 ml.',
     },
     faqs: [
-      { question: 'Wie viel wiegt ein gehäufter Esslöffel Mehl?', answer: 'Ein gehäufter EL Mehl bringt etwa 12 bis 15 Gramm auf die Waage (etwa das Doppelte eines glatt gestrichenen Löffels).' },
-      { question: 'Wie viel Gramm Backpulver enthält ein normales Tütchen?', answer: 'Ein handelsüblicher Beutel Backpulver in Deutschland wiegt exakt 15 bis 16 Gramm und reicht für 500 g Mehl.' },
+      { question: 'Wie viel Gramm sind 1 Esslöffel Zucker?', answer: 'Ein gestrichener Esslöffel Zucker wiegt etwa 15 g, ein gehäufter etwa 20 g. Ein gestrichener Teelöffel Zucker wiegt etwa 5 g.' },
+      { question: 'Wie viel Gramm hat ein Teelöffel Salz?', answer: 'Ein gestrichener Teelöffel Salz wiegt etwa 6 g, ein gehäufter etwa 9 g. Ein gestrichener Esslöffel Salz bringt rund 18 g auf die Waage.' },
+      { question: 'Wie viel ml sind 100 g Mehl?', answer: 'Etwa 189 ml. Mehl hat eine Dichte von rund 0,53 g/ml, also gilt 100 g ÷ 0,53 g/ml ≈ 188,7 ml. Je nachdem, wie locker das Mehl im Messbecher liegt, kann der Wert schwanken.' },
+      { question: 'Wie viel wiegen 250 ml Milch?', answer: 'Etwa 257,5 g. Milch ist mit rund 1,03 g/ml etwas schwerer als Wasser. 1 Liter Milch wiegt daher etwa 1.030 g.' },
+      { question: 'Wie viel ml hat ein Esslöffel?', answer: 'Ein gestrichener Esslöffel fasst etwa 15 ml, ein Teelöffel etwa 5 ml. Drei Teelöffel ergeben also einen Esslöffel. Haushaltslöffel können davon etwas abweichen.' },
     ],
-    relatedSlugs: ['cups-in-gramm-rechner', 'gramm-in-ml-rechner', 'portionsrechner'],
+    relatedSlugs: ['cups-in-gramm-rechner', 'portionsrechner', 'hefe-umrechner', 'gewicht-masse-umrechner'],
   },
   {
     id: "cups-in-gramm-rechner",

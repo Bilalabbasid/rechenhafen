@@ -163,13 +163,13 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 3. Spritkosten
     const sprit = getCalculatorBySlug('spritkostenrechner');
-    expect(sprit?.metaTitle).toBe('Spritkostenrechner: Benzinkosten für Ihre Fahrt');
-    expect(sprit?.h1).toBe('Spritkostenrechner – Benzin- & Dieselkosten pro Fahrt, km & Mitfahrer berechnen');
+    expect(sprit?.metaTitle).toBe('Spritkostenrechner: Fahrtkosten mit Maut & Mitfahrern');
+    expect(sprit?.h1).toBe('Spritkostenrechner: Sprit- und Fahrtkosten berechnen und teilen');
     expect(sprit?.workedExample.description).toBeDefined();
     expect(sprit?.faqs.length).toBeGreaterThanOrEqual(4);
 
     // 4. Kreisumfang
-    const kreis = getCalculatorBySlug('kreis-umfang-rechner');
+    const kreis = getCalculatorDefinitionBySlug('kreis-umfang-rechner'); // merged into kreisrechner, content kept
     expect(kreis?.metaTitle).toBe('Kreisumfang berechnen: Rechner & Formel (U = 2·π·r = π·d)');
     expect(kreis?.h1).toBe('Kreisumfang Rechner – Exakten Umfang aus Radius oder Durchmesser berechnen');
     expect(kreis?.workedExample.description).toBeDefined();
@@ -301,12 +301,15 @@ describe('SEO & 301 Redirects Verification', () => {
     expect(urls).toContain('https://rechenhafen.de/rechner/warmmiete-rechner/');
     expect(urls.some((u) => u.includes('warmmiete-zu-kaltmiete-rechner'))).toBe(false);
 
-    // 4. Mietbelastungsquote de-optimization
-    const mietbelastung = getCalculatorBySlug('mietbelastungsquote-rechner');
-    expect(mietbelastung).toBeDefined();
-    expect(mietbelastung?.h1).not.toContain('Warmmiete berechnen');
-    expect(mietbelastung?.metaTitle).not.toContain('Warmmiete berechnen');
-    expect(mietbelastung?.searchKeywords).not.toContain('warmmiete berechnen');
+    // 4. Mietbelastungsquote was merged into the Mietbudget page (5 Nov 2026); that page must
+    //    still leave the "Warmmiete berechnen" intent to the Warmmiete calculator.
+    expect(getCalculatorBySlug('mietbelastungsquote-rechner')).toBeUndefined();
+    const mietbudget = getCalculatorBySlug('mietbudget-rechner');
+    expect(mietbudget).toBeDefined();
+    expect(mietbudget?.searchKeywords).toContain('mietbelastungsquote rechner');
+    expect(mietbudget?.h1).not.toContain('Warmmiete berechnen');
+    expect(mietbudget?.metaTitle).not.toContain('Warmmiete berechnen');
+    expect(mietbudget?.searchKeywords).not.toContain('warmmiete berechnen');
   });
 
   it('verifies Restalkohol safety fix: cooking intent only, no driving claims, safety disclaimer', () => {

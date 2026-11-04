@@ -1,10 +1,17 @@
 /**
- * Calculators retired on 5 Nov 2026 because they earned zero Google impressions in the
- * 28-day GSC window (6 Oct – 2 Nov 2026) despite being live the whole time.
+ * Retired calculators, all on 5 Nov 2026, in two batches:
+ *  1. 70 calculators with zero Google impressions in the 28-day GSC window
+ *     (6 Oct – 2 Nov 2026) despite being live the whole time.
+ *  2. The calculator audit (seo-audit/AUDIT-CALCULATORS-2026-11.md): 47 duplicate-intent
+ *     calculators merged into a stronger page, and 15 low-value calculators retired.
+ *     Merge targets still have to gain the merged pages' extra options as part of
+ *     improving them (see the audit's merge table).
  *
- * Kept despite zero impressions because other content depends on them: werktage-rechner,
- * teilzeit-gehaltsrechner, sondertilgungsrechner (primary tools of Ratgeber articles) and
- * indexmiete-rechner (linked from the Mieterhöhung result).
+ * Kept despite zero impressions because other content depends on them:
+ * teilzeit-gehaltsrechner, sondertilgungsrechner and cups-in-gramm-rechner (primary tools of
+ * Ratgeber articles) and indexmiete-rechner (linked from the Mieterhöhung result).
+ *
+ * Redirect chains are resolved: every target is a live page, never another retired one.
  *
  * Each retired slug 301-redirects to the closest live page (see next.config.ts).
  * Their definitions and engines stay in the codebase (ALL_CALCULATOR_DEFINITIONS) so

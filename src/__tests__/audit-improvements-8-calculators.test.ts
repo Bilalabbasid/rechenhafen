@@ -34,8 +34,9 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
       expect(zeroPrice.primary.value).toBe(0);
     });
 
-    it('has calculator metadata cross-linking to fahrtkostenrechner', () => {
-      expect(calc?.relatedSlugs).toContain('fahrtkostenrechner');
+    it('has calculator metadata cross-linking to fahrgemeinschaft-sprit-rechner (fahrtkostenrechner merged in)', () => {
+      expect(calc?.relatedSlugs).toContain('fahrgemeinschaft-sprit-rechner');
+      expect(calc?.relatedSlugs).not.toContain('fahrtkostenrechner');
     });
   });
 
@@ -306,8 +307,8 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
     ];
 
     const expectedTitles: Record<string, string> = {
-      'spritkostenrechner': 'Spritkostenrechner: Benzinkosten für Ihre Fahrt',
-      'brutto-netto-rechner': 'Brutto-Netto-Rechner 2026: Was bleibt vom Gehalt?',
+      'spritkostenrechner': 'Spritkostenrechner: Fahrtkosten mit Maut & Mitfahrern',
+      'brutto-netto-rechner': 'Brutto-Netto-Rechner 2026 mit Sozialabgaben AN & AG',
       'gasverbrauch-kwh-m3-rechner': 'Gasverbrauch berechnen: Zählerstände & m³ in kWh',
       'gaskostenrechner': 'Gaskostenrechner: kWh, m³, Grundpreis & Monatskosten',
       'kies-splitt-rechner': 'Splittrechner: Wie viel Splitt brauche ich?',

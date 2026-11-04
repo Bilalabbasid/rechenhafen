@@ -8,7 +8,7 @@ import {
   formatAdaptiveUnit,
   formatHumanReadableDuration,
 } from '@/lib/calculators/einheiten';
-import { getCalculatorBySlug } from '@/data/calculators';
+import { getCalculatorBySlug, getCalculatorDefinitionBySlug } from '@/data/calculators';
 
 describe('Units Converter Cluster Regression Tests', () => {
   describe('1. Parser & Utility Helpers', () => {
@@ -290,12 +290,13 @@ describe('Units Converter Cluster Regression Tests', () => {
     it('has all 4 calculators properly defined and discoverable in catalog', () => {
       const laengen = getCalculatorBySlug('laengen-umrechner');
       const zoll = getCalculatorBySlug('zoll-in-cm-rechner');
-      const meilen = getCalculatorBySlug('meilen-km-umrechner');
+      const meilen = getCalculatorDefinitionBySlug('meilen-km-umrechner'); // merged into laengen-umrechner
       const zeit = getCalculatorBySlug('zeit-umrechner');
 
       expect(laengen).toBeDefined();
       expect(zoll).toBeDefined();
       expect(meilen).toBeDefined();
+      expect(getCalculatorBySlug('meilen-km-umrechner')).toBeUndefined();
       expect(zeit).toBeDefined();
     });
 
@@ -318,7 +319,7 @@ describe('Units Converter Cluster Regression Tests', () => {
     });
 
     it('ensures meilen-km-umrechner cross-references geschwindigkeit-umrechner and laengen-umrechner', () => {
-      const meilen = getCalculatorBySlug('meilen-km-umrechner')!;
+      const meilen = getCalculatorDefinitionBySlug('meilen-km-umrechner')!;
       expect(meilen.relatedSlugs).toContain('laengen-umrechner');
       expect(meilen.relatedSlugs).toContain('geschwindigkeit-umrechner');
     });

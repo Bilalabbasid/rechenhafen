@@ -118,38 +118,186 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'betonrechner',
     slug: 'betonrechner',
-    name: 'Betonrechner (Volumen in m³ & Fertigbetonsäcke)',
+    name: 'Betonrechner (Volumen, Fertigbeton-Säcke & Mischungsverhältnis)',
     shortName: 'Beton berechnen',
     category: 'bauen-renovieren',
     subcategory: 'Baustoffe & Beton',
-    metaTitle: 'Betonrechner – Betonvolumen (m³) & Säcke berechnen',
-    metaDescription: 'Ermitteln Sie das benötigte Betonvolumen in Kubikmetern und die Anzahl der Fertigbeton-Säcke (25 kg/40 kg) für Fundamente und Platten.',
-    h1: 'Betonrechner für Fundamente, Platten & Estrich',
-    shortDescription: 'Berechnet das Betonvolumen in Kubikmetern und die Anzahl an Trockenbeton-Säcken.',
-    searchKeywords: ['betonrechner', 'betonvolumen berechnen', 'wieviel fertigbeton säcke brauche ich', 'fundament beton rechner'],
-    inputs: [
-      { id: 'lengthM', label: 'Länge in Metern', type: 'number', defaultValue: 3.0, step: 0.1, unit: 'm' },
-      { id: 'widthM', label: 'Breite in Metern', type: 'number', defaultValue: 2.0, step: 0.1, unit: 'm' },
-      { id: 'depthCm', label: 'Dicke / Tiefe in Zentimetern', type: 'number', defaultValue: 15, min: 1, step: 1, unit: 'cm' },
-      { id: 'bagWeightKg', label: 'Sackgewicht', type: 'number', defaultValue: 25, unit: 'kg/Sack' },
+    metaTitle: 'Betonrechner: Menge in m³, Säcke & Mischverhältnis',
+    metaDescription: 'Betonmenge kostenlos berechnen: Kubikmeter, Fertigbeton-Säcke oder Zement, Kies und Wasser zum Selbstmischen – mit Reserve für Verdichtung.',
+    h1: 'Betonrechner: Wie viel Beton brauche ich?',
+    shortDescription: 'Berechnet das Betonvolumen für Fundament, Platte oder Sockel und zeigt, wie viele Fertigbeton-Säcke oder wie viel Zement, Kies und Wasser Sie brauchen.',
+    searchKeywords: [
+      'betonrechner',
+      'betonvolumen berechnen',
+      'wie viel beton brauche ich',
+      'wieviel fertigbeton säcke brauche ich',
+      'beton mischungsverhältnis',
+      'beton selber mischen verhältnis',
+      'zement kies wasser verhältnis',
+      'wie viel zement für 1 m3 beton',
     ],
-    calculate: calculateConcreteVolume,
-    formula: 'Volumen (m³) = Länge (m) × Breite (m) × Tiefe (m)',
-    formulaExplanation: 'Das geometrische Volumen multipliziert mit der Dichte von fertigem Beton (ca. 2.100 kg Trockenmischung pro m³).',
-    workedExample: {
-      title: 'Beispiel: Fundament 3m × 2m × 15cm Dicke',
-      description: 'Volumen: 0,90 m³ (900 Liter). Entspricht rund 1.890 kg Trockenmischung (ca. 76 Säcke à 25 kg).',
-      inputs: { lengthM: 3.0, widthM: 2.0, depthCm: 15, bagWeightKg: 25 },
-      resultSummary: '0,90 m³ (ca. 76 Säcke à 25 kg)',
+    inputs: [
+      { id: 'lengthM', label: 'Länge', type: 'number', defaultValue: 3.0, min: 0.1, step: 0.1, unit: 'm' },
+      { id: 'widthM', label: 'Breite', type: 'number', defaultValue: 2.0, min: 0.1, step: 0.1, unit: 'm' },
+      { id: 'depthCm', label: 'Dicke bzw. Tiefe', type: 'number', defaultValue: 15, min: 1, step: 1, unit: 'cm' },
+      {
+        id: 'reservePercent',
+        label: 'Reserve für Verdichtung & Unebenheiten',
+        type: 'select',
+        defaultValue: '5',
+        options: [
+          { value: '0', label: 'Keine Reserve' },
+          { value: '5', label: '5 % (ebener, verdichteter Untergrund)' },
+          { value: '10', label: '10 % (Erdreich, unebene Baugrube)' },
+        ],
+      },
+      {
+        id: 'supplyMode',
+        label: 'Wie möchten Sie betonieren?',
+        type: 'select',
+        defaultValue: 'bags',
+        options: [
+          { value: 'bags', label: 'Fertigbeton aus Säcken (Trockenbeton)' },
+          { value: 'mix', label: 'Selbst mischen (Zement + Betonkies)' },
+          { value: 'transport', label: 'Transportbeton bestellen' },
+        ],
+      },
+      { id: 'bagWeightKg', label: 'Sackgewicht', type: 'number', defaultValue: 25, min: 1, step: 5, unit: 'kg', dependsOn: { field: 'supplyMode', value: 'bags' } },
+      {
+        id: 'mixRatio',
+        label: 'Betonsorte',
+        type: 'select',
+        defaultValue: 'standard',
+        dependsOn: { field: 'supplyMode', value: 'mix' },
+        options: [
+          { value: 'standard', label: 'Normalbeton C20/25 – Zement : Kies ≈ 1 : 4' },
+          { value: 'strong', label: 'Höhere Festigkeit C25/30 – Zement : Kies ≈ 1 : 3' },
+          { value: 'lean', label: 'Magerbeton / Sauberkeitsschicht – ≈ 1 : 7' },
+        ],
+      },
+    ],
+    calculate: (inputs) => {
+      const base = calculateConcreteVolume(inputs);
+      if (base.error) return base;
+
+      const reservePct = Math.max(0, parseFloat(String(inputs.reservePercent ?? '0')) || 0);
+      const netM3 = Number(base.primary.value);
+      const m3 = netM3 * (1 + reservePct / 100);
+      const mode = inputs.supplyMode === 'mix' || inputs.supplyMode === 'transport' ? inputs.supplyMode : 'bags';
+      const fmtM3 = (v: number) => `${formatNumber(v, 2)} m³ (${formatNumber(v * 1000, 0)} Liter)`;
+      const area = base.secondary?.find((x) => x.id === 'area');
+
+      const primary = {
+        id: 'volume',
+        label: reservePct > 0 ? `Betonmenge inkl. ${reservePct} % Reserve` : 'Benötigtes Betonvolumen',
+        value: m3,
+        formattedValue: fmtM3(m3),
+        highlight: true,
+      };
+      const netItem = { id: 'netVolume', label: 'Reines Volumen ohne Reserve', value: netM3, formattedValue: fmtM3(netM3) };
+      const transportHint =
+        m3 >= 1.5 && mode !== 'transport'
+          ? 'Ab etwa 1,5 m³ ist Transportbeton aus dem Fahrmischer meist günstiger und gleichmäßiger als Sackware oder Selbstmischen.'
+          : undefined;
+
+      if (mode === 'mix') {
+        const MIX = {
+          standard: { cement: 300, gravel: 1800, water: 165, shovels: 4, label: 'C20/25 (1 : 4)' },
+          strong: { cement: 350, gravel: 1750, water: 175, shovels: 3, label: 'C25/30 (1 : 3)' },
+          lean: { cement: 180, gravel: 1950, water: 140, shovels: 7, label: 'Magerbeton (≈ 1 : 7)' },
+        } as const;
+        const mix = MIX[(inputs.mixRatio as keyof typeof MIX) in MIX ? (inputs.mixRatio as keyof typeof MIX) : 'standard'];
+        const cementKg = Math.round(m3 * mix.cement);
+        const gravelKg = Math.round(m3 * mix.gravel);
+        const waterL = Math.round(m3 * mix.water);
+        const sacks = Math.ceil(cementKg / 25);
+        return {
+          primary,
+          secondary: [
+            { id: 'cementSacks', label: 'Zement (25-kg-Säcke)', value: sacks, formattedValue: `${sacks} Säcke (${formatNumber(cementKg, 0)} kg)`, highlight: true },
+            { id: 'gravelKg', label: 'Betonkies 0/16 mm', value: gravelKg, formattedValue: `${formatNumber(gravelKg, 0)} kg (${formatNumber(gravelKg / 1000, 2)} t)` },
+            { id: 'waterL', label: 'Anmachwasser ca.', value: waterL, formattedValue: `${formatNumber(waterL, 0)} Liter` },
+            { id: 'shovelRatio', label: 'Faustregel in Schaufeln', value: mix.shovels, formattedValue: `1 Schaufel Zement auf ${mix.shovels} Schaufeln Kies` },
+          ],
+          details: [netItem, ...(area ? [area] : [])],
+          summaryText: `Für ${formatNumber(m3, 2)} m³ ${mix.label} brauchen Sie ${sacks} Säcke Zement, rund ${formatNumber(gravelKg / 1000, 2)} t Betonkies und etwa ${formatNumber(waterL, 0)} Liter Wasser.`,
+          warning: transportHint,
+        };
+      }
+
+      if (mode === 'transport') {
+        return {
+          primary,
+          secondary: [
+            { id: 'freshWeight', label: 'Gewicht Frischbeton (ca. 2,4 t/m³)', value: m3 * 2400, formattedValue: `ca. ${formatNumber((m3 * 2400) / 1000, 2)} t` },
+            netItem,
+            ...(area ? [area] : []),
+          ],
+          summaryText: `Bestellen Sie rund ${formatNumber(m3, 2)} m³ Transportbeton. Mindestmengen, Lieferpauschale und Pumpenkosten erfragen Sie beim Betonwerk.`,
+        };
+      }
+
+      const bagWeightKg = parseFloat(String(inputs.bagWeightKg)) > 0 ? parseFloat(String(inputs.bagWeightKg)) : 25;
+      const dryKg = m3 * 2100;
+      const bags = Math.ceil(dryKg / bagWeightKg);
+      return {
+        primary,
+        secondary: [
+          { id: 'bags', label: `Fertigbeton-Säcke à ${formatNumber(bagWeightKg, 0)} kg`, value: bags, formattedValue: `${bags} Säcke`, highlight: true },
+          { id: 'weight', label: 'Trockenbeton gesamt', value: dryKg, formattedValue: `ca. ${formatNumber(dryKg, 0)} kg (${formatNumber(dryKg / 1000, 2)} t)` },
+          netItem,
+          ...(area ? [area] : []),
+        ],
+        summaryText: `Für ${formatNumber(m3, 2)} m³ Beton brauchen Sie etwa ${bags} Säcke Fertigbeton à ${formatNumber(bagWeightKg, 0)} kg.`,
+        warning: transportHint,
+      };
     },
+    formula: 'Volumen (m³) = Länge × Breite × Dicke (m) × (1 + Reserve)',
+    formulaExplanation: 'Aus dem Volumen ergibt sich die Menge: Trockenbeton wiegt rund 2.100 kg pro m³ fertigen Beton. Zum Selbstmischen braucht 1 m³ Normalbeton C20/25 etwa 300 kg Zement, 1.800 kg Betonkies und 165 Liter Wasser.',
+    workedExample: {
+      title: 'Bodenplatte 3 × 2 m, 15 cm dick, aus Säcken',
+      description: '3 m × 2 m × 0,15 m = 0,90 m³. Mit 5 % Reserve sind es 0,945 m³, also rund 1.985 kg Trockenbeton – 80 Säcke à 25 kg.',
+      inputs: { lengthM: 3, widthM: 2, depthCm: 15, reservePercent: '5', supplyMode: 'bags', bagWeightKg: 25 },
+      resultSummary: '0,95 m³ – 80 Säcke à 25 kg',
+      },
+    workedExamples: [
+      {
+        title: 'Bodenplatte 3 × 2 m, 15 cm dick, aus Säcken',
+        description: '3 m × 2 m × 0,15 m = 0,90 m³. Mit 5 % Reserve sind es 0,945 m³, also rund 1.985 kg Trockenbeton – 80 Säcke à 25 kg.',
+        inputs: { lengthM: 3, widthM: 2, depthCm: 15, reservePercent: '5', supplyMode: 'bags', bagWeightKg: 25 },
+        resultSummary: '0,95 m³ – 80 Säcke à 25 kg',
+      },
+      {
+        title: 'Fundament 2 × 0,5 m, 50 cm tief, selbst gemischt',
+        description: '2 m × 0,5 m × 0,5 m = 0,50 m³, mit 5 % Reserve 0,525 m³. Für C20/25: 158 kg Zement (7 Säcke), rund 945 kg Kies und 87 Liter Wasser.',
+        inputs: { lengthM: 2, widthM: 0.5, depthCm: 50, reservePercent: '5', supplyMode: 'mix', mixRatio: 'standard' },
+        resultSummary: '7 Säcke Zement, 0,95 t Kies, 87 l Wasser',
+      },
+    ],
     content: {
-      intro: 'Dieser Betonmengenrechner ermittelt das benötigte Raumvolumen in Kubikmetern (m³) und das Fertiggewicht in Tonnen für Fundamente, Bodenplatten und Stützen.',
-      details: 'Normalbeton (Klasse C20/25 oder C25/30) hat eine Rohdichte von ca. 2,3 bis 2,4 Tonnen pro Kubikmeter. 1 m³ Frischbeton benötigt ca. 300 kg Zement, 1.850 kg Zuschlag (Kies/Sand) und 150 bis 170 Liter Anmachwasser.',
+      intro: 'Der Betonrechner ermittelt aus Länge, Breite und Dicke, wie viel Beton Sie für eine Bodenplatte, ein Fundament oder einen Sockel brauchen – und übersetzt das Volumen in Fertigbeton-Säcke oder in Zement, Kies und Wasser zum Selbstmischen. Für Streifen- und Punktfundamente mit Frosttiefe nutzen Sie den [Fundament-Rechner](/rechner/fundament-rechner/).',
+      sections: [
+        {
+          title: 'Säcke, selbst mischen oder Transportbeton?',
+          content: '- **Fertigbeton aus Säcken** ist bequem für kleine Mengen bis etwa 0,5 m³, zum Beispiel für Zaunpfosten oder eine kleine Platte.\n- **Selbst mischen** aus Zement und Betonkies ist bei mittleren Mengen deutlich günstiger, braucht aber einen Mischer und etwas Übung.\n- **Transportbeton** lohnt sich meist ab 1 bis 1,5 m³. Er kommt gleichmäßig gemischt in der bestellten Festigkeitsklasse.',
+        },
+        {
+          title: 'Das richtige Mischungsverhältnis',
+          content: 'Für Normalbeton C20/25 gilt die Faustregel 1 : 4 – eine Schaufel Zement auf vier Schaufeln Betonkies 0/16. Für stärker belastete Bauteile nehmen Sie mehr Zement (etwa 1 : 3), für eine Sauberkeitsschicht genügt Magerbeton (etwa 1 : 7). Geben Sie Wasser nach und nach zu: Der Wasser-Zement-Wert sollte zwischen 0,50 und 0,60 liegen. Zu viel Wasser macht den Beton schwach und rissanfällig.',
+        },
+        {
+          title: 'Warum eine Reserve sinnvoll ist',
+          content: 'Beim Verdichten und durch Unebenheiten im Untergrund geht Volumen verloren. Auf ebenem, verdichtetem Schotter reichen 5 %, in einer Baugrube im Erdreich eher 10 %. Ein halber Sack zu viel ist billiger als eine Betonierfuge, weil das Material ausgeht.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie viel Verdichtungszuschlag muss bei Frischbeton eingerechnet werden?', answer: 'Rechnen Sie mit etwa 5 bis 8 Prozent Volumenschwund durch das Rütteln/Verdichten und Unebenheiten im Erdreich.' },
-      { question: 'Wann lohnt sich Transportbeton (Fahrmischer) statt selber mischen?', answer: 'Ab einem Volumen von ca. 1,0 bis 1,5 Kubikmetern ist Transportbeton wirtschaftlicher, körperlich schonender und garantiert gleichmäßige Festigkeitsklassen nach DIN EN 206.' },
+      { question: 'Wie viel Beton brauche ich für 1 m² Bodenplatte?', answer: 'Das hängt von der Dicke ab: Bei 10 cm sind es 0,1 m³, bei 15 cm 0,15 m³ pro Quadratmeter. Rechnen Sie 5 bis 10 % Reserve für Verdichtung dazu.' },
+      { question: 'Wie viele Säcke Fertigbeton ergeben 1 m³?', answer: 'Für 1 m³ fertigen Beton brauchen Sie rund 2.100 kg Trockenbeton, also etwa 84 Säcke à 25 kg oder 53 Säcke à 40 kg. Die genaue Ergiebigkeit steht auf dem Sack.' },
+      { question: 'Wie viel Zement brauche ich für 1 m³ Beton?', answer: 'Für Normalbeton C20/25 etwa 300 kg Zement – das sind 12 Säcke à 25 kg. Dazu kommen rund 1.800 kg Betonkies und 165 Liter Wasser.' },
+      { question: 'Was ist das Mischungsverhältnis für Beton?', answer: 'Für die meisten Arbeiten im Garten und am Haus gilt 1 Teil Zement auf 4 Teile Betonkies. Das entspricht etwa einem Beton der Klasse C20/25.' },
+      { question: 'Ab wann lohnt sich Transportbeton?', answer: 'Meist ab 1 bis 1,5 m³. Darunter fallen die Lieferpauschalen stark ins Gewicht. Darüber sparen Sie viel Arbeit, und der Beton ist gleichmäßiger gemischt.' },
     ],
-    relatedSlugs: ['beton-mischungsverhaeltnis-rechner', 'zaun-pfosten-rechner', 'schalungssteine-rechner', 'bodenbelag-rechner', 'farbmengen-rechner', 'zylinderrechner'],
+    relatedSlugs: ['fundament-rechner', 'estrich-rechner', 'schalungssteine-rechner', 'kies-splitt-rechner', 'zaun-pfosten-rechner', 'aushub-erdarbeiten-rechner'],
   },
 ];

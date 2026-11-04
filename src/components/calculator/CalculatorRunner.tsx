@@ -1228,7 +1228,7 @@ export default function CalculatorRunner({
                 <div className={styles.warningAlert} role="status">
                   <AlertTriangle size={18} className={styles.warningIcon} />
                   <div>
-                    <strong>Gesetzlicher Hinweis (§ 4 ArbZG)</strong>
+                    <strong>{slug === 'arbeitszeitrechner' ? 'Gesetzlicher Hinweis (§ 4 ArbZG)' : 'Hinweis'}</strong>
                     <p>{result.warning}</p>
                   </div>
                 </div>

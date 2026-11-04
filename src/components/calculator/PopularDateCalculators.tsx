@@ -31,25 +31,14 @@ const POPULAR_DATE_CALCULATORS: PopularDateLink[] = [
   },
   {
     slug: 'arbeitstage-rechner',
-    name: 'Arbeitstage-Rechner',
-    shortDesc: 'Tatsächliche Arbeitstage (Mo–Fr) für alle 16 Bundesländer inklusive Feiertagen.',
-    badge: '5-Tage-Woche',
-  },
-  {
-    slug: 'werktage-rechner',
-    name: 'Werktage-Rechner (Mo–Sa)',
-    shortDesc: 'Gesetzliche Werktage nach § 3 BUrlG und BGB für Fristen und Mietzahlungen.',
-    badge: '6-Tage-Woche',
+    name: 'Arbeitstage- & Werktage-Rechner',
+    shortDesc: 'Arbeitstage (Mo–Fr) oder Werktage (Mo–Sa) für alle 16 Bundesländer inklusive Feiertagen.',
+    badge: '5- oder 6-Tage-Woche',
   },
   {
     slug: 'datum-plus-tage',
-    name: 'Datum plus Tage',
-    shortDesc: 'Welches Datum ist in X Tagen? Zieldatum und Wochentag sofort ermitteln.',
-  },
-  {
-    slug: 'datum-minus-tage',
-    name: 'Datum minus Tage',
-    shortDesc: 'Tage von einem Stichtag subtrahieren und historisches Datum bestimmen.',
+    name: 'Datum plus/minus Tage',
+    shortDesc: 'Welches Datum ist in X Tagen – oder war vor X Tagen? Zieldatum und Wochentag sofort ermitteln.',
   },
   {
     slug: 'altersrechner',

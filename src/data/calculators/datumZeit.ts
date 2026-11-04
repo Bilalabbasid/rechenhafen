@@ -16,7 +16,7 @@ import {
   calculateTageBisWeihnachten,
 } from '@/lib/calculators/datumZeit';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
-import { getBerlinTodayString } from '@/lib/calculators/dateMath';
+import { getBerlinTodayString, calculateTageBisGeburtstag } from '@/lib/calculators/dateMath';
 
 const FEDERAL_STATE_OPTIONS = [
   { value: 'bundesweit', label: 'Bundesweit (nur 9 einheitliche Feiertage)' },
@@ -481,57 +481,105 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'tage-bis-geburtstag',
     slug: 'tage-bis-geburtstag',
-    name: 'Tage-bis-zum-Geburtstag-Rechner',
+    name: 'Geburtstagsrechner: Tage bis zum Geburtstag',
     shortName: 'Tage bis Geburtstag',
     category: 'datum-zeit',
     subcategory: 'Alter & Geburtstag',
-    metaTitle: 'Tage bis zum Geburtstag – Countdown & Schlafeinheiten',
-    metaDescription: 'Wie viele Tage sind es noch bis zum Geburtstag? Berechnen Sie verbleibende Tage, Wochen und Stunden mit dem Countdown-Rechner.',
-    h1: 'Geburtstags-Countdown – Tage bis zum nächsten Geburtstag',
-    shortDescription: 'Zählt die verbleibenden Tage, Wochen und Schlafeinheiten bis zum nächsten Geburtstag für Vorfreude und Eventplanung.',
-    searchKeywords: ['tage bis zum geburtstag', 'tage bis geburtstag', 'geburtstag countdown', 'wann habe ich wieder geburtstag'],
-    inputs: [
-      { id: 'birthDate', label: 'Geburtstag (Tag & Monat)', type: 'date', defaultValue: '1996-10-24' },
+    metaTitle: 'Tage bis Geburtstag: Countdown, Wochentag & Alter',
+    metaDescription: 'Wie viele Tage noch bis zum Geburtstag? Kostenlos berechnen – mit Wochentag, neuem Alter, Wochentag Ihrer Geburt und nächstem runden Geburtstag.',
+    h1: 'Tage bis zum Geburtstag berechnen – mit Wochentag und Alter',
+    shortDescription: 'Zählt die Tage bis zu Ihrem nächsten Geburtstag und zeigt Wochentag, neues Alter, den Wochentag Ihrer Geburt und Ihren nächsten runden Geburtstag.',
+    searchKeywords: [
+      'tage bis zum geburtstag',
+      'tage bis geburtstag',
+      'geburtstag countdown',
+      'wann habe ich wieder geburtstag',
+      'geburtstagsrechner',
+      'geburtstag rechner',
+      'an welchem wochentag geboren',
+      'wochentag geburtstag',
+      'auf welchen wochentag fällt mein geburtstag',
+      'wie alt werde ich',
+      'runder geburtstag berechnen',
     ],
-    calculate: (inputs) => {
-      const b = new Date(inputs.birthDate || '1996-10-24');
-      const today = new Date();
-      const currentYear = today.getFullYear();
-      let next = new Date(currentYear, b.getMonth(), b.getDate());
-      if (next < today) {
-        next = new Date(currentYear + 1, b.getMonth(), b.getDate());
-      }
-      const diffMs = next.getTime() - today.getTime();
-      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      const weeks = Math.floor(days / 7);
-      const remDays = days % 7;
-      return {
-        primary: { id: 'days', label: 'Verbleibende Tage', value: days, formattedValue: `${days} Tage`, highlight: true },
-        secondary: [
-          { id: 'nextDate', label: 'Datum des nächsten Geburtstags', value: formatDateDe(next), formattedValue: formatDateDe(next) },
-          { id: 'weeks', label: 'In Wochen', value: weeks, formattedValue: `${weeks} Wochen und ${remDays} Tage` },
-          { id: 'hours', label: 'In Stunden (ca.)', value: days * 24, formattedValue: `ca. ${days * 24} Stunden` },
-        ],
-        summaryText: `Bis zu Ihrem nächsten Geburtstag am ${formatDateDe(next)} sind es noch genau ${days} Tage (${weeks} Wochen und ${remDays} Tage).`,
-      };
-    },
-    formula: 'Tage = Nächster Geburtstag - Heutiges Datum',
-    formulaExplanation: 'Liegt der Geburtstag im aktuellen Kalenderjahr bereits in der Vergangenheit, wird der Geburtstag des Folgejahres als Zielzeitpunkt angesetzt.',
+    inputs: [
+      {
+        id: 'birthDate',
+        label: 'Ihr Geburtsdatum',
+        type: 'date',
+        defaultValue: '1996-10-24',
+        helpText: 'Mit Geburtsjahr, damit Alter und Wochentag der Geburt stimmen.',
+      },
+    ],
+    calculate: calculateTageBisGeburtstag,
+    formula: 'Tage = nächster Geburtstag − heute | Neues Alter = Jahr des nächsten Geburtstags − Geburtsjahr',
+    formulaExplanation: 'Liegt der Geburtstag in diesem Jahr schon hinter Ihnen, zählt der Rechner bis zum Geburtstag im nächsten Jahr. Die Wochentage ergeben sich aus dem gregorianischen Kalender. Wer am 29. Februar geboren ist, bekommt in Nicht-Schaltjahren den 28. Februar angezeigt und zusätzlich den 1. März, ab dem das neue Alter rechtlich gilt.',
     workedExample: {
-      title: 'Beispiel: Nächster Geburtstag in 45 Tagen',
-      description: 'Es verbleiben 6 Wochen und 3 Tage.',
+      title: 'Beispiel 1: Geburtstag am 24.10.1996 (Stand 05.11.2026)',
+      description: 'Der Geburtstag 2026 ist vorbei, also zählt der Rechner bis zum 24.10.2027. Das sind 353 Tage oder 50 Wochen und 3 Tage. Der Tag ist ein Sonntag, Sie werden 31. Geboren wurden Sie an einem Donnerstag. Der nächste runde Geburtstag ist der 40. am Freitag, 24.10.2036.',
       inputs: { birthDate: '1996-10-24' },
-      resultSummary: '45 Tage',
+      resultSummary: '353 Tage bis Sonntag, 24.10.2027 (31. Geburtstag)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Geburtstag am 24.10.1996 (Stand 05.11.2026)',
+        description: 'Der Geburtstag 2026 ist vorbei, also zählt der Rechner bis zum 24.10.2027. Das sind 353 Tage oder 50 Wochen und 3 Tage. Der Tag ist ein Sonntag, Sie werden 31. Geboren wurden Sie an einem Donnerstag. Der nächste runde Geburtstag ist der 40. am Freitag, 24.10.2036.',
+        inputs: { birthDate: '1996-10-24' },
+        resultSummary: '353 Tage bis Sonntag, 24.10.2027 (31. Geburtstag)',
+      },
+      {
+        title: 'Beispiel 2: Geboren am 29.02.2000 (Stand 05.11.2026)',
+        description: '2027 ist kein Schaltjahr. Der Rechner zeigt deshalb Sonntag, den 28.02.2027: noch 115 Tage oder 16 Wochen und 3 Tage bis zum 27. Geburtstag. Rechtlich gilt das neue Alter ab Montag, 01.03.2027. Geboren wurden Sie an einem Dienstag.',
+        inputs: { birthDate: '2000-02-29' },
+        resultSummary: '115 Tage bis 28.02.2027 (rechtlich neues Alter ab 01.03.2027)',
+      },
+      {
+        title: 'Beispiel 3: Heute ist Geburtstag (05.11.1986, Stand 05.11.2026)',
+        description: 'Fällt der Geburtstag auf heute, zeigt der Rechner „Heute ist Ihr Geburtstag!“. Sie werden 40, das ist zugleich Ihr runder Geburtstag. Der 05.11.1986 war ein Mittwoch.',
+        inputs: { birthDate: '1986-11-05' },
+        resultSummary: 'Heute ist Ihr Geburtstag – 40 Jahre',
+      },
+    ],
     content: {
-      intro: 'Dieser Countdown berechnet die exakt verbleibenden Kalendertage und Stunden bis zu Ihrem nächsten Geburtstag.',
-      details: 'Er berücksichtigt automatisch, ob der Geburtstag im laufenden Kalenderjahr bereits verstrichen ist (in diesem Fall wird auf das Folgejahr berechnet) und bezieht eventuelle Schalttage nahtlos ein.',
+      intro: 'Dieser Rechner zählt die Tage bis zu Ihrem nächsten Geburtstag. Er zeigt außerdem, auf welchen Wochentag der Tag fällt, wie alt Sie werden, an welchem Wochentag Sie geboren sind und wann Ihr nächster runder Geburtstag ansteht. Sie geben dafür nur Ihr Geburtsdatum ein.',
+      sections: [
+        {
+          title: 'So zählt der Geburtstags-Countdown',
+          content: 'Gezählt wird von heute (deutsche Zeit) bis zum nächsten Geburtstag. Ist er in diesem Jahr schon vorbei, nimmt der Rechner den Geburtstag im nächsten Jahr. Am Geburtstag selbst erscheint „Heute ist Ihr Geburtstag!“.\n- **Tage und Wochen**: z. B. 353 Tage = 50 Wochen und 3 Tage.\n- **Wochentag des Geburtstags**: Der 24.10.2027 ist ein Sonntag.\n- **Neues Alter**: Geburtsjahr 1996, Geburtstag 2027 → 31 Jahre.\n- **Runder Geburtstag**: der nächste 10er-Geburtstag mit Datum, Wochentag und Tagen bis dahin.',
+        },
+        {
+          title: 'Wochentag der Geburt und Wochentag des Geburtstags',
+          content: 'Ein normales Jahr hat 365 Tage, das sind 52 Wochen und 1 Tag. Deshalb rückt Ihr Geburtstag jedes Jahr um einen Wochentag weiter, nach einem 29. Februar um zwei. Fällt der 14.08. im Jahr 2026 auf einen Freitag, ist er 2027 ein Samstag. Den Wochentag Ihrer Geburt zeigt der Rechner ebenfalls: Der 14.08.1992 war ein Freitag, der 24.10.1996 ein Donnerstag.',
+        },
+        {
+          title: 'Geburtstag am 29. Februar',
+          content: 'In Schaltjahren wie 2028 fällt der Geburtstag auf den 29.02. In den übrigen Jahren zeigt der Rechner den 28.02. Rechtlich vollendet sich das Lebensjahr mit Ablauf des 28. Februar (§ 187 Abs. 2, § 188 Abs. 2 BGB). Das neue Alter gilt also ab dem 1. März, auch dieses Datum steht im Ergebnis.\n\nIhr genaues Alter in Jahren, Monaten und Tagen berechnet der [Altersrechner](/rechner/altersrechner/), die Tage seit Ihrer Geburt der Rechner [Alter in Tagen](/rechner/alter-in-tagen/). Einen Countdown zu jedem anderen Datum bietet der [Tagerechner](/rechner/tage-zwischen-zwei-daten/).',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wann schaltet der Rechner auf das nächste Lebensjahr um?', answer: 'Exakt um 00:00 Uhr des Geburtstages; an Ihrem Ehrentag selbst zeigt der Countdown "Heute ist Ihr Geburtstag!" an.' },
-      { question: 'Wie viele Tage hat das persönliche Lebensjahr?', answer: '365 Tage, es sei denn, in den 12 Monaten bis zum nächsten Geburtstag liegt ein 29. Februar (dann sind es 366 Tage).' },
+      {
+        question: 'Wie viele Tage sind es noch bis zu meinem Geburtstag?',
+        answer: 'Geben Sie Ihr Geburtsdatum ein, der Rechner zählt ab heute bis zum nächsten Geburtstag. Ist er in diesem Jahr schon vorbei, zählt er bis zum Geburtstag im nächsten Jahr. Wer am 24.10. Geburtstag hat, wartet am 05.11.2026 noch 353 Tage.',
+      },
+      {
+        question: 'An welchem Wochentag wurde ich geboren?',
+        answer: 'Der Rechner zeigt den Wochentag Ihrer Geburt direkt im Ergebnis. Der 14.08.1992 war zum Beispiel ein Freitag, der 29.02.2000 ein Dienstag. Grundlage ist der gregorianische Kalender.',
+      },
+      {
+        question: 'Auf welchen Wochentag fällt mein Geburtstag nächstes Jahr?',
+        answer: 'In der Regel auf den folgenden Wochentag, weil 365 Tage 52 Wochen und 1 Tag sind. Liegt ein 29. Februar dazwischen, springt der Geburtstag um zwei Wochentage. Der Rechner zeigt den Wochentag Ihres nächsten Geburtstags automatisch an.',
+      },
+      {
+        question: 'Wie alt werde ich an meinem nächsten Geburtstag?',
+        answer: 'Ziehen Sie das Geburtsjahr vom Jahr des nächsten Geburtstags ab. Wer 1996 geboren ist und am 24.10.2027 Geburtstag hat, wird 31. Der Rechner nennt außerdem Datum und Wochentag Ihres nächsten runden Geburtstags.',
+      },
+      {
+        question: 'Wann haben am 29. Februar Geborene in Nicht-Schaltjahren Geburtstag?',
+        answer: 'Der Rechner zeigt in Nicht-Schaltjahren den 28. Februar, an dem viele feiern. Rechtlich vollendet sich das Lebensjahr mit Ablauf des 28. Februar, das neue Alter gilt ab dem 1. März. Beide Daten stehen im Ergebnis.',
+      },
     ],
-    relatedSlugs: ['geburtstagsrechner', 'altersrechner', 'countdown-rechner'],
+    relatedSlugs: ['altersrechner', 'alter-in-tagen', 'tage-zwischen-zwei-daten', 'altersunterschied', 'tage-bis-weihnachten', 'schaltjahr-rechner'],
   },  {
     id: 'wochen-zwischen-daten',
     slug: 'wochen-zwischen-daten',
@@ -713,17 +761,27 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Tagerechner',
     category: 'datum-zeit',
     subcategory: 'Datumsdifferenz',
-    metaTitle: 'Tagerechner: Tage zwischen zwei Daten berechnen',
-    metaDescription: 'Mit dem Tagerechner berechnest du Tage, Wochen sowie volle Jahre, Monate und Tage zwischen zwei Daten – bis oder seit einem Datum.',
+    metaTitle: 'Tagerechner: Tage, Wochen & Monate zwischen zwei Daten',
+    metaDescription: 'Kostenloser Tagerechner: Tage, Wochen und Monate zwischen zwei Daten zählen – auch bis oder seit heute, mit Countdown in Stunden und Minuten.',
     h1: 'Tagerechner: Tage zwischen zwei Daten berechnen',
-    shortDescription: 'Berechnet die exakte Anzahl von Kalendertagen, vollen Wochen und Jahren zwischen zwei Daten – wahlweise als Zeitspanne, Countdown bis zu einem Termin oder vergangene Tage seit einem Stichtag.',
+    shortDescription: 'Zählt die Kalendertage zwischen zwei Daten und zeigt das Ergebnis zusätzlich in Wochen, Monaten und Jahren. Mit Countdown bis zu einem Termin und Zählung seit einem Stichtag.',
     searchKeywords: [
       'tagerechner',
       'tage zwischen zwei daten',
       'tage zwischen zwei daten berechnen',
+      'wochen zwischen zwei daten',
+      'wie viele wochen zwischen zwei daten',
+      'monate zwischen zwei daten',
+      'monate zwischen zwei daten berechnen',
+      'anzahl monate berechnen',
+      'monatsdifferenz rechner',
+      'countdown rechner',
+      'countdown bis datum',
       'tage bis datum',
       'tage seit datum',
       'wieviele tage bis',
+      'tage bis urlaub',
+      'tage bis silvester',
       'tage zählen',
       'kalendertage rechner',
       'zeitspanne berechnen',
@@ -743,88 +801,127 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '1960-03-01' },
       { id: 'endDate', label: 'Enddatum', type: 'date', defaultValue: '2026-12-31' },
       {
+        id: 'targetTime',
+        label: 'Uhrzeit am Zieltag (für den Countdown)',
+        type: 'select',
+        defaultValue: '00:00',
+        options: generateTimeOptions(),
+        helpText: 'Für die Restzeit in Stunden und Minuten ab jetzt (deutsche Zeit).',
+        dependsOn: { field: 'mode', value: 'until' },
+      },
+      {
         id: 'includeStartDay',
         label: 'Starttag mitzählen (+1 Tag)',
         type: 'boolean',
         defaultValue: false,
-        helpText: 'Aktivieren, wenn Start- und Endtag beidseitig voll mitgezählt werden sollen (z. B. für Urlaube oder Fristen).',
+        helpText: 'Aktivieren, wenn Start- und Endtag beide voll zählen sollen (z. B. Urlaub von Montag bis Freitag = 5 Tage).',
       },
     ],
     calculate: calculateTagerechner,
-    formula: 'Tage = Kalendertage(Enddatum) - Kalendertage(Startdatum) [+ 1 Tag bei Starttag-Zählung]',
-    formulaExplanation: 'Astronomisch und kalendarisch exakte Tageszählung unter vollständiger Einbeziehung aller Schalttage (inkl. 29. Februar) und monatsspezifischer Tageslängen (28, 29, 30 oder 31 Tage). Die Umrechnung erfolgt strikt kalendertreu ohne ungenaue 30,44- oder 365-Tage-Durchschnitte.',
+    formula: 'Tage = Enddatum − Startdatum (+1 bei Starttag-Zählung) | Wochen = Tage ÷ 7 | Monate = volle Kalendermonate ab dem Startdatum + Resttage',
+    formulaExplanation: 'Der Rechner wandelt beide Daten in fortlaufende Tagesnummern um und bildet die Differenz. Monatslängen von 28 bis 31 Tagen und alle Schalttage sind damit automatisch richtig. Monate zählt er ab dem Startdatum; fehlt der Starttag im Zielmonat (z. B. der 31.), gilt der letzte Tag dieses Monats.',
     workedExample: {
       title: 'Beispiel 1: Historischer Zeitraum (01.03.1960 bis heute)',
-      description: 'Berechnet alle vergangenen Tage, vollen Wochen sowie die exakte Spanne in Jahren, Monaten und Tagen seit dem 1. März 1960.',
+      description: 'Modus „Tage seit einem Datum“: Vom 01.03.1960 bis zum 05.11.2026 sind es 24.355 Tage. Das sind 3.479 Wochen und 2 Tage oder 66 Jahre, 8 Monate und 4 Tage. Der Wert steigt jeden Tag um 1.',
       inputs: { mode: 'since', startDate: '1960-03-01', includeStartDay: false },
-      resultSummary: 'Exakte Tages- und Jahreszählung unter Berücksichtigung aller zwischenliegenden Schaltjahre',
+      resultSummary: '24.355 Tage (Stand 05.11.2026)',
     },
     workedExamples: [
       {
         title: 'Beispiel 1: Historischer Zeitraum (01.03.1960 bis heute)',
-        description: 'Berechnet alle vergangenen Tage, vollen Wochen sowie die exakte Spanne in Jahren, Monaten und Tagen seit dem 1. März 1960.',
+        description: 'Modus „Tage seit einem Datum“: Vom 01.03.1960 bis zum 05.11.2026 sind es 24.355 Tage. Das sind 3.479 Wochen und 2 Tage oder 66 Jahre, 8 Monate und 4 Tage. Der Wert steigt jeden Tag um 1.',
         inputs: { mode: 'since', startDate: '1960-03-01', includeStartDay: false },
-        resultSummary: 'Exakte Tages- und Jahreszählung unter Berücksichtigung aller zwischenliegenden Schaltjahre',
+        resultSummary: '24.355 Tage (Stand 05.11.2026)',
       },
       {
-        title: 'Beispiel 2: Zukunftsplanung (Heute bis zum 05.10.2050)',
-        description: 'Ermittelt die exakt verbleibenden Kalendertage und Wochen bis zum 5. Oktober 2050 für langfristige Finanz-, Renten- oder Projektplanungen.',
-        inputs: { mode: 'until', endDate: '2050-10-05', includeStartDay: false },
-        resultSummary: 'Kalendergenaue Tagesdifferenz bis zum Stichtag 2050',
+        title: 'Beispiel 2: Countdown (heute bis zum 05.10.2050)',
+        description: 'Modus „Tage bis zu einem Datum“: Am 05.11.2026 liegen bis zum 05.10.2050 noch 8.735 Tage. Das sind 1.247 Wochen und 6 Tage oder 23 Jahre und 11 Monate. Mit Uhrzeit zeigt der Rechner zusätzlich die Restzeit in Stunden und Minuten ab jetzt.',
+        inputs: { mode: 'until', endDate: '2050-10-05', targetTime: '00:00', includeStartDay: false },
+        resultSummary: '8.735 Tage (Stand 05.11.2026)',
       },
       {
-        title: 'Beispiel 3: Gleicher Tag (Same-Day mit und ohne Starttag)',
-        description: 'Liegen Start- und Enddatum auf demselben Tag (z. B. 15.05.2026 bis 15.05.2026), beträgt die reine Differenz 0 Tage (0 Wochen). Wird „Starttag mitzählen“ aktiviert, wird der Kalendertag selbst einbezogen und der Rechner weist exakt 1 Kalendertag aus.',
+        title: 'Beispiel 3: Wochen und Monate (01.01.2026 bis 30.06.2026)',
+        description: 'Zwischen dem 01.01.2026 und dem 30.06.2026 liegen 180 Tage. 180 ÷ 7 ergibt 25 Wochen und 5 Tage. Kalendarisch sind es 5 Monate (bis 01.06.2026) und 29 Tage.',
+        inputs: { mode: 'between', startDate: '2026-01-01', endDate: '2026-06-30', includeStartDay: false },
+        resultSummary: '180 Tage = 25 Wochen und 5 Tage = 5 Monate und 29 Tage',
+      },
+      {
+        title: 'Beispiel 4: Monatsende (31.01.2026 bis 01.03.2026)',
+        description: 'Der Februar 2026 hat nur 28 Tage. Ein Monat ab dem 31.01.2026 endet deshalb am 28.02.2026. Bis zum 01.03.2026 sind es 29 Tage, also 1 Monat und 1 Tag.',
+        inputs: { mode: 'between', startDate: '2026-01-31', endDate: '2026-03-01', includeStartDay: false },
+        resultSummary: '29 Tage = 1 Monat und 1 Tag',
+      },
+      {
+        title: 'Beispiel 5: Gleicher Tag (Same-Day mit und ohne Starttag)',
+        description: 'Liegen Start- und Enddatum auf demselben Tag (15.05.2026 bis 15.05.2026), beträgt die Differenz 0 Tage. Mit „Starttag mitzählen“ zählt der Tag selbst, das Ergebnis ist 1 Tag.',
         inputs: { mode: 'between', startDate: '2026-05-15', endDate: '2026-05-15', includeStartDay: false },
-        resultSummary: '0 Tage (ohne Starttag) bzw. 1 Kalendertag (mit Starttag)',
+        resultSummary: '0 Tage (ohne Starttag) bzw. 1 Tag (mit Starttag)',
       },
       {
-        title: 'Beispiel 4: Schaltjahr-Übergang (28.02.2024 bis 01.03.2024)',
-        description: 'Da 2024 ein Schaltjahr ist, existiert der 29. Februar. Die Differenz beträgt ohne Starttag exakt 2 Tage (28.02. → 29.02. → 01.03.), mit Starttag 3 Tage.',
+        title: 'Beispiel 6: Schaltjahr (28.02.2024 bis 01.03.2024)',
+        description: '2024 ist ein Schaltjahr, der 29. Februar liegt dazwischen. Die Differenz beträgt 2 Tage, mit Starttag 3 Tage. Im Jahr 2026 wären es nur 1 bzw. 2 Tage.',
         inputs: { mode: 'between', startDate: '2024-02-28', endDate: '2024-03-01', includeStartDay: false },
-        resultSummary: '2 Tage (bzw. 3 Tage inklusive Starttag)',
+        resultSummary: '2 Tage (bzw. 3 Tage mit Starttag)',
       },
     ],
     content: {
-      intro: 'Mit diesem Tagerechner berechnen Sie präzise die Anzahl der Kalendertage, vollen Wochen sowie die exakte Spanne in Jahren, Monaten und Tagen zwischen zwei beliebigen Terminen. Er unterstützt drei Betriebsmodi: die freie Zeitspanne zwischen zwei Daten, den Countdown bis zu einem Zieldatum sowie das Ermitteln vergangener Tage seit einem historischen Stichtag.',
-      details: '### Tage zwischen zwei Daten berechnen\n\nFür Projektplanungen, Fristenkontrollen, Vertragslaufzeiten oder Urlaubsreisen ist die genaue Kenntnis der Kalendertage unerlässlich. Der Tagerechner ermittelt die Differenz auf Tagesbasis und weist zusätzlich aus, wie viele volle Kalenderwochen und verbleibende Einzeltage darin enthalten sind. Zudem wird die kalendarische Distanz in vollen Jahren, Monaten und Resttagen aufgeschlüsselt.\n\n### Wie viele Tage sind es bis zu einem Datum?\n\nIm Modus **Tage bis zu einem Datum** dient das heutige Tagesdatum (bezogen auf die deutsche Zeitzone *Europe/Berlin*) als automatischer Startpunkt. Geben Sie einfach Ihr gewünschtes Zieldatum ein – etwa für den nächsten Urlaub, eine behördliche Einreichungsfrist oder das Jahresende. Der Rechner liefert Ihnen sofort die exakte Tages- und Wochenzahl bis zu diesem Tag. Für den Countdown zu Heiligabend steht Ihnen zudem unser spezialisierter [Tage bis Weihnachten](/rechner/tage-bis-weihnachten/) zur Verfügung.\n\n### Wie viele Tage sind seit einem Datum vergangen?\n\nIm Modus **Tage seit einem Datum** setzen Sie den Fokus auf die Vergangenheit. Egal ob Firmenjubiläum, Geburtstag, Hochzeitstag oder ein historisches Ereignis wie der 01.03.1960: Der Rechner zeigt Ihnen auf den Tag genau, wie viele Tage und Wochen seither vergangen sind.\n\n### Zählt der Starttag mit?\n\nIm deutschen Rechtsverkehr gilt nach **§ 187 Abs. 1 BGB** (Ereignisfrist), dass der Tag, in den das auslösende Ereignis fällt, bei der Fristberechnung nicht mitgerechnet wird. Die Frist beginnt erst mit Beginn des Folgetages. Für reine Zeitspannenberechnungen (z. B. die Dauer eines Krankenhausaufenthalts oder Urlaubs von Montag bis Mittwoch) werden hingegen häufig beide Grenztage voll beansprucht. Über die Option **Starttag mitzählen** können Sie mit einem Klick zwischen beiden Zählweisen wechseln (+1 Tag bei aktiver Option).\n\n### So werden Schaltjahre und Monate berücksichtigt\n\nIm Gegensatz zu vereinfachten Online-Tools teilt dieser Rechner nicht pauschal durch 30,44 oder 365. Stattdessen wird jeder Monat nach seiner echten gregorianischen Länge (28, 29, 30 oder 31 Tage) berechnet. Alle zwischenliegenden Schaltjahre – inklusive des 29. Februars – werden exakt berücksichtigt. Dadurch entstehen weder Rundungsfehler noch Verzerrungen durch Sommer-/Winterzeit-Umstellungen.\n\n### Beispiele: vom 01.03.1960 bis heute und bis zum 05.10.2050\n\n- **01.03.1960 bis heute**: Da 1960 selbst ein Schaltjahr war (der 29. Februar lag jedoch vor dem 1. März), werden alle nachfolgenden Schalttage lückenlos gezählt. Bis heute sind über 24.000 Tage vergangen.\n- **Heute bis zum 05.10.2050**: Ermittelt die präzise Distanz für langfristige Vorsorge-, Spar- und Rentenplanungen unter Berücksichtigung aller zukünftigen Schaltjahre (2028, 2032, 2036, 2040, 2044, 2048).\n- **Gleicher Tag (Same-Day) mit und ohne Starttag**: Liegen Start- und Enddatum auf demselben Tag (z. B. 15.05.2026 bis 15.05.2026), beträgt die reine Differenz 0 Tage (0 Wochen). Wird das Häkchen „Starttag mitzählen“ aktiviert, wird der Tag selbst voll mitgezählt und das Tool weist exakt 1 Kalendertag aus.\n- **28.02.2024 bis 01.03.2024**: Im Schaltjahr 2024 liegt der 29. Februar dazwischen. Die Differenz beträgt daher genau 2 Tage (ohne Starttag) bzw. 3 Tage (mit Starttag).\n\nErgänzend können Sie auch unseren [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/) für 5-Tage-Wochen mit Feiertagen, den [Werktage-Rechner](/rechner/werktage-rechner/) (Mo–Sa), den [Altersrechner](/rechner/altersrechner/), den [Schaltjahr-Rechner](/rechner/schaltjahr-rechner/) sowie [Datum plus Tage](/rechner/datum-plus-tage/) und [Datum minus Tage](/rechner/datum-minus-tage/) nutzen.',
+      intro: 'Der Tagerechner zählt die Kalendertage zwischen zwei Daten und rechnet sie sofort in Wochen, Monate und Jahre um. Wählen Sie oben, ob Sie eine freie Zeitspanne berechnen, die Tage bis zu einem Termin herunterzählen oder die Tage seit einem Stichtag ermitteln möchten. Schaltjahre und unterschiedliche Monatslängen sind immer eingerechnet.',
+      sections: [
+        {
+          title: 'Tage, Wochen und Monate zwischen zwei Daten',
+          content: 'Das Ergebnis erscheint in mehreren Einheiten:\n- **Kalendertage**: die reine Differenz, z. B. 180 Tage vom 01.01.2026 bis 30.06.2026.\n- **Wochen und Tage**: 180 ÷ 7 = 25 Wochen und 5 Tage.\n- **Monate und Tage**: volle Kalendermonate ab dem Startdatum plus Resttage, hier 5 Monate und 29 Tage.\n- **Jahre, Monate und Tage**: für lange Zeiträume, etwa 90 Jahre, 7 Monate und 4 Tage vom 01.03.1960 bis 05.10.2050.\n- **Stunden und Minuten**: 24 Stunden je Kalendertag, z. B. 4.320 Stunden für 180 Tage.\n\nWochen ergeben sich direkt aus der Tageszahl. Monate zählt der Rechner kalendergenau: Ein Monat ist voll, sobald derselbe Tag im Folgemonat erreicht ist.',
+        },
+        {
+          title: 'Countdown: Wie viele Tage noch bis zu einem Datum?',
+          content: 'Im Modus **Tage bis zu einem Datum** beginnt die Zählung automatisch heute (deutsche Zeit). Sie geben nur das Zieldatum ein, etwa den ersten Urlaubstag oder eine Abgabefrist. Mit der optionalen Uhrzeit sehen Sie zusätzlich die Restzeit ab jetzt in Tagen, Stunden und Minuten. Die Umstellung zwischen Sommer- und Winterzeit ist dabei eingerechnet.\n\nÜber die Schnellwahl springen Sie direkt zu Heiligabend, Silvester, Neujahr oder Ostern. Im Modus **Tage seit einem Datum** zählt der Rechner umgekehrt bis heute, z. B. seit der Hochzeit oder dem Arbeitsbeginn. Für Weihnachten gibt es den Rechner [Tage bis Weihnachten](/rechner/tage-bis-weihnachten/), für Ihren nächsten Geburtstag den Rechner [Tage bis Geburtstag](/rechner/tage-bis-geburtstag/).',
+        },
+        {
+          title: 'Monate zählen: Was gilt am Monatsende?',
+          content: 'Nicht jeder Monat hat einen 30. oder 31. Tag. Fehlt der Starttag im Zielmonat, nimmt der Rechner den letzten Tag dieses Monats:\n- 15.01.2026 bis 15.10.2026 = genau 9 Monate (273 Tage).\n- 31.01.2026 bis 28.02.2026 = 1 Monat, weil der Februar 2026 am 28. endet.\n- 31.01.2026 bis 01.03.2026 = 1 Monat und 1 Tag (29 Tage).\n\nDamit gilt immer: Startdatum plus die angezeigten Monate plus die Resttage ergibt genau das Enddatum. Verträge können für Kündigungs- oder Mietfristen eine eigene Zählweise festlegen.',
+        },
+        {
+          title: 'Starttag mitzählen oder nicht?',
+          content: 'Standardmäßig zeigt der Rechner die Differenz: Vom 15.05. bis zum 15.05. sind es 0 Tage. Das entspricht der Fristberechnung nach **§ 187 Abs. 1 BGB**, bei der der Tag des Ereignisses nicht mitzählt. Bei Urlaub, Klinikaufenthalten oder Veranstaltungen zählen dagegen meist beide Tage. Setzen Sie dann das Häkchen bei „Starttag mitzählen“: Montag bis Freitag ergibt 5 statt 4 Tage. Nur Arbeitstage ohne Wochenenden und Feiertage zählt der [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/).',
+        },
+      ],
+      details: 'Alle Berechnungen laufen tagesgenau nach dem gregorianischen Kalender. Schalttage wie der 29.02.2024 oder der 29.02.2028 zählen als normale Kalendertage. Ein Datum um eine bestimmte Zahl von Tagen verschieben Sie mit [Datum plus Tage](/rechner/datum-plus-tage/). Ihr genaues Alter zeigt der [Altersrechner](/rechner/altersrechner/), ob ein Jahr ein Schaltjahr ist, prüft der [Schaltjahr-Rechner](/rechner/schaltjahr-rechner/).',
     },
     faqs: [
       {
-        question: 'Wie berechnet der Tagerechner die Tage zwischen zwei Daten?',
-        answer: 'Der Rechner ermittelt die astronomisch exakte Differenz fortlaufender Kalendertage unter Berücksichtigung der tatsächlichen Monatslängen und aller Schalttage. Es werden keine ungenauen Näherungswerte verwendet.',
+        question: 'Wie viele Wochen liegen zwischen zwei Daten?',
+        answer: 'Teilen Sie die Zahl der Tage durch 7, der Rest sind die übrigen Tage. Vom 01.01.2026 bis 30.06.2026 sind es 180 Tage, also 25 Wochen und 5 Tage. Der Rechner zeigt Wochen und Resttage automatisch an.',
       },
       {
-        question: 'Wie viele Tage sind es bis zu einem bestimmten Datum?',
-        answer: 'Wählen Sie den Modus „Tage bis zu einem Datum“. Der Rechner setzt automatisch das heutige Datum in Berlin als Start und berechnet die verbleibenden Kalendertage und vollen Wochen bis zu Ihrem Wunschtermin.',
+        question: 'Wie berechne ich die Monate zwischen zwei Daten?',
+        answer: 'Zählen Sie vom Startdatum aus volle Kalendermonate und addieren Sie die übrigen Tage. Vom 15.01.2026 bis 15.10.2026 sind es genau 9 Monate. Eine Faustformel mit 30 Tagen pro Monat liefert bei langen Zeiträumen falsche Werte.',
       },
       {
-        question: 'Wie viele Tage sind seit einem Datum vergangen?',
-        answer: 'Wählen Sie den Modus „Tage seit einem Datum“ und tragen Sie Ihr historisches Startdatum ein. Der Rechner ermittelt sekundenschnell, wie viele Tage, Wochen, Monate und Jahre seitdem vergangen sind.',
+        question: 'Wie viele Tage sind es noch bis zu einem bestimmten Datum?',
+        answer: 'Wählen Sie „Tage bis zu einem Datum“ und tragen Sie das Zieldatum ein. Der Rechner zählt ab heute und zeigt Tage, Wochen und die Restzeit in Stunden und Minuten. Am 05.11.2026 sind es zum Beispiel 56 Tage bis Silvester.',
       },
       {
-        question: 'Zählt der Starttag bei der Berechnung mit?',
-        answer: 'Standardmäßig wird die Differenz berechnet (Starttag zählt als Tag 0, Endtag als Tag X). Aktivieren Sie das Häkchen „Starttag mitzählen“, wenn sowohl der erste als auch der letzte Tag voll eingerechnet werden sollen (+1 Tag).',
+        question: 'Zählt der erste Tag mit, wenn man Tage zwischen zwei Daten berechnet?',
+        answer: 'Standardmäßig nicht: Der Rechner zeigt die Differenz, wie bei Fristen nach § 187 BGB. Sollen beide Tage zählen, etwa bei einem Urlaub von Montag bis Freitag, aktivieren Sie „Starttag mitzählen“. Dann ergeben sich 5 statt 4 Tage.',
       },
       {
-        question: 'Wie werden Schaltjahre und der 29. Februar berücksichtigt?',
-        answer: 'Fällt ein 29. Februar in den ausgewählten Zeitraum (wie im Schaltjahr 2024, 2028 etc.), wird dieser Tag vollumfänglich als eigenständiger Kalendertag mitgezählt.',
+        question: 'Wie lange ist ein Monat, wenn das Startdatum der 31. ist?',
+        answer: 'Hat der Zielmonat weniger Tage, gilt sein letzter Tag als Monatsende. Vom 31.01.2026 bis 28.02.2026 ist daher 1 Monat vergangen, bis zum 01.03.2026 sind es 1 Monat und 1 Tag. So geht die Rechnung Startdatum plus Monate plus Tage immer genau auf.',
       },
       {
-        question: 'Warum rechnet der Tagerechner genauer als Faustformeln mit 30 Tagen pro Monat?',
-        answer: 'Weil Kalendermonate zwischen 28 und 31 Tage lang sind. Eine pauschale Division durch 30 oder 30,44 führt bei längeren Zeiträumen zu Fehlern von mehreren Tagen. Unser Rechner nutzt echte Kalenderarithmetik.',
+        question: 'Werden Schaltjahre beim Tagezählen berücksichtigt?',
+        answer: 'Ja. Jeder 29. Februar im Zeitraum zählt als eigener Tag. Vom 28.02.2024 bis 01.03.2024 sind es deshalb 2 Tage, im Jahr 2026 wäre es nur 1 Tag.',
       },
     ],
-    relatedSlugs: ['datum-plus-tage',
-      'dienstjubilaeum-rechner',
-      'alter-in-tagen',
-      'tage-bis-weihnachten',
+    relatedSlugs: [
+      'datum-plus-tage',
       'arbeitstage-rechner',
-      'werktage-rechner',
-      'datum-minus-tage',
-      'altersrechner',
+      'tage-bis-weihnachten',
       'tage-bis-geburtstag',
-      'schaltjahr-rechner', 'wochen-zwischen-daten', 'monate-zwischen-daten'],
+      'altersrechner',
+      'alter-in-tagen',
+      'dienstjubilaeum-rechner',
+      'schaltjahr-rechner',
+    ],
   },
   {
     id: 'tage-bis-weihnachten',
@@ -886,10 +983,10 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       sections: [
         {
           title: 'Wie viele Samstage sind es noch bis Weihnachten?',
-          content: 'Wer Geschenke oder gemeinsame Termine plant, möchte oft die verbleibenden Wochenenden kennen. Die Zahl der Samstage ist nicht immer gleich der Zahl voller Wochen: Entscheidend ist, auf welchen Wochentag Start- und Zieldatum fallen.\n\nGezählt werden Samstage nach heute bis einschließlich des gewählten Zieldatums.\n\nFür die Planung von arbeitsfreien Tagen und Brückentagen im Büro oder Betrieb beachten Sie bitte den Unterschied zwischen Kalendertagen und regulären Arbeitswochen: Nutzen Sie dafür unseren spezialisierten [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/) oder den [Werktage-Rechner](/rechner/werktage-rechner/).',
+          content: 'Wer Geschenke oder gemeinsame Termine plant, möchte oft die verbleibenden Wochenenden kennen. Die Zahl der Samstage ist nicht immer gleich der Zahl voller Wochen: Entscheidend ist, auf welchen Wochentag Start- und Zieldatum fallen.\n\nGezählt werden Samstage nach heute bis einschließlich des gewählten Zieldatums.\n\nFür die Planung von arbeitsfreien Tagen und Brückentagen im Büro oder Betrieb beachten Sie bitte den Unterschied zwischen Kalendertagen und regulären Arbeitswochen: Nutzen Sie dafür unseren spezialisierten [Arbeitstage- und Werktage-Rechner](/rechner/arbeitstage-rechner/).',
         },
       ],
-      details: '### Wann sind Heiligabend und die Weihnachtsfeiertage?\n\nIm deutschsprachigen Raum beginnt das Weihnachtsfest traditionell am Abend des **24. Dezembers (Heiligabend)** mit der Bescherung. Gesetzliche Feiertage nach den Feiertagsgesetzen aller 16 Bundesländer sind der **1. Weihnachtstag (25. Dezember)** und der **2. Weihnachtstag (26. Dezember)**.\n\nHeiligabend selbst ist in Deutschland kein gesetzlicher Feiertag, sondern ein regulärer Werktag (oft als Bankfeiertag oder tariflicher halber Arbeitstag geregelt).\n\n### Wie wird der Countdown berechnet?\n\nDie Berechnung erfolgt tagesgenau unter Berücksichtigung der mitteleuropäischen Zeitzone (*Europe/Berlin*). Der Rechner zieht das heutige Datum vom Zieldatum ab und schlüsselt das Ergebnis in Kalendertage, ganze Wochen und verbleibende Einzeltage auf. Zudem erfahren Sie direkt, auf welchen Wochentag das nächste Weihnachtsfest fällt.\n\n### Warum schaltet der Rechner nach Weihnachten automatisch um?\n\nSobald der 24. bzw. 25. Dezember des aktuellen Kalenderjahres verstrichen ist, blickt der Rechner automatisch nach vorne: Er kalkuliert nahtlos den Countdown für das Weihnachtsfest des kommenden Kalenderjahres. So bleibt die Seite das ganze Jahr über aktuell und verlässlich.\n\nWenn Sie wissen möchten, wie viele Arbeitstage bis zum Jahresende verbleiben, nutzen Sie unseren [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/). Für beliebige andere Zeitspannen steht Ihnen der allgemeine [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung. Weitere Zeitzähler und Hilfen finden Sie in unserer Themenwelt [Datum & Zeit](/datum-zeit/) sowie im [Countdown-Rechner](/rechner/countdown-rechner/) und beim [Tage bis Geburtstag](/rechner/tage-bis-geburtstag/).',
+      details: '### Wann sind Heiligabend und die Weihnachtsfeiertage?\n\nIm deutschsprachigen Raum beginnt das Weihnachtsfest traditionell am Abend des **24. Dezembers (Heiligabend)** mit der Bescherung. Gesetzliche Feiertage nach den Feiertagsgesetzen aller 16 Bundesländer sind der **1. Weihnachtstag (25. Dezember)** und der **2. Weihnachtstag (26. Dezember)**.\n\nHeiligabend selbst ist in Deutschland kein gesetzlicher Feiertag, sondern ein regulärer Werktag (oft als Bankfeiertag oder tariflicher halber Arbeitstag geregelt).\n\n### Wie wird der Countdown berechnet?\n\nDie Berechnung erfolgt tagesgenau unter Berücksichtigung der mitteleuropäischen Zeitzone (*Europe/Berlin*). Der Rechner zieht das heutige Datum vom Zieldatum ab und schlüsselt das Ergebnis in Kalendertage, ganze Wochen und verbleibende Einzeltage auf. Zudem erfahren Sie direkt, auf welchen Wochentag das nächste Weihnachtsfest fällt.\n\n### Warum schaltet der Rechner nach Weihnachten automatisch um?\n\nSobald der 24. bzw. 25. Dezember des aktuellen Kalenderjahres verstrichen ist, blickt der Rechner automatisch nach vorne: Er kalkuliert nahtlos den Countdown für das Weihnachtsfest des kommenden Kalenderjahres. So bleibt die Seite das ganze Jahr über aktuell und verlässlich.\n\nWenn Sie wissen möchten, wie viele Arbeitstage bis zum Jahresende verbleiben, nutzen Sie unseren [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/). Für beliebige andere Zeitspannen steht Ihnen der allgemeine [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung. Weitere Zeitzähler und Hilfen finden Sie in unserer Themenwelt [Datum & Zeit](/datum-zeit/) sowie beim [Tage bis Geburtstag](/rechner/tage-bis-geburtstag/).',
     },
     faqs: [
       {
@@ -925,11 +1022,11 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Arbeitstage berechnen',
     category: 'datum-zeit',
     subcategory: 'Arbeitstage & Werktage',
-    metaTitle: 'Arbeitstage Rechner – Arbeitstage pro Jahr nach Bundesland',
-    metaDescription: 'Berechnen Sie die gesetzlichen Arbeitstage pro Jahr und Monat für alle 16 Bundesländer inklusive gesetzlicher Feiertage.',
-    h1: 'Arbeitstage Rechner – Arbeitstage im Kalenderjahr ermitteln',
-    shortDescription: 'Ermittelt die exakte Anzahl der Arbeitstage im Jahr oder Monat für alle deutschen Bundesländer mit Feiertagsberechnung.',
-    searchKeywords: ['arbeitstage rechner bundesland', 'arbeitstage rechner', 'arbeitstage berechnen', 'werktage mo fr rechner', 'arbeitstage monat'],
+    metaTitle: 'Arbeitstage & Werktage Rechner – nach Bundesland',
+    metaDescription: 'Arbeitstage (Mo–Fr) und Werktage (Mo–Sa) kostenlos berechnen – für jedes Bundesland mit Feiertagen, pro Monat, Jahr oder beliebigem Zeitraum.',
+    h1: 'Arbeitstage und Werktage berechnen – mit Feiertagen je Bundesland',
+    shortDescription: 'Zählt die Arbeitstage (5-Tage-Woche) oder Werktage (Montag bis Samstag) in einem Zeitraum – mit den gesetzlichen Feiertagen Ihres Bundeslandes.',
+    searchKeywords: ['arbeitstage rechner bundesland', 'arbeitstage rechner', 'arbeitstage berechnen', 'werktage rechner', 'werktage berechnen', 'werktage zwischen zwei daten', 'ist samstag ein werktag', 'arbeitstage monat'],
     inputs: [
       { id: 'startDate', label: 'Startdatum', type: 'date', defaultValue: '2026-01-01' },
       { id: 'endDate', label: 'Enddatum', type: 'date', defaultValue: '2026-01-31' },
@@ -976,13 +1073,29 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       inputs: { startDate: '2026-01-01', endDate: '2026-01-31', workweek: 'mo-fr', excludeHolidays: true, hoursPerDay: 8 },
       resultSummary: '21 Arbeitstage (168 Arbeitsstunden)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel: Januar 2026 (31 Kalendertage, Bundesweit)',
+        description: 'Enthält 21 Arbeitstage (nach Abzug von 1 Feiertag an Neujahr und 9 Wochenendtagen) sowie 168 Arbeitsstunden.',
+        inputs: { startDate: '2026-01-01', endDate: '2026-01-31', workweek: 'mo-fr', excludeHolidays: true, hoursPerDay: 8 },
+        resultSummary: '21 Arbeitstage (168 Arbeitsstunden)',
+      },
+      {
+        title: 'Beispiel: Werktage im Februar 2026 (Montag bis Samstag)',
+        description: 'Der Februar 2026 hat 28 Tage und 4 Sonntage, Feiertage fallen nicht hinein. Es bleiben 24 Werktage – wichtig etwa für Fristen wie die Mietzahlung bis zum dritten Werktag.',
+        inputs: { startDate: '2026-02-01', endDate: '2026-02-28', workweek: 'mo-sa', excludeHolidays: true, hoursPerDay: 8 },
+        resultSummary: '24 Werktage',
+      },
+    ],
     content: {
       intro: 'Die Ermittlung der tatsächlichen Arbeitstage bildet das Fundament für die Pendlerpauschale in der Einkommensteuererklärung sowie für Urlaubs- und Arbeitszeitplanungen.',
-      details: 'Ein typisches Kalenderjahr hat bei einer 5-Tage-Woche (Montag bis Freitag) zwischen 250 und 252 potenzielle Arbeitstage. Nach Abzug von Feiertagen und Urlaub verbleiben meist 200 bis 220 tatsächliche Arbeitstage.\n\n### Unterschied zwischen Arbeitstagen und Werktagen\n\nIm deutschen Arbeits- und Zivilrecht gilt eine zentrale Unterscheidung:\n- **Arbeitstage**: Tage, an denen im Rahmen des individuellen Arbeitsverhältnisses tatsächlich Dienst geleistet werden muss. Im modernen Büro- und Verwaltungsalltag ist dies typischerweise die 5-Tage-Woche von **Montag bis Freitag**.\n- **Werktage**: Gesetzlich definierte Tage nach § 3 Abs. 2 Bundesurlaubsgesetz (BUrlG) und dem Bürgerlichen Gesetzbuch (BGB). Hierzu zählen alle Tage von **Montag bis einschließlich Samstag** (6-Tage-Woche), sofern kein gesetzlicher Feiertag vorliegt. Relevanz besitzt dieser Begriff bei Kündigungsfristen, Mietzahlungen (§ 556b Abs. 1 BGB) und Ladenschlussgesetzen.\n\nFür Fristen auf 6-Tage-Basis nutzen Sie unseren spezialisierten [Werktage-Rechner](/rechner/werktage-rechner/). Für beliebige Zeitspannen zwischen zwei Daten steht Ihnen unser [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung.',
+      details: 'Ein typisches Kalenderjahr hat bei einer 5-Tage-Woche (Montag bis Freitag) zwischen 250 und 252 potenzielle Arbeitstage. Nach Abzug von Feiertagen und Urlaub verbleiben meist 200 bis 220 tatsächliche Arbeitstage.\n\n### Unterschied zwischen Arbeitstagen und Werktagen\n\nIm deutschen Arbeits- und Zivilrecht gilt eine zentrale Unterscheidung:\n- **Arbeitstage**: Tage, an denen im Rahmen des individuellen Arbeitsverhältnisses tatsächlich Dienst geleistet werden muss. Im modernen Büro- und Verwaltungsalltag ist dies typischerweise die 5-Tage-Woche von **Montag bis Freitag**.\n- **Werktage**: Gesetzlich definierte Tage nach § 3 Abs. 2 Bundesurlaubsgesetz (BUrlG) und dem Bürgerlichen Gesetzbuch (BGB). Hierzu zählen alle Tage von **Montag bis einschließlich Samstag** (6-Tage-Woche), sofern kein gesetzlicher Feiertag vorliegt. Relevanz besitzt dieser Begriff bei Kündigungsfristen, Mietzahlungen (§ 556b Abs. 1 BGB) und Ladenschlussgesetzen.\n\nFür Fristen auf 6-Tage-Basis wählen Sie oben die Option „Montag bis Samstag“. Für beliebige Zeitspannen zwischen zwei Daten steht Ihnen unser [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung.',
     },
     faqs: [
       { question: 'Wie viele Arbeitstage erkennt das Finanzamt bei einer 5-Tage-Woche pauschal an?', answer: 'Die meisten Finanzämter akzeptieren ohne gesonderte Einzelnachweise 220 bis 230 Arbeitstage pro Jahr für die Entfernungspauschale.' },
       { question: 'Müssen Feiertage am Wochenende abgezogen werden?', answer: 'Nein, Feiertage, die ohnehin auf einen Samstag oder Sonntag fallen, mindern die reguläre Arbeitszeit nicht zusätzlich.' },
+      { question: 'Ist der Samstag ein Werktag?', answer: 'Ja. Nach § 3 Abs. 2 Bundesurlaubsgesetz und für Fristen im BGB zählt der Samstag als Werktag, Sonn- und Feiertage dagegen nicht. Wählen Sie oben „Montag bis Samstag“, um Werktage statt Arbeitstage zu zählen.' },
+      { question: 'Zählen regionale Feiertage wie Fronleichnam als Werktage?', answer: 'Nein, nicht in den Bundesländern, in denen sie gesetzliche Feiertage sind – etwa Fronleichnam in Bayern oder NRW. Wählen Sie Ihr Bundesland, dann zieht der Rechner genau diese Feiertage ab.' },
     ],
     relatedSlugs: ['tage-zwischen-zwei-daten', 'werktage-rechner', 'tage-bis-weihnachten', 'tage-zwischen-zwei-daten', 'altersrechner', 'arbeitszeitrechner', 'urlaubstage-rechner'],
   },
@@ -1061,17 +1174,28 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Datum + Tage',
     category: 'datum-zeit',
     subcategory: 'Datumsdifferenz',
-    metaTitle: 'Datum plus Tage Rechner – Welches Datum ist in X Tagen?',
-    metaDescription: 'Addieren Sie Tage zu einem Datum und erfahren Sie sofort das Zieldatum, den Wochentag und die Kalenderwoche.',
-    h1: 'Datum plus Tage berechnen',
-    shortDescription: 'Addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum.',
-    searchKeywords: ['datum plus tage', 'datum addieren', 'welches datum ist in 30 tagen', 'tage dazurechnen'],
+    metaTitle: 'Datum plus/minus Tage – Welches Datum ist in X Tagen?',
+    metaDescription: 'Tage zu einem Datum addieren oder abziehen: Zieldatum, Wochentag und Kalenderwoche sofort berechnen – kostenlos und ohne Anmeldung.',
+    h1: 'Datum plus oder minus Tage berechnen',
+    shortDescription: 'Addiert oder subtrahiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum.',
+    searchKeywords: ['datum plus tage', 'datum addieren', 'welches datum ist in 30 tagen', 'tage dazurechnen', 'datum minus tage', 'datum subtrahieren', 'welches datum war vor 30 tagen'],
     inputs: [
+      {
+        id: 'operation',
+        label: 'Rechenart',
+        type: 'select',
+        defaultValue: 'add',
+        options: [
+          { value: 'add', label: 'Tage addieren (in die Zukunft)' },
+          { value: 'subtract', label: 'Tage abziehen (in die Vergangenheit)' },
+        ],
+      },
       { id: 'startDate', label: 'Ausgangsdatum', type: 'date', defaultValue: '2026-03-01' },
-      { id: 'days', label: 'Hinzuzufügende Tage', type: 'number', defaultValue: 14, min: 0, unit: 'Tage' },
+      { id: 'days', label: 'Anzahl Tage', type: 'number', defaultValue: 14, min: 0, unit: 'Tage' },
     ],
-    calculate: (inputs) => calculateDateAdd({ ...inputs, operation: 'add' }),
-    formula: 'Zieldatum = Ausgangsdatum + n Tage',
+    calculate: (inputs) =>
+      calculateDateAdd({ ...inputs, operation: inputs.operation === 'subtract' ? 'subtract' : 'add' }),
+    formula: 'Zieldatum = Ausgangsdatum ± n Tage',
     formulaExplanation: 'Kalendarische Addition unter Berücksichtigung von Monatsüberläufen.',
     workedExample: {
       title: 'Beispiel: 01.03.2026 plus 14 Tage',
@@ -1079,15 +1203,31 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       inputs: { startDate: '2026-03-01', days: 14 },
       resultSummary: '15.03.2026',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel: 01.03.2026 plus 14 Tage',
+        description: 'Ergibt Sonntag, den 15.03.2026 – etwa das Ende eines Zahlungsziels „zahlbar innerhalb von 14 Tagen“.',
+        inputs: { operation: 'add', startDate: '2026-03-01', days: 14 },
+        resultSummary: '15.03.2026',
+      },
+      {
+        title: 'Beispiel: 01.05.2026 minus 30 Tage',
+        description: 'Mit „Tage abziehen“ ergibt sich Mittwoch, der 01.04.2026 – praktisch, um eine Vorlauffrist rückwärts zu bestimmen.',
+        inputs: { operation: 'subtract', startDate: '2026-05-01', days: 30 },
+        resultSummary: '01.04.2026',
+      },
+    ],
     content: {
-      intro: 'Dieser Zukunftsrechner addiert eine beliebige Anzahl von Tagen zu einem Ausgangsdatum und ermittelt das exakte Zieldatum samt Wochentag.',
+      intro: 'Dieser Rechner addiert Tage zu einem Datum oder zieht sie ab und ermittelt das exakte Zieldatum samt Wochentag – etwa für Zahlungsziele, Lieferfristen oder Vorlaufzeiten.',
       details: 'Berücksichtigt präzise Monatsgrenzen (28, 29, 30 oder 31 Tage) und Schaltjahre. Ideal zur Bestimmung von Zahlungszielen (z. B. "zahlbar innerhalb von 14 Tagen") oder Lieferfristen.',
     },
     faqs: [
       { question: 'Wie berechnet man eine 14-tägige Frist nach BGB?', answer: 'Nach § 187 Abs. 1 BGB zählt der Tag des Zugangs nicht mit; die Frist beginnt am darauffolgenden Tag und endet mit Ablauf des 14. Tages.' },
       { question: 'Fällt das Ergebnis bei Addition von Vielfachen von 7 immer auf denselben Wochentag?', answer: 'Ja, jede Addition von 7, 14, 21, 28 etc. Tagen landet exakt auf demselben Wochentag wie das Startdatum.' },
+      { question: 'Wie ermittelt man den spätesten Absendetermin bei einer 4-wöchigen Kündigungsfrist?', answer: 'Wählen Sie „Tage abziehen“, ziehen Sie 28 Kalendertage vom Fristende ab und rechnen Sie 2 bis 3 Tage Postlaufzeit als Puffer ein.' },
+      { question: 'Was geschieht beim Abziehen über einen Schalttag hinweg?', answer: 'Fällt der 29. Februar in den Zeitraum, wird er automatisch als vollwertiger Tag mitgezählt.' },
     ],
-    relatedSlugs: ['tage-zwischen-zwei-daten', 'dienstjubilaeum-rechner', 'alter-in-tagen', 'datum-minus-tage', 'arbeitstage-rechner'],
+    relatedSlugs: ['tage-zwischen-zwei-daten', 'dienstjubilaeum-rechner', 'alter-in-tagen', 'arbeitstage-rechner'],
   },
   {
     id: 'datum-minus-tage',

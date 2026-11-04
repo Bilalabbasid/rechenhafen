@@ -14,10 +14,10 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     category: 'einheiten',
     subcategory: 'Länge & Distanz',
     metaTitle: 'Längenumrechner: Meter, Zentimeter, Zoll, Fuß & Meilen',
-    metaDescription: 'Längeneinheiten sofort umrechnen: Meter, Zentimeter, Millimeter, Kilometer, Zoll (Inch), Fuß, Yard, Meilen und Seemeilen nach exakten NIST-Normen.',
-    h1: 'Längenumrechner – Maßeinheiten präzise umrechnen',
+    metaDescription: 'Längen kostenlos umrechnen: Meter, Zentimeter, Kilometer, Zoll, Fuß, Yard, Meilen und Seemeilen – mit exakten Faktoren und Tabelle.',
+    h1: 'Längenumrechner: Meter, Zoll, Fuß und Meilen umrechnen',
     shortDescription: 'Wandelt Längenmaße zwischen metrischem und imperialem Maßsystem um.',
-    searchKeywords: ['längenumrechner', 'zoll in cm umrechnen', 'inch in cm rechner', 'fuß in meter', 'meilen in km', 'seemeilen umrechnen'],
+    searchKeywords: ['längenumrechner', 'zoll in cm umrechnen', 'inch in cm rechner', 'fuß in meter', 'meilen in km', 'km in meilen', 'meilen km umrechner', 'seemeilen umrechnen'],
     inputs: [
       { id: 'value', label: 'Eingabewert', type: 'number', defaultValue: 1, step: 0.1 },
       {
@@ -63,7 +63,21 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
       description: '55 in × 2,54 = 139,70 cm.',
       inputs: { value: 55, fromUnit: 'in', toUnit: 'cm' },
       resultSummary: '139,70 cm',
-    },
+      },
+    workedExamples: [
+      {
+        title: 'Beispiel: 55 Zoll (TV-Bildschirmdiagonale)',
+        description: '55 in × 2,54 = 139,70 cm.',
+        inputs: { value: 55, fromUnit: 'in', toUnit: 'cm' },
+        resultSummary: '139,70 cm',
+      },
+      {
+        title: 'Beispiel: Marathon in Meilen und Kilometern',
+        description: 'Ein Marathon ist 26,2 Meilen lang: 26,2 × 1,609344 = 42,16 km.',
+        inputs: { value: 26.2, fromUnit: 'mi', toUnit: 'km' },
+        resultSummary: '42,16 km',
+      },
+    ],
     quickReference: [
       {
         title: 'Wichtige Umrechnungsfaktoren auf einen Blick',
@@ -83,6 +97,7 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
       details: 'Die offizielle völkerrechtliche Definition nach NIST lautet seit dem internationalen Abkommen von 1959: 1 Inch (Zoll) = exakt 25,4 Millimeter. 1 Fuß (Foot) = 12 Zoll = 30,48 cm. 1 Yard = 3 Fuß = 91,44 cm. 1 Landmeile = 1.609,344 Meter. Für nautische und maritime Berechnungen gilt: 1 Seemeile = exakt 1.852 Meter.',
     },
     faqs: [
+      { question: 'Wie viele Kilometer sind eine Meile?', answer: 'Eine Landmeile (Statute Mile) entspricht genau 1,609344 Kilometern. Umgekehrt ist ein Kilometer rund 0,621 Meilen. 100 km/h sind also etwa 62 mph.' },
       { question: 'Wie lang ist eine Seemeile (Nautische Meile NM)?', answer: 'Eine Seemeile ist völkerrechtlich auf exakt 1.852 Meter definiert; sie entsprach ursprünglich einer Bogenminute (1/60 Grad) auf einem Meridian der Erdkugel.' },
       { question: 'Sind Zoll und Inch dasselbe Maß?', answer: 'Ja. „Inch“ ist die englische Bezeichnung und „Zoll“ die traditionelle deutsche Übersetzung für dieselbe Längeneinheit (Einheitenzeichen in oder \"). 1 Zoll entspricht exakt 2,54 cm.' },
       { question: 'Wie rechnet man Kilometer in Meilen um?', answer: 'Teilen Sie die Kilometer durch 1,609344 oder multiplizieren Sie mit ca. 0,621371. Beispiel: 100 km ÷ 1,609344 ≈ 62,14 Meilen.' },

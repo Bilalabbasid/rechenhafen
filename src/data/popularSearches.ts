@@ -19,7 +19,7 @@ export const POPULAR_CALCULATOR_SLUGS: string[] = [
   'altersrechner',
   'bmi-rechner',
   'spritkostenrechner',
-  'kreditrechner',
+  'ratenkreditrechner',
   'zinseszinsrechner',
   'stundenlohnrechner',
   'inflationsrechner',
@@ -38,7 +38,7 @@ export const POPULAR_SEARCH_CHIPS: PopularChip[] = [
   { label: 'Alter', slug: 'altersrechner' },
   { label: 'BMI', slug: 'bmi-rechner' },
   { label: 'Spritkosten', slug: 'spritkostenrechner' },
-  { label: 'Kredit', slug: 'kreditrechner' },
+  { label: 'Kredit', slug: 'ratenkreditrechner' },
   { label: 'Zinseszins', slug: 'zinseszinsrechner' },
   { label: 'Stundenlohn', slug: 'stundenlohnrechner' },
 ];

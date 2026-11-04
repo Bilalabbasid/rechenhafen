@@ -10,36 +10,171 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'kreisrechner',
     slug: 'kreisrechner',
-    name: 'Kreisrechner (Fläche, Umfang, Durchmesser & Radius)',
+    name: 'Kreisrechner (Umfang, Fläche, Radius & Durchmesser)',
     shortName: 'Kreis berechnen',
     category: 'geometrie',
     subcategory: '2D-Flächen & Umfang',
-    metaTitle: 'Kreisrechner – Radius, Durchmesser, Fläche & Umfang',
-    metaDescription: 'Berechnen Sie Radius, Durchmesser, Kreisfläche und Kreisumfang aus einem beliebigen bekannten Wert mit Formel und Rechenweg.',
-    h1: 'Kreisrechner – Alle Kreiswerte aus einer Angabe berechnen',
-    shortDescription: 'Ermittelt Radius, Durchmesser, Flächeninhalt und Kreisumfang aus einer einzigen beliebigen Eingabegröße mit Rechenweg.',
-    searchKeywords: ['kreisrechner', 'kreisfläche berechnen', 'umfang kreis formel', 'kreis radius berechnen pi'],
+    metaTitle: 'Kreisrechner – Kreisumfang, Fläche, Radius & Durchmesser',
+    metaDescription: 'Kreis kostenlos berechnen: Aus Radius, Durchmesser, Umfang oder Fläche ergeben sich alle anderen Werte – mit Formel U = 2πr = πd und Rechenweg.',
+    h1: 'Kreisrechner – Kreisumfang, Fläche, Radius und Durchmesser berechnen',
+    shortDescription: 'Starten Sie mit Radius, Durchmesser, Umfang oder Fläche – der Rechner ermittelt alle übrigen Kreiswerte samt Rechenweg, wahlweise in mm, cm, dm, m oder km.',
+    searchKeywords: [
+      'kreisrechner',
+      'kreis berechnen',
+      'kreisumfang berechnen',
+      'kreisumfang rechner',
+      'umfang kreis formel',
+      'formel kreisumfang',
+      'kreisfläche berechnen',
+      'flächeninhalt kreis',
+      'durchmesser aus umfang berechnen',
+      'radius aus umfang berechnen',
+      'radius aus fläche berechnen',
+      'kreis radius berechnen pi',
+      'umfang kreis durchmesser pi',
+    ],
     inputs: [
-      { id: 'radius', label: 'Kreisradius (r) in cm', type: 'number', defaultValue: 6.0, min: 0.01, step: 0.1, unit: 'cm' },
+      {
+        id: 'givenType',
+        label: 'Bekannt ist …',
+        type: 'select',
+        defaultValue: 'radius',
+        options: [
+          { value: 'radius', label: 'Radius r' },
+          { value: 'diameter', label: 'Durchmesser d' },
+          { value: 'circumference', label: 'Umfang U' },
+          { value: 'area', label: 'Fläche A' },
+        ],
+      },
+      {
+        id: 'givenValue',
+        label: 'Radius r',
+        type: 'number',
+        defaultValue: 5,
+        min: 0,
+        step: 0.1,
+        conditionalLabels: [
+          { condition: { field: 'givenType', value: 'radius' }, label: 'Radius r' },
+          { condition: { field: 'givenType', value: 'diameter' }, label: 'Durchmesser d' },
+          { condition: { field: 'givenType', value: 'circumference' }, label: 'Umfang U' },
+          { condition: { field: 'givenType', value: 'area' }, label: 'Fläche A (Einheit zum Quadrat, z. B. cm²)' },
+        ],
+      },
+      {
+        id: 'unit',
+        label: 'Längeneinheit',
+        type: 'select',
+        defaultValue: 'cm',
+        options: [
+          { value: 'mm', label: 'Millimeter (mm, Fläche in mm²)' },
+          { value: 'cm', label: 'Zentimeter (cm, Fläche in cm²)' },
+          { value: 'dm', label: 'Dezimeter (dm, Fläche in dm²)' },
+          { value: 'm', label: 'Meter (m, Fläche in m²)' },
+          { value: 'km', label: 'Kilometer (km, Fläche in km²)' },
+        ],
+      },
     ],
     calculate: calculateCircle,
-    formula: 'Fläche A = π × r² | Umfang U = 2 × π × r',
-    formulaExplanation: 'Multiplikation des quadrierten Radius mit der mathematischen Konstante Pi (π ≈ 3,14159...).',
+    formula: 'Umfang U = 2 · π · r = π · d   |   Fläche A = π · r²   |   r = U / (2π) = √(A / π)',
+    formulaExplanation: 'Die Kreiszahl π ≈ 3,14159 ist das Verhältnis von Umfang zu Durchmesser – bei jedem Kreis gleich. Deshalb genügt eine einzige Größe, um alle anderen zu berechnen: Der Rechner bestimmt zuerst den Radius und daraus Durchmesser, Umfang und Fläche.',
     workedExample: {
-      title: 'Beispiel: Kreis mit Radius r = 6 cm',
-      description: 'Fläche A = π × 36 ≈ 113,10 cm². Umfang U = 2 × π × 6 ≈ 37,70 cm.',
-      inputs: { radius: 6.0 },
-      resultSummary: 'A = 113,10 cm² | U = 37,70 cm',
+      title: 'Radius 5 cm: Umfang und Fläche',
+      inputs: { givenType: 'radius', givenValue: 5, unit: 'cm' },
+      steps: ['d = 2 · 5 cm = 10 cm', 'U = 2 · π · 5 cm ≈ 31,42 cm', 'A = π · 5² = π · 25 ≈ 78,54 cm²'],
+      resultSummary: 'U ≈ 31,42 cm, A ≈ 78,54 cm²',
     },
+    workedExamples: [
+      {
+        title: 'Radius 5 cm: Umfang und Fläche',
+        description: 'Der Standardfall aus dem Matheunterricht: Der Radius ist gegeben.',
+        inputs: { givenType: 'radius', givenValue: 5, unit: 'cm' },
+        steps: ['d = 2 · 5 cm = 10 cm', 'U = 2 · π · 5 cm ≈ 31,42 cm', 'A = π · 5² = π · 25 ≈ 78,54 cm²'],
+        resultSummary: 'U ≈ 31,42 cm, A ≈ 78,54 cm²',
+      },
+      {
+        title: 'Kreisumfang aus dem Durchmesser: rundes Beet mit 4 m',
+        description: 'Ein rundes Gartenbeet misst quer durch die Mitte 4 Meter. Wie viel Beeteinfassung wird gebraucht?',
+        inputs: { givenType: 'diameter', givenValue: 4, unit: 'm' },
+        steps: ['U = π · d', 'U = 3,14159 · 4 m ≈ 12,57 m', 'Fläche zum Vergleich: A = π · 2² ≈ 12,57 m²'],
+        resultSummary: 'Sie brauchen rund 12,57 m Einfassung (plus etwas Verschnitt).',
+      },
+      {
+        title: 'Durchmesser aus dem Umfang: Baumstamm mit 94,2 cm Umfang',
+        description: 'Mit dem Maßband lässt sich der Umfang eines Stamms leicht messen, der Durchmesser nicht. Also rückwärts rechnen.',
+        inputs: { givenType: 'circumference', givenValue: 94.2, unit: 'cm' },
+        steps: ['d = U / π', 'd = 94,2 cm / 3,14159 ≈ 29,98 cm', 'r = d / 2 ≈ 14,99 cm'],
+        resultSummary: 'Der Stamm ist knapp 30 cm dick.',
+      },
+      {
+        title: 'Radius aus der Fläche: 50 m² Rasenkreis',
+        description: 'Ein kreisrunder Rasen soll 50 m² groß werden. Wie lang muss die Schnur sein, mit der Sie den Kreis abstecken?',
+        inputs: { givenType: 'area', givenValue: 50, unit: 'm' },
+        steps: ['r = √(A / π)', 'r = √(50 / 3,14159) = √15,92 ≈ 3,99 m'],
+        resultSummary: 'Die Schnur muss etwa 3,99 m lang sein.',
+      },
+    ],
     content: {
-      intro: 'Dieser Kreisrechner berechnet Flächeninhalt, Umfang, Durchmesser und Radius eines ebenen Kreises über die Kreiszahl Pi (pi ≈ 3,14159265).',
-      details: 'Fundamentale Formeln: Fläche A = pi · r², Umfang U = 2 · pi · r = pi · d. Wird der Radius eines Kreises verdoppelt, vervierfacht sich dessen Flächeninhalt.',
+      intro: 'Mit diesem Kreisrechner berechnen Sie den Kreisumfang, die Kreisfläche, den Radius und den Durchmesser – egal, welche dieser vier Größen Sie kennen. Wählen Sie aus, was bekannt ist, geben Sie den Wert ein und Sie sehen sofort alle übrigen Werte samt Rechenweg. Die Einheit stellen Sie zwischen Millimeter und Kilometer um.',
+      sections: [
+        {
+          title: 'Kreisumfang berechnen: U = 2 · π · r = π · d',
+          content:
+            'Der Umfang ist die Länge der Kreislinie. Bei jedem Kreis ist er gut dreimal so lang wie der Durchmesser – genauer π-mal so lang, mit π ≈ 3,14159. Daraus ergeben sich zwei gleichwertige Formeln:\n\n' +
+            '- Mit dem Durchmesser: **U = π · d**\n' +
+            '- Mit dem Radius: **U = 2 · π · r** (weil d = 2 · r)\n\n' +
+            'Beispiel: Radius 5 cm → U = 2 · 3,14159 · 5 cm ≈ 31,42 cm. Ein Fahrradreifen mit 70 cm Durchmesser legt pro Umdrehung π · 70 cm ≈ 2,20 m zurück.',
+        },
+        {
+          title: 'Kreisfläche berechnen: A = π · r²',
+          content:
+            'Für die Fläche quadrieren Sie zuerst den Radius und multiplizieren dann mit π: Bei r = 5 cm ist A = π · 25 ≈ 78,54 cm². Kennen Sie nur den Durchmesser, halbieren Sie ihn vorher – oder rechnen Sie A = π · d² / 4.\n\n' +
+            'Weil der Radius im Quadrat steht, wächst die Fläche schneller als der Umfang: Doppelter Radius heißt doppelter Umfang, aber vierfache Fläche. Für Kreisausschnitte und -abschnitte gibt es den [Kreissegment-Rechner](/rechner/kreissegment-rechner/), für runde Körper den [Zylinder-Rechner](/rechner/zylinderrechner/) und den [Kugel-Rechner](/rechner/kugel-oberflaeche-rechner/).',
+        },
+        {
+          title: 'Rückwärts rechnen: Radius aus Umfang oder Fläche',
+          content:
+            'Oft lässt sich der Umfang leichter messen als der Durchmesser, etwa bei Baumstämmen, Säulen oder Rohren. Dann stellen Sie die Formel um:\n\n' +
+            '- Aus dem Umfang: **d = U / π** und **r = U / (2π)**\n' +
+            '- Aus der Fläche: **r = √(A / π)**\n\n' +
+            'Beispiel: Ein Stamm hat 94,2 cm Umfang. Dann ist d = 94,2 / 3,14159 ≈ 29,98 cm, also knapp 30 cm.',
+        },
+        {
+          title: 'Worauf Sie achten sollten',
+          content:
+            '- **Radius und Durchmesser nicht verwechseln:** Setzen Sie in A = π · r² den Durchmesser ein, wird die Fläche viermal zu groß.\n' +
+            '- **Einheiten:** Umfang, Radius und Durchmesser haben eine Längeneinheit (cm), die Fläche eine Flächeneinheit (cm²). 1 m² sind 10.000 cm² – zum Umrechnen hilft der [Flächen-Umrechner](/rechner/flaeche-umrechner/).\n' +
+            '- **Genauigkeit von π:** Mit 3,14 statt dem genauen Wert weicht das Ergebnis um etwa 0,05 % ab. Für Hausaufgaben genügt das meist, der Rechner verwendet den genauen Wert.\n' +
+            '- **Durchmesser richtig messen:** Er verläuft immer durch den Mittelpunkt. Messen Sie an mehreren Stellen und nehmen Sie den größten Wert.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie berechnet man den Radius, wenn nur die Fläche bekannt ist?', answer: 'Man teilt den Flächeninhalt durch Pi und zieht aus dem Zwischenergebnis die Quadratwurzel: r = Wurzel(A / pi).' },
-      { question: 'Woher stammt die Kreiszahl Pi?', answer: 'Pi ist das konstante Verhältnis des Umfangs eines beliebigen Kreises zu seinem Durchmesser, eine irrationale und transzendente mathematische Konstante.' },
+      {
+        question: 'Wie berechnet man den Umfang eines Kreises?',
+        answer: 'Multiplizieren Sie den Durchmesser mit π: U = π · d. Kennen Sie den Radius, rechnen Sie U = 2 · π · r. Ein Kreis mit 10 cm Durchmesser hat also einen Umfang von etwa 31,42 cm.',
+      },
+      {
+        question: 'Wie berechne ich den Durchmesser, wenn nur der Umfang bekannt ist?',
+        answer: 'Teilen Sie den Umfang durch π: d = U / π. Bei 50 cm Umfang ist der Durchmesser 50 / 3,14159 ≈ 15,92 cm. Den Radius erhalten Sie, indem Sie den Durchmesser halbieren.',
+      },
+      {
+        question: 'Wie berechnet man die Fläche eines Kreises?',
+        answer: 'Mit A = π · r². Quadrieren Sie also zuerst den Radius und multiplizieren Sie das Ergebnis mit π. Bei r = 3 m ist die Fläche π · 9 ≈ 28,27 m².',
+      },
+      {
+        question: 'Wie berechne ich den Radius aus der Fläche?',
+        answer: 'Teilen Sie die Fläche durch π und ziehen Sie aus dem Ergebnis die Wurzel: r = √(A / π). Für eine Fläche von 100 cm² ergibt das √(100 / 3,14159) = √31,83 ≈ 5,64 cm.',
+      },
+      {
+        question: 'Warum wird die Fläche viermal so groß, wenn man den Radius verdoppelt?',
+        answer: 'Der Radius steht in der Flächenformel im Quadrat. Aus r wird 2r, aus r² also (2r)² = 4r². Der Umfang dagegen verdoppelt sich nur, weil r dort nicht quadriert wird.',
+      },
+      {
+        question: 'Mit welchem Wert für π soll ich rechnen?',
+        answer: 'In der Schule reicht meist π ≈ 3,14; genauer ist 3,14159. Der Rechner nutzt den vollen Wert, deshalb können sich Ihre Ergebnisse von Hand in der zweiten Nachkommastelle leicht unterscheiden. Steht in der Aufgabe kein Wert, verwenden Sie am besten die π-Taste des Taschenrechners.',
+      },
     ],
-    relatedSlugs: ['goldener-schnitt-rechner', 'ellipse-flaeche-rechner', 'zylinderrechner', 'rechteckrechner', 'pythagoras-rechner', 'vektor-skalarprodukt-rechner'],
+    relatedSlugs: ['zylinderrechner', 'kreissegment-rechner', 'kugel-oberflaeche-rechner', 'dreieckrechner', 'rechteckrechner', 'flaeche-umrechner'],
   },
   {
     id: 'zylinderrechner',

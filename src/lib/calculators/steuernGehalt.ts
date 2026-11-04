@@ -88,15 +88,132 @@ export function computeChurchTax(est: number, stateRate: number): number {
   return Math.round(est * (stateRate / 100) * 100) / 100;
 }
 
+/** Liest eine Zahl aus einer Eingabe (deutsches Komma erlaubt). Leere Eingabe → null, ungültig → NaN. */
+function readNumberInput(raw: unknown): number | null {
+  if (raw === undefined || raw === null || String(raw).trim() === '') return null;
+  if (typeof raw === 'number') return raw;
+  return parseFloat(String(raw).trim().replace(',', '.'));
+}
+
+/**
+ * Obergrenze der SolZ-Milderungszone (§ 4 Satz 2 SolzG): Ab dieser Einkommensteuer ist der
+ * Milderungsbetrag (11,9 % des Überhangs über die Freigrenze) größer als 5,5 % der Steuer,
+ * es gilt also der volle Zuschlag. Wird aus den Config-Werten abgeleitet, nicht hart codiert.
+ */
+export function computeSolZMilderungEnd(isMarried: boolean, config: TaxYearConfig): number {
+  const freigrenze = isMarried ? config.solzFreigrenzeMarried : config.solzFreigrenzeSingle;
+  return (freigrenze * config.solzMilderungRate) / (config.solzMilderungRate - config.solzRate);
+}
+
+function describeSolZ(est: number, solz: number, isMarried: boolean, config: TaxYearConfig) {
+  const freigrenze = isMarried ? config.solzFreigrenzeMarried : config.solzFreigrenzeSingle;
+  const milderungEnd = computeSolZMilderungEnd(isMarried, config);
+  const fullSolz = Math.round(est * config.solzRate * 100) / 100;
+  let status: 'frei' | 'milderung' | 'voll' = 'voll';
+  if (est <= freigrenze) status = 'frei';
+  else if (solz < fullSolz) status = 'milderung';
+  const statusText =
+    status === 'frei'
+      ? 'Kein Soli: Steuer liegt unter der Freigrenze'
+      : status === 'milderung'
+        ? 'Milderungszone: reduzierter Soli'
+        : 'Voller Soli (5,5 % der Einkommensteuer)';
+  return { freigrenze, milderungEnd, fullSolz, status, statusText };
+}
+
 // ==========================================
-// 1. EINKOMMENSTEUERRECHNER
+// 1. EINKOMMENSTEUERRECHNER (inkl. Soli-Modus)
 // ==========================================
 export function calculateEinkommensteuer(inputs: Record<string, any>): CalculationResult {
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
-  const zvE = Math.max(0, Number(inputs.taxableIncome) || 0);
   const isSplitting = inputs.tariffType === 'splitting';
   const stateRate = inputs.churchTaxRate === '8' ? 8 : inputs.churchTaxRate === '9' ? 9 : 0;
+  const isSoliMode = inputs.mode === 'soli';
+
+  // --- Modus: Soli aus bekannter Einkommensteuer (z. B. laut Steuerbescheid) ---
+  if (isSoliMode) {
+    const rawTax = readNumberInput(inputs.incomeTax);
+    if (rawTax === null) {
+      return {
+        primary: { id: 'solz', label: 'Solidaritätszuschlag', value: 0, formattedValue: '-' },
+        error: 'Bitte geben Sie die festgesetzte Einkommensteuer ein.',
+      };
+    }
+    if (!Number.isFinite(rawTax) || rawTax < 0) {
+      return {
+        primary: { id: 'solz', label: 'Solidaritätszuschlag', value: 0, formattedValue: '-' },
+        error: 'Die Einkommensteuer muss eine Zahl ab 0 € sein.',
+      };
+    }
+    const est = rawTax;
+    const solz = computeSolZ(est, isSplitting, config);
+    const info = describeSolZ(est, solz, isSplitting, config);
+    const kirchensteuer = computeChurchTax(est, stateRate);
+    const effectiveRate = est > 0 ? (solz / est) * 100 : 0;
+    const totalTax = est + solz + kirchensteuer;
+
+    const secondary: ResultItem[] = [
+      { id: 'solzStatus', label: 'Soli-Status', value: info.statusText, formattedValue: info.statusText },
+      {
+        id: 'solzFreigrenze',
+        label: `Soli-Freigrenze ${config.year} (${isSplitting ? 'Zusammenveranlagung' : 'Einzelveranlagung'})`,
+        value: info.freigrenze,
+        formattedValue: formatCurrency(info.freigrenze),
+        helpText: 'Bis zu dieser Einkommensteuer fällt kein Solidaritätszuschlag an (§ 3 Abs. 3 SolzG).',
+      },
+      {
+        id: 'solzMilderungEnde',
+        label: 'Ende der Milderungszone (ab hier voller Soli)',
+        value: info.milderungEnd,
+        formattedValue: `${formatNumber(info.milderungEnd, 0)} €`,
+        helpText: 'Zwischen Freigrenze und diesem Wert beträgt der Soli höchstens 11,9 % des Betrags über der Freigrenze (§ 4 SolzG).',
+      },
+      { id: 'solzEffectiveRate', label: 'Soli in % der Einkommensteuer', value: effectiveRate, formattedValue: formatPercent(effectiveRate) },
+    ];
+    if (info.status === 'milderung') {
+      secondary.push({
+        id: 'solzMilderungVorteil',
+        label: 'Ersparnis durch die Milderungszone',
+        value: info.fullSolz - solz,
+        formattedValue: formatCurrency(info.fullSolz - solz),
+        helpText: `Ohne Milderungszone wären 5,5 % = ${formatCurrency(info.fullSolz)} fällig.`,
+      });
+    }
+    secondary.push(
+      { id: 'kirchensteuer', label: stateRate > 0 ? `Kirchensteuer (${stateRate} %)` : 'Kirchensteuer', value: kirchensteuer, formattedValue: formatCurrency(kirchensteuer) },
+      { id: 'totalTax', label: 'Einkommensteuer + Soli + Kirchensteuer', value: totalTax, formattedValue: formatCurrency(totalTax) },
+    );
+
+    const summary =
+      info.status === 'frei'
+        ? `Bei ${formatCurrency(est)} Einkommensteuer zahlen Sie keinen Solidaritätszuschlag. Die Freigrenze ${config.year} liegt bei ${formatCurrency(info.freigrenze)}.`
+        : info.status === 'milderung'
+          ? `Bei ${formatCurrency(est)} Einkommensteuer liegen Sie in der Milderungszone. Der Soli beträgt ${formatCurrency(solz)} statt ${formatCurrency(info.fullSolz)} (5,5 %).`
+          : `Bei ${formatCurrency(est)} Einkommensteuer zahlen Sie den vollen Soli von 5,5 % = ${formatCurrency(solz)}.`;
+
+    return {
+      primary: { id: 'solz', label: 'Solidaritätszuschlag', value: solz, formattedValue: formatCurrency(solz), highlight: true },
+      secondary,
+      summaryText: summary,
+    };
+  }
+
+  // --- Modus: Einkommensteuer aus dem zu versteuernden Einkommen ---
+  const rawZvE = readNumberInput(inputs.taxableIncome);
+  if (rawZvE === null) {
+    return {
+      primary: { id: 'einkommensteuer', label: 'Einkommensteuer', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihr zu versteuerndes Einkommen ein.',
+    };
+  }
+  if (!Number.isFinite(rawZvE) || rawZvE < 0) {
+    return {
+      primary: { id: 'einkommensteuer', label: 'Einkommensteuer', value: 0, formattedValue: '-' },
+      error: 'Das zu versteuernde Einkommen muss eine Zahl ab 0 € sein.',
+    };
+  }
+  const zvE = rawZvE;
 
   let est = 0;
   if (isSplitting) {
@@ -115,6 +232,14 @@ export function calculateEinkommensteuer(inputs: Record<string, any>): Calculati
   const marginalRate = isSplitting
     ? computeMarginalTaxRate(Math.floor(zvE / 2), config)
     : computeMarginalTaxRate(zvE, config);
+  const solzInfo = describeSolZ(est, solz, isSplitting, config);
+
+  const solzSummary =
+    solzInfo.status === 'frei'
+      ? `Ihre Einkommensteuer liegt unter der Soli-Freigrenze von ${formatCurrency(solzInfo.freigrenze)}, es fällt kein Solidaritätszuschlag an.`
+      : solzInfo.status === 'milderung'
+        ? `Sie liegen in der Soli-Milderungszone: ${formatCurrency(solz)} statt ${formatCurrency(solzInfo.fullSolz)}.`
+        : `Es fällt der volle Soli von 5,5 % an (${formatCurrency(solz)}).`;
 
   return {
     primary: {
@@ -129,9 +254,17 @@ export function calculateEinkommensteuer(inputs: Record<string, any>): Calculati
       { id: 'avgTaxRate', label: 'Durchschnittssteuersatz', value: avgTaxRate, formattedValue: formatPercent(avgTaxRate) },
       { id: 'totalAvgRate', label: 'Effektive Gesamtsteuerquote', value: totalAvgRate, formattedValue: formatPercent(totalAvgRate) },
       { id: 'marginalRate', label: 'Grenzsteuersatz', value: marginalRate, formattedValue: formatPercent(marginalRate) },
-      { id: 'solz', label: 'Solidaritätszuschlag', value: solz, formattedValue: formatCurrency(solz) },
-      { id: 'kirchensteuer', label: 'Kirchensteuer', value: kirchensteuer, formattedValue: formatCurrency(kirchensteuer) },
+      { id: 'solz', label: 'Solidaritätszuschlag', value: solz, formattedValue: formatCurrency(solz), helpText: solzInfo.statusText },
+      {
+        id: 'solzFreigrenze',
+        label: `Soli-Freigrenze ${config.year}`,
+        value: solzInfo.freigrenze,
+        formattedValue: formatCurrency(solzInfo.freigrenze),
+        helpText: `Voller Soli (5,5 %) erst ab ${formatNumber(solzInfo.milderungEnd, 0)} € Einkommensteuer; dazwischen gilt die Milderungszone.`,
+      },
+      { id: 'kirchensteuer', label: stateRate > 0 ? `Kirchensteuer (${stateRate} %)` : 'Kirchensteuer', value: kirchensteuer, formattedValue: formatCurrency(kirchensteuer) },
     ],
+    summaryText: `Bei ${formatCurrency(zvE)} zu versteuerndem Einkommen (${isSplitting ? 'Splittingtarif' : 'Grundtarif'} ${config.year}) beträgt die Einkommensteuer ${formatCurrency(est)}, das sind ${formatPercent(avgTaxRate)} im Durchschnitt. ${solzSummary}`,
   };
 }
 
@@ -201,7 +334,20 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
 
-  const rawGross = Math.max(0, Number(inputs.grossSalary) || 0);
+  const parsedGross = readNumberInput(inputs.grossSalary);
+  if (parsedGross === null) {
+    return {
+      primary: { id: 'monthlyNet', label: 'Netto pro Monat', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihr Bruttogehalt ein.',
+    };
+  }
+  if (!Number.isFinite(parsedGross) || parsedGross < 0) {
+    return {
+      primary: { id: 'monthlyNet', label: 'Netto pro Monat', value: 0, formattedValue: '-' },
+      error: 'Das Bruttogehalt muss eine Zahl ab 0 € sein.',
+    };
+  }
+  const rawGross = parsedGross;
   const isAnnual = inputs.period === 'year';
   const monthlyGross = isAnnual ? rawGross / 12 : rawGross;
   const annualGross = isAnnual ? rawGross : rawGross * 12;
@@ -210,10 +356,14 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   const hasChurchTax = inputs.churchTax === 'yes' || inputs.churchTax === true;
   const state = String(inputs.federalState || 'other');
   const churchTaxRate = hasChurchTax ? (state === 'bayern' || state === 'baden_wuerttemberg' ? 8 : 9) : 0;
-  const numChildren = Math.max(0, parseInt(inputs.children || '0', 10));
-  const age = Math.max(0, parseInt(inputs.age || '30', 10));
+  const numChildren = Math.max(0, parseInt(inputs.children || '0', 10) || 0);
+  const age = Math.max(0, parseInt(inputs.age || '30', 10) || 0);
   const isPrivateKv = inputs.healthInsuranceType === 'private';
-  const kvZusatz = Math.max(0, Number(inputs.kvZusatzbeitrag ?? config.zusatzbeitragKrankenversicherungDurchschnitt * 100));
+  const parsedZusatz = readNumberInput(inputs.kvZusatzbeitrag);
+  const kvZusatz = parsedZusatz !== null && Number.isFinite(parsedZusatz)
+    ? Math.max(0, parsedZusatz)
+    : config.zusatzbeitragKrankenversicherungDurchschnitt * 100;
+  const showEmployerShare = inputs.showEmployerShare === true || inputs.showEmployerShare === 'true' || inputs.showEmployerShare === 'yes';
 
   // --- SOZIALVERSICHERUNG (MONATLICH) ---
   let anRv = 0;
@@ -243,22 +393,30 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
     agKv = anKv;
   }
 
+  // Aufteilung KV: allgemeiner Beitrag und Zusatzbeitrag (je zur Hälfte AN/AG)
+  const anKvAllgemein = isPrivateKv ? 0 : kvGross * (config.beitragssatzKrankenversicherungAllgemein / 2);
+  const anKvZusatz = isPrivateKv ? 0 : anKv - anKvAllgemein;
+
   // Pflegeversicherung
+  let anPvBaseRate = 0;
+  let pvAdjustmentRate = 0; // + Kinderlosenzuschlag bzw. − Abschlag ab dem 2. Kind (trägt allein der AN)
   if (!isPrivateKv) {
     const isSachsen = state === 'sachsen';
-    let anPvRate = isSachsen ? config.pflegeSachsenAnteilAN : config.beitragssatzPflegeversicherung / 2;
+    anPvBaseRate = isSachsen ? config.pflegeSachsenAnteilAN : config.beitragssatzPflegeversicherung / 2;
     agPv = kvGross * (isSachsen ? config.pflegeSachsenAnteilAG : config.beitragssatzPflegeversicherung / 2);
 
-    // Kinderlosenzuschlag: 0,6 % allein von AN ab 23 Jahren
+    // Kinderlosenzuschlag: 0,6 % allein von AN ab 23 Jahren (§ 55 Abs. 3 SGB XI)
     if (age >= 23 && numChildren === 0) {
-      anPvRate += config.pflegeZuschlagKinderlos;
+      pvAdjustmentRate = config.pflegeZuschlagKinderlos;
     } else if (numChildren > 1) {
-      // Abschlag ab 2. bis 5. Kind je 0,25 %
+      // Abschlag vom 2. bis 5. Kind je 0,25 Beitragssatzpunkte (Kinder unter 25 Jahren)
       const eligibleKids = Math.min(4, numChildren - 1);
-      anPvRate = Math.max(0.01, anPvRate - eligibleKids * config.pflegeAbschlagKind);
+      pvAdjustmentRate = -eligibleKids * config.pflegeAbschlagKind;
     }
-    anPv = kvGross * anPvRate;
+    anPv = kvGross * Math.max(0, anPvBaseRate + pvAdjustmentRate);
   }
+  const anPvBase = kvGross * anPvBaseRate;
+  const anPvAdjustment = anPv - anPvBase;
 
   const monthlySocialAN = anRv + anAv + anKv + anPv;
   const annualSocialAN = monthlySocialAN * 12;
@@ -334,8 +492,94 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
 
   // Arbeitgeberkosten
   const agSvTotal = agRv + agAv + agKv + agPv;
-  const agUmlagen = monthlyGross * (config.umlageU1 + config.umlageU2 + config.umlageU3Insolvenzgeld + config.berufsgenossenschaftDurchschnitt);
+  const umlageRate = config.umlageU1 + config.umlageU2 + config.umlageU3Insolvenzgeld + config.berufsgenossenschaftDurchschnitt;
+  const agUmlagen = monthlyGross * umlageRate;
   const monthlyEmployerTotal = monthlyGross + agSvTotal + agUmlagen;
+
+  // Kirchensteuer als Sonderausgabe (§ 10 Abs. 1 Nr. 4 EStG): grobe Erstattung über die Steuererklärung
+  let churchRefundMarginal = 0;
+  if (taxClass === '1' || taxClass === '4') churchRefundMarginal = computeMarginalTaxRate(taxableBase, config);
+  else if (taxClass === '2') churchRefundMarginal = computeMarginalTaxRate(Math.max(0, taxableBase - 4260), config);
+  else if (taxClass === '3') churchRefundMarginal = computeMarginalTaxRate(Math.floor(taxableBase / 2), config);
+  const churchRefundYear = annualChurchTax * (churchRefundMarginal / 100);
+
+  const pct = (rate: number) => formatPercent(rate * 100, 3);
+  const kvHelp = isPrivateKv
+    ? 'Privat versichert: Ihren PKV-Beitrag und den Arbeitgeberzuschuss rechnet der Rechner nicht ein.'
+    : `${pct(config.beitragssatzKrankenversicherungAllgemein / 2)} allgemeiner Beitrag (${formatCurrency(anKvAllgemein)}) + ${pct(kvZusatz / 200)} Zusatzbeitrag (${formatCurrency(anKvZusatz)}), höchstens bis ${formatCurrency(config.bbgKrankenversicherungMonat)} Brutto (BBG).`;
+  let pvHelp = isPrivateKv
+    ? 'Privat versichert: private Pflegepflichtversicherung wird nicht berechnet.'
+    : `Grundbeitrag ${pct(anPvBaseRate)} (${formatCurrency(anPvBase)})`;
+  if (!isPrivateKv && pvAdjustmentRate > 0) pvHelp += ` + Kinderlosenzuschlag ${pct(pvAdjustmentRate)} (${formatCurrency(anPvAdjustment)}).`;
+  else if (!isPrivateKv && pvAdjustmentRate < 0) pvHelp += ` − Abschlag für ${numChildren} Kinder (${formatCurrency(Math.abs(anPvAdjustment))}).`;
+  else if (!isPrivateKv) pvHelp += numChildren === 1 ? ', kein Kinderlosenzuschlag mit 1 Kind.' : ', kein Kinderlosenzuschlag unter 23 Jahren.';
+
+  const secondary: ResultItem[] = [
+    { id: 'annualNet', label: 'Netto pro Jahr', value: annualNet, formattedValue: formatCurrency(annualNet) },
+    { id: 'monthlyGross', label: 'Brutto pro Monat', value: monthlyGross, formattedValue: formatCurrency(monthlyGross) },
+    { id: 'totalDeductions', label: 'Gesamtabzüge monatlich', value: monthlyDeductions, formattedValue: formatCurrency(monthlyDeductions) },
+    { id: 'lohnsteuer', label: 'Lohnsteuer', value: monthlyLohnsteuer, formattedValue: formatCurrency(monthlyLohnsteuer) },
+    { id: 'solz', label: 'Solidaritätszuschlag', value: monthlySolz, formattedValue: formatCurrency(monthlySolz) },
+    { id: 'kirchensteuer', label: churchTaxRate > 0 ? `Kirchensteuer (${churchTaxRate} %)` : 'Kirchensteuer', value: monthlyChurchTax, formattedValue: formatCurrency(monthlyChurchTax) },
+  ];
+  if (churchRefundYear > 0) {
+    secondary.push({
+      id: 'kirchensteuerErstattung',
+      label: 'Kirchensteuer: Steuerersparnis als Sonderausgabe (ca. pro Jahr)',
+      value: churchRefundYear,
+      formattedValue: formatCurrency(churchRefundYear),
+      helpText: `Gezahlte Kirchensteuer (${formatCurrency(annualChurchTax)} im Jahr) mindert in der Steuererklärung Ihr Einkommen. Bei Ihrem Grenzsteuersatz von ${formatPercent(churchRefundMarginal)} sinkt die Einkommensteuer um etwa diesen Betrag.`,
+    });
+  }
+  secondary.push(
+    {
+      id: 'socialTotal',
+      label: 'Sozialabgaben gesamt (AN)',
+      value: monthlySocialAN,
+      formattedValue: formatCurrency(monthlySocialAN),
+      helpText: `${formatPercent(socialQuota)} Ihres Bruttos gehen an KV, PV, RV und AV.`,
+    },
+    { id: 'krankenversicherung', label: 'Krankenversicherung (AN)', value: anKv, formattedValue: formatCurrency(anKv), helpText: kvHelp },
+    { id: 'kvZusatzbeitrag', label: `davon Zusatzbeitrag (AN, ${pct(kvZusatz / 200)})`, value: anKvZusatz, formattedValue: formatCurrency(anKvZusatz) },
+    { id: 'pflegeversicherung', label: 'Pflegeversicherung (AN)', value: anPv, formattedValue: formatCurrency(anPv), helpText: pvHelp },
+  );
+  if (anPvAdjustment !== 0) {
+    secondary.push({
+      id: 'pvKinderAnpassung',
+      label: anPvAdjustment > 0 ? 'davon Kinderlosenzuschlag PV' : 'davon Kinderabschlag PV',
+      value: anPvAdjustment,
+      formattedValue: formatCurrency(anPvAdjustment),
+    });
+  }
+  secondary.push(
+    { id: 'rentenversicherung', label: 'Rentenversicherung (AN)', value: anRv, formattedValue: formatCurrency(anRv), helpText: `${pct(config.beitragssatzRentenversicherung / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).` },
+    { id: 'arbeitslosenversicherung', label: 'Arbeitslosenversicherung (AN)', value: anAv, formattedValue: formatCurrency(anAv), helpText: `${pct(config.beitragssatzArbeitslosenversicherung / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).` },
+    { id: 'netQuota', label: 'Nettoquote vom Brutto', value: netQuota, formattedValue: formatPercent(netQuota) },
+    { id: 'taxQuota', label: 'Steuerabzugsquote', value: taxQuota, formattedValue: formatPercent(taxQuota) },
+    { id: 'socialQuota', label: 'Sozialabgabenquote', value: socialQuota, formattedValue: formatPercent(socialQuota) },
+  );
+
+  if (showEmployerShare) {
+    secondary.push(
+      { id: 'agKrankenversicherung', label: 'Krankenversicherung (AG)', value: agKv, formattedValue: formatCurrency(agKv), helpText: isPrivateKv ? 'PKV-Zuschuss des Arbeitgebers nicht berücksichtigt.' : 'Gleicher Anteil wie beim Arbeitnehmer, inkl. halbem Zusatzbeitrag.' },
+      { id: 'agPflegeversicherung', label: 'Pflegeversicherung (AG)', value: agPv, formattedValue: formatCurrency(agPv), helpText: 'Ohne Kinderlosenzuschlag – den zahlt allein der Arbeitnehmer.' },
+      { id: 'agRentenversicherung', label: 'Rentenversicherung (AG)', value: agRv, formattedValue: formatCurrency(agRv) },
+      { id: 'agArbeitslosenversicherung', label: 'Arbeitslosenversicherung (AG)', value: agAv, formattedValue: formatCurrency(agAv) },
+      { id: 'agSocialTotal', label: 'Sozialabgaben gesamt (AG)', value: agSvTotal, formattedValue: formatCurrency(agSvTotal) },
+      {
+        id: 'agUmlagen',
+        label: 'Umlagen U1, U2, Insolvenzgeld & Unfallversicherung (AG)',
+        value: agUmlagen,
+        formattedValue: formatCurrency(agUmlagen),
+        helpText: `Richtwerte: U1 ${pct(config.umlageU1)}, U2 ${pct(config.umlageU2)}, Insolvenzgeldumlage ${pct(config.umlageU3Insolvenzgeld)}, Berufsgenossenschaft Ø ${pct(config.berufsgenossenschaftDurchschnitt)}. Ihre Kasse und BG können abweichen.`,
+      },
+      { id: 'svGesamt', label: 'Sozialversicherung gesamt (AN + AG)', value: monthlySocialAN + agSvTotal, formattedValue: formatCurrency(monthlySocialAN + agSvTotal) },
+    );
+  }
+  secondary.push({ id: 'employerTotal', label: 'Arbeitgeber-Gesamtkosten (monatlich)', value: monthlyEmployerTotal, formattedValue: formatCurrency(monthlyEmployerTotal) });
+  if (showEmployerShare) {
+    secondary.push({ id: 'employerTotalYear', label: 'Arbeitgeber-Gesamtkosten (jährlich)', value: monthlyEmployerTotal * 12, formattedValue: formatCurrency(monthlyEmployerTotal * 12) });
+  }
 
   return {
     primary: {
@@ -344,22 +588,8 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
       value: monthlyNet,
       formattedValue: formatCurrency(monthlyNet),
     },
-    secondary: [
-      { id: 'annualNet', label: 'Netto pro Jahr', value: annualNet, formattedValue: formatCurrency(annualNet) },
-      { id: 'monthlyGross', label: 'Brutto pro Monat', value: monthlyGross, formattedValue: formatCurrency(monthlyGross) },
-      { id: 'totalDeductions', label: 'Gesamtabzüge monatlich', value: monthlyDeductions, formattedValue: formatCurrency(monthlyDeductions) },
-      { id: 'lohnsteuer', label: 'Lohnsteuer', value: monthlyLohnsteuer, formattedValue: formatCurrency(monthlyLohnsteuer) },
-      { id: 'solz', label: 'Solidaritätszuschlag', value: monthlySolz, formattedValue: formatCurrency(monthlySolz) },
-      { id: 'kirchensteuer', label: 'Kirchensteuer', value: monthlyChurchTax, formattedValue: formatCurrency(monthlyChurchTax) },
-      { id: 'rentenversicherung', label: 'Rentenversicherung (AN)', value: anRv, formattedValue: formatCurrency(anRv) },
-      { id: 'krankenversicherung', label: 'Krankenversicherung (AN)', value: anKv, formattedValue: formatCurrency(anKv) },
-      { id: 'pflegeversicherung', label: 'Pflegeversicherung (AN)', value: anPv, formattedValue: formatCurrency(anPv) },
-      { id: 'arbeitslosenversicherung', label: 'Arbeitslosenversicherung (AN)', value: anAv, formattedValue: formatCurrency(anAv) },
-      { id: 'netQuota', label: 'Nettoquote vom Brutto', value: netQuota, formattedValue: formatPercent(netQuota) },
-      { id: 'taxQuota', label: 'Steuerabzugsquote', value: taxQuota, formattedValue: formatPercent(taxQuota) },
-      { id: 'socialQuota', label: 'Sozialabgabenquote', value: socialQuota, formattedValue: formatPercent(socialQuota) },
-      { id: 'employerTotal', label: 'Arbeitgeber-Gesamtkosten (monatlich)', value: monthlyEmployerTotal, formattedValue: formatCurrency(monthlyEmployerTotal) },
-    ],
+    secondary,
+    summaryText: `Von ${formatCurrency(monthlyGross)} brutto bleiben ${formatCurrency(monthlyNet)} netto im Monat. Abgezogen werden ${formatCurrency(monthlyTaxTotal)} Steuern und ${formatCurrency(monthlySocialAN)} Sozialabgaben (KV ${formatCurrency(anKv)}, PV ${formatCurrency(anPv)}, RV ${formatCurrency(anRv)}, AV ${formatCurrency(anAv)}). Ihr Arbeitgeber zahlt insgesamt rund ${formatCurrency(monthlyEmployerTotal)}.`,
   };
 }
 

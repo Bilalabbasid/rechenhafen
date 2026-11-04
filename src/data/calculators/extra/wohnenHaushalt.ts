@@ -1,4 +1,4 @@
-import { CalculatorDefinition } from '@/types/calculator';
+import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
 import { calculateLandlordTenantCO2 } from '@/lib/calculators/co2';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
@@ -47,6 +47,482 @@ function buildGasM3QuickReference(): string {
     `| Gasverbrauch | in kWh | Arbeitspreis-Kosten |\n| --- | --- | --- |\n${rows}`,
     'Brennwert und Zustandszahl unterscheiden sich je nach Netzgebiet – beide Werte stehen auf Ihrer Gasabrechnung. Die Beispielpreise sind keine aktuellen Marktpreise. Jahreskosten inklusive Grundpreis und monatlichem Durchschnitt berechnen Sie mit dem [Gaskostenrechner](/rechner/gaskostenrechner/).',
   ].join('\n\n');
+}
+
+// ---------------------------------------------------------------------------
+// Stromkosten-Rechner für Geräte (stromkosten-geraete-rechner)
+// Enthält die Funktionen der früheren Einzelrechner für Fernseher, Kühlschrank,
+// Klimaanlage und Standby. Die Gerätewerte sind nur Vorbelegungen – Nutzer
+// können jederzeit eigene Watt- bzw. kWh-Werte eintragen.
+// ---------------------------------------------------------------------------
+interface ApplianceField {
+  id: string;
+  /** Wert, wenn das Feld gar nicht übergeben wurde (z. B. ältere Links). */
+  fallback: number;
+  /** Akkusativ-Formulierung für „Bitte geben Sie … ein.“ */
+  name: string;
+  /** Nominativ-Formulierung für Fehlermeldungen („… darf nicht negativ sein.“). */
+  title: string;
+  max?: number;
+  maxMessage?: string;
+  /** true: Wert muss größer als 0 sein. */
+  positive?: boolean;
+  /** true: leeres Feld nutzt den Fallback statt eines Fehlers. */
+  emptyUsesFallback?: boolean;
+}
+
+const APPLIANCE_FIELDS: Record<string, ApplianceField> = {
+  powerWatts: { id: 'powerWatts', fallback: 150, name: 'die Leistungsaufnahme des Geräts in Watt', title: 'Die Leistungsaufnahme' },
+  hoursPerDay: { id: 'hoursPerDay', fallback: 4, name: 'die tägliche Nutzungsdauer in Stunden', title: 'Die Nutzungsdauer', max: 24, maxMessage: 'Die Nutzungsdauer kann höchstens 24 Stunden pro Tag betragen.' },
+  usageDays: { id: 'usageDays', fallback: 365, name: 'die Anzahl der Nutzungstage', title: 'Die Anzahl der Nutzungstage', max: 366, maxMessage: 'Bitte geben Sie höchstens 366 Nutzungstage ein.', positive: true, emptyUsesFallback: true },
+  electricityPrice: { id: 'electricityPrice', fallback: 36, name: 'den Strompreis in Cent pro kWh', title: 'Der Strompreis' },
+  tvWatts: { id: 'tvWatts', fallback: 120, name: 'die Leistung des Fernsehers im Betrieb in Watt', title: 'Die Leistung des Fernsehers' },
+  tvHoursPerDay: { id: 'tvHoursPerDay', fallback: 4, name: 'die tägliche Fernsehzeit in Stunden', title: 'Die Fernsehzeit', max: 24, maxMessage: 'Die Fernsehzeit kann höchstens 24 Stunden pro Tag betragen.' },
+  tvStandbyWatts: { id: 'tvStandbyWatts', fallback: 1, name: 'die Standby-Leistung des Fernsehers in Watt', title: 'Die Standby-Leistung' },
+  fridgeKwhYear: { id: 'fridgeKwhYear', fallback: 220, name: 'den Jahresverbrauch in kWh vom Energielabel', title: 'Der Jahresverbrauch' },
+  fridgeNewKwhYear: { id: 'fridgeNewKwhYear', fallback: 115, name: 'den Jahresverbrauch des Neugeräts in kWh', title: 'Der Jahresverbrauch des Neugeräts' },
+  fridgeNewPrice: { id: 'fridgeNewPrice', fallback: 650, name: 'den Kaufpreis des Neugeräts', title: 'Der Kaufpreis' },
+  acSplitWatts: { id: 'acSplitWatts', fallback: 600, name: 'die Leistungsaufnahme der Klimaanlage in Watt', title: 'Die Leistungsaufnahme' },
+  acMobileWatts: { id: 'acMobileWatts', fallback: 1200, name: 'die Leistungsaufnahme der Klimaanlage in Watt', title: 'Die Leistungsaufnahme' },
+  acHoursPerDay: { id: 'acHoursPerDay', fallback: 6, name: 'die Kühlstunden pro Tag', title: 'Die Kühldauer', max: 24, maxMessage: 'Die Kühldauer kann höchstens 24 Stunden pro Tag betragen.' },
+  acDays: { id: 'acDays', fallback: 35, name: 'die Anzahl der Kühltage', title: 'Die Anzahl der Kühltage', max: 366, maxMessage: 'Bitte geben Sie höchstens 366 Kühltage ein.' },
+  standbyWatts: { id: 'standbyWatts', fallback: 35, name: 'die Standby-Leistung in Watt', title: 'Die Standby-Leistung' },
+  standbyHoursPerDay: { id: 'standbyHoursPerDay', fallback: 20, name: 'die Stunden im Standby pro Tag', title: 'Die Standby-Dauer', max: 24, maxMessage: 'Die Standby-Dauer kann höchstens 24 Stunden pro Tag betragen.' },
+};
+
+function readApplianceFields(inputs: Record<string, any>, ids: string[]): { values: Record<string, number> } | { error: string } {
+  const values: Record<string, number> = {};
+  for (const id of ids) {
+    const f = APPLIANCE_FIELDS[id];
+    const raw = inputs[id];
+    let v: number;
+    if (raw === undefined || raw === null) {
+      v = f.fallback;
+    } else {
+      const s = String(raw).trim().replace(',', '.');
+      if (s === '') {
+        if (!f.emptyUsesFallback) return { error: `Bitte geben Sie ${f.name} ein.` };
+        v = f.fallback;
+      } else {
+        v = Number(s);
+      }
+    }
+    if (!Number.isFinite(v)) return { error: `Bitte geben Sie ${f.name} als gültige Zahl ein.` };
+    if (v < 0) return { error: `${f.title} darf nicht negativ sein.` };
+    if (f.positive && v === 0) return { error: `${f.title} muss größer als 0 sein.` };
+    if (f.max !== undefined && v > f.max) return { error: f.maxMessage || `${f.title} ist zu groß.` };
+    values[id] = v;
+  }
+  return { values };
+}
+
+const APPLIANCE_DEVICE_LABELS: Record<string, string> = {
+  custom: 'Eigenes Gerät',
+  tv: 'Fernseher',
+  fridge: 'Kühl- oder Gefriergerät',
+  fridgeCompare: 'Kühlschrank Alt gegen Neu',
+  acSplit: 'Split-Klimaanlage',
+  acMobile: 'Mobiles Klimagerät',
+  standby: 'Standby-Verbraucher',
+};
+
+function applianceYearItems(kwhYear: number, priceEur: number) {
+  const costYear = kwhYear * priceEur;
+  return [
+    { id: 'kwhYear', label: 'Stromverbrauch pro Jahr', value: kwhYear, formattedValue: `${formatNumber(kwhYear, 1)} kWh` },
+    { id: 'costMonth', label: 'Kosten pro Monat (Jahresdurchschnitt)', value: costYear / 12, formattedValue: formatCurrency(costYear / 12) },
+    { id: 'costDay', label: 'Kosten pro Tag (Jahresdurchschnitt)', value: costYear / 365, formattedValue: formatCurrency(costYear / 365) },
+  ];
+}
+
+function calculateApplianceElectricity(inputs: Record<string, any>): CalculationResult {
+  const rawDevice = String(inputs.device ?? 'custom');
+  const device = rawDevice in APPLIANCE_DEVICE_LABELS ? rawDevice : 'custom';
+  const primaryId = device === 'custom' ? 'costPeriod' : device === 'fridgeCompare' ? 'yearlySaving' : 'costYear';
+  const fail = (error: string): CalculationResult => ({
+    primary: { id: primaryId, label: 'Stromkosten', value: 0, formattedValue: '–' },
+    secondary: [],
+    error,
+  });
+
+  const fieldIds: Record<string, string[]> = {
+    custom: ['powerWatts', 'hoursPerDay', 'usageDays', 'electricityPrice'],
+    tv: ['tvWatts', 'tvHoursPerDay', 'tvStandbyWatts', 'electricityPrice'],
+    fridge: ['fridgeKwhYear', 'electricityPrice'],
+    fridgeCompare: ['fridgeKwhYear', 'fridgeNewKwhYear', 'fridgeNewPrice', 'electricityPrice'],
+    acSplit: ['acSplitWatts', 'acHoursPerDay', 'acDays', 'electricityPrice'],
+    acMobile: ['acMobileWatts', 'acHoursPerDay', 'acDays', 'electricityPrice'],
+    standby: ['standbyWatts', 'standbyHoursPerDay', 'electricityPrice'],
+  };
+  const read = readApplianceFields(inputs, fieldIds[device]);
+  if ('error' in read) return fail(read.error);
+  const v = read.values;
+  const priceCent = v.electricityPrice;
+  const priceEur = priceCent / 100;
+  const priceText = `${formatNumber(priceCent, 2)} ct/kWh`;
+  const priceQualification = 'Nur Arbeitspreis: Der Grundpreis Ihres Stromtarifs fällt unabhängig vom Gerät an und ist nicht enthalten.';
+
+  if (device === 'custom') {
+    const watts = v.powerWatts;
+    const hours = v.hoursPerDay;
+    const days = v.usageDays;
+    const kwhPerHour = watts / 1000;
+    const kwhPerDay = kwhPerHour * hours;
+    const totalKwhPeriod = kwhPerDay * days;
+    const costPeriod = totalKwhPeriod * priceEur;
+    const costPerHour = kwhPerHour * priceEur;
+    const costPerDay = kwhPerDay * priceEur;
+    const isFullYear = days === 365;
+    const periodLabel = isFullYear ? 'Stromkosten pro Jahr (365 Tage)' : `Stromkosten für ${formatNumber(days, 0)} Nutzungstage`;
+    const text = `Ein Gerät mit ${formatNumber(watts, 0)} Watt verbraucht bei ${formatNumber(hours, 1)} Stunden täglich an ${formatNumber(days, 0)} Tagen ${formatNumber(totalKwhPeriod, 1)} kWh. Bei ${priceText} kostet das ${formatCurrency(costPeriod)}.`;
+    return {
+      primary: { id: 'costPeriod', label: periodLabel, value: costPeriod, formattedValue: formatCurrency(costPeriod), highlight: true },
+      secondary: [
+        { id: 'totalKwhPeriod', label: `Stromverbrauch (${formatNumber(days, 0)} Tage)`, value: totalKwhPeriod, formattedValue: `${formatNumber(totalKwhPeriod, 1)} kWh` },
+        { id: 'costPerHour', label: 'Kosten pro Betriebsstunde', value: costPerHour, formattedValue: `${formatCurrency(costPerHour)} / Std.` },
+        { id: 'costPerDay', label: 'Kosten pro Nutzungstag', value: costPerDay, formattedValue: `${formatCurrency(costPerDay)} / Tag` },
+        { id: 'costPerMonth', label: 'Kosten pro Monat bei täglicher Nutzung', value: (costPerDay * 365) / 12, formattedValue: formatCurrency((costPerDay * 365) / 12) },
+        { id: 'costYearExtrapolated', label: 'Hochrechnung auf 365 Tage', value: costPerDay * 365, formattedValue: formatCurrency(costPerDay * 365) },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      qualifications: [
+        priceQualification,
+        'Annahme: Das Gerät läuft während der Nutzungszeit mit voller Leistung. Thermostate und Sparmodi senken den tatsächlichen Verbrauch.',
+        isFullYear
+          ? 'Berechnet für ein volles Jahr (365 Nutzungstage).'
+          : `Berechnet für genau ${formatNumber(days, 0)} Nutzungstage.`,
+      ],
+      calculationSteps: [
+        `${formatNumber(kwhPerHour, 3)} kW × ${formatNumber(hours, 1)} Std./Tag × ${formatNumber(days, 0)} Tage = ${formatNumber(totalKwhPeriod, 1)} kWh`,
+        `${formatNumber(totalKwhPeriod, 1)} kWh × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(costPeriod)}`,
+      ],
+      basisSummary: [
+        { label: 'Gerät', value: APPLIANCE_DEVICE_LABELS.custom },
+        { label: 'Leistung', value: `${formatNumber(watts, 0)} Watt` },
+        { label: 'Nutzung pro Tag', value: `${formatNumber(hours, 1)} Stunden` },
+        { label: 'Nutzungstage', value: `${formatNumber(days, 0)} Tage` },
+        { label: 'Strompreis', value: priceText },
+      ],
+    };
+  }
+
+  if (device === 'tv') {
+    const watts = v.tvWatts;
+    const hours = v.tvHoursPerDay;
+    const standbyW = v.tvStandbyWatts;
+    const standbyHours = 24 - hours;
+    const activeKwh = (watts * hours * 365) / 1000;
+    const standbyKwh = (standbyW * standbyHours * 365) / 1000;
+    const kwhYear = activeKwh + standbyKwh;
+    const costYear = kwhYear * priceEur;
+    const standbyCost = standbyKwh * priceEur;
+    const costPerHourCent = (watts / 1000) * priceCent;
+    const text = `Ein Fernseher mit ${formatNumber(watts, 0)} Watt und ${formatNumber(hours, 1)} Stunden täglicher Nutzung verbraucht samt Standby ${formatNumber(kwhYear, 1)} kWh im Jahr. Bei ${priceText} kostet das ${formatCurrency(costYear)} pro Jahr, davon ${formatCurrency(standbyCost)} für Standby.`;
+    return {
+      primary: { id: 'costYear', label: 'Stromkosten des Fernsehers pro Jahr', value: costYear, formattedValue: formatCurrency(costYear), highlight: true },
+      secondary: [
+        ...applianceYearItems(kwhYear, priceEur),
+        { id: 'costPerHour', label: 'Kosten pro Fernsehstunde', value: costPerHourCent / 100, formattedValue: `${formatNumber(costPerHourCent, 1)} Cent / Std.` },
+        { id: 'standbyCost', label: 'Davon Standby-Kosten pro Jahr', value: standbyCost, formattedValue: formatCurrency(standbyCost) },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      qualifications: [
+        priceQualification,
+        `Annahme: In den übrigen ${formatNumber(standbyHours, 1)} Stunden pro Tag steht der Fernseher im Standby.`,
+        'Die Leistung schwankt mit Helligkeit und Bildinhalt; HDR-Inhalte erhöhen sie spürbar.',
+      ],
+      calculationSteps: [
+        `Betrieb: ${formatNumber(watts, 0)} W × ${formatNumber(hours, 1)} Std. × 365 Tage = ${formatNumber(activeKwh, 1)} kWh`,
+        `Standby: ${formatNumber(standbyW, 1)} W × ${formatNumber(standbyHours, 1)} Std. × 365 Tage = ${formatNumber(standbyKwh, 1)} kWh`,
+        `${formatNumber(kwhYear, 1)} kWh × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(costYear)}`,
+      ],
+      basisSummary: [
+        { label: 'Gerät', value: APPLIANCE_DEVICE_LABELS.tv },
+        { label: 'Leistung im Betrieb', value: `${formatNumber(watts, 0)} Watt` },
+        { label: 'Fernsehzeit', value: `${formatNumber(hours, 1)} Std./Tag` },
+        { label: 'Standby-Leistung', value: `${formatNumber(standbyW, 1)} Watt` },
+        { label: 'Strompreis', value: priceText },
+      ],
+    };
+  }
+
+  if (device === 'fridge') {
+    const kwhYear = v.fridgeKwhYear;
+    const costYear = kwhYear * priceEur;
+    const avgWatts = (kwhYear * 1000) / 8760;
+    const text = `Ein Kühl- oder Gefriergerät mit ${formatNumber(kwhYear, 0)} kWh pro Jahr kostet bei ${priceText} ${formatCurrency(costYear)} im Jahr, also ${formatCurrency(costYear / 12)} im Monat.`;
+    return {
+      primary: { id: 'costYear', label: 'Stromkosten des Kühlgeräts pro Jahr', value: costYear, formattedValue: formatCurrency(costYear), highlight: true },
+      secondary: [
+        ...applianceYearItems(kwhYear, priceEur),
+        { id: 'avgWatts', label: 'Durchschnittliche Leistungsaufnahme', value: avgWatts, formattedValue: `${formatNumber(avgWatts, 1)} Watt` },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      qualifications: [
+        priceQualification,
+        'Der Wert auf dem EU-Energielabel gilt für Normbedingungen. Warme Aufstellorte, häufiges Öffnen und Vereisung erhöhen den Verbrauch.',
+      ],
+      calculationSteps: [
+        `${formatNumber(kwhYear, 0)} kWh/Jahr × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(costYear)}`,
+        `${formatCurrency(costYear)} ÷ 12 = ${formatCurrency(costYear / 12)} pro Monat`,
+      ],
+      basisSummary: [
+        { label: 'Gerät', value: APPLIANCE_DEVICE_LABELS.fridge },
+        { label: 'Jahresverbrauch', value: `${formatNumber(kwhYear, 0)} kWh` },
+        { label: 'Strompreis', value: priceText },
+      ],
+    };
+  }
+
+  if (device === 'fridgeCompare') {
+    const oldKwh = v.fridgeKwhYear;
+    const newKwh = v.fridgeNewKwhYear;
+    const price = v.fridgeNewPrice;
+    const oldCost = oldKwh * priceEur;
+    const newCost = newKwh * priceEur;
+    const saving = oldCost - newCost;
+    const savedKwh = oldKwh - newKwh;
+    const amortYears = saving > 0 ? price / saving : 0;
+    let amortText: string;
+    if (saving <= 0) amortText = 'Keine Amortisation (keine Stromersparnis)';
+    else if (price === 0) amortText = 'Sofort (kein Kaufpreis angegeben)';
+    else amortText = `ca. ${formatNumber(amortYears, 1)} Jahre`;
+    const text = saving > 0
+      ? `Das Neugerät spart ${formatNumber(savedKwh, 0)} kWh und ${formatCurrency(saving)} pro Jahr. ${price > 0 ? `Der Kaufpreis von ${formatCurrency(price)} hat sich nach ${formatNumber(amortYears, 1)} Jahren über die Stromersparnis bezahlt gemacht.` : ''}`.trim()
+      : `Das Neugerät verbraucht nicht weniger Strom als das Altgerät. Ein Austausch spart bei diesen Werten keine Stromkosten.`;
+    return {
+      primary: { id: 'yearlySaving', label: 'Stromkosten-Ersparnis pro Jahr mit Neugerät', value: saving, formattedValue: formatCurrency(saving), highlight: true },
+      secondary: [
+        { id: 'oldCost', label: 'Stromkosten Altgerät pro Jahr', value: oldCost, formattedValue: formatCurrency(oldCost) },
+        { id: 'newCost', label: 'Stromkosten Neugerät pro Jahr', value: newCost, formattedValue: formatCurrency(newCost) },
+        { id: 'savedKwh', label: 'Eingesparter Strom pro Jahr', value: savedKwh, formattedValue: `${formatNumber(savedKwh, 0)} kWh` },
+        { id: 'monthlySaving', label: 'Ersparnis pro Monat', value: saving / 12, formattedValue: formatCurrency(saving / 12) },
+        { id: 'amortYears', label: 'Amortisation des Kaufpreises', value: amortYears, formattedValue: amortText },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      warning: saving <= 0 ? 'Der eingegebene Verbrauch des Neugeräts ist nicht niedriger als der des Altgeräts.' : undefined,
+      qualifications: [
+        priceQualification,
+        'Die Amortisation berücksichtigt nur Stromkosten. Entsorgung, Lieferung und künftige Strompreisänderungen sind nicht enthalten.',
+      ],
+      calculationSteps: [
+        `Altgerät: ${formatNumber(oldKwh, 0)} kWh × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(oldCost)}`,
+        `Neugerät: ${formatNumber(newKwh, 0)} kWh × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(newCost)}`,
+        `Ersparnis: ${formatCurrency(oldCost)} − ${formatCurrency(newCost)} = ${formatCurrency(saving)} pro Jahr`,
+        ...(saving > 0 && price > 0 ? [`Amortisation: ${formatCurrency(price)} ÷ ${formatCurrency(saving)} = ${formatNumber(amortYears, 1)} Jahre`] : []),
+      ],
+      basisSummary: [
+        { label: 'Vergleich', value: APPLIANCE_DEVICE_LABELS.fridgeCompare },
+        { label: 'Altgerät', value: `${formatNumber(oldKwh, 0)} kWh/Jahr` },
+        { label: 'Neugerät', value: `${formatNumber(newKwh, 0)} kWh/Jahr` },
+        { label: 'Kaufpreis Neugerät', value: formatCurrency(price) },
+        { label: 'Strompreis', value: priceText },
+      ],
+    };
+  }
+
+  if (device === 'acSplit' || device === 'acMobile') {
+    const watts = device === 'acSplit' ? v.acSplitWatts : v.acMobileWatts;
+    const hours = v.acHoursPerDay;
+    const days = v.acDays;
+    const kwhPerHour = watts / 1000;
+    const kwhSeason = kwhPerHour * hours * days;
+    const costSeason = kwhSeason * priceEur;
+    const costPerHour = kwhPerHour * priceEur;
+    const costPerDay = costPerHour * hours;
+    const text = `Die Klimaanlage (${APPLIANCE_DEVICE_LABELS[device]}) mit ${formatNumber(watts, 0)} Watt verbraucht bei ${formatNumber(hours, 1)} Stunden an ${formatNumber(days, 0)} Tagen ${formatNumber(kwhSeason, 1)} kWh. Bei ${priceText} kostet das ${formatCurrency(costSeason)} pro Saison, ${formatCurrency(costPerDay)} pro Hitzetag.`;
+    return {
+      primary: { id: 'costYear', label: 'Stromkosten pro Kühlsaison (Jahr)', value: costSeason, formattedValue: formatCurrency(costSeason), highlight: true },
+      secondary: [
+        { id: 'kwhYear', label: 'Stromverbrauch pro Kühlsaison', value: kwhSeason, formattedValue: `${formatNumber(kwhSeason, 1)} kWh` },
+        { id: 'costPerHotDay', label: 'Kosten pro Kühltag', value: costPerDay, formattedValue: formatCurrency(costPerDay) },
+        { id: 'costPerHour', label: 'Kosten pro Kühlstunde', value: costPerHour, formattedValue: formatCurrency(costPerHour) },
+        { id: 'costMonth', label: 'Kosten pro Monat (aufs Jahr verteilt)', value: costSeason / 12, formattedValue: formatCurrency(costSeason / 12) },
+      ],
+      summaryText: text,
+      directAnswer: text,
+      qualifications: [
+        priceQualification,
+        'Die Leistung ist ein Mittelwert. Inverter-Geräte regeln nach Erreichen der Zieltemperatur herunter, bei großer Hitze liegt die Leistung höher.',
+      ],
+      calculationSteps: [
+        `${formatNumber(kwhPerHour, 3)} kWh pro Stunde × ${formatNumber(hours, 1)} Std. × ${formatNumber(days, 0)} Tage = ${formatNumber(kwhSeason, 1)} kWh`,
+        `${formatNumber(kwhSeason, 1)} kWh × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(costSeason)}`,
+      ],
+      basisSummary: [
+        { label: 'Gerät', value: APPLIANCE_DEVICE_LABELS[device] },
+        { label: 'Leistung beim Kühlen', value: `${formatNumber(watts, 0)} Watt` },
+        { label: 'Kühlzeit', value: `${formatNumber(hours, 1)} Std. an ${formatNumber(days, 0)} Tagen` },
+        { label: 'Strompreis', value: priceText },
+      ],
+    };
+  }
+
+  // Standby
+  const standbyW = v.standbyWatts;
+  const standbyHours = v.standbyHoursPerDay;
+  const kwhYear = (standbyW * standbyHours * 365) / 1000;
+  const costYear = kwhYear * priceEur;
+  const text = `${formatNumber(standbyW, 1)} Watt Standby-Leistung an ${formatNumber(standbyHours, 1)} Stunden täglich ergeben ${formatNumber(kwhYear, 1)} kWh im Jahr. Bei ${priceText} kostet das ${formatCurrency(costYear)} pro Jahr.`;
+  return {
+    primary: { id: 'costYear', label: 'Standby-Kosten pro Jahr', value: costYear, formattedValue: formatCurrency(costYear), highlight: true },
+    secondary: applianceYearItems(kwhYear, priceEur),
+    summaryText: text,
+    directAnswer: text,
+    qualifications: [
+      priceQualification,
+      'Mit einer abschaltbaren Steckdosenleiste oder einem Zwischenstecker mit Zeitschaltung lassen sich diese Kosten weitgehend vermeiden.',
+    ],
+    calculationSteps: [
+      `${formatNumber(standbyW, 1)} W × ${formatNumber(standbyHours, 1)} Std. × 365 Tage ÷ 1.000 = ${formatNumber(kwhYear, 1)} kWh`,
+      `${formatNumber(kwhYear, 1)} kWh × ${formatNumber(priceEur, 4)} €/kWh = ${formatCurrency(costYear)}`,
+    ],
+    basisSummary: [
+      { label: 'Gerät', value: APPLIANCE_DEVICE_LABELS.standby },
+      { label: 'Standby-Leistung', value: `${formatNumber(standbyW, 1)} Watt` },
+      { label: 'Standby-Dauer', value: `${formatNumber(standbyHours, 1)} Std./Tag` },
+      { label: 'Strompreis', value: priceText },
+    ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Vorfälligkeitsentschädigung (vorfaelligkeitsentschaedigung-baufinanzierung-rechner)
+// Baufinanzierung: bisherige Näherung der Aktiv-Passiv-Methode (unverändert).
+// Ratenkredit: gesetzliche Obergrenze nach § 502 Abs. 3 BGB (Allgemein-Verbraucherdarlehen):
+//   Nr. 1: 1 % des vorzeitig zurückgezahlten Betrags, 0,5 %, wenn zwischen vorzeitiger
+//          und vereinbarter Rückzahlung höchstens ein Jahr liegt,
+//   Nr. 2: höchstens die Sollzinsen, die bis zur vereinbarten Rückzahlung angefallen wären.
+// ---------------------------------------------------------------------------
+function calculateMortgagePrepaymentEstimate(inputs: Record<string, any>): CalculationResult {
+  const debtRaw = inputs.remainingDebt;
+  const contractRaw = inputs.contractRate;
+  const reinvestRaw = inputs.reinvestmentRate;
+  const yearsRaw = inputs.remainingYears;
+
+  const debtStr = debtRaw !== undefined && debtRaw !== null ? String(debtRaw).trim() : '';
+  const contractStr = contractRaw !== undefined && contractRaw !== null ? String(contractRaw).trim() : '';
+  const reinvestStr = reinvestRaw !== undefined && reinvestRaw !== null ? String(reinvestRaw).trim() : '';
+  const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
+
+  const debt = debtStr !== '' ? parseFloat(debtStr.replace(',', '.')) : 180000;
+  const contract = contractStr !== '' ? parseFloat(contractStr.replace(',', '.')) : 4.2;
+  const reinvest = reinvestStr !== '' ? parseFloat(reinvestStr.replace(',', '.')) : 2.4;
+  const years = yearsStr !== '' ? parseFloat(yearsStr.replace(',', '.')) : 4;
+
+  if (isNaN(debt) || isNaN(contract) || isNaN(reinvest) || isNaN(years) || debt < 0 || contract < 0 || reinvest < 0 || years < 0) {
+    return {
+      primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: 0, formattedValue: '–' },
+      secondary: [],
+      error: 'Bitte geben Sie gültige Werte ein (Werte dürfen nicht negativ sein).',
+    };
+  }
+
+  const interestDiff = Math.max(0, contract - reinvest);
+  // Zinsverschlechterungsschaden grob geschätzt (unter Berücksichtigung ersparter Risiko- und Verwaltungskosten ca. 0,15 %)
+  const netDiff = Math.max(0, interestDiff - 0.15);
+  const compensation = debt * (netDiff / 100) * years * 0.90; // Barwert-Abzinsung ca. 90%
+  const pctOfDebt = debt > 0 ? (compensation / debt) * 100 : 0;
+  return {
+    primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: compensation, formattedValue: formatCurrency(compensation), highlight: true },
+    secondary: [
+      { id: 'interestDiff', label: 'Zinsdifferenz p.a.', value: interestDiff, formattedValue: formatPercent(interestDiff, 2) },
+      { id: 'pctOfDebt', label: 'Anteil an der Restschuld', value: pctOfDebt, formattedValue: formatPercent(pctOfDebt, 2) },
+      { id: 'totalPayoff', label: 'Ablösebetrag (Restschuld + Entschädigung)', value: debt + compensation, formattedValue: formatCurrency(debt + compensation) },
+    ],
+    summaryText: `Bei einer Zinsdifferenz von ${formatPercent(interestDiff, 2)} und ${formatNumber(years, 1)} Jahren Restzinsbindung verlangt die Bank voraussichtlich ca. ${formatCurrency(compensation)} Entschädigung.`,
+    directAnswer: compensation === 0
+      ? 'Liegt der Wiederanlagezins auf oder über Ihrem Vertragszins, entsteht der Bank kein Zinsschaden. Es fällt voraussichtlich keine Vorfälligkeitsentschädigung an.'
+      : `Bei ${formatCurrency(debt)} Restschuld, ${formatPercent(interestDiff, 2)} Zinsdifferenz und ${formatNumber(years, 1)} Jahren Restzinsbindung beträgt die geschätzte Entschädigung ca. ${formatCurrency(compensation)} (${formatPercent(pctOfDebt, 2)} der Restschuld).`,
+    qualifications: [
+      'Schätzung: Banken rechnen mit der Renditekurve von Pfandbriefen und dem genauen Tilgungsplan. Die tatsächliche Forderung kann abweichen.',
+      'Vereinbarte, noch nicht genutzte Sondertilgungen senken die Entschädigung und sind hier nicht berücksichtigt.',
+    ],
+    calculationSteps: [
+      `Zinsdifferenz: ${formatPercent(contract, 2)} − ${formatPercent(reinvest, 2)} = ${formatPercent(interestDiff, 2)}`,
+      `Abzug ersparter Verwaltungs- und Risikokosten (0,15 %): ${formatPercent(netDiff, 2)}`,
+      `${formatCurrency(debt)} × ${formatPercent(netDiff, 2)} × ${formatNumber(years, 1)} Jahre × 0,9 (Abzinsung) = ${formatCurrency(compensation)}`,
+    ],
+    basisSummary: [
+      { label: 'Darlehensart', value: 'Baufinanzierung (Schätzung)' },
+      { label: 'Restschuld', value: formatCurrency(debt) },
+      { label: 'Vertragszins vs. Wiederanlage', value: `${formatPercent(contract, 2)} vs. ${formatPercent(reinvest, 2)}` },
+      { label: 'Restzinsbindung', value: `${formatNumber(years, 1)} Jahre` },
+    ],
+  };
+}
+
+function calculateConsumerLoanPrepayment(inputs: Record<string, any>): CalculationResult {
+  const fail = (error: string): CalculationResult => ({
+    primary: { id: 'compensation', label: 'Maximale Vorfälligkeitsentschädigung', value: 0, formattedValue: '–' },
+    secondary: [],
+    error,
+  });
+  const read = (raw: unknown, fallback: number): number | null => {
+    if (raw === undefined || raw === null) return fallback;
+    const s = String(raw).trim().replace(',', '.');
+    return s === '' ? null : Number(s);
+  };
+  const debt = read(inputs.consumerDebt, 12000);
+  const months = read(inputs.consumerMonths, 24);
+  const rate = read(inputs.consumerRate, 6.5);
+
+  if (debt === null) return fail('Bitte geben Sie den Betrag ein, den Sie vorzeitig zurückzahlen.');
+  if (months === null) return fail('Bitte geben Sie die Restlaufzeit in Monaten ein.');
+  if (rate === null) return fail('Bitte geben Sie den Sollzins Ihres Kredits ein.');
+  if (!Number.isFinite(debt) || !Number.isFinite(months) || !Number.isFinite(rate)) return fail('Bitte geben Sie gültige Zahlen ein.');
+  if (debt < 0) return fail('Der Rückzahlungsbetrag darf nicht negativ sein.');
+  if (rate < 0) return fail('Der Sollzins darf nicht negativ sein.');
+  if (rate > 100) return fail('Bitte geben Sie einen Sollzins von höchstens 100 % ein.');
+  if (months <= 0) return fail('Die Restlaufzeit muss mindestens 1 Monat betragen.');
+  if (months > 1200) return fail('Bitte geben Sie eine Restlaufzeit von höchstens 1.200 Monaten ein.');
+
+  const capPct = months <= 12 ? 0.5 : 1.0;
+  const capByPct = (debt * capPct) / 100;
+  // Sollzinsen bis zum Vertragsende bei gleichbleibender Monatsrate (Annuität)
+  const i = rate / 100 / 12;
+  const remainingInterest = i === 0 || debt === 0 ? 0 : (debt * i) / (1 - Math.pow(1 + i, -months)) * months - debt;
+  const fee = Math.min(capByPct, remainingInterest);
+  const interestCapBinds = remainingInterest < capByPct;
+  const netSaving = remainingInterest - fee;
+
+  const text = interestCapBinds
+    ? `Die Bank darf höchstens ${formatCurrency(fee)} verlangen. Die ${formatPercent(capPct, 1)}-Grenze (${formatCurrency(capByPct)}) greift nicht, weil bis zum Vertragsende nur ${formatCurrency(remainingInterest)} Sollzinsen angefallen wären.`
+    : `Die Bank darf höchstens ${formatCurrency(fee)} verlangen (${formatPercent(capPct, 1)} von ${formatCurrency(debt)}, Restlaufzeit ${months <= 12 ? 'höchstens' : 'über'} 12 Monate). Sie sparen ${formatCurrency(remainingInterest)} Sollzinsen, nach Abzug der Entschädigung ${formatCurrency(netSaving)}.`;
+
+  return {
+    primary: { id: 'compensation', label: 'Maximale Vorfälligkeitsentschädigung (§ 502 BGB)', value: fee, formattedValue: formatCurrency(fee), highlight: true },
+    secondary: [
+      { id: 'capRate', label: 'Gesetzlicher Höchstsatz', value: capPct, formattedValue: `${formatPercent(capPct, 1)} der Restschuld` },
+      { id: 'capByPct', label: `${formatPercent(capPct, 1)}-Grenze in Euro`, value: capByPct, formattedValue: formatCurrency(capByPct) },
+      { id: 'remainingInterest', label: 'Sollzinsen bis zum Vertragsende (Grenze 2)', value: remainingInterest, formattedValue: formatCurrency(remainingInterest) },
+      { id: 'totalPayoff', label: 'Ablösebetrag höchstens (Restschuld + Entschädigung)', value: debt + fee, formattedValue: formatCurrency(debt + fee) },
+      { id: 'netSaving', label: 'Ersparte Zinsen nach Abzug der Entschädigung', value: netSaving, formattedValue: formatCurrency(netSaving) },
+    ],
+    summaryText: text,
+    directAnswer: text,
+    qualifications: [
+      'Gesetzliche Obergrenze für Allgemein-Verbraucherdarlehen mit gebundenem Sollzins (§ 502 Abs. 1 und 3 BGB). Die Bank darf weniger verlangen, aber nicht mehr.',
+      'Die Sollzinsen bis zum Vertragsende werden mit gleichbleibender Monatsrate (Annuität) aus Restschuld, Sollzins und Restlaufzeit berechnet.',
+      'Keine Entschädigung bei variablem Zins, bei Rückzahlung aus einer vertraglich verlangten Restschuldversicherung oder bei unzureichenden Vertragsangaben zu Laufzeit, Kündigungsrecht oder Berechnung (§ 502 Abs. 2 BGB).',
+    ],
+    calculationSteps: [
+      `Restlaufzeit ${formatNumber(months, 0)} Monate → Höchstsatz ${formatPercent(capPct, 1)}`,
+      `Grenze 1: ${formatCurrency(debt)} × ${formatPercent(capPct, 1)} = ${formatCurrency(capByPct)}`,
+      `Grenze 2: Sollzinsen bei ${formatPercent(rate, 2)} über ${formatNumber(months, 0)} Monate = ${formatCurrency(remainingInterest)}`,
+      `Entschädigung höchstens: der kleinere Wert = ${formatCurrency(fee)}`,
+    ],
+    basisSummary: [
+      { label: 'Darlehensart', value: 'Ratenkredit (§ 502 BGB)' },
+      { label: 'Vorzeitig zurückgezahlter Betrag', value: formatCurrency(debt) },
+      { label: 'Restlaufzeit', value: `${formatNumber(months, 0)} Monate` },
+      { label: 'Sollzins', value: formatPercent(rate, 2) },
+    ],
+  };
 }
 
 export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
@@ -1350,90 +1826,114 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
   {
     id: 'vorfaelligkeitsentschaedigung-baufinanzierung-rechner',
     slug: 'vorfaelligkeitsentschaedigung-baufinanzierung-rechner',
-    name: 'Vorfälligkeitsentschädigung Baufinanzierung-Rechner (Aktiv-Passiv-Methode)',
-    shortName: 'Vorfälligkeitsentschädigung Baufinanzierung',
+    name: 'Vorfälligkeitsentschädigung-Rechner (Baufinanzierung & Ratenkredit)',
+    shortName: 'Vorfälligkeitsentschädigung',
     category: 'wohnen-immobilien',
     subcategory: 'Immobilienkauf & Finanzierung',
-    metaTitle: 'Vorfälligkeitsentschädigung Baufinanzierung Rechner',
-    metaDescription: 'Berechnen Sie die Vorfälligkeitsentschädigung für Immobiliardarlehen nach der BGH Aktiv-Passiv-Methode bei vorzeitiger Kündigung.',
-    h1: 'Vorfälligkeitsentschädigung Baufinanzierung – BGH-Methode',
-    shortDescription: 'Schätzt die Bankenentschädigung bei vorzeitiger Kündigung eines Immobilienkredits nach der anerkannten Aktiv-Passiv-Methode.',
-    searchKeywords: ['vorfaelligkeitsentschaedigung baufinanzierung', 'vorfaelligkeitsentschaedigung rechner', 'baufinanzierung vorzeitig kuendigen kosten', 'aktiv passiv methode bgh', 'schadensersatz bank zinsverlust'],
-    inputs: [
-      { id: 'remainingDebt', label: 'Aktuelle Restschuld des Darlehens', type: 'number', defaultValue: 180000, min: 0, step: 5000, unit: '€', helpText: 'Noch offene Darlehens-Restschuld zum Kündigungstermin.' },
-      { id: 'contractRate', label: 'Vereinbarter Darlehenszins p.a.', type: 'number', defaultValue: 4.2, min: 0, step: 0.1, unit: '%', helpText: 'Im Darlehensvertrag fest vereinbarter Sollzins.' },
-      { id: 'reinvestmentRate', label: 'Aktuelle Wiederanlage-Rendite (z. B. Bundesanleihen)', type: 'number', defaultValue: 2.4, min: 0, step: 0.1, unit: '%', helpText: 'Aktuelle Wiederanlage-Rendite (0 % bei Null- oder Negativzinsphasen).' },
-      { id: 'remainingYears', label: 'Restliche Zinsbindungszeit in Jahren (max. 10 Jahre)', type: 'number', defaultValue: 4, min: 0, max: 10, step: 0.5, unit: 'Jahre', helpText: 'Verbleibende Jahre bis zum Ende der Zinsbindung (höchstens 10 Jahre nach § 489 BGB).' },
+    metaTitle: 'Vorfälligkeitsentschädigung Rechner: Baukredit & Ratenkredit',
+    metaDescription: 'Vorfälligkeitsentschädigung kostenlos berechnen: Schätzung für Baufinanzierungen und gesetzliche Obergrenze für Ratenkredite nach § 502 BGB.',
+    h1: 'Vorfälligkeitsentschädigung berechnen – Baufinanzierung und Ratenkredit',
+    shortDescription: 'Schätzt die Vorfälligkeitsentschädigung einer Baufinanzierung nach der Aktiv-Passiv-Methode und berechnet für Ratenkredite die gesetzliche Obergrenze nach § 502 BGB (1 % bzw. 0,5 %, höchstens die restlichen Sollzinsen).',
+    searchKeywords: [
+      'vorfälligkeitsentschädigung rechner',
+      'vorfälligkeitsentschädigung berechnen',
+      'vorfälligkeitsentschädigung baufinanzierung',
+      'vorfälligkeitsentschädigung ratenkredit',
+      '502 bgb vorfälligkeitsentschädigung',
+      'kredit vorzeitig zurückzahlen kosten',
+      'ablösegebühr kredit',
+      'baufinanzierung vorzeitig kündigen kosten',
+      'aktiv passiv methode bgh',
     ],
-    calculate: (inputs) => {
-      const debtRaw = inputs.remainingDebt;
-      const contractRaw = inputs.contractRate;
-      const reinvestRaw = inputs.reinvestmentRate;
-      const yearsRaw = inputs.remainingYears;
-
-      const debtStr = debtRaw !== undefined && debtRaw !== null ? String(debtRaw).trim() : '';
-      const contractStr = contractRaw !== undefined && contractRaw !== null ? String(contractRaw).trim() : '';
-      const reinvestStr = reinvestRaw !== undefined && reinvestRaw !== null ? String(reinvestRaw).trim() : '';
-      const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
-
-      const debt = debtStr !== '' ? parseFloat(debtStr.replace(',', '.')) : 180000;
-      const contract = contractStr !== '' ? parseFloat(contractStr.replace(',', '.')) : 4.2;
-      const reinvest = reinvestStr !== '' ? parseFloat(reinvestStr.replace(',', '.')) : 2.4;
-      const years = yearsStr !== '' ? parseFloat(yearsStr.replace(',', '.')) : 4;
-
-      if (isNaN(debt) || isNaN(contract) || isNaN(reinvest) || isNaN(years) || debt < 0 || contract < 0 || reinvest < 0 || years < 0) {
-        return {
-          primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Bitte geben Sie gültige Werte ein (Werte dürfen nicht negativ sein).',
-        };
-      }
-
-      const interestDiff = Math.max(0, contract - reinvest);
-      // Zinsverschlechterungsschaden grob geschätzt (unter Berücksichtigung ersparter Risiko- und Verwaltungskosten ca. 0,15 %)
-      const netDiff = Math.max(0, interestDiff - 0.15);
-      const compensation = debt * (netDiff / 100) * years * 0.90; // Barwert-Abzinsung ca. 90%
-      const pctOfDebt = debt > 0 ? (compensation / debt) * 100 : 0;
-      return {
-        primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: compensation, formattedValue: formatCurrency(compensation), highlight: true },
-        secondary: [
-          { id: 'interestDiff', label: 'Zinsdifferenz p.a.', value: interestDiff, formattedValue: formatPercent(interestDiff, 2) },
-          { id: 'pctOfDebt', label: 'Anteil an der Restschuld', value: pctOfDebt, formattedValue: formatPercent(pctOfDebt, 2) },
+    inputs: [
+      {
+        id: 'loanType',
+        label: 'Darlehensart',
+        type: 'select',
+        defaultValue: 'baufinanzierung',
+        options: [
+          { value: 'baufinanzierung', label: 'Baufinanzierung / Immobiliendarlehen (Schätzung nach Aktiv-Passiv-Methode)' },
+          { value: 'ratenkredit', label: 'Ratenkredit / Verbraucherkredit (gesetzliche Obergrenze § 502 BGB)' },
         ],
-        summaryText: `Bei einer Zinsdifferenz von ${formatPercent(interestDiff, 2)} und ${years} Jahren Restlaufzeit verlangt die Bank voraussichtlich ca. ${formatCurrency(compensation)} Entschädigung.`,
-        directAnswer: compensation === 0
-          ? `Bei einer Zinsdifferenz von 0,00 % (oder Marktzins über Vertragszins) entsteht der Bank kein Zinsschaden. Es fällt voraussichtlich keine Vorfälligkeitsentschädigung an.`
-          : `Bei ${formatCurrency(debt)} Restschuld, ${formatPercent(interestDiff, 2)} Zinsdifferenz und ${years} Jahren Restzinsbindung beträgt die geschätzte Bankentschädigung ca. ${formatCurrency(compensation)} (${formatPercent(pctOfDebt, 2)} der Restschuld).`,
-        basisSummary: [
-          { label: 'Restschuld', value: formatCurrency(debt) },
-          { label: 'Vertragszins vs. Wiederanlage', value: `${formatPercent(contract, 2)} vs. ${formatPercent(reinvest, 2)}` },
-          { label: 'Restzinsbindung', value: `${years} Jahre` },
-        ],
-      };
-    },
-    formula: 'Entschädigung ≈ Restschuld × Zinsdifferenz × Restjahre (Barwertberechnung)',
-    formulaExplanation: 'Die Bank berechnet den Zinsschaden nach der BGH-konformen Aktiv-Passiv-Methode: Differenz zwischen Vertragszins und Rendite sicherer Kapitalmarkttitel abzüglich ersparter Verwaltungs- und Risikokosten.',
+      },
+      // Baufinanzierung
+      { id: 'remainingDebt', label: 'Aktuelle Restschuld des Darlehens', type: 'number', defaultValue: 180000, min: 0, step: 5000, unit: '€', helpText: 'Noch offene Restschuld zum Rückzahlungstermin.', dependsOn: { field: 'loanType', value: 'baufinanzierung' } },
+      { id: 'contractRate', label: 'Vereinbarter Sollzins p.a.', type: 'number', defaultValue: 4.2, min: 0, step: 0.1, unit: '%', helpText: 'Im Darlehensvertrag festgeschriebener Sollzins.', dependsOn: { field: 'loanType', value: 'baufinanzierung' } },
+      { id: 'reinvestmentRate', label: 'Aktuelle Wiederanlage-Rendite (z. B. Pfandbriefe)', type: 'number', defaultValue: 2.4, min: 0, step: 0.1, unit: '%', helpText: 'Rendite sicherer Kapitalmarktpapiere mit passender Restlaufzeit. Beispielwert – aktuelle Werte veröffentlicht die Deutsche Bundesbank.', dependsOn: { field: 'loanType', value: 'baufinanzierung' } },
+      { id: 'remainingYears', label: 'Restliche Zinsbindung in Jahren (max. 10 Jahre)', type: 'number', defaultValue: 4, min: 0, max: 10, step: 0.5, unit: 'Jahre', helpText: 'Jahre bis zum Ende der Zinsbindung. Nach 10 Jahren können Sie nach § 489 BGB ohne Entschädigung kündigen.', dependsOn: { field: 'loanType', value: 'baufinanzierung' } },
+      // Ratenkredit
+      { id: 'consumerDebt', label: 'Vorzeitig zurückgezahlter Betrag (Restschuld)', type: 'number', defaultValue: 12000, min: 0, step: 500, unit: '€', helpText: 'Der Betrag, den Sie vor dem vereinbarten Termin zurückzahlen.', dependsOn: { field: 'loanType', value: 'ratenkredit' } },
+      { id: 'consumerMonths', label: 'Restlaufzeit bis zum vereinbarten Vertragsende', type: 'number', defaultValue: 24, min: 1, max: 1200, step: 1, unit: 'Monate', helpText: 'Bei höchstens 12 Monaten gilt die 0,5-%-Grenze, darüber die 1-%-Grenze.', dependsOn: { field: 'loanType', value: 'ratenkredit' } },
+      { id: 'consumerRate', label: 'Gebundener Sollzins p.a.', type: 'number', defaultValue: 6.5, min: 0, max: 100, step: 0.1, unit: '%', helpText: 'Steht im Kreditvertrag. Er begrenzt die Entschädigung auf die Zinsen bis zum Vertragsende.', dependsOn: { field: 'loanType', value: 'ratenkredit' } },
+    ],
+    calculate: (inputs) =>
+      String(inputs.loanType ?? 'baufinanzierung') === 'ratenkredit'
+        ? calculateConsumerLoanPrepayment(inputs)
+        : calculateMortgagePrepaymentEstimate(inputs),
+    formula: 'Baufinanzierung: Entschädigung ≈ Restschuld × (Zinsdifferenz − 0,15 %) × Restjahre × 0,9 | Ratenkredit: höchstens 1 % der Restschuld (Restlaufzeit ≤ 12 Monate: 0,5 %), maximal die Sollzinsen bis zum Vertragsende',
+    formulaExplanation: 'Bei einer Baufinanzierung ersetzt die Entschädigung den Zinsschaden der Bank: Vertragszins minus Wiederanlagerendite, abzüglich ersparter Verwaltungs- und Risikokosten, abgezinst auf heute. Der Rechner nähert das mit 0,15 % Kostenabzug und dem Faktor 0,9 an. Beim Ratenkredit begrenzt § 502 Abs. 3 BGB die Entschädigung: höchstens 1 % des vorzeitig gezahlten Betrags, 0,5 % bei höchstens einem Jahr Restlaufzeit, und nie mehr als die Sollzinsen bis zum Vertragsende.',
     workedExample: {
-      title: 'Beispiel: 180.000 € Restschuld, 4,2 % Zins, 2,4 % Wiederanlage, 4 Jahre Rest',
-      inputValues: [{ label: 'Restschuld', value: '180.000 €' }, { label: 'Vertragszins', value: '4,2 %' }, { label: 'Wiederanlage', value: '2,4 %' }, { label: 'Restlaufzeit', value: '4 Jahre' }],
-      steps: ['Zinsdifferenz: 4,2 % - 2,4 % = 1,80 %', 'Bereinigt um Risiko/Kosten ≈ 1,65 %', 'Geschätzter Barwertschaden ≈ 10.600 €'],
-      result: 'ca. 10.692,00 € Entschädigung',
+      title: 'Beispiel: Baufinanzierung mit 180.000 € Restschuld und 4 Jahren Restzinsbindung',
+      inputValues: [{ label: 'Restschuld', value: '180.000 €' }, { label: 'Sollzins', value: '4,2 %' }, { label: 'Wiederanlage (Beispiel)', value: '2,4 %' }, { label: 'Restzinsbindung', value: '4 Jahre' }],
+      steps: ['Zinsdifferenz: 4,2 % − 2,4 % = 1,80 %', 'Abzüglich 0,15 % ersparte Kosten: 1,65 %', '180.000 € × 1,65 % × 4 Jahre × 0,9 = 10.692,00 €'],
+      result: 'ca. 10.692,00 € Vorfälligkeitsentschädigung (5,94 % der Restschuld)',
+      inputs: { loanType: 'baufinanzierung', remainingDebt: 180000, contractRate: 4.2, reinvestmentRate: 2.4, remainingYears: 4 },
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Baufinanzierung mit 180.000 € Restschuld und 4 Jahren Restzinsbindung',
+        inputValues: [{ label: 'Restschuld', value: '180.000 €' }, { label: 'Sollzins', value: '4,2 %' }, { label: 'Wiederanlage (Beispiel)', value: '2,4 %' }, { label: 'Restzinsbindung', value: '4 Jahre' }],
+        steps: ['Zinsdifferenz: 4,2 % − 2,4 % = 1,80 %', 'Abzüglich 0,15 % ersparte Kosten: 1,65 %', '180.000 € × 1,65 % × 4 Jahre × 0,9 = 10.692,00 €'],
+        result: 'ca. 10.692,00 € Vorfälligkeitsentschädigung (5,94 % der Restschuld)',
+        inputs: { loanType: 'baufinanzierung', remainingDebt: 180000, contractRate: 4.2, reinvestmentRate: 2.4, remainingYears: 4 },
+      },
+      {
+        title: 'Beispiel 2: Ratenkredit über 12.000 € mit 24 Monaten Restlaufzeit',
+        inputValues: [{ label: 'Restschuld', value: '12.000 €' }, { label: 'Restlaufzeit', value: '24 Monate' }, { label: 'Sollzins', value: '6,5 %' }],
+        steps: ['Restlaufzeit über 12 Monate → Höchstsatz 1 %', 'Grenze 1: 12.000 € × 1 % = 120,00 €', 'Grenze 2: Sollzinsen bis Vertragsende = 829,32 €', 'Maximal zulässig ist der kleinere Wert: 120,00 €'],
+        result: 'höchstens 120,00 € Entschädigung – Sie sparen 829,32 € Zinsen, netto 709,32 €',
+        inputs: { loanType: 'ratenkredit', consumerDebt: 12000, consumerMonths: 24, consumerRate: 6.5 },
+      },
+      {
+        title: 'Beispiel 3: Ratenkredit über 3.000 € mit nur 2 Monaten Restlaufzeit',
+        inputValues: [{ label: 'Restschuld', value: '3.000 €' }, { label: 'Restlaufzeit', value: '2 Monate' }, { label: 'Sollzins', value: '2,9 %' }],
+        steps: ['Restlaufzeit höchstens 12 Monate → Höchstsatz 0,5 %', 'Grenze 1: 3.000 € × 0,5 % = 15,00 €', 'Grenze 2: Sollzinsen bis Vertragsende = 10,88 €', 'Maximal zulässig ist der kleinere Wert: 10,88 €'],
+        result: 'höchstens 10,88 € Entschädigung – hier begrenzen die restlichen Zinsen',
+        inputs: { loanType: 'ratenkredit', consumerDebt: 3000, consumerMonths: 2, consumerRate: 2.9 },
+      },
+    ],
     content: {
-      intro: 'Kündigen Eigentümer ein Festzinsdarlehen vor Ablauf der Zinsbindung wegen Immobilienverkaufs, berechnet die Bank ihren Zinsschaden nach der vom Bundesgerichtshof (BGH) anerkannten Aktiv-Passiv-Methode.',
-      details: 'Die Bank vergleicht die vertraglich vereinbarten Zinsen mit der Wiederanlage der Restsumme in sicheren Pfandbriefen über die Restlaufzeit. Ersparte Verwaltungskosten und Risikoabschläge müssen abgezogen werden.',
+      intro: 'Mit diesem Rechner ermitteln Sie kostenlos, was eine vorzeitige Rückzahlung Ihres Kredits kostet. Für eine Baufinanzierung schätzt er den Zinsschaden der Bank nach der Aktiv-Passiv-Methode. Für einen Ratenkredit berechnet er die gesetzliche Obergrenze nach § 502 BGB. Wählen Sie oben die Darlehensart – die passenden Eingabefelder erscheinen automatisch.',
+      sections: [
+        {
+          title: 'Ratenkredit: gesetzliche Obergrenze nach § 502 BGB',
+          content: 'Bei Verbraucherkrediten mit festem Sollzins ist die Entschädigung doppelt gedeckelt. Erstens: höchstens 1 % des vorzeitig zurückgezahlten Betrags. Liegen zwischen vorzeitiger und vereinbarter Rückzahlung höchstens 12 Monate, sind es 0,5 %. Zweitens: nie mehr als die Sollzinsen, die Sie bis zum Vertragsende noch gezahlt hätten. Es gilt der kleinere Wert.\n\nBeispiel: 12.000 € Restschuld, 24 Monate Restlaufzeit, 6,5 % Sollzins. Die 1-%-Grenze liegt bei 120 €, die restlichen Zinsen bei 829,32 €. Die Bank darf höchstens 120 € verlangen. Sie sparen also rund 709 € Zinsen.',
+        },
+        {
+          title: 'Baufinanzierung: Zinsschaden nach der Aktiv-Passiv-Methode',
+          content: 'Für Immobiliendarlehen gilt keine Prozent-Grenze. Die Bank darf ihren tatsächlichen Zinsschaden verlangen. Sie vergleicht die vereinbarten Zinsen mit der Rendite, die sie bei Wiederanlage in sichere Pfandbriefe erzielt. Ersparte Verwaltungs- und Risikokosten muss sie abziehen, und der Schaden wird auf heute abgezinst.\n\nDer Rechner bildet das vereinfacht ab: Zinsdifferenz minus 0,15 %, mal Restschuld und Restjahre, mal 0,9 für die Abzinsung. Das ergibt eine Größenordnung, keine verbindliche Zahl. Lassen Sie die Abrechnung der Bank im Zweifel prüfen, etwa bei einer Verbraucherzentrale.',
+        },
+        {
+          title: 'Wann entfällt die Vorfälligkeitsentschädigung?',
+          content: 'Beim Ratenkredit entfällt sie, wenn der Sollzins variabel ist, wenn eine vom Vertrag verlangte Restschuldversicherung die Rückzahlung übernimmt oder wenn der Vertrag Laufzeit, Kündigungsrecht oder Berechnung der Entschädigung unzureichend angibt (§ 502 Abs. 2 BGB).\n\nBei der Baufinanzierung können Sie nach 10 Jahren ab Auszahlung mit sechs Monaten Frist ohne Entschädigung kündigen (§ 489 BGB). Vereinbarte Sondertilgungen senken die Entschädigung. Wie sich eine Sondertilgung auf Laufzeit und Zinsen auswirkt, zeigt der [Sondertilgungsrechner](/rechner/sondertilgungsrechner/). Ihren Tilgungsplan berechnen Sie mit dem [Tilgungsrechner](/rechner/tilgungsrechner/), Raten für einen neuen Kredit mit dem [Ratenkreditrechner](/rechner/ratenkreditrechner/).',
+        },
+      ],
+      details: 'Ratenkredit: Entschädigung = min(1 % bzw. 0,5 % × Restschuld; Sollzinsen bis Vertragsende). Baufinanzierung: Entschädigung ≈ Restschuld × (Vertragszins − Wiederanlagezins − 0,15 %) × Restjahre × 0,9.',
     },
     faqs: [
-      { question: 'Kann die Vorfälligkeitsentschädigung bei Immobilienverkauf vermieden werden?', answer: 'Ja, wenn der Käufer der Immobilie das bestehende Darlehen zu den alten Konditionen übernimmt (Schuldnerwechsel) und die Bank zustimmt.' },
-      { question: 'Darf die Bank nach 10 Jahren noch eine Entschädigung verlangen?', answer: 'Nein, nach § 489 Abs. 1 Nr. 2 BGB steht Darlehensnehmern nach Ablauf von 10 Jahren ein gesetzliches, gebührenfreies Kündigungsrecht mit 6 Monaten Frist zu.' },
+      { question: 'Wie hoch ist die Vorfälligkeitsentschädigung bei einem Ratenkredit?', answer: 'Höchstens 1 % des vorzeitig zurückgezahlten Betrags, bei höchstens 12 Monaten Restlaufzeit höchstens 0,5 %. Zusätzlich darf sie die Sollzinsen bis zum Vertragsende nicht übersteigen. Bei 12.000 € und 24 Monaten Restlaufzeit sind das maximal 120 €.' },
+      { question: 'Wie berechnet die Bank die Vorfälligkeitsentschädigung bei einer Baufinanzierung?', answer: 'Nach der vom BGH anerkannten Aktiv-Passiv-Methode. Die Bank vergleicht Ihre Vertragszinsen mit der Rendite sicherer Pfandbriefe für die Restlaufzeit, zieht ersparte Kosten ab und zinst den Schaden ab. Bei 180.000 € Restschuld, 1,8 Prozentpunkten Zinsdifferenz und 4 Jahren Rest ergibt die Schätzung rund 10.700 €.' },
+      { question: 'Wann muss ich keine Vorfälligkeitsentschädigung zahlen?', answer: 'Bei variablem Sollzins, bei Rückzahlung durch eine vom Kreditvertrag verlangte Restschuldversicherung und bei unzureichenden Vertragsangaben zur Laufzeit, zum Kündigungsrecht oder zur Berechnung (§ 502 Abs. 2 BGB). Bei Baufinanzierungen entfällt sie außerdem nach Ablauf von 10 Jahren ab Auszahlung (§ 489 BGB).' },
+      { question: 'Lohnt es sich, einen Ratenkredit vorzeitig zurückzuzahlen?', answer: 'Meist ja, weil die Entschädigung gedeckelt ist und Sie die restlichen Zinsen sparen. Bei 12.000 € Restschuld, 24 Monaten Restlaufzeit und 6,5 % Sollzins sparen Sie 829,32 € Zinsen und zahlen höchstens 120 € Entschädigung. Netto bleiben 709,32 €.' },
+      { question: 'Kann ich die Vorfälligkeitsentschädigung beim Hausverkauf vermeiden?', answer: 'Ja, wenn der Käufer das Darlehen zu den alten Konditionen übernimmt und die Bank zustimmt. Möglich ist auch ein Pfandtausch: Das Darlehen wird auf eine neue Immobilie übertragen. Beides müssen Sie mit Ihrer Bank verhandeln.' },
     ],
-    relatedSlugs: ['restschuld-rechner', 'tilgungsrechner', 'sondertilgungsrechner'],
+    relatedSlugs: ['tilgungsrechner', 'sondertilgungsrechner', 'ratenkreditrechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'BGH-Rechtsprechung zur Aktiv-Passiv-Methode (XI ZR 197/00) & Deutsche Bundesbank',
-      sourceUrl: 'https://www.bundesbank.de/de/statistiken/geld-und-kapitalmaerkte/zinssaetze-und-renditen/zinsstrukturkurve-608480',
-      lastVerified: '2026-01-15',
+      source: '§ 502 BGB, BGH-Rechtsprechung zur Aktiv-Passiv-Methode (XI ZR 197/00) & Deutsche Bundesbank',
+      sourceUrl: 'https://www.gesetze-im-internet.de/bgb/__502.html',
+      lastVerified: '2026-11-05',
     },
   },
 
@@ -1820,7 +2320,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die monatliche Warmmiete beziffert den Gesamtbetrag, den Sie als Mieter jeden Monat an den Vermieter überweisen. Mit unserem Warmmiete-Rechner ermitteln Sie Ihre Warmmiete transparent aus Kaltmiete, kalten Nebenkosten und Heizkosten – inklusive jährlicher Gesamtsumme und Quadratmeterpreisen. Die exakte Zusammensetzung hängt stets vom Mietvertrag und der jährlichen Betriebskostenabrechnung ab.',
-      details: 'Formel: Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten. Die Kaltmiete (Nettomiete) vergütet ausschließlich die Raumnutzung und dient als Referenz für Mietspiegel und Mietpreisbremse. Die Nebenkostenvorauszahlung umfasst kalte Betriebskosten (Müll, Grundsteuer, Hausmeister, Wasser/Abwasser) sowie Heizungs- und Warmwasserkosten gemäß der Betriebskostenverordnung (BetrKV). Prüfen Sie mit dem [Mietbelastungsquote Rechner](/rechner/mietbelastungsquote-rechner/) auch, ob die Miete zu Ihrem Gehalt passt, kalkulieren Sie Kaufnebenkosten mit dem [Kaufnebenkosten Rechner](/rechner/kaufnebenkosten-rechner/) oder vergleichen Sie Optionen im [Mietbudget Rechner](/rechner/mietbudget-rechner/).',
+      details: 'Formel: Warmmiete = Kaltmiete + kalte Nebenkosten + Heizkosten. Die Kaltmiete (Nettomiete) vergütet ausschließlich die Raumnutzung und dient als Referenz für Mietspiegel und Mietpreisbremse. Die Nebenkostenvorauszahlung umfasst kalte Betriebskosten (Müll, Grundsteuer, Hausmeister, Wasser/Abwasser) sowie Heizungs- und Warmwasserkosten gemäß der Betriebskostenverordnung (BetrKV). Ob die Warmmiete zu Ihrem Einkommen passt, prüfen Sie mit dem [Mietbudget-Rechner](/rechner/mietbudget-rechner/). Beim Wohnungskauf helfen der [Notar- und Grundbuchkosten-Rechner](/rechner/notar-grundbuch-kosten-rechner/) und der [Tilgungsrechner](/rechner/tilgungsrechner/).',
     },
     faqs: [
       {
@@ -2095,148 +2595,158 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
   {
     id: 'stromkosten-geraete-rechner',
     slug: 'stromkosten-geraete-rechner',
-    name: 'Stromkosten-Rechner für Elektrogeräte (Watt in Euro)',
+    name: 'Stromkosten-Rechner für Geräte (Fernseher, Kühlschrank, Klimaanlage, Standby)',
     shortName: 'Stromkosten Geräte',
     category: 'haushalt-energie',
     subcategory: 'Strom & Sparen',
-    metaTitle: 'Stromkosten Rechner Geräte – Watt in kWh',
-    metaDescription: 'Berechnen Sie die Stromkosten einzelner Haushaltsgeräte in Euro pro Tag, Monat und Jahr anhand von Leistungsaufnahme (Watt) und Strompreis.',
-    h1: 'Stromkosten Rechner für Geräte – Watt in Euro umrechnen',
-    shortDescription: 'Ermittelt den Stromverbrauch und die jährlichen Stromkosten für beliebige Haushaltsgeräte.',
-    searchKeywords: ['stromkosten rechner geraete', 'watt in euro umrechnen', 'kwh rechner stromkosten', 'stromverbrauch haushalt berechnen'],
-    inputs: [
-      { id: 'powerWatts', label: 'Leistungsaufnahme des Geräts in Watt', type: 'number', defaultValue: 150, min: 0, step: 5, unit: 'W' },
-      { id: 'hoursPerDay', label: 'Nutzungsdauer pro Tag in Stunden', type: 'number', defaultValue: 4, min: 0.1, max: 24, step: 0.5, unit: 'Std./Tag' },
-      { id: 'usageDays', label: 'Nutzungstage im Betrachtungszeitraum', type: 'number', defaultValue: 365, min: 1, max: 365, step: 1, unit: 'Tage', helpText: 'z. B. 30 Tage für einen Monat, 365 Tage für ein ganzes Jahr oder 10 Tage für temporäre Heizgeräte' },
-      { id: 'electricityPrice', label: 'Strompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 5, max: 90, step: 0.5, unit: 'ct/kWh' },
+    metaTitle: 'Stromkosten Rechner Geräte: Fernseher, Kühlschrank & Co.',
+    metaDescription: 'Stromkosten einzelner Geräte kostenlos berechnen: Fernseher, Kühlschrank, Klimaanlage, Standby oder Watt-Angabe – Kosten pro Tag, Monat und Jahr.',
+    h1: 'Stromkosten Rechner für Geräte – Fernseher, Kühlschrank, Klimaanlage & Standby',
+    shortDescription: 'Wählen Sie ein Gerät oder tragen Sie die Watt-Angabe ein. Der Rechner zeigt den Stromverbrauch in kWh und die Kosten pro Tag, Monat und Jahr – auch für Standby, Klimaanlage und den Vergleich Kühlschrank alt gegen neu.',
+    searchKeywords: [
+      'stromkosten rechner geräte',
+      'watt in euro umrechnen',
+      'stromverbrauch gerät berechnen',
+      'kwh rechner stromkosten',
+      'fernseher stromverbrauch',
+      'fernseher stromkosten',
+      'kühlschrank stromkosten',
+      'kühlschrank stromverbrauch kwh',
+      'gefrierschrank stromkosten',
+      'standby kosten',
+      'standby stromverbrauch berechnen',
+      'klimaanlage stromverbrauch',
+      'klimaanlage stromkosten',
     ],
-    calculate: (inputs) => {
-      if (inputs.powerWatts === undefined || inputs.powerWatts === null || String(inputs.powerWatts).trim() === '') {
-        return {
-          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Bitte geben Sie die Leistungsaufnahme des Geräts in Watt ein.',
-        };
-      }
-      if (inputs.hoursPerDay === undefined || inputs.hoursPerDay === null || String(inputs.hoursPerDay).trim() === '') {
-        return {
-          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Bitte geben Sie die tägliche Nutzungsdauer in Stunden ein.',
-        };
-      }
-      if (inputs.electricityPrice === undefined || inputs.electricityPrice === null || String(inputs.electricityPrice).trim() === '') {
-        return {
-          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Bitte geben Sie den Strompreis in Cent pro kWh ein.',
-        };
-      }
-
-      const wattsStr = String(inputs.powerWatts).trim();
-      const hoursStr = String(inputs.hoursPerDay).trim();
-      const priceStr = String(inputs.electricityPrice).trim();
-      const daysStr = inputs.usageDays !== undefined && inputs.usageDays !== null && String(inputs.usageDays).trim() !== ''
-        ? String(inputs.usageDays).trim()
-        : '365';
-
-      const watts = parseFloat(wattsStr.replace(',', '.'));
-      const hours = parseFloat(hoursStr.replace(',', '.'));
-      const days = parseFloat(daysStr.replace(',', '.'));
-      const priceCent = parseFloat(priceStr.replace(',', '.'));
-
-      if (isNaN(watts) || isNaN(hours) || isNaN(days) || isNaN(priceCent)) {
-        return {
-          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Bitte geben Sie gültige Zahlenwerte ein.',
-        };
-      }
-
-      if (watts < 0 || hours < 0 || days <= 0 || priceCent < 0) {
-        return {
-          primary: { id: 'costPeriod', label: 'Stromkosten im Zeitraum', value: 0, formattedValue: '–' },
-          secondary: [],
-          error: 'Leistung, Stunden und Strompreis dürfen nicht negativ sein. Die Nutzungstage müssen mindestens 1 betragen.',
-        };
-      }
-
-      const kwhPerHour = watts / 1000;
-      const kwhPerDay = kwhPerHour * hours;
-      const totalKwhPeriod = kwhPerDay * days;
-      const costPeriod = (totalKwhPeriod * priceCent) / 100;
-      const costPerHour = (kwhPerHour * priceCent) / 100;
-      const costPerDay = (kwhPerDay * priceCent) / 100;
-
-      const isFullYear = days === 365;
-      const periodLabel = isFullYear ? 'Stromkosten pro Jahr (365 Tage)' : `Stromkosten für ${days} Nutzungstage`;
-
-      return {
-        primary: {
-          id: 'costPeriod',
-          label: periodLabel,
-          value: costPeriod,
-          formattedValue: formatCurrency(costPeriod),
-          highlight: true,
-        },
-        secondary: [
-          { id: 'totalKwhPeriod', label: `Stromverbrauch (${days} Tage)`, value: totalKwhPeriod, formattedValue: `${formatNumber(totalKwhPeriod, 1)} kWh` },
-          { id: 'costPerHour', label: 'Kosten pro Betriebsstunde', value: costPerHour, formattedValue: `${formatCurrency(costPerHour)} / Std.` },
-          { id: 'costPerDay', label: 'Kosten pro Nutzungstag', value: costPerDay, formattedValue: `${formatCurrency(costPerDay)} / Tag` },
-          { id: 'costYearExtrapolated', label: 'Hochrechnung auf 365 Tage', value: costPerDay * 365, formattedValue: formatCurrency(costPerDay * 365) },
+    inputs: [
+      {
+        id: 'device',
+        label: 'Gerät',
+        type: 'select',
+        defaultValue: 'custom',
+        options: [
+          { value: 'custom', label: 'Eigenes Gerät (Watt vom Typenschild)' },
+          { value: 'tv', label: 'Fernseher (Betrieb und Standby)' },
+          { value: 'fridge', label: 'Kühlschrank / Gefrierschrank (kWh/Jahr vom EU-Label)' },
+          { value: 'fridgeCompare', label: 'Kühlschrank: Altgerät gegen Neugerät vergleichen' },
+          { value: 'acSplit', label: 'Klimaanlage – Split-Gerät' },
+          { value: 'acMobile', label: 'Klimaanlage – mobiles Gerät mit Abluftschlauch' },
+          { value: 'standby', label: 'Standby-Verbraucher (Geräte im Bereitschaftsmodus)' },
         ],
-        summaryText: `Dein Gerät verbraucht bei ${formatNumber(watts, 0)} Watt und täglich ${formatNumber(hours, 1)} Stunden Nutzung in ${days} Tagen insgesamt ${formatNumber(totalKwhPeriod, 1)} kWh. Bei ${formatNumber(priceCent, 1)} Cent/kWh kostet das ${formatCurrency(costPeriod)}.`,
-        directAnswer: `Dein Gerät verbraucht bei ${formatNumber(watts, 0)} Watt und täglich ${formatNumber(hours, 1)} Stunden Nutzung in ${days} Tagen insgesamt ${formatNumber(totalKwhPeriod, 1)} kWh. Bei ${formatNumber(priceCent, 1)} Cent/kWh kostet das ${formatCurrency(costPeriod)}.`,
-        qualifications: [
-          'Nur reine Verbrauchskosten; ohne Grundpreis des Stromversorgers.',
-          'Schätzung bei durchgehend voller Leistung; Thermostate oder Ruhemodi können den tatsächlichen Verbrauch reduzieren.',
-          isFullYear
-            ? 'Berechnet für ein volles Kalenderjahr (365 Nutzungstage).'
-            : `Berechnet für exakt ${days} Nutzungstage (keine Zwangshochrechnung auf das Gesamtjahr).`,
-        ],
-        calculationSteps: [
-          `${formatNumber(watts / 1000, 2)} kW × ${formatNumber(hours, 1)} Stunden pro Tag × ${days} Tage = ${formatNumber(totalKwhPeriod, 1)} kWh`,
-          `${formatNumber(totalKwhPeriod, 1)} kWh × ${formatCurrency(priceCent / 100, 2)}/kWh = ${formatCurrency(costPeriod)}`,
-        ],
-        basisSummary: [
-          { label: 'Leistung des Geräts', value: `${formatNumber(watts, 0)} Watt` },
-          { label: 'Nutzung pro Tag', value: `${formatNumber(hours, 1)} Stunden` },
-          { label: 'Nutzungstage', value: `${days} Tage` },
-          { label: 'Strompreis', value: `${formatNumber(priceCent, 1)} Cent/kWh` },
-        ],
-      };
-    },
-    formula: 'Kosten = (Watt × Stunden/Tag × Nutzungstage / 1000) × Strompreis in €',
-    formulaExplanation: 'Watt dividiert durch 1.000 ergibt Kilowatt (kW). Multipliziert mit den Betriebsstunden, den tatsächlichen Nutzungstagen und dem Arbeitspreis je kWh erhält man die Gesamtkosten ohne pauschale Zwangshochrechnung auf 365 Tage.',
+      },
+      // Eigenes Gerät
+      { id: 'powerWatts', label: 'Leistungsaufnahme des Geräts in Watt', type: 'number', defaultValue: 150, min: 0, step: 5, unit: 'W', helpText: 'Steht auf dem Typenschild oder im Datenblatt. Genauer ist ein Messwert vom Strommessgerät.', dependsOn: { field: 'device', value: 'custom' } },
+      { id: 'hoursPerDay', label: 'Nutzungsdauer pro Tag in Stunden', type: 'number', defaultValue: 4, min: 0, max: 24, step: 0.5, unit: 'Std./Tag', dependsOn: { field: 'device', value: 'custom' } },
+      { id: 'usageDays', label: 'Nutzungstage im Zeitraum', type: 'number', defaultValue: 365, min: 1, max: 366, step: 1, unit: 'Tage', helpText: 'z. B. 365 für ein Jahr, 30 für einen Monat oder 60 für einen Heizlüfter im Winter.', dependsOn: { field: 'device', value: 'custom' } },
+      // Fernseher
+      { id: 'tvWatts', label: 'Leistung des Fernsehers im Betrieb in Watt', type: 'number', defaultValue: 120, min: 0, max: 1000, step: 5, unit: 'W', helpText: 'Vorschlag: 120 W. Typisch sind 50 bis 200 W je nach Größe und Technik (LED, QLED, OLED).', dependsOn: { field: 'device', value: 'tv' } },
+      { id: 'tvHoursPerDay', label: 'Fernsehzeit pro Tag in Stunden', type: 'number', defaultValue: 4, min: 0, max: 24, step: 0.5, unit: 'Std./Tag', dependsOn: { field: 'device', value: 'tv' } },
+      { id: 'tvStandbyWatts', label: 'Standby-Leistung des Fernsehers in Watt', type: 'number', defaultValue: 1, min: 0, max: 50, step: 0.5, unit: 'W', helpText: 'Neuere Geräte liegen meist unter 1 W, ältere oder Geräte mit Schnellstart deutlich darüber.', dependsOn: { field: 'device', value: 'tv' } },
+      // Kühl- und Gefriergeräte
+      {
+        id: 'fridgeKwhYear',
+        label: 'Jahresverbrauch laut EU-Energielabel in kWh',
+        type: 'number',
+        defaultValue: 220,
+        min: 0,
+        max: 2000,
+        step: 5,
+        unit: 'kWh/Jahr',
+        helpText: 'Die Angabe „kWh/annum“ auf dem Energielabel. Ältere Geräte ohne Label: oft 250 bis 350 kWh.',
+        dependsOn: { field: 'device', value: ['fridge', 'fridgeCompare'] },
+        conditionalLabels: [{ condition: { field: 'device', value: 'fridgeCompare' }, label: 'Jahresverbrauch des Altgeräts in kWh' }],
+      },
+      { id: 'fridgeNewKwhYear', label: 'Jahresverbrauch des Neugeräts in kWh', type: 'number', defaultValue: 115, min: 0, max: 2000, step: 5, unit: 'kWh/Jahr', helpText: 'Sparsame Neugeräte liegen oft bei 90 bis 130 kWh pro Jahr.', dependsOn: { field: 'device', value: 'fridgeCompare' } },
+      { id: 'fridgeNewPrice', label: 'Kaufpreis des Neugeräts', type: 'number', defaultValue: 650, min: 0, step: 25, unit: '€', helpText: '0 eintragen, wenn Sie nur die Stromersparnis sehen möchten.', dependsOn: { field: 'device', value: 'fridgeCompare' } },
+      // Klimaanlage
+      { id: 'acSplitWatts', label: 'Mittlere Leistungsaufnahme beim Kühlen in Watt', type: 'number', defaultValue: 600, min: 0, max: 5000, step: 50, unit: 'W', helpText: 'Vorschlag: 600 W (≈ 0,6 kWh pro Stunde) für ein Inverter-Split-Gerät.', dependsOn: { field: 'device', value: 'acSplit' } },
+      { id: 'acMobileWatts', label: 'Mittlere Leistungsaufnahme beim Kühlen in Watt', type: 'number', defaultValue: 1200, min: 0, max: 5000, step: 50, unit: 'W', helpText: 'Vorschlag: 1.200 W (≈ 1,2 kWh pro Stunde) für ein mobiles Monoblock-Gerät.', dependsOn: { field: 'device', value: 'acMobile' } },
+      { id: 'acHoursPerDay', label: 'Kühlstunden pro Tag', type: 'number', defaultValue: 6, min: 0, max: 24, step: 1, unit: 'Std./Tag', dependsOn: { field: 'device', value: ['acSplit', 'acMobile'] } },
+      { id: 'acDays', label: 'Kühltage pro Jahr', type: 'number', defaultValue: 35, min: 0, max: 366, step: 5, unit: 'Tage', helpText: 'Anzahl der Tage, an denen die Klimaanlage läuft (z. B. heiße Sommertage).', dependsOn: { field: 'device', value: ['acSplit', 'acMobile'] } },
+      // Standby
+      { id: 'standbyWatts', label: 'Standby-Leistung in Watt (alle Geräte zusammen)', type: 'number', defaultValue: 35, min: 0, max: 2000, step: 1, unit: 'W', helpText: 'Ein typischer Haushalt kommt auf 20 bis 50 W Standby. Ein Strommessgerät zeigt den genauen Wert.', dependsOn: { field: 'device', value: 'standby' } },
+      { id: 'standbyHoursPerDay', label: 'Stunden ohne Nutzung (im Standby) pro Tag', type: 'number', defaultValue: 20, min: 0, max: 24, step: 1, unit: 'Std./Tag', dependsOn: { field: 'device', value: 'standby' } },
+      // Für alle Geräte
+      { id: 'electricityPrice', label: 'Strompreis (Arbeitspreis) in Cent pro kWh', type: 'number', defaultValue: 36, min: 0, max: 200, step: 0.5, unit: 'ct/kWh', helpText: 'Vorbelegt mit 36 ct/kWh als Beispielwert. Tragen Sie den Arbeitspreis aus Ihrem Stromvertrag ein.' },
+    ],
+    calculate: calculateApplianceElectricity,
+    formula: 'Kosten = Leistung (W) ÷ 1.000 × Stunden pro Tag × Tage × Strompreis (€/kWh); Kühlgeräte: kWh/Jahr × Strompreis',
+    formulaExplanation: 'Watt geteilt durch 1.000 ergibt Kilowatt. Kilowatt mal Betriebsstunden ergibt Kilowattstunden (kWh). Die kWh mal Arbeitspreis sind die Stromkosten. Beim Fernseher kommt der Standby-Verbrauch in den übrigen Stunden des Tages hinzu. Bei Kühl- und Gefriergeräten steht der Jahresverbrauch direkt auf dem EU-Energielabel. Standby-Kosten = Standby-Leistung × Stunden ohne Nutzung × 365 Tage.',
     workedExample: {
-      title: 'Beispiel 1: 150-Watt Fernseher 4 Stunden täglich an 365 Tagen bei 36 ct/kWh',
-      inputValues: [{ label: 'Leistung', value: '150 Watt' }, { label: 'Betriebszeit', value: '4 Std./Tag' }, { label: 'Nutzungstage', value: '365 Tage' }, { label: 'Strompreis', value: '36 ct/kWh' }],
-      steps: ['Täglich: 150 W × 4 h = 600 Wh = 0,6 kWh/Tag', '365 Tage: 0,6 kWh × 365 = 219 kWh', 'Kosten: 219 kWh × 0,36 € = 78,84 €'],
-      result: '78,84 € Stromkosten pro Jahr',
+      title: 'Beispiel: Fernseher mit 120 W, 4 Stunden täglich und 1 W Standby',
+      inputValues: [{ label: 'Gerät', value: 'Fernseher' }, { label: 'Leistung', value: '120 W' }, { label: 'Fernsehzeit', value: '4 Std./Tag' }, { label: 'Standby', value: '1 W' }, { label: 'Strompreis (Beispiel)', value: '36 ct/kWh' }],
+      steps: ['Betrieb: 120 W × 4 h × 365 Tage = 175,2 kWh', 'Standby: 1 W × 20 h × 365 Tage = 7,3 kWh', 'Summe: 182,5 kWh × 0,36 € = 65,70 € pro Jahr'],
+      result: '65,70 € pro Jahr (5,48 € pro Monat), davon 2,63 € Standby',
+      inputs: { device: 'tv', tvWatts: 120, tvHoursPerDay: 4, tvStandbyWatts: 1, electricityPrice: 36 },
     },
     workedExamples: [
       {
-        title: 'Beispiel 1: 150-Watt Fernseher 4 Stunden täglich an 365 Tagen bei 36 ct/kWh',
-        description: 'Täglich: 0,6 kWh. Jährlich (365 Tage): 219 kWh. Kosten: 78,84 € pro Jahr.',
-        inputs: { powerWatts: 150, hoursPerDay: 4, usageDays: 365, electricityPrice: 36 },
-        resultSummary: '78,84 € pro Jahr (219 kWh)',
+        title: 'Beispiel 1: Fernseher mit 120 W, 4 Stunden täglich und 1 W Standby',
+        inputValues: [{ label: 'Gerät', value: 'Fernseher' }, { label: 'Leistung', value: '120 W' }, { label: 'Fernsehzeit', value: '4 Std./Tag' }, { label: 'Standby', value: '1 W' }, { label: 'Strompreis (Beispiel)', value: '36 ct/kWh' }],
+        steps: ['Betrieb: 120 W × 4 h × 365 Tage = 175,2 kWh', 'Standby: 1 W × 20 h × 365 Tage = 7,3 kWh', 'Summe: 182,5 kWh × 0,36 € = 65,70 € pro Jahr'],
+        result: '65,70 € pro Jahr (5,48 € pro Monat), davon 2,63 € Standby',
+        inputs: { device: 'tv', tvWatts: 120, tvHoursPerDay: 4, tvStandbyWatts: 1, electricityPrice: 36 },
       },
       {
-        title: 'Beispiel 2: 2.000-Watt Heizlüfter 2 Stunden täglich an genau 30 Tagen bei 35 ct/kWh',
-        description: 'Täglich: 2.000 W × 2 h = 4 kWh/Tag. 30 Tage: 4 kWh × 30 = 120 kWh. Kosten: 120 kWh × 0,35 € = 42,00 €.',
-        inputs: { powerWatts: 2000, hoursPerDay: 2, usageDays: 30, electricityPrice: 35 },
-        resultSummary: '42,00 € für 30 Tage (120 kWh, 0,70 €/Std.)',
+        title: 'Beispiel 2: Kühlschrank alt (320 kWh) gegen neu (115 kWh)',
+        inputValues: [{ label: 'Altgerät', value: '320 kWh/Jahr' }, { label: 'Neugerät', value: '115 kWh/Jahr' }, { label: 'Kaufpreis', value: '650 €' }, { label: 'Strompreis (Beispiel)', value: '36 ct/kWh' }],
+        steps: ['Altgerät: 320 kWh × 0,36 € = 115,20 €', 'Neugerät: 115 kWh × 0,36 € = 41,40 €', 'Ersparnis: 115,20 € − 41,40 € = 73,80 € pro Jahr', 'Amortisation: 650 € ÷ 73,80 € = 8,8 Jahre'],
+        result: '73,80 € Ersparnis pro Jahr, Kaufpreis nach ca. 8,8 Jahren eingespart',
+        inputs: { device: 'fridgeCompare', fridgeKwhYear: 320, fridgeNewKwhYear: 115, fridgeNewPrice: 650, electricityPrice: 36 },
+      },
+      {
+        title: 'Beispiel 3: Split-Klimaanlage 6 Stunden an 35 Hitzetagen',
+        inputValues: [{ label: 'Gerät', value: 'Split-Klimaanlage' }, { label: 'Leistung', value: '600 W' }, { label: 'Betrieb', value: '6 Std. an 35 Tagen' }, { label: 'Strompreis (Beispiel)', value: '36 ct/kWh' }],
+        steps: ['Verbrauch: 0,6 kW × 6 h × 35 Tage = 126 kWh', 'Kosten: 126 kWh × 0,36 € = 45,36 € pro Sommer', 'Pro Hitzetag: 0,6 kW × 6 h × 0,36 € = 1,30 €'],
+        result: '45,36 € pro Sommer (ein mobiles Gerät mit 1.200 W: 90,72 €)',
+        inputs: { device: 'acSplit', acSplitWatts: 600, acHoursPerDay: 6, acDays: 35, electricityPrice: 36 },
+      },
+      {
+        title: 'Beispiel 4: 35 W Standby an 20 Stunden pro Tag',
+        inputValues: [{ label: 'Gerät', value: 'Standby-Verbraucher' }, { label: 'Standby-Leistung', value: '35 W' }, { label: 'Standby-Dauer', value: '20 Std./Tag' }, { label: 'Strompreis (Beispiel)', value: '36 ct/kWh' }],
+        steps: ['Verbrauch: 35 W × 20 h × 365 Tage ÷ 1.000 = 255,5 kWh', 'Kosten: 255,5 kWh × 0,36 € = 91,98 € pro Jahr', 'Pro Monat: 91,98 € ÷ 12 = 7,67 €'],
+        result: '91,98 € pro Jahr für Standby',
+        inputs: { device: 'standby', standbyWatts: 35, standbyHoursPerDay: 20, electricityPrice: 36 },
+      },
+      {
+        title: 'Beispiel 5: Heizlüfter mit 2.000 W, 2 Stunden täglich an 30 Tagen',
+        inputValues: [{ label: 'Gerät', value: 'Eigenes Gerät' }, { label: 'Leistung', value: '2.000 W' }, { label: 'Nutzung', value: '2 Std./Tag an 30 Tagen' }, { label: 'Strompreis (Beispiel)', value: '35 ct/kWh' }],
+        steps: ['Pro Tag: 2 kW × 2 h = 4 kWh', '30 Tage: 4 kWh × 30 = 120 kWh', 'Kosten: 120 kWh × 0,35 € = 42,00 €'],
+        result: '42,00 € für 30 Tage (0,70 € pro Betriebsstunde)',
+        inputs: { device: 'custom', powerWatts: 2000, hoursPerDay: 2, usageDays: 30, electricityPrice: 35 },
       },
     ],
     content: {
-      intro: 'Dieser Gerätekostenrechner beziffert die laufenden Kosten einzelner Verbraucher (Waschmaschine, PC, Backofen, Heizlüfter) pro Nutzung, Tag, Monat und Jahr. Eine detaillierte Beispielrechnung mit Kosten pro Stunde und Monat für Heizgeräte finden Sie in unserem Ratgeber [Heizlüfter mit 2000 Watt: Kosten pro Stunde und Monat](/ratgeber/heizluefter-2000-watt-stromkosten/).',
-      details: 'Kosten = (Leistung in Watt / 1.000) · Betriebsstunden · Strompreis je kWh. Ein Heizlüfter mit 2.000 Watt verursacht bei 35 Cent/kWh pro Betriebsstunde bereits 0,70 Euro Stromkosten.',
+      intro: 'Mit diesem Rechner ermitteln Sie kostenlos, was ein einzelnes Elektrogerät an Strom kostet. Wählen Sie Fernseher, Kühl- oder Gefriergerät, Klimaanlage oder Standby-Verbraucher – oder tragen Sie die Watt-Angabe eines beliebigen Geräts ein. Sie sehen den Verbrauch in kWh und die Kosten pro Tag, Monat und Jahr. Alle Gerätewerte sind Vorschläge und lassen sich überschreiben. Ein ausführliches Rechenbeispiel für Heizgeräte finden Sie im Ratgeber [Heizlüfter mit 2000 Watt: Kosten pro Stunde und Monat](/ratgeber/heizluefter-2000-watt-stromkosten/).',
+      sections: [
+        {
+          title: 'Watt in kWh und Euro umrechnen',
+          content: 'Auf dem Typenschild steht die Leistung in Watt (W). Geteilt durch 1.000 ergibt sich Kilowatt (kW). Kilowatt mal Betriebsstunden ergibt Kilowattstunden (kWh) – die Einheit auf Ihrer Stromrechnung. Die kWh mal Arbeitspreis sind die Kosten.\n\nBeispiel: Ein Heizlüfter mit 2.000 W läuft 2 Stunden am Tag. Das sind 2 kW × 2 h = 4 kWh pro Tag und 120 kWh in 30 Tagen. Bei einem Beispielpreis von 35 ct/kWh kostet das 42,00 €.\n\n| Gerät (Beispielwerte) | Leistung und Nutzung | kWh pro Jahr | Kosten pro Jahr bei 36 ct/kWh |\n| --- | --- | --- | --- |\n| WLAN-Router | 10 W, 24 Std. täglich | 87,6 kWh | 31,54 € |\n| Fernseher | 120 W, 4 Std. täglich + 1 W Standby | 182,5 kWh | 65,70 € |\n| Kühl-Gefrier-Kombination | 220 kWh laut Energielabel | 220 kWh | 79,20 € |\n| Standby im Haushalt | 35 W, 20 Std. täglich | 255,5 kWh | 91,98 € |\n| Gaming-PC | 300 W, 3 Std. täglich | 328,5 kWh | 118,26 € |\n| Split-Klimaanlage | 600 W, 6 Std. an 35 Tagen | 126 kWh | 45,36 € |\n\nDie Werte sind Beispiele. Ihr Gerät kann deutlich abweichen – am genauesten ist ein Messwert vom Steckdosen-Strommessgerät.',
+        },
+        {
+          title: 'Kühlschrank und Gefrierschrank: Wert vom EU-Energielabel nutzen',
+          content: 'Kühl- und Gefriergeräte laufen rund um die Uhr, schalten den Kompressor aber immer wieder ab. Watt mal 24 Stunden würde den Verbrauch deshalb stark überschätzen. Tragen Sie stattdessen den Jahresverbrauch in kWh vom EU-Energielabel ein. Ältere Geräte verbrauchen oft 250 bis 350 kWh im Jahr, sparsame Neugeräte 90 bis 130 kWh.\n\nMit der Option „Kühlschrank: Altgerät gegen Neugerät vergleichen“ sehen Sie die jährliche Ersparnis. Der Rechner zeigt außerdem, nach wie vielen Jahren sich der Kaufpreis über die gesparten Stromkosten bezahlt macht.',
+        },
+        {
+          title: 'Standby und Klimaanlage: Kosten, die man leicht übersieht',
+          content: 'Viele Geräte ziehen auch ausgeschaltet Strom: Router, Spielekonsolen mit Schnellstart, Receiver, Kaffeevollautomaten. Ein typischer Haushalt kommt auf 20 bis 50 W Standby. Die Kosten ergeben sich aus Standby-Leistung × Stunden ohne Nutzung × 365 Tage. Eine abschaltbare Steckdosenleiste beendet diesen Verbrauch.\n\nBei Klimaanlagen entscheidet der Gerätetyp. Split-Geräte kühlen deutlich effizienter als mobile Monoblock-Geräte, die warme Luft über einen Schlauch durch das Fenster leiten. Der Rechner schlägt 600 W für Split-Geräte und 1.200 W für mobile Geräte vor. Steht die Leistung im Datenblatt, tragen Sie diesen Wert ein.',
+        },
+        {
+          title: 'Welcher Rechner passt zu Ihrer Frage?',
+          content: 'Für die gesamte Stromrechnung mit Grundpreis und Abschlag nutzen Sie den [Stromkostenrechner](/rechner/stromkostenrechner/). Waschmaschine, Spülmaschine und Trockner rechnen mit Kosten pro Durchgang und haben eigene Rechner: [Waschmaschine](/rechner/waschmaschine-kosten-rechner/), [Spülmaschine](/rechner/spuelmaschine-kosten-rechner/) und [Trockner](/rechner/trockner-kosten-rechner/). Was der Wechsel auf LED-Lampen spart, zeigt der [LED-Ersparnis-Rechner](/rechner/led-ersparnis-rechner/).',
+        },
+      ],
+      details: 'Kosten = Leistung in Watt ÷ 1.000 × Betriebsstunden × Strompreis je kWh. Ein Gerät mit 1.000 W kostet bei 36 ct/kWh pro Betriebsstunde 36 Cent. Der Grundpreis Ihres Stromtarifs ist nicht enthalten, weil er unabhängig vom einzelnen Gerät anfällt.',
     },
     faqs: [
-      { question: 'Welches Haushaltsgerät verbraucht im Jahr am meisten Strom?', answer: 'In der Regel Kühl- und Gefriergeräte (durch den Dauerbetrieb 24/7), gefolgt von elektrischer Warmwasserbereitung, Wäschetrocknern und Gaming-PCs.' },
-      { question: 'Wie misst man den echten Stromverbrauch einzelner Geräte?', answer: 'Mit einem digitalen Energiekosten-Messgerät für die Steckdose, das die tatsächliche Leistungsaufnahme über mehrere Tage und Betriebszyklen aufzeichnet.' },
+      { question: 'Wie viel Strom verbraucht ein Fernseher im Jahr?', answer: 'Ein Fernseher mit 120 Watt verbraucht bei 4 Stunden täglich 175,2 kWh im Jahr. Mit 1 Watt Standby in der übrigen Zeit sind es 182,5 kWh. Bei 36 ct/kWh kostet das 65,70 € pro Jahr. Große Geräte ab 65 Zoll und HDR-Inhalte liegen oft deutlich darüber.' },
+      { question: 'Was kostet ein Kühlschrank im Jahr an Strom?', answer: 'Multiplizieren Sie den Jahresverbrauch vom EU-Energielabel mit Ihrem Strompreis. Ein Gerät mit 220 kWh pro Jahr kostet bei 36 ct/kWh 79,20 € im Jahr. Ein sparsames Neugerät mit 115 kWh kommt auf 41,40 €.' },
+      { question: 'Lohnt sich ein neuer Kühlschrank wegen der Stromkosten?', answer: 'Das hängt vom Verbrauch des Altgeräts ab. Ersetzt ein Neugerät mit 115 kWh ein Altgerät mit 320 kWh, sparen Sie bei 36 ct/kWh 73,80 € im Jahr. Ein Kaufpreis von 650 € ist dann nach etwa 8,8 Jahren über die Stromersparnis eingespart.' },
+      { question: 'Wie hoch sind die Standby-Kosten im Jahr?', answer: 'Rechnen Sie Standby-Leistung × Stunden ohne Nutzung × 365 Tage. Ein Haushalt mit 35 Watt Standby an 20 Stunden täglich verbraucht 255,5 kWh im Jahr. Bei 36 ct/kWh kostet das 91,98 €.' },
+      { question: 'Wie viel Strom verbraucht eine Klimaanlage pro Stunde?', answer: 'Ein Split-Gerät braucht beim Kühlen oft rund 0,6 kWh pro Stunde, ein mobiles Monoblock-Gerät etwa 1,2 kWh. Bei 36 ct/kWh sind das rund 22 bzw. 43 Cent pro Stunde. An 35 Hitzetagen mit je 6 Stunden ergibt das 45,36 € bzw. 90,72 €.' },
+      { question: 'Wie rechne ich Watt in Euro um?', answer: 'Teilen Sie die Watt-Zahl durch 1.000 und multiplizieren Sie mit den Betriebsstunden. Das Ergebnis in kWh mal Strompreis ergibt die Kosten. Beispiel: 2.000 W × 1 Stunde = 2 kWh, bei 35 ct/kWh also 70 Cent.' },
     ],
-    relatedSlugs: ['klimaanlage-stromkosten-rechner', 'fernseher-stromkosten-rechner', 'stromkostenrechner', 'gasverbrauch-kwh-m3-rechner', 'led-ersparnis-rechner'],
+    relatedSlugs: ['stromkostenrechner', 'waschmaschine-kosten-rechner', 'spuelmaschine-kosten-rechner', 'trockner-kosten-rechner', 'led-ersparnis-rechner', 'balkonkraftwerk-ertrag-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

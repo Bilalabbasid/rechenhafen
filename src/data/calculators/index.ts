@@ -55,9 +55,22 @@ function liveRelatedSlugs(calc: CalculatorDefinition): string[] {
   const out: string[] = [];
   for (const slug of calc.relatedSlugs) {
     const target = isCalculatorRetired(slug)
-      ? RETIRED_CALCULATORS[slug].match(/^\/rechner\/([^/]+)\/$/)?.[1]
+      ? RETIRED_CALCULATORS[slug].match(/^\/rechner\/([^/?]+)\/(?:\?.*)?$/)?.[1]
       : slug;
     if (target && target !== calc.slug && !out.includes(target)) out.push(target);
+  }
+  // Every related link was retired or merged into this page itself: fall back to live
+  // calculators of the same subcategory, then category.
+  if (out.length === 0) {
+    const live = ALL_CALCULATOR_DEFINITIONS.filter((c) => c.slug !== calc.slug && !isCalculatorRetired(c.slug));
+    const pool = [
+      ...live.filter((c) => calc.subcategory && c.subcategory === calc.subcategory),
+      ...live.filter((c) => c.category === calc.category),
+    ];
+    for (const c of pool) {
+      if (!out.includes(c.slug)) out.push(c.slug);
+      if (out.length >= 3) break;
+    }
   }
   return out;
 }

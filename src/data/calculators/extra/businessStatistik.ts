@@ -1,5 +1,153 @@
-import { CalculatorDefinition } from '@/types/calculator';
+import { CalculatorDefinition, CalculationResult, ResultItem } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+
+// ---------------------------------------------------------------------------
+// Rentabilitätsrechner (umsatzrentabilitaet-rechner)
+// Vereint Umsatz-, Eigenkapital- und Gesamtkapitalrentabilität. Umsatz,
+// Eigenkapital und Fremdkapital sind optional: Jede Kennzahl, deren Basis
+// größer als 0 ist, wird berechnet.
+// ---------------------------------------------------------------------------
+function rosRating(ros: number, profit: number): string {
+  if (profit === 0) return 'Ausgeglichen (Break-Even, kein Gewinn)';
+  if (ros < 0) return 'Verlustzone (negatives Ergebnis)';
+  if (ros < 2) return 'Geringe Marge (anfällig bei Kostensteigerungen)';
+  if (ros < 5) return 'Durchschnittlicher Mittelstandsbereich';
+  if (ros < 10) return 'Gute Ertragskraft';
+  return 'Sehr hohe Ertragskraft';
+}
+
+function roeRating(roe: number): string {
+  if (roe < 0) return 'Verlust: Das Eigenkapital schrumpft';
+  if (roe < 6) return 'Niedrig im Verhältnis zum unternehmerischen Risiko';
+  if (roe < 12) return 'Solide Verzinsung des Eigenkapitals';
+  return 'Hohe Verzinsung des Eigenkapitals';
+}
+
+function calculateProfitabilityRatios(inputs: Record<string, any>): CalculationResult {
+  const read = (raw: unknown): number | null => {
+    if (raw === undefined || raw === null) return null;
+    const s = String(raw).trim().replace(',', '.');
+    return s === '' ? null : Number(s);
+  };
+  const fail = (error: string): CalculationResult => ({
+    primary: { id: 'ros', label: 'Rentabilität', value: 0, formattedValue: '–' },
+    secondary: [],
+    error,
+    summaryText: error,
+  });
+
+  const profit = read(inputs.profit);
+  const revenue = read(inputs.revenue);
+  const equity = read(inputs.equity);
+  const debt = read(inputs.debt);
+  const interest = read(inputs.interestExpense);
+
+  if (profit === null) return fail('Bitte geben Sie den Gewinn (Jahresüberschuss) ein.');
+  for (const v of [profit, revenue, equity, debt, interest]) {
+    if (v !== null && !Number.isFinite(v)) return fail('Bitte geben Sie gültige Zahlen ein.');
+  }
+  if (revenue !== null && revenue < 0) return fail('Der Umsatz darf nicht negativ sein.');
+  if (debt !== null && debt < 0) return fail('Das Fremdkapital darf nicht negativ sein.');
+  if (interest !== null && interest < 0) return fail('Die Fremdkapitalzinsen dürfen nicht negativ sein.');
+
+  const rev = revenue ?? 0;
+  const eq = equity ?? 0;
+  const fk = debt ?? 0;
+  const z = interest ?? 0;
+  const totalCapital = eq + fk;
+
+  const ros = rev > 0 ? (profit / rev) * 100 : null;
+  const roe = eq > 0 ? (profit / eq) * 100 : null;
+  const gkr = totalCapital > 0 ? ((profit + z) / totalCapital) * 100 : null;
+  const debtRate = fk > 0 ? (z / fk) * 100 : null;
+
+  if (ros === null && roe === null && gkr === null) {
+    return fail('Bitte geben Sie einen Umsatz, ein Eigenkapital oder ein Fremdkapital größer als 0 € ein.');
+  }
+
+  const items: ResultItem[] = [];
+  const steps: string[] = [];
+  const notes: string[] = [];
+
+  if (ros !== null) {
+    items.push({ id: 'centPerEuro', label: 'Gewinn pro 1 € Umsatz', value: ros, formattedValue: `${formatNumber(ros, 1)} Cent` });
+    items.push({ id: 'rating', label: 'Einschätzung Umsatzrendite', value: 0, formattedValue: rosRating(ros, profit) });
+    steps.push(`Umsatzrentabilität = ${formatCurrency(profit)} ÷ ${formatCurrency(rev)} × 100 = ${formatPercent(ros)}`);
+  } else {
+    notes.push('Umsatzrentabilität nicht berechnet: Umsatz fehlt oder ist 0 €.');
+  }
+
+  if (roe !== null) {
+    items.push({ id: 'roe', label: 'Eigenkapitalrentabilität (ROE)', value: roe, formattedValue: formatPercent(roe) });
+    items.push({ id: 'roeRating', label: 'Einschätzung Eigenkapitalrendite', value: 0, formattedValue: roeRating(roe) });
+    steps.push(`Eigenkapitalrentabilität = ${formatCurrency(profit)} ÷ ${formatCurrency(eq)} × 100 = ${formatPercent(roe)}`);
+  } else if (eq < 0) {
+    notes.push('Eigenkapitalrentabilität nicht aussagekräftig: Das Eigenkapital ist negativ (bilanzielle Überschuldung).');
+  } else {
+    notes.push('Eigenkapitalrentabilität nicht berechnet: Eigenkapital fehlt oder ist 0 €.');
+  }
+
+  if (gkr !== null) {
+    items.push({ id: 'roa', label: 'Gesamtkapitalrentabilität (GKR)', value: gkr, formattedValue: formatPercent(gkr) });
+    items.push({ id: 'totalCapital', label: 'Gesamtkapital (Eigen- + Fremdkapital)', value: totalCapital, formattedValue: formatCurrency(totalCapital) });
+    steps.push(`Gesamtkapitalrentabilität = (${formatCurrency(profit)} + ${formatCurrency(z)}) ÷ ${formatCurrency(totalCapital)} × 100 = ${formatPercent(gkr)}`);
+  } else {
+    notes.push('Gesamtkapitalrentabilität nicht berechnet: Eigen- und Fremdkapital ergeben zusammen nicht mehr als 0 €.');
+  }
+
+  if (ros !== null && totalCapital > 0) {
+    const turnover = rev / totalCapital;
+    items.push({ id: 'capitalTurnover', label: 'Kapitalumschlag (Umsatz ÷ Gesamtkapital)', value: turnover, formattedValue: `${formatNumber(turnover, 2)}-mal pro Jahr` });
+  }
+
+  let leverageText: string | undefined;
+  if (debtRate !== null) {
+    items.push({ id: 'debtRate', label: 'Fremdkapitalzinssatz (Zinsen ÷ Fremdkapital)', value: debtRate, formattedValue: formatPercent(debtRate) });
+    if (gkr !== null && roe !== null) {
+      const diff = gkr - debtRate;
+      if (Math.abs(diff) < 1e-9) leverageText = 'Neutral: Gesamtkapitalrendite und Fremdkapitalzins sind gleich hoch.';
+      else if (diff > 0) leverageText = `Positiv: Das Gesamtkapital verdient ${formatPercent(gkr)}, das Fremdkapital kostet ${formatPercent(debtRate)}. Fremdkapital hebt die Eigenkapitalrendite.`;
+      else leverageText = `Negativ: Das Gesamtkapital verdient ${formatPercent(gkr)}, das Fremdkapital kostet ${formatPercent(debtRate)}. Fremdkapital drückt die Eigenkapitalrendite.`;
+      items.push({ id: 'leverage', label: 'Leverage-Effekt', value: diff, formattedValue: leverageText });
+      steps.push(`Leverage-Formel: ${formatPercent(gkr)} + (${formatPercent(gkr)} − ${formatPercent(debtRate)}) × ${formatCurrency(fk)} ÷ ${formatCurrency(eq)} = ${formatPercent(roe)}`);
+    }
+  } else if (z > 0) {
+    notes.push('Zinsen ohne Fremdkapital eingegeben: Der Fremdkapitalzinssatz und der Leverage-Effekt lassen sich nicht berechnen.');
+  }
+
+  const primary: ResultItem = ros !== null
+    ? { id: 'ros', label: 'Umsatzrentabilität (Umsatzrendite)', value: ros, formattedValue: formatPercent(ros), highlight: true }
+    : roe !== null
+      ? { id: 'roe', label: 'Eigenkapitalrentabilität (ROE)', value: roe, formattedValue: formatPercent(roe), highlight: true }
+      : { id: 'roa', label: 'Gesamtkapitalrentabilität (GKR)', value: gkr as number, formattedValue: formatPercent(gkr as number), highlight: true };
+  // Kennzahl, die schon als Hauptergebnis erscheint, nicht doppelt anzeigen
+  const secondary = items.filter((it) => it.id !== primary.id);
+
+  const parts: string[] = [];
+  if (ros !== null) parts.push(`Umsatzrendite ${formatPercent(ros)} (${formatNumber(ros, 1)} Cent Gewinn je Euro Umsatz)`);
+  if (roe !== null) parts.push(`Eigenkapitalrendite ${formatPercent(roe)}`);
+  if (gkr !== null) parts.push(`Gesamtkapitalrendite ${formatPercent(gkr)}`);
+  const summary = `Bei ${formatCurrency(profit)} Gewinn ergeben sich: ${parts.join(', ')}.${leverageText ? ` Leverage-Effekt: ${leverageText}` : ''}`;
+
+  return {
+    primary,
+    secondary,
+    summaryText: summary,
+    directAnswer: summary,
+    calculationSteps: steps,
+    qualifications: [
+      'Verwenden Sie für alle Kennzahlen denselben Gewinnbegriff, z. B. den Jahresüberschuss nach Steuern aus der Gewinn- und Verlustrechnung.',
+      'Eigen- und Fremdkapital aus der Bilanz; genauer sind Durchschnittswerte aus Anfangs- und Schlussbilanz.',
+      ...notes,
+    ],
+    basisSummary: [
+      { label: 'Gewinn', value: formatCurrency(profit) },
+      { label: 'Umsatz', value: rev > 0 ? formatCurrency(rev) : 'nicht angegeben' },
+      { label: 'Eigenkapital', value: equity !== null && eq !== 0 ? formatCurrency(eq) : 'nicht angegeben' },
+      { label: 'Fremdkapital / Zinsen', value: fk > 0 ? `${formatCurrency(fk)} / ${formatCurrency(z)}` : 'nicht angegeben' },
+    ],
+  };
+}
 
 export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
   {
@@ -845,102 +993,93 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
   {
     id: "umsatzrentabilitaet-rechner",
     slug: "umsatzrentabilitaet-rechner",
-    name: "Umsatzrentabilitäts-Rechner (Umsatzrendite & Return on Sales ROS)",
-    shortName: "Umsatzrendite-Rechner",
+    name: "Rentabilitätsrechner: Umsatz-, Eigenkapital- und Gesamtkapitalrentabilität",
+    shortName: "Rentabilität berechnen",
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
-    metaTitle: 'Umsatzrentabilität Rechner – Umsatzrendite',
-    metaDescription: 'Berechnen Sie die Umsatzrendite / Umsatzrentabilität (ROS in %): Wie viel Cent Reingewinn verbleiben dem Unternehmen von jedem Euro Umsatz?',
-    h1: 'Umsatzrentabilität Rechner – Umsatzrendite (ROS) ermitteln',
-    shortDescription: 'Berechnet die Umsatzrendite in Prozent aus Gewinn und Gesamtumsatz.',
-    searchKeywords: ["umsatzrentabilitaet rechner formel gewinn umsatz","umsatzrendite return on sales ros prozent","wieviel cent gewinn pro euro umsatz","bruttoumsatzrendite nettoumsatzrendite berechnen"],
-    inputs: [
-          {
-                "id": "revenue",
-                "label": "Gesamtumsatz (Nettoumsatzerlöse)",
-                "type": "number",
-                "defaultValue": 1000000,
-                "min": 100,
-                "max": 1000000000,
-                "step": 10000,
-                "unit": "€"
-          },
-          {
-                "id": "profit",
-                "label": "Gewinn (Jahresüberschuss vor oder nach Steuern)",
-                "type": "number",
-                "defaultValue": 80000,
-                "min": -100000000,
-                "max": 100000000,
-                "step": 2500,
-                "unit": "€"
-          }
+    metaTitle: 'Umsatzrentabilität Rechner mit Eigen- & Gesamtkapitalrendite',
+    metaDescription: 'Umsatzrendite, Eigenkapital- und Gesamtkapitalrentabilität kostenlos berechnen – aus Gewinn, Umsatz und Kapital, inklusive Leverage-Effekt.',
+    h1: 'Rentabilität berechnen – Umsatzrentabilität, Eigenkapital- und Gesamtkapitalrentabilität',
+    shortDescription: 'Berechnet aus Gewinn, Umsatz, Eigenkapital, Fremdkapital und Zinsen die Umsatzrentabilität, die Eigenkapitalrentabilität und die Gesamtkapitalrentabilität. Felder, die Sie auf 0 setzen, werden übersprungen.',
+    searchKeywords: [
+      "umsatzrentabilität berechnen",
+      "umsatzrendite berechnen",
+      "umsatzrentabilität formel",
+      "eigenkapitalrentabilität berechnen",
+      "eigenkapitalrendite formel",
+      "gesamtkapitalrentabilität berechnen",
+      "gesamtkapitalrendite formel",
+      "rentabilität berechnen",
+      "return on equity berechnen",
+      "return on sales ros",
+      "leverage effekt berechnen",
     ],
-    calculate: (inputs: Record<string, any>) => {
-      const rev = Number(inputs.revenue);
-      const prof = Number(inputs.profit) || 0;
-
-      if (isNaN(rev) || rev <= 0) {
-        return {
-          primary: { id: 'ros', label: 'Umsatzrendite (ROS)', value: 0, formattedValue: '0,00 %', highlight: true },
-          secondary: [
-            { id: 'centPerEuro', label: 'Gewinn pro 1 Euro Umsatz', value: 0, formattedValue: '0,0 Cent / Euro' },
-            { id: 'rating', label: 'Brancheneinschätzung', value: 0, formattedValue: 'Umsatz muss größer als 0 € sein' },
-          ],
-          summaryText: 'Bitte geben Sie einen Nettoumsatz größer als 0 € an.',
-        };
-      }
-
-      // Umsatzrendite ROS = (Gewinn / Umsatz) * 100
-      const ros = (prof / rev) * 100;
-      const centPerEuro = (prof / rev) * 100; // in Cent
-
-      let rating = 'Solide Rentabilität';
-      if (prof === 0) rating = 'Ausgeglichen (Break-Even, kein Gewinn)';
-      else if (ros < 0) rating = 'Verlustzone (negativer Ertrag)';
-      else if (ros < 2.0) rating = 'Geringe Marge (stark krisenanfällig bei Preissteigerungen)';
-      else if (ros < 5.0) rating = 'Durchschnittlicher Mittelstandsbereich';
-      else if (ros < 10.0) rating = 'Gute Ertragskraft';
-      else rating = 'Hervorragende Preismacht und Rentabilität';
-
-      return {
-        primary: { id: 'ros', label: 'Umsatzrendite (ROS)', value: ros, formattedValue: formatPercent(ros), highlight: true },
-        secondary: [
-          { id: 'centPerEuro', label: 'Gewinn pro 1 Euro Umsatz', value: centPerEuro, formattedValue: formatNumber(centPerEuro, 1) + ' Cent / Euro' },
-          { id: 'rating', label: 'Brancheneinschätzung', value: 0, formattedValue: rating },
-        ],
-        summaryText: 'Von jedem Euro Umsatz verbleiben dem Unternehmen genau ' + formatNumber(centPerEuro, 1) + ' Cent Gewinn. Die Umsatzrendite beträgt ' + formatPercent(ros) + ' (' + rating + ').',
-      };
-    },
-    formula: "Umsatzrentabilität (%) = (Gewinn / Umsatz) × 100",
-    formulaExplanation: "Die Umsatzrendite zeigt die markt- und kostenseitige Effizienz eines Unternehmens: Sie beziffert, welcher Prozentsatz des Umsatzes als Gewinn im Unternehmen verbleibt.",
+    inputs: [
+      { id: "profit", label: "Gewinn (Jahresüberschuss)", type: "number", defaultValue: 80000, min: -1000000000000, max: 1000000000000, step: 1000, unit: "€", helpText: "Bei einem Verlust tragen Sie einen negativen Wert ein." },
+      { id: "revenue", label: "Umsatz (Nettoumsatzerlöse)", type: "number", defaultValue: 1000000, min: 0, max: 1000000000000, step: 10000, unit: "€", helpText: "Für die Umsatzrentabilität. 0 eintragen, wenn Sie sie nicht brauchen." },
+      { id: "equity", label: "Eigenkapital", type: "number", defaultValue: 400000, min: -1000000000000, max: 1000000000000, step: 5000, unit: "€", helpText: "Bilanziertes Eigenkapital für die Eigenkapitalrentabilität. 0 eintragen, wenn unbekannt." },
+      { id: "debt", label: "Fremdkapital (Kredite, Verbindlichkeiten)", type: "number", defaultValue: 600000, min: 0, max: 1000000000000, step: 5000, unit: "€", helpText: "Eigenkapital + Fremdkapital = Gesamtkapital (Bilanzsumme)." },
+      { id: "interestExpense", label: "Fremdkapitalzinsen pro Jahr", type: "number", defaultValue: 24000, min: 0, max: 1000000000000, step: 1000, unit: "€", helpText: "Zinsaufwand laut Gewinn- und Verlustrechnung. 0 bei schuldenfreien Unternehmen." },
+    ],
+    calculate: calculateProfitabilityRatios,
+    formula: "Umsatzrentabilität = Gewinn ÷ Umsatz × 100 | Eigenkapitalrentabilität = Gewinn ÷ Eigenkapital × 100 | Gesamtkapitalrentabilität = (Gewinn + Fremdkapitalzinsen) ÷ (Eigenkapital + Fremdkapital) × 100",
+    formulaExplanation: "Die Umsatzrentabilität zeigt, wie viel Cent Gewinn von jedem Euro Umsatz bleiben. Die Eigenkapitalrentabilität misst die Verzinsung des Kapitals der Eigentümer. Die Gesamtkapitalrentabilität bewertet das gesamte eingesetzte Kapital; dafür werden die Fremdkapitalzinsen zum Gewinn addiert, weil sie der Ertrag der Kreditgeber sind. Leverage-Formel: EK-Rendite = GK-Rendite + (GK-Rendite − Fremdkapitalzins) × Fremdkapital ÷ Eigenkapital.",
     workedExample: {
-          "title": "Beispiel: 1.000.000 € Umsatz und 80.000 € Jahresgewinn",
-          "inputValues": [
-                {
-                      "label": "Umsatz",
-                      "value": "1.000.000 €"
-                },
-                {
-                      "label": "Gewinn",
-                      "value": "80.000 €"
-                }
-          ],
-          "steps": [
-                "Umsatzrendite = (80.000 / 1.000.000) × 100 = 8,0 %",
-                "Entspricht 8 Cent Gewinn je 1 € Umsatz"
-          ],
-          "result": "8,0 % Umsatzrendite"
+      title: "Beispiel: 80.000 € Gewinn bei 1 Mio. € Umsatz und 1 Mio. € Gesamtkapital",
+      inputValues: [{ label: "Gewinn", value: "80.000 €" }, { label: "Umsatz", value: "1.000.000 €" }, { label: "Eigenkapital", value: "400.000 €" }, { label: "Fremdkapital", value: "600.000 €" }, { label: "Zinsen", value: "24.000 €" }],
+      steps: ["Umsatzrentabilität: 80.000 ÷ 1.000.000 × 100 = 8 %", "Eigenkapitalrentabilität: 80.000 ÷ 400.000 × 100 = 20 %", "Gesamtkapitalrentabilität: (80.000 + 24.000) ÷ 1.000.000 × 100 = 10,4 %", "Fremdkapitalzins: 24.000 ÷ 600.000 = 4 % → positiver Leverage-Effekt"],
+      result: "Umsatzrendite 8 %, Eigenkapitalrendite 20 %, Gesamtkapitalrendite 10,4 %",
+      inputs: { profit: 80000, revenue: 1000000, equity: 400000, debt: 600000, interestExpense: 24000 },
     },
+    workedExamples: [
+      {
+        title: "Beispiel 1: Alle drei Kennzahlen mit positivem Leverage-Effekt",
+        inputValues: [{ label: "Gewinn", value: "80.000 €" }, { label: "Umsatz", value: "1.000.000 €" }, { label: "Eigenkapital", value: "400.000 €" }, { label: "Fremdkapital", value: "600.000 €" }, { label: "Zinsen", value: "24.000 €" }],
+        steps: ["Umsatzrentabilität: 80.000 ÷ 1.000.000 × 100 = 8 %", "Eigenkapitalrentabilität: 80.000 ÷ 400.000 × 100 = 20 %", "Gesamtkapitalrentabilität: (80.000 + 24.000) ÷ 1.000.000 × 100 = 10,4 %", "Fremdkapitalzins: 24.000 ÷ 600.000 = 4 % → positiver Leverage-Effekt"],
+        result: "Umsatzrendite 8 %, Eigenkapitalrendite 20 %, Gesamtkapitalrendite 10,4 %",
+        inputs: { profit: 80000, revenue: 1000000, equity: 400000, debt: 600000, interestExpense: 24000 },
+      },
+      {
+        title: "Beispiel 2: Negativer Leverage-Effekt bei teurem Fremdkapital",
+        inputValues: [{ label: "Gewinn", value: "10.000 €" }, { label: "Umsatz", value: "2.000.000 €" }, { label: "Eigenkapital", value: "200.000 €" }, { label: "Fremdkapital", value: "800.000 €" }, { label: "Zinsen", value: "48.000 €" }],
+        steps: ["Umsatzrentabilität: 10.000 ÷ 2.000.000 × 100 = 0,5 %", "Gesamtkapitalrentabilität: (10.000 + 48.000) ÷ 1.000.000 × 100 = 5,8 %", "Fremdkapitalzins: 48.000 ÷ 800.000 = 6 % – höher als 5,8 %", "Eigenkapitalrentabilität: 5,8 % + (5,8 % − 6 %) × 4 = 5 %"],
+        result: "Eigenkapitalrendite nur 5 % – das Fremdkapital kostet mehr, als es einbringt",
+        inputs: { profit: 10000, revenue: 2000000, equity: 200000, debt: 800000, interestExpense: 48000 },
+      },
+      {
+        title: "Beispiel 3: Nur die Umsatzrendite",
+        inputValues: [{ label: "Gewinn", value: "45.000 €" }, { label: "Umsatz", value: "900.000 €" }, { label: "Eigenkapital", value: "0 € (übersprungen)" }, { label: "Fremdkapital", value: "0 € (übersprungen)" }],
+        steps: ["Umsatzrentabilität: 45.000 ÷ 900.000 × 100 = 5 %", "Das entspricht 5 Cent Gewinn je Euro Umsatz"],
+        result: "5 % Umsatzrendite",
+        inputs: { profit: 45000, revenue: 900000, equity: 0, debt: 0, interestExpense: 0 },
+      },
+    ],
     content: {
-      intro: 'Die Umsatzrentabilität (Umsatzrendite / Return on Sales, ROS) beziffert den Gewinnanteil, den ein Unternehmen mit jedem umgesetzten Euro erwirtschaftet.',
-      details: 'ROS = (Jahresüberschuss / Umsatzerlöse) · 100. Eine Umsatzrendite von 8 % bedeutet, dass nach Begleichung aller Material-, Personal-, Verwaltungs- und Steuerkosten von 100 € Umsatz genau 8 € Reingewinn verbleiben.',
+      intro: 'Mit diesem Rechner berechnen Sie kostenlos die drei wichtigsten Rentabilitätskennzahlen in einem Schritt: Umsatzrentabilität, Eigenkapitalrentabilität und Gesamtkapitalrentabilität. Sie brauchen nur Gewinn, Umsatz, Eigenkapital, Fremdkapital und Zinsaufwand aus Jahresabschluss oder BWA. Fehlt Ihnen ein Wert, tragen Sie 0 ein – der Rechner zeigt dann alle Kennzahlen, die sich berechnen lassen.',
+      sections: [
+        {
+          title: 'Die drei Kennzahlen im Überblick',
+          content: '| Kennzahl | Formel | Aussage |\n| --- | --- | --- |\n| Umsatzrentabilität (ROS) | Gewinn ÷ Umsatz × 100 | Gewinn in Cent je Euro Umsatz |\n| Eigenkapitalrentabilität (ROE) | Gewinn ÷ Eigenkapital × 100 | Verzinsung des Kapitals der Eigentümer |\n| Gesamtkapitalrentabilität | (Gewinn + Zinsen) ÷ Gesamtkapital × 100 | Verzinsung des gesamten eingesetzten Kapitals |\n\nBei der Gesamtkapitalrentabilität werden die Zinsen zum Gewinn addiert. So bleibt die Kennzahl unabhängig davon, ob das Unternehmen mit Eigen- oder Fremdkapital finanziert ist. Zusätzlich zeigt der Rechner den Kapitalumschlag (Umsatz ÷ Gesamtkapital) und den Fremdkapitalzinssatz.',
+        },
+        {
+          title: 'Leverage-Effekt: Wann Fremdkapital die Eigenkapitalrendite erhöht',
+          content: 'Verdient das Gesamtkapital mehr, als das Fremdkapital an Zinsen kostet, steigt die Eigenkapitalrendite mit jedem zusätzlichen Kredit-Euro. Das ist der positive Leverage-Effekt. Liegt die Gesamtkapitalrendite unter dem Kreditzins, kehrt sich der Hebel um.\n\nFormel: EK-Rendite = GK-Rendite + (GK-Rendite − Fremdkapitalzins) × Fremdkapital ÷ Eigenkapital.\n\nBeispiel: 10,4 % Gesamtkapitalrendite, 4 % Zins, Verschuldungsgrad 1,5 (600.000 € ÷ 400.000 €). Die Eigenkapitalrendite beträgt 10,4 % + 6,4 % × 1,5 = 20 %. Mehr Fremdkapital erhöht aber auch das Risiko: Sinkt die Rendite oder steigen die Zinsen, schrumpft die Eigenkapitalrendite schnell.',
+        },
+        {
+          title: 'Welche Werte sind gut?',
+          content: 'Gute Werte hängen stark von der Branche ab. Der Lebensmittelhandel arbeitet oft mit 1,5 bis 3 % Umsatzrendite und gleicht das über hohe Mengen aus. Software- und Pharmaunternehmen erreichen teils 20 % und mehr. Eine Eigenkapitalrendite von 10 bis 18 % gilt im Mittelstand als solide. Liegt sie dauerhaft unter dem Zins sicherer Anlagen, lohnt sich das unternehmerische Risiko kaum.\n\nVergleichen Sie Kennzahlen am besten mit Vorjahren und Unternehmen derselben Branche. Für die Preis- und Kostenkalkulation nutzen Sie den [Deckungsbeitrag-Rechner](/rechner/deckungsbeitrag-rechner/), für die Zahlungsfähigkeit den [Liquiditätsgrad-Rechner](/rechner/liquiditaetsgrad-rechner/) und für den Mittelzufluss den [Cashflow-Rechner](/rechner/cashflow-rechner/).',
+        },
+      ],
+      details: 'Umsatzrentabilität = Gewinn ÷ Umsatz × 100. Eigenkapitalrentabilität = Gewinn ÷ Eigenkapital × 100. Gesamtkapitalrentabilität = (Gewinn + Fremdkapitalzinsen) ÷ Gesamtkapital × 100.',
     },
     faqs: [
-      { question: 'Welche Branchen haben traditionell niedrige, welche hohe Umsatzrenditen?', answer: 'Der Lebensmitteleinzelhandel operiert oft mit extrem niedrigen Margen von 1,5 bis 3 Prozent (hohe Umschlagshäufigkeit); Software- und Pharmaunternehmen erzielen oft 20 bis 35 Prozent Umsatzrendite.' },
-      { question: 'Was ist die operative Umsatzrendite (EBIT-Marge)?', answer: 'EBIT / Umsatz · 100; sie misst die reine operative Leistung vor Zinsaufwendungen und Steuern.' },
+      { question: 'Wie berechnet man die Umsatzrentabilität?', answer: 'Teilen Sie den Gewinn durch den Umsatz und multiplizieren Sie mit 100. Bei 80.000 € Gewinn und 1.000.000 € Umsatz ergibt das 8 %. Von jedem Euro Umsatz bleiben also 8 Cent Gewinn.' },
+      { question: 'Wie berechnet man die Eigenkapitalrentabilität?', answer: 'Teilen Sie den Jahresüberschuss durch das Eigenkapital und multiplizieren Sie mit 100. Bei 40.000 € Gewinn und 250.000 € Eigenkapital ergibt das 16 %. Das ist die Verzinsung des Kapitals, das die Eigentümer eingesetzt haben.' },
+      { question: 'Warum werden bei der Gesamtkapitalrentabilität die Zinsen addiert?', answer: 'Die Zinsen sind der Ertrag, den das Fremdkapital für die Kreditgeber erwirtschaftet. Erst mit ihnen zeigt die Kennzahl, was das gesamte Kapital verdient hat – unabhängig von der Finanzierung. Bei 60.000 € Gewinn, 20.000 € Zinsen und 1.000.000 € Gesamtkapital sind das 8 %.' },
+      { question: 'Was ist der Leverage-Effekt?', answer: 'Der Hebeleffekt des Fremdkapitals auf die Eigenkapitalrendite. Liegt die Gesamtkapitalrendite über dem Fremdkapitalzins, steigert zusätzliches Fremdkapital die Eigenkapitalrendite. Liegt sie darunter, sinkt die Eigenkapitalrendite mit jedem weiteren Kredit.' },
+      { question: 'Welche Umsatzrendite ist gut?', answer: 'Das hängt von der Branche ab. Im Lebensmittelhandel sind 1,5 bis 3 % üblich, im Mittelstand gelten 2 bis 5 % als durchschnittlich. Software- und Pharmaunternehmen erreichen teils über 20 %.' },
     ],
-    relatedSlugs: ['marge-rechner', 'ebit-ebitda-rechner', 'eigenkapitalrentabilitaet-rechner', 'gesamtkapitalrentabilitaet-rechner'],
+    relatedSlugs: ['deckungsbeitrag-rechner', 'liquiditaetsgrad-rechner', 'cashflow-rechner', 'abschreibung-linear-degressiv-rechner'],
   },
   {
     id: "eigenkapitalrentabilitaet-rechner",

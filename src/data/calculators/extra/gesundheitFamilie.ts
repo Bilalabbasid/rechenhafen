@@ -2,6 +2,7 @@ import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { DUESSELDORFER_TABELLE_2026, getDtEinkommensgruppe, getDtTabellenbetrag, DtAltersstufe } from '@/data/regulated/unterhalt/duesseldorferTabelle2026';
+import { parseDateParts, dateToDayNumber, dayNumberToDate, formatDateGerman, getBerlinTodayString } from '@/lib/calculators/dateMath';
 
 // Unterhalt 2026: Mindestunterhalt (MUV) und Düsseldorfer Tabelle 2026; Kindergeld aus der Steuer-Konfiguration (§ 66 Abs. 1 EStG: 259 €)
 const DT_2026 = DUESSELDORFER_TABELLE_2026;
@@ -393,64 +394,225 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'waist-to-hip-ratio-rechner',
     slug: 'waist-to-hip-ratio-rechner',
-    name: 'WHR-Rechner (Taille-Hüft-Verhältnis) (Taille-Hüft-Verhältnis & Bauchfett-Risiko)',
+    name: 'WHR-Rechner (Taille-Hüft-Verhältnis & Waist-to-Height-Ratio)',
     shortName: 'WHR-Rechner (Taille-Hüft-Verhältnis)',
     category: 'gesundheit-fitness',
     subcategory: 'Gewicht & Körper',
-    metaTitle: 'WHR Rechner – Taille-Hüft-Verhältnis berechnen',
-    metaDescription: 'Ermitteln Sie Ihr Taille-zu-Hüfte-Verhältnis (WHR) zur Bestimmung des viszeralen Bauchfetts und des kardiovaskulären Risikos (Apfel- vs. Birnenform).',
-    h1: 'WHR Rechner – Taille-Hüft-Verhältnis & Gesundheitsrisiko',
-    shortDescription: 'Misst das Verhältnis von Taillenumfang zu Hüftumfang zur Beurteilung der Fettverteilung.',
-    searchKeywords: ['whr rechner taille huefte verhaeltnis', 'waist to hip ratio berechnen who', 'bauchfett risiko apfelform birnenform', 'viszerales fett messen'],
+    metaTitle: 'WHR Rechner – Taille-Hüft-Verhältnis & WHtR berechnen',
+    metaDescription: 'WHR und WHtR kostenlos berechnen: Taille-Hüft-Verhältnis mit WHO-Grenzwerten, Taille-zu-Größe-Verhältnis mit 0,5-Regel und Ihr maximaler Taillenumfang.',
+    h1: 'WHR Rechner – Taille-Hüft-Verhältnis und Waist-to-Height-Ratio',
+    shortDescription: 'Berechnet aus Taille, Hüfte und Körpergröße Ihr Taille-Hüft-Verhältnis (WHR) und Ihr Taille-zu-Größe-Verhältnis (WHtR) mit Einstufung.',
+    searchKeywords: [
+      'whr rechner',
+      'waist to hip ratio berechnen',
+      'taille hüft verhältnis berechnen',
+      'waist to height ratio',
+      'whtr rechner',
+      'taille zu körpergröße rechner',
+      'bauchumfang frau normal',
+      'bauchumfang mann normal',
+      'bauchfett risiko berechnen',
+      'apfeltyp birnentyp',
+    ],
     inputs: [
       { id: 'gender', label: 'Biologisches Geschlecht', type: 'select', defaultValue: 'female', options: [
-        { value: 'female', label: 'Frau (Normalwert unter 0,85)' },
-        { value: 'male', label: 'Mann (Normalwert unter 0,90)' },
+        { value: 'female', label: 'Frau' },
+        { value: 'male', label: 'Mann' },
       ]},
-      { id: 'waistCm', label: 'Taillenumfang in cm (schmalste Stelle)', type: 'number', defaultValue: 74, min: 45, max: 160, step: 0.5, unit: 'cm' },
-      { id: 'hipCm', label: 'Hüftumfang in cm (breiteste Stelle)', type: 'number', defaultValue: 96, min: 60, max: 180, step: 0.5, unit: 'cm' },
+      { id: 'waistCm', label: 'Taillenumfang', type: 'number', defaultValue: 74, min: 40, max: 200, step: 0.5, unit: 'cm', helpText: 'Mitte zwischen unterster Rippe und Beckenkamm, entspannt nach dem Ausatmen.' },
+      { id: 'hipCm', label: 'Hüftumfang', type: 'number', defaultValue: 96, min: 50, max: 200, step: 0.5, unit: 'cm', helpText: 'An der breitesten Stelle des Gesäßes.' },
+      { id: 'includeHeight', label: 'Auch Taille-zu-Größe-Verhältnis (WHtR) berechnen', type: 'boolean', defaultValue: true },
+      { id: 'heightCm', label: 'Körpergröße', type: 'number', defaultValue: 168, min: 100, max: 250, step: 1, unit: 'cm', dependsOn: { field: 'includeHeight', value: true } },
+      { id: 'ageYears', label: 'Alter', type: 'number', defaultValue: 35, min: 18, max: 120, step: 1, unit: 'Jahre', helpText: 'Für den Altershinweis zur WHtR ab 40 Jahren.', dependsOn: { field: 'includeHeight', value: true } },
     ],
     calculate: (inputs) => {
+      const isEmpty = (v: any) => v === undefined || v === null || String(v).trim() === '';
+      const fail = (error: string) => ({
+        primary: { id: 'whr', label: 'Taille-Hüft-Verhältnis (WHR)', value: 0, formattedValue: '-' },
+        error,
+      });
       const isMale = inputs.gender === 'male';
-      const waist = inputs.waistCm !== undefined && inputs.waistCm !== '' ? Math.max(0, parseFloat(inputs.waistCm) || 0) : 74;
-      const hip = inputs.hipCm !== undefined && inputs.hipCm !== '' ? Math.max(1, parseFloat(inputs.hipCm) || 0) : 96;
-      const whr = waist / hip;
 
-      let risk = 'Normal / Geringes Risiko (Birnenform)';
-      if (isMale) {
-        if (whr >= 1.0) risk = 'Stark erhöhtes Herz-Kreislauf-Risiko (ausgeprägte Apfelform)';
-        else if (whr >= 0.90) risk = 'Mäßig erhöhtes Risiko';
-      } else {
-        if (whr >= 0.85) risk = 'Stark erhöhtes Herz-Kreislauf-Risiko (ausgeprägte Apfelform)';
-        else if (whr >= 0.80) risk = 'Mäßig erhöhtes Risiko';
+      const waist = isEmpty(inputs.waistCm) ? 74 : parseFloat(inputs.waistCm);
+      const hip = isEmpty(inputs.hipCm) ? 96 : parseFloat(inputs.hipCm);
+      if (!Number.isFinite(waist) || waist < 40 || waist > 200) {
+        return fail('Bitte geben Sie einen Taillenumfang zwischen 40 und 200 cm ein.');
+      }
+      if (!Number.isFinite(hip) || hip < 50 || hip > 200) {
+        return fail('Bitte geben Sie einen Hüftumfang zwischen 50 und 200 cm ein.');
+      }
+      const whr = waist / hip;
+      if (whr < 0.5 || whr > 1.5) {
+        return fail('Taille und Hüfte passen so nicht zusammen. Bitte prüfen Sie, ob beide Maße in Zentimetern eingetragen sind.');
+      }
+
+      // WHtR nur, wenn gewünscht (Schalter) bzw. – bei älteren Links ohne Schalter – wenn eine Größe übergeben wurde
+      const includeHeight = inputs.includeHeight === undefined
+        ? !isEmpty(inputs.heightCm)
+        : inputs.includeHeight === true || inputs.includeHeight === 'true';
+      let height: number | undefined;
+      if (includeHeight) {
+        const h = parseFloat(inputs.heightCm);
+        if (!Number.isFinite(h) || h < 100 || h > 250) {
+          return fail('Bitte geben Sie eine Körpergröße zwischen 100 und 250 cm ein.');
+        }
+        height = h;
+      }
+
+      let age: number | undefined;
+      if (includeHeight && !isEmpty(inputs.ageYears)) {
+        const a = parseFloat(inputs.ageYears);
+        if (!Number.isFinite(a) || a < 18 || a > 120) {
+          return fail(Number.isFinite(a) && a >= 0 && a < 18
+            ? 'Die Grenzwerte gelten für Erwachsene ab 18 Jahren. Bei Kindern beurteilt die Kinderarztpraxis den Bauchumfang mit Perzentilen.'
+            : 'Bitte geben Sie ein Alter zwischen 18 und 120 Jahren ein.');
+        }
+        age = a;
+      }
+
+      // WHR nach WHO (2008): erhöhtes Risiko ab 0,90 (Männer) bzw. 0,85 (Frauen)
+      const whrLimit = isMale ? 0.9 : 0.85;
+      const whrHigh = whr >= whrLimit;
+      const whrRisk = whrHigh
+        ? `Ab WHO-Grenzwert ${formatNumber(whrLimit, 2)}: erhöhtes Risiko für Stoffwechsel- und Herz-Kreislauf-Erkrankungen`
+        : `Unter dem WHO-Grenzwert ${formatNumber(whrLimit, 2)}: kein erhöhtes Risiko durch die Fettverteilung`;
+      const shape = whrHigh ? 'Apfeltyp – Fett sitzt eher am Bauch' : 'Birnentyp bzw. ausgeglichen – Fett sitzt eher an Hüfte und Beinen';
+
+      // Taillenumfang nach WHO (2008)
+      const waistLow = isMale ? 94 : 80;
+      const waistHighLimit = isMale ? 102 : 88;
+      const waistRisk = waist >= waistHighLimit
+        ? `Deutlich erhöht (ab ${waistHighLimit} cm)`
+        : waist >= waistLow
+          ? `Erhöht (${waistLow} bis unter ${waistHighLimit} cm)`
+          : `Nicht erhöht (unter ${waistLow} cm)`;
+
+      const secondary: any[] = [
+        { id: 'risk', label: 'Einstufung WHR (WHO)', value: whrHigh ? 1 : 0, formattedValue: whrRisk },
+        { id: 'shape', label: 'Fettverteilungstyp', value: 0, formattedValue: shape },
+      ];
+      const calculationSteps = [`WHR = ${formatNumber(waist, 1)} cm / ${formatNumber(hip, 1)} cm = ${formatNumber(whr, 2)}`];
+
+      let whtr: number | undefined;
+      let whtrStatus = '';
+      if (height !== undefined) {
+        whtr = waist / height;
+        // Einstufung nach NICE (2022): 0,4–0,49 kein erhöhtes Risiko, 0,5–0,59 erhöht, ab 0,6 hoch
+        if (whtr < 0.4) whtrStatus = 'Unter 0,4: sehr schmale Taille – prüfen Sie mit dem BMI, ob Untergewicht vorliegt';
+        else if (whtr < 0.5) whtrStatus = '0,4 bis 0,49: kein erhöhtes Gesundheitsrisiko';
+        else if (whtr < 0.6) whtrStatus = '0,5 bis 0,59: erhöhtes Gesundheitsrisiko';
+        else whtrStatus = 'Ab 0,6: hohes Gesundheitsrisiko';
+        secondary.push(
+          { id: 'whtr', label: 'Taille-zu-Größe-Verhältnis (WHtR)', value: whtr, formattedValue: formatNumber(whtr, 2) },
+          { id: 'whtrStatus', label: 'Einstufung WHtR', value: 0, formattedValue: whtrStatus },
+          { id: 'maxWaist', label: 'Taillenumfang für WHtR 0,5 (halbe Körpergröße)', value: height * 0.5, formattedValue: `unter ${formatNumber(height * 0.5, 1)} cm` },
+        );
+        calculationSteps.push(`WHtR = ${formatNumber(waist, 1)} cm / ${formatNumber(height, 0)} cm = ${formatNumber(whtr, 2)}`);
+      }
+      secondary.push({ id: 'waistRisk', label: `Taillenumfang ${formatNumber(waist, 1)} cm (WHO, ${isMale ? 'Männer' : 'Frauen'})`, value: waist, formattedValue: waistRisk });
+
+      if (whtr !== undefined && age !== undefined && age >= 40) {
+        secondary.push({
+          id: 'ageNote',
+          label: 'Hinweis zum Alter',
+          value: 'Hinweis',
+          formattedValue: 'Ab 40 bis 50 Jahren nennen einige Quellen für die WHtR einen höheren Grenzwert von bis zu 0,6. Diese Altersanpassung ist weniger gut belegt als die 0,5-Regel.',
+        });
+      }
+
+      let warning: string | undefined;
+      if (whrHigh || (whtr !== undefined && whtr >= 0.6) || waist >= waistHighLimit) {
+        warning = 'Ein großer Bauchumfang ist ein Risikofaktor, keine Diagnose. Lassen Sie Blutdruck, Blutzucker und Blutfette bei Ihrer Hausarztpraxis prüfen, zum Beispiel beim Check-up ab 35.';
       }
 
       return {
         primary: { id: 'whr', label: 'Taille-Hüft-Verhältnis (WHR)', value: whr, formattedValue: formatNumber(whr, 2), highlight: true },
-        secondary: [
-          { id: 'risk', label: 'Gesundheitliche Bewertung (WHO)', value: 0, formattedValue: risk },
-          { id: 'shape', label: 'Fettverteilungstyp', value: 0, formattedValue: whr > (isMale ? 0.95 : 0.85) ? 'Apfeltyp (Bauchbetont)' : 'Birnentyp (Hüftbetont)' },
-        ],
-        summaryText: `Ihr WHR-Wert liegt bei ${formatNumber(whr, 2)} (${risk}).`,
+        secondary,
+        calculationSteps,
+        ...(warning ? { warning } : {}),
+        summaryText: `Ihr Taille-Hüft-Verhältnis liegt bei ${formatNumber(whr, 2)} (${whrHigh ? 'ab' : 'unter'} dem WHO-Grenzwert von ${formatNumber(whrLimit, 2)}).${whtr !== undefined ? ` Ihr Taille-zu-Größe-Verhältnis beträgt ${formatNumber(whtr, 2)}; die Taille sollte unter ${formatNumber((height as number) * 0.5, 0)} cm liegen.` : ''}`,
       };
     },
-    formula: 'WHR = Taillenumfang (cm) / Hüftumfang (cm)',
-    formulaExplanation: 'Nach Vorgaben der Weltgesundheitsorganisation (WHO) gilt bei Frauen ein WHR ab 0,85 und bei Männern ab 0,90 als Grenze für viszerales Bauchfett und erhöhtes Herzinfarktrisiko.',
+    formula: 'WHR = Taillenumfang / Hüftumfang · WHtR = Taillenumfang / Körpergröße',
+    formulaExplanation: 'Die WHO wertet ein Taille-Hüft-Verhältnis ab 0,90 bei Männern und ab 0,85 bei Frauen als erhöhtes Risiko für Stoffwechselerkrankungen (WHO 2008). Für die Waist-to-Height-Ratio gilt die Faustregel: Die Taille sollte weniger als die Hälfte der Körpergröße messen (WHtR unter 0,5). Das britische NICE stuft 0,5 bis 0,59 als erhöhtes und ab 0,6 als hohes Risiko ein.',
     workedExample: {
-      title: 'Beispiel: Frau mit 74 cm Taille und 96 cm Hüfte',
-      inputValues: [{ label: 'Taille', value: '74 cm' }, { label: 'Hüfte', value: '96 cm' }],
-      steps: ['WHR = 74 / 96 ≈ 0,77', 'Wert liegt unter 0,80 = Idealer Normalbereich'],
-      result: 'WHR 0,77 (Birnentyp / Optimal)',
+      title: 'Beispiel 1: Frau, 35 Jahre, Taille 74 cm, Hüfte 96 cm, 168 cm groß',
+      inputValues: [{ label: 'Taille', value: '74 cm' }, { label: 'Hüfte', value: '96 cm' }, { label: 'Größe', value: '168 cm' }],
+      steps: [
+        'WHR = 74 / 96 = 0,77 → unter dem WHO-Grenzwert 0,85',
+        'WHtR = 74 / 168 = 0,44 → kein erhöhtes Risiko',
+        'Taille für WHtR 0,5: unter 84 cm',
+      ],
+      result: 'WHR 0,77 und WHtR 0,44 – beide im unbedenklichen Bereich',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Frau, 35 Jahre, Taille 74 cm, Hüfte 96 cm, 168 cm groß',
+        inputValues: [{ label: 'Taille', value: '74 cm' }, { label: 'Hüfte', value: '96 cm' }, { label: 'Größe', value: '168 cm' }],
+        steps: [
+          'WHR = 74 / 96 = 0,77 → unter dem WHO-Grenzwert 0,85',
+          'WHtR = 74 / 168 = 0,44 → kein erhöhtes Risiko',
+          'Taille für WHtR 0,5: unter 84 cm',
+        ],
+        result: 'WHR 0,77 und WHtR 0,44 – beide im unbedenklichen Bereich',
+      },
+      {
+        title: 'Beispiel 2: Mann, 52 Jahre, Taille 98 cm, Hüfte 100 cm, 178 cm groß',
+        inputValues: [{ label: 'Taille', value: '98 cm' }, { label: 'Hüfte', value: '100 cm' }, { label: 'Größe', value: '178 cm' }],
+        steps: [
+          'WHR = 98 / 100 = 0,98 → ab dem WHO-Grenzwert 0,90',
+          'WHtR = 98 / 178 = 0,55 → erhöhtes Risiko (0,5 bis 0,59)',
+          'Taillenumfang 98 cm → erhöht nach WHO (94 bis unter 102 cm)',
+          'Taille für WHtR 0,5: unter 89 cm',
+        ],
+        result: 'WHR 0,98 (Apfeltyp) und WHtR 0,55 – beide über dem Grenzwert',
+      },
+    ],
     content: {
-      intro: 'Das Taille-Hüft-Verhältnis (Waist-to-Hip Ratio, WHR) beurteilt die Fettverteilung und unterscheidet zwischen der gefährlichen Apfelform (viszerales Bauchfett) und der Birnenform.',
-      details: 'WHR = Taillenumfang / Hüftumfang. Die WHO definiert ein erhöhtes kardiovaskuläres Risiko ab einem WHR von 0,90 bei Männern und ab 0,85 bei Frauen.',
+      intro: 'Wo Ihr Körperfett sitzt, sagt mehr über das Risiko für Herz-Kreislauf-Erkrankungen und Diabetes aus als das Gewicht allein. Dieser Rechner zeigt dafür zwei Kennzahlen: das Taille-Hüft-Verhältnis (WHR) mit den WHO-Grenzwerten und das Taille-zu-Größe-Verhältnis (WHtR) mit der 0,5-Regel. Dazu ordnet er Ihren Taillenumfang ein. Sie brauchen nur ein Maßband.',
+      sections: [
+        {
+          title: 'So messen Sie richtig',
+          content: 'Messen Sie morgens, im Stehen, ohne Kleidung am Bauch. Die Taille messen Sie nach dem WHO-Protokoll in der Mitte zwischen unterster Rippe und Oberkante des Beckenkamms, entspannt nach dem Ausatmen. Die Hüfte messen Sie an der breitesten Stelle des Gesäßes. Das Maßband liegt waagerecht an, ohne einzuschneiden. Messen Sie zweimal und nehmen Sie den Mittelwert.',
+        },
+        {
+          title: 'WHR: Taille im Verhältnis zur Hüfte',
+          content: 'Die WHR zeigt, ob Fett eher am Bauch (Apfeltyp) oder an Hüfte und Oberschenkeln (Birnentyp) sitzt. Bauchfett umgibt die inneren Organe und ist stoffwechselaktiver. Die WHO setzt die Grenze bei 0,85 für Frauen und 0,90 für Männer. Für den Taillenumfang allein nennt sie: erhöht ab 80 cm (Frauen) bzw. 94 cm (Männer), deutlich erhöht ab 88 cm bzw. 102 cm.',
+        },
+        {
+          title: 'WHtR: die 0,5-Regel',
+          content: 'Die Waist-to-Height-Ratio teilt den Taillenumfang durch die Körpergröße. Als Faustregel gilt: Die Taille sollte weniger als die Hälfte der Körpergröße messen. Bei 1,70 m wären das weniger als 85 cm. Der Wert ist für Frauen und Männer gleich. Das britische NICE ordnet 0,4 bis 0,49 als unbedenklich, 0,5 bis 0,59 als erhöht und ab 0,6 als hohes Risiko ein. Für ältere Menschen werden teils höhere Grenzen genannt. Diese sind aber weniger gut belegt.',
+        },
+        {
+          title: 'Was die Werte nicht leisten',
+          content: 'WHR und WHtR sind Screening-Werte. Sie ersetzen keine ärztliche Untersuchung von Blutdruck, Blutzucker und Blutfetten. Während der Schwangerschaft und bei Kindern gelten die Grenzwerte nicht. Ergänzend zeigt der [BMI-Rechner](/rechner/bmi-rechner/) Ihr Normalgewicht. Wie viele Kalorien Sie zum Abnehmen brauchen, berechnet der [Kalorienbedarf-Rechner](/rechner/kalorienbedarf-rechner/).',
+        },
+      ],
+      details: 'WHR = Taillenumfang / Hüftumfang; WHO-Grenzwert 0,90 (Männer) bzw. 0,85 (Frauen). WHtR = Taillenumfang / Körpergröße; unter 0,5 kein erhöhtes Risiko, 0,5–0,59 erhöht, ab 0,6 hoch (NICE 2022). Taillenumfang nach WHO: Frauen erhöht ab 80 cm, deutlich erhöht ab 88 cm; Männer ab 94 bzw. 102 cm.',
     },
     faqs: [
-      { question: 'Warum ist Bauchfett (viszerales Fett) so viel gefährlicher als Unterhautfett?', answer: 'Viszerales Fett umhüllt innere Organe und ist hochgradig stoffwechselaktiv: Es schüttet entzündungsfördernde Botenstoffe aus, fördert Arteriosklerose, Bluthochdruck und Typ-2-Diabetes.' },
-      { question: 'Wie misst man den Taillenumfang korrekt?', answer: 'Morgens vor dem Frühstück stehend, entspannt ausgeatmet, genau in der Mitte zwischen dem unteren Rippenbogen und der Oberkante des Beckenkamms.' },
+      {
+        question: 'Wie berechne ich das Taille-Hüft-Verhältnis?',
+        answer: 'Teilen Sie Ihren Taillenumfang durch Ihren Hüftumfang, beide in Zentimetern. Bei 80 cm Taille und 100 cm Hüfte ergibt sich eine WHR von 0,80. Frauen liegen damit unter dem WHO-Grenzwert von 0,85.',
+      },
+      {
+        question: 'Welcher WHR-Wert ist normal?',
+        answer: 'Nach der WHO gilt bei Frauen ein Wert unter 0,85 und bei Männern unter 0,90 als unbedenklich. Werte darüber zeigen, dass sich Fett vor allem am Bauch sammelt. Das erhöht das Risiko für Diabetes und Herz-Kreislauf-Erkrankungen.',
+      },
+      {
+        question: 'Was ist die Waist-to-Height-Ratio?',
+        answer: 'Die Waist-to-Height-Ratio (WHtR) ist der Taillenumfang geteilt durch die Körpergröße. Liegt sie unter 0,5, ist die Taille kleiner als die halbe Körpergröße. Bei 1,80 m sollte die Taille also unter 90 cm liegen.',
+      },
+      {
+        question: 'Welcher Bauchumfang ist bei Frauen und Männern normal?',
+        answer: 'Die WHO sieht bei Frauen ab 80 cm und bei Männern ab 94 cm ein erhöhtes Risiko. Ab 88 cm bzw. 102 cm gilt das Risiko als deutlich erhöht. Bei großen Menschen ist die WHtR aussagekräftiger, weil sie die Körpergröße berücksichtigt.',
+      },
+      {
+        question: 'Ist die WHtR aussagekräftiger als der BMI?',
+        answer: 'Für das Risiko durch Bauchfett ja. Der BMI unterscheidet nicht zwischen Muskeln und Fett und zeigt nicht, wo das Fett sitzt. Studien zeigen, dass die WHtR Herz-Kreislauf-Risiken oft besser vorhersagt als der BMI. Am besten betrachten Sie beide Werte zusammen.',
+      },
     ],
-    relatedSlugs: ['waist-to-height-ratio-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner', 'idealgewicht-creff-rechner'],
+    relatedSlugs: ['bmi-rechner', 'kalorienbedarf-rechner', 'blutdruck-klassifikation-rechner', 'intervallfasten-16-8-rechner'],
   },
 
   {
@@ -1255,60 +1417,292 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'puls-trainingszonen-rechner',
     slug: 'puls-trainingszonen-rechner',
-    name: 'Puls-Trainingszonen-Rechner (Fettverbrennung & Cardio)',
+    name: 'Puls-Trainingszonen-Rechner (Maximalpuls, Karvonen & 5 Pulszonen)',
     shortName: 'Puls Trainingszonen',
     category: 'gesundheit-fitness',
     subcategory: 'Training & Sport',
-    metaTitle: 'Puls-Trainingszonen Rechner – Trainingspuls berechnen',
-    metaDescription: 'Berechnen Sie die 5 Herzfrequenz-Trainingsbereiche für Ihr Ausdauertraining: Von aktiver Regeneration über Fettverbrennung bis zum Schwellentraining.',
-    h1: 'Puls-Trainingszonen Rechner – Herzfrequenzzonen für Ausdauertraining',
-    shortDescription: 'Berechnet die 5 Herzfrequenzzonen für gezieltes Lauftraining und Radsport.',
-    searchKeywords: ['puls trainingszonen rechner', 'herzfrequenz zonen rechner ausdauer', 'fettverbrennungszone puls berechnen', 'aerobe schwelle herzfrequenz berechnen'],
+    metaTitle: 'Puls-Trainingszonen Rechner – mit Maximalpuls & Karvonen',
+    metaDescription: 'Pulszonen kostenlos berechnen: Maximalpuls nach Tanaka oder 220 − Alter, eigene HFmax oder Karvonen mit Ruhepuls – alle 5 Trainingszonen auf einen Blick.',
+    h1: 'Puls-Trainingszonen Rechner – Maximalpuls und Pulszonen berechnen',
+    shortDescription: 'Schätzt Ihren Maximalpuls aus dem Alter oder nutzt Ihren Messwert und berechnet daraus die 5 Trainingszonen – wahlweise mit Ruhepuls nach Karvonen.',
+    searchKeywords: [
+      'puls trainingszonen rechner',
+      'pulszonen berechnen',
+      'trainingspuls berechnen',
+      'maximalpuls berechnen',
+      'maximalpuls rechner',
+      'hfmax berechnen',
+      '220 minus alter',
+      'tanaka formel maximalpuls',
+      'karvonen formel',
+      'herzfrequenzzonen berechnen',
+      'fettverbrennungspuls berechnen',
+      'zone 2 puls berechnen',
+    ],
     inputs: [
-      { id: 'maxHeartRate', label: 'Ihre maximale Herzfrequenz (HFmax) in bpm', type: 'number', defaultValue: 185, min: 140, max: 225, step: 1, unit: 'bpm' },
+      {
+        id: 'hfMaxMethod',
+        label: 'Maximalpuls (HFmax) bestimmen',
+        type: 'select',
+        defaultValue: 'tanaka',
+        options: [
+          { value: 'tanaka', label: 'Aus dem Alter schätzen – Tanaka (208 − 0,7 × Alter)' },
+          { value: 'fox', label: 'Aus dem Alter schätzen – Faustformel (220 − Alter)' },
+          { value: 'measured', label: 'Gemessenen Maximalpuls eingeben' },
+        ],
+      },
+      { id: 'ageYears', label: 'Alter', type: 'number', defaultValue: 35, min: 14, max: 100, step: 1, unit: 'Jahre', dependsOn: { field: 'hfMaxMethod', value: ['tanaka', 'fox'] } },
+      {
+        id: 'maxHeartRate',
+        label: 'Gemessener Maximalpuls (HFmax)',
+        type: 'number',
+        defaultValue: 185,
+        min: 100,
+        max: 230,
+        step: 1,
+        unit: 'bpm',
+        helpText: 'Höchster Wert aus einem Belastungstest oder einem harten Wettkampf, z. B. von Brustgurt oder Sportuhr.',
+        dependsOn: { field: 'hfMaxMethod', value: 'measured' },
+      },
+      {
+        id: 'zoneMethod',
+        label: 'Zonen berechnen nach',
+        type: 'select',
+        defaultValue: 'hfmax',
+        options: [
+          { value: 'hfmax', label: 'Prozent vom Maximalpuls (Standard vieler Sportuhren)' },
+          { value: 'karvonen', label: 'Karvonen – Herzfrequenzreserve mit Ruhepuls' },
+        ],
+      },
+      {
+        id: 'restingHeartRate',
+        label: 'Ruhepuls (morgens im Liegen)',
+        type: 'number',
+        defaultValue: 62,
+        min: 30,
+        max: 120,
+        step: 1,
+        unit: 'bpm',
+        helpText: 'Messen Sie an drei Morgen direkt nach dem Aufwachen und nehmen Sie den Mittelwert.',
+        dependsOn: { field: 'zoneMethod', value: 'karvonen' },
+      },
     ],
     calculate: (inputs) => {
-      const hf = parseFloat(inputs.maxHeartRate) || 185;
+      const isEmpty = (v: any) => v === undefined || v === null || String(v).trim() === '';
+      const fail = (error: string) => ({
+        primary: { id: 'z2', label: 'Zone 2: Grundlagenausdauer (60 - 70 %)', value: 0, formattedValue: '-' },
+        error,
+      });
 
-      const z1Min = Math.round(hf * 0.50);
-      const z1Max = Math.round(hf * 0.60);
-      const z2Min = Math.round(hf * 0.60);
-      const z2Max = Math.round(hf * 0.70);
-      const z3Min = Math.round(hf * 0.70);
-      const z3Max = Math.round(hf * 0.80);
-      const z4Min = Math.round(hf * 0.80);
-      const z4Max = Math.round(hf * 0.90);
-      const z5Min = Math.round(hf * 0.90);
-      const z5Max = hf;
+      // Ältere Links übergeben nur maxHeartRate → dann gilt der gemessene Wert
+      const rawMethod = inputs.hfMaxMethod;
+      const method: 'tanaka' | 'fox' | 'measured' =
+        rawMethod === 'tanaka' || rawMethod === 'fox' || rawMethod === 'measured'
+          ? rawMethod
+          : (!isEmpty(inputs.maxHeartRate) ? 'measured' : 'tanaka');
+      const useKarvonen = inputs.zoneMethod === 'karvonen';
+
+      let hf = 0;
+      let hfMethodLabel = '';
+      let hfStep = '';
+      let age: number | undefined;
+      if (method === 'measured') {
+        const measured = parseFloat(inputs.maxHeartRate);
+        if (isEmpty(inputs.maxHeartRate) || !Number.isFinite(measured)) {
+          return fail('Bitte geben Sie Ihren gemessenen Maximalpuls in Schlägen pro Minute ein.');
+        }
+        if (measured < 100 || measured > 230) {
+          return fail('Bitte geben Sie einen Maximalpuls zwischen 100 und 230 Schlägen pro Minute ein.');
+        }
+        hf = Math.round(measured);
+        hfMethodLabel = 'gemessen';
+        hfStep = `HFmax (gemessen) = ${hf} bpm`;
+      } else {
+        const a = parseFloat(inputs.ageYears);
+        if (isEmpty(inputs.ageYears) || !Number.isFinite(a)) {
+          return fail('Bitte geben Sie Ihr Alter in Jahren ein.');
+        }
+        if (a < 14 || a > 100) {
+          return fail(a >= 0 && a < 14
+            ? 'Die Formeln für den Maximalpuls gelten erst ab 14 Jahren. Für Kinder eignen sie sich nicht.'
+            : 'Bitte geben Sie ein Alter zwischen 14 und 100 Jahren ein.');
+        }
+        age = a;
+        if (method === 'tanaka') {
+          // Tanaka, Monahan & Seals (2001): HFmax = 208 − 0,7 × Alter
+          hf = Math.round(208 - 0.7 * a);
+          hfMethodLabel = 'Tanaka';
+          hfStep = `HFmax (Tanaka) = 208 − 0,7 × ${formatNumber(a, 0)} = ${formatNumber(208 - 0.7 * a, 1)} ≈ ${hf} bpm`;
+        } else {
+          // Klassische Faustformel (Fox & Haskell 1971): HFmax = 220 − Alter
+          hf = Math.round(220 - a);
+          hfMethodLabel = '220 − Alter';
+          hfStep = `HFmax (220 − Alter) = 220 − ${formatNumber(a, 0)} = ${hf} bpm`;
+        }
+      }
+
+      let rhr = 0;
+      if (useKarvonen) {
+        const r = parseFloat(inputs.restingHeartRate);
+        if (isEmpty(inputs.restingHeartRate) || !Number.isFinite(r)) {
+          return fail('Bitte geben Sie Ihren Ruhepuls ein oder wählen Sie „Prozent vom Maximalpuls“.');
+        }
+        if (r < 30 || r > 120) {
+          return fail('Bitte geben Sie einen Ruhepuls zwischen 30 und 120 Schlägen pro Minute ein.');
+        }
+        if (r >= hf - 20) {
+          return fail('Der Ruhepuls muss deutlich unter dem Maximalpuls liegen. Bitte prüfen Sie beide Werte.');
+        }
+        rhr = Math.round(r);
+      }
+      const hrr = hf - rhr; // Herzfrequenzreserve (bei Prozent-Methode: rhr = 0 → hrr = HFmax)
+
+      const bpm = (pct: number) => Math.round(rhr + hrr * pct);
+      const zones = [
+        { id: 'z1', name: 'Zone 1: Regeneration', from: 0.5, to: 0.6 },
+        { id: 'z2', name: 'Zone 2: Grundlagenausdauer / Fettstoffwechsel', from: 0.6, to: 0.7 },
+        { id: 'z3', name: 'Zone 3: Aerobes Tempo', from: 0.7, to: 0.8 },
+        { id: 'z4', name: 'Zone 4: Schwellenbereich', from: 0.8, to: 0.9 },
+        { id: 'z5', name: 'Zone 5: Maximalbereich', from: 0.9, to: 1.0 },
+      ].map((z) => ({
+        ...z,
+        lo: bpm(z.from),
+        hi: z.to === 1 ? hf : bpm(z.to),
+        label: `${z.name} (${Math.round(z.from * 100)} - ${Math.round(z.to * 100)} %${useKarvonen ? ' HFR' : ''})`,
+      }));
+      const zoneItem = (z: typeof zones[number]) => ({ id: z.id, label: z.label, value: z.hi, formattedValue: `${z.lo} - ${z.hi} bpm` });
+      const z2 = zones[1];
+
+      const secondary: any[] = [
+        { id: 'hfMax', label: `Maximalpuls (HFmax, ${hfMethodLabel})`, value: hf, formattedValue: `${hf} bpm` },
+        zoneItem(zones[0]),
+        zoneItem(zones[2]),
+        zoneItem(zones[3]),
+        zoneItem(zones[4]),
+      ];
+      if (useKarvonen) {
+        secondary.push({ id: 'hrr', label: 'Herzfrequenzreserve (HFmax − Ruhepuls)', value: hrr, formattedValue: `${hrr} bpm` });
+      }
+      if (age !== undefined) {
+        const other = method === 'tanaka' ? Math.round(220 - age) : Math.round(208 - 0.7 * age);
+        secondary.push({
+          id: 'hfMaxComparison',
+          label: method === 'tanaka' ? 'Zum Vergleich: 220 − Alter' : 'Zum Vergleich: Tanaka-Formel',
+          value: other,
+          formattedValue: `${other} bpm`,
+        });
+        secondary.push({ id: 'note', label: 'Genauigkeit', value: 'Hinweis', formattedValue: 'Altersformeln streuen um etwa ±10 bpm. Ein Belastungstest liefert Ihren echten Maximalpuls.' });
+      }
+
+      const calculationSteps = [
+        hfStep,
+        useKarvonen
+          ? `Herzfrequenzreserve = ${hf} − ${rhr} = ${hrr} bpm`
+          : 'Zonen = HFmax × Prozentsatz',
+        useKarvonen
+          ? `Zone 2 = ${rhr} + ${hrr} × 0,6 bis ${rhr} + ${hrr} × 0,7 = ${z2.lo} - ${z2.hi} bpm`
+          : `Zone 2 = ${hf} × 0,6 bis ${hf} × 0,7 = ${z2.lo} - ${z2.hi} bpm`,
+      ];
 
       return {
-        primary: { id: 'z2', label: 'Zone 2: Fettstoffwechsel / Grundlagenausdauer (60 - 70 %)', value: z2Max, formattedValue: `${z2Min} - ${z2Max} bpm`, highlight: true },
-        secondary: [
-          { id: 'z1', label: 'Zone 1: Regeneration (50 - 60 %)', value: z1Max, formattedValue: `${z1Min} - ${z1Max} bpm` },
-          { id: 'z3', label: 'Zone 3: Aerobes Tempo / Cardio (70 - 80 %)', value: z3Max, formattedValue: `${z3Min} - ${z3Max} bpm` },
-          { id: 'z4', label: 'Zone 4: Anaerobe Schwelle (80 - 90 %)', value: z4Max, formattedValue: `${z4Min} - ${z4Max} bpm` },
-          { id: 'z5', label: 'Zone 5: Maximalleistung / VO2max (90 - 100 %)', value: z5Max, formattedValue: `${z5Min} - ${z5Max} bpm` },
-        ],
-        summaryText: `Bei einer HFmax von ${hf} bpm trainieren Sie in Zone 2 (Fettverbrennung & Grundlagenausdauer) im Bereich von ${z2Min} bis ${z2Max} Schlägen pro Minute.`,
+        primary: { id: 'z2', label: `${z2.name} (60 - 70 %${useKarvonen ? ' HFR' : ''})`, value: z2.hi, formattedValue: `${z2.lo} - ${z2.hi} bpm`, highlight: true },
+        secondary,
+        calculationSteps,
+        summaryText: `Ihr Maximalpuls liegt bei ${hf} bpm (${hfMethodLabel}). ${useKarvonen ? `Mit Ruhepuls ${rhr} bpm nach Karvonen` : 'Nach Prozent vom Maximalpuls'} trainieren Sie die Grundlagenausdauer (Zone 2) bei ${z2.lo} bis ${z2.hi} Schlägen pro Minute.`,
       };
     },
-    formula: 'Zone = HFmax × Prozentsatz (50 % bis 100 %)',
-    formulaExplanation: 'Das standardisierte 5-Zonen-Modell wird von Sportuhren und Ausdauertrainern weltweit genutzt, um Trainingsreize präzise zu steuern.',
+    formula: 'HFmax = 208 − 0,7 × Alter (Tanaka) oder 220 − Alter · Zone = HFmax × % · Karvonen: Zone = Ruhepuls + (HFmax − Ruhepuls) × %',
+    formulaExplanation: 'Der Maximalpuls lässt sich aus dem Alter schätzen: nach Tanaka et al. (2001) mit 208 − 0,7 × Alter oder mit der älteren Faustformel 220 − Alter. Haben Sie Ihren Maximalpuls gemessen, nutzt der Rechner diesen Wert. Die fünf Zonen sind Prozentbereiche vom Maximalpuls. Bei der Karvonen-Methode beziehen sich die Prozente auf die Herzfrequenzreserve (Maximalpuls minus Ruhepuls), danach wird der Ruhepuls wieder addiert.',
     workedExample: {
-      title: 'Beispiel: HFmax 185 bpm',
-      inputValues: [{ label: 'HFmax', value: '185 bpm' }],
-      steps: ['Zone 2 (60-70 %): 185 × 0,60 = 111 bpm bis 185 × 0,70 = 130 bpm', 'Zone 4 (80-90 %): 148 bis 167 bpm'],
-      result: 'Zone 2: 111 - 130 bpm',
+      title: 'Beispiel 1: 35 Jahre, Tanaka-Formel, Prozent vom Maximalpuls',
+      inputValues: [{ label: 'Alter', value: '35 Jahre' }, { label: 'Methode', value: '% HFmax' }],
+      steps: [
+        'HFmax = 208 − 0,7 × 35 = 183,5 ≈ 184 bpm',
+        'Zone 2 = 184 × 0,6 bis 184 × 0,7 = 110 bis 129 bpm',
+        'Zone 4 = 184 × 0,8 bis 184 × 0,9 = 147 bis 166 bpm',
+      ],
+      result: 'Zone 2: 110 - 129 bpm',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: 35 Jahre, Tanaka-Formel, Prozent vom Maximalpuls',
+        inputValues: [{ label: 'Alter', value: '35 Jahre' }, { label: 'Methode', value: '% HFmax' }],
+        steps: [
+          'HFmax = 208 − 0,7 × 35 = 183,5 ≈ 184 bpm',
+          'Zone 2 = 184 × 0,6 bis 184 × 0,7 = 110 bis 129 bpm',
+          'Zone 4 = 184 × 0,8 bis 184 × 0,9 = 147 bis 166 bpm',
+        ],
+        result: 'Zone 2: 110 - 129 bpm',
+      },
+      {
+        title: 'Beispiel 2: 35 Jahre, Ruhepuls 62 bpm, Karvonen',
+        inputValues: [{ label: 'Alter', value: '35 Jahre' }, { label: 'Ruhepuls', value: '62 bpm' }, { label: 'Methode', value: 'Karvonen' }],
+        steps: [
+          'HFmax = 208 − 0,7 × 35 ≈ 184 bpm',
+          'Herzfrequenzreserve = 184 − 62 = 122 bpm',
+          'Zone 2 = 62 + 122 × 0,6 bis 62 + 122 × 0,7 = 135 bis 147 bpm',
+        ],
+        result: 'Zone 2: 135 - 147 bpm',
+      },
+      {
+        title: 'Beispiel 3: Gemessener Maximalpuls 192 bpm',
+        inputValues: [{ label: 'HFmax', value: '192 bpm (gemessen)' }, { label: 'Methode', value: '% HFmax' }],
+        steps: [
+          'Zone 2 = 192 × 0,6 bis 192 × 0,7 = 115 bis 134 bpm',
+          'Zone 4 = 192 × 0,8 bis 192 × 0,9 = 154 bis 173 bpm',
+        ],
+        result: 'Zone 2: 115 - 134 bpm',
+      },
+    ],
     content: {
-      intro: 'Dieser Trainingszonenrechner teilt Ihre Herzfrequenz nach der Karvonen-Methode oder prozentualer HFmax in die fünf Ausdauerbereiche (Zone 1 bis 5) ein.',
-      details: 'Zone 1 (50–60 % Rekompensation), Zone 2 (60–70 % Grundlagenausdauer / Fettstoffwechsel), Zone 3 (70–80 % aerob), Zone 4 (80–90 % anaerobe Schwelle), Zone 5 (90–100 % Maximalbereich).',
+      intro: 'Dieser Rechner bestimmt zuerst Ihren Maximalpuls (HFmax) und teilt ihn dann in fünf Trainingszonen auf. Den Maximalpuls schätzt er aus Ihrem Alter oder übernimmt Ihren Messwert. Die Zonen berechnet er als Prozent vom Maximalpuls oder – genauer für Ihren Trainingszustand – nach Karvonen mit Ihrem Ruhepuls.',
+      sections: [
+        {
+          title: 'Maximalpuls: Formel oder Messung?',
+          content: 'Die Faustformel 220 − Alter ist leicht zu merken, unterschätzt den Maximalpuls bei älteren Menschen aber oft. Tanaka, Monahan und Seals haben 2001 aus über 350 Studien die Formel 208 − 0,7 × Alter abgeleitet. Für einen 50-Jährigen ergibt Tanaka 173 statt 170 bpm, für einen 70-Jährigen 159 statt 150 bpm. Beide Formeln liefern nur Durchschnittswerte. Ihr echter Maximalpuls kann um 10 bpm oder mehr abweichen. Genauer ist ein Stufentest in der Sportmedizin oder der höchste Wert aus einem harten Wettkampf.',
+        },
+        {
+          title: 'Prozent vom Maximalpuls oder Karvonen?',
+          content: 'Die einfache Methode multipliziert den Maximalpuls mit dem Prozentsatz der Zone. Die Karvonen-Methode rechnet mit der Herzfrequenzreserve, also Maximalpuls minus Ruhepuls. So fließt Ihr Trainingszustand ein: Bei niedrigem Ruhepuls liegen die Zonen enger zusammen und höher. Bei 184 bpm Maximalpuls und 62 bpm Ruhepuls liegt Zone 2 nach Karvonen bei 135–147 bpm, nach der einfachen Methode bei 110–129 bpm. Achten Sie beim Vergleich mit Ihrer Sportuhr darauf, welche Methode sie nutzt.',
+        },
+        {
+          title: 'Die fünf Trainingszonen',
+          content: '- Zone 1 (50–60 %): Regeneration, lockeres Bewegen\n- Zone 2 (60–70 %): Grundlagenausdauer, längere ruhige Einheiten\n- Zone 3 (70–80 %): aerobes Tempo, zügige Dauerläufe\n- Zone 4 (80–90 %): Schwellenbereich, Intervalle und Tempoläufe\n- Zone 5 (90–100 %): Maximalbereich, sehr kurze Belastungen\n\nViele Trainingspläne setzen den Großteil der Einheiten in Zone 1 und 2. Wie viel Energie Sie dabei verbrauchen, zeigt der [Kalorienbedarf-Rechner](/rechner/kalorienbedarf-rechner/).',
+        },
+        {
+          title: 'Sicherheit beim pulsgesteuerten Training',
+          content: 'Medikamente wie Betablocker senken den Puls. Dann passen weder die Formeln noch die Zonen. Lassen Sie sich vor intensivem Training ärztlich untersuchen, wenn Sie Herz-Kreislauf-Erkrankungen, Bluthochdruck oder Diabetes haben oder nach längerer Pause wieder einsteigen. Brustschmerz, Atemnot oder Schwindel beim Sport sind ein Grund, sofort aufzuhören. Ihren Blutdruck können Sie mit dem [Blutdruck-Rechner](/rechner/blutdruck-klassifikation-rechner/) einordnen.',
+        },
+      ],
+      details: 'Tanaka-Formel: HFmax = 208 − 0,7 × Alter (Tanaka, Monahan & Seals, J Am Coll Cardiol 2001). Faustformel: HFmax = 220 − Alter. Prozent-Methode: Zielpuls = HFmax × Intensität. Karvonen (1957): Zielpuls = Ruhepuls + (HFmax − Ruhepuls) × Intensität.',
     },
     faqs: [
-      { question: 'Warum ist Zone-2-Training für Ausdauersportler so fundamental?', answer: 'Zone 2 maximiert die Bildung neuer Mitochondrien ("Kraftwerke der Zelle") und trainiert die Muskulatur, Fett effizient als primäre Energiequelle bei submaximaler Belastung zu verbrennen.' },
-      { question: 'Wie funktioniert die Karvonen-Formel mit Herzfrequenzreserve?', answer: 'Trainingspuls = Ruhepuls + ((HFmax - Ruhepuls) · Intensität in %). Sie bezieht den individuellen Fitnesszustand über den Ruhepuls direkt in die Zonenberechnung ein.' },
+      {
+        question: 'Wie berechne ich meinen Maximalpuls?',
+        answer: 'Am einfachsten mit einer Altersformel. Nach Tanaka gilt 208 − 0,7 × Alter, bei 40 Jahren also 180 bpm. Die Faustformel 220 − Alter ergibt ebenfalls 180 bpm. Genauer ist ein Belastungstest, denn die Formeln streuen um etwa ±10 bpm.',
+      },
+      {
+        question: 'Was ist die Karvonen-Formel?',
+        answer: 'Die Karvonen-Formel berechnet den Trainingspuls aus der Herzfrequenzreserve: Ruhepuls + (Maximalpuls − Ruhepuls) × Intensität. Bei 184 bpm Maximalpuls, 62 bpm Ruhepuls und 70 % ergeben sich 62 + 122 × 0,7 ≈ 147 bpm. So berücksichtigt die Formel Ihren Trainingszustand.',
+      },
+      {
+        question: 'In welchem Pulsbereich verbrennt man am meisten Fett?',
+        answer: 'Anteilig nutzt der Körper in Zone 1 und 2 (etwa 60–70 % der HFmax) besonders viel Fett als Energiequelle. Insgesamt verbrauchen Sie bei höherer Intensität aber mehr Kalorien pro Minute. Für das Abnehmen zählt vor allem die gesamte Energiebilanz.',
+      },
+      {
+        question: 'Ist die Formel 220 minus Alter noch aktuell?',
+        answer: 'Sie ist weit verbreitet, aber ungenau. Bei jüngeren Menschen passt sie meist gut, bei älteren unterschätzt sie den Maximalpuls oft deutlich. Die Tanaka-Formel 208 − 0,7 × Alter bildet den Altersverlauf besser ab.',
+      },
+      {
+        question: 'Wie hoch darf mein Puls beim Sport sein?',
+        answer: 'Kurzzeitig darf ein gesunder Mensch bis an seinen Maximalpuls gehen. Für die meisten Einheiten reichen 60 bis 80 % davon. Haben Sie eine Herzerkrankung oder nehmen Sie pulssenkende Medikamente, legen Sie Ihre Obergrenze bitte mit Ihrer Ärztin oder Ihrem Arzt fest.',
+      },
+      {
+        question: 'Warum zeigt meine Sportuhr andere Pulszonen an?',
+        answer: 'Sportuhren nutzen unterschiedliche Zonenmodelle und Formeln. Manche rechnen mit Prozent vom Maximalpuls, andere mit der Herzfrequenzreserve oder der Laktatschwelle. Tragen Sie in der Uhr am besten Ihren gemessenen Maximal- und Ruhepuls ein und wählen Sie hier dieselbe Methode.',
+      },
     ],
-    relatedSlugs: ['maximalpuls-hfmax-rechner', 'laufpace-rechner', 'vo2max-cooper-test-rechner'],
+    relatedSlugs: ['blutdruck-klassifikation-rechner', 'kalorienbedarf-rechner', 'radfahren-kalorien-watt-rechner', 'schwimmen-kalorienverbrauch-rechner', 'schritt-distanz-kalorien-rechner'],
   },
 
   {
@@ -2125,55 +2519,286 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'zykluslaenge-eisprung-rechner',
     slug: 'zykluslaenge-eisprung-rechner',
-    name: 'Zyklusrechner (Eisprung & Lutealphase bei unregelmäßigem Zyklus)',
+    name: 'Zyklusrechner (Eisprung, fruchtbare Tage & Zykluskalender)',
     shortName: 'Zyklusrechner Eisprung',
     category: 'familie-schwangerschaft',
     subcategory: 'Schwangerschaft & Geburt',
-    metaTitle: 'Zyklusrechner – Eisprung & fruchtbare Tage berechnen',
-    metaDescription: 'Berechnen Sie den Eisprungtag und das fruchtbare Fenster für Zykluslängen von 21 bis 40 Tagen anhand der Lutealphase (14 Tage vor Periodenbeginn).',
-    h1: 'Zyklusrechner – Eisprungtag & fruchtbares Fenster bestimmen',
-    shortDescription: 'Kalkuliert Ovulation und fruchtbare Tage für individuelle Zykluslängen.',
-    searchKeywords: ['zyklusrechner eisprung unregelmaessig', 'ovulation berechnen zykluslaenge 32 tage', 'lutealphase eisprung vor naechster periode', 'fruchtbarkeitstest ovulationstag'],
+    metaTitle: 'Zyklusrechner – fruchtbare Tage & Eisprung mit Kalender',
+    metaDescription: 'Fruchtbare Tage kostenlos berechnen: Eisprung, fruchtbares Fenster und nächste Periode für drei Zyklen im Voraus – auch bei unregelmäßigem Zyklus.',
+    h1: 'Zyklusrechner – fruchtbare Tage und Eisprung berechnen',
+    shortDescription: 'Berechnet Eisprung, fruchtbare Tage und die nächste Periode als Kalender für drei Zyklen – mit eigener Lutealphase und für unregelmäßige Zyklen.',
+    searchKeywords: [
+      'zyklusrechner',
+      'fruchtbare tage berechnen',
+      'fruchtbare tage rechner',
+      'eisprung berechnen',
+      'eisprungrechner',
+      'wann ist mein eisprung',
+      'eisprung unregelmäßiger zyklus',
+      'ovulationsrechner',
+      'eisprungkalender',
+      'lutealphase eisprung berechnen',
+      'eisprung berechnen kinderwunsch',
+    ],
     inputs: [
-      { id: 'cycleLengthDays', label: 'Ihre durchschnittliche Zykluslänge in Tagen (Standard: 28 Tage)', type: 'number', defaultValue: 28, min: 21, max: 45, step: 1, unit: 'Tage' },
-      { id: 'lutealPhaseDays', label: 'Dauer der Lutealphase / Gelbkörperphase (Standard: 14 Tage)', type: 'number', defaultValue: 14, min: 10, max: 16, step: 1, unit: 'Tage' },
+      {
+        id: 'mode',
+        label: 'Berechnung',
+        type: 'select',
+        defaultValue: 'dates',
+        options: [
+          { value: 'dates', label: 'Mit Datum – Kalender für die nächsten 3 Zyklen' },
+          { value: 'days', label: 'Nur Zyklustage – ohne Datum' },
+        ],
+      },
+      { id: 'lastPeriodDate', label: 'Erster Tag der letzten Periode', type: 'date', defaultValue: getBerlinTodayString(), dependsOn: { field: 'mode', value: 'dates' } },
+      {
+        id: 'cycleType',
+        label: 'Ihr Zyklus ist',
+        type: 'select',
+        defaultValue: 'regular',
+        options: [
+          { value: 'regular', label: 'Regelmäßig (durchschnittliche Länge)' },
+          { value: 'irregular', label: 'Unregelmäßig (kürzester und längster Zyklus)' },
+        ],
+      },
+      { id: 'cycleLengthDays', label: 'Durchschnittliche Zykluslänge', type: 'number', defaultValue: 28, min: 21, max: 45, step: 1, unit: 'Tage', helpText: 'Vom ersten Tag der Periode bis zum Tag vor der nächsten Periode.', dependsOn: { field: 'cycleType', value: 'regular' } },
+      { id: 'shortestCycleDays', label: 'Kürzester Zyklus der letzten 6–12 Monate', type: 'number', defaultValue: 26, min: 21, max: 45, step: 1, unit: 'Tage', dependsOn: { field: 'cycleType', value: 'irregular' } },
+      { id: 'longestCycleDays', label: 'Längster Zyklus der letzten 6–12 Monate', type: 'number', defaultValue: 32, min: 21, max: 45, step: 1, unit: 'Tage', dependsOn: { field: 'cycleType', value: 'irregular' } },
+      { id: 'lutealPhaseDays', label: 'Lutealphase (Tage vom Eisprung bis zur Periode)', type: 'number', defaultValue: 14, min: 10, max: 16, step: 1, unit: 'Tage', helpText: 'Meist 12 bis 14 Tage. Nur ändern, wenn Sie Ihren Wert kennen, z. B. aus der Temperaturmethode.' },
     ],
     calculate: (inputs) => {
-      const cycle = parseInt(inputs.cycleLengthDays, 10) || 28;
-      const luteal = parseInt(inputs.lutealPhaseDays, 10) || 14;
+      const isEmpty = (v: any) => v === undefined || v === null || String(v).trim() === '';
+      const fail = (error: string) => ({
+        primary: { id: 'ovulationDay', label: 'Voraussichtlicher Eisprung', value: 0, formattedValue: '-' },
+        error,
+      });
+      const readInt = (v: any, fallback: number) => (isEmpty(v) ? fallback : Number(String(v).replace(',', '.')));
 
-      // Der Eisprung findet fast immer ziemlich genau 14 Tage VOR der nächsten Periode statt
-      const ovulationDay = cycle - luteal; // z. B. bei 28 Tagen: Tag 14; bei 35 Tagen: Tag 21!
-      const fertileStartDay = Math.max(1, ovulationDay - 5);
-      const fertileEndDay = ovulationDay + 1;
+      const irregular = inputs.cycleType === 'irregular';
+      // Ohne Moduswahl (ältere Links): Datum nur nutzen, wenn eines übergeben wurde
+      const useDates = inputs.mode === 'dates' || (inputs.mode === undefined && !isEmpty(inputs.lastPeriodDate));
+
+      const luteal = readInt(inputs.lutealPhaseDays, 14);
+      if (!Number.isInteger(luteal) || luteal < 10 || luteal > 16) {
+        return fail('Bitte geben Sie für die Lutealphase einen ganzzahligen Wert zwischen 10 und 16 Tagen ein.');
+      }
+
+      let shortest: number;
+      let longest: number;
+      if (irregular) {
+        shortest = readInt(inputs.shortestCycleDays, 26);
+        longest = readInt(inputs.longestCycleDays, 32);
+        if (!Number.isInteger(shortest) || !Number.isInteger(longest) || shortest < 21 || longest > 45 || shortest > 45 || longest < 21) {
+          return fail('Bitte geben Sie für den kürzesten und längsten Zyklus ganze Zahlen zwischen 21 und 45 Tagen ein.');
+        }
+        if (shortest > longest) {
+          return fail('Der kürzeste Zyklus darf nicht länger sein als der längste. Bitte prüfen Sie die beiden Werte.');
+        }
+      } else {
+        const cycle = readInt(inputs.cycleLengthDays, 28);
+        if (!Number.isInteger(cycle) || cycle < 21 || cycle > 45) {
+          return fail('Bitte geben Sie eine ganzzahlige Zykluslänge zwischen 21 und 45 Tagen ein.');
+        }
+        shortest = cycle;
+        longest = cycle;
+      }
+
+      // Zyklustag 1 = erster Tag der Periode. Eisprung = Zykluslänge − Lutealphase (z. B. 28 − 14 = Tag 14).
+      const ovEarly = shortest - luteal;
+      const ovLate = longest - luteal;
+      const fertileStart = Math.max(1, ovEarly - 5); // Spermien überleben bis zu 5 Tage
+      const fertileEnd = ovLate + 1; // Eizelle ca. 12–24 Std. befruchtungsfähig
+      const avgCycle = Math.round((shortest + longest) / 2);
+      const spread = longest - shortest;
+
+      const dayRange = (a: number, b: number) => (a === b ? `${a}. Zyklustag` : `Zyklustag ${a} bis ${b}`);
+      const secondary: any[] = [];
+      let primary: any;
+      let breakdown: any;
+      let summaryText: string;
+      let warning: string | undefined;
+
+      if (useDates) {
+        const parts = parseDateParts(inputs.lastPeriodDate);
+        if (!parts) {
+          return fail('Bitte geben Sie ein gültiges Datum für den ersten Tag Ihrer letzten Periode ein.');
+        }
+        const lmp = dateToDayNumber(parts.year, parts.month, parts.day);
+        const todayParts = parseDateParts(getBerlinTodayString());
+        const today = todayParts ? dateToDayNumber(todayParts.year, todayParts.month, todayParts.day) : lmp;
+        if (lmp > today) {
+          return fail('Das Datum der letzten Periode liegt in der Zukunft. Bitte geben Sie den ersten Tag Ihrer letzten Blutung ein.');
+        }
+        if (today - lmp > 90) {
+          warning = 'Ihre letzte Periode liegt mehr als 90 Tage zurück. Bleibt die Periode aus, klären Sie die Ursache bitte mit einem Schwangerschaftstest oder in Ihrer Frauenarztpraxis.';
+        }
+        // Zyklustag n entspricht Datum = erster Periodentag + (n − 1)
+        const d = (start: number, cycleDay: number) => formatDateGerman(dayNumberToDate(start + cycleDay - 1));
+        const range = (start: number, a: number, b: number) => (a === b ? d(start, a) : `${d(start, a)} bis ${d(start, b)}`);
+
+        const ovText = range(lmp, ovEarly, ovLate);
+        primary = {
+          id: 'ovulationDate',
+          label: irregular ? 'Voraussichtlicher Eisprung (Zeitraum)' : 'Voraussichtlicher Eisprung',
+          value: formatDateGerman(dayNumberToDate(lmp + ovEarly - 1)),
+          formattedValue: ovText,
+          highlight: true,
+        };
+        secondary.push(
+          { id: 'fertileWindow', label: 'Fruchtbare Tage', value: 'window', formattedValue: range(lmp, fertileStart, fertileEnd) },
+          { id: 'ovulationCycleDay', label: 'Eisprung am', value: ovEarly, formattedValue: dayRange(ovEarly, ovLate) },
+          { id: 'nextPeriod', label: 'Nächste Periode voraussichtlich', value: 'nextPeriod', formattedValue: range(lmp, shortest + 1, longest + 1) },
+        );
+
+        const rows = [0, 1, 2].map((k) => {
+          const start = lmp + k * avgCycle;
+          return {
+            period: `${k + 1}. Zyklus`,
+            values: {
+              periodStart: formatDateGerman(dayNumberToDate(start)),
+              fertile: range(start, fertileStart, fertileEnd),
+              ovulation: range(start, ovEarly, ovLate),
+            },
+          };
+        });
+        breakdown = {
+          columns: [
+            { key: 'periodStart', label: 'Periode beginnt' },
+            { key: 'fertile', label: 'Fruchtbare Tage' },
+            { key: 'ovulation', label: 'Eisprung' },
+          ],
+          rows,
+        };
+        summaryText = irregular
+          ? `Bei Zykluslängen von ${shortest} bis ${longest} Tagen liegt Ihr Eisprung voraussichtlich zwischen dem ${ovText.replace(' bis ', ' und dem ')}. Fruchtbar sind Sie vom ${range(lmp, fertileStart, fertileEnd).replace(' bis ', ' bis zum ')}.`
+          : `Bei einem ${shortest}-Tage-Zyklus ist Ihr Eisprung voraussichtlich am ${ovText}. Ihre fruchtbaren Tage liegen vom ${range(lmp, fertileStart, fertileEnd).replace(' bis ', ' bis zum ')}.`;
+      } else {
+        primary = {
+          id: 'ovulationDay',
+          label: irregular ? 'Voraussichtlicher Eisprung (Zyklustage)' : 'Voraussichtlicher Tag des Eisprungs (Zyklustag)',
+          value: ovEarly,
+          formattedValue: dayRange(ovEarly, ovLate),
+          highlight: true,
+        };
+        secondary.push(
+          { id: 'fertileWindow', label: 'Fruchtbares Zeitfenster', value: 0, formattedValue: dayRange(fertileStart, fertileEnd) },
+          { id: 'nextPeriod', label: 'Nächste Periode voraussichtlich', value: shortest + 1, formattedValue: dayRange(shortest + 1, longest + 1) },
+        );
+        summaryText = `Bei ${irregular ? `Zykluslängen von ${shortest} bis ${longest}` : `einer Zykluslänge von ${shortest}`} Tagen liegt der Eisprung voraussichtlich ${irregular ? `zwischen Zyklustag ${ovEarly} und ${ovLate}` : `am ${ovEarly}. Zyklustag`}. Ihre fruchtbaren Tage sind Zyklustag ${fertileStart} bis ${fertileEnd}.`;
+      }
+
+      secondary.push(
+        { id: 'follicularPhase', label: 'Follikelphase (bis zum Eisprung)', value: ovEarly, formattedValue: irregular ? `${ovEarly} bis ${ovLate} Tage` : `${ovEarly} Tage` },
+        { id: 'lutealPhase', label: 'Lutealphase (Gelbkörperphase)', value: luteal, formattedValue: `${luteal} Tage` },
+        { id: 'disclaimer', label: 'Hinweis', value: 'Orientierung', formattedValue: 'Nicht zur Verhütung geeignet – die Berechnung schätzt den Eisprung nur.' },
+      );
+
+      if (spread > 7) {
+        const spreadNote = `Ihr Zyklus schwankt um ${spread} Tage. Die Kalenderrechnung wird dadurch ungenau. Ovulationstests oder die Temperaturmethode helfen weiter. Schwankt Ihr Zyklus dauerhaft um mehr als 7 bis 9 Tage, sprechen Sie mit Ihrer Frauenarztpraxis.`;
+        warning = warning ? `${warning} ${spreadNote}` : spreadNote;
+      }
 
       return {
-        primary: { id: 'ovulationDay', label: 'Voraussichtlicher Tag des Eisprungs (Zyklustag)', value: ovulationDay, formattedValue: `${ovulationDay}. Zyklustag`, highlight: true },
-        secondary: [
-          { id: 'fertileWindow', label: 'Fruchtbares Zeitfenster', value: 0, formattedValue: `Zyklustag ${fertileStartDay} bis ${fertileEndDay}` },
-          { id: 'follicularPhase', label: 'Dauer der Follikelphase (Reifung)', value: ovulationDay, formattedValue: `${ovulationDay} Tage` },
-          { id: 'lutealPhase', label: 'Lutealphase (Gelbkörperphase)', value: luteal, formattedValue: `${luteal} Tage` },
+        primary,
+        secondary,
+        ...(breakdown ? { breakdown } : {}),
+        ...(warning ? { warning } : {}),
+        calculationSteps: [
+          irregular
+            ? `Frühester Eisprung = ${shortest} − ${luteal} = Zyklustag ${ovEarly}; spätester = ${longest} − ${luteal} = Zyklustag ${ovLate}`
+            : `Eisprung = ${shortest} − ${luteal} = Zyklustag ${ovEarly}`,
+          `Fruchtbare Tage = 5 Tage vor bis 1 Tag nach dem Eisprung = Zyklustag ${fertileStart} bis ${fertileEnd}`,
+          ...(useDates && irregular ? [`Folgezyklen mit mittlerer Zykluslänge von ${avgCycle} Tagen fortgeschrieben`] : []),
         ],
-        summaryText: `Bei einer Zykluslänge von ${cycle} Tagen findet der Eisprung voraussichtlich am ${ovulationDay}. Zyklustag statt. Ihre fruchtbarsten Tage sind von Zyklustag ${fertileStartDay} bis ${fertileEndDay}.`,
+        summaryText,
       };
     },
-    formula: 'Eisprungtag = Zykluslänge - Lutealphase (14 Tage)',
-    formulaExplanation: 'Während die Follikelphase vor dem Eisprung stark variieren kann, ist die zweite Zyklushälfte (Lutealphase) nach dem Eisprung bei den meisten Frauen biologisch konstant 12 bis 14 Tage lang.',
+    formula: 'Eisprung (Zyklustag) = Zykluslänge − Lutealphase · Fruchtbare Tage = Eisprung − 5 bis Eisprung + 1',
+    formulaExplanation: 'Der erste Tag der Periode ist Zyklustag 1. Der Eisprung liegt meist 12 bis 14 Tage vor der nächsten Periode (Lutealphase). Spermien überleben im Körper bis zu 5 Tage, die Eizelle ist nach dem Eisprung etwa 12 bis 24 Stunden befruchtungsfähig. Daraus ergibt sich ein fruchtbares Fenster von 5 Tagen vor bis 1 Tag nach dem Eisprung. Bei unregelmäßigem Zyklus rechnet der Rechner mit dem kürzesten und dem längsten Zyklus.',
     workedExample: {
-      title: 'Beispiel: 32 Tage Zyklusdauer',
-      inputValues: [{ label: 'Zyklusdauer', value: '32 Tage' }, { label: 'Lutealphase', value: '14 Tage' }],
-      steps: ['Eisprung = 32 - 14 = 18. Zyklustag', 'Fruchtbare Tage: Tag 13 bis Tag 19'],
-      result: 'Eisprung am 18. Zyklustag',
+      title: 'Beispiel 1: Regelmäßiger 28-Tage-Zyklus, letzte Periode am 02.11.2026',
+      inputValues: [{ label: 'Letzte Periode', value: '02.11.2026' }, { label: 'Zykluslänge', value: '28 Tage' }, { label: 'Lutealphase', value: '14 Tage' }],
+      steps: [
+        'Eisprung = 28 − 14 = Zyklustag 14 → 15.11.2026',
+        'Fruchtbare Tage = Zyklustag 9 bis 15 → 10.11. bis 16.11.2026',
+        'Nächste Periode = 02.11. + 28 Tage → 30.11.2026; nächster Eisprung am 13.12.2026',
+      ],
+      result: 'Eisprung am 15.11.2026, fruchtbar vom 10.11. bis 16.11.2026',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Regelmäßiger 28-Tage-Zyklus, letzte Periode am 02.11.2026',
+        inputValues: [{ label: 'Letzte Periode', value: '02.11.2026' }, { label: 'Zykluslänge', value: '28 Tage' }, { label: 'Lutealphase', value: '14 Tage' }],
+        steps: [
+          'Eisprung = 28 − 14 = Zyklustag 14 → 15.11.2026',
+          'Fruchtbare Tage = Zyklustag 9 bis 15 → 10.11. bis 16.11.2026',
+          'Nächste Periode = 02.11. + 28 Tage → 30.11.2026; nächster Eisprung am 13.12.2026',
+        ],
+        result: 'Eisprung am 15.11.2026, fruchtbar vom 10.11. bis 16.11.2026',
+      },
+      {
+        title: 'Beispiel 2: Unregelmäßiger Zyklus von 26 bis 33 Tagen, letzte Periode am 02.11.2026',
+        inputValues: [{ label: 'Letzte Periode', value: '02.11.2026' }, { label: 'Kürzester Zyklus', value: '26 Tage' }, { label: 'Längster Zyklus', value: '33 Tage' }],
+        steps: [
+          'Frühester Eisprung = 26 − 14 = Zyklustag 12 → 13.11.2026',
+          'Spätester Eisprung = 33 − 14 = Zyklustag 19 → 20.11.2026',
+          'Fruchtbare Tage = Zyklustag 7 bis 20 → 08.11. bis 21.11.2026',
+        ],
+        result: 'Eisprung zwischen 13.11. und 20.11.2026, fruchtbar vom 08.11. bis 21.11.2026',
+      },
+      {
+        title: 'Beispiel 3: Nur Zyklustage, 32-Tage-Zyklus',
+        inputValues: [{ label: 'Zykluslänge', value: '32 Tage' }, { label: 'Lutealphase', value: '14 Tage' }],
+        steps: ['Eisprung = 32 − 14 = Zyklustag 18', 'Fruchtbare Tage = Zyklustag 13 bis 19'],
+        result: 'Eisprung am 18. Zyklustag',
+      },
+    ],
     content: {
-      intro: 'Dieser Menstruationsrechner analysiert die Schwankungen Ihrer Zykluslänge zur Bestimmung der fruchtbaren Phase und der voraussichtlichen nächsten Periode.',
-      details: 'Ein regulärer Menstruationszyklus dauert 21 bis 35 Tage (Mittelwert: 28 Tage). Die zweite Zyklushälfte (Gelbkörperphase / Lutealphase) ist mit 12 bis 16 Tagen biologisch stabil; zeitliche Verschiebungen betreffen fast immer die Eireifungsphase.',
+      intro: 'Mit diesem Zyklusrechner sehen Sie, wann Ihr Eisprung voraussichtlich stattfindet und an welchen Tagen Sie fruchtbar sind. Geben Sie den ersten Tag Ihrer letzten Periode und Ihre Zykluslänge ein. Der Rechner zeigt dann einen Kalender für die nächsten drei Zyklen. Schwankt Ihr Zyklus, tragen Sie den kürzesten und längsten Zyklus ein. Ohne Datum erhalten Sie die Werte als Zyklustage.',
+      sections: [
+        {
+          title: 'So rechnet der Zyklusrechner',
+          content: 'Zyklustag 1 ist der erste Tag Ihrer Blutung. Der Eisprung findet meist 12 bis 14 Tage vor der nächsten Periode statt. Diese zweite Zyklushälfte heißt Lutealphase und ist bei den meisten Frauen recht stabil. Bei einem 28-Tage-Zyklus liegt der Eisprung deshalb um Zyklustag 14, bei einem 35-Tage-Zyklus um Tag 21. Fruchtbar sind Sie an den 5 Tagen vor dem Eisprung, am Tag des Eisprungs und am Tag danach.',
+        },
+        {
+          title: 'Unregelmäßiger Zyklus',
+          content: 'Schwankt Ihr Zyklus, wählen Sie „Unregelmäßig“ und tragen Sie den kürzesten und den längsten Zyklus der letzten 6 bis 12 Monate ein. Der Rechner nimmt den frühesten möglichen Eisprung aus dem kürzesten und den spätesten aus dem längsten Zyklus. Das fruchtbare Fenster wird dadurch länger. Bei 26 bis 33 Tagen umfasst es zum Beispiel Zyklustag 7 bis 20. Die Folgezyklen schreibt der Rechner mit der mittleren Länge fort. Tragen Sie nach jeder Periode das neue Datum ein.',
+        },
+        {
+          title: 'Eisprung erkennen: Tests und Körperzeichen',
+          content: 'Die Kalenderrechnung ist eine Schätzung. Genauer werden Sie mit Ovulationstests aus der Apotheke: Sie messen den LH-Anstieg 24 bis 36 Stunden vor dem Eisprung. Klarer, dehnbarer Zervixschleim zeigt die fruchtbarsten Tage an. Die Basaltemperatur steigt nach dem Eisprung um etwa 0,2 bis 0,5 °C. Aus mehreren gemessenen Zyklen kennen Sie dann auch Ihre eigene Lutealphase.',
+        },
+        {
+          title: 'Wann Sie ärztlichen Rat suchen sollten',
+          content: 'Wenden Sie sich an Ihre Frauenarztpraxis, wenn Ihr Zyklus regelmäßig kürzer als 21 oder länger als 38 Tage ist, um mehr als 7 bis 9 Tage schwankt oder die Periode länger als 90 Tage ausbleibt. Bei Kinderwunsch ist eine Abklärung nach 12 Monaten ohne Schwangerschaft sinnvoll, ab 35 Jahren schon nach 6 Monaten. Ist ein Test positiv, berechnet der [Geburtstermin-Rechner](/rechner/geburtstermin-rechner/) den voraussichtlichen Entbindungstermin.',
+        },
+      ],
+      details: 'Eisprung (Zyklustag) = Zykluslänge − Lutealphase. Fruchtbares Fenster = Eisprungtag − 5 bis Eisprungtag + 1. Bei unregelmäßigem Zyklus: frühester Eisprung = kürzester Zyklus − Lutealphase, spätester Eisprung = längster Zyklus − Lutealphase. Datum = erster Tag der Periode + (Zyklustag − 1) Tage. Die Berechnung ersetzt keine Verhütungsmethode.',
     },
     faqs: [
-      { question: 'Wie berechnet man die Zykluslänge exakt?', answer: 'Zählen Sie die Tage vom ersten Tag der Periodenblutung (Tag 1) bis zum letzten Tag vor dem Einsetzen der nächsten Blutung.' },
-      { question: 'Ab welcher Schwankungsbreite gilt ein Zyklus als unregelmäßig?', answer: 'Schwankungen von bis zu 4 Tagen gelten als vollkommen normal; variiert die Zyklusdauer um mehr als 8 bis 10 Tage, empfiehlt sich eine gynäkologische Hormonabklärung.' },
+      {
+        question: 'Wie berechne ich meine fruchtbaren Tage?',
+        answer: 'Ziehen Sie von Ihrer Zykluslänge 14 Tage ab, so erhalten Sie den Zyklustag des Eisprungs. Fruchtbar sind die 5 Tage davor, der Eisprungtag und der Tag danach. Bei einem 28-Tage-Zyklus sind das die Zyklustage 9 bis 15.',
+      },
+      {
+        question: 'Wann habe ich bei einem 30-Tage-Zyklus meinen Eisprung?',
+        answer: 'Bei 30 Tagen und einer Lutealphase von 14 Tagen liegt der Eisprung um Zyklustag 16. Ihre fruchtbaren Tage sind dann etwa Zyklustag 11 bis 17. Die Periode beginnt voraussichtlich an Tag 31, also am ersten Tag des neuen Zyklus.',
+      },
+      {
+        question: 'Wie berechne ich den Eisprung bei unregelmäßigem Zyklus?',
+        answer: 'Nehmen Sie Ihren kürzesten und Ihren längsten Zyklus der letzten Monate und ziehen Sie jeweils 14 Tage ab. Der Eisprung liegt dann irgendwo zwischen diesen beiden Zyklustagen. Ovulationstests helfen, den Tag genauer einzugrenzen.',
+      },
+      {
+        question: 'Wie viele Tage im Monat ist man fruchtbar?',
+        answer: 'Rund 6 Tage pro Zyklus. Spermien überleben im Körper bis zu 5 Tage, die Eizelle ist nach dem Eisprung nur etwa 12 bis 24 Stunden befruchtungsfähig. Am wahrscheinlichsten ist eine Schwangerschaft bei Geschlechtsverkehr in den 2 bis 3 Tagen vor dem Eisprung.',
+      },
+      {
+        question: 'Kann ich mit dem Zyklusrechner verhüten?',
+        answer: 'Nein. Der Eisprung kann sich durch Stress, Krankheit oder Reisen verschieben, und die Rechnung bildet das nicht ab. Für die natürliche Familienplanung brauchen Sie eine erlernte Methode mit Temperatur- und Schleimbeobachtung, am besten mit Beratung.',
+      },
     ],
-    relatedSlugs: ['fruchtbare-tage-rechner', 'geburtstermin-rechner', 'schwangerschaftswoche-ssw-rechner'],
+    relatedSlugs: ['geburtstermin-rechner', 'mutterschaftsgeld-rechner', 'erstausstattung-baby-rechner'],
   },
 
   {
@@ -2429,15 +3054,26 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'erstausstattung-baby-rechner',
     slug: 'erstausstattung-baby-rechner',
-    name: 'Baby-Erstausstattungs-Rechner (Kostenplan & Budget)',
+    name: 'Baby-Erstausstattungs-Rechner (Kostenplan inkl. Windelbudget)',
     shortName: 'Baby Erstausstattung',
     category: 'familie-schwangerschaft',
     subcategory: 'Baby & Kind',
-    metaTitle: 'Erstausstattung Baby: Kosten-Rechner & Budgetplan',
-    metaDescription: 'Planen Sie die Kosten für die Baby-Erstausstattung: Kinderwagen, Babybett, Wickelkommode, Kleidung und Babyschale im Vergleich Neu vs. Gebraucht.',
-    h1: 'Erstausstattung Baby Rechner – Kosten für die Erstausstattung planen',
-    shortDescription: 'Kalkuliert die Anschaffungskosten für die Ankunft des ersten Kindes.',
-    searchKeywords: ['erstausstattung baby rechner', 'was kostet erstausstattung baby durchschnitt', 'baby erstausstattung liste kosten', 'kinderwagen babybett kosten budget'],
+    metaTitle: 'Erstausstattung Baby Rechner – Kosten inkl. Windeln',
+    metaDescription: 'Baby-Erstausstattung kostenlos durchrechnen: Kosten nach Ausstattungsstandard, Geschenke abziehen und Windelkosten für 1 bis 3 Jahre einplanen.',
+    h1: 'Erstausstattung Baby Rechner – Kosten und Windelbudget planen',
+    shortDescription: 'Berechnet Ihre Kosten für die Baby-Erstausstattung nach Abzug von Geschenken und plant den Windelbedarf für 1 bis 3 Jahre mit ein.',
+    searchKeywords: [
+      'erstausstattung baby rechner',
+      'was kostet erstausstattung baby',
+      'baby erstausstattung kosten',
+      'windeln kosten baby',
+      'windelkosten berechnen',
+      'wie viele windeln braucht ein baby am tag',
+      'windelbedarf rechner',
+      'windeln kosten erstes jahr',
+      'stoffwindeln vs wegwerfwindeln kosten',
+      'baby kosten erstes jahr',
+    ],
     inputs: [
       {
         id: 'equipmentStandard',
@@ -2445,49 +3081,208 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'smart_mix',
         options: [
-          { value: 'used_thrifty', label: 'Sparsam / Hauptsächlich gebraucht & Flohmarkt (ca. 600 - 900 €)' },
-          { value: 'smart_mix', label: 'Cleverer Mix aus Neuware (Sitz/Matratze) & Second-Hand (ca. 1.400 - 1.900 €)' },
-          { value: 'premium_new', label: 'Marken-Neukauf / Premium Design (ca. 2.500 - 4.000 €)' },
+          { value: 'used_thrifty', label: 'Sparsam – überwiegend gebraucht (ca. 750 €)' },
+          { value: 'smart_mix', label: 'Mix – Sicherheitsartikel neu, Rest gebraucht (ca. 1.650 €)' },
+          { value: 'premium_new', label: 'Alles neu / Markenprodukte (ca. 3.200 €)' },
         ],
       },
-      { id: 'hasPresentsBudget', label: 'Geschenke-Budget von Großeltern & Verwandten', type: 'number', defaultValue: 500, min: 0, max: 3000, step: 100, unit: '€' },
+      { id: 'hasPresentsBudget', label: 'Geschenke von Familie und Freunden', type: 'number', defaultValue: 500, min: 0, max: 5000, step: 50, unit: '€' },
+      { id: 'includeDiapers', label: 'Windelkosten einplanen', type: 'boolean', defaultValue: true },
+      {
+        id: 'diaperMonths',
+        label: 'Zeitraum für Windeln',
+        type: 'select',
+        defaultValue: '12',
+        options: [
+          { value: '12', label: 'Erstes Lebensjahr (12 Monate)' },
+          { value: '24', label: 'Zwei Jahre (24 Monate)' },
+          { value: '36', label: 'Bis zum Trockenwerden (ca. 36 Monate)' },
+        ],
+        dependsOn: { field: 'includeDiapers', value: true },
+      },
+      { id: 'diapersPerDayYear1', label: 'Windeln pro Tag im 1. Lebensjahr', type: 'number', defaultValue: 7, min: 0, max: 15, step: 1, unit: 'Stück/Tag', helpText: 'Neugeborene brauchen 7 bis 10, ab etwa 6 Monaten 5 bis 6 Windeln täglich.', dependsOn: { field: 'includeDiapers', value: true } },
+      { id: 'diapersPerDayYear2to3', label: 'Windeln pro Tag ab dem 2. Lebensjahr', type: 'number', defaultValue: 5, min: 0, max: 15, step: 1, unit: 'Stück/Tag', helpText: 'Nur bei einem Zeitraum über 12 Monate relevant. Üblich sind 4 bis 5 Windeln.', dependsOn: { field: 'includeDiapers', value: true } },
+      { id: 'costPerDiaper', label: 'Preis pro Windel', type: 'number', defaultValue: 0.24, min: 0, max: 2, step: 0.01, unit: '€', helpText: 'Eigenmarken ca. 0,15–0,20 €, Markenwindeln ca. 0,25–0,35 €.', dependsOn: { field: 'includeDiapers', value: true } },
     ],
     calculate: (inputs) => {
-      const type = inputs.equipmentStandard || 'smart_mix';
-      const gifts = inputs.hasPresentsBudget !== undefined && inputs.hasPresentsBudget !== '' ? Math.max(0, parseFloat(inputs.hasPresentsBudget) || 0) : 500;
+      const isEmpty = (v: any) => v === undefined || v === null || String(v).trim() === '';
+      const fail = (error: string) => ({
+        primary: { id: 'ownCost', label: 'Eigene Ausgaben für die Erstausstattung', value: 0, formattedValue: '-' },
+        error,
+      });
+      const num = (v: any, fallback: number) => (isEmpty(v) ? fallback : parseFloat(String(v).replace(',', '.')));
+
+      const type = inputs.equipmentStandard === 'used_thrifty' || inputs.equipmentStandard === 'premium_new' ? inputs.equipmentStandard : 'smart_mix';
+      const gifts = num(inputs.hasPresentsBudget, 500);
+      if (!Number.isFinite(gifts) || gifts < 0 || gifts > 100000) {
+        return fail('Bitte geben Sie für Geschenke einen Betrag von 0 € oder mehr ein.');
+      }
 
       let totalGrossCost = 1650;
       if (type === 'used_thrifty') totalGrossCost = 750;
       if (type === 'premium_new') totalGrossCost = 3200;
-
       const ownCost = Math.max(0, totalGrossCost - gifts);
+      const typeLabel = type === 'used_thrifty' ? 'sparsam / gebraucht' : type === 'premium_new' ? 'alles neu' : 'Mix aus neu und gebraucht';
+
+      const secondary: any[] = [
+        { id: 'equipmentOwnCost', label: 'Eigenanteil Erstausstattung', value: ownCost, formattedValue: formatCurrency(ownCost) },
+        { id: 'totalGrossCost', label: `Gesamtwert der Erstausstattung (${typeLabel})`, value: totalGrossCost, formattedValue: formatCurrency(totalGrossCost) },
+        { id: 'gifts', label: 'Übernommen von Familie / Geschenke', value: Math.min(gifts, totalGrossCost), formattedValue: formatCurrency(Math.min(gifts, totalGrossCost)) },
+      ];
+      const calculationSteps = [`Erstausstattung: ${formatCurrency(totalGrossCost)} − ${formatCurrency(gifts)} Geschenke = ${formatCurrency(ownCost)}`];
+
+      // Windeln nur, wenn ausdrücklich eingeschaltet (im Formular standardmäßig an)
+      const includeDiapers = inputs.includeDiapers === true || inputs.includeDiapers === 'true';
+      if (!includeDiapers) {
+        return {
+          primary: { id: 'ownCost', label: 'Eigene Ausgaben für die Erstausstattung', value: ownCost, formattedValue: formatCurrency(ownCost), highlight: true },
+          secondary: secondary.slice(1),
+          calculationSteps,
+          summaryText: `Für die Baby-Erstausstattung (${typeLabel}) fallen ca. ${formatCurrency(totalGrossCost)} an. Nach Abzug von ${formatCurrency(Math.min(gifts, totalGrossCost))} Geschenken verbleiben für Sie ${formatCurrency(ownCost)}.`,
+        };
+      }
+
+      const monthsRaw = parseInt(String(inputs.diaperMonths ?? '12'), 10);
+      const months = monthsRaw === 24 || monthsRaw === 36 ? monthsRaw : 12;
+      const d1 = num(inputs.diapersPerDayYear1, 7);
+      const d23 = num(inputs.diapersPerDayYear2to3, 5);
+      const price = num(inputs.costPerDiaper, 0.24);
+      if (!Number.isFinite(d1) || d1 < 0 || d1 > 15 || !Number.isFinite(d23) || d23 < 0 || d23 > 15) {
+        return fail('Bitte geben Sie zwischen 0 und 15 Windeln pro Tag ein.');
+      }
+      if (!Number.isFinite(price) || price < 0 || price > 2) {
+        return fail('Bitte geben Sie einen Preis pro Windel zwischen 0 und 2 € ein.');
+      }
+
+      // Logik des Windelbudgets: 1. Lebensjahr 365 Tage, jedes weitere Jahr 365 Tage
+      const daysYear1 = 365;
+      const daysLater = ((months - 12) / 12) * 365;
+      const diapersYear1 = d1 * daysYear1;
+      const diapersLater = d23 * daysLater;
+      const totalDiapers = diapersYear1 + diapersLater;
+      const diaperCost = totalDiapers * price;
+      const diaperMonthly = diaperCost / months;
+      const total = ownCost + diaperCost;
+
+      // Stoffwindel-Vergleich: Annahme Komplettset ca. 450 €, ohne Wasch- und Stromkosten
+      const CLOTH_SET = 450;
+      const clothDiff = diaperCost - CLOTH_SET;
+
+      secondary.push(
+        { id: 'totalDiapers', label: `Windeln in ${months} Monaten`, value: totalDiapers, formattedValue: `ca. ${formatNumber(totalDiapers, 0)} Stück` },
+        { id: 'diaperCost', label: `Windelkosten in ${months} Monaten`, value: diaperCost, formattedValue: formatCurrency(diaperCost) },
+        { id: 'diaperMonthly', label: 'Windelkosten pro Monat (Durchschnitt)', value: diaperMonthly, formattedValue: formatCurrency(diaperMonthly) },
+        {
+          id: 'clothSaving',
+          label: 'Stoffwindeln zum Vergleich (Set ca. 450 €, ohne Waschkosten)',
+          value: Math.max(0, clothDiff),
+          formattedValue: clothDiff > 0 ? `bis zu ${formatCurrency(clothDiff)} günstiger` : 'Im gewählten Zeitraum kein Kostenvorteil',
+        },
+      );
+      calculationSteps.push(
+        `Windeln 1. Lebensjahr: ${formatNumber(d1, 0)} × 365 = ${formatNumber(diapersYear1, 0)} Stück`,
+        ...(months > 12 ? [`Windeln danach: ${formatNumber(d23, 0)} × ${formatNumber(daysLater, 0)} Tage = ${formatNumber(diapersLater, 0)} Stück`] : []),
+        `Windelkosten: ${formatNumber(totalDiapers, 0)} × ${formatCurrency(price)} = ${formatCurrency(diaperCost)}`,
+        `Gesamtbudget: ${formatCurrency(ownCost)} + ${formatCurrency(diaperCost)} = ${formatCurrency(total)}`,
+      );
 
       return {
-        primary: { id: 'ownCost', label: 'Eigene Ausgaben für die Erstausstattung', value: ownCost, formattedValue: formatCurrency(ownCost), highlight: true },
-        secondary: [
-          { id: 'totalGrossCost', label: 'Gesamtwert aller Anschaffungen', value: totalGrossCost, formattedValue: formatCurrency(totalGrossCost) },
-          { id: 'gifts', label: 'Übernommen von Familie / Geschenke', value: gifts, formattedValue: formatCurrency(gifts) },
-        ],
-        summaryText: `Für die Baby-Erstausstattung (${type === 'used_thrifty' ? 'Second Hand' : type === 'premium_new' ? 'Premium' : 'Cleverer Mix'}) fallen ca. ${formatCurrency(totalGrossCost)} an. Nach Abzug von ${formatCurrency(gifts)} Geschenken verbleiben für Sie ${formatCurrency(ownCost)}.`,
+        primary: { id: 'totalBudget', label: `Ihr Budget: Erstausstattung + Windeln (${months} Monate)`, value: total, formattedValue: formatCurrency(total), highlight: true },
+        secondary,
+        calculationSteps,
+        summaryText: `Für die Erstausstattung (${typeLabel}) zahlen Sie nach Geschenken ${formatCurrency(ownCost)}. Dazu kommen in ${months} Monaten rund ${formatNumber(totalDiapers, 0)} Windeln für ${formatCurrency(diaperCost)} (${formatCurrency(diaperMonthly)} pro Monat). Insgesamt sollten Sie ${formatCurrency(total)} einplanen.`,
       };
     },
-    formula: 'Eigenanteil = Gesamtkosten Erstausstattung - Geschenke der Familie',
-    formulaExplanation: 'Größte Einzelposten sind Kinderwagen (300 bis 1.200 €), Babyschale (150 bis 350 €) und Wickelkommode/Bett (250 bis 800 €).',
+    formula: 'Budget = (Erstausstattung − Geschenke) + Windeln · Windelkosten = (Windeln/Tag 1. Jahr × 365 + Windeln/Tag ab 2. Jahr × 365 je weiteres Jahr) × Preis pro Windel',
+    formulaExplanation: 'Der Rechner nimmt einen typischen Gesamtwert für die Erstausstattung (750 €, 1.650 € oder 3.200 €) und zieht Geschenke ab. Für die Windeln multipliziert er den Tagesbedarf mit 365 Tagen pro Lebensjahr und dem Stückpreis. Die größten Einzelposten der Ausstattung sind Kinderwagen (300 bis 1.200 €), Babyschale (150 bis 350 €) sowie Bett und Wickelkommode (250 bis 800 €).',
     workedExample: {
-      title: 'Beispiel: Cleverer Mix bei 500 € Unterstützung durch Familie',
-      inputValues: [{ label: 'Standard', value: 'Mix Neu/Gebraucht' }, { label: 'Geschenke', value: '500 €' }],
-      steps: ['Gesamtkosten ca. 1.650 €', 'Abzug Geschenke: 1.650 € - 500 € = 1.150 €'],
-      result: 'ca. 1.150,00 € Eigenkosten',
+      title: 'Beispiel 1: Mix aus neu und gebraucht, 500 € Geschenke, Windeln im ersten Jahr',
+      inputValues: [{ label: 'Standard', value: 'Mix (1.650 €)' }, { label: 'Geschenke', value: '500 €' }, { label: 'Windeln', value: '7 pro Tag à 0,24 €' }],
+      steps: [
+        'Erstausstattung: 1.650 € − 500 € = 1.150 €',
+        'Windeln: 7 × 365 = 2.555 Stück × 0,24 € = 613,20 €',
+        'Budget: 1.150 € + 613,20 € = 1.763,20 €',
+      ],
+      result: '1.763,20 € für Erstausstattung und Windeln im ersten Jahr',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Mix aus neu und gebraucht, 500 € Geschenke, Windeln im ersten Jahr',
+        inputValues: [{ label: 'Standard', value: 'Mix (1.650 €)' }, { label: 'Geschenke', value: '500 €' }, { label: 'Windeln', value: '7 pro Tag à 0,24 €' }],
+        steps: [
+          'Erstausstattung: 1.650 € − 500 € = 1.150 €',
+          'Windeln: 7 × 365 = 2.555 Stück × 0,24 € = 613,20 €',
+          'Budget: 1.150 € + 613,20 € = 1.763,20 €',
+        ],
+        result: '1.763,20 € für Erstausstattung und Windeln im ersten Jahr',
+      },
+      {
+        title: 'Beispiel 2: Sparsam, 200 € Geschenke, Windeln bis zum Trockenwerden mit Eigenmarke',
+        inputValues: [{ label: 'Standard', value: 'Sparsam (750 €)' }, { label: 'Geschenke', value: '200 €' }, { label: 'Windeln', value: '7 bzw. 5 pro Tag à 0,20 €, 36 Monate' }],
+        steps: [
+          'Erstausstattung: 750 € − 200 € = 550 €',
+          'Windeln: 7 × 365 + 5 × 730 = 2.555 + 3.650 = 6.205 Stück',
+          'Windelkosten: 6.205 × 0,20 € = 1.241 € (ca. 34,47 € pro Monat)',
+          'Budget: 550 € + 1.241 € = 1.791 €',
+        ],
+        result: '1.791 € für drei Jahre; mit Stoffwindeln bis zu 791 € weniger',
+      },
+      {
+        title: 'Beispiel 3: Alles neu, 1.000 € Geschenke, ohne Windeln',
+        inputValues: [{ label: 'Standard', value: 'Alles neu (3.200 €)' }, { label: 'Geschenke', value: '1.000 €' }],
+        steps: ['Erstausstattung: 3.200 € − 1.000 € = 2.200 €'],
+        result: '2.200 € Eigenanteil',
+      },
+    ],
     content: {
-      intro: 'Dieser Budgetplaner kalkuliert die Gesamtkosten für die Baby-Erstausstattung in den Bereichen Kinderwagen, Babyzimmer, Kleidung, Wickeln und Transport.',
-      details: 'Eine solide Erstausstattung kostet im Neukauf zwischen 1.200 und 3.000 Euro. Durch gezielten Gebrauchtkauf (Second-Hand-Basare) lassen sich 50 bis 70 Prozent der Anschaffungskosten einsparen.',
+      intro: 'Was kostet die Ankunft eines Babys? Dieser Rechner zeigt Ihnen die Kosten für die Erstausstattung nach drei Ausstattungsstandards. Er zieht Geschenke von Familie und Freunden ab und plant auf Wunsch die Windeln für das erste Jahr, zwei Jahre oder bis zum Trockenwerden mit ein. So sehen Sie auf einen Blick, welches Budget Sie brauchen.',
+      sections: [
+        {
+          title: 'Was die Erstausstattung kostet',
+          content: 'Die drei Standards beruhen auf typischen Preisen. Sparsam mit überwiegend gebrauchten Sachen sind es rund 750 €. Ein Mix aus neuen Sicherheitsartikeln und gebrauchten Möbeln und Kleidern kostet rund 1.650 €. Wer alles neu kauft, kommt auf rund 3.200 €. Die größten Posten sind Kinderwagen (300 bis 1.200 €), Babyschale (150 bis 350 €) sowie Bett und Wickelkommode (250 bis 800 €). Babyschale und Matratze sollten Sie neu kaufen, bei Kleidung und Möbeln lohnt sich Second-Hand.',
+        },
+        {
+          title: 'Windeln: Bedarf und Kosten',
+          content: 'Neugeborene brauchen 7 bis 10 Windeln am Tag, ab etwa 6 Monaten sind es meist 5 bis 6, im zweiten und dritten Jahr 4 bis 5. Bei 7 Windeln täglich sind das 2.555 Stück im ersten Jahr. Mit 0,24 € pro Stück kostet das rund 613 € oder 51 € im Monat. Bis zum Trockenwerden mit etwa drei Jahren kommen rund 6.200 Windeln zusammen. Eigenmarken aus der Drogerie kosten oft 0,15 bis 0,20 € pro Windel und senken die Summe deutlich.',
+        },
+        {
+          title: 'Stoffwindeln oder Einwegwindeln?',
+          content: 'Ein Stoffwindel-Set kostet einmalig rund 450 €. Der Rechner vergleicht diesen Betrag mit Ihren Einwegwindel-Kosten. Wasser, Strom und Waschmittel sind dabei nicht enthalten. Über drei Jahre lassen sich so mehrere Hundert Euro sparen, besonders wenn das Set für Geschwister weitergenutzt wird. Im ersten Jahr allein ist der Vorteil oft klein.',
+        },
+        {
+          title: 'Zuschüsse und Unterstützung',
+          content: 'Schwangere in einer finanziellen Notlage können über eine Schwangerschaftsberatungsstelle Hilfe der Bundesstiftung Mutter und Kind beantragen. Wer Bürgergeld bezieht, erhält vom Jobcenter auf Antrag Leistungen für die Erstausstattung bei Schwangerschaft und Geburt (§ 24 Abs. 3 SGB II). Einige Kommunen geben Windelsäcke oder Zuschüsse für die Entsorgung aus. Ob Ihnen Kinderzuschlag zusteht, prüft der [Kinderzuschlag-Rechner](/rechner/kinderzuschlag-kiz-rechner/). Für die Zeit danach hilft der [Kita-Gebühren-Rechner](/rechner/kita-gebuehren-rechner/).',
+        },
+      ],
+      details: 'Erstausstattung: Sparsam ca. 750 €, Mix ca. 1.650 €, alles neu ca. 3.200 € (Richtwerte). Windeln: 1. Lebensjahr Windeln/Tag × 365, jedes weitere Jahr Windeln/Tag × 365. Stoffwindel-Vergleich mit einem Set für ca. 450 € ohne Waschkosten.',
     },
     faqs: [
-      { question: 'Welche Posten der Erstausstattung sind unverzichtbar?', answer: 'Babyschale fürs Auto (zwingend für die Entlassung aus der Klinik), Beistellbett, Schlafsack (keine Kissen oder Decken wegen SIDS-Risiko), Wickelauflage und Kleidung in Größe 50/56.' },
-      { question: 'Gibt es staatliche Hilfen für die Baby-Erstausstattung?', answer: 'Schwangere mit geringem Einkommen oder Bürgergeld-Bezug können bei der Bundesstiftung Mutter und Kind oder beim Jobcenter nach § 24 SGB II einen Zuschuss zur Erstausstattung beantragen.' },
+      {
+        question: 'Was kostet eine Baby-Erstausstattung?',
+        answer: 'Je nach Anspruch zwischen etwa 750 € und 3.200 €. Mit einem Mix aus neuen Sicherheitsartikeln und gebrauchten Sachen liegen viele Familien bei rund 1.650 €. Geschenke und Leihgaben senken den Eigenanteil oft deutlich.',
+      },
+      {
+        question: 'Wie viele Windeln braucht ein Baby am Tag?',
+        answer: 'Neugeborene brauchen in den ersten Wochen 7 bis 10 Windeln am Tag. Ab etwa 6 Monaten sinkt der Bedarf auf 5 bis 6, im zweiten und dritten Lebensjahr auf 4 bis 5 Windeln täglich.',
+      },
+      {
+        question: 'Wie viel kosten Windeln im ersten Jahr?',
+        answer: 'Bei 7 Windeln täglich brauchen Sie 2.555 Windeln im ersten Jahr. Zu 0,24 € pro Stück sind das rund 613 €, also etwa 51 € im Monat. Mit Eigenmarken für 0,18 € sinkt der Betrag auf rund 460 €.',
+      },
+      {
+        question: 'Lohnen sich Stoffwindeln finanziell?',
+        answer: 'Über die ganze Wickelzeit meist ja. Einwegwindeln kosten bis zum Trockenwerden oft 1.200 bis 1.800 €, ein Stoffwindel-Set rund 450 € plus Waschkosten. Im ersten Jahr allein ist der Unterschied kleiner.',
+      },
+      {
+        question: 'Was gehört unbedingt zur Erstausstattung?',
+        answer: 'Eine Babyschale fürs Auto, ein sicherer Schlafplatz mit fester Matratze, ein Baby-Schlafsack statt Decke und Kissen, eine Wickelmöglichkeit und Kleidung in Größe 50/56. Vieles andere können Sie bei Bedarf nachkaufen.',
+      },
+      {
+        question: 'Gibt es Zuschüsse für die Baby-Erstausstattung?',
+        answer: 'Ja. Schwangere in Notlagen können über eine Schwangerschaftsberatungsstelle Geld der Bundesstiftung Mutter und Kind beantragen. Bürgergeld-Beziehende erhalten auf Antrag Leistungen des Jobcenters für die Erstausstattung bei Schwangerschaft und Geburt.',
+      },
     ],
-    relatedSlugs: ['windelbudget-rechner', 'kindersitz-groesse-i-size-rechner', 'elterngeld-basis-plus-rechner'],
+    relatedSlugs: ['kita-gebuehren-rechner', 'kinderzuschlag-kiz-rechner', 'lebensmittelbudget-rechner', 'geburtstermin-rechner', 'mutterschaftsgeld-rechner'],
   },
 
   {

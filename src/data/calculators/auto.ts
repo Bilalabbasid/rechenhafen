@@ -1,6 +1,7 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import {
   calculateFuelCost,
+  calculateFuelConsumption,
   calculateTripExpenses,
   calculateCommuterAllowance,
   calculateEVCharging,
@@ -19,11 +20,24 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Spritkosten berechnen',
     category: 'auto-verkehr',
     subcategory: 'Sprit & Verbrauch',
-    metaTitle: 'Spritkostenrechner: Benzinkosten für Ihre Fahrt',
-    metaDescription: 'Ermitteln Sie den Kraftstoffbedarf in Litern und die reinen Spritkosten aus Strecke, Verbrauch und Preis pro Liter – für einfache Fahrten oder Hin- und Rückweg.',
-    h1: 'Spritkostenrechner – Benzin- & Dieselkosten pro Fahrt, km & Mitfahrer berechnen',
-    shortDescription: 'Berechnet Kraftstoffkosten, Literbedarf und Kosten pro Kilometer für Einzelfahrten, Fahrgemeinschaften und Pendelstrecken.',
-    searchKeywords: ['spritkostenrechner', 'spritkosten berechnen', 'fahrtkosten berechnen auto', 'spritkosten pro km', 'benzinkosten rechner', 'spritkosten teilen', 'fahrtkosten fahrgemeinschaft'],
+    metaTitle: 'Spritkostenrechner: Fahrtkosten mit Maut & Mitfahrern',
+    metaDescription: 'Kostenloser Spritkostenrechner: Benzin- und Dieselkosten pro Fahrt, Hin- und Rückweg, Maut, Parken und Verschleiß – mit Kosten pro Person und Monat.',
+    h1: 'Spritkostenrechner: Sprit- und Fahrtkosten berechnen und teilen',
+    shortDescription: 'Berechnet Spritkosten, Literbedarf und Kosten pro Kilometer für Einzelfahrten, Hin- und Rückweg und Pendelstrecken. Optional mit Maut, Parkgebühren und Verschleißpauschale, aufgeteilt pro Person und hochgerechnet auf den Monat.',
+    searchKeywords: [
+      'spritkostenrechner',
+      'spritkosten berechnen',
+      'fahrtkosten berechnen',
+      'fahrtkostenrechner',
+      'fahrtkosten berechnen auto',
+      'fahrtkosten ausrechnen',
+      'spritkosten pro km',
+      'benzinkosten rechner',
+      'spritkosten teilen',
+      'fahrtkosten teilen mitfahrer',
+      'sprit und maut rechner',
+      'reisekosten fahrt berechnen',
+    ],
     inputs: [
       { id: 'distance', label: 'Fahrstrecke in Kilometern', type: 'number', defaultValue: 50, min: 0, step: 1, unit: 'km' },
       {
@@ -40,10 +54,21 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
       { id: 'pricePerLiter', label: 'Kraftstoffpreis pro Liter', type: 'number', defaultValue: 1.78, min: 0.5, step: 0.01, unit: '€/Liter' },
       { id: 'tripsCount', label: 'Anzahl der Fahrten', type: 'number', defaultValue: 1, min: 1, step: 1, helpText: 'z.B. 1 für Einzelfahrt oder mehr bei regelmäßigen Touren' },
       { id: 'passengers', label: 'Anzahl Personen (inklusive Fahrer)', type: 'number', defaultValue: 1, min: 1, max: 9, step: 1, helpText: 'Gesamtzahl der Personen im Fahrzeug inklusive Fahrer' },
+      {
+        id: 'includeExtraCosts',
+        label: 'Maut, Parken, Verschleiß und Fahrten pro Monat ergänzen',
+        type: 'boolean',
+        defaultValue: false,
+        helpText: 'Für die vollständigen Fahrtkosten einer Reise oder Fahrgemeinschaft.',
+      },
+      { id: 'tollCosts', label: 'Maut & Vignette je Fahrt', type: 'number', defaultValue: 0, min: 0, step: 1, unit: '€', helpText: 'Bei Hin- und Rückfahrt die Maut für beide Richtungen zusammen eintragen.', dependsOn: { field: 'includeExtraCosts', value: true } },
+      { id: 'parkingCosts', label: 'Parkgebühren je Fahrt', type: 'number', defaultValue: 0, min: 0, step: 1, unit: '€', dependsOn: { field: 'includeExtraCosts', value: true } },
+      { id: 'vehicleAllowancePerKm', label: 'Verschleißpauschale je km (ohne Sprit)', type: 'number', defaultValue: 0, min: 0, step: 0.01, unit: '€/km', helpText: 'Freiwilliger Aufschlag für Reifen, Wartung und Wertverlust, z. B. 0,05 €/km. Kein gesetzlicher Wert.', dependsOn: { field: 'includeExtraCosts', value: true } },
+      { id: 'tripsPerMonth', label: 'Fahrten pro Monat (für die Monatsrechnung)', type: 'number', defaultValue: 0, min: 0, step: 1, helpText: '0 = keine Hochrechnung. Eine Hin- und Rückfahrt zählt als eine Fahrt.', dependsOn: { field: 'includeExtraCosts', value: true } },
     ],
     calculate: calculateFuelCost,
-    formula: 'Spritkosten = (Strecke in km / 100) × Verbrauch in l × Literpreis in €',
-    formulaExplanation: 'Der Durchschnittsverbrauch wird auf die gefahrene Distanz umgerechnet und mit dem aktuellen Literpreis multipliziert.',
+    formula: 'Spritkosten = (Strecke in km / 100) × Verbrauch in l × Literpreis in € | Fahrtkosten = Spritkosten + Maut + Parken + Strecke × Verschleiß je km',
+    formulaExplanation: 'Der Durchschnittsverbrauch wird auf die gefahrene Distanz umgerechnet und mit dem Literpreis multipliziert. Bei Hin- und Rückfahrt verdoppelt sich die Strecke. Optional kommen Maut und Parkgebühren je Fahrt sowie eine Verschleißpauschale je Kilometer dazu. Die Summe wird mit der Anzahl der Fahrten multipliziert und durch die Zahl der Personen geteilt.',
     workedExample: {
       title: 'Beispiel: 100 km Strecke bei 6,0 l/100 km und 1,80 €/l',
       description: 'Auf einer Strecke von 100 km bei einem Durchschnittsverbrauch von 6,0 l/100 km und einem Kraftstoffpreis von 1,80 €/l werden 6,00 Liter Kraftstoff verbraucht. Die reinen Spritkosten betragen exakt 10,80 € (entspricht 0,108 € Spritkosten pro Kilometer).',
@@ -63,18 +88,46 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
         inputs: { distance: 50, consumption: 6.8, pricePerLiter: 1.78, tripsCount: 1 },
         resultSummary: '6,05 € pro Fahrt (0,121 € / km)',
       },
+      {
+        title: 'Beispiel 3: Wochenendausflug zu dritt mit Maut, Parken und Verschleiß',
+        description: '225 km einfache Strecke als Hin- und Rückfahrt (450 km), 6,5 l/100 km, 1,75 €/l, 20 € Maut, 10 € Parken, 0,05 €/km Verschleiß, 3 Personen.\n- Sprit: 450 × 6,5 ÷ 100 = 29,25 l × 1,75 €/l = 51,19 €\n- Verschleiß: 450 km × 0,05 €/km = 22,50 €\n- Gesamt: 51,19 € + 20,00 € + 10,00 € + 22,50 € = 103,69 €\n- Pro Person: 103,69 € ÷ 3 = 34,56 €',
+        inputs: { distance: 225, tripType: 'roundtrip', consumption: 6.5, pricePerLiter: 1.75, tripsCount: 1, passengers: 3, includeExtraCosts: true, tollCosts: 20, parkingCosts: 10, vehicleAllowancePerKm: 0.05, tripsPerMonth: 0 },
+        resultSummary: '103,69 € Fahrtkosten gesamt (34,56 € pro Person)',
+      },
+      {
+        title: 'Beispiel 4: Pendeln zu zweit mit Parkgebühr, 20 Fahrten im Monat',
+        description: '30 km einfache Strecke, hin und zurück 60 km, 6,8 l/100 km, 1,78 €/l, 3 € Parken pro Tag, 2 Personen. Sprit je Fahrt: 4,08 l × 1,78 €/l = 7,26 €. Mit Parken 10,26 € je Fahrt. Bei 20 Fahrten: 205,25 € im Monat, also 102,62 € pro Person.',
+        inputs: { distance: 30, tripType: 'roundtrip', consumption: 6.8, pricePerLiter: 1.78, tripsCount: 1, passengers: 2, includeExtraCosts: true, tollCosts: 0, parkingCosts: 3, vehicleAllowancePerKm: 0, tripsPerMonth: 20 },
+        resultSummary: '10,26 € pro Fahrt, 205,25 € pro Monat (102,62 € pro Person)',
+      },
     ],
     content: {
-      intro: 'Unser kostenloser Spritkostenrechner ermittelt die reinen Treibstoffausgaben für Einzelfahrten, Urlaubsreisen oder die tägliche Fahrt zur Arbeit auf Basis Ihrer Angaben.',
-      details: 'Die Berechnung basiert auf der physikalischen Grundformel: Spritkosten = (Distanz / 100) · Verbrauch (l/100km) · Literpreis. Dieser Rechner fokussiert sich bewusst auf die reinen Kraftstoffausgaben. Möchten Sie die vollständigen Reiseausgaben inklusive Autobahnmaut, Parkgebühren und einer freiwilligen Fahrzeug-Verschleißpauschale auf Mitfahrer aufteilen, nutzen Sie unseren erweiterten [Fahrtkostenrechner](/rechner/fahrtkostenrechner/). Für die steuerliche Geltendmachung beim Finanzamt nutzen Sie unseren [Pendlerpauschale-Rechner](/rechner/pendlerpauschale-rechner/) und für die Vollkosten Ihres Autos den [Auto-Gesamtkosten-Rechner](/rechner/auto-gesamtkosten-rechner/).',
+      intro: 'Was kostet die Fahrt mit dem Auto? Der Spritkostenrechner rechnet aus Strecke, Verbrauch und Literpreis die Spritkosten für eine einfache Fahrt, Hin- und Rückweg oder mehrere Fahrten. Auf Wunsch ergänzen Sie Maut, Parkgebühren und eine Verschleißpauschale. Der Rechner teilt die Summe durch die Zahl der Mitfahrer und rechnet sie auf den Monat hoch.',
+      sections: [
+        {
+          title: 'So berechnen Sie Spritkosten pro Fahrt',
+          content: 'Tragen Sie die Strecke, Ihren Durchschnittsverbrauch und den Literpreis ein. Wählen Sie „Hin- und Rückfahrt“, verdoppelt der Rechner die Strecke. Unter „Anzahl der Fahrten“ rechnen Sie mehrere gleiche Fahrten zusammen.\n\nBeispiel: 100 km bei 6,0 l/100 km und 1,80 €/l ergeben 6 Liter und 10,80 € Spritkosten, also 0,108 € pro Kilometer. Ihren echten Verbrauch ermitteln Sie mit dem [Kraftstoffverbrauch-Rechner](/rechner/kraftstoffverbrauch-rechner/).',
+        },
+        {
+          title: 'Fahrtkosten mit Maut, Parken und Verschleiß',
+          content: 'Aktivieren Sie „Maut, Parken, Verschleiß und Fahrten pro Monat ergänzen“. Dann erscheinen vier weitere Felder:\n- **Maut & Vignette je Fahrt**: tatsächliche Gebühren, bei Hin- und Rückfahrt beide Richtungen zusammen.\n- **Parkgebühren je Fahrt**: Parkticket am Ziel oder unterwegs.\n- **Verschleißpauschale je km**: freiwilliger Aufschlag für Reifen, Wartung und Wertverlust. Er enthält keinen Sprit, damit nichts doppelt zählt.\n- **Fahrten pro Monat**: rechnet die Kosten einer Fahrt auf Monat und Jahr hoch.\n\nDas Ergebnis zeigt die Fahrtkosten gesamt, jeden Posten einzeln, die Kosten pro km inklusive Nebenkosten und den Anteil pro Person. Maut für Österreich, die Schweiz oder den Brenner ermitteln Sie mit dem [Mautrechner](/rechner/autobahn-maut-rechner-vignette/).',
+        },
+        {
+          title: 'Was das Ergebnis bedeutet und wie es weitergeht',
+          content: 'Die Spritkosten liegen meist bei 0,10 bis 0,18 € pro Kilometer. Die Vollkosten eines Autos mit Wertverlust, Versicherung und Werkstatt sind deutlich höher. Diese rechnen Sie mit dem [Auto-Gesamtkosten-Rechner](/rechner/auto-gesamtkosten-rechner/).\n\n- Teilen Sie regelmäßig Fahrten zur Arbeit, rechnet der [Fahrgemeinschaft-Rechner](/rechner/fahrgemeinschaft-sprit-rechner/) die Monatsbeträge je Mitfahrer.\n- Für die Steuer zählt nicht der tatsächliche Sprit, sondern die Entfernungspauschale. Die berechnen Sie im [Pendlerpauschale-Rechner](/rechner/pendlerpauschale-rechner/).',
+        },
+      ],
+      details: 'Formel: Spritkosten = (Strecke ÷ 100) × Verbrauch (l/100 km) × Literpreis. Fahrtkosten = Spritkosten + Maut + Parken + Strecke × Verschleißpauschale. Der Rechner dient der privaten Kostenumlage. Er ermittelt keine steuerlich abzugsfähigen Werbungskosten und keine steuerfreie Reisekostenerstattung des Arbeitgebers.',
     },
     faqs: [
-      { question: 'Wie teilt man Spritkosten bei einer Fahrgemeinschaft fair auf?', answer: 'Geben Sie die gesamte Fahrstrecke (bei Hin- und Rückfahrt Option auswählen) und den aktuellen Literpreis ein. Tragen Sie unter "Anzahl Personen" alle Mitfahrenden inklusive Fahrer ein. Der Rechner weist Ihnen direkt den fairen Betrag pro Person aus.' },
+      { question: 'Wie teilt man Spritkosten bei einer Fahrgemeinschaft fair auf?', answer: 'Geben Sie die Strecke ein, wählen Sie bei Bedarf „Hin- und Rückfahrt“ und tragen Sie den Literpreis ein. Unter „Anzahl Personen“ zählen alle Mitfahrenden inklusive Fahrer. Maut und Parkgebühren ergänzen Sie über den Schalter für Nebenkosten. Der Rechner zeigt dann den Betrag pro Person.' },
+      { question: 'Wie berechne ich Fahrtkosten mit Maut und Parkgebühren?', answer: 'Aktivieren Sie die Nebenkosten und tragen Sie Maut und Parken je Fahrt ein. Der Rechner addiert sie zu den Spritkosten. Beispiel: 450 km mit 51,19 € Sprit, 20 € Maut, 10 € Parken und 22,50 € Verschleiß ergeben 103,69 €, zu dritt 34,56 € pro Person.' },
       { question: 'Was ist der Unterschied zwischen Spritkosten und den realen Gesamtkosten pro km?', answer: 'Die reinen Spritkosten betragen typischerweise zwischen 0,10 € und 0,18 € pro Kilometer. Die realen Vollkosten eines Autos liegen laut ADAC unter Einbeziehung von Anschaffung, Wertverlust, Inspektion, Reifenverschleiß und Versicherung jedoch meist zwischen 0,40 € und 0,75 € pro Kilometer.' },
       { question: 'Wie rechnet man den Verbrauch von Liter pro 100 km in Kosten pro Kilometer um?', answer: 'Multiplizieren Sie den Durchschnittsverbrauch in Litern mit dem Preis pro Liter und teilen Sie das Ergebnis durch 100: (6,8 l × 1,80 €/l) / 100 = 0,1224 € pro Kilometer.' },
+      { question: 'Kann ich meine Fahrtkosten von der Steuer absetzen?', answer: 'Für den Weg zur Arbeit setzt das Finanzamt nicht Ihre tatsächlichen Spritkosten an, sondern die Entfernungspauschale für die einfache Strecke. Diese berechnen Sie mit dem [Pendlerpauschale-Rechner](/rechner/pendlerpauschale-rechner/). Der Spritkostenrechner ist für die private Kostenaufteilung gedacht.' },
       { question: 'Wie viel Geld spart eine Reduzierung der Autobahngeschwindigkeit von 130 auf 110 km/h?', answer: 'Aufgrund des quadratisch ansteigenden Luftwiderstands sinkt der Kraftstoffverbrauch bei einer Temporeduzierung von 130 auf 110 km/h im Schnitt um 15 bis 20 Prozent, was bei einer 500 km langen Urlaubsreise oft 10 bis 15 Euro einspart.' },
     ],
-    relatedSlugs: ['kraftstoffverbrauch-rechner', 'fahrtkostenrechner', 'pendlerpauschale-rechner', 'auto-gesamtkosten-rechner', 'kfz-steuer-rechner', 'autobahn-maut-rechner-vignette'],
+    relatedSlugs: ['kraftstoffverbrauch-rechner', 'fahrgemeinschaft-sprit-rechner', 'pendlerpauschale-rechner', 'auto-gesamtkosten-rechner', 'autobahn-maut-rechner-vignette', 'elektroauto-ladekosten-rechner'],
     trustMeta: {
       methodology: 'Physikalische Weg-Verbrauch-Preis-Formel mit Rundung nach kaufmännischen Grundsätzen',
       legalBasis: 'Markttransparenzstelle für Kraftstoffe (MTS-K) / ADAC Betriebskostentabellen',
@@ -89,48 +142,105 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Verbrauch l/100km',
     category: 'auto-verkehr',
     subcategory: 'Sprit & Verbrauch',
-    metaTitle: 'Kraftstoffverbrauch Rechner – Liter auf 100 km berechnen',
-    metaDescription: 'Berechnen Sie den echten Durchschnittsverbrauch Ihres Autos nach dem Tanken: Getankte Liter geteilt durch gefahrene Kilometer.',
-    h1: 'Kraftstoffverbrauch berechnen (l/100 km)',
-    shortDescription: 'Ermittelt den realen Spritverbrauch Ihres Autos aus getankter Menge und Tageskilometerstand.',
-    searchKeywords: ['kraftstoffverbrauch rechner', 'liter pro 100 km berechnen', 'benzinverbrauch rechner', 'auto verbrauch formel'],
-    inputs: [
-      { id: 'distanceKm', label: 'Gefahrene Kilometer seit letztem Volltanken', type: 'number', defaultValue: 620, min: 1, unit: 'km' },
-      { id: 'litersFueled', label: 'Nachgetankte Liter (voll)', type: 'number', defaultValue: 42.5, min: 0.1, step: 0.1, unit: 'Liter' },
+    metaTitle: 'Kraftstoffverbrauch-Rechner: l/100 km & MPG umrechnen',
+    metaDescription: 'Kostenloser Kraftstoffverbrauch-Rechner: echten Verbrauch nach dem Tanken in l/100 km ermitteln und zwischen l/100 km, km/l und MPG (US/UK) umrechnen.',
+    h1: 'Kraftstoffverbrauch berechnen und umrechnen (l/100 km, km/l, MPG)',
+    shortDescription: 'Ermittelt den realen Spritverbrauch Ihres Autos aus getankter Menge und gefahrenen Kilometern. Im zweiten Modus rechnet er Verbrauchswerte zwischen l/100 km, km/l, US-MPG und UK-MPG um.',
+    searchKeywords: [
+      'kraftstoffverbrauch rechner',
+      'liter pro 100 km berechnen',
+      'benzinverbrauch rechner',
+      'auto verbrauch formel',
+      'mpg umrechnen',
+      'mpg in liter pro 100 km',
+      'l/100km in mpg',
+      'spritverbrauch umrechner',
+      'km pro liter umrechnen',
+      'miles per gallon in liter umrechnen',
     ],
-    calculate: (inputs) => {
-      const dist = inputs.distanceKm !== undefined && inputs.distanceKm !== '' ? parseFloat(inputs.distanceKm) : 620;
-      const liters = inputs.litersFueled !== undefined && inputs.litersFueled !== '' ? parseFloat(inputs.litersFueled) : 42.5;
-      if (isNaN(dist) || dist <= 0 || isNaN(liters) || liters <= 0) {
-        return { primary: { id: 'cons', label: 'Verbrauch', value: 0, formattedValue: '0 l/100km' }, error: 'Bitte gültige Werte größer als 0 für Kilometer und getankte Liter angeben.' };
-      }
-      const consumption = (liters / dist) * 100;
-      return {
-        primary: { id: 'cons', label: 'Durchschnittsverbrauch', value: consumption, formattedValue: `${formatNumber(consumption, 2)} l/100 km`, highlight: true },
-        secondary: [
-          { id: 'kmPerLiter', label: 'Reichweite pro Liter Kraftstoff', value: dist / liters, formattedValue: `${formatNumber(dist / liters, 2)} km/l` },
-          { id: 'distance', label: 'Gefahrene Strecke', value: dist, formattedValue: `${formatNumber(dist, 0)} km` },
+    inputs: [
+      {
+        id: 'mode',
+        label: 'Was möchten Sie tun?',
+        type: 'select',
+        defaultValue: 'tanken',
+        options: [
+          { value: 'tanken', label: 'Verbrauch aus einer Tankfüllung berechnen' },
+          { value: 'umrechnen', label: 'Verbrauch umrechnen (l/100 km ↔ km/l ↔ MPG)' },
         ],
-        summaryText: `Ihr Fahrzeug verbraucht real ${formatNumber(consumption, 2)} Liter auf 100 Kilometer. Mit einem Liter Kraftstoff kommen Sie ${formatNumber(dist / liters, 2)} km weit.`,
-      };
-    },
-    formula: 'Verbrauch (l/100 km) = (Getankte Liter / Gefahrene Kilometer) × 100',
-    formulaExplanation: 'Die getankte Kraftstoffmenge wird durch die seit dem letzten Volltanken gefahrenen Kilometer dividiert und mit 100 multipliziert.',
+      },
+      { id: 'distanceKm', label: 'Gefahrene Kilometer seit letztem Volltanken', type: 'number', defaultValue: 620, min: 1, unit: 'km', dependsOn: { field: 'mode', value: 'tanken' } },
+      { id: 'litersFueled', label: 'Nachgetankte Liter (voll)', type: 'number', defaultValue: 42.5, min: 0.1, step: 0.1, unit: 'Liter', dependsOn: { field: 'mode', value: 'tanken' } },
+      { id: 'inputValue', label: 'Verbrauchswert', type: 'number', defaultValue: 6.5, min: 0.1, step: 0.1, helpText: 'Zahl in der Einheit, die Sie darunter auswählen.', dependsOn: { field: 'mode', value: 'umrechnen' } },
+      {
+        id: 'inputUnit',
+        label: 'Einheit des Verbrauchswerts',
+        type: 'select',
+        defaultValue: 'l100km',
+        options: [
+          { value: 'l100km', label: 'Liter pro 100 km (l/100 km)' },
+          { value: 'kml', label: 'Kilometer pro Liter (km/l)' },
+          { value: 'usmpg', label: 'Meilen pro Gallone, USA (MPG US)' },
+          { value: 'ukmpg', label: 'Meilen pro Gallone, Großbritannien (MPG UK)' },
+        ],
+        dependsOn: { field: 'mode', value: 'umrechnen' },
+      },
+    ],
+    calculate: calculateFuelConsumption,
+    formula: 'Verbrauch (l/100 km) = (Getankte Liter / Gefahrene Kilometer) × 100 | MPG (US) = 235,215 ÷ l/100 km | MPG (UK) = 282,481 ÷ l/100 km | km/l = 100 ÷ l/100 km',
+    formulaExplanation: 'Die getankte Kraftstoffmenge wird durch die seit dem letzten Volltanken gefahrenen Kilometer dividiert und mit 100 multipliziert. Für die Umrechnung gilt: 1 Meile = 1,609344 km, 1 US-Gallone = 3,785411784 l, 1 UK-Gallone = 4,54609 l. Weil l/100 km Liter je Strecke und MPG Strecke je Gallone misst, wird der Kehrwert gebildet.',
     workedExample: {
       title: 'Beispiel: 42,5 Liter auf 620 km getankt',
       description: '(42,5 / 620) × 100 = 6,85 l/100 km.',
       inputs: { distanceKm: 620, litersFueled: 42.5 },
       resultSummary: '6,85 l/100 km',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: 42,5 Liter nach 620 km nachgetankt',
+        description: '(42,5 ÷ 620) × 100 = 6,85 l/100 km. Mit einem Liter fahren Sie 620 ÷ 42,5 = 14,59 km. Das entspricht 34,3 MPG (US) bzw. 41,2 MPG (UK).',
+        inputs: { mode: 'tanken', distanceKm: 620, litersFueled: 42.5 },
+        resultSummary: '6,85 l/100 km',
+      },
+      {
+        title: 'Beispiel 2: US-Auto mit 30 MPG in l/100 km umrechnen',
+        description: '235,215 ÷ 30 = 7,84 l/100 km. Das sind 12,75 km pro Liter oder 36 MPG nach britischer Gallone.',
+        inputs: { mode: 'umrechnen', inputValue: 30, inputUnit: 'usmpg' },
+        resultSummary: '7,84 l/100 km',
+      },
+      {
+        title: 'Beispiel 3: 6,5 l/100 km in MPG umrechnen',
+        description: 'US: 235,215 ÷ 6,5 = 36,2 MPG. UK: 282,481 ÷ 6,5 = 43,5 MPG. km/l: 100 ÷ 6,5 = 15,38 km/l.',
+        inputs: { mode: 'umrechnen', inputValue: 6.5, inputUnit: 'l100km' },
+        resultSummary: '36,2 MPG (US), 43,5 MPG (UK), 15,38 km/l',
+      },
+    ],
     content: {
-      intro: 'Bordcomputer zeigen im Alltag häufig geschönte Verbrauchswerte an. Mit der klassischen Zapfsäulen-Methode ermitteln Sie den echten Durchschnittsdurst Ihres Fahrzeugs.',
-      details: 'Methode: Voll tanken, Tageskilometerzähler auf 0 stellen, beim nächsten Volltanken die getankten Liter notieren und durch die gefahrenen Kilometer teilen: (Getankte Liter / Gefahrene km) · 100.',
+      intro: 'Wie viel verbraucht Ihr Auto wirklich? Der Rechner ermittelt den echten Durchschnittsverbrauch aus einer Tankfüllung. Im zweiten Modus rechnet er Verbrauchswerte um: l/100 km, km/l und Meilen pro Gallone nach US- und UK-Maß. So vergleichen Sie Angaben aus Testberichten, Importpapieren oder einem Bordcomputer mit US-Einstellung.',
+      sections: [
+        {
+          title: 'Verbrauch nach dem Tanken ermitteln',
+          content: 'Bordcomputer zeigen oft zu niedrige Werte. Genauer ist die Tankmethode:\n1. Tanken Sie voll und setzen Sie den Tageskilometerzähler auf 0.\n2. Fahren Sie wie gewohnt.\n3. Tanken Sie wieder voll und notieren Sie die getankten Liter und die gefahrenen Kilometer.\n\nBeispiel: 42,5 Liter nach 620 km ergeben 6,85 l/100 km. Über mehrere Tankfüllungen gemittelt wird der Wert genauer.',
+        },
+        {
+          title: 'Verbrauch umrechnen: l/100 km, km/l und MPG',
+          content: 'l/100 km misst Liter je Strecke, MPG und km/l messen Strecke je Menge. Deshalb gilt: je höher der MPG-Wert, desto sparsamer das Auto. US- und UK-MPG unterscheiden sich, weil die britische Gallone mit 4,546 Litern größer ist als die US-Gallone mit 3,785 Litern.\n\n| l/100 km | km/l | MPG (US) | MPG (UK) |\n| --- | --- | --- | --- |\n| 4 | 25,0 | 58,8 | 70,6 |\n| 5 | 20,0 | 47,0 | 56,5 |\n| 6 | 16,7 | 39,2 | 47,1 |\n| 8 | 12,5 | 29,4 | 35,3 |\n| 10 | 10,0 | 23,5 | 28,2 |',
+        },
+        {
+          title: 'Was Sie mit dem Ergebnis tun',
+          content: 'Mit Ihrem echten Verbrauch rechnen Sie die Kosten jeder Fahrt im [Spritkostenrechner](/rechner/spritkostenrechner/) aus. Den CO₂-Ausstoß Ihres Autos ermitteln Sie mit dem [CO₂-Autorechner](/rechner/co2-auto-rechner/). Liegt Ihr Verbrauch deutlich über der WLTP-Angabe, prüfen Sie Reifendruck, Dachträger und den Anteil an Kurzstrecken.',
+        },
+      ],
+      details: 'Methode: Voll tanken, Tageskilometerzähler auf 0 stellen, beim nächsten Volltanken die getankten Liter notieren und durch die gefahrenen Kilometer teilen: (Getankte Liter / Gefahrene km) · 100. Umrechnung: MPG (US) = 235,215 ÷ (l/100 km), MPG (UK) = 282,481 ÷ (l/100 km), km/l = 100 ÷ (l/100 km).',
     },
     faqs: [
+      { question: 'Wie rechne ich MPG in Liter pro 100 km um?', answer: 'Teilen Sie 235,215 durch den US-MPG-Wert. 30 MPG (US) ergeben 7,84 l/100 km. Bei britischen Angaben teilen Sie 282,481 durch den MPG-Wert.' },
+      { question: 'Wie viele Liter auf 100 km sind 40 MPG?', answer: 'Nach US-Gallone sind 40 MPG rund 5,88 l/100 km. Nach britischer Gallone sind es rund 7,06 l/100 km. Prüfen Sie also immer, aus welchem Land die Angabe stammt.' },
+      { question: 'Warum unterscheiden sich US-MPG und UK-MPG?', answer: 'Die britische Gallone fasst 4,54609 Liter, die US-Gallone nur 3,785411784 Liter. Mit einer UK-Gallone fährt ein Auto deshalb weiter. Derselbe Verbrauch ergibt in UK-MPG einen rund 20 % höheren Wert.' },
       { question: 'Warum weicht der reale Verbrauch von den Herstellerangaben (WLTP) ab?', answer: 'Der WLTP-Zyklus wird auf Prüfständen bei 23 °C ohne Klimaanlage und mit minimaler Zuladung ermittelt; im Realverkehr treiben Kaltstarts, Heizung, Kurzstrecken und Fahrstil den Verbrauch nach oben.' },
       { question: 'Wie wirkt sich vorausschauendes Fahren auf den Verbrauch aus?', answer: 'Durch frühzeitiges Hochschalten (bei ca. 2.000 U/min), Nutzung der Schubabschaltung und Vermeidung unnötigen Bremsens lassen sich 15 bis 25 Prozent Kraftstoff einsparen.' },
     ],
-    relatedSlugs: ['spritkostenrechner', 'fahrtkostenrechner', 'auto-gesamtkosten-rechner', 'kraftstoffverbrauch-umrechner', 'co2-auto-rechner'],
+    relatedSlugs: ['spritkostenrechner', 'auto-gesamtkosten-rechner', 'co2-auto-rechner', 'elektroauto-ladekosten-rechner', 'fahrgemeinschaft-sprit-rechner'],
   },
   {
     id: 'pendlerpauschale-rechner',
@@ -686,7 +796,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
         },
         {
           title: 'Fahrtkosten und Steuern berechnen',
-          content: 'Für die reinen Kraftstoffkosten nutzen Sie den [Spritkostenrechner](/rechner/spritkostenrechner/) oder den [Fahrtkostenrechner](/rechner/fahrtkostenrechner/). Zur steuerlichen Geltendmachung steht Ihnen der [Pendlerpauschale-Rechner](/rechner/pendlerpauschale-rechner/) bereit.',
+          content: 'Für die reinen Kraftstoffkosten nutzen Sie den [Spritkostenrechner](/rechner/spritkostenrechner/). Zur steuerlichen Geltendmachung steht Ihnen der [Pendlerpauschale-Rechner](/rechner/pendlerpauschale-rechner/) bereit.',
         },
       ],
       details: 'Formel: Jahres-Pkm = einfache Distanz × 2 × Pendeltage. Emissionen = Pkm × Faktor in g CO₂e/Pkm ÷ 1.000. Quelle: UBA TREMOD 6.71B (10/2025), Bezugsjahr 2024, Durchschnittswerte im Personenverkehr.',

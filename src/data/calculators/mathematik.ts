@@ -8,56 +8,199 @@ import {
   calculatePythagoras,
   calculateGcdLcm,
   calculateRoot,
+  calculateTriangle,
 } from '@/lib/calculators/mathematik';
 import { formatNumber, formatPercent } from '@/lib/formatters';
+
+const LENGTH_UNIT_OPTIONS = [
+  { value: 'mm', label: 'Millimeter (mm)' },
+  { value: 'cm', label: 'Zentimeter (cm)' },
+  { value: 'dm', label: 'Dezimeter (dm)' },
+  { value: 'm', label: 'Meter (m)' },
+  { value: 'km', label: 'Kilometer (km)' },
+];
+
+/** Zeigt hinter einem Längenfeld die im Feld „Längeneinheit“ (id: unit) gewählte Einheit an. */
+const withLengthUnit = (label: string) =>
+  LENGTH_UNIT_OPTIONS.map((u) => ({ condition: { field: 'unit', value: u.value }, label, unit: u.value }));
 
 export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'prozentrechner',
     slug: 'prozentrechner',
-    name: 'Prozentrechner',
+    name: 'Prozentrechner (Prozentwert, Prozentsatz & Grundwert)',
     shortName: 'Prozentrechner',
     category: 'mathematik',
     subcategory: 'Prozentrechnung',
     metaTitle: 'Prozentrechner – Prozentwert, Prozentsatz & Grundwert',
-    metaDescription: 'Kostenloser Online-Prozentrechner: Wie viel sind X % von Y? Prozentuale Veränderungen, Aufschläge und Rabatte schnell und einfach berechnen.',
-    h1: 'Prozentrechner – Alle Prozentrechnungen auf einen Blick',
-    shortDescription: 'Berechnet den Prozentwert, Prozentsatz, Grundwert und prozentuale Zu- oder Abnahmen.',
-    searchKeywords: ['prozentrechner', 'wie viel prozent von', 'prozent berechnen', 'prozentrechnung formel', 'prozentwert berechnen'],
+    metaDescription: 'Prozentrechner kostenlos: Prozentwert, Prozentsatz oder Grundwert berechnen und Aufschläge oder Rabatte zurückrechnen – mit Formel und Rechenweg.',
+    h1: 'Prozentrechner – Prozentwert, Prozentsatz und Grundwert berechnen',
+    shortDescription: 'Löst jede Grundaufgabe der Prozentrechnung: Prozentwert, Prozentsatz oder Grundwert gesucht – dazu Aufschläge, Rabatte und der Ursprungswert vor einer Änderung.',
+    searchKeywords: [
+      'prozentrechner',
+      'prozent berechnen',
+      'prozentrechnung',
+      'prozentwert berechnen',
+      'prozentsatz berechnen',
+      'grundwert berechnen',
+      'grundwert rechner',
+      'grundwert berechnen formel',
+      '100 prozent berechnen',
+      'wie viel prozent von',
+      'wie viel prozent sind',
+      'prozentrechnung formel',
+      'ursprungspreis berechnen',
+      'prozent aufschlag berechnen',
+      'rabatt in prozent berechnen',
+    ],
     inputs: [
       {
         id: 'calculationMode',
-        label: 'Berechnungsart',
+        label: 'Was möchten Sie berechnen?',
         type: 'select',
         defaultValue: 'partOf',
         options: [
-          { value: 'partOf', label: 'Wie viel sind X % von Y? (Prozentwert berechnen)' },
-          { value: 'increase', label: 'Grundwert um X % erhöhen (+ Aufschlag)' },
-          { value: 'decrease', label: 'Grundwert um X % reduzieren (- Rabatt)' },
-          { value: 'shareOf', label: 'X ist wie viel Prozent von Y? (Prozentsatz ermitteln)' },
+          { value: 'partOf', label: 'Prozentwert: Wie viel sind p % von G?' },
+          { value: 'shareOf', label: 'Prozentsatz: W ist wie viel % von G?' },
+          { value: 'baseOf', label: 'Grundwert: W sind p % von wie viel?' },
+          { value: 'increase', label: 'Wert um p % erhöhen (Aufschlag)' },
+          { value: 'decrease', label: 'Wert um p % verringern (Rabatt)' },
+          { value: 'baseFromIncreased', label: 'Ursprungswert vor einer Erhöhung um p %' },
+          { value: 'baseFromDecreased', label: 'Ursprungswert vor einem Rabatt von p %' },
         ],
       },
-      { id: 'percent', label: 'Prozentsatz bzw. Wert (X)', type: 'number', defaultValue: 19, step: 0.1 },
-      { id: 'base', label: 'Grundwert / Bezugsgröße (Y)', type: 'number', defaultValue: 250, step: 0.01 },
+      {
+        id: 'percent',
+        label: 'Prozentsatz p',
+        type: 'number',
+        defaultValue: 20,
+        step: 0.1,
+        unit: '%',
+        dependsOn: { field: 'calculationMode', value: ['partOf', 'baseOf', 'increase', 'decrease', 'baseFromIncreased', 'baseFromDecreased'] },
+      },
+      {
+        id: 'base',
+        label: 'Grundwert G (das Ganze, 100 %)',
+        type: 'number',
+        defaultValue: 250,
+        step: 0.01,
+        dependsOn: { field: 'calculationMode', value: ['partOf', 'shareOf', 'increase', 'decrease'] },
+      },
+      {
+        id: 'part',
+        label: 'Prozentwert W (der Anteil)',
+        type: 'number',
+        defaultValue: 50,
+        step: 0.01,
+        dependsOn: { field: 'calculationMode', value: ['shareOf', 'baseOf'] },
+      },
+      {
+        id: 'finalValue',
+        label: 'Wert nach der Änderung',
+        type: 'number',
+        defaultValue: 300,
+        step: 0.01,
+        helpText: 'Zum Beispiel der Bruttopreis nach Aufschlag oder der reduzierte Preis nach Rabatt.',
+        dependsOn: { field: 'calculationMode', value: ['baseFromIncreased', 'baseFromDecreased'] },
+      },
     ],
     calculate: calculatePercentage,
-    formula: 'Prozentwert (W) = Grundwert (G) × (Prozentsatz (p) / 100)',
-    formulaExplanation: 'Der Grundwert stellt das Ganze (100 %) dar. Multipliziert mit dem Hundertstel des Prozentsatzes ergibt sich der gesuchte Anteil (Prozentwert).',
+    formula: 'W = G · p / 100   |   p = W / G · 100   |   G = W · 100 / p',
+    formulaExplanation: 'Der Grundwert G ist das Ganze (100 %), der Prozentwert W ein Teil davon und der Prozentsatz p gibt an, wie viele Hundertstel dieser Teil ausmacht. Kennen Sie zwei der drei Größen, liefert eine der drei Formeln die dritte.',
     workedExample: {
-      title: 'Beispiel: 19 % von 250 €',
-      description: '250 € × (19 / 100) = 47,50 €.',
-      inputs: { percent: 19, base: 250 },
-      resultSummary: '47,50 € (Gesamtsumme: 297,50 €)',
+      title: 'Prozentwert: Wie viel sind 20 % von 250 €?',
+      description: 'Gesucht ist der Prozentwert W. Grundwert und Prozentsatz sind bekannt.',
+      inputs: { calculationMode: 'partOf', percent: 20, base: 250 },
+      steps: ['W = G · p / 100', 'W = 250 € · 20 / 100', 'W = 5.000 / 100 = 50 €'],
+      resultSummary: '20 % von 250 € sind 50 €.',
     },
+    workedExamples: [
+      {
+        title: 'Prozentwert: Wie viel sind 20 % von 250 €?',
+        description: 'Gesucht ist der Prozentwert W. Grundwert und Prozentsatz sind bekannt.',
+        inputs: { calculationMode: 'partOf', percent: 20, base: 250 },
+        steps: ['W = G · p / 100', 'W = 250 € · 20 / 100', 'W = 5.000 / 100 = 50 €'],
+        resultSummary: '20 % von 250 € sind 50 €.',
+      },
+      {
+        title: 'Prozentsatz: 18 von 24 Aufgaben richtig – wie viel Prozent sind das?',
+        description: 'Eine Klassenarbeit hat 24 Aufgaben, 18 davon sind richtig gelöst. Gesucht ist der Prozentsatz p.',
+        inputs: { calculationMode: 'shareOf', part: 18, base: 24 },
+        steps: ['p = W / G · 100', 'p = 18 / 24 · 100', 'p = 0,75 · 100 = 75 %'],
+        resultSummary: '18 von 24 Aufgaben sind 75 %.',
+      },
+      {
+        title: 'Grundwert: 45 € Rabatt sind 15 % – wie teuer war der Artikel?',
+        description: 'Der Rabatt (Prozentwert) und der Rabattsatz sind bekannt, gesucht ist der ursprüngliche Preis als Grundwert.',
+        inputs: { calculationMode: 'baseOf', part: 45, percent: 15 },
+        steps: ['G = W · 100 / p', 'G = 45 € · 100 / 15', 'G = 4.500 / 15 = 300 €'],
+        resultSummary: 'Der Artikel kostete ursprünglich 300 €.',
+      },
+      {
+        title: 'Rückwärts rechnen: Nach 20 % Rabatt kostet die Jacke 80 € – was war der alte Preis?',
+        description: 'Nach dem Rabatt zahlen Sie noch 80 % des alten Preises. Der reduzierte Preis ist also nicht der Grundwert.',
+        inputs: { calculationMode: 'baseFromDecreased', finalValue: 80, percent: 20 },
+        steps: ['100 % − 20 % = 80 % des alten Preises', 'G = 80 € · 100 / 80', 'G = 100 €'],
+        resultSummary: 'Die Jacke kostete vorher 100 €.',
+      },
+    ],
     content: {
-      intro: 'Der Prozentwert (W) drückt den absoluten Teil eines Ganzen aus, bezogen auf einen Grundwert (G) von 100 Prozent.',
-      details: 'Die Grundformel lautet W = G · (p / 100). Im Kopf lässt sich der Prozentwert oft zerlegen: 15 % von 240 € sind 10 % (24 €) plus 5 % (12 €), also 36 €.',
+      intro: 'Mit diesem Prozentrechner lösen Sie alle drei Grundaufgaben der Prozentrechnung: Sie können den Prozentwert, den Prozentsatz oder den Grundwert berechnen. Zusätzlich erhöhen oder senken Sie Werte um einen Prozentsatz und rechnen vom Preis nach Aufschlag oder Rabatt auf den Ursprungswert zurück. Wählen Sie oben aus, was gesucht ist – der Rechner zeigt nur die passenden Eingabefelder und den Rechenweg Schritt für Schritt.',
+      sections: [
+        {
+          title: 'Grundwert, Prozentwert, Prozentsatz: die drei Größen',
+          content:
+            'Jede Prozentaufgabe dreht sich um dieselben drei Größen:\n\n' +
+            '- **Grundwert G** – das Ganze, also 100 %. Beispiel: der ursprüngliche Preis von 250 €.\n' +
+            '- **Prozentwert W** – der Anteil vom Ganzen. Beispiel: 50 € Rabatt.\n' +
+            '- **Prozentsatz p** – wie viele Hundertstel der Anteil ausmacht. Beispiel: 20 %.\n\n' +
+            '„Prozent“ heißt „von Hundert“: 20 % sind 20 Hundertstel, also 0,20. Wer bei einer Textaufgabe zuerst klärt, welche Zahl das Ganze ist, hat die halbe Aufgabe schon gelöst.',
+        },
+        {
+          title: 'Die drei Formeln – und der Dreisatz als Eselsbrücke',
+          content:
+            'Alle Formeln folgen aus einer Grundgleichung: **W = G · p / 100**. Stellen Sie sie nach der gesuchten Größe um:\n\n' +
+            '- Prozentwert: W = G · p / 100 → 20 % von 250 = 250 · 20 / 100 = 50\n' +
+            '- Prozentsatz: p = W / G · 100 → 50 von 250 = 50 / 250 · 100 = 20 %\n' +
+            '- Grundwert: G = W · 100 / p → 50 sind 20 % von 50 · 100 / 20 = 250\n\n' +
+            'Wer Formeln nicht gern auswendig lernt, rechnet mit dem Dreisatz: Wenn 20 % genau 50 sind, ist 1 % gleich 50 / 20 = 2,5. Dann sind 100 % gleich 2,5 · 100 = 250. Diesen Weg zeigt der Rechner bei der Grundwert-Aufgabe mit an. Für andere Verhältnisaufgaben hilft der [Dreisatzrechner](/rechner/dreisatzrechner/).',
+        },
+        {
+          title: 'Vorsicht bei Rabatt, Aufschlag und Mehrwertsteuer',
+          content:
+            'Der häufigste Fehler: vom falschen Grundwert ausgehen. Nach 20 % Rabatt zahlen Sie noch 80 % des alten Preises. Kostet die Jacke jetzt 80 €, war der alte Preis also 80 / 0,8 = 100 € – und nicht 80 € + 20 % = 96 €.\n\n' +
+            'Genauso beim Aufschlag: Ein Bruttopreis von 119 € enthält 19 % Mehrwertsteuer auf den Nettopreis. Netto sind es 119 / 1,19 = 100 €, nicht 119 € − 19 % = 96,39 €. Für diese Rückrechnung gibt es die Modi „Ursprungswert vor einer Erhöhung“ und „Ursprungswert vor einem Rabatt“. Speziell für die Umsatzsteuer eignet sich der [MwSt-Rechner](/rechner/mwst-rechner/), für Preisnachlässe der [Rabattrechner](/rechner/rabattrechner/).\n\n' +
+            'Wollen Sie wissen, um wie viel Prozent sich zwei Werte unterscheiden, nutzen Sie den [Rechner für den prozentualen Unterschied](/rechner/prozentualer-unterschied-rechner/). Für Tausendstel statt Hundertstel gibt es den [Promillerechner](/rechner/promillerechner/).',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie rechnet man Prozente schnell im Kopf aus?', answer: 'Zerlegen Sie den Prozentsatz in einfache Teilbeträge wie 10 % (Komma um eine Stelle nach links verschieben), 1 % (zwei Stellen) oder 50 % (halbieren).' },
-      { question: 'Was ist der Unterschied zwischen Prozentwert und Prozentsatz?', answer: 'Der Prozentsatz (p %) ist die relative Verhältniszahl mit dem Prozentzeichen, während der Prozentwert (W) die konkrete absolute Zahl in Euro, Kilogramm oder Einheiten darstellt.' },
+      {
+        question: 'Wie rechnet man Prozent aus?',
+        answer: 'Teilen Sie den Anteil durch das Ganze und multiplizieren Sie mit 100: p = W / G · 100. Sind zum Beispiel 30 von 120 Schülern krank, sind das 30 / 120 · 100 = 25 %. Wollen Sie umgekehrt wissen, wie viel 25 % von 120 sind, rechnen Sie 120 · 25 / 100 = 30.',
+      },
+      {
+        question: 'Wie berechnet man den Grundwert?',
+        answer: 'Der Grundwert ist das Ganze (100 %). Sie berechnen ihn mit G = W · 100 / p, also Prozentwert mal 100 geteilt durch den Prozentsatz. Sind 45 € genau 15 % eines Preises, beträgt der Preis 45 · 100 / 15 = 300 €.',
+      },
+      {
+        question: 'Wie viel Prozent sind 30 von 120?',
+        answer: '30 von 120 sind 25 %, denn 30 / 120 = 0,25 und 0,25 · 100 = 25. Im Rechner wählen Sie dafür „Prozentsatz“, tragen 30 als Prozentwert W und 120 als Grundwert G ein.',
+      },
+      {
+        question: 'Wie rechne ich vom reduzierten Preis auf den ursprünglichen Preis zurück?',
+        answer: 'Ziehen Sie den Rabatt von 100 % ab und teilen Sie den reduzierten Preis durch diesen Anteil. Bei 25 % Rabatt und einem Preis von 60 € rechnen Sie 60 / 0,75 = 80 €. Den Rabatt einfach wieder aufzuschlagen (60 € + 25 % = 75 €) ist falsch, weil sich die 25 % auf den alten Preis beziehen.',
+      },
+      {
+        question: 'Wie kann man Prozente im Kopf rechnen?',
+        answer: 'Zerlegen Sie den Prozentsatz in einfache Teile: 10 % bekommen Sie, indem Sie das Komma um eine Stelle nach links schieben, 1 % mit zwei Stellen, 50 % durch Halbieren. 15 % von 240 sind also 10 % (24) plus 5 % (12), zusammen 36.',
+      },
+      {
+        question: 'Was ist der Unterschied zwischen Prozent und Prozentpunkten?',
+        answer: 'Prozentpunkte beschreiben den Abstand zwischen zwei Prozentsätzen, Prozent die relative Veränderung. Steigt ein Zinssatz von 2 % auf 3 %, ist das ein Plus von einem Prozentpunkt, aber eine Steigerung um 50 %.',
+      },
     ],
-    relatedSlugs: ['antiproportionaler-dreisatz-rechner', 'prozentualer-unterschied-rechner', 'prozentuale-veraenderung', 'grundwert-rechner', 'dreisatzrechner', 'bruchrechner', 'prozent-von-prozent-rechner'],
+    relatedSlugs: ['prozentualer-unterschied-rechner', 'mwst-rechner', 'rabattrechner', 'dreisatzrechner', 'promillerechner', 'bruchrechner'],
   },
   {
     id: 'prozentuale-veraenderung',
@@ -321,50 +464,220 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'dreieckrechner',
     slug: 'dreieckrechner',
-    name: 'Dreieck-Rechner (Flächeninhalt & Umfang)',
+    name: 'Dreieck-Rechner (Fläche, Umfang, Höhen & Winkel)',
     shortName: 'Dreieck berechnen',
     category: 'mathematik',
     subcategory: 'Zahlen & Algebra',
-    metaTitle: 'Dreieck Rechner – Flächeninhalt & Umfang berechnen',
-    metaDescription: 'Berechnen Sie die Fläche und den Umfang jedes Dreiecks aus Grundseite und Höhe. Schnelle & präzise Geometrieberechnung.',
-    h1: 'Dreieck Rechner – Fläche & Umfang online berechnen',
-    shortDescription: 'Ermittelt den Flächeninhalt und Umfang von Dreiecken aus Grundseite und Höhe.',
-    searchKeywords: ['dreieckrechner', 'dreieck fläche berechnen', 'dreieck formel grundseite höhe', 'umfang dreieck rechner'],
-    inputs: [
-      { id: 'baseG', label: 'Grundseite (g) in cm', type: 'number', defaultValue: 10, min: 0.1, step: 0.1, unit: 'cm' },
-      { id: 'heightH', label: 'Höhe (h) in cm', type: 'number', defaultValue: 6, min: 0.1, step: 0.1, unit: 'cm' },
+    metaTitle: 'Dreieck berechnen – Fläche, Umfang, Höhen & Winkel',
+    metaDescription: 'Dreieck kostenlos berechnen: aus Grundseite und Höhe, drei Seiten (Heron) oder zwei Seiten und Winkel – mit Höhen, Winkeln, Radien und Rechenweg.',
+    h1: 'Dreieck berechnen – Fläche, Umfang, Höhen und Winkel',
+    shortDescription: 'Berechnet Flächeninhalt, Umfang, alle drei Höhen, die Winkel sowie Inkreis- und Umkreisradius – aus drei Seiten, aus Grundseite und Höhe oder aus zwei Seiten mit eingeschlossenem Winkel.',
+    searchKeywords: [
+      'dreieckrechner',
+      'dreieck berechnen',
+      'dreieck fläche berechnen',
+      'flächeninhalt dreieck',
+      'dreieck formel grundseite höhe',
+      'höhe dreieck berechnen',
+      'dreieck umfang berechnen',
+      'heron formel',
+      'dreieck 3 seiten berechnen',
+      'dreieck winkel berechnen',
+      'dreieck fläche zwei seiten und winkel',
+      'inkreisradius dreieck berechnen',
+      'umkreisradius dreieck',
+      'dreiecksungleichung',
     ],
-    calculate: (inputs) => {
-      const g = inputs.baseG !== undefined && inputs.baseG !== '' ? parseFloat(inputs.baseG) : 10;
-      const h = inputs.heightH !== undefined && inputs.heightH !== '' ? parseFloat(inputs.heightH) : 6;
-      if (g <= 0 || h <= 0 || isNaN(g) || isNaN(h)) return { primary: { id: 'area', label: 'Fläche', value: 0, formattedValue: '0 cm²' }, error: 'Werte müssen positiv sein.' };
-      const area = (g * h) / 2;
-      return {
-        primary: { id: 'area', label: 'Flächeninhalt (A)', value: area, formattedValue: `${formatNumber(area, 2)} cm²`, highlight: true },
-        secondary: [
-          { id: 'base', label: 'Grundseite (g)', value: g, formattedValue: `${formatNumber(g, 2)} cm` },
-          { id: 'height', label: 'Höhe (h)', value: h, formattedValue: `${formatNumber(h, 2)} cm` },
+    inputs: [
+      {
+        id: 'given',
+        label: 'Gegeben ist …',
+        type: 'select',
+        defaultValue: 'threeSides',
+        options: [
+          { value: 'threeSides', label: 'Drei Seiten a, b, c' },
+          { value: 'baseHeight', label: 'Grundseite g und Höhe h' },
+          { value: 'twoSidesAngle', label: 'Zwei Seiten a, b und der Winkel γ dazwischen' },
         ],
-        summaryText: `Ein Dreieck mit Grundseite ${formatNumber(g, 2)} cm und Höhe ${formatNumber(h, 2)} cm hat einen Flächeninhalt von ${formatNumber(area, 2)} cm².`,
-      };
-    },
-    formula: 'Fläche A = (Grundseite g × Höhe h) / 2',
-    formulaExplanation: 'Ein Dreieck besitzt stets exakt den halben Flächeninhalt eines Rechtecks mit gleicher Grundlinie und Höhe.',
+      },
+      {
+        id: 'sideA',
+        label: 'Seite a',
+        type: 'number',
+        defaultValue: 6,
+        min: 0,
+        step: 0.1,
+        unit: 'cm',
+        conditionalLabels: withLengthUnit('Seite a'),
+        dependsOn: { field: 'given', value: ['threeSides', 'twoSidesAngle'] },
+      },
+      {
+        id: 'sideB',
+        label: 'Seite b',
+        type: 'number',
+        defaultValue: 8,
+        min: 0,
+        step: 0.1,
+        unit: 'cm',
+        conditionalLabels: withLengthUnit('Seite b'),
+        dependsOn: { field: 'given', value: ['threeSides', 'twoSidesAngle'] },
+      },
+      {
+        id: 'sideC',
+        label: 'Seite c',
+        type: 'number',
+        defaultValue: 10,
+        min: 0,
+        step: 0.1,
+        unit: 'cm',
+        conditionalLabels: withLengthUnit('Seite c'),
+        dependsOn: { field: 'given', value: 'threeSides' },
+      },
+      {
+        id: 'angleGamma',
+        label: 'Winkel γ zwischen a und b',
+        type: 'number',
+        defaultValue: 90,
+        min: 0,
+        max: 180,
+        step: 1,
+        unit: '°',
+        helpText: 'Der Winkel muss von den Seiten a und b eingeschlossen werden, also an der Ecke liegen, an der a und b zusammenstoßen.',
+        dependsOn: { field: 'given', value: 'twoSidesAngle' },
+      },
+      {
+        id: 'baseG',
+        label: 'Grundseite g',
+        type: 'number',
+        defaultValue: 10,
+        min: 0,
+        step: 0.1,
+        unit: 'cm',
+        conditionalLabels: withLengthUnit('Grundseite g'),
+        dependsOn: { field: 'given', value: 'baseHeight' },
+      },
+      {
+        id: 'heightH',
+        label: 'Höhe h (senkrecht auf g)',
+        type: 'number',
+        defaultValue: 6,
+        min: 0,
+        step: 0.1,
+        unit: 'cm',
+        conditionalLabels: withLengthUnit('Höhe h (senkrecht auf g)'),
+        dependsOn: { field: 'given', value: 'baseHeight' },
+      },
+      {
+        id: 'unit',
+        label: 'Längeneinheit',
+        type: 'select',
+        defaultValue: 'cm',
+        options: LENGTH_UNIT_OPTIONS,
+      },
+    ],
+    calculate: calculateTriangle,
+    formula: 'A = ½ · g · h   |   A = √(s · (s − a) · (s − b) · (s − c)) mit s = (a + b + c) / 2   |   A = ½ · a · b · sin γ',
+    formulaExplanation: 'Welche Formel passt, hängt davon ab, was gegeben ist: Grundseite und Höhe, alle drei Seiten (Satz des Heron) oder zwei Seiten mit dem eingeschlossenen Winkel. Sind die drei Seiten bekannt, folgen die Höhen aus h = 2A / Seite und die Winkel aus dem Kosinussatz.',
     workedExample: {
-      title: 'Beispiel: Grundseite 10 cm, Höhe 6 cm',
-      description: '(10 × 6) / 2 = 30 cm².',
-      inputs: { baseG: 10, heightH: 6 },
-      resultSummary: '30,00 cm²',
+      title: 'Drei Seiten: a = 6 cm, b = 8 cm, c = 10 cm',
+      inputs: { given: 'threeSides', sideA: 6, sideB: 8, sideC: 10, unit: 'cm' },
+      steps: [
+        'Halber Umfang: s = (6 + 8 + 10) / 2 = 12 cm',
+        'Heron: A = √(12 · 6 · 4 · 2) = √576 = 24 cm²',
+        'Höhen: h_a = 48 / 6 = 8 cm, h_b = 48 / 8 = 6 cm, h_c = 48 / 10 = 4,8 cm',
+        'Winkel: α ≈ 36,87°, β ≈ 53,13°, γ = 90°',
+        'Inkreisradius = 24 / 12 = 2 cm, Umkreisradius = 480 / 96 = 5 cm',
+      ],
+      resultSummary: 'A = 24 cm², Umfang 24 cm, rechtwinklig mit dem rechten Winkel bei C',
     },
+    workedExamples: [
+      {
+        title: 'Drei Seiten: a = 6 cm, b = 8 cm, c = 10 cm',
+        description: 'Alle drei Seiten sind bekannt, eine Höhe nicht. Der Satz des Heron liefert die Fläche, daraus folgen Höhen, Winkel und Radien.',
+        inputs: { given: 'threeSides', sideA: 6, sideB: 8, sideC: 10, unit: 'cm' },
+        steps: [
+          'Halber Umfang: s = (6 + 8 + 10) / 2 = 12 cm',
+          'Heron: A = √(12 · (12 − 6) · (12 − 8) · (12 − 10)) = √(12 · 6 · 4 · 2) = √576 = 24 cm²',
+          'Höhen: h_a = 2 · 24 / 6 = 8 cm, h_b = 2 · 24 / 8 = 6 cm, h_c = 2 · 24 / 10 = 4,8 cm',
+          'Winkel mit dem Kosinussatz: α ≈ 36,87°, β ≈ 53,13°, γ = 90°',
+          'Inkreisradius = A / s = 24 / 12 = 2 cm, Umkreisradius = a · b · c / (4A) = 480 / 96 = 5 cm',
+        ],
+        resultSummary: 'A = 24 cm², Umfang 24 cm, rechtwinklig mit dem rechten Winkel bei C',
+      },
+      {
+        title: 'Grundseite und Höhe: g = 10 cm, h = 6 cm',
+        description: 'Der Klassiker aus dem Unterricht: Grundseite und die senkrecht darauf stehende Höhe sind gegeben.',
+        inputs: { given: 'baseHeight', baseG: 10, heightH: 6, unit: 'cm' },
+        steps: ['A = ½ · g · h', 'A = ½ · 10 cm · 6 cm', 'A = 60 cm² / 2 = 30 cm²'],
+        resultSummary: 'A = 30 cm². Wäre das Dreieck gleichschenklig, hätte jeder Schenkel √(5² + 6²) ≈ 7,81 cm.',
+      },
+      {
+        title: 'Zwei Seiten und Winkel: a = 5 m, b = 7 m, γ = 60°',
+        description: 'Ein dreieckiges Beet: Zwei Kanten sind gemessen, dazu der Winkel zwischen ihnen. Gesucht sind die dritte Seite und die Fläche.',
+        inputs: { given: 'twoSidesAngle', sideA: 5, sideB: 7, angleGamma: 60, unit: 'm' },
+        steps: [
+          'Kosinussatz: c² = 5² + 7² − 2 · 5 · 7 · cos 60° = 25 + 49 − 35 = 39',
+          'c = √39 ≈ 6,24 m',
+          'Fläche: A = ½ · 5 · 7 · sin 60° ≈ 17,5 · 0,866 ≈ 15,16 m²',
+        ],
+        resultSummary: 'Dritte Seite c ≈ 6,24 m, Fläche ≈ 15,16 m², Umfang ≈ 18,24 m',
+      },
+    ],
     content: {
-      intro: 'Die Dreiecksberechnung bestimmt Flächeninhalt, Umfang und Höhen beliebiger rechtwinkliger, gleichschenkliger oder unregelmäßiger Dreiecke.',
-      details: 'Die fundamentale Flächenformel lautet A = (g · h) / 2. Bei rechtwinkligen Dreiecken dienen die beiden Katheten direkt als Grundseite und Höhe: A = (a · b) / 2.',
+      intro: 'Mit diesem Dreieck-Rechner berechnen Sie jedes Dreieck aus den Angaben, die Sie gerade haben: aus drei Seiten, aus Grundseite und Höhe oder aus zwei Seiten mit dem Winkel dazwischen. Sind alle Seiten bekannt oder berechenbar, erhalten Sie neben Flächeninhalt und Umfang auch alle drei Höhen, die drei Winkel, Inkreis- und Umkreisradius und die Dreiecksart. Der Rechner prüft außerdem, ob es ein Dreieck mit Ihren Seitenlängen überhaupt geben kann.',
+      sections: [
+        {
+          title: 'Drei Wege zur Dreiecksfläche',
+          content:
+            '**1. Grundseite und Höhe:** A = ½ · g · h. Jedes Dreieck ist genau halb so groß wie das Rechteck mit derselben Grundseite und Höhe. Bei g = 10 cm und h = 6 cm ergibt das 60 cm² / 2 = 30 cm².\n\n' +
+            '**2. Drei Seiten (Satz des Heron):** Berechnen Sie zuerst den halben Umfang s = (a + b + c) / 2. Dann gilt A = √(s · (s − a) · (s − b) · (s − c)). Bei 6, 8 und 10 cm ist s = 12 und A = √(12 · 6 · 4 · 2) = √576 = 24 cm². Eine Höhe müssen Sie dafür nicht kennen.\n\n' +
+            '**3. Zwei Seiten und der eingeschlossene Winkel:** A = ½ · a · b · sin γ. Die dritte Seite liefert der Kosinussatz: c² = a² + b² − 2ab · cos γ. Ist γ = 90°, wird daraus der Satz des Pythagoras – dafür gibt es auch den [Pythagoras-Rechner](/rechner/pythagoras-rechner/).',
+        },
+        {
+          title: 'Höhen, Winkel, Inkreis und Umkreis aus den drei Seiten',
+          content:
+            'Kennen Sie die Fläche, bekommen Sie jede Höhe, indem Sie die Flächenformel umstellen: **h_a = 2A / a**, h_b = 2A / b, h_c = 2A / c. Die Höhe auf der längsten Seite ist immer die kürzeste.\n\n' +
+            'Die Winkel berechnet der Rechner mit dem Kosinussatz, zum Beispiel cos α = (b² + c² − a²) / (2bc). Zur Kontrolle: Die drei Winkel ergeben zusammen immer 180°. Der größte Winkel liegt stets gegenüber der längsten Seite.\n\n' +
+            'Der **Inkreisradius** ist A / s, der **Umkreisradius** ist a · b · c / (4A). Bei einem rechtwinkligen Dreieck ist der Umkreisradius genau die halbe Hypotenuse (Satz des Thales). Ob ein Dreieck spitz-, recht- oder stumpfwinklig ist, sehen Sie unter „Dreiecksart“. Möchten Sie Winkel ins Bogenmaß umrechnen, hilft der [Bogenmaß-Rechner](/rechner/bogenmass-grad-rechner/).',
+        },
+        {
+          title: 'Typische Fehler – und wann es kein Dreieck gibt',
+          content:
+            '- **Dreiecksungleichung:** Die längste Seite muss kürzer sein als die beiden anderen zusammen. Mit 3 cm, 4 cm und 8 cm lässt sich kein Dreieck zeichnen, weil 3 + 4 = 7 kleiner als 8 ist. Der Rechner meldet das, statt eine falsche Fläche auszugeben.\n' +
+            '- **Höhe ist nicht die schräge Seite:** Die Höhe steht immer senkrecht auf der Grundseite. Bei einem stumpfwinkligen Dreieck kann ihr Fußpunkt sogar außerhalb des Dreiecks auf der verlängerten Grundseite liegen.\n' +
+            '- **Eingeschlossener Winkel:** Die Formel ½ · a · b · sin γ gilt nur für den Winkel zwischen a und b, nicht für einen der anderen Winkel.\n' +
+            '- **Einheiten:** Alle Seiten müssen dieselbe Einheit haben. Die Fläche hat dann die Einheit zum Quadrat, also cm² statt cm.\n\n' +
+            'Für Vierecke nutzen Sie den [Rechteck-Rechner](/rechner/rechteckrechner/), den [Trapez-Rechner](/rechner/trapez-flaeche-rechner/) oder den [Parallelogramm-Rechner](/rechner/parallelogramm-rechner/).',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie berechnet man die Fläche eines Dreiecks ohne gegebene Höhe?', answer: 'Sind alle drei Seitenlängen a, b und c bekannt, liefert der Satz von Heron die Fläche: A = Wurzel aus [s · (s-a) · (s-b) · (s-c)], wobei s der halbe Umfang (a+b+c)/2 ist.' },
-      { question: 'Welche Winkelsumme hat jedes ebene Dreieck?', answer: 'Die Summe aller drei Innenwinkel im euklidischen Dreieck beträgt ausnahmslos exakt 180 Grad (alpha + beta + gamma = 180°).' },
+      {
+        question: 'Wie berechnet man die Fläche eines Dreiecks?',
+        answer: 'Am einfachsten mit A = ½ · Grundseite · Höhe. Die Höhe muss dabei senkrecht auf der Grundseite stehen. Bei einer Grundseite von 8 cm und einer Höhe von 5 cm ist die Fläche 8 · 5 / 2 = 20 cm².',
+      },
+      {
+        question: 'Wie berechne ich die Fläche eines Dreiecks nur mit den drei Seiten?',
+        answer: 'Mit dem Satz des Heron: Bilden Sie den halben Umfang s = (a + b + c) / 2 und rechnen Sie A = √(s · (s − a) · (s − b) · (s − c)). Für die Seiten 5, 5 und 6 cm ist s = 8 und A = √(8 · 3 · 3 · 2) = √144 = 12 cm².',
+      },
+      {
+        question: 'Wie berechnet man die Höhe eines Dreiecks?',
+        answer: 'Berechnen Sie zuerst die Fläche und stellen Sie dann A = ½ · c · h_c nach der Höhe um: h_c = 2A / c. Hat ein Dreieck 24 cm² Fläche und die Seite c = 10 cm, ist h_c = 48 / 10 = 4,8 cm. Sind nur die drei Seiten bekannt, bekommen Sie die Fläche über den Satz des Heron.',
+      },
+      {
+        question: 'Wie erkenne ich, ob es ein Dreieck mit diesen Seiten gibt?',
+        answer: 'Prüfen Sie die Dreiecksungleichung: Die beiden kürzeren Seiten müssen zusammen länger sein als die längste Seite. Bei 4, 5 und 10 cm klappt das nicht, denn 4 + 5 = 9 ist kleiner als 10. Sind beide Werte gleich groß, liegen alle Ecken auf einer Linie und die Fläche ist 0.',
+      },
+      {
+        question: 'Wie berechnet man die Winkel eines Dreiecks aus drei Seiten?',
+        answer: 'Mit dem Kosinussatz, zum Beispiel cos γ = (a² + b² − c²) / (2ab). Den Winkel liefert dann die Taste cos⁻¹ auf dem Taschenrechner. Den dritten Winkel erhalten Sie am schnellsten über die Winkelsumme: α + β + γ = 180°.',
+      },
+      {
+        question: 'Wie erkenne ich, ob ein Dreieck rechtwinklig ist?',
+        answer: 'Ein Dreieck ist genau dann rechtwinklig, wenn die Quadrate der beiden kürzeren Seiten zusammen das Quadrat der längsten Seite ergeben (a² + b² = c²). Bei 6, 8 und 10 cm gilt 36 + 64 = 100, also liegt ein rechter Winkel gegenüber der 10-cm-Seite.',
+      },
     ],
-    relatedSlugs: ['pythagoras-rechner', 'rechteckrechner', 'kreisrechner'],
+    relatedSlugs: ['pythagoras-rechner', 'trapez-flaeche-rechner', 'parallelogramm-rechner', 'rechteckrechner', 'kreisrechner', 'bogenmass-grad-rechner'],
   },
   {
     id: 'durchschnittsrechner',
@@ -530,36 +843,133 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'quadratwurzel-rechner',
     slug: 'quadratwurzel-rechner',
-    name: 'Quadratwurzel & Wurzel-Rechner',
+    name: 'Quadratwurzel-Rechner (auch n-te Wurzel)',
     shortName: 'Wurzelrechner',
     category: 'mathematik',
     subcategory: 'Zahlen & Algebra',
-    metaTitle: 'Wurzelrechner – Quadratwurzel und n-te Wurzel online ziehen',
-    metaDescription: 'Berechnen Sie Quadratwurzeln, Kubikwurzeln und beliebige n-te Wurzeln aus Zahlen online mit hoher Präzision.',
-    h1: 'Wurzelrechner – Quadratwurzel & n-te Wurzel',
-    shortDescription: 'Zieht Quadratwurzeln und beliebige n-te Wurzeln aus Zahlen.',
-    searchKeywords: ['wurzelrechner', 'quadratwurzel rechner', 'wurzel ziehen online', 'dritte wurzel berechnen'],
+    metaTitle: 'Quadratwurzel Rechner – Wurzel ziehen, auch n-te Wurzel',
+    metaDescription: 'Quadratwurzel kostenlos berechnen: Wurzel ziehen mit Rechenweg, Probe und vereinfachter Wurzel (√72 = 6·√2) – auf Wunsch auch jede n-te Wurzel.',
+    h1: 'Quadratwurzel berechnen – Wurzel ziehen mit Rechenweg',
+    shortDescription: 'Zieht die Quadratwurzel aus jeder Zahl, zeigt Probe, Einschachtelung und teilweises Wurzelziehen und berechnet über den Wurzelexponenten n auch die 4., 5. oder jede andere Wurzel.',
+    searchKeywords: [
+      'quadratwurzel rechner',
+      'quadratwurzel berechnen',
+      'wurzel ziehen',
+      'wurzelrechner',
+      'wurzel berechnen',
+      'wurzel ziehen online',
+      'n-te wurzel',
+      'n-te wurzel rechner',
+      'nte wurzel berechnen',
+      '4 wurzel berechnen',
+      'wurzel vereinfachen',
+      'teilweise wurzel ziehen',
+      'wurzel aus negativer zahl',
+    ],
     inputs: [
-      { id: 'value', label: 'Radikand (Zahl unter der Wurzel)', type: 'number', defaultValue: 144, step: 0.01 },
-      { id: 'degree', label: 'Wurzelexponent (2 = Quadratwurzel, 3 = Kubikwurzel)', type: 'number', defaultValue: 2, min: 2, max: 10, step: 1 },
+      { id: 'value', label: 'Zahl unter der Wurzel (Radikand)', type: 'number', defaultValue: 144, step: 1 },
+      {
+        id: 'degree',
+        label: 'Wurzelexponent n (2 = Quadratwurzel)',
+        type: 'number',
+        defaultValue: 2,
+        min: 1,
+        max: 100,
+        step: 1,
+        helpText: 'Lassen Sie n = 2 für die Quadratwurzel. Für die 4. Wurzel tragen Sie 4 ein, für die 5. Wurzel 5 usw.',
+      },
     ],
     calculate: calculateRoot,
-    formula: 'x = ⁿ√a  =>  xⁿ = a',
-    formulaExplanation: 'Die n-te Wurzel aus a ist die Zahl x, die potenziert mit n wieder a ergibt.',
+    formula: '√a = y  ⇔  y² = a (y ≥ 0)   |   ⁿ√a = a^(1/n)',
+    formulaExplanation: 'Die Quadratwurzel aus a ist die nicht-negative Zahl, die mit sich selbst multipliziert a ergibt. Allgemein ist die n-te Wurzel aus a die Zahl, die n-mal mit sich selbst multipliziert wieder a ergibt – das entspricht der Potenz a hoch 1/n.',
     workedExample: {
-      title: 'Beispiel: √144',
-      description: '12 × 12 = 144, also ist die Quadratwurzel aus 144 genau 12.',
+      title: 'Quadratwurzel aus 144',
       inputs: { value: 144, degree: 2 },
-      resultSummary: '12,0000',
+      steps: ['Gesucht ist y mit y² = 144.', '12 · 12 = 144', 'Also ist √144 = 12.'],
+      resultSummary: '√144 = 12 (exakt)',
     },
+    workedExamples: [
+      {
+        title: 'Quadratwurzel aus 144',
+        description: '144 ist eine Quadratzahl, die Wurzel geht also glatt auf.',
+        inputs: { value: 144, degree: 2 },
+        steps: ['Gesucht ist y mit y² = 144.', '12 · 12 = 144', 'Also ist √144 = 12.'],
+        resultSummary: '√144 = 12 (exakt)',
+      },
+      {
+        title: 'Quadratwurzel aus 50 – einschachteln und vereinfachen',
+        description: '50 ist keine Quadratzahl. Das Ergebnis ist eine irrationale Zahl mit unendlich vielen Nachkommastellen.',
+        inputs: { value: 50, degree: 2 },
+        steps: [
+          'Einschachteln: 7² = 49 < 50 < 64 = 8², also liegt √50 zwischen 7 und 8.',
+          'Teilweise Wurzelziehen: 50 = 25 · 2, also √50 = √25 · √2 = 5 · √2.',
+          'Gerundet: √50 ≈ 7,071068',
+        ],
+        resultSummary: '√50 = 5 · √2 ≈ 7,0711',
+      },
+      {
+        title: '4. Wurzel aus 81',
+        description: 'Mit dem Wurzelexponenten n = 4 wird die Zahl gesucht, die viermal mit sich selbst multipliziert 81 ergibt.',
+        inputs: { value: 81, degree: 4 },
+        steps: ['Gesucht ist y mit y⁴ = 81.', '3 · 3 · 3 · 3 = 81', 'Also ist ⁴√81 = 3. Zur Kontrolle: √(√81) = √9 = 3.'],
+        resultSummary: '⁴√81 = 3',
+      },
+      {
+        title: '5. Wurzel aus −32',
+        description: 'Bei ungeradem Wurzelexponenten darf die Zahl unter der Wurzel negativ sein.',
+        inputs: { value: -32, degree: 5 },
+        steps: ['2⁵ = 32, also ist (−2)⁵ = −32.', 'Damit gilt ⁵√(−32) = −2.'],
+        resultSummary: '⁵√(−32) = −2',
+      },
+    ],
     content: {
-      intro: 'Die Quadratwurzel einer nicht-negativen Zahl x ist diejenige Zahl y ≥ 0, deren Quadrat (y · y) exakt x ergibt.',
-      details: 'Wurzeln aus Nicht-Quadratzahlen (wie Wurzel aus 2 oder 3) sind irrationale Zahlen mit unendlich vielen, nicht-periodischen Nachkommastellen. Numerisch lässt sich die Wurzel über das babylonische Heron-Verfahren approximieren.',
+      intro: 'Mit diesem Quadratwurzel-Rechner ziehen Sie die Wurzel aus jeder Zahl. Neben dem Ergebnis sehen Sie die Probe, zwischen welchen ganzen Zahlen die Wurzel liegt und – wo möglich – die vereinfachte Form wie √72 = 6 · √2. Über das Feld „Wurzelexponent n“ berechnen Sie auch die 4., 5. oder jede andere n-te Wurzel. Lassen Sie n auf 2, erhalten Sie die gewöhnliche Quadratwurzel.',
+      sections: [
+        {
+          title: 'Was bedeutet Wurzelziehen?',
+          content:
+            'Wurzelziehen ist die Umkehrung des Quadrierens. Die Quadratwurzel aus 49 ist 7, weil 7 · 7 = 49. Die Zahl unter dem Wurzelzeichen heißt **Radikand**.\n\n' +
+            'Obwohl auch (−7)² = 49 ist, liefert √49 immer nur die positive Lösung 7. Löst man dagegen die Gleichung x² = 49, gibt es zwei Lösungen: x = 7 und x = −7.\n\n' +
+            'Allgemein ist die n-te Wurzel aus a die Zahl, die hoch n wieder a ergibt. In Potenzschreibweise ist ⁿ√a = a^(1/n), die Quadratwurzel also a^(1/2). So rechnen Sie Wurzeln auch auf Taschenrechnern ohne eigene Wurzeltaste aus.',
+        },
+        {
+          title: 'Wurzeln ohne Taschenrechner: einschachteln und vereinfachen',
+          content:
+            '**Einschachteln:** Suchen Sie die Quadratzahlen direkt unter und über dem Radikanden. Für √50 sind das 49 = 7² und 64 = 8². Also liegt √50 zwischen 7 und 8, und zwar knapp über 7.\n\n' +
+            '**Teilweise Wurzelziehen:** Zerlegen Sie den Radikanden in eine Quadratzahl mal einen Rest. 72 = 36 · 2, also √72 = √36 · √2 = 6 · √2. In der Schule wird diese vereinfachte Form oft als exaktes Ergebnis verlangt.\n\n' +
+            '**Faustformel:** √a ≈ q + (a − q²) / (2q), wobei q² die nächstkleinere Quadratzahl ist. Für √50: 7 + 1 / 14 ≈ 7,07 – schon auf zwei Nachkommastellen genau.',
+        },
+        {
+          title: 'n-te Wurzeln und negative Zahlen',
+          content:
+            'Aus einer negativen Zahl gibt es keine reelle Quadratwurzel, denn jede reelle Zahl zum Quadrat ist positiv oder 0. Dasselbe gilt für alle geraden Wurzelexponenten (4, 6, 8 …). Der Rechner meldet in diesem Fall einen Fehler und nennt bei der Quadratwurzel die komplexe Lösung.\n\n' +
+            'Bei ungeraden Exponenten (3, 5, 7 …) ist das anders: ⁵√(−32) = −2, weil (−2)⁵ = −32. Für die dritte Wurzel, etwa für die Kantenlänge eines Würfels, gibt es den eigenen [Kubikwurzel-Rechner](/rechner/kubikwurzel-rechner/).\n\n' +
+            'Wurzeln brauchen Sie zum Beispiel beim [Satz des Pythagoras](/rechner/pythagoras-rechner/) (c = √(a² + b²)) oder beim [Dreieck-Rechner](/rechner/dreieckrechner/) mit der Heron-Formel. Sehr große oder kleine Zahlen schreiben Sie übersichtlich mit dem [Zehnerpotenzen-Rechner](/rechner/zehnerpotenzen-rechner/).',
+        },
+      ],
     },
     faqs: [
-      { question: 'Warum hat eine Quadratwurzel im Reellen keine negativen Ergebnisse?', answer: 'Die Wurzelfunktion ist auf den reellen Zahlen als Hauptwert definiert und liefert per Konvention immer das nicht-negative Ergebnis.' },
-      { question: 'Wie zieht man eine Quadratwurzel im Kopf näherungsweise?', answer: 'Suchen Sie die nächste Quadratzahl. Für Wurzel(50): Die nächste Quadratzahl ist 49 (Wurzel 7). Näherung: 7 + (50 - 49) / (2 × 7) = 7 + 1/14 ≈ 7,07.' },
+      {
+        question: 'Wie zieht man die Wurzel aus einer Zahl?',
+        answer: 'Sie suchen die Zahl, die mit sich selbst multipliziert die gegebene Zahl ergibt: √81 = 9, weil 9 · 9 = 81. Geht die Wurzel nicht glatt auf, schachteln Sie sie zwischen zwei Quadratzahlen ein oder nutzen den Rechner, der das Ergebnis auf 6 Nachkommastellen rundet.',
+      },
+      {
+        question: 'Kann man die Wurzel aus einer negativen Zahl ziehen?',
+        answer: 'Eine Quadratwurzel aus einer negativen Zahl gibt es bei den reellen Zahlen nicht, weil jedes Quadrat positiv oder 0 ist. Erst mit den komplexen Zahlen gilt zum Beispiel √(−9) = 3i. Bei ungeraden Wurzeln wie der 3. oder 5. Wurzel ist ein negativer Radikand dagegen erlaubt: ⁵√(−32) = −2.',
+      },
+      {
+        question: 'Wie vereinfacht man eine Wurzel, zum Beispiel √72?',
+        answer: 'Zerlegen Sie die Zahl in die größte Quadratzahl mal einen Rest: 72 = 36 · 2. Die Wurzel aus der Quadratzahl ziehen Sie vor die Wurzel: √72 = √36 · √2 = 6 · √2. Der Rechner zeigt diese Form unter „Vereinfachte Wurzel“ an.',
+      },
+      {
+        question: 'Wie berechnet man die n-te Wurzel, zum Beispiel die 4. Wurzel?',
+        answer: 'Tragen Sie im Rechner den Wurzelexponenten n = 4 ein. Von Hand rechnen Sie a hoch 1/4, also 16^(1/4) = 2, denn 2 · 2 · 2 · 2 = 16. Die 4. Wurzel ist außerdem die Wurzel aus der Wurzel: √(√16) = √4 = 2.',
+      },
+      {
+        question: 'Warum hat √2 unendlich viele Nachkommastellen?',
+        answer: 'Die Wurzel aus einer natürlichen Zahl, die keine Quadratzahl ist, ist immer irrational. Sie lässt sich nicht als Bruch schreiben, deshalb enden und wiederholen sich ihre Nachkommastellen nie. Jeder Taschenrechner zeigt daher nur einen gerundeten Wert wie √2 ≈ 1,414214.',
+      },
     ],
-    relatedSlugs: ['pythagoras-rechner', 'prozentrechner', 'dreisatzrechner', 'kubikwurzel-rechner'],
+    relatedSlugs: ['kubikwurzel-rechner', 'pythagoras-rechner', 'zehnerpotenzen-rechner', 'dreieckrechner', 'bruchrechner'],
   },
 ];

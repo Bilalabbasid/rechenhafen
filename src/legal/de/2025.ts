@@ -142,22 +142,22 @@ export const LEGAL_VALUES_2025: GermanLegalValues = {
 
   // Solidaritätszuschlag 2025
   solzFreigrenzeSingle: {
-    value: 18720,
+    value: 19950, // angehoben durch das Steuerfortentwicklungsgesetz (Dezember 2024)
     unit: 'EUR/Jahr',
     law: '§ 3 Abs. 3 SolzG',
     sourceUrl: 'https://www.gesetze-im-internet.de/solzg_1995/__3.html',
     validFrom: '2025-01-01',
     verified: true,
-    checkedAt: '2025-01-15',
+    checkedAt: '2026-11-05',
   },
   solzFreigrenzeMarried: {
-    value: 37440,
+    value: 39900,
     unit: 'EUR/Jahr',
     law: '§ 3 Abs. 3 SolzG',
     sourceUrl: 'https://www.gesetze-im-internet.de/solzg_1995/__3.html',
     validFrom: '2025-01-01',
     verified: true,
-    checkedAt: '2025-01-15',
+    checkedAt: '2026-11-05',
   },
   solzRate: {
     value: 0.055,

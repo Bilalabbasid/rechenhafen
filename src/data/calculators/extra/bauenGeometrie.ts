@@ -1854,7 +1854,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           content: 'Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben:\n- **Bewehrungsstahl**: Durchmesser, Anzahl, Lage und Verankerung der Bewehrungseisen hängen von Erddruck, Windlast, Mauerhöhe und Belastung ab und müssen statisch bemessen werden.\n- **Fundament**: Fundamentbeton ist eine getrennte Position und darf nicht aus der Schalungsstein-Füllmenge abgeleitet werden.\n- **Herstellerrichtlinien**: Beachten Sie die Verarbeitungsrichtlinien des Herstellers bezüglich maximaler Füllhöhe je Betoniertag und Frischbetonkonsistenz.',
         },
       ],
-      details: 'Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden genau 8 Steine je Quadratmeter Nettofläche benötigt. Füllbeton und Fundamentbeton müssen getrennt berechnet werden. Weiterführende Werkzeuge: [Betonrechner](/rechner/betonrechner/) und [Beton-Mischungsverhältnis Rechner](/rechner/beton-mischungsverhaeltnis-rechner/).',
+      details: 'Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden genau 8 Steine je Quadratmeter Nettofläche benötigt. Füllbeton und Fundamentbeton müssen getrennt berechnet werden. Weiterführende Werkzeuge: [Betonrechner mit Mischungsverhältnis](/rechner/betonrechner/) und [Fundament-Rechner](/rechner/fundament-rechner/).',
     },
     faqs: [
       { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Handelsübliche Standard-Schalungssteine haben die Maße 50 cm Länge und 25 cm Höhe (Fläche 0,125 m²). Für einen Quadratmeter Wandfläche werden exakt 8 Steine benötigt. Rechnen Sie zusätzlich eine Steinreserve von ca. 5 % für Zuschnitt und Bruch ein.' },

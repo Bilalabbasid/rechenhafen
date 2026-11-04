@@ -68,7 +68,8 @@ describe('retired calculators', () => {
       expect(sitemapUrls.has(`https://rechenhafen.de/rechner/${slug}/`), slug).toBe(false);
       expect(INDEXABLE_CALCULATOR_SLUGS.has(slug), slug).toBe(false);
 
-      const targetSlug = target.match(/^\/rechner\/([^/]+)\/$/)?.[1];
+      // A target may carry a preset query (e.g. ?mode=until) so visitors land in the right mode.
+      const targetSlug = target.match(/^\/rechner\/([^/?]+)\/(?:\?[a-zA-Z]+=[a-z0-9]+)?$/)?.[1];
       if (targetSlug) expect(getCalculatorBySlug(targetSlug), `${slug} -> ${target}`).toBeDefined();
       else expect(categoryPaths.has(target), `${slug} -> ${target}`).toBe(true);
 
@@ -86,5 +87,17 @@ describe('retired calculators', () => {
       c.relatedSlugs.filter((s) => isCalculatorRetired(s)).map((s) => `${c.slug} -> ${s}`),
     );
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('redirect hygiene', () => {
+  it('has no redirect chains: no destination is itself a redirect source', async () => {
+    const nextConfig = (await import('../../next.config')).default;
+    const redirects = await nextConfig.redirects!();
+    const sources = new Set(redirects.map((r) => r.source.replace(/\/$/, '')));
+    const chains = redirects
+      .filter((r) => r.destination.startsWith('/') && sources.has(r.destination.split('?')[0].replace(/\/$/, '')))
+      .map((r) => `${r.source} -> ${r.destination}`);
+    expect(chains).toEqual([]);
   });
 });

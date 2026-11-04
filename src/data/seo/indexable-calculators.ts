@@ -48,7 +48,6 @@ const BY_SEARCH_DEMAND = [
   'etf-sparplan-rechner', // 108 impr., 0 clicks
   'ewige-rente-rechner', // 50 impr., 0 clicks
   'fahrgemeinschaft-sprit-rechner', // 54 impr., 0 clicks
-  'fahrtkostenrechner', // 196 impr., 0 clicks
   'fahrzeit-rechner', // 362 impr., 0 clicks
   'flaeche-umrechner', // 125 impr., 0 clicks
   'fondue-raclette-mengen-rechner', // 83 impr., 0 clicks

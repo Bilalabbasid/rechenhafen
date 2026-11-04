@@ -2,6 +2,7 @@ import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { computeEStSingle, computeUebergangsbereich } from '@/lib/calculators/steuernGehalt';
+import { calculateDienstwagen } from '@/lib/calculators/auto';
 
 // ---------------------------------------------------------------------------
 // LKW-Maut Deutschland: Mautteilsätze in Euro je km nach Anlage 1 BFStrMG
@@ -459,14 +460,24 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     shortName: 'Dienstwagen 1%-Regelung',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
-    metaTitle: 'Dienstwagen Rechner – 1 % Regelung & geldwerter Vorteil',
-    metaDescription: 'Berechnen Sie den geldwerten Vorteil und die tatsächliche Netto-Belastung für Ihren Firmenwagen nach der 1-%-Regel (Verbrenner 1 %, Hybrid 0,5 %, Elektro 0,25 %).',
-    h1: 'Dienstwagen Rechner – 1 % Pauschalversteuerung berechnen',
-    shortDescription: 'Ermittelt den steuerpflichtigen geldwerten Vorteil für die Privatnutzung eines Dienstwagens (§ 8 Abs. 2 EStG).',
-    searchKeywords: ['dienstwagen rechner', '1 prozent regelung firmenwagen berechnen', 'geldwerter vorteil arbeitsweg 0 03 prozent', 'dienstwagen elektro 0 25'],
+    metaTitle: 'Dienstwagen-Rechner: 1-%-Regelung vs. Fahrtenbuch',
+    metaDescription: 'Kostenloser Dienstwagen-Rechner: geldwerten Vorteil nach 1-%-Regel für Verbrenner, Hybrid und E-Auto berechnen und mit dem Fahrtenbuch vergleichen.',
+    h1: 'Dienstwagen-Rechner: 1-%-Regelung berechnen und mit Fahrtenbuch vergleichen',
+    shortDescription: 'Ermittelt den geldwerten Vorteil für die private Nutzung des Firmenwagens nach der 1-%-, 0,5-%- oder 0,25-%-Regel inklusive Arbeitsweg. Auf Wunsch vergleicht er das Ergebnis mit der Fahrtenbuchmethode und zeigt, welche Variante günstiger ist.',
+    searchKeywords: [
+      'dienstwagen rechner',
+      '1 prozent regelung firmenwagen berechnen',
+      'geldwerter vorteil arbeitsweg 0 03 prozent',
+      'dienstwagen elektro 0 25',
+      'fahrtenbuch oder 1 prozent',
+      'fahrtenbuch vs 1 prozent rechner',
+      'lohnt sich fahrtenbuch dienstwagen',
+      'firmenwagen rechner',
+      'geldwerter vorteil dienstwagen berechnen',
+    ],
     inputs: [
-      { id: 'grossListPrice', label: 'Bruttolistenpreis (UVP bei Erstzulassung inkl. Sonderausstattung)', type: 'number', defaultValue: 48000, min: 5000, step: 1000, unit: '€' },
-      { id: 'distanceWorkKm', label: 'Einfache Entfernung zur ersten Tätigkeitsstätte (km)', type: 'number', defaultValue: 20, min: 0, max: 200, step: 1, unit: 'km' },
+      { id: 'grossListPrice', label: 'Bruttolistenpreis (UVP bei Erstzulassung inkl. Sonderausstattung)', type: 'number', defaultValue: 48000, min: 5000, step: 1000, unit: '€', helpText: 'Wird auf volle 100 € abgerundet. Rabatte und Gebrauchtwagenpreis spielen keine Rolle.' },
+      { id: 'distanceWorkKm', label: 'Einfache Entfernung zur ersten Tätigkeitsstätte (km)', type: 'number', defaultValue: 20, min: 0, max: 200, step: 1, unit: 'km', helpText: 'Zählt nur in vollen Kilometern.' },
       {
         id: 'carDriveType',
         label: 'Fahrzeugantrieb (Steuersatz nach § 6 Abs. 1 Nr. 4 EStG)',
@@ -475,58 +486,88 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         options: [
           { value: 'combustion', label: 'Verbrenner (1,0 % Privat + 0,03 % Arbeitsweg)' },
           { value: 'hybrid', label: 'Plug-in-Hybrid (0,5 % Privat + 0,015 % Arbeitsweg)' },
-          { value: 'electric', label: 'Reines Elektroauto bis 70.000 € (0,25 % Privat + 0,0075 % Arbeitsweg)' },
+          { value: 'electric', label: 'Reines Elektroauto (0,25 % bis 100.000 € Listenpreis, darüber 0,5 %)' },
         ],
       },
       { id: 'taxRate', label: 'Ihr persönlicher Grenzsteuersatz (inkl. Soli)', type: 'number', defaultValue: 38, min: 14, max: 45, step: 1, unit: '%' },
+      {
+        id: 'compareLogbook',
+        label: 'Mit Fahrtenbuch vergleichen',
+        type: 'boolean',
+        defaultValue: false,
+        helpText: 'Stellt der 1-%-Regelung die Fahrtenbuchmethode gegenüber und zeigt, welche Variante günstiger ist.',
+      },
+      { id: 'yearlyActualCarCosts', label: 'Gesamtkosten des Fahrzeugs pro Jahr', type: 'number', defaultValue: 10500, min: 0, step: 500, unit: '€', helpText: 'Abschreibung oder Leasingrate, Sprit bzw. Strom, Versicherung, Kfz-Steuer, Wartung, Reifen – brutto inkl. USt. Bei E-Autos und Plug-in-Hybriden Abschreibung bzw. Leasing nur anteilig ansetzen.', dependsOn: { field: 'compareLogbook', value: true } },
+      { id: 'totalYearlyKm', label: 'Gesamtfahrleistung pro Jahr', type: 'number', defaultValue: 25000, min: 0, step: 1000, unit: 'km', dependsOn: { field: 'compareLogbook', value: true } },
+      { id: 'privateSharePct', label: 'Anteil reiner Privatfahrten (ohne Arbeitsweg)', type: 'number', defaultValue: 20, min: 0, max: 100, step: 5, unit: '%', helpText: 'Laut Fahrtenbuch oder Schätzung, bezogen auf die Gesamtfahrleistung.', dependsOn: { field: 'compareLogbook', value: true } },
+      { id: 'workDays', label: 'Tage mit Fahrt zur Arbeit pro Jahr', type: 'number', defaultValue: 220, min: 0, max: 366, step: 1, unit: 'Tage', helpText: 'Jeder Tag zählt mit Hin- und Rückweg.', dependsOn: { field: 'compareLogbook', value: true } },
     ],
-    calculate: (inputs) => {
-      const price = parseFloat(inputs.grossListPrice) || 48000;
-      const km = inputs.distanceWorkKm !== undefined && inputs.distanceWorkKm !== '' ? parseFloat(inputs.distanceWorkKm) : 20;
-      const type = inputs.carDriveType || 'combustion';
-      const taxRate = (parseFloat(inputs.taxRate) || 38) / 100;
-
-      let privRate = 0.01;
-      let commuteRate = 0.0003;
-      if (type === 'hybrid') { privRate = 0.005; commuteRate = 0.00015; }
-      if (type === 'electric') { privRate = 0.0025; commuteRate = 0.000075; }
-
-      const privateBenefit = price * privRate;
-      const commuteBenefit = price * commuteRate * km;
-      const totalBenefit = privateBenefit + commuteBenefit;
-      const netCost = totalBenefit * (taxRate + 0.20); // ca. Steuersatz + ca. 20% Sozialversicherung
-
-      return {
-        primary: { id: 'totalBenefit', label: 'Monatlicher geldwerter Vorteil (brutto)', value: totalBenefit, formattedValue: formatCurrency(totalBenefit), highlight: true },
-        secondary: [
-          { id: 'netCost', label: 'Geschätzter Netto-Gehaltsabzug', value: netCost, formattedValue: formatCurrency(netCost) },
-          { id: 'privateBenefit', label: 'Anteil reine Privatnutzung', value: privateBenefit, formattedValue: formatCurrency(privateBenefit) },
-          { id: 'commuteBenefit', label: 'Anteil Fahrten Wohnung-Arbeit', value: commuteBenefit, formattedValue: formatCurrency(commuteBenefit) },
-        ],
-        summaryText: `Bei ${formatCurrency(price)} Bruttolistenpreis und ${km} km Arbeitsweg erhöht sich Ihr Steuerbrutto monatlich um ${formatCurrency(totalBenefit)}. Das kostet Sie netto ca. ${formatCurrency(netCost)} im Monat.`,
-      };
-    },
-    formula: 'Geldwerter Vorteil = BLP × Privatnutzungssatz + BLP × Arbeitswegsatz × Entfernungskilometer',
-    formulaExplanation: 'Grundlage ist stets der gerundete Bruttolistenpreis (UVP) im Zeitpunkt der Erstzulassung, selbst bei Gebrauchtwagen oder Rabatten.',
+    calculate: calculateDienstwagen,
+    formula: 'Geldwerter Vorteil = BLP × Privatnutzungssatz + BLP × Arbeitswegsatz × Entfernungskilometer | Fahrtenbuch = Gesamtkosten ÷ Gesamt-km × (Privat-km + Arbeitsweg-km)',
+    formulaExplanation: 'Grundlage ist stets der auf volle 100 € abgerundete Bruttolistenpreis (UVP) im Zeitpunkt der Erstzulassung, selbst bei Gebrauchtwagen oder Rabatten. Beim Fahrtenbuch werden die tatsächlichen Gesamtkosten im Verhältnis der privat gefahrenen Kilometer (einschließlich Arbeitsweg) zur Gesamtfahrleistung versteuert. Die Netto-Belastung ist eine grobe Schätzung mit Ihrem Grenzsteuersatz plus rund 20 % Sozialabgaben.',
     workedExample: {
       title: 'Beispiel: 48.000 € Verbrenner, 20 km Arbeitsweg',
       inputValues: [{ label: 'BLP', value: '48.000 €' }, { label: 'Entfernung', value: '20 km' }],
       steps: ['Privat: 48.000 € × 1 % = 480,00 €', 'Arbeitsweg: 48.000 € × 0,03 % × 20 = 288,00 €', 'Summe Vorteil = 768,00 € monatlich'],
       result: '768,00 € brutto geldwerter Vorteil',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Verbrenner für 48.000 €, 20 km Arbeitsweg',
+        description: 'Privatnutzung: 48.000 € × 1 % = 480,00 €. Arbeitsweg: 48.000 € × 0,03 % × 20 km = 288,00 €. Geldwerter Vorteil: 768,00 € im Monat, 9.216 € im Jahr. Bei 38 % Grenzsteuersatz kostet das netto geschätzt 445,44 € im Monat.',
+        inputs: { grossListPrice: 48000, distanceWorkKm: 20, carDriveType: 'combustion', taxRate: 38, compareLogbook: false },
+        resultSummary: '768,00 € geldwerter Vorteil pro Monat',
+      },
+      {
+        title: 'Beispiel 2: Plug-in-Hybrid für 60.000 €, 25 km Arbeitsweg',
+        description: 'Halbierter Satz: 60.000 € × 0,5 % = 300,00 €. Arbeitsweg: 60.000 € × 0,015 % × 25 km = 225,00 €. Geldwerter Vorteil: 525,00 € im Monat.',
+        inputs: { grossListPrice: 60000, distanceWorkKm: 25, carDriveType: 'hybrid', taxRate: 38, compareLogbook: false },
+        resultSummary: '525,00 € geldwerter Vorteil pro Monat',
+      },
+      {
+        title: 'Beispiel 3: Vergleich – das Fahrtenbuch ist günstiger',
+        description: 'Verbrenner, 52.000 € BLP, 18 km Arbeitsweg, 10.500 € Gesamtkosten, 25.000 km im Jahr, 20 % Privatfahrten, 220 Arbeitstage.\n- 1-%-Regelung: (520 € + 280,80 €) × 12 = 9.609,60 €\n- Fahrtenbuch: 0,42 €/km × (5.000 km privat + 7.920 km Arbeitsweg) = 5.426,40 €\n- Differenz: 4.183,20 € weniger geldwerter Vorteil, netto geschätzt 2.426,26 € im Jahr',
+        inputs: { grossListPrice: 52000, distanceWorkKm: 18, carDriveType: 'combustion', taxRate: 38, compareLogbook: true, yearlyActualCarCosts: 10500, totalYearlyKm: 25000, privateSharePct: 20, workDays: 220 },
+        resultSummary: 'Günstiger ist das Fahrtenbuch: 4.183,20 € weniger geldwerter Vorteil pro Jahr',
+      },
+      {
+        title: 'Beispiel 4: Vergleich – die 1-%-Regelung ist günstiger',
+        description: 'Verbrenner, 30.000 € BLP, 15 km Arbeitsweg, 12.000 € Gesamtkosten, 20.000 km im Jahr, 50 % Privatfahrten, 200 Arbeitstage.\n- 1-%-Regelung: (300 € + 135 €) × 12 = 5.220,00 €\n- Fahrtenbuch: 0,60 €/km × (10.000 km + 6.000 km) = 9.600,00 €\n- Die Pauschale ist 4.380,00 € günstiger, ein Fahrtenbuch lohnt sich hier nicht.',
+        inputs: { grossListPrice: 30000, distanceWorkKm: 15, carDriveType: 'combustion', taxRate: 38, compareLogbook: true, yearlyActualCarCosts: 12000, totalYearlyKm: 20000, privateSharePct: 50, workDays: 200 },
+        resultSummary: 'Günstiger ist die 1-%-Regelung: 4.380,00 € weniger geldwerter Vorteil pro Jahr',
+      },
+    ],
     content: {
-      intro: 'Die 1-Prozent-Regelung (§ 6 Abs. 1 Nr. 4 EStG) versteuert die private Nutzung eines Firmenwagens pauschal als geldwerten Vorteil.',
+      intro: 'Wer einen Firmenwagen privat nutzt, versteuert einen geldwerten Vorteil. Der Rechner ermittelt ihn nach der 1-%-Regelung, für Plug-in-Hybride mit 0,5 % und für E-Autos mit 0,25 %, jeweils inklusive Arbeitsweg. Mit einem Schalter vergleichen Sie das Ergebnis mit der Fahrtenbuchmethode. Der Rechner nennt die günstigere Variante und die Differenz pro Jahr.',
+      sections: [
+        {
+          title: 'So funktioniert die 1-%-Regelung',
+          content: 'Pro Monat werden dem steuerpflichtigen Brutto hinzugerechnet:\n- **Privatnutzung**: 1 % des Bruttolistenpreises (Plug-in-Hybrid 0,5 %, E-Auto 0,25 %).\n- **Arbeitsweg**: 0,03 % des Bruttolistenpreises je Entfernungskilometer (Hybrid 0,015 %, E-Auto 0,0075 %).\n\nMaßgeblich ist der Listenpreis bei Erstzulassung inklusive Sonderausstattung, abgerundet auf volle 100 €. Rabatte und ein günstigerer Gebrauchtwagenpreis zählen nicht. Bei 48.000 € und 20 km ergibt das 768 € im Monat.',
+        },
+        {
+          title: 'Fahrtenbuch oder 1-%-Regelung: der Vergleich',
+          content: 'Beim Fahrtenbuch versteuern Sie den tatsächlichen privaten Anteil an den Gesamtkosten. Der Rechner teilt die Jahreskosten durch die Gesamtkilometer und multipliziert mit Ihren Privat- und Arbeitswegkilometern. Arbeitswegkilometer = Arbeitstage × 2 × einfache Entfernung.\n\nDas Fahrtenbuch lohnt sich meist, wenn\n- der Listenpreis hoch ist, die laufenden Kosten aber niedrig sind,\n- Sie wenig privat fahren,\n- das Auto älter oder abgeschrieben ist.\n\nLiegt die 1-%-Pauschale über den Gesamtkosten des Fahrzeugs, wird höchstens der Betrag der Gesamtkosten versteuert (Kostendeckelung). Der Rechner berücksichtigt das und weist darauf hin. Bei E-Autos und Plug-in-Hybriden fließen Abschreibung oder Leasingrate nur anteilig in die Gesamtkosten ein.',
+        },
+        {
+          title: 'Was das Ergebnis bedeutet und was Sie jetzt tun',
+          content: 'Die Netto-Belastung ist eine grobe Schätzung: Grenzsteuersatz plus rund 20 % Sozialabgaben. Liegt Ihr Gehalt über den Beitragsbemessungsgrenzen, fallen auf den Vorteil keine oder nur teilweise Sozialabgaben an. Genauer wird es, wenn Sie den geldwerten Vorteil zu Ihrem Gehalt addieren und im [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) rechnen.\n\n- Die Methode wählen Sie für jedes Fahrzeug zu Beginn des Kalenderjahres. Ein Wechsel im laufenden Jahr ist nur beim Fahrzeugwechsel möglich.\n- Ein Fahrtenbuch muss zeitnah und lückenlos geführt werden, sonst setzt das Finanzamt die 1-%-Regel an.\n- Die jährlichen Gesamtkosten eines Autos schätzen Sie mit dem [Auto-Gesamtkosten-Rechner](/rechner/auto-gesamtkosten-rechner/).',
+        },
+      ],
       details: 'Monatlich wird 1 % des Bruttolistenpreises (UVP bei Erstzulassung inklusive Sonderausstattung, gerundet auf volle 100 €) dem steuerpflichtigen Bruttogehalt hinzugerechnet. Für Fahrten zwischen Wohnung und Arbeitsstätte kommen 0,03 % je Entfernungskilometer hinzu.',
     },
     faqs: [
-      { question: 'Welche Steuervergünstigung gilt für Elektro- und Hybrid-Dienstwagen?', answer: 'Für reine Elektroautos mit Bruttolistenpreis bis 70.000 € gilt die 0,25-%-Regel; für teurere E-Autos und qualifizierte Plug-in-Hybride (mind. 80 km elektrische Reichweite) gilt die 0,5-%-Regelung.' },
+      { question: 'Fahrtenbuch oder 1-%-Regelung – was ist günstiger?', answer: 'Das hängt vom Listenpreis, den tatsächlichen Kosten und Ihrem Privatanteil ab. Bei 52.000 € Listenpreis, 10.500 € Jahreskosten und 20 % Privatfahrten spart das Fahrtenbuch rund 4.180 € geldwerten Vorteil im Jahr. Aktivieren Sie im Rechner „Mit Fahrtenbuch vergleichen“ und tragen Sie Ihre Werte ein.' },
+      { question: 'Was zählt zu den Gesamtkosten beim Fahrtenbuch?', answer: 'Dazu gehören Abschreibung oder Leasingrate, Kraftstoff bzw. Strom, Versicherung, Kfz-Steuer, Wartung, Reparaturen und Reifen, jeweils brutto. Nicht dazu zählen zum Beispiel Maut und Parkgebühren. Bei E-Autos und Plug-in-Hybriden wird die Abschreibung bzw. Leasingrate nur anteilig angesetzt.' },
+      { question: 'Welche Steuervergünstigung gilt für Elektro- und Hybrid-Dienstwagen?', answer: 'Für reine Elektroautos gilt die 0,25-%-Regel, wenn der Bruttolistenpreis höchstens 100.000 € beträgt. Diese Grenze gilt für Fahrzeuge, die ab dem 1. Juli 2025 angeschafft wurden; davor lag sie bei 70.000 €. Teurere E-Autos und Plug-in-Hybride mit mindestens 80 km elektrischer Reichweite werden mit 0,5 % versteuert.' },
       { question: 'Gilt der Rabatt des Händlers auch für den Bruttolistenpreis?', answer: 'Nein, maßgeblich ist ausnahmslos die offizielle unverbindliche Preisempfehlung (UVP) des Herstellers zum Zeitpunkt der Erstzulassung, selbst wenn der Wagen mit 30 % Rabatt erworben wurde.' },
+      { question: 'Welche Anforderungen stellt das Finanzamt an ein ordnungsgemäßes Fahrtenbuch?', answer: 'Es muss zeitnah, fortlaufend und in geschlossener Form geführt werden. Datum, Kilometerstand vor und nach der Fahrt, Reiseziel, Zweck und aufgesuchte Geschäftspartner müssen lückenlos notiert werden.' },
+      { question: 'Kann man während des Kalenderjahres von der 1-%-Regel zum Fahrtenbuch wechseln?', answer: 'Nein, die Methode darf für dasselbe Fahrzeug nur zu Beginn des Kalenderjahres oder bei einem Fahrzeugwechsel unterjährig geändert werden.' },
     ],
-    relatedSlugs: ['dienstwagen-1-prozent-rechner', 'hybrid-auto-kosten-rechner', 'fahrtenbuch-vs-1-prozent-rechner', 'pendlerpauschale-rechner', 'kfz-steuer-rechner', 'dienstfahrrad-jobrad-rechner'],
+    relatedSlugs: ['hybrid-auto-kosten-rechner', 'brutto-netto-rechner', 'pendlerpauschale-rechner', 'auto-gesamtkosten-rechner', 'kfz-steuer-rechner', 'dienstfahrrad-jobrad-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 EStG, § 8 Abs. 2 EStG)',
+      source: 'Einkommensteuergesetz (§ 6 Abs. 1 Nr. 4 EStG, § 8 Abs. 2 EStG; Fahrtenbuchmethode nach § 8 Abs. 2 Satz 4 EStG)',
       sourceUrl: 'https://www.gesetze-im-internet.de/estg/__6.html',
       lastVerified: '2026-01-15',
     },
@@ -1381,7 +1422,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         },
         {
           title: 'Leasing versus Direktkauf: Wann lohnt sich das Dienstrad?',
-          content: 'Das Dienstrad-Leasing lohnt sich besonders durch drei Effekte:\n- **Steuer- und SV-Vorteil**: Die monatliche Netto-Belastung liegt meist 25 bis 40 Prozent unter der regulären Brutto-Rate.\n- **Integrierte Versicherung**: Diebstahl, Vandalismus und Verschleiß sind in den Leasingpaketen meist günstig mitversichert.\n- **Günstige Übernahme**: Am Ende der 36 Monate können Sie das Rad meist für ca. 15 bis 18 Prozent des Ursprungspreises privat übernehmen.\n\nPrüfen Sie Ihre Gehaltsbasis mit unserem [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) oder vergleichen Sie die Mobilitätskosten mit dem [Pendlerpauschale Rechner](/rechner/pendlerpauschale-rechner/) und dem [Fahrtkostenrechner](/rechner/fahrtkostenrechner/).',
+          content: 'Das Dienstrad-Leasing lohnt sich besonders durch drei Effekte:\n- **Steuer- und SV-Vorteil**: Die monatliche Netto-Belastung liegt meist 25 bis 40 Prozent unter der regulären Brutto-Rate.\n- **Integrierte Versicherung**: Diebstahl, Vandalismus und Verschleiß sind in den Leasingpaketen meist günstig mitversichert.\n- **Günstige Übernahme**: Am Ende der 36 Monate können Sie das Rad meist für ca. 15 bis 18 Prozent des Ursprungspreises privat übernehmen.\n\nPrüfen Sie Ihre Gehaltsbasis mit unserem [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) oder vergleichen Sie die Mobilitätskosten mit dem [Pendlerpauschale Rechner](/rechner/pendlerpauschale-rechner/) und dem [Spritkostenrechner](/rechner/spritkostenrechner/).',
         },
         {
           title: 'Einfluss von Gehalt, Steuerklasse und Arbeitgeberzuschuss',
@@ -2013,7 +2054,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       lastVerified: '2026-01-15',
     },
   },
-
+
   {
     id: 'kuendigungsfrist-arbeitnehmer-rechner',
     slug: 'kuendigungsfrist-arbeitnehmer-rechner',
@@ -2168,7 +2209,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     ],
     relatedSlugs: ['nachtzuschlag-sonntagszuschlag-rechner', 'stundenlohnrechner', 'teilzeit-gehaltsrechner', 'urlaubsabgeltung-rechner'],
   },
-
+
   {
     id: 'krankengeld-rechner',
     slug: 'krankengeld-rechner',
@@ -2775,7 +2816,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     ],
     relatedSlugs: ['stundenlohnrechner', 'teilzeit-gehaltsrechner', 'gehaltserhoehung-rechner'],
   },
-
+
   {
     id: 'urlaubsabgeltung-rechner',
     slug: 'urlaubsabgeltung-rechner',

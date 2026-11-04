@@ -1,6 +1,7 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { parseDateParts, calculateAnniversaryDate } from '@/lib/calculators/dateMath';
+import { calculateDezimalBruch, calculateProzentVergleich } from '@/lib/calculators/bruchProzent';
 
 export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
   // ==================== DATUM & ZEIT (2) ====================
@@ -172,53 +173,128 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
   {
     id: 'prozentualer-unterschied-rechner',
     slug: 'prozentualer-unterschied-rechner',
-    name: 'Prozentualer Unterschied-Rechner',
-    shortName: 'Prozentualer Unterschied',
+    name: 'Prozentuale Veränderung & prozentualer Unterschied',
+    shortName: 'Prozentuale Veränderung',
     category: 'mathematik',
     subcategory: 'Prozentrechnung',
-    metaTitle: 'Prozentualer Unterschied: Rechner für zwei Werte',
-    metaDescription: 'Berechnen Sie den prozentualen Unterschied und die relative Abweichung zwischen zwei beliebigen Zahlen schnell & online.',
-    h1: 'Prozentualer Unterschied Rechner',
-    shortDescription: 'Ermittelt den relativen Unterschied zwischen zwei Zahlen bezogen auf ihren Mittelwert oder Ausgangswert.',
-    searchKeywords: ['prozentualer unterschied rechner', 'relative abweichung berechnen', 'differenz in prozent', 'unterschied prozent berechnen'],
-    inputs: [
-      { id: 'valA', label: 'Erster Wert (A)', type: 'number', defaultValue: 80, step: 1 },
-      { id: 'valB', label: 'Zweiter Wert (B)', type: 'number', defaultValue: 100, step: 1 },
+    metaTitle: 'Prozentuale Veränderung & Unterschied berechnen',
+    metaDescription: 'Prozentuale Veränderung kostenlos berechnen: Steigerung oder Abnahme von alt zu neu, symmetrischer Unterschied und Prozentpunkte – mit Rechenweg.',
+    h1: 'Prozentuale Veränderung und prozentualen Unterschied berechnen',
+    shortDescription: 'Berechnet, um wie viel Prozent ein Wert von alt zu neu gestiegen oder gefallen ist. Zeigt zusätzlich den symmetrischen prozentualen Unterschied und bei Prozentsätzen die Differenz in Prozentpunkten.',
+    searchKeywords: [
+      'prozentuale veränderung berechnen',
+      'prozentuale veränderung rechner',
+      'prozentuale steigerung berechnen',
+      'prozentuale abnahme berechnen',
+      'prozentuale senkung',
+      'zuwachs in prozent',
+      'prozentualer unterschied rechner',
+      'prozentualer unterschied zwischen zwei zahlen',
+      'relative abweichung berechnen',
+      'differenz in prozent',
+      'unterschied prozent berechnen',
+      'prozentpunkte berechnen',
     ],
-    calculate: (inputs) => {
-      const a = inputs.valA !== undefined && inputs.valA !== '' ? parseFloat(inputs.valA) : 80;
-      const b = inputs.valB !== undefined && inputs.valB !== '' ? parseFloat(inputs.valB) : 100;
-      const diff = Math.abs(a - b);
-      const avg = (a + b) / 2;
-      if (avg === 0) return { primary: { id: 'diff', label: 'Unterschied', value: 0, formattedValue: '0 %' }, error: 'Beide Werte dürfen nicht gleichzeitig null sein.' };
-      const pctDiff = (diff / Math.abs(avg)) * 100;
-      const pctFromA = a !== 0 ? ((b - a) / Math.abs(a)) * 100 : 0;
-      return {
-        primary: { id: 'pctDiff', label: 'Symmetrischer Unterschied', value: pctDiff, formattedValue: formatPercent(pctDiff, 2), highlight: true },
-        secondary: [
-          { id: 'absDiff', label: 'Absolute Differenz', value: diff, formattedValue: formatNumber(diff, 2) },
-          { id: 'fromA', label: 'Veränderung von A zu B', value: pctFromA, formattedValue: `${pctFromA >= 0 ? '+' : ''}${formatPercent(pctFromA, 2)}` },
+    inputs: [
+      {
+        id: 'mode',
+        label: 'Was möchten Sie berechnen?',
+        type: 'select',
+        defaultValue: 'change',
+        options: [
+          { value: 'change', label: 'Prozentuale Veränderung (alt → neu)' },
+          { value: 'difference', label: 'Prozentualer Unterschied (symmetrisch)' },
         ],
-        summaryText: `Zwischen ${formatNumber(a)} und ${formatNumber(b)} besteht ein symmetrischer Unterschied von ${formatPercent(pctDiff, 2)}.`,
-      };
-    },
-    formula: 'Unterschied (%) = (|A - B| / ((A + B) / 2)) × 100',
-    formulaExplanation: 'Die relative Differenz bezogen auf den Mittelwert beider Werte ist unabhängig von der Reihenfolge symmetrisch.',
+      },
+      {
+        id: 'valA',
+        label: 'Alter Wert (Ausgangswert)',
+        type: 'number',
+        defaultValue: 80,
+        step: 0.01,
+        conditionalLabels: [{ condition: { field: 'mode', value: 'difference' }, label: 'Wert A' }],
+      },
+      {
+        id: 'valB',
+        label: 'Neuer Wert',
+        type: 'number',
+        defaultValue: 100,
+        step: 0.01,
+        conditionalLabels: [{ condition: { field: 'mode', value: 'difference' }, label: 'Wert B' }],
+      },
+      {
+        id: 'arePercentages',
+        label: 'Werte sind Prozentsätze',
+        type: 'boolean',
+        defaultValue: false,
+        helpText: 'z. B. Zinssatz von 2 % auf 3 %: zeigt zusätzlich die Differenz in Prozentpunkten.',
+      },
+    ],
+    calculate: calculateProzentVergleich,
+    formula: 'Veränderung (%) = (Neu − Alt) ÷ |Alt| × 100 | Unterschied (%) = |A − B| ÷ ((|A| + |B|) ÷ 2) × 100',
+    formulaExplanation: 'Die Veränderung bezieht die Differenz auf den alten Wert, deshalb zählt die Richtung. Der Unterschied bezieht sie auf den Mittelwert beider Beträge, deshalb ist die Reihenfolge egal.',
     workedExample: {
-      title: 'Beispiel: Wert A = 80, Wert B = 100',
-      description: 'Differenz: 20. Mittelwert: 90. Prozentualer Unterschied: 22,22 %.',
-      inputs: { valA: 80, valB: 100 },
-      resultSummary: '22,22 % Unterschied',
+      title: 'Beispiel 1: Preis steigt von 80 € auf 100 €',
+      description: 'Differenz: 100 − 80 = 20. Veränderung: 20 ÷ 80 × 100 = +25 %. Symmetrischer Unterschied: 20 ÷ 90 × 100 = 22,22 %. Der Rückweg von 100 € auf 80 € wäre −20 %.',
+      inputs: { mode: 'change', valA: 80, valB: 100, arePercentages: false },
+      resultSummary: '+25 % (Unterschied 22,22 %)',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: Preis steigt von 80 € auf 100 €',
+        description: 'Differenz: 100 − 80 = 20. Veränderung: 20 ÷ 80 × 100 = +25 %. Symmetrischer Unterschied: 20 ÷ 90 × 100 = 22,22 %. Der Rückweg von 100 € auf 80 € wäre −20 %.',
+        inputs: { mode: 'change', valA: 80, valB: 100, arePercentages: false },
+        resultSummary: '+25 % (Unterschied 22,22 %)',
+      },
+      {
+        title: 'Beispiel 2: Umsatz sinkt von 250.000 € auf 190.000 €',
+        description: 'Differenz: 190.000 − 250.000 = −60.000. Veränderung: −60.000 ÷ 250.000 × 100 = −24 %. Der Umsatz hat also um 24 % abgenommen.',
+        inputs: { mode: 'change', valA: 250000, valB: 190000, arePercentages: false },
+        resultSummary: '−24 % (Abnahme)',
+      },
+      {
+        title: 'Beispiel 3: Zinssatz steigt von 2 % auf 3 %',
+        description: 'Mit „Werte sind Prozentsätze“ zeigt der Rechner beide Sichtweisen: absolut +1 Prozentpunkt, relativ eine Steigerung um 1 ÷ 2 × 100 = +50 %.',
+        inputs: { mode: 'change', valA: 2, valB: 3, arePercentages: true },
+        resultSummary: '+50 % bzw. +1 Prozentpunkt',
+      },
+      {
+        title: 'Beispiel 4: Zwei Angebote vergleichen (450 € und 500 €)',
+        description: 'Modus „Prozentualer Unterschied“: 50 ÷ ((450 + 500) ÷ 2) × 100 = 10,53 %. Als Veränderung wären es +11,11 % von 450 auf 500 und −10 % von 500 auf 450.',
+        inputs: { mode: 'difference', valA: 450, valB: 500, arePercentages: false },
+        resultSummary: '10,53 % Unterschied',
+      },
+    ],
     content: {
-      intro: 'Der prozentuale Unterschied vergleicht zwei gleichrangige Größen symmetrisch miteinander, ohne dass eine der beiden a priori als Basis definiert ist.',
-      details: 'Die relative Differenz wird durch den Mittelwert beider Zahlen geteilt: |A - B| / ((A + B) / 2) · 100. Dadurch bleibt das prozentuale Ergebnis identisch, egal welche Zahl zuerst genannt wird.',
+      intro: 'Mit diesem Rechner berechnen Sie die prozentuale Veränderung zwischen einem alten und einem neuen Wert, also um wie viel Prozent etwas gestiegen oder gefallen ist. Zusätzlich sehen Sie den symmetrischen prozentualen Unterschied, die absolute Differenz und den Rückweg. Bei Zinsen oder Quoten zeigt er auf Wunsch die Differenz in Prozentpunkten.',
+      sections: [
+        {
+          title: 'Prozentuale Veränderung berechnen: Formel und Beispiel',
+          content: 'Die Formel lautet **(Neu − Alt) ÷ Alt × 100**. Ein positives Ergebnis ist eine Steigerung, ein negatives eine Abnahme.\n- Preis von 80 € auf 100 €: (100 − 80) ÷ 80 × 100 = **+25 %**.\n- Umsatz von 250.000 € auf 190.000 €: (190.000 − 250.000) ÷ 250.000 × 100 = **−24 %**.\n\nAchtung Basiseffekt: Der Rückweg von 100 € auf 80 € ist nur −20 %, weil die Basis jetzt 100 ist. Aus +50 % und danach −50 % wird von 100 aus nicht wieder 100, sondern 75.',
+        },
+        {
+          title: 'Veränderung oder Unterschied: Welche Zahl brauchen Sie?',
+          content: 'Die **prozentuale Veränderung** hat eine Richtung. Sie vergleicht einen neuen Wert mit einem alten, etwa Preise, Gehälter oder Umsätze über die Zeit. Der **prozentuale Unterschied** ist symmetrisch: Er teilt die Differenz durch den Mittelwert beider Werte. Das passt, wenn keiner der beiden Werte die Basis ist, etwa bei zwei Angeboten, zwei Messgeräten oder zwei Städten.\n\nBeispiel 450 € und 500 €: Der Unterschied beträgt 50 ÷ 475 × 100 = 10,53 %. Als Veränderung sind es +11,11 % (von 450 auf 500) oder −10 % (von 500 auf 450).',
+        },
+        {
+          title: 'Prozent oder Prozentpunkte?',
+          content: 'Ändern sich Werte, die selbst Prozentsätze sind, gibt es zwei Antworten. Steigt ein Zinssatz von 2 % auf 3 %, ist das ein Plus von **1 Prozentpunkt**, aber eine relative Steigerung um **50 %**. Setzen Sie das Häkchen „Werte sind Prozentsätze“, dann zeigt der Rechner beide Zahlen. Bei Arbeitslosenquoten oder Wahlergebnissen sind in den Nachrichten meist Prozentpunkte gemeint.',
+        },
+        {
+          title: 'Sonderfälle: Ausgangswert 0 und negative Werte',
+          content: 'Vom Ausgangswert 0 aus lässt sich keine prozentuale Veränderung berechnen, weil durch 0 geteilt würde. Der Rechner zeigt dann die absolute Differenz und den symmetrischen Unterschied. Bei negativen Ausgangswerten teilt er durch den Betrag, damit das Vorzeichen die Richtung behält: Von −50 auf −25 sind es +50 %. Haben die Werte unterschiedliche Vorzeichen, sind Prozentangaben nur eingeschränkt aussagekräftig.\n\nFür Prozentwert, Grundwert und Prozentsatz nutzen Sie den [Prozentrechner](/rechner/prozentrechner/).',
+        },
+      ],
     },
     faqs: [
-      { question: 'Was unterscheidet den prozentualen Unterschied von der prozentualen Veränderung?', answer: 'Die Veränderung bezieht sich strikt auf den alten Ausgangswert (Richtung zählt). Der Unterschied ist richtungsneutral und teilt durch den Mittelwert beider Zahlen.' },
-      { question: 'Wann verwendet man die symmetrische Differenz?', answer: 'In Laborvergleichen, Messreihen zweier unabhängiger Sensoren oder beim Preisvergleich zweier Konkurrenzprodukte.' },
+      { question: 'Wie berechnet man die prozentuale Veränderung?', answer: 'Ziehen Sie den alten Wert vom neuen ab, teilen Sie durch den alten Wert und multiplizieren Sie mit 100. Von 80 auf 100: 20 ÷ 80 × 100 = +25 %. Ein negatives Ergebnis bedeutet eine Abnahme.' },
+      { question: 'Wie berechne ich eine prozentuale Abnahme?', answer: 'Mit derselben Formel, das Ergebnis ist dann negativ. Sinkt der Umsatz von 250.000 € auf 190.000 €, sind das (190.000 − 250.000) ÷ 250.000 × 100 = −24 %. Man spricht von einer Abnahme um 24 %.' },
+      { question: 'Was ist der Unterschied zwischen prozentualer Veränderung und prozentualem Unterschied?', answer: 'Die Veränderung bezieht sich auf den alten Wert, die Richtung zählt. Der Unterschied bezieht sich auf den Mittelwert beider Werte und ist in beide Richtungen gleich. Für Entwicklungen über die Zeit nehmen Sie die Veränderung, für den Vergleich zweier gleichrangiger Werte den Unterschied.' },
+      { question: 'Was ist der Unterschied zwischen Prozent und Prozentpunkten?', answer: 'Prozentpunkte sind die einfache Differenz zweier Prozentsätze. Steigt eine Quote von 4 % auf 5 %, ist das 1 Prozentpunkt mehr, relativ aber 25 % mehr. Der Rechner zeigt beides, wenn Sie „Werte sind Prozentsätze“ aktivieren.' },
+      { question: 'Warum ergeben +50 % und danach −50 % nicht wieder den Ausgangswert?', answer: 'Weil sich die Basis ändert. 100 plus 50 % ergibt 150, davon 50 % abgezogen bleiben 75. Für den Rückweg von 150 auf 100 wären nur −33,33 % nötig.' },
+      { question: 'Kann man eine prozentuale Veränderung von 0 aus berechnen?', answer: 'Nein. Vom Ausgangswert 0 aus müsste durch 0 geteilt werden, das Ergebnis ist nicht definiert. Geben Sie dann die absolute Veränderung an, etwa „von 0 auf 50 Stück“. Der symmetrische Unterschied beträgt in diesem Fall immer 200 %.' },
     ],
-    relatedSlugs: ['prozentrechner', 'prozentuale-veraenderung', 'dreisatzrechner'],
+    relatedSlugs: ['prozentrechner', 'dreisatzrechner', 'promillerechner', 'inflationsrechner', 'rabattrechner'],
   },
   {
     id: 'prozent-von-prozent-rechner',
@@ -422,66 +498,125 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
   {
     id: 'dezimal-in-bruch-rechner',
     slug: 'dezimal-in-bruch-rechner',
-    name: 'Dezimalzahl in Bruch-Rechner',
-    shortName: 'Dezimal in Bruch',
+    name: 'Dezimalzahl in Bruch & Bruch in Dezimalzahl umrechnen',
+    shortName: 'Dezimal ↔ Bruch',
     category: 'mathematik',
     subcategory: 'Bruchrechnung',
-    metaTitle: 'Dezimalzahl in Bruch umrechnen: Rechner mit Kürzen',
-    metaDescription: 'Wandeln Sie Kommazahlen in exakte Brüche mit Zähler und Nenner um. Automatisches Kürzen auf den kleinsten gemeinsamen Nenner.',
-    h1: 'Dezimalzahl in Bruch Rechner (mit Kürzen)',
-    shortDescription: 'Wandelt Dezimalzahlen in vollständig gekürzte Brüche und gemischte Zahlen um.',
-    searchKeywords: ['dezimal in bruch rechner', 'kommazahl in bruch umrechnen', 'dezimalzahl als bruch', 'kommazahl kuerzen bruch'],
-    inputs: [
-      { id: 'decimalVal', label: 'Dezimalzahl (z. B. 0,75 oder 1,25)', type: 'number', defaultValue: 0.75, step: 0.01 },
+    metaTitle: 'Dezimalzahl in Bruch umrechnen – und Bruch in Dezimalzahl',
+    metaDescription: 'Kostenlos Dezimalzahl in Bruch umrechnen und Bruch in Dezimalzahl – mit Kürzen, gemischten Zahlen, Periode (0,333… = 1/3) und Rechenweg.',
+    h1: 'Dezimalzahl in Bruch umrechnen (und umgekehrt)',
+    shortDescription: 'Wandelt Dezimalzahlen in gekürzte Brüche und Brüche in Dezimalzahlen um – auch periodische Zahlen wie 0,(3), negative Werte und gemischte Zahlen.',
+    searchKeywords: [
+      'dezimalzahl in bruch',
+      'dezimal in bruch rechner',
+      'kommazahl in bruch umrechnen',
+      'dezimalzahl als bruch',
+      'bruch in dezimalzahl',
+      'bruch in dezimal rechner',
+      'bruch in kommazahl umrechnen',
+      'periodische dezimalzahl in bruch',
+      'periode in bruch umwandeln',
+      'gemischte zahl in dezimalzahl',
+      'kommazahl kürzen bruch',
     ],
-    calculate: (inputs) => {
-      const dec = parseFloat(inputs.decimalVal) || 0;
-      const sign = dec < 0 ? -1 : 1;
-      const absDec = Math.abs(dec);
-      const str = absDec.toString();
-      const parts = str.split('.');
-      let num = 0;
-      let den = 1;
-      if (parts.length > 1) {
-        const decimals = parts[1].length;
-        den = Math.pow(10, decimals);
-        num = Math.round(absDec * den);
-      } else {
-        num = Math.round(absDec);
-        den = 1;
-      }
-      function gcd(a: number, b: number): number { return b === 0 ? a : gcd(b, a % b); }
-      const g = gcd(num, den);
-      const simpNum = (num / g) * sign;
-      const simpDen = den / g;
-      const whole = Math.floor(Math.abs(simpNum) / simpDen) * sign;
-      const remNum = Math.abs(simpNum) % simpDen;
-      return {
-        primary: { id: 'fraction', label: 'Gekürzter Bruch', value: dec, formattedValue: `${simpNum} / ${simpDen}`, highlight: true },
-        secondary: [
-          { id: 'mixed', label: 'Gemischte Zahl', value: dec, formattedValue: remNum > 0 && Math.abs(whole) > 0 ? `${whole} ${remNum}/${simpDen}` : `${simpNum}/${simpDen}` },
-          { id: 'gcd', label: 'Größter gemeinsamer Teiler (ggT)', value: g, formattedValue: formatNumber(g, 0) },
+    inputs: [
+      {
+        id: 'direction',
+        label: 'Umrechnung',
+        type: 'select',
+        defaultValue: 'dec2frac',
+        options: [
+          { value: 'dec2frac', label: 'Dezimalzahl → Bruch' },
+          { value: 'frac2dec', label: 'Bruch → Dezimalzahl' },
         ],
-        summaryText: `Die Dezimalzahl ${formatNumber(dec, 4)} entspricht dem gekürzten Bruch ${simpNum} / ${simpDen}.`,
-      };
-    },
-    formula: 'Bruch = Zähler / Nenner (gekürzt durch den ggT)',
-    formulaExplanation: 'Eine Dezimalzahl mit N Nachkommastellen wird als Bruch mit Nenner 10^N geschrieben und gekürzt.',
+      },
+      {
+        id: 'decimalVal',
+        label: 'Dezimalzahl',
+        type: 'text',
+        defaultValue: '0,75',
+        placeholder: 'z. B. 0,75 · −1,25 · 0,(3)',
+        helpText: 'Periode in Klammern: 0,(3) = 0,333… und 0,1(6) = 0,1666…',
+        dependsOn: { field: 'direction', value: 'dec2frac' },
+      },
+      {
+        id: 'wholeNumber',
+        label: 'Ganze Zahl (optional, für gemischte Zahlen)',
+        type: 'number',
+        defaultValue: 0,
+        step: 1,
+        helpText: 'Bei negativen gemischten Zahlen das Minus hier eintragen (−2 3/8).',
+        dependsOn: { field: 'direction', value: 'frac2dec' },
+      },
+      { id: 'numerator', label: 'Zähler', type: 'number', defaultValue: 5, step: 1, dependsOn: { field: 'direction', value: 'frac2dec' } },
+      { id: 'denominator', label: 'Nenner', type: 'number', defaultValue: 6, step: 1, dependsOn: { field: 'direction', value: 'frac2dec' } },
+    ],
+    calculate: calculateDezimalBruch,
+    formula: 'Endlich: Ziffern ohne Komma ÷ 10^Nachkommastellen | Periodisch: (Ziffern bis Periodenende − Ziffern vor der Periode) ÷ (Neunen × 10^Vorperiode) | Bruch → Dezimalzahl: Zähler ÷ Nenner',
+    formulaExplanation: 'Eine endliche Dezimalzahl wird zum Bruch mit einer Zehnerpotenz im Nenner und dann mit dem ggT gekürzt. Bei einer Periode stehen im Nenner so viele Neunen, wie die Periode Stellen hat. In die andere Richtung teilt der Rechner Zähler durch Nenner und erkennt die Periode daran, dass sich ein Divisionsrest wiederholt.',
     workedExample: {
-      title: 'Beispiel: 0,75',
-      description: '0,75 = 75/100. Gekürzt mit 25 ergibt 3/4.',
-      inputs: { decimalVal: 0.75 },
-      resultSummary: '3/4 (vollständig gekürzt)',
+      title: 'Beispiel 1: 0,75 als Bruch',
+      description: '0,75 hat zwei Nachkommastellen: 75/100. Der ggT von 75 und 100 ist 25, gekürzt ergibt sich 3/4. In Prozent sind das 75 %.',
+      inputs: { direction: 'dec2frac', decimalVal: '0,75' },
+      resultSummary: '3/4',
     },
+    workedExamples: [
+      {
+        title: 'Beispiel 1: 0,75 als Bruch',
+        description: '0,75 hat zwei Nachkommastellen: 75/100. Der ggT von 75 und 100 ist 25, gekürzt ergibt sich 3/4. In Prozent sind das 75 %.',
+        inputs: { direction: 'dec2frac', decimalVal: '0,75' },
+        resultSummary: '3/4',
+      },
+      {
+        title: 'Beispiel 2: Periodische Zahl 0,1666… als Bruch',
+        description: 'Eingabe 0,1(6): Vorperiode 1, Periode 6. Rechnung (16 − 1) ÷ 90 = 15/90, gekürzt mit 15 ergibt 1/6.',
+        inputs: { direction: 'dec2frac', decimalVal: '0,1(6)' },
+        resultSummary: '1/6',
+      },
+      {
+        title: 'Beispiel 3: 2,125 als Bruch und gemischte Zahl',
+        description: '2,125 = 2125/1000. Gekürzt mit 125 ergibt das 17/8, als gemischte Zahl 2 1/8.',
+        inputs: { direction: 'dec2frac', decimalVal: '2,125' },
+        resultSummary: '17/8 = 2 1/8',
+      },
+      {
+        title: 'Beispiel 4: Bruch 5/6 als Dezimalzahl',
+        description: '5 ÷ 6 = 0,8333… Ab der zweiten Nachkommastelle wiederholt sich die 3, weil bei der Division immer wieder der Rest 2 entsteht. Schreibweise: 0,8(3), gerundet 0,8333333333.',
+        inputs: { direction: 'frac2dec', wholeNumber: 0, numerator: 5, denominator: 6 },
+        resultSummary: '0,8(3)',
+      },
+      {
+        title: 'Beispiel 5: Negative gemischte Zahl −2 3/8',
+        description: '−2 3/8 = −(2 × 8 + 3)/8 = −19/8. 19 ÷ 8 = 2,375, das Ergebnis ist also −2,375. Der Nenner 8 = 2 × 2 × 2 enthält nur den Faktor 2, deshalb endet die Dezimalzahl.',
+        inputs: { direction: 'frac2dec', wholeNumber: -2, numerator: 3, denominator: 8 },
+        resultSummary: '−2,375',
+      },
+    ],
     content: {
-      intro: 'Dieser Rechner transformiert endliche oder periodische Kommazahlen in exakte, vollständig gekürzte Brüche.',
-      details: 'Bei endlichen Dezimalzahlen wird die Zahl mit 10 pro Nachkommastelle erweitert (z. B. 0,75 = 75/100 = 3/4). Bei rein periodischen Zahlen wird der Periodenblock durch Neunen geteilt (0,333... = 3/9 = 1/3).',
+      intro: 'Dieser Rechner wandelt eine Dezimalzahl in einen vollständig gekürzten Bruch um und auf Wunsch einen Bruch in eine Dezimalzahl. Er versteht periodische Zahlen wie 0,(3), negative Werte und gemischte Zahlen und zeigt jeden Rechenschritt. Die Richtung wählen Sie oben im Feld „Umrechnung“.',
+      sections: [
+        {
+          title: 'Dezimalzahl in Bruch umrechnen',
+          content: 'Schreiben Sie die Zahl ohne Komma in den Zähler. In den Nenner kommt eine 1 mit so vielen Nullen, wie die Zahl Nachkommastellen hat. Danach kürzen Sie mit dem größten gemeinsamen Teiler (ggT).\n- 0,75 = 75/100 = **3/4** (gekürzt mit 25).\n- 2,125 = 2125/1000 = **17/8** = 2 1/8 (gekürzt mit 125).\n- −0,4 = −4/10 = **−2/5**.\n\nDen ggT zweier Zahlen bestimmt auch der [ggT-Rechner](/rechner/ggt-rechner/).',
+        },
+        {
+          title: 'Periodische Dezimalzahlen in Brüche umwandeln',
+          content: 'Geben Sie die Periode in Klammern ein: 0,(3) steht für 0,333…, 0,1(6) für 0,1666…. Auch „0,333…“ mit Auslassungspunkten versteht der Rechner, wenn sich die Ziffern mindestens zweimal wiederholen.\n\nDie Regel: Ziffern bis zum Ende der ersten Periode minus Ziffern vor der Periode. Das teilen Sie durch so viele Neunen, wie die Periode lang ist, mit so vielen Nullen dahinter, wie die Vorperiode lang ist.\n- 0,(3) = 3/9 = **1/3**\n- 0,1(6) = (16 − 1)/90 = 15/90 = **1/6**\n- 0,(142857) = 142857/999999 = **1/7**\n- 0,(9) = 9/9 = **1**',
+        },
+        {
+          title: 'Bruch in Dezimalzahl umrechnen',
+          content: 'Stellen Sie oben „Bruch → Dezimalzahl“ ein. Der Bruchstrich bedeutet „geteilt durch“: 3/4 = 3 ÷ 4 = 0,75. Ob das Ergebnis endet, hängt vom gekürzten Nenner ab. Enthält er nur die Primfaktoren 2 und 5, endet die Dezimalzahl (3/8 = 0,375). Sonst entsteht eine Periode (5/6 = 0,8333… = 0,8(3)). Der Rechner markiert die Periode mit einem Strich über den Ziffern.\n\nFür gemischte Zahlen tragen Sie die ganze Zahl separat ein: 2 1/4 = 2,25. Bei negativen gemischten Zahlen gehört das Minus vor die ganze Zahl: −2 3/8 = −2,375. Brüche addieren oder multiplizieren Sie im [Bruchrechner](/rechner/bruchrechner/).',
+        },
+      ],
     },
     faqs: [
-      { question: 'Wie wandelt man 0,125 in einen Bruch um?', answer: '0,125 hat drei Nachkommastellen, also 125/1000. Geteilt durch den ggT 125 ergibt das exakt 1/8.' },
-      { question: 'Warum entspricht die Periode 0,999... exakt der ganzen Zahl 1?', answer: 'Weil 1/3 = 0,333... ist. Multipliziert man beide Seiten mit 3, folgt 3 × (1/3) = 1 und 3 × 0,333... = 0,999...; daher ist 0,999... = 1.' },
+      { question: 'Wie wandelt man eine Dezimalzahl in einen Bruch um?', answer: 'Schreiben Sie die Ziffern ohne Komma über eine Zehnerpotenz mit so vielen Nullen, wie es Nachkommastellen gibt, und kürzen Sie. 0,125 = 125/1000, gekürzt mit 125 ergibt 1/8.' },
+      { question: 'Wie wandelt man einen Bruch in eine Dezimalzahl um?', answer: 'Teilen Sie den Zähler durch den Nenner. 7/8 = 7 ÷ 8 = 0,875. Bei gemischten Zahlen addieren Sie die ganze Zahl: 2 1/4 = 2 + 0,25 = 2,25.' },
+      { question: 'Wie schreibt man 0,333… als Bruch?', answer: 'Die Periode 3 hat eine Stelle, also teilen Sie 3 durch 9: 0,333… = 3/9 = 1/3. Im Rechner geben Sie dafür 0,(3) oder 0,333… ein.' },
+      { question: 'Woran erkennt man, ob ein Bruch eine periodische Dezimalzahl ergibt?', answer: 'Kürzen Sie den Bruch vollständig und zerlegen Sie den Nenner in Primfaktoren. Kommen nur 2 und 5 vor, endet die Dezimalzahl, z. B. 3/20 = 0,15. Jeder andere Primfaktor erzeugt eine Periode, z. B. 1/7 = 0,(142857).' },
+      { question: 'Ist 0,999… wirklich gleich 1?', answer: 'Ja. Nach der Periodenregel ist 0,(9) = 9/9 = 1. Anders gesagt: 1/3 = 0,333…, und dreimal 0,333… ergibt 0,999… = 3/3 = 1.' },
     ],
-    relatedSlugs: ['bruch-in-dezimal-rechner', 'bruchrechner', 'ggt-rechner'],
+    relatedSlugs: ['bruchrechner', 'ggt-rechner', 'kgv-rechner', 'prozentrechner', 'promillerechner'],
   },
   {
     id: 'kubikwurzel-rechner',

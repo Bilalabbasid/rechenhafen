@@ -356,7 +356,8 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
         hipCm: '0',
         gender: 'female',
       });
-      expect(res?.error).toBeUndefined();
+      // Seit der Zusammenführung mit dem WHtR-Rechner: klare Fehlermeldung statt Ersatzwert
+      expect(res?.error).toContain('Hüftumfang');
       expect(Number.isFinite(res?.primary.value)).toBe(true);
     });
 

@@ -84,11 +84,6 @@ const CATEGORY_FOCUS_MAP: Record<string, { title: string; subtitle: string; item
         name: 'Fundament Rechner',
         shortDesc: 'Frostfreie Streifen- und Punktfundamente mit Erdaushub und Betonbedarf dimensionieren.',
       },
-      {
-        slug: 'beton-mischungsverhaeltnis-rechner',
-        name: 'Beton-Mischungsverhältnis',
-        shortDesc: 'Exakte Anteile von Zement, Sand, Kies und Wasser für Standardmischungen ermitteln.',
-      },
     ],
   },
 };

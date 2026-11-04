@@ -252,9 +252,10 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
     it('verifies Tagerechner has exact required SEO title, meta description, and H1', () => {
       const calc = getCalculatorBySlug('tage-zwischen-zwei-daten');
       expect(calc).toBeDefined();
-      expect(calc?.metaTitle).toBe('Tagerechner: Tage zwischen zwei Daten berechnen');
+      // Updated 5 Nov 2026: page absorbed wochen-/monate-zwischen-daten and countdown-rechner (Sie-form, weeks & months in title)
+      expect(calc?.metaTitle).toBe('Tagerechner: Tage, Wochen & Monate zwischen zwei Daten');
       expect(calc?.metaDescription).toBe(
-        'Mit dem Tagerechner berechnest du Tage, Wochen sowie volle Jahre, Monate und Tage zwischen zwei Daten – bis oder seit einem Datum.'
+        'Kostenloser Tagerechner: Tage, Wochen und Monate zwischen zwei Daten zählen – auch bis oder seit heute, mit Countdown in Stunden und Minuten.'
       );
       expect(calc?.h1).toBe('Tagerechner: Tage zwischen zwei Daten berechnen');
     });
@@ -272,7 +273,7 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
 
       const metaTage = await generateCalcMetadata({ params: Promise.resolve({ slug: 'tage-zwischen-zwei-daten' }) });
       const renderedTage = template.replace('%s', metaTage.title as string);
-      expect(renderedTage).toBe('Tagerechner: Tage zwischen zwei Daten berechnen | RechenHafen');
+      expect(renderedTage).toBe('Tagerechner: Tage, Wochen & Monate zwischen zwei Daten | RechenHafen');
       expect(renderedTage).not.toContain('RechenHafen | RechenHafen');
 
       const metaXmas = await generateCalcMetadata({ params: Promise.resolve({ slug: 'tage-bis-weihnachten' }) });
@@ -372,31 +373,30 @@ describe('Tagerechner & Date-Calculator Cluster Verification', () => {
       const tagerechner = getCalculatorBySlug('tage-zwischen-zwei-daten');
       expect(tagerechner?.relatedSlugs).toContain('tage-bis-weihnachten');
       expect(tagerechner?.relatedSlugs).toContain('arbeitstage-rechner');
-      expect(tagerechner?.relatedSlugs).toContain('werktage-rechner');
+      // werktage-rechner and datum-minus-tage were merged (5 Nov 2026) into arbeitstage-rechner / datum-plus-tage
+      expect(tagerechner?.relatedSlugs).not.toContain('werktage-rechner');
       expect(tagerechner?.relatedSlugs).toContain('datum-plus-tage');
-      expect(tagerechner?.relatedSlugs).toContain('datum-minus-tage');
+      expect(tagerechner?.relatedSlugs).not.toContain('datum-minus-tage');
       expect(tagerechner?.relatedSlugs).toContain('altersrechner');
       expect(tagerechner?.relatedSlugs).toContain('tage-bis-geburtstag');
       expect(tagerechner?.relatedSlugs).toContain('schaltjahr-rechner');
 
       const xmas = getCalculatorBySlug('tage-bis-weihnachten');
       expect(xmas?.relatedSlugs).toContain('tage-zwischen-zwei-daten');
-      expect(xmas?.relatedSlugs).toContain('countdown-rechner');
+      expect(xmas?.relatedSlugs).not.toContain('countdown-rechner'); // merged into tage-zwischen-zwei-daten
       expect(xmas?.relatedSlugs).toContain('tage-bis-geburtstag');
       expect(xmas?.content?.details).toContain('/datum-zeit/');
-      expect(xmas?.content?.details).toContain('/rechner/countdown-rechner/');
+      expect(xmas?.content?.details).not.toContain('/rechner/countdown-rechner/'); // retired, no stale links
       expect(xmas?.content?.details).toContain('/rechner/tage-bis-geburtstag/');
       expect(xmas?.content?.details).toContain('/rechner/tage-zwischen-zwei-daten/');
 
       const arbeitstage = getCalculatorBySlug('arbeitstage-rechner');
       expect(arbeitstage?.relatedSlugs).toContain('tage-zwischen-zwei-daten');
-      expect(arbeitstage?.relatedSlugs).toContain('werktage-rechner');
+      expect(arbeitstage?.relatedSlugs).not.toContain('werktage-rechner');
       expect(arbeitstage?.content?.details).toContain('Unterschied zwischen Arbeitstagen und Werktagen');
-
-      const werktage = getCalculatorBySlug('werktage-rechner');
-      expect(werktage?.relatedSlugs).toContain('tage-zwischen-zwei-daten');
-      expect(werktage?.relatedSlugs).toContain('arbeitstage-rechner');
-      expect(werktage?.content?.details).toContain('Werktage vs. Arbeitstage nach deutschem Recht');
+      // The Werktage page is merged: its URL 301s to the Arbeitstage page, which has a Mo–Sa option.
+      expect(getCalculatorBySlug('werktage-rechner')).toBeUndefined();
+      expect(arbeitstage?.inputs.find((i) => i.id === 'workweek')?.options?.map((o) => o.value)).toContain('mo-sa');
     });
   });
 });

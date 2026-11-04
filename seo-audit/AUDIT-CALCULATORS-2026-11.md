@@ -1,6 +1,6 @@
 # RechenHafen calculator audit – November 2026
 
-**Status:** Plan only. Nothing on the site was changed by this audit.
+**Status:** Carried out on 5 Nov 2026, at the owner's decision, all at once rather than in the batches of section 9. Two merges were flipped so the stronger URL survives. `cups-in-gramm-rechner` was kept, and two more merges were added: Mietbelastungsquote → Mietbudget and Beton-Mischungsverhältnis → Betonrechner. Exact record: [MERGES-2026-11.md](MERGES-2026-11.md).
 **Data:** Google Search Console, Web search, 6 Oct – 2 Nov 2026 (28 days; the sitewide drop happened on 23 Oct, so most impressions come from the 17 days before it).
 **Scope:** the 338 live calculators after the 5 Nov retirement of 70 zero-impression calculators.
 **Full table:** [`calculator-audit-2026-11.csv`](calculator-audit-2026-11.csv) – one row per calculator with numbers, decision, target and reason.
