@@ -21,6 +21,8 @@ import styles from '@/styles/layout.module.css';
 import { ShieldCheck, Info, AlertCircle } from 'lucide-react';
 
 import { formatMetaTitle } from '@/lib/seo/title';
+import { AUTHOR_DISPLAY_NAME, authorSchema } from '@/config/site-owner';
+import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -51,6 +53,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: canonicalUrl,
     },
+    // Thin/low-demand calculators stay usable but are kept out of Google's index (see indexable-calculators.ts).
+    ...(isCalculatorIndexable(calc.slug)
+      ? {}
+      : { robots: { index: false, follow: true, googleBot: { index: false, follow: true } } }),
     openGraph: {
       title: cleanTitle,
       description: calc.metaDescription,
@@ -95,10 +101,11 @@ export default async function CalculatorPage({ params }: PageProps) {
 
   const cleanTitle = formatMetaTitle(calc.metaTitle);
   const canonicalUrl = `https://rechenhafen.de/rechner/${calc.slug}/`;
+  // Only show a "Stand" date that is actually recorded for this calculator – never an invented default.
   const lastModified =
     calc.timeSensitiveMeta?.lastVerified ||
     calc.trustMeta?.lastReviewed ||
-    '2026-01-01';
+    undefined;
 
   // Structured Data Graph: WebPage + WebApplication/SoftwareApplication
   const structuredDataGraph = {
@@ -119,11 +126,7 @@ export default async function CalculatorPage({ params }: PageProps) {
           '@type': 'Thing',
           name: calc.shortName || calc.name,
         },
-        author: {
-          '@type': 'Person',
-          name: '[FILL: real editor/founder name]',
-          url: 'https://rechenhafen.de/ueber-uns/',
-        },
+        author: authorSchema(),
         publisher: {
           '@type': 'Organization',
           name: 'RechenHafen',
@@ -276,7 +279,7 @@ export default async function CalculatorPage({ params }: PageProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: 'var(--space-3)', fontSize: '0.85rem', color: 'var(--color-text-muted)', flexWrap: 'wrap' }}>
           <span>Erstellt und gepflegt von</span>
           <Link href="/ueber-uns/" style={{ color: 'var(--color-text-primary)', fontWeight: 600, textDecoration: 'underline' }}>
-            [FILL: real editor/founder name]
+            {AUTHOR_DISPLAY_NAME}
           </Link>
           {lastModified && (
             <>

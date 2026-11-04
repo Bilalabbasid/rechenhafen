@@ -1,3 +1,4 @@
+import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
@@ -10,7 +11,7 @@ describe('New Query-Led Articles & Bidirectional Linking QA', () => {
     expect(article).toBeDefined();
     expect(article?.slug).toBe('splitt-2-5-gewicht-schuettdichte');
     expect(article?.category).toBe('bauen-renovieren');
-    expect(article?.author.name).toBe('[FILL: real editor/founder name]');
+    expect(article?.author.name).toBe(AUTHOR_DISPLAY_NAME);
     expect(article?.reviewer).toBeUndefined();
     expect(article?.publishedAt).toBe('2026-10-18');
     expect(article?.updatedAt).toBe('2026-10-18');
@@ -36,7 +37,7 @@ describe('New Query-Led Articles & Bidirectional Linking QA', () => {
     expect(article).toBeDefined();
     expect(article?.slug).toBe('lebensmonate-berechnen');
     expect(article?.category).toBe('datum-zeit');
-    expect(article?.author.name).toBe('[FILL: real editor/founder name]');
+    expect(article?.author.name).toBe(AUTHOR_DISPLAY_NAME);
     expect(article?.reviewer).toBeUndefined();
     expect(article?.publishedAt).toBe('2026-10-18');
     expect(article?.updatedAt).toBe('2026-10-18');

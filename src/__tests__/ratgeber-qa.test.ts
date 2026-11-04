@@ -1,3 +1,4 @@
+import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
 import { describe, it, expect } from 'vitest';
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
 import { getCalculatorBySlug } from '@/data/calculators';
@@ -107,7 +108,7 @@ describe('RechenHafen Ratgeber / Blog QA Verification', () => {
     for (const art of [erythritArticle, heizoelArticle]) {
       expect(art.reviewer).toBeUndefined();
       expect(JSON.stringify(art.author)).not.toContain('Fachredaktion');
-      expect(art.author.name).toBe('[FILL: real editor/founder name]');
+      expect(art.author.name).toBe(AUTHOR_DISPLAY_NAME);
     }
   });
 });

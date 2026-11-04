@@ -5,6 +5,7 @@ import nextConfig from '../../next.config';
 import { ALL_CALCULATORS, getCalculatorBySlug } from '@/data/calculators';
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
 import sitemap from '@/app/sitemap';
+import { INDEXABLE_CALCULATOR_SLUGS, isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 
 describe('SEO & 301 Redirects Verification', () => {
   it('has configured permanent 301 redirect for old kalorienbedarfrechner URL in next.config.ts', async () => {
@@ -371,8 +372,8 @@ describe('SEO & 301 Redirects Verification', () => {
       expect(sitemapSet.has(catUrl), `Missing category in sitemap: ${catUrl}`).toBe(true);
     }
 
-    // 3. All registered calculators present
-    for (const calc of ALL_CALCULATORS) {
+    // 3. All indexable calculators present (noindex calculators are deliberately excluded)
+    for (const calc of ALL_CALCULATORS.filter((c) => isCalculatorIndexable(c.slug))) {
       const calcUrl = `https://rechenhafen.de/rechner/${calc.slug}/`;
       expect(sitemapSet.has(calcUrl), `Missing calculator in sitemap: ${calcUrl}`).toBe(true);
     }
@@ -385,7 +386,7 @@ describe('SEO & 301 Redirects Verification', () => {
     }
 
     // 5. Total count exact match (7 static + 17 categories + 421 calculators + 16 articles = 461)
-    const expectedTotal = 7 + CATEGORIES.length + ALL_CALCULATORS.length + articles.length;
+    const expectedTotal = 7 + CATEGORIES.length + INDEXABLE_CALCULATOR_SLUGS.size + articles.length;
     expect(sitemapEntries.length).toBe(expectedTotal);
     expect(sitemapSet.size).toBe(expectedTotal);
 
@@ -429,7 +430,9 @@ describe('SEO & 301 Redirects Verification', () => {
       'https://rechenhafen.de/rechner/bausteine-mauerwerk-rechner/',
     ];
     for (const ku of keyUrls) {
-      expect(sitemapSet.has(ku), `Expected key URL missing from sitemap: ${ku}`).toBe(true);
+      const calcSlug = ku.match(/\/rechner\/([^/]+)\/$/)?.[1];
+      const shouldBeListed = calcSlug ? isCalculatorIndexable(calcSlug) : true;
+      expect(sitemapSet.has(ku), `Key URL sitemap state mismatch: ${ku}`).toBe(shouldBeListed);
     }
 
     // 8. Verify specific redirected URLs are excluded

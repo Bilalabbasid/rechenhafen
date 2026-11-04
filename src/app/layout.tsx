@@ -4,6 +4,7 @@ import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
 import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import CookieConsentBanner from '@/components/common/CookieConsentBanner';
+import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -19,8 +20,8 @@ export const metadata: Metadata = {
     template: '%s | RechenHafen',
   },
   description:
-    'RechenHafen ist die führende deutsche Plattform für über 400 präzise Online-Rechner: Finanzen, Zinseszins, Spritkosten, Alter, BMI, Steuern, Bauen und Alltag.',
-  authors: [{ name: '[FILL: real editor/founder name]', url: 'https://rechenhafen.de/ueber-uns/' }],
+    'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+  authors: [{ name: AUTHOR_DISPLAY_NAME, url: 'https://rechenhafen.de/ueber-uns/' }],
   creator: 'RechenHafen',
   publisher: 'RechenHafen',
   formatDetection: {

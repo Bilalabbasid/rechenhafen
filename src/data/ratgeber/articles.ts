@@ -1,3 +1,4 @@
+import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
 import { RatgeberArticle } from '@/types/ratgeber';
 
 export const RATGEBER_ARTICLES: RatgeberArticle[] = [
@@ -13,7 +14,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 6,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -171,7 +172,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-12',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -306,7 +307,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -454,7 +455,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -602,7 +603,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-20',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -741,7 +742,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-21',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -883,7 +884,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-21',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -1018,7 +1019,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-22',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -1153,7 +1154,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-22',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -1288,7 +1289,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-22',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -1427,7 +1428,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-09-26',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -1612,7 +1613,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-02',
     readingTimeMin: 6,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -1795,7 +1796,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-02',
     readingTimeMin: 6,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -1962,7 +1963,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-03',
     readingTimeMin: 5,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -2150,7 +2151,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-03',
     readingTimeMin: 6,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -2356,7 +2357,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-05',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -2559,7 +2560,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -2737,7 +2738,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -2923,7 +2924,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -3104,7 +3105,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 360,
     },
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -3275,7 +3276,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 450,
     },
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -3433,7 +3434,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       height: 480,
     },
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -3596,7 +3597,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-26',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -3852,7 +3853,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-26',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -4082,7 +4083,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-26',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     coverIllustration: {
@@ -4318,7 +4319,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -4471,7 +4472,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -4614,7 +4615,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -4753,7 +4754,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -4896,7 +4897,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 7,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:
@@ -5031,7 +5032,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     updatedAt: '2026-10-29',
     readingTimeMin: 8,
     author: {
-      name: '[FILL: real editor/founder name]',
+      name: AUTHOR_DISPLAY_NAME,
       role: 'Redaktion RechenHafen',
     },
     summary:

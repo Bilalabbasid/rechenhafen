@@ -9,6 +9,7 @@ import { metadata as impressumMetadata } from '@/app/impressum/page';
 import { metadata as datenschutzMetadata } from '@/app/datenschutz/page';
 import { metadata as notFoundMetadata } from '@/app/not-found';
 import sitemap from '@/app/sitemap';
+import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 import { ALL_CALCULATORS } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
 import { getAllArticles } from '@/data/ratgeber/articles';
@@ -103,9 +104,9 @@ describe('Google SEO Starter Guide Compliance & Quality Suite', () => {
         expect(urls.has(`https://rechenhafen.de/${cat.slug}/`)).toBe(true);
       }
 
-      // Calculators
+      // Calculators: indexable ones are listed, noindex ones are not
       for (const calc of ALL_CALCULATORS) {
-        expect(urls.has(`https://rechenhafen.de/rechner/${calc.slug}/`)).toBe(true);
+        expect(urls.has(`https://rechenhafen.de/rechner/${calc.slug}/`)).toBe(isCalculatorIndexable(calc.slug));
       }
 
       // Ratgeber

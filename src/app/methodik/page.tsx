@@ -6,6 +6,7 @@ import styles from '@/styles/layout.module.css';
 import { LEGAL_VALUES_2026, LegalConstant } from '@/legal/de';
 import { CheckCircle2, AlertTriangle, BookOpen, ExternalLink, HelpCircle, Mail, Clock, ShieldAlert, Cpu } from 'lucide-react';
 
+import { SITE_OWNER } from '@/config/site-owner';
 export const metadata: Metadata = {
   title: 'Wie wir rechnen: Methodik, Datenquellen & Grenzen',
   description: 'Transparenz bei RechenHafen: Woher unsere Zahlen stammen, wie Formeln getestet werden, wann Gesetzeswerte aktualisiert werden und wo die Grenzen eines Online-Rechners liegen.',
@@ -302,6 +303,8 @@ export default function MethodikPage() {
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
             5. Fehler melden &amp; Änderungsprotokoll
           </h2>
+          {SITE_OWNER.contactEmail ? (
+            <>
           <p>
             Transparenz bedeutet für uns auch, offen mit Fehlern oder veränderten Rechtslagen umzugehen. Sollten Sie in einer Formel, einer Quellenangabe oder einem Rechnertext eine Unstimmigkeit feststellen, bitten wir um Ihren Hinweis:
           </p>
@@ -317,7 +320,7 @@ export default function MethodikPage() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Mail size={18} style={{ color: 'var(--color-primary)' }} />
-              <span><strong>Redaktionskontakt:</strong> [FILL: feedback-email z. B. redaktion@rechenhafen.de]</span>
+              <span><strong>Redaktionskontakt:</strong> <a href={`mailto:${SITE_OWNER.contactEmail}`} style={{ color: 'var(--color-primary)' }}>{SITE_OWNER.contactEmail}</a></span>
             </div>
             <div>
               <strong>Unser Qualitätsversprechen:</strong>
@@ -326,6 +329,12 @@ export default function MethodikPage() {
               </p>
             </div>
           </div>
+            </>
+          ) : (
+            <p>
+              Transparenz bedeutet für uns auch, offen mit Fehlern oder veränderten Rechtslagen umzugehen. Wenn sich eine Rechtslage oder ein amtlicher Wert ändert, passen wir den betroffenen Rechner an und vermerken das Datum der Prüfung auf der jeweiligen Seite.
+            </p>
+          )}
         </section>
       </article>
     </div>

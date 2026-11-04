@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { ALL_CALCULATORS } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
 import { getAllArticles } from '@/data/ratgeber/articles';
+import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://rechenhafen.de';
@@ -46,8 +47,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: platformUpdateDate,
   }));
 
-  // 408 Rechnerseiten (schließt die 16 auf 301-Weiterleitung gesetzten Duplikate automatisch aus)
-  const calculatorPages: MetadataRoute.Sitemap = ALL_CALCULATORS.map((calc) => {
+  // Nur indexierbare Rechnerseiten (noindex-Seiten gehören nicht in die Sitemap, siehe indexable-calculators.ts)
+  const calculatorPages: MetadataRoute.Sitemap = ALL_CALCULATORS.filter((calc) =>
+    isCalculatorIndexable(calc.slug),
+  ).map((calc) => {
     const lastRev = calc.trustMeta?.lastReviewed || calc.timeSensitiveMeta?.lastVerified;
     return {
       url: `${baseUrl}/rechner/${calc.slug}/`,

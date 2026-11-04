@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import styles from '@/styles/layout.module.css';
+import { SITE_OWNER } from '@/config/site-owner';
 import { Anchor, ShieldCheck, Cpu, BookOpen, AlertCircle, RefreshCw, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -33,14 +34,11 @@ export default function UeberUnsPage() {
       name: 'RechenHafen',
       url: 'https://rechenhafen.de',
       logo: 'https://rechenhafen.de/icon.svg',
-      email: 'kontakt@rechenhafen.de',
-      founder: {
-        '@type': 'Person',
-        name: '[FILL: founder name]',
-      },
-      sameAs: [
-        '[FILL: real profiles if any, z. B. LinkedIn/GitHub/X oder leer lassen]',
-      ],
+      ...(SITE_OWNER.contactEmail ? { email: SITE_OWNER.contactEmail } : {}),
+      ...(SITE_OWNER.editorName.trim()
+        ? { founder: { '@type': 'Person', name: SITE_OWNER.editorName.trim() } }
+        : {}),
+      ...(SITE_OWNER.editorProfiles.length > 0 ? { sameAs: SITE_OWNER.editorProfiles } : {}),
       publishingPrinciples: 'https://rechenhafen.de/ueber-uns/#methodik',
       description: 'Unabhängige deutsche Informationsplattform für verifizierte Online-Rechner auf Basis amtlicher Gesetze, BMF-Standards und DIN-Normen.',
     },
@@ -82,12 +80,14 @@ export default function UeberUnsPage() {
           <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-primary)', marginBottom: 'var(--space-3)' }}>
             Wer hinter RechenHafen steht
           </h2>
-          <p>
-            RechenHafen wird betrieben von <strong>[FILL: founder name]</strong>.
-          </p>
-          <p style={{ marginTop: 'var(--space-2)' }}>
-            <em>[FILL: founder name + 2–3 sentences of real background, z. B. beruflicher Hintergrund in Softwareentwicklung, Wirtschaftsmathematik oder Datenanalyse, Motivation zur Gründung der Plattform und Vision einer barrierefreien, datenschutzfreundlichen Rechner-Sammlung für Deutschland].</em>
-          </p>
+          {SITE_OWNER.editorName.trim() && (
+            <p>
+              RechenHafen wird betrieben von <strong>{SITE_OWNER.editorName.trim()}</strong>.
+            </p>
+          )}
+          {SITE_OWNER.editorBio.trim() && (
+            <p style={{ marginTop: 'var(--space-2)' }}>{SITE_OWNER.editorBio.trim()}</p>
+          )}
           <p style={{ marginTop: 'var(--space-2)' }}>
             <strong>Warum RechenHafen existiert:</strong> Viele bestehende Rechner im deutschsprachigen Internet sind mit aufdringlicher Werbung überladen, verlangen unnötige Kontaktdaten für einfache Rechenergebnisse oder basieren auf veralteten Gesetzesständen. RechenHafen wurde geschaffen, um allen Bürgern, Selbstständigen und Fachkräften eine verlässliche Orientierung zu bieten: kostenlose, transparente Berechnungen direkt im Browser, ohne Datenspeicherung und mit klar nachvollziehbaren Formeln.
           </p>
@@ -155,6 +155,7 @@ export default function UeberUnsPage() {
         </section>
 
         {/* 3. Error reporting */}
+        {SITE_OWNER.contactEmail && (
         <section style={{ marginBottom: 'var(--space-8)', background: 'var(--color-surface-subtle)', padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
             <Mail size={24} style={{ color: 'var(--color-primary)' }} />
@@ -166,12 +167,13 @@ export default function UeberUnsPage() {
             Trotz sorgfältiger Recherche und automatisierter Tests können sich Gesetzesfassungen ändern oder Einzelfall-Konstellationen auftreten. Wenn Ihnen eine Unstimmigkeit, ein veralteter Wert oder ein Rundungsfehler auffällt, freuen wir uns über Ihren Hinweis:
           </p>
           <p style={{ margin: 'var(--space-3) 0 0', fontWeight: 600 }}>
-            E-Mail: <a href="mailto:kontakt@rechenhafen.de" style={{ color: 'var(--color-primary)' }}>kontakt@rechenhafen.de</a>
+            E-Mail: <a href={`mailto:${SITE_OWNER.contactEmail}`} style={{ color: 'var(--color-primary)' }}>{SITE_OWNER.contactEmail}</a>
           </p>
           <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 'var(--space-2) 0 0' }}>
             Bitte geben Sie die betroffene Rechner-URL sowie die konkreten Eingabewerte an. Jeder Hinweis wird manuell anhand der jeweiligen Primärquelle verifiziert, behoben und im Änderungsprotokoll dokumentiert.
           </p>
         </section>
+        )}
 
         {/* 4. Public Korrekturen / Änderungsprotokoll */}
         <section style={{ marginBottom: 'var(--space-8)' }}>
@@ -218,7 +220,7 @@ export default function UeberUnsPage() {
         {/* 5. Legal disclaimers link */}
         <section style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-6)' }}>
           <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
-            Die rechtlichen Pflichtangaben des Diensteanbieters finden Sie im <Link href="/impressum/" style={{ color: 'var(--color-primary)' }}>Impressum</Link>. Einzelheiten zur Datenverarbeitung erläutert unsere <Link href="/datenschutz/" style={{ color: 'var(--color-primary)' }}>Datenschutzerklärung</Link>.
+            Rechtliche Hinweise finden Sie im <Link href="/impressum/" style={{ color: 'var(--color-primary)' }}>Impressum</Link>. Einzelheiten zur Datenverarbeitung erläutert unsere <Link href="/datenschutz/" style={{ color: 'var(--color-primary)' }}>Datenschutzerklärung</Link>.
           </p>
         </section>
       </article>

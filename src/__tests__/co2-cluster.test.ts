@@ -1,3 +1,4 @@
+import { AUTHOR_DISPLAY_NAME } from '@/config/site-owner';
 import { describe, it, expect } from 'vitest';
 import { EMISSION_FACTORS, getFactor, REMOVED_UNVERIFIED_FACTORS, CO2_PRICE_2026_CORRIDOR } from '@/data/emissions';
 import {
@@ -598,7 +599,7 @@ describe('CO2 Calculator Cluster Comprehensive Regression & Legal Verification S
       for (const slug of expectedSlugs) {
         const article = getArticleBySlug(slug);
         expect(article, `Article ${slug} must be registered`).toBeDefined();
-        expect(article?.author.name).toBe('[FILL: real editor/founder name]');
+        expect(article?.author.name).toBe(AUTHOR_DISPLAY_NAME);
         expect(article?.reviewer).toBeUndefined();
         expect(article?.sections.length).toBeGreaterThanOrEqual(3);
         expect(article?.faqs.length).toBeGreaterThanOrEqual(2);

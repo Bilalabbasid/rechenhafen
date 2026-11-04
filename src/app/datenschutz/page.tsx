@@ -2,6 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import Breadcrumbs from '@/components/calculator/Breadcrumbs';
 import styles from '@/styles/layout.module.css';
+import { SITE_OWNER } from '@/config/site-owner';
 
 export const metadata: Metadata = {
   title: 'Datenschutzerklärung',
@@ -48,11 +49,13 @@ export default function DatenschutzPage() {
             2. Verantwortliche Stelle
           </h2>
           <p>
-            Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO):<br />
-            RechenHafen Digital<br />
-            Musterstraße 42<br />
-            20457 Hamburg<br />
-            E-Mail: <a href="mailto:datenschutz@rechenhafen.de" style={{ color: 'var(--color-primary)' }}>datenschutz@rechenhafen.de</a>
+            Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist der Betreiber der Website rechenhafen.de.
+            {SITE_OWNER.impressum.name && (<><br />{SITE_OWNER.impressum.name}</>)}
+            {SITE_OWNER.impressum.street && (<><br />{SITE_OWNER.impressum.street}</>)}
+            {SITE_OWNER.impressum.city && (<><br />{SITE_OWNER.impressum.city}</>)}
+            {SITE_OWNER.contactEmail && (
+              <><br />E-Mail: <a href={`mailto:${SITE_OWNER.contactEmail}`} style={{ color: 'var(--color-primary)' }}>{SITE_OWNER.contactEmail}</a></>
+            )}
           </p>
         </section>
 

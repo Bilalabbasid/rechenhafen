@@ -10,6 +10,7 @@ import ArticleFaqAccordion from '@/components/ratgeber/ArticleFaqAccordion';
 import TableOfContents from '@/components/ratgeber/TableOfContents';
 import GasClusterLinks from '@/components/calculator/GasClusterLinks';
 import styles from '@/styles/ratgeber.module.css';
+import { authorSchema } from '@/config/site-owner';
 import {
   Calendar,
   Clock,
@@ -126,11 +127,7 @@ export default async function RatgeberArticlePage({ params }: PageProps) {
       '@type': 'WebPage',
       '@id': `https://rechenhafen.de/ratgeber/${article.slug}/`,
     },
-    author: {
-      '@type': 'Person',
-      name: article.author.name,
-      url: 'https://rechenhafen.de/ueber-uns/',
-    },
+    author: authorSchema(),
     publisher: {
       '@type': 'Organization',
       name: 'RechenHafen',
