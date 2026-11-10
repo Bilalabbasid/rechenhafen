@@ -8,6 +8,7 @@
  *   npm run indexnow -- --dry-run          # list the URLs, send nothing
  *   npm run indexnow                       # all live pages + all retired (redirected) URLs
  *   npm run indexnow -- /rechner/foo/ ...  # only the given paths
+ *   npm run indexnow -- --calculators      # all live calculator pages only
  *
  * Only submit URLs that really changed; IndexNow is not a ranking trick, and resubmitting
  * unchanged URLs again and again can get the key throttled.
@@ -51,7 +52,9 @@ async function main() {
   const given = args.filter((a) => a.startsWith('/'));
   const key = findKey();
   const keyLocation = `${ORIGIN}/${key}.txt`;
-  const urls = [...new Set((given.length ? given : allPaths()).map((p) => ORIGIN + p))];
+  const calculatorsOnly = args.includes('--calculators');
+  const chosen = given.length ? given : calculatorsOnly ? ALL_CALCULATORS.map((c) => `/rechner/${c.slug}/`) : allPaths();
+  const urls = [...new Set(chosen.map((p) => ORIGIN + p))];
 
   console.log(`${urls.length} URLs, key file ${keyLocation}`);
   if (dryRun) {
