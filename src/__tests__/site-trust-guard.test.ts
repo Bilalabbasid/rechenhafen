@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ALL_CALCULATORS } from '@/data/calculators';
-import { INDEXABLE_CALCULATOR_SLUGS } from '@/data/seo/indexable-calculators';
+import { PRIORITY_CALCULATOR_SLUGS, isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 import sitemap from '@/app/sitemap';
 
 const SRC = path.resolve(__dirname, '..');
@@ -36,20 +36,21 @@ describe('site trust guard', () => {
   });
 });
 
-describe('indexable calculator allowlist', () => {
+describe('indexing policy: every live calculator is indexable', () => {
   const liveSlugs = new Set(ALL_CALCULATORS.map((c) => c.slug));
 
-  it('only lists calculators that actually exist', () => {
-    const unknown = [...INDEXABLE_CALCULATOR_SLUGS].filter((s) => !liveSlugs.has(s));
+  it('the priority list only names calculators that actually exist', () => {
+    const unknown = [...PRIORITY_CALCULATOR_SLUGS].filter((s) => !liveSlugs.has(s));
     expect(unknown).toEqual([]);
   });
 
-  it('sitemap contains exactly the indexable calculators', () => {
+  it('sitemap contains every live calculator', () => {
     const calcUrls = sitemap()
       .map((e) => e.url)
       .filter((u) => /\/rechner\/[^/]+\/$/.test(u))
       .map((u) => u.split('/').slice(-2, -1)[0]);
-    expect(new Set(calcUrls)).toEqual(new Set([...INDEXABLE_CALCULATOR_SLUGS]));
+    expect(new Set(calcUrls)).toEqual(liveSlugs);
+    for (const slug of liveSlugs) expect(isCalculatorIndexable(slug), slug).toBe(true);
   });
 });
 
@@ -66,7 +67,7 @@ describe('retired calculators', () => {
     for (const [slug, target] of Object.entries(RETIRED_CALCULATORS)) {
       expect(getCalculatorBySlug(slug), slug).toBeUndefined();
       expect(sitemapUrls.has(`https://rechenhafen.de/rechner/${slug}/`), slug).toBe(false);
-      expect(INDEXABLE_CALCULATOR_SLUGS.has(slug), slug).toBe(false);
+      expect(isCalculatorIndexable(slug), slug).toBe(false);
 
       // A target may carry a preset query (e.g. ?mode=until) so visitors land in the right mode.
       const targetSlug = target.match(/^\/rechner\/([^/?]+)\/(?:\?[a-zA-Z]+=[a-z0-9]+)?$/)?.[1];

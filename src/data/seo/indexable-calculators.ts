@@ -1,15 +1,14 @@
+import { isCalculatorRetired } from './retired-calculators';
+
 /**
- * Calculators that stay indexable while the site recovers from the 23 Oct 2026 sitewide drop.
+ * Indexing policy (owner decision, 11 Nov 2026): EVERY live calculator is indexable on all
+ * search engines and listed in the sitemap. The 5–11 Nov noindex of low-demand pages was
+ * reverted because Bing was ranking and sending visitors to several of them.
  *
- * Source: Google Search Console export, Web search, 6 Oct – 2 Nov 2026 (last 28 days).
- * Rule: a calculator is kept in the index if it earned >= 50 impressions in that window
- * (impressions of a redirected old URL count for its target), or if it is in the small
- * hand-verified core set below.
- * Every other calculator stays live and linked, but gets `noindex, follow` and is left out
- * of the sitemap, so Google judges the site on its strongest pages only.
- *
- * To promote a calculator back into the index, add its slug here – ideally only after
- * it has unique, hand-checked content (own examples, sources, a real reason to exist).
+ * The list below is kept as the set of PRIORITY calculators – proven search demand in the
+ * GSC window 6 Oct – 2 Nov 2026 (>= 50 impressions, incl. redirected old URLs) plus a small
+ * hand-verified core. It no longer controls indexing; it only decides which calculators are
+ * shown first in automatic "related calculators" links and which to improve first.
  */
 
 /** Calculators with >= 50 impressions in the GSC window. */
@@ -145,8 +144,13 @@ const HAND_VERIFIED_CORE = [
   'heizkostenvergleich-rechner',
 ];
 
-export const INDEXABLE_CALCULATOR_SLUGS: ReadonlySet<string> = new Set([...BY_SEARCH_DEMAND, ...HAND_VERIFIED_CORE]);
+export const PRIORITY_CALCULATOR_SLUGS: ReadonlySet<string> = new Set([...BY_SEARCH_DEMAND, ...HAND_VERIFIED_CORE]);
 
+export function isPriorityCalculator(slug: string): boolean {
+  return PRIORITY_CALCULATOR_SLUGS.has(slug);
+}
+
+/** Every live calculator is indexable; only retired (redirected) slugs are not. */
 export function isCalculatorIndexable(slug: string): boolean {
-  return INDEXABLE_CALCULATOR_SLUGS.has(slug);
+  return !isCalculatorRetired(slug);
 }

@@ -19,7 +19,7 @@ import { STEUERN_GEHALT_CALCULATORS } from './steuernGehalt';
 import { EXTRA_CALCULATORS } from './extra';
 import { enrichCalculator } from './enrichment';
 import { isCalculatorRetired, RETIRED_CALCULATORS } from '@/data/seo/retired-calculators';
-import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
+import { isPriorityCalculator } from '@/data/seo/indexable-calculators';
 
 const RAW_CALCULATORS: CalculatorDefinition[] = [
   ...DATUM_ZEIT_CALCULATORS,
@@ -101,10 +101,10 @@ export function getCalculatorsByCategory(categorySlug: string): CalculatorDefini
   return ALL_CALCULATORS.filter((c) => c.category === categorySlug);
 }
 
-/** Live calculators with indexable pages first, so automatic related links point at pages Google counts. */
+/** Live calculators with proven-demand (priority) pages first, so automatic related links favour the strongest pages. */
 const CALCULATORS_INDEXABLE_FIRST: CalculatorDefinition[] = [
-  ...ALL_CALCULATORS.filter((c) => isCalculatorIndexable(c.slug)),
-  ...ALL_CALCULATORS.filter((c) => !isCalculatorIndexable(c.slug)),
+  ...ALL_CALCULATORS.filter((c) => isPriorityCalculator(c.slug)),
+  ...ALL_CALCULATORS.filter((c) => !isPriorityCalculator(c.slug)),
 ];
 
 export function getRelatedCalculators(calc: CalculatorDefinition, limit = 4): CalculatorDefinition[] {

@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: canonicalUrl,
     },
-    // Thin/low-demand calculators stay usable but are kept out of Google's index (see indexable-calculators.ts).
+    // All live calculators are indexable (policy in indexable-calculators.ts); this guard only matters for retired slugs.
     ...(isCalculatorIndexable(calc.slug)
       ? {}
       : { robots: { index: false, follow: true, googleBot: { index: false, follow: true } } }),

@@ -7,7 +7,7 @@ import { RETIRED_CALCULATORS } from '@/data/seo/retired-calculators';
 
 import { getAllArticles, getArticleBySlug } from '@/data/ratgeber/articles';
 import sitemap from '@/app/sitemap';
-import { INDEXABLE_CALCULATOR_SLUGS, isCalculatorIndexable } from '@/data/seo/indexable-calculators';
+import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 
 describe('SEO & 301 Redirects Verification', () => {
   it('has configured permanent 301 redirect for old kalorienbedarfrechner URL in next.config.ts', async () => {
@@ -394,7 +394,7 @@ describe('SEO & 301 Redirects Verification', () => {
     }
 
     // 5. Total count exact match (7 static + 17 categories + 421 calculators + 16 articles = 461)
-    const expectedTotal = 8 + CATEGORIES.length + INDEXABLE_CALCULATOR_SLUGS.size + articles.length;
+    const expectedTotal = 8 + CATEGORIES.length + ALL_CALCULATORS.length + articles.length;
     expect(sitemapEntries.length).toBe(expectedTotal);
     expect(sitemapSet.size).toBe(expectedTotal);
 
