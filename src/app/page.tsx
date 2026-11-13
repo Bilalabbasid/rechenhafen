@@ -12,20 +12,29 @@ import { ShieldCheck, CheckCircle2, Zap, ArrowRight, Clock, BookOpen } from 'luc
 import styles from '@/styles/layout.module.css';
 import cardsStyles from '@/styles/cards.module.css';
 import ratgeberStyles from '@/styles/ratgeber.module.css';
+import FaqAccordion from '@/components/calculator/FaqAccordion';
+import {
+  SITE_LAST_UPDATED,
+  LEGAL_VALUES_CHECKED_AT,
+  OFFICIAL_SOURCES,
+  formatGermanDate,
+  getHomeFaqs,
+} from '@/data/home';
+
+const HOME_TITLE = 'Kostenlose Online-Rechner 2026 | RechenHafen';
+const HOME_DESCRIPTION = `${ALL_CALCULATORS.length} kostenlose Online-Rechner für Deutschland: Brutto-Netto, Steuern, Kredit, BMI, Datum und mehr. Mit Werten für 2026, ohne Login.`;
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'RechenHafen – Alle Rechner an einem Ort',
+    absolute: HOME_TITLE,
   },
-  description:
-    'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+  description: HOME_DESCRIPTION,
   alternates: {
     canonical: 'https://rechenhafen.de/',
   },
   openGraph: {
-    title: 'RechenHafen – Alle Rechner an einem Ort',
-    description:
-      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     url: 'https://rechenhafen.de/',
     siteName: 'RechenHafen',
     locale: 'de_DE',
@@ -42,9 +51,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'RechenHafen – Alle Rechner an einem Ort',
-    description:
-      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.',
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     images: ['https://rechenhafen.de/og-image.jpg'],
   },
 };
@@ -65,8 +73,37 @@ export default function HomePage() {
   // Curated Ratgeber articles
   const featuredArticles = getAllArticles().slice(0, 3);
 
+  const homeFaqs = getHomeFaqs(totalCalculators);
+
+  // Homepage as a collection page: the popular calculators as an ItemList, plus the real update date.
+  const homeSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    url: 'https://rechenhafen.de/',
+    inLanguage: 'de-DE',
+    dateModified: SITE_LAST_UPDATED,
+    isPartOf: { '@type': 'WebSite', name: 'RechenHafen', url: 'https://rechenhafen.de' },
+    mainEntity: {
+      '@type': 'ItemList',
+      name: 'Beliebte Rechner',
+      numberOfItems: popularCalculators.length,
+      itemListElement: popularCalculators.map((calc, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: calc!.name,
+        url: `https://rechenhafen.de/rechner/${calc!.slug}/`,
+      })),
+    },
+  };
+
   return (
     <div className={styles.container}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeSchema).replace(/</g, '\\u003c') }}
+      />
       {/* 1. Hero Section - Focused, 300–400px Desktop */}
       <section className={styles.heroSection}>
         <div className={styles.heroEyebrow}>
@@ -74,11 +111,18 @@ export default function HomePage() {
         </div>
 
         <h1 className={styles.heroTitle}>
-          Alle Rechner an einem Ort.
+          Kostenlose Online-Rechner für Deutschland
         </h1>
 
         <p className={styles.heroText}>
-          Kostenlose Rechner für Finanzen, Steuern, Alltag, Gesundheit, Auto, Wohnen und mehr.
+          Alle Rechner an einem Ort: Steuern, Gehalt, Finanzen, Alltag, Gesundheit, Auto und Wohnen.
+          Mit den Werten für 2026, ohne Login, berechnet direkt in Ihrem Browser.
+        </p>
+
+        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', margin: '0 0 var(--space-4)' }}>
+          Zuletzt aktualisiert: <time dateTime={SITE_LAST_UPDATED}>{formatGermanDate(SITE_LAST_UPDATED)}</time>
+          {' · '}Steuer- und Sozialversicherungswerte 2026 geprüft am{' '}
+          <time dateTime={LEGAL_VALUES_CHECKED_AT}>{formatGermanDate(LEGAL_VALUES_CHECKED_AT)}</time>
         </p>
 
         {/* Large Central Search Input */}
@@ -470,6 +514,35 @@ export default function HomePage() {
             </span>
           </div>
         </div>
+      </section>
+
+      {/* 7. FAQ */}
+      <FaqAccordion faqs={homeFaqs} />
+
+      {/* 8. Official sources */}
+      <section className={styles.sectionBlock} aria-labelledby="quellen-heading">
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionHeaderLeft}>
+            <h2 id="quellen-heading" className={styles.sectionTitle}>
+              Amtliche Quellen
+            </h2>
+            <p className={styles.sectionSubtitle}>
+              Auf diesen Quellen beruhen die Steuer-, Gehalts- und Sozialversicherungsrechner.{' '}
+              <Link href="/methodik/">So rechnen wir</Link>.
+            </p>
+          </div>
+        </div>
+        <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {OFFICIAL_SOURCES.map((src) => (
+            <li key={src.url} style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+              <a href={src.url} target="_blank" rel="noopener" style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+                {src.name}
+              </a>
+              {': '}
+              {src.usedFor}
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

@@ -220,21 +220,18 @@ describe('SEO & 301 Redirects Verification', () => {
 
     // 2. Homepage metadata verification
     expect(pageMeta.title).toEqual({
-      absolute: 'RechenHafen – Alle Rechner an einem Ort',
+      absolute: 'Kostenlose Online-Rechner 2026 | RechenHafen',
     });
-    expect(pageMeta.description).toBe(
-      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.'
-    );
+    expect(pageMeta.description).toMatch(/^\d+ kostenlose Online-Rechner für Deutschland: /);
+    expect((pageMeta.description as string).length).toBeLessThanOrEqual(160);
 
     // 3. Open Graph verification
     const og = pageMeta.openGraph as any;
     expect(og).toBeDefined();
     expect(og.type).toBe('website');
     expect(og.url).toBe('https://rechenhafen.de/');
-    expect(og.title).toBe('RechenHafen – Alle Rechner an einem Ort');
-    expect(og.description).toBe(
-      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.'
-    );
+    expect(og.title).toBe('Kostenlose Online-Rechner 2026 | RechenHafen');
+    expect(og.description).toBe(pageMeta.description);
     expect(Array.isArray(og.images)).toBe(true);
     expect(og.images[0]).toEqual({
       url: 'https://rechenhafen.de/og-image.jpg',
@@ -248,10 +245,8 @@ describe('SEO & 301 Redirects Verification', () => {
     const twitter = pageMeta.twitter as any;
     expect(twitter).toBeDefined();
     expect(twitter.card).toBe('summary_large_image');
-    expect(twitter.title).toBe('RechenHafen – Alle Rechner an einem Ort');
-    expect(twitter.description).toBe(
-      'Kostenlose Online-Rechner für Alltag, Finanzen, Steuern, Gesundheit und mehr. Kein Login, keine Paywall.'
-    );
+    expect(twitter.title).toBe('Kostenlose Online-Rechner 2026 | RechenHafen');
+    expect(twitter.description).toBe(pageMeta.description);
     expect(twitter.images).toEqual(['https://rechenhafen.de/og-image.jpg']);
 
     // 5. Robots allow rule for crawlers

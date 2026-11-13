@@ -3,6 +3,7 @@ import { ALL_CALCULATORS } from '@/data/calculators';
 import { CATEGORIES } from '@/data/categories';
 import { getAllArticles } from '@/data/ratgeber/articles';
 import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
+import { SITE_LAST_UPDATED } from '@/data/home';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://rechenhafen.de';
@@ -13,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/`,
-      lastModified: platformUpdateDate,
+      lastModified: new Date(`${SITE_LAST_UPDATED}T00:00:00.000Z`),
     },
     {
       url: `${baseUrl}/rechner/`,
