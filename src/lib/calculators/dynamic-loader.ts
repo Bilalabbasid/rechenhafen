@@ -29,10 +29,13 @@ const MODULE_LOADERS: Record<string, () => Promise<{ default?: any; [key: string
   extraEinheitenKochen: () => import('@/data/calculators/extra/einheitenKochen'),
   extraBusinessStatistik: () => import('@/data/calculators/extra/businessStatistik'),
   steuernGehalt: () => import('@/data/calculators/steuernGehalt'),
+  steuerRecht: () => import('@/data/calculators/steuerRecht'),
 };
 
 const SLUG_TO_MODULE: Record<string, string> = {
   "brutto-netto-rechner": "steuernGehalt",
+  "pfaendungsrechner": "steuerRecht",
+  "ehegattensplitting-rechner": "steuerRecht",
   "netto-brutto-rechner": "steuernGehalt",
   "einkommensteuerrechner": "steuernGehalt",
   "grenzsteuersatz-rechner": "steuernGehalt",
@@ -45,7 +48,7 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "bonus-netto-rechner": "steuernGehalt",
   "abfindungsrechner": "steuernGehalt",
   "renten-brutto-netto-rechner": "steuernGehalt",
-  "mwst-rechner": "steuernGehalt",
+  "mwst-rechner": "business",
   "gewerbesteuer-rechner": "steuernGehalt",
   "mieterhoehung-rechner": "wohnen",
   "altersrechner": "datumZeit",
@@ -256,7 +259,7 @@ const SLUG_TO_MODULE: Record<string, string> = {
   "vermoegenswirksame-leistungen-rechner": "extraAutoArbeit",
   "betriebliche-altersvorsorge-rechner": "extraAutoArbeit",
   "jahresgehalt-in-monatsgehalt-rechner": "extraAutoArbeit",
-  "stundensatz-kalkulation-freiberufler-rechner": "extraAutoArbeit",
+  "stundensatz-kalkulation-freiberufler-rechner": "extraBusinessStatistik",
   "urlaubsabgeltung-rechner": "extraAutoArbeit",
   "arbeitslosengeld-1-rechner": "extraAutoArbeit",
   "buergergeld-anspruch-rechner": "extraAutoArbeit",

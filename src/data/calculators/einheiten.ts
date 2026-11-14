@@ -210,11 +210,21 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Temperatur-Umrechner',
     category: 'einheiten',
     subcategory: 'Temperatur',
-    metaTitle: 'Temperatur-Umrechner – Celsius, Fahrenheit',
-    metaDescription: 'Rechnen Sie Temperaturen zwischen Grad Celsius, Fahrenheit und Kelvin um. Inklusive Umrechnungsformeln und Siedepunkten.',
-    h1: 'Temperatur-Umrechner (°C, °F & Kelvin)',
-    shortDescription: 'Wandelt Temperaturwerte zwischen Celsius, Fahrenheit und Kelvin um.',
-    searchKeywords: ['temperatur umrechner', 'celsius in fahrenheit rechner', 'fahrenheit in celsius formel', 'kelvin umrechnen'],
+    metaTitle: 'Celsius in Fahrenheit umrechnen – Temperatur-Umrechner',
+    metaDescription: 'Celsius in Fahrenheit, Fahrenheit in Celsius und Kelvin umrechnen: mit Formel, Rechenweg und den wichtigsten Werten für Körpertemperatur und Backofen.',
+    h1: 'Temperatur-Umrechner: Celsius in Fahrenheit und Kelvin umrechnen',
+    shortDescription: 'Rechnet Temperaturen zwischen Celsius, Fahrenheit und Kelvin um – mit Formel und typischen Werten.',
+    searchKeywords: [
+      'celsius in fahrenheit',
+      'fahrenheit in celsius',
+      'temperatur umrechnen',
+      'temperatur umrechner',
+      'grad celsius in fahrenheit',
+      'fahrenheit celsius umrechnung',
+      'fahrenheit in celsius formel',
+      'celsius in kelvin',
+      'kelvin in celsius',
+    ],
     inputs: [
       { id: 'value', label: 'Temperaturwert', type: 'number', defaultValue: 25, step: 0.5 },
       {
@@ -241,22 +251,76 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     calculate: calculateTemperatureConversion,
-    formula: '°F = °C × 1,8 + 32 | °C = (°F - 32) / 1,8 | K = °C + 273,15',
-    formulaExplanation: 'Im Gegensatz zu anderen Maßeinheiten erfordert die Temperaturumrechnung neben einer Skalierung auch eine Nullpunktverschiebung (Offset 32 bzw. 273,15).',
+    formula: '°F = °C × 1,8 + 32   |   °C = (°F − 32) / 1,8   |   K = °C + 273,15',
+    formulaExplanation: 'Anders als bei Länge oder Gewicht reicht bei Temperaturen kein einfacher Faktor: Celsius und Fahrenheit haben verschiedene Nullpunkte. Deshalb wird erst skaliert (× 1,8) und dann verschoben (+ 32). Kelvin hat dieselben Schritte wie Celsius, beginnt aber am absoluten Nullpunkt.',
     workedExample: {
-      title: 'Beispiel: 25 °C (Zimmertemperatur)',
-      description: '25 × 1,8 + 32 = 77,00 °F.',
+      title: 'Beispiel: 25 °C (Zimmertemperatur) in Fahrenheit',
+      description: '25 × 1,8 + 32 = 77 °F.',
       inputs: { value: 25, fromUnit: 'C', toUnit: 'F' },
       resultSummary: '77,00 °F',
     },
+    workedExamples: [
+      {
+        title: 'Celsius in Fahrenheit: 25 °C',
+        description: 'Zimmertemperatur in Fahrenheit umrechnen.',
+        inputs: { value: 25, fromUnit: 'C', toUnit: 'F' },
+        steps: ['°F = 25 × 1,8 + 32', '°F = 45 + 32', '°F = 77'],
+        resultSummary: '25 °C sind 77 °F.',
+      },
+      {
+        title: 'Fahrenheit in Celsius: Backofen auf 350 °F',
+        description: 'Ein amerikanisches Rezept verlangt 350 °F.',
+        inputs: { value: 350, fromUnit: 'F', toUnit: 'C' },
+        steps: ['°C = (350 − 32) / 1,8', '°C = 318 / 1,8', '°C ≈ 176,67'],
+        resultSummary: '350 °F sind rund 177 °C – stellen Sie den Ofen auf 175 bis 180 °C.',
+      },
+      {
+        title: 'Celsius in Kelvin: 20 °C',
+        description: 'Für Physik und Chemie wird in Kelvin gerechnet.',
+        inputs: { value: 20, fromUnit: 'C', toUnit: 'K' },
+        steps: ['K = 20 + 273,15', 'K = 293,15'],
+        resultSummary: '20 °C sind 293,15 K.',
+      },
+    ],
     content: {
-      intro: 'Dieser Temperaturrechner transformiert Werte exakt zwischen Grad Celsius (°C), Fahrenheit (°F) und der thermodynamischen Basiseinheit Kelvin (K).',
-      details: 'Formeln: Fahrenheit = (Celsius · 1,8) + 32; Celsius = (Fahrenheit - 32) / 1,8; Kelvin = Celsius + 273,15. Am absoluten Nullpunkt bei 0 Kelvin (-273,15 °C) stoppt jede thermische Teilchenbewegung.',
+      intro: 'Mit diesem Temperatur-Umrechner rechnen Sie Grad Celsius (°C), Grad Fahrenheit (°F) und Kelvin (K) in beide Richtungen um. Typische Anlässe sind amerikanische Rezepte und Backofenangaben, Wetterberichte aus den USA, Fiebermessen mit Thermometern in Fahrenheit oder Aufgaben in Physik und Chemie.',
+      sections: [
+        {
+          title: 'Celsius in Fahrenheit und zurück: die Formeln',
+          content:
+            '- **Celsius in Fahrenheit:** °F = °C × 1,8 + 32\n' +
+            '- **Fahrenheit in Celsius:** °C = (°F − 32) / 1,8\n' +
+            '- **Celsius in Kelvin:** K = °C + 273,15\n' +
+            '- **Kelvin in Celsius:** °C = K − 273,15\n\n' +
+            'Die Reihenfolge ist wichtig: Bei Fahrenheit in Celsius ziehen Sie zuerst 32 ab und teilen danach durch 1,8. Als Faustformel für den Kopf: Fahrenheit minus 30, dann halbieren. Aus 80 °F werden so etwa 25 °C (genau 26,7 °C).',
+        },
+        {
+          title: 'Wichtige Werte auf einen Blick',
+          content:
+            '- 0 °C = 32 °F (Wasser gefriert)\n' +
+            '- 20 °C = 68 °F (Raumtemperatur)\n' +
+            '- 37 °C = 98,6 °F (normale Körpertemperatur)\n' +
+            '- 38 °C = 100,4 °F (Fieber)\n' +
+            '- 100 °C = 212 °F (Wasser kocht auf Meereshöhe)\n' +
+            '- 180 °C = 356 °F (Backofen, Ober-/Unterhitze)\n' +
+            '- 0 °F = −17,78 °C\n' +
+            '- −273,15 °C = 0 K (absoluter Nullpunkt)',
+        },
+        {
+          title: 'Warum Kelvin kein Gradzeichen hat',
+          content:
+            'Kelvin ist die SI-Basiseinheit der Temperatur und eine absolute Skala: 0 K ist der absolute Nullpunkt, kälter geht es nicht. Deshalb schreibt man 293,15 K und nicht „Grad Kelvin“. Ein Temperaturunterschied von 1 K ist genau so groß wie 1 °C. Werte unter 0 K gibt es nicht; der Rechner meldet dann einen Fehler.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Bei welcher Temperatur sind Celsius und Fahrenheit zahlenmäßig identisch?', answer: 'Bei exakt -40 Grad: -40 °C entspricht genau -40 °F, da (-40 × 1,8) + 32 = -72 + 32 = -40.' },
-      { question: 'Warum nutzt die Wissenschaft die Kelvin-Skala ohne Gradzeichen?', answer: 'Weil Kelvin eine absolute thermodynamische Einheit ist (keine relative Skala wie Celsius mit willkürlichem Gefrierpunkt von Wasser); negative Kelvin-Temperaturen existieren im Reellen nicht.' },
+      { question: 'Wie rechnet man Celsius in Fahrenheit um?', answer: 'Multiplizieren Sie die Celsius-Temperatur mit 1,8 und addieren Sie 32: °F = °C × 1,8 + 32. 30 °C sind also 30 × 1,8 + 32 = 86 °F.' },
+      { question: 'Wie rechnet man Fahrenheit in Celsius um?', answer: 'Ziehen Sie 32 ab und teilen Sie durch 1,8: °C = (°F − 32) / 1,8. 100 °F sind (100 − 32) / 1,8 = 37,78 °C.' },
+      { question: 'Wie viel Grad Celsius sind 350 Grad Fahrenheit im Backofen?', answer: '350 °F sind 176,67 °C. In deutschen Rezepten entspricht das 175 bis 180 °C Ober-/Unterhitze. 400 °F sind 204,44 °C, also etwa 200 °C.' },
+      { question: 'Was ist die normale Körpertemperatur in Fahrenheit?', answer: '37 °C entsprechen 98,6 °F. Ab etwa 38 °C (100,4 °F) spricht man von Fieber.' },
+      { question: 'Bei welcher Temperatur sind Celsius und Fahrenheit gleich?', answer: 'Bei −40 Grad: −40 °C sind genau −40 °F, denn −40 × 1,8 + 32 = −72 + 32 = −40.' },
+      { question: 'Wie rechnet man Celsius in Kelvin um?', answer: 'Addieren Sie 273,15: K = °C + 273,15. 20 °C sind 293,15 K. Umgekehrt ziehen Sie 273,15 ab: 300 K sind 26,85 °C.' },
     ],
-    relatedSlugs: ['schokolade-temperieren-rechner', 'laengen-umrechner', 'gewicht-masse-umrechner'],
+    relatedSlugs: ['backzeit-temperatur-umluft-oberhitze-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'laengen-umrechner', 'gewicht-masse-umrechner', 'geschwindigkeit-umrechner'],
   },
 ];

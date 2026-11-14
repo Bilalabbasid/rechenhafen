@@ -437,6 +437,13 @@ export function calculateTemperatureConversion(inputs: Record<string, any>): Cal
   const fahrenheit = celsius * (9 / 5) + 32;
   const kelvin = celsius + 273.15;
 
+  if (kelvin < -1e-9) {
+    return {
+      primary: { id: 'temp', label: 'Temperatur', value: 0, formattedValue: '-' },
+      error: 'Diese Temperatur liegt unter dem absoluten Nullpunkt (0 K = −273,15 °C = −459,67 °F) und ist physikalisch nicht möglich.',
+    };
+  }
+
   const toLabel = to === 'K' ? 'Kelvin (K)' : `Grad ${to === 'C' ? 'Celsius' : 'Fahrenheit'} (°${to})`;
   const toFormatted = to === 'K' ? `${formatNumber(result, 2)} K` : `${formatNumber(result, 2)} °${to}`;
   const fromFormatted = from === 'K' ? `${formatNumber(val, 1)} K` : `${formatNumber(val, 1)} °${from}`;

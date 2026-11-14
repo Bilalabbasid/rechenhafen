@@ -1823,7 +1823,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       { question: 'Was ist der Unterschied zwischen Dispo- und Überziehungszins?', answer: 'Der Dispozinssatz gilt innerhalb des vereinbarten Rahmens (z. B. bis 3 Monatsgehälter). Wird dieser Rahmen noch weiter überzogen (geduldete Überziehung), verlangen Banken oft zusätzliche Strafzinsen.' },
       { question: 'Ab wann sollte ein Dispositionskredit umgeschuldet werden?', answer: 'Sobald das Konto länger als zwei bis drei Monate im Minus verharrt, ist ein günstiger Ratenkredit rechnerisch fast immer die wirtschaftlichere Wahl.' },
     ],
-    relatedSlugs: ['umschuldung-rechner', 'kreditrechner', 'kaufkraftverlust-rechner'],
+    relatedSlugs: ['pfaendungsrechner', 'umschuldung-rechner', 'kreditrechner', 'kaufkraftverlust-rechner'],
   },
   {
     id: 'maximaler-kredit-rechner',

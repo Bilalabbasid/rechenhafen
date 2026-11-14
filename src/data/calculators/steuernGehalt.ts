@@ -514,7 +514,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       { question: 'Was bringt das Ehegattensplitting?', answer: 'Beim Splittingverfahren (§ 32a Abs. 5 EStG) wird das gemeinsame Einkommen beider Partner halbiert, die Steuer für die Hälfte berechnet und anschließend verdoppelt. Das bringt den größten Steuervorteil, wenn ein Partner deutlich mehr verdient als der andere.' },
       { question: 'Gilt der Spitzensteuersatz von 42 % für mein gesamtes Einkommen?', answer: 'Nein, das ist ein weit verbreiteter Irrtum. Der Spitzensteuersatz ist ein Grenzsteuersatz. Er fällt nur für den Betrag an, der die Tarifgrenze (69.879 € im Jahr 2026) übersteigt. Alle Einkommensbestandteile darunter werden mit den niedrigeren Zonensätzen besteuert.' },
     ],
-    relatedSlugs: ['grenzsteuersatz-rechner', 'brutto-netto-rechner', 'kapitalertragsteuer-rechner', 'abfindungsrechner', 'gewerbesteuer-rechner', 'netto-brutto-rechner'],
+    relatedSlugs: ['ehegattensplitting-rechner', 'grenzsteuersatz-rechner', 'brutto-netto-rechner', 'kapitalertragsteuer-rechner', 'abfindungsrechner', 'gewerbesteuer-rechner', 'netto-brutto-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

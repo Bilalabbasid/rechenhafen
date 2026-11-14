@@ -4864,105 +4864,122 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
   {
     id: "quader-volumen-rechner",
     slug: "quader-volumen-rechner",
-    name: "Quader-Rechner (Volumen, Oberfläche & Raumdiagonale)",
-    shortName: "Quader-Rechner",
+    name: "Quader- und Würfel-Rechner (Volumen, Oberfläche & Raumdiagonale)",
+    shortName: "Quader & Würfel",
     category: "geometrie",
     subcategory: "Körper",
-    metaTitle: 'Quader Rechner – Volumen V = a · b · c, Oberfläche',
-    metaDescription: 'Berechnen Sie das Quadervolumen (V = a · b · c), die Gesamtoberfläche (O = 2(ab + bc + ca)) und die 3D-Raumdiagonale d = √(a² + b² + c²) aus Länge, Breite und Höhe.',
-    h1: 'Quader Rechner – Volumen, Oberfläche & Raumdiagonale berechnen',
-    shortDescription: 'Berechnet Volumen, Oberfläche und Raumdiagonale eines Quaders.',
-    searchKeywords: ["quader rechner volumen a b c","quader oberflaeche formel berechnen","raumdiagonale quader pythagoras 3d","quader kantenlaenge volumen"],
+    metaTitle: 'Quader & Würfel berechnen – Volumen und Oberfläche',
+    metaDescription: 'Volumen, Oberfläche und Raumdiagonale von Quader und Würfel berechnen: V = a · b · c bzw. V = a³ – mit Formeln, Rechenweg und Umrechnung in Liter.',
+    h1: 'Quader und Würfel berechnen – Volumen, Oberfläche und Raumdiagonale',
+    shortDescription: 'Berechnet Volumen (auch in Litern), Oberfläche, Raumdiagonale und Kantenlänge von Quader und Würfel.',
+    searchKeywords: [
+      'quader berechnen',
+      'volumen quader',
+      'volumen quader berechnen',
+      'oberfläche quader',
+      'würfel berechnen',
+      'volumen würfel',
+      'oberfläche würfel',
+      'raumdiagonale quader',
+      'quader rechner',
+      'würfel volumen formel',
+    ],
     inputs: [
-          {
-                "id": "lengthA",
-                "label": "Länge (a)",
-                "type": "number",
-                "defaultValue": 10,
-                "min": 0.1,
-                "max": 1000,
-                "step": 0.1,
-                "unit": "cm"
-          },
-          {
-                "id": "widthB",
-                "label": "Breite (b)",
-                "type": "number",
-                "defaultValue": 6,
-                "min": 0.1,
-                "max": 1000,
-                "step": 0.1,
-                "unit": "cm"
-          },
-          {
-                "id": "heightC",
-                "label": "Höhe (c)",
-                "type": "number",
-                "defaultValue": 4,
-                "min": 0.1,
-                "max": 1000,
-                "step": 0.1,
-                "unit": "cm"
-          }
+      {
+        id: "body",
+        label: "Körper",
+        type: "select",
+        defaultValue: "quader",
+        options: [
+          { value: "quader", label: "Quader (Länge, Breite, Höhe)" },
+          { value: "wuerfel", label: "Würfel (alle Kanten gleich lang)" },
+        ],
+      },
+      { id: "lengthA", label: "Länge a (beim Würfel: Kantenlänge)", type: "number", defaultValue: 10, min: 0.1, max: 1000, step: 0.1, unit: "cm" },
+      { id: "widthB", label: "Breite b", type: "number", defaultValue: 6, min: 0.1, max: 1000, step: 0.1, unit: "cm", dependsOn: { field: "body", value: "quader" } },
+      { id: "heightC", label: "Höhe c", type: "number", defaultValue: 4, min: 0.1, max: 1000, step: 0.1, unit: "cm", dependsOn: { field: "body", value: "quader" } },
     ],
     calculate: (inputs: Record<string, any>) => {
-      const a = Number(inputs.lengthA) || 0;
-      const b = Number(inputs.widthB) || 0;
-      const c = Number(inputs.heightC) || 0;
-      
-      // Volumen V = a * b * c
+      const isCube = inputs.body === 'wuerfel';
+      const a = Number(String(inputs.lengthA ?? '').replace(',', '.'));
+      const b = isCube ? a : Number(String(inputs.widthB ?? '').replace(',', '.'));
+      const c = isCube ? a : Number(String(inputs.heightC ?? '').replace(',', '.'));
+      if (![a, b, c].every((x) => isFinite(x) && x > 0)) {
+        return {
+          primary: { id: 'volume', label: 'Volumen (V)', value: 0, formattedValue: '-' },
+          error: isCube ? 'Bitte geben Sie eine Kantenlänge größer als 0 ein.' : 'Bitte geben Sie Länge, Breite und Höhe größer als 0 ein.',
+        };
+      }
+
       const v = a * b * c;
-      // Oberfläche O = 2 * (a*b + b*c + a*c)
-      const o = 2 * ((a * b) + (b * c) + (a * c));
-      // Raumdiagonale d = sqrt(a^2 + b^2 + c^2)
-      const d = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2) + Math.pow(c, 2));
-      // Gesamte Kantenlänge K = 4 * (a + b + c)
+      const o = 2 * (a * b + b * c + a * c);
+      const d = Math.sqrt(a * a + b * b + c * c);
       const k = 4 * (a + b + c);
-      
+      const name = isCube ? 'Würfel' : 'Quader';
+      const dims = isCube ? `Kantenlänge ${formatNumber(a, 2)} cm` : `${formatNumber(a, 2)} × ${formatNumber(b, 2)} × ${formatNumber(c, 2)} cm`;
+
       return {
-        primary: { id: 'volume', label: 'Quadervolumen (V)', value: v, formattedValue: formatNumber(v, 2) + ' cm³ (' + formatNumber(v / 1000, 3) + ' l)', highlight: true },
+        primary: { id: 'volume', label: `Volumen ${name} (V)`, value: v, formattedValue: formatNumber(v, 2) + ' cm³ (' + formatNumber(v / 1000, 3) + ' Liter)', highlight: true },
         secondary: [
-          { id: 'surface', label: 'Gesamtoberfläche (O)', value: o, formattedValue: formatNumber(o, 2) + ' cm²' },
+          { id: 'surface', label: 'Oberfläche (O)', value: o, formattedValue: formatNumber(o, 2) + ' cm²' },
           { id: 'spaceDiag', label: 'Raumdiagonale (d)', value: d, formattedValue: formatNumber(d, 2) + ' cm' },
-          { id: 'edges', label: 'Gesamte Kantenlänge (Drahtmodell)', value: k, formattedValue: formatNumber(k, 1) + ' cm' },
+          { id: 'edges', label: 'Summe aller Kanten', value: k, formattedValue: formatNumber(k, 2) + ' cm' },
         ],
-        summaryText: 'Der Quader (' + a + ' × ' + b + ' × ' + c + ' cm) hat ein Volumen von ' + formatNumber(v, 2) + ' cm³, eine Oberfläche von ' + formatNumber(o, 2) + ' cm² und eine Raumdiagonale von ' + formatNumber(d, 2) + ' cm.',
+        summaryText: `Der ${name} (${dims}) hat ein Volumen von ${formatNumber(v, 2)} cm³, eine Oberfläche von ${formatNumber(o, 2)} cm² und eine Raumdiagonale von ${formatNumber(d, 2)} cm.`,
       };
     },
-    formula: "V = a × b × c; O = 2 × (ab + bc + ca); d = √(a² + b² + c²)",
-    formulaExplanation: "Die Raumdiagonale verbindet zwei gegenüberliegende Ecken durch das Innere des Quaders und lässt sich über den doppelten Satz des Pythagoras ermitteln.",
+    formula: "Quader: V = a · b · c, O = 2 · (ab + bc + ac)   |   Würfel: V = a³, O = 6 · a²   |   d = √(a² + b² + c²)",
+    formulaExplanation: "Ein Würfel ist ein Quader mit drei gleich langen Kanten. Deshalb werden aus a · b · c einfach a³ und aus der Quaderoberfläche 6 · a². Die Raumdiagonale folgt aus dem Satz des Pythagoras im Raum.",
     workedExample: {
-          "title": "Beispiel: Quader mit a = 10 cm, b = 6 cm, c = 4 cm",
-          "inputValues": [
-                {
-                      "label": "a",
-                      "value": "10 cm"
-                },
-                {
-                      "label": "b",
-                      "value": "6 cm"
-                },
-                {
-                      "label": "c",
-                      "value": "4 cm"
-                }
-          ],
-          "steps": [
-                "V = 10 × 6 × 4 = 240 cm³",
-                "O = 2 × (60 + 24 + 40) = 2 × 124 = 248 cm²",
-                "d = √(100 + 36 + 16) = √152 ≈ 12,33 cm"
-          ],
-          "result": "V = 240 cm³, O = 248 cm², d = 12,33 cm"
+      title: "Beispiel: Quader mit a = 10 cm, b = 6 cm, c = 4 cm",
+      description: "V = 240 cm³, O = 248 cm², d ≈ 12,33 cm.",
+      inputs: { body: "quader", lengthA: 10, widthB: 6, heightC: 4 },
+      resultSummary: "V = 240 cm³ (0,24 Liter)",
     },
+    workedExamples: [
+      {
+        title: "Quader: 10 cm × 6 cm × 4 cm",
+        description: "Ein Karton mit Länge 10 cm, Breite 6 cm und Höhe 4 cm.",
+        inputs: { body: "quader", lengthA: 10, widthB: 6, heightC: 4 },
+        steps: ["V = 10 · 6 · 4 = 240 cm³", "O = 2 · (60 + 24 + 40) = 248 cm²", "d = √(100 + 36 + 16) = √152 ≈ 12,33 cm"],
+        resultSummary: "240 cm³ Volumen, 248 cm² Oberfläche.",
+      },
+      {
+        title: "Würfel mit 5 cm Kantenlänge",
+        description: "Alle drei Kanten sind 5 cm lang.",
+        inputs: { body: "wuerfel", lengthA: 5 },
+        steps: ["V = 5³ = 125 cm³", "O = 6 · 5² = 150 cm²", "d = 5 · √3 ≈ 8,66 cm"],
+        resultSummary: "125 cm³ Volumen, 150 cm² Oberfläche.",
+      },
+    ],
     content: {
-      intro: 'Der Quaderrechner berechnet Rauminhalt, Gesamtoberfläche, Kantenlänge und Raumdiagonale rechtwinkliger Schachteln, Räume und Container.',
-      details: 'Volumen V = a · b · c. Oberfläche O = 2 · (ab + bc + ac). Raumdiagonale d = Wurzel(a² + b² + c²). 1 m³ entspricht genau 1.000 Litern Rauminhalt.',
+      intro: 'Mit diesem Rechner berechnen Sie Volumen, Oberfläche, Raumdiagonale und Kantenlänge eines Quaders oder Würfels. Typische Anwendungen sind Kartons und Pakete, Aquarien, Hochbeete, Räume und Container. Das Volumen wird zusätzlich in Liter umgerechnet.',
+      sections: [
+        {
+          title: 'Formeln für Quader und Würfel',
+          content:
+            '- **Volumen Quader:** V = a · b · c (Länge mal Breite mal Höhe)\n' +
+            '- **Oberfläche Quader:** O = 2 · (a · b + b · c + a · c)\n' +
+            '- **Volumen Würfel:** V = a³\n' +
+            '- **Oberfläche Würfel:** O = 6 · a²\n' +
+            '- **Raumdiagonale:** d = √(a² + b² + c²), beim Würfel d = a · √3',
+        },
+        {
+          title: 'Volumen in Liter umrechnen',
+          content:
+            '1 Liter entspricht 1.000 cm³ oder 1 dm³, und 1 m³ sind 1.000 Liter. Ein Aquarium mit 80 × 35 × 40 cm hat also 112.000 cm³ = 112 Liter Volumen. Achten Sie darauf, alle Kanten in derselben Einheit einzugeben.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Passt eine 2,50 m lange Latte in einen Karton mit 2 × 1 × 1 Meter?', answer: 'Raumdiagonale d = Wurzel(2² + 1² + 1²) = Wurzel(4 + 1 + 1) = Wurzel(6) ≈ 2,45 Meter. Nein, die Latte ist ca. 5 cm zu lang.' },
-      { question: 'Wie viele 20-Fuß-Seecontainer (ca. 33 m³ Innenvolumen) benötigt man für 100 m³ Frachtgut?', answer: '100 / 33 = 3,03; es werden mindestens 4 Container benötigt.' },
+      { question: 'Wie berechnet man das Volumen eines Quaders?', answer: 'Multiplizieren Sie Länge, Breite und Höhe: V = a · b · c. Ein Quader mit 10 cm, 6 cm und 4 cm hat 10 · 6 · 4 = 240 cm³ Volumen.' },
+      { question: 'Wie berechnet man das Volumen eines Würfels?', answer: 'Nehmen Sie die Kantenlänge hoch drei: V = a³. Ein Würfel mit 5 cm Kantenlänge hat 5 · 5 · 5 = 125 cm³ Volumen.' },
+      { question: 'Wie berechnet man die Oberfläche eines Quaders?', answer: 'Ein Quader hat drei Paare gleich großer Flächen: O = 2 · (a · b + b · c + a · c). Bei 10 × 6 × 4 cm sind das 2 · (60 + 24 + 40) = 248 cm².' },
+      { question: 'Wie berechnet man die Oberfläche eines Würfels?', answer: 'Ein Würfel hat sechs gleich große Quadrate: O = 6 · a². Bei 5 cm Kantenlänge sind das 6 · 25 = 150 cm².' },
+      { question: 'Wie viele Liter passen in einen Quader?', answer: 'Rechnen Sie das Volumen in cm³ aus und teilen Sie durch 1.000. Ein Hochbeet von 100 × 50 × 40 cm fasst 200.000 cm³ = 200 Liter Erde.' },
+      { question: 'Passt eine 2,50 m lange Latte in einen Karton mit 2 × 1 × 1 Meter?', answer: 'Nein. Die längste Strecke im Karton ist die Raumdiagonale: √(2² + 1² + 1²) = √6 ≈ 2,45 m. Die Latte ist rund 5 cm zu lang.' },
     ],
-    relatedSlugs: ['prisma-volumen-rechner', 'rechteckrechner', 'pyramide-volumen-rechner', 'zylinderrechner'],
+    relatedSlugs: ['zylinderrechner', 'rechteckrechner', 'kegel-volumen-rechner', 'kugel-oberflaeche-rechner', 'volumen-umrechner'],
   },
   {
     id: "prisma-volumen-rechner",

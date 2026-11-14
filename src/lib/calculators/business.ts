@@ -2,41 +2,69 @@ import { CalculationResult } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
 
-export function calculateMargin(inputs: Record<string, any>): CalculationResult {
-  const purchasePrice = inputs.purchasePrice !== undefined && inputs.purchasePrice !== '' && !isNaN(parseFloat(inputs.purchasePrice))
-    ? parseFloat(inputs.purchasePrice)
-    : 50; // Einkaufspreis netto
-  const sellingPrice = inputs.sellingPrice !== undefined && inputs.sellingPrice !== '' && !isNaN(parseFloat(inputs.sellingPrice))
-    ? parseFloat(inputs.sellingPrice)
-    : 100; // Verkaufspreis netto
+function parsePrice(v: unknown): number | null {
+  if (v === undefined || v === null || v === '') return null;
+  const n = parseFloat(String(v).replace(',', '.'));
+  return isNaN(n) ? null : n;
+}
 
-  if (purchasePrice <= 0 || sellingPrice <= 0) {
-    return {
-      primary: { id: 'margin', label: 'Handelsmarge', value: 0, formattedValue: '0 %' },
-      error: 'Einkaufs- und Verkaufspreis müssen größer als 0 sein.',
-    };
+/**
+ * Marge, Aufschlag und Preiskalkulation.
+ * mode 'fromPrices'       – EK und VK gegeben → Marge und Aufschlag
+ * mode 'priceFromMargin'  – EK und Zielmarge (auf VK) gegeben → nötiger VK
+ * mode 'priceFromMarkup'  – EK und Aufschlag (auf EK) gegeben → VK
+ */
+export function calculateMargin(inputs: Record<string, any>): CalculationResult {
+  const mode = inputs.mode || 'fromPrices';
+  const purchasePrice = parsePrice(inputs.purchasePrice) ?? 50; // Einkaufspreis netto
+  const fail = (error: string): CalculationResult => ({
+    primary: { id: 'margin', label: 'Handelsmarge', value: 0, formattedValue: '-' },
+    error,
+  });
+
+  if (purchasePrice <= 0) return fail('Der Einkaufspreis muss größer als 0 sein.');
+
+  let sellingPrice: number;
+  if (mode === 'priceFromMargin') {
+    const target = parsePrice(inputs.targetMargin) ?? 30;
+    if (target < 0 || target >= 100) return fail('Die Marge bezieht sich auf den Verkaufspreis und muss zwischen 0 und unter 100 % liegen.');
+    sellingPrice = purchasePrice / (1 - target / 100);
+  } else if (mode === 'priceFromMarkup') {
+    const markup = parsePrice(inputs.markupPercent) ?? 50;
+    if (markup < 0) return fail('Der Aufschlag darf nicht negativ sein.');
+    sellingPrice = purchasePrice * (1 + markup / 100);
+  } else {
+    sellingPrice = parsePrice(inputs.sellingPrice) ?? 100; // Verkaufspreis netto
+    if (sellingPrice <= 0) return fail('Einkaufs- und Verkaufspreis müssen größer als 0 sein.');
   }
 
   const grossProfit = sellingPrice - purchasePrice;
-  // Handelsspanne (Marge) = (Gewinn / Verkaufspreis) * 100
+  // Handelsspanne (Marge) = Gewinn / Verkaufspreis · 100
   const marginPercent = (grossProfit / sellingPrice) * 100;
-  // Aufschlagssatz = (Gewinn / Einkaufspreis) * 100
+  // Aufschlagssatz = Gewinn / Einkaufspreis · 100
   const markupPercent = (grossProfit / purchasePrice) * 100;
+  const grossPrice = sellingPrice * 1.19;
+
+  const secondary = [
+    { id: 'markup', label: 'Kalkulationsaufschlag (auf EK)', value: markupPercent, formattedValue: formatPercent(markupPercent, 2) },
+    { id: 'margin', label: 'Handelsspanne (Marge auf VK)', value: marginPercent, formattedValue: formatPercent(marginPercent, 2) },
+    { id: 'grossProfit', label: 'Rohgewinn pro Stück', value: grossProfit, formattedValue: formatCurrency(grossProfit) },
+    { id: 'factor', label: 'Kalkulationsfaktor', value: sellingPrice / purchasePrice, formattedValue: `${formatNumber(sellingPrice / purchasePrice, 2)} ×` },
+    { id: 'grossPrice', label: 'Verkaufspreis brutto (inkl. 19 % MwSt)', value: grossPrice, formattedValue: formatCurrency(grossPrice) },
+  ];
+
+  if (mode === 'fromPrices') {
+    return {
+      primary: { id: 'margin', label: 'Handelsspanne (Marge auf VK)', value: marginPercent, formattedValue: formatPercent(marginPercent, 2), highlight: true },
+      secondary: secondary.filter((x) => x.id !== 'margin'),
+      summaryText: `Bei einem Einkaufspreis von ${formatCurrency(purchasePrice)} und Verkaufspreis von ${formatCurrency(sellingPrice)} erzielen Sie ${formatCurrency(grossProfit)} Rohertrag. Das entspricht einer Handelsmarge von ${formatPercent(marginPercent, 2)} bzw. einem Aufschlag von ${formatPercent(markupPercent, 2)} auf den Einkaufspreis.`,
+    };
+  }
 
   return {
-    primary: {
-      id: 'margin',
-      label: 'Handelsspanne (Marge auf VK)',
-      value: marginPercent,
-      formattedValue: formatPercent(marginPercent, 2),
-      highlight: true,
-    },
-    secondary: [
-      { id: 'markup', label: 'Kalkulationsaufschlag (auf EK)', value: markupPercent, formattedValue: formatPercent(markupPercent, 2) },
-      { id: 'grossProfit', label: 'Rohgewinn pro Stück', value: grossProfit, formattedValue: formatCurrency(grossProfit) },
-      { id: 'factor', label: 'Kalkulationsfaktor', value: sellingPrice / purchasePrice, formattedValue: `${formatNumber(sellingPrice / purchasePrice, 2)} ×` },
-    ],
-    summaryText: `Bei einem Einkaufspreis von ${formatCurrency(purchasePrice)} und Verkaufspreis von ${formatCurrency(sellingPrice)} erzielen Sie ${formatCurrency(grossProfit)} Rohertrag. Das entspricht einer Handelsmarge von ${formatPercent(marginPercent, 2)} bzw. einem Aufschlag von ${formatPercent(markupPercent, 2)} auf den Einkaufspreis.`,
+    primary: { id: 'sellingPrice', label: 'Verkaufspreis netto (VK)', value: sellingPrice, formattedValue: formatCurrency(sellingPrice), highlight: true },
+    secondary,
+    summaryText: `Für ${mode === 'priceFromMargin' ? `eine Marge von ${formatPercent(marginPercent, 2)}` : `einen Aufschlag von ${formatPercent(markupPercent, 2)}`} auf ${formatCurrency(purchasePrice)} Einkaufspreis müssen Sie für ${formatCurrency(sellingPrice)} netto verkaufen (${formatCurrency(grossPrice)} brutto). Rohgewinn: ${formatCurrency(grossProfit)} pro Stück.`,
   };
 }
 

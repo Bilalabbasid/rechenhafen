@@ -6,9 +6,10 @@ import { CATEGORIES } from '@/data/categories';
 
 describe('RechenHafen Calculators Comprehensive QA Verification', () => {
   it('contains exactly 423 calculators across 17 categories', () => {
+    // 408 → 410 (Nov 2026): Pfändungsrechner und Ehegattensplitting-Rechner neu.
     // 424 → 423: doppelter Abfindungsrechner (abfindung-fuenftelregelung-rechner) per 301 in abfindungsrechner zusammengeführt
-    expect(ALL_CALCULATOR_DEFINITIONS.length).toBe(408);
-    expect(ALL_CALCULATORS.length).toBe(408 - Object.keys(RETIRED_CALCULATORS).length);
+    expect(ALL_CALCULATOR_DEFINITIONS.length).toBe(410);
+    expect(ALL_CALCULATORS.length).toBe(410 - Object.keys(RETIRED_CALCULATORS).length);
     expect(CATEGORIES.length).toBe(17);
   });
 

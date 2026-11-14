@@ -496,13 +496,13 @@ export const LEGAL_VALUES_2026: GermanLegalValues = {
     description: 'Ermäßigter Steuersatz der Umsatzsteuer (7 %)',
   },
   pfaendungsfreigrenzeGrundbetrag: {
-    value: 1491.75,
+    value: 1587.4,
     unit: 'EUR/Monat',
-    law: '§ 850c ZPO i. V. m. Pfändungsfreigrenzenbekanntmachung',
+    law: '§ 850c ZPO i. V. m. Pfändungsfreigrenzenbekanntmachung 2026',
     sourceUrl: 'https://www.gesetze-im-internet.de/zpo/__850c.html',
-    validFrom: '2026-01-01',
+    validFrom: '2026-07-01',
     verified: true,
-    checkedAt: '2026-10-25',
+    checkedAt: '2026-11-14',
     description: 'Unpfändbarer Grundbetrag für Arbeitseinkommen für Schuldner ohne Unterhaltspflichten',
   },
   co2PreisBrennstoffe: {

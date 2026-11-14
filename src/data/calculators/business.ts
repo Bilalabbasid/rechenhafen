@@ -12,37 +12,110 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'marge-rechner',
     slug: 'marge-rechner',
-    name: 'Marge- & Handelsspannen-Rechner',
+    name: 'Marge-Rechner (Handelsspanne, Aufschlag & Preiskalkulation)',
     shortName: 'Marge berechnen',
     category: 'business',
     subcategory: 'Preise & Margen',
-    metaTitle: 'Marge Rechner – Handelsspanne & Rohgewinn berechnen',
-    metaDescription: 'Ermitteln Sie Handelsmarge (auf Verkaufspreis), Kalkulationsaufschlag (auf Einkaufspreis) und Rohertrag in Euro und Prozent.',
-    h1: 'Marge & Handelsspanne Rechner',
-    shortDescription: 'Berechnet Handelsspanne, Kalkulationsaufschlag und Gewinnspanne im Handel und E-Commerce.',
-    searchKeywords: ['marge rechner', 'handelsspanne berechnen', 'aufschlag berechnen einkaufspreis', 'gewinnmarge formel'],
+    metaTitle: 'Marge berechnen – Margenrechner mit Aufschlag & Preis',
+    metaDescription: 'Marge und Handelsspanne berechnen, Kalkulationsaufschlag ermitteln oder den Verkaufspreis aus der Wunschmarge kalkulieren – mit Formeln und Beispielen.',
+    h1: 'Marge berechnen: Handelsspanne, Aufschlag und Verkaufspreis',
+    shortDescription: 'Berechnet Marge und Aufschlag aus Einkaufs- und Verkaufspreis oder den nötigen Verkaufspreis für eine Wunschmarge.',
+    searchKeywords: [
+      'marge berechnen',
+      'marge rechner',
+      'margenrechner',
+      'handelsspanne berechnen',
+      'aufschlag berechnen',
+      'kalkulationsaufschlag berechnen',
+      'verkaufspreis berechnen',
+      'preiskalkulation',
+      'gewinnmarge berechnen',
+      'marge formel',
+      'marge und aufschlag',
+    ],
     inputs: [
-      { id: 'purchasePrice', label: 'Einkaufspreis netto (EK)', type: 'number', defaultValue: 40.0, step: 0.5, unit: '€' },
-      { id: 'sellingPrice', label: 'Verkaufspreis netto (VK)', type: 'number', defaultValue: 100.0, step: 0.5, unit: '€' },
+      {
+        id: 'mode',
+        label: 'Was möchten Sie berechnen?',
+        type: 'select',
+        defaultValue: 'fromPrices',
+        options: [
+          { value: 'fromPrices', label: 'Marge aus Einkaufs- und Verkaufspreis' },
+          { value: 'priceFromMargin', label: 'Verkaufspreis für eine Wunschmarge' },
+          { value: 'priceFromMarkup', label: 'Verkaufspreis mit Aufschlag auf den Einkauf' },
+        ],
+      },
+      { id: 'purchasePrice', label: 'Einkaufspreis netto (EK)', type: 'number', defaultValue: 40.0, min: 0.01, step: 0.5, unit: '€' },
+      { id: 'sellingPrice', label: 'Verkaufspreis netto (VK)', type: 'number', defaultValue: 100.0, min: 0.01, step: 0.5, unit: '€', dependsOn: { field: 'mode', value: 'fromPrices' } },
+      { id: 'targetMargin', label: 'Gewünschte Marge (auf den Verkaufspreis)', type: 'number', defaultValue: 30, min: 0, max: 99.9, step: 1, unit: '%', dependsOn: { field: 'mode', value: 'priceFromMargin' } },
+      { id: 'markupPercent', label: 'Aufschlag auf den Einkaufspreis', type: 'number', defaultValue: 50, min: 0, step: 1, unit: '%', dependsOn: { field: 'mode', value: 'priceFromMarkup' } },
     ],
     calculate: calculateMargin,
-    formula: 'Marge (%) = ((VK - EK) / VK) × 100 | Aufschlag (%) = ((VK - EK) / EK) × 100',
-    formulaExplanation: 'Die Marge bezieht sich stets auf den Verkaufspreis (kann nie über 100 % liegen). Der Aufschlagssatz bezieht sich auf den Einkaufspreis und kann beliebig hoch sein.',
+    formula: 'Marge = (VK − EK) / VK · 100   |   Aufschlag = (VK − EK) / EK · 100   |   VK = EK / (1 − Marge / 100)',
+    formulaExplanation: 'Die Marge (Handelsspanne) bezieht sich immer auf den Verkaufspreis und liegt deshalb unter 100 %. Der Aufschlag bezieht sich auf den Einkaufspreis und kann beliebig hoch sein. Für eine Wunschmarge teilen Sie den Einkaufspreis durch (1 − Marge).',
     workedExample: {
       title: 'Beispiel: Einkauf 40 € netto, Verkauf 100 € netto',
-      description: 'Gewinn: 60 €. Handelsmarge: 60,00 % (Kalkulationsaufschlag: 150,00 %).',
-      inputs: { purchasePrice: 40.0, sellingPrice: 100.0 },
+      description: 'Gewinn: 60 €. Handelsmarge: 60 % (Kalkulationsaufschlag: 150 %).',
+      inputs: { mode: 'fromPrices', purchasePrice: 40.0, sellingPrice: 100.0 },
       resultSummary: 'Marge: 60,00 % | Aufschlag: 150,00 %',
     },
+    workedExamples: [
+      {
+        title: 'Marge aus Einkaufs- und Verkaufspreis',
+        description: 'Ein Händler kauft für 40 € netto ein und verkauft für 100 € netto.',
+        inputs: { mode: 'fromPrices', purchasePrice: 40, sellingPrice: 100 },
+        steps: ['Rohgewinn = 100 € − 40 € = 60 €', 'Marge = 60 / 100 · 100 = 60 %', 'Aufschlag = 60 / 40 · 100 = 150 %'],
+        resultSummary: '60 % Marge, 150 % Aufschlag.',
+      },
+      {
+        title: 'Verkaufspreis für 30 % Marge',
+        description: 'Einkaufspreis 70 € netto, gewünscht sind 30 % Marge auf den Verkaufspreis.',
+        inputs: { mode: 'priceFromMargin', purchasePrice: 70, targetMargin: 30 },
+        steps: ['VK = 70 € / (1 − 0,30)', 'VK = 70 € / 0,70', 'VK = 100 €'],
+        resultSummary: 'Verkaufspreis 100 € netto (119 € brutto). 70 € + 30 % Aufschlag (91 €) wären zu wenig.',
+      },
+      {
+        title: 'Verkaufspreis mit 50 % Aufschlag',
+        description: 'Einkaufspreis 40 € netto, kalkuliert wird mit 50 % Aufschlag.',
+        inputs: { mode: 'priceFromMarkup', purchasePrice: 40, markupPercent: 50 },
+        steps: ['VK = 40 € · (1 + 0,50)', 'VK = 60 €', 'Marge = 20 / 60 · 100 = 33,33 %'],
+        resultSummary: 'Verkaufspreis 60 € netto, das entspricht 33,33 % Marge.',
+      },
+    ],
     content: {
-      intro: 'Dieser Margenrechner unterscheidet strikt zwischen Handelsspanne (Bruttomarge auf den Verkaufspreis) und dem prozentualen Kalkulationsaufschlag auf den Einkaufspreis.',
-      details: 'Handelsspanne (Marge) = (Verkaufspreis - Einkaufspreis) / Verkaufspreis · 100. Kalkulationszuschlag = (Verkaufspreis - Einkaufspreis) / Einkaufspreis · 100. Ein Aufschlag von 100 % (Verdopplung) entspricht exakt einer Marge von 50 %.',
+      intro: 'Mit diesem Margenrechner berechnen Sie die Marge (Handelsspanne) und den Kalkulationsaufschlag aus Einkaufs- und Verkaufspreis. Umgekehrt kalkuliert er den Verkaufspreis, den Sie für eine gewünschte Marge oder einen festen Aufschlag verlangen müssen. Alle Preise sind Nettopreise; den Bruttopreis mit 19 % Mehrwertsteuer zeigt der Rechner zusätzlich an.',
+      sections: [
+        {
+          title: 'Marge und Aufschlag: der wichtige Unterschied',
+          content:
+            'Beide Kennzahlen beschreiben denselben Rohgewinn in Euro, beziehen ihn aber auf eine andere Basis:\n\n' +
+            '- **Marge (Handelsspanne):** Rohgewinn geteilt durch den **Verkaufspreis**. Sie kann nie 100 % erreichen.\n' +
+            '- **Aufschlag (Kalkulationszuschlag):** Rohgewinn geteilt durch den **Einkaufspreis**. Er kann über 100 % liegen.\n\n' +
+            'Ein Aufschlag von 100 % (Preis verdoppelt) entspricht einer Marge von 50 %. Wer 30 % Marge möchte und einfach 30 % aufschlägt, landet nur bei 23,08 % Marge.',
+        },
+        {
+          title: 'Marge in Aufschlag umrechnen und zurück',
+          content:
+            '- **Aufschlag = Marge / (100 − Marge) · 100.** 25 % Marge entsprechen 33,33 % Aufschlag.\n' +
+            '- **Marge = Aufschlag / (100 + Aufschlag) · 100.** 50 % Aufschlag entsprechen 33,33 % Marge.\n\n' +
+            'Typische Paare: 20 % Marge = 25 % Aufschlag, 40 % Marge = 66,67 % Aufschlag, 60 % Marge = 150 % Aufschlag.',
+        },
+        {
+          title: 'Rohertrag ist nicht Gewinn',
+          content:
+            'Die Marge zeigt den Rohertrag nach dem Wareneinsatz. Davon müssen noch Miete, Personal, Versand, Zahlungsgebühren und andere Fixkosten bezahlt werden. Ob am Ende Gewinn übrig bleibt, zeigt der [Deckungsbeitragsrechner](/rechner/deckungsbeitrag-rechner/) mit Break-even-Menge.',
+        },
+      ],
     },
     faqs: [
-      { question: 'Warum verwechseln viele Gründer Marge und Aufschlag?', answer: 'Weil die Euro-Differenz identisch ist, sich der Prozentsatz aber auf unterschiedliche Basen bezieht: 50 € Gewinn bei 100 € Einkaufspreis sind 50 % Aufschlag, aber nur 33,3 % Marge vom 150 € Verkaufspreis.' },
-      { question: 'Was ist die Rohertragsmarge (Gross Profit Margin)?', answer: 'Der prozentuale Anteil des Umsatzerlöses, der nach Abzug der direkten Herstellungskosten (COGS) zur Deckung der Fixkosten verbleibt.' },
+      { question: 'Wie berechnet man die Marge?', answer: 'Ziehen Sie den Einkaufspreis vom Verkaufspreis ab und teilen Sie das Ergebnis durch den Verkaufspreis: Marge = (VK − EK) / VK · 100. Bei 40 € Einkauf und 100 € Verkauf sind das 60 / 100 · 100 = 60 %.' },
+      { question: 'Wie berechne ich den Verkaufspreis aus der gewünschten Marge?', answer: 'Teilen Sie den Einkaufspreis durch (1 − Marge): VK = EK / (1 − Marge / 100). Für 30 % Marge auf 70 € Einkaufspreis: 70 / 0,7 = 100 € netto.' },
+      { question: 'Was ist der Unterschied zwischen Marge und Aufschlag?', answer: 'Die Marge bezieht den Gewinn auf den Verkaufspreis, der Aufschlag auf den Einkaufspreis. 60 € Gewinn bei 40 € Einkauf und 100 € Verkauf sind 60 % Marge, aber 150 % Aufschlag.' },
+      { question: 'Ist die Handelsspanne dasselbe wie die Marge?', answer: 'Ja. Handelsspanne, Marge und Bruttomarge meinen im Handel dasselbe: den Anteil des Verkaufspreises, der nach dem Wareneinsatz übrig bleibt.' },
+      { question: 'Rechnet man die Marge mit Netto- oder Bruttopreisen?', answer: 'Mit Nettopreisen. Die Mehrwertsteuer gehört nicht Ihnen, sondern wird ans Finanzamt abgeführt. Rechnen Sie mit Bruttopreisen, wirkt die Marge zu hoch.' },
+      { question: 'Welche Marge ist gut?', answer: 'Das hängt stark von der Branche ab. Lebensmittelhandel arbeitet mit niedrigen Margen und hohem Umsatz, Mode, Kosmetik oder Software mit deutlich höheren. Entscheidend ist, dass der Rohertrag alle Fixkosten deckt.' },
     ],
-    relatedSlugs: ['mwst-rechner', 'break-even-rechner', 'prozentrechner'],
+    relatedSlugs: ['deckungsbeitrag-rechner', 'mwst-rechner', 'prozentrechner', 'rabattrechner', 'umsatzrentabilitaet-rechner'],
   },
   {
     id: 'mwst-rechner',

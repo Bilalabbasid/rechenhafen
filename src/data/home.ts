@@ -10,7 +10,7 @@ import type { FAQItem } from '@/types/calculator';
  * Bump it only when calculators, values or texts change — never just to look fresh.
  * Shown on the homepage, used as dateModified in its schema and as lastModified in the sitemap.
  */
-export const SITE_LAST_UPDATED = '2026-11-13';
+export const SITE_LAST_UPDATED = '2026-11-14';
 
 /** Most recent date on which the 2026 legal values (tax, social security) were checked. */
 export const LEGAL_VALUES_CHECKED_AT: string = Object.values(LEGAL_VALUES_2026)

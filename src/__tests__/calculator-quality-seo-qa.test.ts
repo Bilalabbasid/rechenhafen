@@ -110,8 +110,8 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
   describe('Calculator Registry & Route Smoke Tests', () => {
     it('discovers all registered calculators from real registry with self-referencing canonicals and exactly one H1', async () => {
       // 424 → 423: abfindung-fuenftelregelung-rechner per 301 in abfindungsrechner zusammengeführt
-      expect(ALL_CALCULATOR_DEFINITIONS.length).toBe(408);
-    expect(ALL_CALCULATORS.length).toBe(408 - Object.keys(RETIRED_CALCULATORS).length);
+      expect(ALL_CALCULATOR_DEFINITIONS.length).toBe(410);
+    expect(ALL_CALCULATORS.length).toBe(410 - Object.keys(RETIRED_CALCULATORS).length);
 
       for (const calc of ALL_CALCULATORS) {
         // Self-referencing canonical
