@@ -29,6 +29,12 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+/**
+ * Regenerate each calculator page at most once a day, so date-dependent values (e.g. the Minijob limit
+ * switching on 1 January, countdowns, "Stand" dates) update without a new deploy.
+ */
+export const revalidate = 86400;
+
 export async function generateStaticParams() {
   return ALL_CALCULATORS.map((c) => ({
     slug: c.slug,

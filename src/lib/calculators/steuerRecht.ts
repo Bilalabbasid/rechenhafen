@@ -1,5 +1,6 @@
 import { CalculationResult, ResultItem } from '@/types/calculator';
-import { formatCurrency, formatPercent } from '@/lib/formatters';
+import { formatCurrency, formatPercent, formatNumber } from '@/lib/formatters';
+import { getMinijobPeriod, getMinijobPeriodByYear, WEEKS_PER_MONTH, type MinijobPeriod } from '@/data/regulated/minijob';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { computeEStSingle, computeSolZ } from '@/lib/calculators/steuernGehalt';
 
@@ -139,5 +140,72 @@ export function calculateSplittingvorteil(inputs: Record<string, any>): Calculat
       vorteil === 0
         ? `Bei gleich hohen Einkommen (${formatCurrency(a)} und ${formatCurrency(b)}) bringt das Ehegattensplitting ${taxYear} keinen Vorteil.`
         : `Mit ${formatCurrency(a)} und ${formatCurrency(b)} zu versteuerndem Einkommen sparen Sie ${taxYear} durch das Ehegattensplitting ${formatCurrency(vorteil)} Einkommensteuer und Soli im Jahr (${formatCurrency(vorteil / 12)} im Monat).`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Minijob-Stundenrechner (§ 8 Abs. 1a SGB IV)
+// ---------------------------------------------------------------------------
+
+
+const eurWhole = (n: number) => `${Math.round(n).toLocaleString('de-DE')} €`;
+const floor2 = (x: number) => Math.floor(x * 100 + 1e-9) / 100;
+
+export function resolveMinijobPeriod(raw: unknown, today?: string): MinijobPeriod {
+  const year = parseInt(String(raw ?? ''), 10);
+  return (Number.isFinite(year) && getMinijobPeriodByYear(year)) || getMinijobPeriod(today);
+}
+
+export function calculateMinijobStunden(inputs: Record<string, any>): CalculationResult {
+  const period = resolveMinijobPeriod(inputs.year === 'auto' ? undefined : inputs.year);
+  const useMindestlohn = inputs.wageType !== 'custom';
+  const wage = useMindestlohn ? period.mindestlohn : readNumber(inputs.hourlyWage);
+  const fail = (error: string): CalculationResult => ({
+    primary: { id: 'maxHoursMonth', label: 'Maximale Stunden pro Monat', value: 0, formattedValue: '-' },
+    error,
+  });
+
+  if (wage === null) return fail('Bitte geben Sie Ihren Stundenlohn ein.');
+  if (wage <= 0) return fail('Der Stundenlohn muss größer als 0 sein.');
+  if (wage < period.mindestlohn - 1e-9) {
+    return fail(`Der Stundenlohn liegt unter dem gesetzlichen Mindestlohn von ${formatCurrency(period.mindestlohn)} (${period.year}). Auch Minijobber haben Anspruch auf den Mindestlohn.`);
+  }
+
+  const maxMonth = floor2(period.grenze / wage);
+  const maxWeek = floor2(period.grenze / wage / WEEKS_PER_MONTH);
+  const maxYear = floor2((period.grenze * 12) / wage);
+
+  const secondary: ResultItem[] = [
+    { id: 'maxHoursWeek', label: 'Maximale Stunden pro Woche (Durchschnitt)', value: maxWeek, formattedValue: `${formatNumber(maxWeek, 2)} Stunden` },
+    { id: 'maxHoursYear', label: 'Maximale Stunden pro Jahr', value: maxYear, formattedValue: `${formatNumber(maxYear, 2)} Stunden` },
+    { id: 'grenze', label: `Minijob-Grenze ${period.year}`, value: period.grenze, formattedValue: `${eurWhole(period.grenze)} im Monat (${eurWhole(period.grenze * 12)} im Jahr)` },
+    { id: 'wage', label: useMindestlohn ? `Stundenlohn (Mindestlohn ${period.year})` : 'Ihr Stundenlohn', value: wage, formattedValue: formatCurrency(wage) },
+  ];
+
+  const plannedWeek = readNumber(inputs.plannedHoursPerWeek);
+  let check = '';
+  if (plannedWeek !== null && plannedWeek > 0) {
+    const monthly = plannedWeek * WEEKS_PER_MONTH * wage;
+    const fits = monthly <= period.grenze + 1e-9;
+    secondary.push({
+      id: 'plannedEarnings',
+      label: `Verdienst bei ${formatNumber(plannedWeek, 2)} Stunden pro Woche`,
+      value: monthly,
+      formattedValue: `${formatCurrency(monthly)} im Monat – ${fits ? 'passt in den Minijob' : `${formatCurrency(monthly - period.grenze)} über der Grenze`}`,
+    });
+    check = fits
+      ? ` ${formatNumber(plannedWeek, 2)} Stunden pro Woche ergeben ${formatCurrency(monthly)} im Monat und passen.`
+      : ` ${formatNumber(plannedWeek, 2)} Stunden pro Woche ergeben ${formatCurrency(monthly)} im Monat und liegen über der Grenze – dann wäre es ein Midijob.`;
+  }
+
+  return {
+    primary: { id: 'maxHoursMonth', label: `Maximale Stunden pro Monat (${period.year})`, value: maxMonth, formattedValue: `${formatNumber(maxMonth, 2)} Stunden`, highlight: true },
+    secondary,
+    calculationSteps: [
+      `Minijob-Grenze ${period.year}: ${eurWhole(period.grenze)} im Monat`,
+      `Stunden pro Monat = ${eurWhole(period.grenze)} / ${formatCurrency(wage)} = ${formatNumber(maxMonth, 2)} Stunden`,
+      `Stunden pro Woche = ${formatNumber(maxMonth, 2)} / 4,33 (13 Wochen / 3 Monate) = ${formatNumber(maxWeek, 2)} Stunden`,
+    ],
+    summaryText: `Bei ${formatCurrency(wage)} Stundenlohn dürfen Sie ${period.year} im Minijob höchstens ${formatNumber(maxMonth, 2)} Stunden im Monat arbeiten, im Schnitt ${formatNumber(maxWeek, 2)} Stunden pro Woche (Grenze ${eurWhole(period.grenze)}).${check}`,
   };
 }

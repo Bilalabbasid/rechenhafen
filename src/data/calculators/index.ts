@@ -17,6 +17,7 @@ import { BUSINESS_CALCULATORS } from './business';
 import { STATISTIK_CALCULATORS } from './statistik';
 import { STEUERN_GEHALT_CALCULATORS } from './steuernGehalt';
 import { STEUER_RECHT_CALCULATORS } from './steuerRecht';
+import { SCHULMATHE_CALCULATORS } from './schulmathe';
 import { EXTRA_CALCULATORS } from './extra';
 import { enrichCalculator } from './enrichment';
 import { isCalculatorRetired, RETIRED_CALCULATORS } from '@/data/seo/retired-calculators';
@@ -33,6 +34,7 @@ const RAW_CALCULATORS: CalculatorDefinition[] = [
   ...ARBEIT_CALCULATORS,
   ...STEUERN_GEHALT_CALCULATORS,
   ...STEUER_RECHT_CALCULATORS,
+  ...SCHULMATHE_CALCULATORS,
   ...GESUNDHEIT_CALCULATORS,
   ...FAMILIE_CALCULATORS,
   ...BAUEN_CALCULATORS,

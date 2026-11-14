@@ -18,7 +18,7 @@ describe('every live calculator can load its engine in the browser', () => {
 
 describe('restored calculators are live, indexable and in the sitemap', () => {
   const urls = new Set(sitemap().map((e) => e.url));
-  for (const slug of ['temperatur-umrechner', 'quader-volumen-rechner', 'marge-rechner', 'pfaendungsrechner', 'ehegattensplitting-rechner']) {
+  for (const slug of ['temperatur-umrechner', 'quader-volumen-rechner', 'marge-rechner', 'pfaendungsrechner', 'ehegattensplitting-rechner', 'pq-formel-rechner', 'minijob-stunden-rechner']) {
     it(slug, () => {
       expect(isCalculatorRetired(slug)).toBe(false);
       expect(getCalculatorBySlug(slug)).toBeDefined();
@@ -120,5 +120,68 @@ describe('keyword pages', () => {
     expect(getCalculatorBySlug('mwst-rechner')!.metaTitle).toContain('Umsatzsteuer');
     expect(getCalculatorBySlug('tilgungsrechner')!.metaTitle).toContain('Hypothekenrechner');
     expect(getCalculatorBySlug('temperatur-umrechner')!.metaTitle).toContain('Celsius in Fahrenheit');
+  });
+});
+
+describe('Minijob limit switches by date', () => {
+  it('formula Mindestlohn × 130 / 3, rounded up, gives the official limits', async () => {
+    const { MINIJOB_PERIODS, minijobGrenzeFromMindestlohn } = await import('@/data/regulated/minijob');
+    for (const p of MINIJOB_PERIODS) expect(minijobGrenzeFromMindestlohn(p.mindestlohn), String(p.year)).toBe(p.grenze);
+  });
+  it('uses 603 € until 31 Dec 2026 and 633 € / 14,60 € from 1 Jan 2027 (German time)', async () => {
+    const { getMinijobPeriod, todayInGermany } = await import('@/data/regulated/minijob');
+    expect(getMinijobPeriod('2026-12-31')).toMatchObject({ grenze: 603, mindestlohn: 13.9 });
+    expect(getMinijobPeriod('2027-01-01')).toMatchObject({ grenze: 633, mindestlohn: 14.6 });
+    // 23:30 UTC on 31 Dec is already 1 Jan in Germany
+    expect(todayInGermany(new Date('2026-12-31T23:30:00Z'))).toBe('2027-01-01');
+  });
+  it('legal data for 2026 matches the period table', async () => {
+    const { getMinijobPeriodByYear } = await import('@/data/regulated/minijob');
+    expect(LEGAL_VALUES_2026.minijobGrenze.value).toBe(getMinijobPeriodByYear(2026)!.grenze);
+    expect(LEGAL_VALUES_2026.mindestlohnStunde.value).toBe(getMinijobPeriodByYear(2026)!.mindestlohn);
+  });
+});
+
+describe('Minijob-Stundenrechner', () => {
+  it('about 43 hours a month / 10 a week at minimum wage', () => {
+    const r26 = run('minijob-stunden-rechner', { year: '2026', wageType: 'mindestlohn' });
+    expect(r26.primary.value).toBe(43.38);
+    expect(r26.secondary!.find((s) => s.id === 'maxHoursWeek')!.value).toBe(10.01);
+    expect(run('minijob-stunden-rechner', { year: '2027', wageType: 'mindestlohn' }).primary.value).toBe(43.35);
+  });
+  it('higher wage means fewer hours, and flags planned hours above the limit', () => {
+    const r = run('minijob-stunden-rechner', { year: '2026', wageType: 'custom', hourlyWage: 15, plannedHoursPerWeek: 10 });
+    expect(r.primary.value).toBe(40.2);
+    expect(r.secondary!.find((s) => s.id === 'plannedEarnings')!.formattedValue).toMatch(/über der Grenze/);
+  });
+  it('rejects wages below the minimum wage of the chosen year', () => {
+    expect(run('minijob-stunden-rechner', { year: '2027', wageType: 'custom', hourlyWage: 14 }).error).toMatch(/Mindestlohn/);
+  });
+});
+
+describe('pq-Formel-Rechner', () => {
+  it('two solutions with steps and Vieta check', () => {
+    const r = run('pq-formel-rechner', { mode: 'pq', p: -2, q: -8 });
+    expect(r.secondary!.find((s) => s.id === 'x1')!.value).toBe(4);
+    expect(r.secondary!.find((s) => s.id === 'x2')!.value).toBe(-2);
+    expect(r.calculationSteps!.join(' ')).toMatch(/Vieta/);
+  });
+  it('general form is normalised by a', () => {
+    const r = run('pq-formel-rechner', { mode: 'abc', a: 2, b: -8, c: 6 });
+    expect([r.secondary!.find((s) => s.id === 'x1')!.value, r.secondary!.find((s) => s.id === 'x2')!.value]).toEqual([3, 1]);
+  });
+  it('double root, no real root and a = 0', () => {
+    expect(run('pq-formel-rechner', { mode: 'pq', p: -4, q: 4 }).primary.formattedValue).toBe('x = 2');
+    expect(run('pq-formel-rechner', { mode: 'pq', p: 2, q: 5 }).primary.formattedValue).toBe('Keine reelle Lösung');
+    expect(run('pq-formel-rechner', { mode: 'abc', a: 0, b: 2, c: 1 }).error).toBeDefined();
+  });
+  it('solutions really solve the equation', () => {
+    for (const [p, q] of [[1, -1], [3.5, -2.25], [-7, 10], [0, -9]]) {
+      const r = run('pq-formel-rechner', { mode: 'pq', p, q });
+      for (const id of ['x1', 'x2']) {
+        const x = Number(r.secondary!.find((s) => s.id === id)!.value);
+        expect(x * x + p * x + q).toBeCloseTo(0, 9);
+      }
+    }
   });
 });

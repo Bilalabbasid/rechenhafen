@@ -30,12 +30,15 @@ const MODULE_LOADERS: Record<string, () => Promise<{ default?: any; [key: string
   extraBusinessStatistik: () => import('@/data/calculators/extra/businessStatistik'),
   steuernGehalt: () => import('@/data/calculators/steuernGehalt'),
   steuerRecht: () => import('@/data/calculators/steuerRecht'),
+  schulmathe: () => import('@/data/calculators/schulmathe'),
 };
 
 const SLUG_TO_MODULE: Record<string, string> = {
   "brutto-netto-rechner": "steuernGehalt",
   "pfaendungsrechner": "steuerRecht",
   "ehegattensplitting-rechner": "steuerRecht",
+  "minijob-stunden-rechner": "steuerRecht",
+  "pq-formel-rechner": "schulmathe",
   "netto-brutto-rechner": "steuernGehalt",
   "einkommensteuerrechner": "steuernGehalt",
   "grenzsteuersatz-rechner": "steuernGehalt",

@@ -957,8 +957,10 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Für Studierende oder Personen ohne sonstige Pflichtversicherung kann sich das Einzahlen lohnen, da mit geringem Eigenbeitrag Beitragsmonate für die Altersrente und der Anspruch auf Erwerbsminderungsrente gesichert werden.' },
       { question: 'Wie hoch ist die Minijob-Grenze 2026?', answer: 'Seit dem 1. Januar 2026 liegt die Minijob-Grenze bei 603 € im Monat (2025: 556 €). Sie ist an den Mindestlohn gekoppelt und steigt mit ihm. Im Jahr dürfen Sie damit bis zu 7.236 € verdienen. Ein gelegentliches, unvorhersehbares Überschreiten ist in bis zu zwei Kalendermonaten pro Jahr erlaubt.' },
+      { question: 'Wie viele Stunden darf ich im Minijob arbeiten?', answer: 'Zum Mindestlohn von 13,90 € (2026) sind es höchstens 43,38 Stunden im Monat, im Schnitt rund 10 Stunden pro Woche. Bei höherem Stundenlohn sind es weniger. Ihre genaue Stundenzahl zeigt der [Minijob-Stundenrechner](/rechner/minijob-stunden-rechner/).' },
+      { question: 'Wie hoch ist die Minijob-Grenze 2027?', answer: 'Ab dem 1. Januar 2027 steigt der Mindestlohn auf 14,60 € und die Minijob-Grenze auf 633 € im Monat (7.596 € im Jahr). Die Formel: Mindestlohn × 130 / 3, auf volle Euro aufgerundet.' },
     ],
-    relatedSlugs: ['midijob-rechner', 'brutto-netto-rechner', 'stundenlohnrechner', 'bonus-netto-rechner'],
+    relatedSlugs: ['minijob-stunden-rechner', 'midijob-rechner', 'brutto-netto-rechner', 'stundenlohnrechner', 'bonus-netto-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,

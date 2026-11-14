@@ -1,5 +1,6 @@
 import { CalculatorDefinition } from '@/types/calculator';
-import { calculatePfaendung, calculateSplittingvorteil, pfaendungsFreibetrag, PFAENDUNGSFREIGRENZEN } from '@/lib/calculators/steuerRecht';
+import { calculatePfaendung, calculateSplittingvorteil, calculateMinijobStunden, pfaendungsFreibetrag, PFAENDUNGSFREIGRENZEN } from '@/lib/calculators/steuerRecht';
+import { getMinijobPeriod, getMinijobPeriodByYear, WEEKS_PER_MONTH } from '@/data/regulated/minijob';
 import { formatCurrency } from '@/lib/formatters';
 
 const P = PFAENDUNGSFREIGRENZEN['2026'];
@@ -11,6 +12,18 @@ const pf1 = calculatePfaendung({ netIncome: 2500, dependents: 1, period: '2026' 
 const sp = calculateSplittingvorteil({ incomeA: 60000, incomeB: 20000, taxYear: '2026' });
 const spOne = calculateSplittingvorteil({ incomeA: 60000, incomeB: 0, taxYear: '2026' });
 const spEqual = calculateSplittingvorteil({ incomeA: 40000, incomeB: 40000, taxYear: '2026' });
+
+// Minijob: values follow today's date (calculator pages are regenerated daily), so the switch on 1 January happens by itself.
+const MJ = getMinijobPeriod();
+const MJ25 = getMinijobPeriodByYear(2025)!;
+const MJ26 = getMinijobPeriodByYear(2026)!;
+const MJ27 = getMinijobPeriodByYear(2027)!;
+const eur0 = (n: number) => `${Math.round(n).toLocaleString('de-DE')} €`;
+const floor2 = (x: number) => Math.floor(x * 100 + 1e-9) / 100;
+const hrs = (grenze: number, wage: number) => floor2(grenze / wage).toLocaleString('de-DE');
+const hrsWeek = (grenze: number, wage: number) => floor2(grenze / wage / WEEKS_PER_MONTH).toLocaleString('de-DE');
+const mjExample = calculateMinijobStunden({ year: String(MJ.year), wageType: 'mindestlohn' });
+const mjExample15 = calculateMinijobStunden({ year: String(MJ.year), wageType: 'custom', hourlyWage: 15, plannedHoursPerWeek: 10 });
 
 export const STEUER_RECHT_CALCULATORS: CalculatorDefinition[] = [
   {
@@ -223,5 +236,125 @@ export const STEUER_RECHT_CALCULATORS: CalculatorDefinition[] = [
       { label: '§ 32a EStG', url: 'https://www.gesetze-im-internet.de/estg/__32a.html' },
       { label: '§ 26 EStG', url: 'https://www.gesetze-im-internet.de/estg/__26.html' },
     ],
+  },
+  {
+    id: 'minijob-stunden-rechner',
+    slug: 'minijob-stunden-rechner',
+    name: 'Minijob-Stundenrechner (Wie viele Stunden darf ich arbeiten?)',
+    shortName: 'Minijob Stunden',
+    category: 'steuern-gehalt',
+    subcategory: 'Sonderzahlungen & Minijob',
+    metaTitle: `Minijob Stunden ${MJ26.year}/${MJ27.year}: Wie viele Stunden pro Woche?`,
+    metaDescription: `Wie viele Stunden darf ich im Minijob arbeiten? ${MJ26.year}: ${eur0(MJ26.grenze)} Grenze, ab 1. Januar ${MJ27.year}: ${eur0(MJ27.grenze)}. Stunden pro Monat und Woche – mit Mindestlohn oder eigenem Stundenlohn.`,
+    h1: 'Minijob-Stundenrechner: Wie viele Stunden darf ich im Minijob arbeiten?',
+    shortDescription: 'Berechnet, wie viele Stunden pro Monat und Woche in einen Minijob passen – mit Mindestlohn oder Ihrem Stundenlohn.',
+    searchKeywords: [
+      'minijob stunden',
+      'minijob wie viele stunden',
+      'minijob wie viele stunden pro woche',
+      'wie viele stunden minijob',
+      'minijob stunden pro woche',
+      'minijob stunden pro monat',
+      'minijob 2026 wie viele stunden',
+      'minijob 2027 wie viele stunden',
+      'minijob grenze 2027',
+      'minijobgrenze 2027',
+      'minijob stundenrechner',
+    ],
+    inputs: [
+      {
+        id: 'year',
+        label: 'Zeitraum',
+        type: 'select',
+        defaultValue: 'auto',
+        options: [
+          { value: 'auto', label: 'Aktuell (nach heutigem Datum)' },
+          { value: String(MJ27.year), label: `${MJ27.year}: ${eur0(MJ27.grenze)} Grenze, ${eur(MJ27.mindestlohn)} Mindestlohn` },
+          { value: String(MJ26.year), label: `${MJ26.year}: ${eur0(MJ26.grenze)} Grenze, ${eur(MJ26.mindestlohn)} Mindestlohn` },
+          { value: String(MJ25.year), label: `${MJ25.year}: ${eur0(MJ25.grenze)} Grenze, ${eur(MJ25.mindestlohn)} Mindestlohn` },
+        ],
+      },
+      {
+        id: 'wageType',
+        label: 'Stundenlohn',
+        type: 'select',
+        defaultValue: 'mindestlohn',
+        options: [
+          { value: 'mindestlohn', label: 'Gesetzlicher Mindestlohn' },
+          { value: 'custom', label: 'Eigener Stundenlohn' },
+        ],
+      },
+      { id: 'hourlyWage', label: 'Ihr Stundenlohn brutto', type: 'number', defaultValue: 15, min: 0.01, max: 200, step: 0.1, unit: '€', dependsOn: { field: 'wageType', value: 'custom' } },
+      { id: 'plannedHoursPerWeek', label: 'Geplante Stunden pro Woche (optional)', type: 'number', defaultValue: 0, min: 0, max: 60, step: 0.5, unit: 'h', helpText: 'Prüft, ob Ihre geplanten Wochenstunden in den Minijob passen. 0 = keine Prüfung.' },
+    ],
+    calculate: calculateMinijobStunden,
+    formula: 'Stunden pro Monat = Minijob-Grenze / Stundenlohn   |   Stunden pro Woche = Stunden pro Monat / 4,33',
+    formulaExplanation: 'Die Minijob-Grenze ist an den Mindestlohn gekoppelt: Mindestlohn × 130 / 3, auf volle Euro aufgerundet. Das entspricht 10 Wochenstunden zum Mindestlohn. Je höher Ihr Stundenlohn, desto weniger Stunden passen in die Grenze. Für die Woche rechnet das Gesetz mit 13 Wochen pro 3 Monate, also 4,33 Wochen im Monat.',
+    workedExample: {
+      title: `Beispiel: Mindestlohn ${MJ.year} (${eur(MJ.mindestlohn)})`,
+      description: mjExample.summaryText ?? '',
+      inputs: { year: String(MJ.year), wageType: 'mindestlohn', plannedHoursPerWeek: 0 },
+      resultSummary: `${mjExample.primary.formattedValue} pro Monat`,
+    },
+    workedExamples: [
+      {
+        title: `Mindestlohn ${MJ26.year}`,
+        description: `${eur0(MJ26.grenze)} Grenze bei ${eur(MJ26.mindestlohn)} pro Stunde.`,
+        inputs: { year: String(MJ26.year), wageType: 'mindestlohn', plannedHoursPerWeek: 0 },
+        steps: [`${eur0(MJ26.grenze)} / ${eur(MJ26.mindestlohn)} = ${hrs(MJ26.grenze, MJ26.mindestlohn)} Stunden im Monat`, `${hrs(MJ26.grenze, MJ26.mindestlohn)} / 4,33 = ${hrsWeek(MJ26.grenze, MJ26.mindestlohn)} Stunden pro Woche`],
+        resultSummary: `${hrs(MJ26.grenze, MJ26.mindestlohn)} Stunden im Monat, rund 10 pro Woche.`,
+      },
+      {
+        title: `Mindestlohn ab 1. Januar ${MJ27.year}`,
+        description: `${eur0(MJ27.grenze)} Grenze bei ${eur(MJ27.mindestlohn)} pro Stunde.`,
+        inputs: { year: String(MJ27.year), wageType: 'mindestlohn', plannedHoursPerWeek: 0 },
+        steps: [`${eur0(MJ27.grenze)} / ${eur(MJ27.mindestlohn)} = ${hrs(MJ27.grenze, MJ27.mindestlohn)} Stunden im Monat`, `${hrs(MJ27.grenze, MJ27.mindestlohn)} / 4,33 = ${hrsWeek(MJ27.grenze, MJ27.mindestlohn)} Stunden pro Woche`],
+        resultSummary: `${hrs(MJ27.grenze, MJ27.mindestlohn)} Stunden im Monat – fast genauso viele wie ${MJ26.year}.`,
+      },
+      {
+        title: `15 € Stundenlohn, 10 Stunden pro Woche (${MJ.year})`,
+        description: 'Wer mehr als den Mindestlohn verdient, darf weniger Stunden arbeiten.',
+        inputs: { year: String(MJ.year), wageType: 'custom', hourlyWage: 15, plannedHoursPerWeek: 10 },
+        resultSummary: mjExample15.summaryText ?? '',
+      },
+    ],
+    content: {
+      intro: `Im Minijob zählt nicht die Stundenzahl, sondern der Verdienst: Er darf im Durchschnitt höchstens ${eur0(MJ.grenze)} im Monat betragen (Stand ${MJ.year}). Wie viele Stunden Sie arbeiten dürfen, hängt deshalb von Ihrem Stundenlohn ab. Zum Mindestlohn sind es rund 43 Stunden im Monat, also etwa 10 Stunden pro Woche. Der Rechner wählt automatisch die Werte, die heute gelten.`,
+      sections: [
+        {
+          title: 'Minijob-Grenze und Mindestlohn nach Jahr',
+          content: [MJ25, MJ26, MJ27]
+            .map((p) => `- **${p === MJ27 ? `ab 1. Januar ${p.year}` : p.year}:** ${eur0(p.grenze)} im Monat (${eur0(p.grenze * 12)} im Jahr), Mindestlohn ${eur(p.mindestlohn)} → ${hrs(p.grenze, p.mindestlohn)} Stunden im Monat`)
+            .join('\n') +
+            '\n\nWeil die Grenze mit dem Mindestlohn steigt, bleibt die mögliche Stundenzahl zum Mindestlohn fast gleich: etwa 43 Stunden im Monat.',
+        },
+        {
+          title: 'Mehr Stunden bei höherem Stundenlohn? Nein, weniger',
+          content: `Die Grenze ist ein Eurobetrag. Bei 15 € pro Stunde passen ${MJ.year} nur ${hrs(MJ.grenze, 15)} Stunden in den Monat, bei 20 € nur ${hrs(MJ.grenze, 20)} Stunden. Wer mehr arbeiten möchte, rutscht in den Midijob (Übergangsbereich) mit reduzierten Sozialabgaben – den Nettolohn zeigt der [Midijob-Rechner](/rechner/midijob-rechner/).`,
+        },
+        {
+          title: 'Kurz mehr arbeiten: was erlaubt ist',
+          content: 'Ein gelegentliches und nicht vorhersehbares Überschreiten der Grenze ist in bis zu zwei Kalendermonaten im Jahr erlaubt, wenn der Verdienst im jeweiligen Monat höchstens das Doppelte der Grenze beträgt (§ 8 Abs. 1b SGB IV). Typisch ist eine Krankheitsvertretung. Planbare Mehrarbeit wie das Weihnachtsgeschäft zählt nicht dazu.',
+        },
+      ],
+    },
+    faqs: [
+      { question: `Wie viele Stunden darf ich ${MJ.year} im Minijob arbeiten?`, answer: `Zum Mindestlohn von ${eur(MJ.mindestlohn)} sind es höchstens ${hrs(MJ.grenze, MJ.mindestlohn)} Stunden im Monat, im Schnitt ${hrsWeek(MJ.grenze, MJ.mindestlohn)} Stunden pro Woche. Entscheidend ist der Verdienst von maximal ${eur0(MJ.grenze)} im Monat, nicht die Stundenzahl.` },
+      { question: 'Wie viele Stunden pro Woche sind im Minijob erlaubt?', answer: `Eine feste Stundengrenze gibt es nicht. Zum Mindestlohn ergeben sich rund 10 Stunden pro Woche (${MJ26.year}: ${hrsWeek(MJ26.grenze, MJ26.mindestlohn)}, ${MJ27.year}: ${hrsWeek(MJ27.grenze, MJ27.mindestlohn)}). Bei höherem Stundenlohn sind es entsprechend weniger.` },
+      { question: `Wie hoch ist die Minijob-Grenze ${MJ27.year}?`, answer: `Ab dem 1. Januar ${MJ27.year} liegt die Minijob-Grenze bei ${eur0(MJ27.grenze)} im Monat und ${eur0(MJ27.grenze * 12)} im Jahr, weil der Mindestlohn auf ${eur(MJ27.mindestlohn)} steigt. Im Jahr ${MJ26.year} gilt eine Grenze von ${eur0(MJ26.grenze)}.` },
+      { question: 'Wie wird die Minijob-Grenze berechnet?', answer: `Mindestlohn mal 130, geteilt durch 3, auf volle Euro aufgerundet (§ 8 Abs. 1a SGB IV). Das entspricht 10 Stunden pro Woche zum Mindestlohn. Für ${MJ27.year}: ${eur(MJ27.mindestlohn)} × 130 / 3 = ${eur((MJ27.mindestlohn * 130) / 3)}, aufgerundet ${eur0(MJ27.grenze)}.` },
+      { question: 'Muss mein Arbeitgeber die Stunden anpassen, wenn der Mindestlohn steigt?', answer: 'Er muss mindestens den neuen Mindestlohn zahlen. Bleiben die Stunden gleich, steigt Ihr Verdienst. Weil die Minijob-Grenze im selben Schritt mitsteigt, passen zum Mindestlohn trotzdem weiterhin rund 43 Stunden im Monat.' },
+      { question: 'Was passiert, wenn ich die Minijob-Grenze überschreite?', answer: 'Dann wird aus dem Minijob ein Midijob mit Beiträgen zur Kranken-, Pflege- und Arbeitslosenversicherung. Ausnahme: Ein gelegentliches, unvorhersehbares Überschreiten in höchstens zwei Monaten im Jahr bis zum Doppelten der Grenze bleibt erlaubt.' },
+    ],
+    relatedSlugs: ['minijob-rechner', 'midijob-rechner', 'stundenlohnrechner', 'brutto-netto-rechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: MJ.year,
+      source: '§ 8 Abs. 1a SGB IV; Fünfte Mindestlohnanpassungsverordnung (13,90 € ab 1.1.2026, 14,60 € ab 1.1.2027)',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_4/__8.html',
+      lastVerified: '2026-11-14',
+    },
+    disclaimerType: 'gehalt-sozialversicherung',
+    legalBasis: [{ label: '§ 8 SGB IV', url: 'https://www.gesetze-im-internet.de/sgb_4/__8.html' }],
   },
 ];
