@@ -32,9 +32,9 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Prozentrechner',
     category: 'mathematik',
     subcategory: 'Prozentrechnung',
-    metaTitle: 'Prozentrechner – Prozentwert, Prozentsatz & Grundwert',
+    metaTitle: 'Prozentrechner: Prozent berechnen mit Formel & Rechenweg',
     metaDescription: 'Prozentrechner kostenlos: Prozentwert, Prozentsatz oder Grundwert berechnen und Aufschläge oder Rabatte zurückrechnen – mit Formel und Rechenweg.',
-    h1: 'Prozentrechner – Prozentwert, Prozentsatz und Grundwert berechnen',
+    h1: 'Prozentrechner – Prozent berechnen: Prozentwert, Prozentsatz und Grundwert',
     shortDescription: 'Löst jede Grundaufgabe der Prozentrechnung: Prozentwert, Prozentsatz oder Grundwert gesucht – dazu Aufschläge, Rabatte und der Ursprungswert vor einer Änderung.',
     searchKeywords: [
       'prozentrechner',
@@ -52,6 +52,12 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       'ursprungspreis berechnen',
       'prozent aufschlag berechnen',
       'rabatt in prozent berechnen',
+      'prozente berechnen',
+      'prozent von berechnen',
+      'prozent ausrechnen',
+      'prozent rechnen',
+      'prozentualen anteil berechnen',
+      'prozentanteil berechnen',
     ],
     inputs: [
       {
@@ -178,6 +184,14 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
       {
         question: 'Wie rechnet man Prozent aus?',
         answer: 'Teilen Sie den Anteil durch das Ganze und multiplizieren Sie mit 100: p = W / G · 100. Sind zum Beispiel 30 von 120 Schülern krank, sind das 30 / 120 · 100 = 25 %. Wollen Sie umgekehrt wissen, wie viel 25 % von 120 sind, rechnen Sie 120 · 25 / 100 = 30.',
+      },
+      {
+        question: 'Wie berechne ich den Prozentsatz?',
+        answer: 'Teilen Sie den Prozentwert durch den Grundwert und nehmen Sie das Ergebnis mal 100: p = W / G · 100. Kostet ein Artikel 80 € und Sie sparen 12 €, beträgt der Rabatt 12 / 80 · 100 = 15 %. Im Rechner wählen Sie dafür „Prozentsatz“.',
+      },
+      {
+        question: 'Wie berechnet man den Prozentwert?',
+        answer: 'Multiplizieren Sie den Grundwert mit dem Prozentsatz und teilen Sie durch 100: W = G · p / 100. 19 % Mehrwertsteuer auf 250 € netto sind also 250 · 19 / 100 = 47,50 €. Im Rechner ist das der Modus „Prozentwert“.',
       },
       {
         question: 'Wie berechnet man den Grundwert?',
@@ -468,7 +482,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Dreieck berechnen',
     category: 'mathematik',
     subcategory: 'Zahlen & Algebra',
-    metaTitle: 'Dreieck berechnen – Fläche, Umfang, Höhen & Winkel',
+    metaTitle: 'Dreieck berechnen – Flächeninhalt, Umfang, Höhen & Winkel',
     metaDescription: 'Dreieck kostenlos berechnen: aus Grundseite und Höhe, drei Seiten (Heron) oder zwei Seiten und Winkel – mit Höhen, Winkeln, Radien und Rechenweg.',
     h1: 'Dreieck berechnen – Fläche, Umfang, Höhen und Winkel',
     shortDescription: 'Berechnet Flächeninhalt, Umfang, alle drei Höhen, die Winkel sowie Inkreis- und Umkreisradius – aus drei Seiten, aus Grundseite und Höhe oder aus zwei Seiten mit eingeschlossenem Winkel.',
@@ -757,6 +771,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Was sind pythagoreische Tripel?', answer: 'Das sind ganzzahlige Seitenlängen, die den Satz exakt erfüllen. Das bekannteste Tripel ist 3, 4, 5 (denn 9 + 16 = 25), gefolgt von 5, 12, 13.' },
       { question: 'Gilt der Satz des Pythagoras auch bei schiefwinkligen Dreiecken?', answer: 'Nein, für allgemeine Dreiecke ohne rechten Winkel gilt der verallgemeinerte Kosinussatz: c² = a² + b² - 2ab · cos(gamma).' },
+      { question: 'Wie berechnet man die Hypotenuse?', answer: 'Quadrieren Sie beide Katheten, addieren Sie die Quadrate und ziehen Sie die Wurzel: c = √(a² + b²). Bei a = 3 cm und b = 4 cm ist c = √(9 + 16) = √25 = 5 cm. Die Hypotenuse ist immer die längste Seite und liegt gegenüber dem rechten Winkel.' },
     ],
     relatedSlugs: ['dreieckrechner', 'quadratwurzel-rechner', 'dreisatzrechner'],
   },

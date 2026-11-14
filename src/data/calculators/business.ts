@@ -51,11 +51,11 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'MwSt-Rechner',
     category: 'business',
     subcategory: 'Preise & Margen',
-    metaTitle: 'Mehrwertsteuer Rechner – Netto & Brutto berechnen',
+    metaTitle: 'MwSt-Rechner: Mehrwertsteuer & Umsatzsteuer berechnen',
     metaDescription: 'Umsatzsteuer online berechnen: Netto zu Brutto oder Brutto zu Netto. Mit 19 % Regelsteuersatz und 7 % ermäßigtem Satz für Deutschland.',
-    h1: 'Mehrwertsteuer Rechner (UStG 19 % und 7 %)',
+    h1: 'Mehrwertsteuer- und Umsatzsteuer-Rechner (19 % und 7 %)',
     shortDescription: 'Wandelt Beträge zwischen Netto und Brutto um und weist die gesetzliche Mehrwertsteuer aus.',
-    searchKeywords: ['mwst rechner', 'mehrwertsteuer berechnen', 'netto brutto rechner', '19 prozent mwst ausrechnen', 'umsatzsteuer rechner'],
+    searchKeywords: ['mwst rechner', 'mehrwertsteuer berechnen', 'netto brutto rechner', '19 prozent mwst ausrechnen', 'umsatzsteuer rechner', 'umsatzsteuer berechnen', 'mehrwertsteuer rechner', 'mwst herausrechnen', 'brutto netto mwst'],
     inputs: [
       { id: 'amount', label: 'Eingabebetrag in Euro', type: 'number', defaultValue: 119.0, step: 0.01, unit: '€' },
       {
@@ -95,6 +95,8 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Welche Produkte unterliegen in Deutschland dem ermäßigten Steuersatz von 7 %?', answer: 'Grundnahrungsmittel (Milch, Brot, Fleisch, Gemüse), Bücher, Zeitungen, Fahrkarten im Nahverkehr und Übernachtungen in Hotels.' },
       { question: 'Was ist der Unterschied zwischen Vorsteuer und Umsatzsteuer?', answer: 'Umsatzsteuer nimmt der Unternehmer von seinen Kunden ein; Vorsteuer zahlt er selbst auf Einkäufe an andere Firmen; an das Finanzamt wird nur die Zahllast (Umsatzsteuer minus Vorsteuer) überwiesen.' },
+      { question: 'Ist Mehrwertsteuer dasselbe wie Umsatzsteuer?', answer: 'Ja. Umsatzsteuer ist der gesetzliche Begriff aus dem Umsatzsteuergesetz (UStG), Mehrwertsteuer der umgangssprachliche. Gemeint ist dieselbe Steuer mit 19 % Regelsatz und 7 % ermäßigtem Satz (§ 12 UStG).' },
+      { question: 'Wie rechne ich die Mehrwertsteuer aus dem Bruttobetrag heraus?', answer: 'Teilen Sie den Bruttobetrag durch 1,19 (bei 7 % durch 1,07), dann erhalten Sie den Nettobetrag. Die Differenz ist die enthaltene Mehrwertsteuer. Bei 119 € brutto sind das 119 / 1,19 = 100 € netto und 19 € Steuer. 19 % vom Bruttobetrag abzuziehen wäre falsch: Das ergäbe 96,39 €.' },
     ],
     relatedSlugs: ['marge-rechner', 'prozentrechner', 'stundenlohnrechner'],
     isTimeSensitive: true,

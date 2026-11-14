@@ -187,7 +187,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
     metaDescription: 'Ermitteln Sie Volumen (in cm³ und Litern), Mantelfläche und Gesamtoberfläche eines Zylinders aus Radius und Höhe.',
     h1: 'Zylinder Rechner – Volumen & Oberfläche berechnen',
     shortDescription: 'Berechnet Volumen, Füllmenge in Litern und Oberfläche von Rundkörpern und Zylindern.',
-    searchKeywords: ['zylinderrechner', 'zylindervolumen berechnen formel', 'oberfläche zylinder rechner', 'volumen zylinder liter'],
+    searchKeywords: ['zylinderrechner', 'zylindervolumen berechnen formel', 'oberfläche zylinder rechner', 'volumen zylinder liter', 'volumen zylinder berechnen', 'zylinder volumen formel', 'mantelfläche zylinder'],
     inputs: [
       { id: 'radius', label: 'Radius der Grundfläche (r)', type: 'number', defaultValue: 5.0, min: 0.1, step: 0.1, unit: 'cm' },
       { id: 'height', label: 'Höhe des Zylinders (h)', type: 'number', defaultValue: 15.0, min: 0.1, step: 0.5, unit: 'cm' },
@@ -208,6 +208,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Wie berechnet man das Fassungsvermögen einer Regentonne in Litern?', answer: 'Messen Sie Innenradius r und Füllhöhe h in Dezimetern (dm): Das berechnete Volumen in dm³ entspricht direkt der Literzahl (z. B. r=3 dm, h=8 dm -> V ≈ 226 Liter).' },
       { question: 'Was ist ein gleichseitiger Zylinder?', answer: 'Ein Zylinder, dessen Höhe h exakt seinem Durchmesser d (h = 2r) entspricht; er besitzt das minimale Oberflächen-zu-Volumen-Verhältnis aller Kreiszylinder.' },
+      { question: 'Wie berechnet man das Volumen eines Zylinders?', answer: 'Grundfläche mal Höhe: V = π · r² · h. Bei r = 5 cm und h = 15 cm ist V = π · 25 · 15 ≈ 1.178,1 cm³, also rund 1,18 Liter (1.000 cm³ = 1 Liter). Kennen Sie nur den Durchmesser d, nehmen Sie r = d / 2.' },
     ],
     relatedSlugs: ['stumpf-kegel-rechner', 'torus-volumen-rechner', 'prisma-volumen-rechner', 'kreisrechner', 'rechteckrechner', 'betonrechner'],
   },

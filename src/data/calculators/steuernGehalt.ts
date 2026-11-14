@@ -372,7 +372,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     subcategory: 'Einkommensteuer & Tarif',
     metaTitle: 'Einkommensteuerrechner 2026 mit Soli & Kirchensteuer',
     metaDescription: 'Kostenloser Einkommensteuerrechner 2026/2025: Steuer nach § 32a EStG, Grenzsteuersatz, Soli mit Freigrenze und Milderungszone sowie Kirchensteuer.',
-    h1: 'Einkommensteuerrechner 2026: Steuer, Soli und Kirchensteuer berechnen',
+    h1: 'Einkommensteuerrechner 2026: Steuer, Solidaritätszuschlag (Soli) und Kirchensteuer berechnen',
     shortDescription: 'Berechnet die tarifliche Einkommensteuer mit Durchschnitts- und Grenzsteuersatz für Grund- und Splittingtarif. Zeigt, ob Soli anfällt (Freigrenze, Milderungszone), und berechnet den Soli auf Wunsch direkt aus Ihrer festgesetzten Steuer.',
     searchKeywords: [
       'einkommensteuerrechner',
@@ -908,7 +908,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     metaDescription: 'Berechnen Sie Nettoverdienst und Arbeitgeberkosten für geringfügige Beschäftigung bei der gesetzlichen Minijob-Grenze (603 € in 2026 / 556 € in 2025).',
     h1: 'Minijob-Rechner – Geringfügige Beschäftigung berechnen',
     shortDescription: 'Ermittelt den Auszahlungsbetrag für Minijobber mit und ohne Befreiung von der Rentenversicherungspflicht sowie die Pauschalabgaben des Arbeitgebers.',
-    searchKeywords: ['minijob rechner 2026', '603 euro minijob rechner', '556 euro minijob', 'minijob rentenversicherung befreiung rechner'],
+    searchKeywords: ['minijob rechner 2026', '603 euro minijob rechner', '556 euro minijob', 'minijob rentenversicherung befreiung rechner', 'minijob grenze 2026', 'minijob rechner', 'minijob abgaben arbeitgeber'],
     inputs: [
       {
         id: 'earnings',
@@ -956,6 +956,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Für Studierende oder Personen ohne sonstige Pflichtversicherung kann sich das Einzahlen lohnen, da mit geringem Eigenbeitrag Beitragsmonate für die Altersrente und der Anspruch auf Erwerbsminderungsrente gesichert werden.' },
+      { question: 'Wie hoch ist die Minijob-Grenze 2026?', answer: 'Seit dem 1. Januar 2026 liegt die Minijob-Grenze bei 603 € im Monat (2025: 556 €). Sie ist an den Mindestlohn gekoppelt und steigt mit ihm. Im Jahr dürfen Sie damit bis zu 7.236 € verdienen. Ein gelegentliches, unvorhersehbares Überschreiten ist in bis zu zwei Kalendermonaten pro Jahr erlaubt.' },
     ],
     relatedSlugs: ['midijob-rechner', 'brutto-netto-rechner', 'stundenlohnrechner', 'bonus-netto-rechner'],
     isTimeSensitive: true,
@@ -1345,7 +1346,8 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     ],
   },
 
-  // 14. UMSATZSTEUERRECHNER  // 15. GEWERBESTEUERRECHNER
+  // 14. UMSATZSTEUERRECHNER
+  // 15. GEWERBESTEUERRECHNER
   {
     id: 'gewerbesteuer-rechner',
     slug: 'gewerbesteuer-rechner',

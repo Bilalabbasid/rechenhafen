@@ -310,9 +310,9 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Tilgungsrechner',
     category: 'kredit-schulden',
     subcategory: 'Tilgung & Annuität',
-    metaTitle: 'Tilgungsrechner: Tilgungsplan, Rate & Restschuld berechnen',
+    metaTitle: 'Tilgungsrechner & Hypothekenrechner: Rate und Restschuld',
     metaDescription: 'Kostenloser Tilgungsrechner für die Baufinanzierung: Monatsrate, Restschuld nach der Zinsbindung, Tilgungsplan und Volltilger-Rate auf einen Blick.',
-    h1: 'Tilgungsrechner: Rate, Restschuld und Tilgungsplan für Ihre Baufinanzierung',
+    h1: 'Tilgungsrechner und Hypothekenrechner: Rate, Restschuld und Tilgungsplan für Ihre Baufinanzierung',
     shortDescription: 'Berechnet Monatsrate, Tilgungsplan und Restschuld nach der Zinsbindung – mit fester Anfangstilgung oder als Volltilger, auf Wunsch direkt aus Kaufpreis, Nebenkosten und Eigenkapital.',
     searchKeywords: [
       'tilgungsrechner',
