@@ -1,6 +1,7 @@
 import { CalculatorDefinition } from '@/types/calculator';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
+import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { DUESSELDORFER_TABELLE_2026, getDtEinkommensgruppe, getDtTabellenbetrag, DtAltersstufe } from '@/data/regulated/unterhalt/duesseldorferTabelle2026';
 import { parseDateParts, dateToDayNumber, dayNumberToDate, formatDateGerman, getBerlinTodayString } from '@/lib/calculators/dateMath';
 
@@ -217,11 +218,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       result: '122 g Protein, 244 g Kohlenhydrate, 54 g Fett',
     },
     content: {
-      intro: 'Dieser Makronährstoffrechner teilt Ihren täglichen Kalorienbedarf optimal in Proteine, Kohlenhydrate und Fette auf.',
-      details: 'Physiologische Brennwerte: 1 g Protein = 4,1 kcal, 1 g Kohlenhydrate = 4,1 kcal, 1 g Fett = 9,3 kcal. Gängige Aufteilungen sind High-Carb (50/30/20), moderat (40/30/30) oder Low-Carb/Keto (20/35/45).',
+      intro: 'Dieser Makronährstoffrechner teilt Ihr tägliches Kalorienziel nach einer von vier festen Verteilungen in Gramm Eiweiß, Kohlenhydrate und Fett auf.',
+      details: 'Physiologische Brennwerte: 1 g Protein = 4,1 kcal, 1 g Kohlenhydrate = 4,1 kcal, 1 g Fett = 9,3 kcal. Zur Auswahl stehen (Kohlenhydrate/Protein/Fett in Prozent der Kalorien): Ausgewogen 50/25/25, Muskelaufbau 40/35/25, Low Carb 20/40/40 und Keto 5/25/70.',
     },
     faqs: [
-      { question: 'Wie viel Gramm Protein benötigt man beim Muskelaufbau?', answer: 'Sportmediziner und Ernährungsgesellschaften empfehlen für Trainierende 1,6 bis 2,2 Gramm Protein pro Kilogramm Körpergewicht am Tag.' },
+      { question: 'Wie viel Gramm Protein benötigt man beim Muskelaufbau?', answer: 'In der Sporternährung werden für Kraftsportler im Muskelaufbau meist etwa 1,6 bis 2,0 Gramm Protein pro Kilogramm Körpergewicht am Tag genannt. Zum Vergleich: Die DGE empfiehlt Erwachsenen ohne besonderes Training 0,8 g/kg.' },
       { question: 'Warum sind Fette für den Hormonhaushalt unverzichtbar?', answer: 'Essenzielle Fettsäuren bilden die molekulare Grundsubstanz für körpereigene Steroidhormone (Testosteron, Östrogen) und ermöglichen die Aufnahme fettlöslicher Vitamine (A, D, E, K).' },
     ],
     relatedSlugs: ['kalorienbedarf-rechner', 'proteinbedarf-sportler-rechner', 'grundumsatz-bmr-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner', 'leistungsumsatz-pal-rechner'],
@@ -819,7 +820,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'gesundheit-fitness',
     subcategory: 'Training & Sport',
     metaTitle: '1RM-Rechner: One-Rep-Max im Krafttraining berechnen',
-    metaDescription: 'Berechnen Sie Ihr Einer-Wiederholungs-Maximum (1RM) für Bankdrücken, Kniebeugen oder Kreuzheben nach Epley, Brzycki und Lombardi ohne Verletzungsrisiko.',
+    metaDescription: 'Schätzen Sie Ihr Einer-Wiederholungs-Maximum (1RM) für Bankdrücken, Kniebeugen oder Kreuzheben nach Epley und Brzycki – ohne riskanten Maximalversuch.',
     h1: '1RM Rechner – Maximalgewicht im Kraftsport berechnen',
     shortDescription: 'Schätzt das 1-Rep-Maximum aus Wiederholungen mit submaximalem Trainingsgewicht.',
     searchKeywords: ['1rm rechner kraftsport', 'one rep max berechnen epley brzycki', 'maximalgewicht bankdruecken rechner', 'prozent maximalgewicht tabelle'],
@@ -858,7 +859,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         summaryText: `Aus ${r} Wiederholungen mit ${w} kg errechnet sich ein geschätztes 1RM von ca. ${formatNumber(avg1Rm, 1)} kg. Ihr Hypertrophie-Trainingsgewicht (10 Wdh. bei 75 %) liegt bei ca. ${formatNumber(avg1Rm * 0.75, 1)} kg.`,
       };
     },
-    formula: '1RM = Gewicht × (1 + Wiederholungen / 30) [Epley-Formel]',
+    formula: '1RM = Mittelwert aus Epley (Gewicht × (1 + Wiederholungen / 30)) und Brzycki (Gewicht / (1,0278 − 0,0278 × Wiederholungen))',
     formulaExplanation: 'Die Schätzung schont Sehnen und Gelenke, da echte Maximalkraftversuche (Singles) ein hohes Verletzungsrisiko bergen.',
     workedExample: {
       title: 'Beispiel: 6 Wiederholungen mit 80 kg Bankdrücken',
@@ -868,11 +869,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Das One-Repetition-Maximum (1RM) ist das maximale Gewicht, das bei einer Kraftübung (z. B. Bankdrücken, Kniebeugen) für genau eine saubere Wiederholung bewältigt werden kann.',
-      details: 'Berechnung nach der Brzycki-Formel: 1RM = Gewicht / (1,0278 - (0,0278 · Wiederholungen)) für 2 bis 10 Wiederholungen. Dies schützt Sehnen und Gelenke vor den Verletzungsrisiken echter Maximalversuche.',
+      details: 'Der Rechner wendet die Epley-Formel (Gewicht × (1 + Wdh./30)) und die Brzycki-Formel (Gewicht / (1,0278 − 0,0278 · Wdh.)) an und zeigt als Hauptergebnis den Mittelwert beider. Am verlässlichsten ist die Schätzung bei 2 bis 10 sauberen Wiederholungen bis kurz vor dem Muskelversagen.',
     },
     faqs: [
       { question: 'Bis zu wie vielen Wiederholungen ist die 1RM-Berechnung zuverlässig?', answer: 'Am genauesten sind 3 bis 6 Wiederholungen; ab mehr als 10 Wiederholungen verfälscht die einsetzende Kraftausdauer die Vorhersage des Maximalkraftwerts.' },
-      { question: 'In welchem Prozentbereich des 1RM trainiert man für Hypertrophie (Muskelaufbau)?', answer: 'Für Muskelwachstum gilt der Bereich von 65 bis 80 Prozent des 1RM bei 8 bis 12 Wiederholungen als optimaler Trainingsreiz.' },
+      { question: 'In welchem Prozentbereich des 1RM trainiert man für Hypertrophie (Muskelaufbau)?', answer: 'Klassisch werden für Muskelaufbau 65 bis 80 Prozent des 1RM bei 8 bis 12 Wiederholungen empfohlen. Muskeln wachsen aber auch mit leichteren oder schwereren Gewichten, wenn die Sätze nah genug ans Muskelversagen gehen.' },
     ],
     relatedSlugs: ['proteinbedarf-sportler-rechner', 'makronaehrstoff-verteilung-rechner', 'maximalpuls-hfmax-rechner'],
   },
@@ -887,7 +888,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     metaTitle: 'Schritte in km & Kalorien Rechner – Schritte umrechnen',
     metaDescription: 'Rechnen Sie Ihre Schritte in Kilometer und verbrannte Kalorien um: Individuelle Schrittlänge nach Körpergröße und Kalorienverbrauch beim Gehen.',
     h1: 'Schritte Rechner – Schritte in Kilometer & Kalorien umrechnen',
-    shortDescription: 'Wandelt gezählte Schritte anhand der Körpergröße in exakte Distanz und Kalorienverbrauch um.',
+    shortDescription: 'Schätzt aus gezählten Schritten und Körpergröße die zurückgelegte Distanz und den Kalorienverbrauch.',
     searchKeywords: ['schritte in km umrechnen rechner', '10000 schritte wie viele kilometer kalorien', 'schrittlaenge berechnen groesse', 'schrittzaehler kalorienverbrauch'],
     inputs: [
       { id: 'stepsCount', label: 'Anzahl der Schritte (z. B. 10.000 Schritte)', type: 'number', defaultValue: 10000, min: 500, max: 80000, step: 500, unit: 'Schritte' },
@@ -916,7 +917,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       };
     },
     formula: 'Distanz (km) = (Schritte × Körpergröße × 0,425) / 100.000; Kalorien ≈ Distanz × Gewicht × 0,52',
-    formulaExplanation: 'Die Schrittlänge hängt direkt von der Beinlänge und Körpergröße ab. Beim zügigen Gehen verbrennt ein Erwachsener rund 40 bis 50 kcal pro 1.000 Schritte.',
+    formulaExplanation: 'Die Schrittlänge hängt von Beinlänge und Körpergröße ab; der Rechner schätzt sie mit 42,5 % der Körpergröße. Für den Verbrauch setzt er rund 0,52 kcal pro kg Körpergewicht und Kilometer an – bei 175 cm und 75 kg sind das etwa 29 kcal pro 1.000 Schritte.',
     workedExample: {
       title: 'Beispiel: 10.000 Schritte bei 175 cm und 75 kg',
       inputValues: [{ label: 'Schritte', value: '10.000' }, { label: 'Größe', value: '175 cm' }, { label: 'Gewicht', value: '75 kg' }],
@@ -925,10 +926,10 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Schrittrechner transformiert gezählte Schritte in gelaufene Kilometer und den resultierenden Kalorienverbrauch.',
-      details: 'Schrittlänge ≈ Körpergröße in cm · 0,415. 10.000 Schritte entsprechen bei durchschnittlicher Schrittlänge rund 6,5 bis 7,5 Kilometern und einem Zusatzverbrauch von etwa 300 bis 450 Kilokalorien.',
+      details: 'Schrittlänge ≈ Körpergröße in cm · 0,425. 10.000 Schritte entsprechen damit bei 160 bis 190 cm Körpergröße rund 6,8 bis 8,1 Kilometern. Der Kalorienwert ist der geschätzte Mehrverbrauch durch das Gehen; bei 175 cm und 75 kg sind es für 10.000 Schritte etwa 290 kcal.',
     },
     faqs: [
-      { question: 'Sind 10.000 Schritte am Tag medizinisch notwendig?', answer: 'Aktuelle kardiologische Studien zeigen, dass bereits ab 6.000 bis 8.000 Schritten täglich das Risiko für Herz-Kreislauf-Erkrankungen und Frühsterblichkeit signifikant sinkt.' },
+      { question: 'Sind 10.000 Schritte am Tag medizinisch notwendig?', answer: 'Nein, die Zahl 10.000 ist keine medizinische Vorgabe. Die WHO empfiehlt Erwachsenen 150 bis 300 Minuten Bewegung mit moderater Intensität pro Woche (oder 75 bis 150 Minuten intensive Bewegung). Zügiges Gehen zählt dazu – jeder zusätzliche Schritt gegenüber einem bewegungsarmen Alltag ist ein Gewinn.' },
       { question: 'Wie misst man seine eigene Schrittlänge exakt aus?', answer: 'Gehen Sie 10 normale Schritte, messen Sie die Gesamtstrecke mit dem Maßband und teilen Sie die Zentimeter durch 10.' },
     ],
     relatedSlugs: ['radfahren-kalorien-watt-rechner', 'laufpace-rechner', 'kalorienbedarf-rechner', 'vo2max-cooper-test-rechner'],
@@ -1085,7 +1086,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         options: [
           { value: 'filter_coffee', label: 'Tasse Filterkaffee (200 ml, ca. 90 mg Koffein)' },
           { value: 'espresso', label: 'Einfacher Espresso (30 ml, ca. 65 mg Koffein)' },
-          { value: 'double_espresso', label: 'Doppelter Espresso / Cappuccino (ca. 130 mg Koffein)' },
+          { value: 'double_espresso', label: 'Doppelter Espresso (z. B. Cappuccino mit zwei Shots, ca. 130 mg Koffein)' },
           { value: 'energy_drink', label: 'Energy Drink Dose (250 ml, ca. 80 mg Koffein)' },
           { value: 'cola', label: 'Glas Cola (330 ml, ca. 35 mg Koffein)' },
         ],
@@ -1111,10 +1112,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const halfLife = 5.0;
       const remainingMg = initialMg * Math.pow(0.5, hours / halfLife);
 
-      let sleepImpact = 'Kein spürbarer Einfluss / Unbedenklich';
-      if (remainingMg > 100) sleepImpact = 'Starke Schlafstörung sehr wahrscheinlich! Tiefschlaf stark vermindert.';
-      else if (remainingMg > 50) sleepImpact = 'Spürbarer Einfluss auf Einschlafzeit und REM-Schlafqualität.';
-      else if (remainingMg > 25) sleepImpact = 'Leichter Einfluss bei koffeinempfindlichen Menschen.';
+      // Orientierung: Laut EFSA können schon 100 mg kurz vor dem Schlafengehen bei manchen Erwachsenen Schlafdauer und -muster beeinflussen.
+      let sleepImpact = 'Geringe Restmenge, meist kein spürbarer Einfluss';
+      if (remainingMg > 100) sleepImpact = 'Deutlicher Einfluss auf Einschlafen und Schlafdauer wahrscheinlich';
+      else if (remainingMg > 50) sleepImpact = 'Einfluss auf Einschlafen und Schlafqualität möglich';
+      else if (remainingMg > 25) sleepImpact = 'Leichter Einfluss bei koffeinempfindlichen Menschen möglich';
 
       return {
         primary: { id: 'remainingMg', label: 'Verbleibendes Koffein im Körper zur Schlafenszeit', value: remainingMg, formattedValue: `ca. ${formatNumber(remainingMg, 0)} mg`, highlight: true },
@@ -1132,14 +1134,14 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       title: 'Beispiel: 2 Tassen Kaffee (180 mg Koffein) 6 Stunden vor dem Schlafen',
       inputValues: [{ label: 'Menge', value: '180 mg' }, { label: 'Zeitabstand', value: '6 Stunden' }],
       steps: ['Halbwertszeit: 5 Stunden', 'Restmenge = 180 × 0,5^(6/5) = 180 × 0,435 ≈ 78 mg'],
-      result: 'ca. 78 mg Restkoffein (entspricht fast einer Tasse Kaffee im Blut!)',
+      result: 'ca. 78 mg Restkoffein (knapp so viel wie eine frische Tasse Filterkaffee mit 90 mg)',
     },
     content: {
-      intro: 'Dieser Rechner modelliert den Abbau von Koffein im Blutkreislauf und ermittelt die optimale Zeitspanne für ungestörten Nachtschlaf.',
-      details: 'Die biologische Halbwertszeit von Koffein beträgt bei gesunden Erwachsenen durchschnittlich 4 bis 6 Stunden: Nach einer Tasse Kaffee mit 100 mg Koffein um 16:00 Uhr zirkulieren um 22:00 Uhr noch immer 50 mg Koffein im Körper.',
+      intro: 'Dieser Rechner schätzt, wie viel Koffein aus Kaffee, Espresso, Cola oder Energy Drinks zur geplanten Schlafenszeit noch in Ihrem Körper ist.',
+      details: 'Die Halbwertszeit von Koffein schwankt von Mensch zu Mensch stark; der Rechner rechnet mit 5 Stunden. Nach einer Tasse Kaffee mit 100 mg Koffein um 16:00 Uhr wären damit um 22:00 Uhr noch rund 44 mg im Körper.',
     },
     faqs: [
-      { question: 'Ab welcher Uhrzeit sollte man keinen Kaffee mehr trinken?', answer: 'Schlafmediziner empfehlen, mindestens 8 bis 10 Stunden vor dem geplanten Einschlafen auf koffeinhaltige Getränke (Kaffee, Cola, Energy Drinks) zu verzichten.' },
+      { question: 'Ab welcher Uhrzeit sollte man keinen Kaffee mehr trinken?', answer: 'Eine feste Uhrzeit gibt es nicht, denn Menge und persönlicher Abbau entscheiden. Mit der Rechner-Annahme von 5 Stunden Halbwertszeit ist nach 10 Stunden noch ein Viertel der Dosis übrig. Wer abends schlecht einschläft, legt den letzten Kaffee deshalb besser in den frühen Nachmittag.' },
       { question: 'Welche Faktoren verlangsamen den Koffeinabbau in der Leber?', answer: 'Schwangerschaft (Halbwertszeit verlängert sich auf bis zu 10–15 Stunden), hormonelle Verhütungsmittel (Pille) und bestimmte Medikamente verlangsamen den Abbau durch das Enzym CYP1A2.' },
     ],
     relatedSlugs: ['alkohol-abbau-rechner', 'nikotin-rauchstopp-ersparnis-rechner', 'schlafbedarfs-rechner', 'wasserbedarf-rechner', 'promillerechner-widmark'],
@@ -1153,8 +1155,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'gesundheit-fitness',
     subcategory: 'Erholung & Vitalität',
     metaTitle: 'Alkoholabbau Rechner – Wie lange braucht die Leber für Bier',
-    metaDescription: 'Berechnen Sie den genauen zeitlichen Verlauf des Alkoholabbaus in der Leber nach getrunkenen Gläsern Bier, Wein oder Schnaps bis zu 0,0 Promille.',
-    h1: 'Alkoholabbau Rechner – Restalkohol & Nüchterntimer ermitteln',
+    metaDescription: 'Schätzen Sie, wie viele Stunden die Leber ungefähr braucht, um den Alkohol aus Bier, Wein oder Schnaps abzubauen – mit Gramm-Tabelle für typische Getränke.',
+    h1: 'Alkoholabbau Rechner – Abbaudauer für Bier, Wein & Schnaps schätzen',
     shortDescription: 'Berechnet die Stunden bis zum vollständigen Abbau von Alkohol im Körper.',
     searchKeywords: ['alkohol abbau rechner', 'wie lange dauert es bis bier abgebaut ist', 'leber alkoholabbau gramm pro stunde', 'restalkohol am naechsten morgen'],
     inputs: [
@@ -1165,8 +1167,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'male',
         options: [
-          { value: 'male', label: 'Männlich (Abbau ca. 0,10 - 0,15 ‰ bzw. ca. 8 - 10 g pro Stunde)' },
-          { value: 'female', label: 'Weiblich (Abbau ca. 0,08 - 0,12 ‰ bzw. ca. 6 - 8 g pro Stunde)' },
+          { value: 'male', label: 'Männlich (Rechenwert ca. 9 g Alkohol pro Stunde)' },
+          { value: 'female', label: 'Weiblich (Rechenwert ca. 7 g Alkohol pro Stunde)' },
         ],
       },
     ],
@@ -1183,23 +1185,23 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           { id: 'rate', label: 'Abbaugeschwindigkeit der Leber', value: degradationRatePerHour, formattedValue: `ca. ${degradationRatePerHour} Gramm/Stunde` },
           { id: 'beersEquivalent', label: 'Entspricht etwa', value: g / 20, formattedValue: `ca. ${formatNumber(g / 20, 1)} Halbe Bier (0,5 l)` },
         ],
-        summaryText: `Für den Abbau von ${g} Gramm Reinalkohol benötigt Ihre Leber rund ${formatNumber(hoursNeeded, 1)} Stunden. Der Prozess kann biologisch nicht beschleunigt werden.`,
+        summaryText: `Für den Abbau von ${g} Gramm Reinalkohol benötigt Ihre Leber rund ${formatNumber(hoursNeeded, 1)} Stunden. Der Prozess kann biologisch nicht beschleunigt werden. Das Ergebnis ist eine grobe Schätzung und kein Nachweis, dass Sie wieder fahrtüchtig sind.`,
       };
     },
     formula: 'Abbauzeit (Stunden) = Reinalkohol in Gramm / Abbaukapazität pro Stunde (ca. 7 - 9 g/h)',
     formulaExplanation: 'Das Enzym Alkoholdehydrogenase (ADH) in der Leber arbeitet mit einer konstanten Geschwindigkeit (Nullter Ordnung).',
     workedExample: {
-      title: 'Beispiel: 48 Gramm Alkohol (ca. 2,5 Gläser Bier oder 0,5 l Wein)',
+      title: 'Beispiel: 48 Gramm Alkohol (ca. 2,4 Halbe Bier mit 5 % oder 0,5 l Wein mit 12 %)',
       inputValues: [{ label: 'Alkohol', value: '48 Gramm' }, { label: 'Geschlecht', value: 'Mann' }],
       steps: ['Abbaukapazität Mann: ca. 9 g pro Stunde', 'Zeit = 48 g / 9 g/h ≈ 5,33 Stunden'],
       result: 'ca. 5 Stunden und 20 Minuten Abbauzeit',
     },
     content: {
-      intro: 'Dieser Abbau-Rechner ermittelt anhand des erreichten Promillewerts den exakten Zeitpunkt der vollständigen Nüchternheit (0,0 ‰).',
-      details: 'Die menschliche Leber baut Alkohol mit einer konstanten Rate von etwa 0,10 bis 0,15 Promille pro Stunde ab (Nullter-Ordnung-Kinetik). Restalkohol am nächsten Morgen führt häufig zu unbewusstem Fahren unter Alkoholeinfluss.',
+      intro: 'Dieser Rechner schätzt aus der getrunkenen Alkoholmenge in Gramm, wie viele Stunden die Leber ungefähr für den vollständigen Abbau braucht. Er rechnet mit festen Durchschnittswerten und kann nicht sagen, ob Sie wieder fahrtüchtig sind.',
+      details: 'Die Leber baut Alkohol mit annähernd gleichbleibender Geschwindigkeit ab, im Blut meist etwa 0,1 bis 0,15 Promille pro Stunde. Wie schnell es bei Ihnen geht, hängt unter anderem von Körpergewicht, Leber und Gewöhnung ab. Wer abends viel getrunken hat, kann am nächsten Morgen noch deutlich Restalkohol im Blut haben.',
     },
     faqs: [
-      { question: 'Wann darf man nach einer durchzechten Nacht wieder sicher Auto fahren?', answer: 'Wer um 02:00 Uhr nachts 1,2 Promille hat, baut bis 08:00 Uhr morgens nur ca. 0,6 bis 0,9 Promille ab und hat beim Losfahren immer noch 0,3 bis 0,6 Promille im Blut.' },
+      { question: 'Wann darf man nach einer durchzechten Nacht wieder sicher Auto fahren?', answer: 'Das kann kein Rechner sicher beantworten. Ein Beispiel zeigt das Problem: Wer um 02:00 Uhr nachts 1,2 Promille hat, baut bis 08:00 Uhr morgens bei 0,1 bis 0,15 Promille pro Stunde nur 0,6 bis 0,9 Promille ab und hat beim Losfahren immer noch 0,3 bis 0,6 Promille im Blut. Fahren Sie nach einem Abend mit viel Alkohol im Zweifel nicht selbst.' },
       { question: 'Hilft fettiges Katerfrühstück beim schnelleren Alkoholabbau?', answer: 'Nein, Nahrung im Magen verzögert lediglich die Aufnahme ins Blut, beschleunigt aber den hepatischen Abbauprozess in der Leber in keiner Weise.' },
     ],
     relatedSlugs: ['promillerechner-widmark', 'koffein-halbwertszeit-rechner', 'schlafbedarfs-rechner'],
@@ -1213,7 +1215,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'gesundheit-fitness',
     subcategory: 'Ernährung & Kalorien',
     metaTitle: 'Intervallfasten Rechner 16:8 – Essensfenster',
-    metaDescription: 'Berechnen Sie Ihre optimalen Essens- und Fastenzeiten für das 16:8-Intervallfasten (Autophagie, Insulinsensitivität und Fettverbrennung).',
+    metaDescription: 'Berechnen Sie Ihre Essens- und Fastenzeiten für Intervallfasten nach 16:8, 14:10 oder 18:6 – mit Beispielplänen für Frühstücks- und Abendesser.',
     h1: 'Intervallfasten Rechner – 16:8 Essens- und Fastenfenster planen',
     shortDescription: 'Plant Beginn und Ende des 8-stündigen Essens- und 16-stündigen Fastenfensters.',
     searchKeywords: ['intervallfasten rechner 16 8', '16 8 methode essenszeiten plan', 'fastenfenster berechnen autophagie', 'intermittierendes fasten uhrzeiten'],
@@ -1254,7 +1256,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       };
     },
     formula: 'Letzte Mahlzeit = Erste Mahlzeit + Essensfenster (z. B. 8 Stunden)',
-    formulaExplanation: 'In der 16-stündigen Fastenphase sinkt der Insulinspiegel auf ein Minimum, wodurch der Körper von der Kohlenhydratspeicherung auf intensive Fettverbrennung und zelluläre Selbstreinigung (Autophagie) umschaltet.',
+    formulaExplanation: 'Das Fastenfenster ergibt sich als Rest des Tages: 24 Stunden minus Essensfenster. Der Rechner arbeitet mit vollen Stunden.',
     workedExample: {
       title: 'Beispiel: Erste Mahlzeit um 12:00 Uhr (16:8 Methode)',
       inputValues: [{ label: 'Erste Mahlzeit', value: '12:00 Uhr' }, { label: 'Methode', value: '16:8' }],
@@ -1262,12 +1264,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       result: 'Essen von 12:00 bis 20:00 Uhr',
     },
     content: {
-      intro: 'Der 16:8-Intervallfasten-Rechner strukturiert das tägliche Fasten- und Essensfenster zur Aktivierung von Zellerneuerungsprozessen (Autophagie).',
+      intro: 'Der Intervallfasten-Rechner zeigt, von wann bis wann Ihr tägliches Essensfenster bei 16:8, 14:10 oder 18:6 liegt und wann die Fastenphase beginnt.',
       details: 'Methode: 16 Stunden Fastenzeit (z. B. von 20:00 Uhr abends bis 12:00 Uhr mittags) gefolgt von einem 8-stündigen Zeitfenster für Mahlzeiten. Während der Fastenphase sind nur Wasser, ungesüßter Tee und schwarzer Kaffee erlaubt.',
     },
     faqs: [
-      { question: 'Was ist Autophagie und ab wann setzt sie ein?', answer: 'Autophagie ist die körpereigene Müllabfuhr der Zellen: Geschädigte Zellbestandteile und Fehlfaltungen werden abgebaut und recycelt; dieser Prozess intensiviert sich ab ca. 14 bis 16 Stunden Fastendauer.' },
-      { question: 'Bricht ein Schluck Milch im Kaffee das Fasten?', answer: 'Ja, bereits geringe Mengen Kalorien oder Proteine stimulieren Insulin und mTOR und unterbrechen den reinen Fastenstoffwechsel und die Autophagie.' },
+      { question: 'Was ist Autophagie und ab wann setzt sie ein?', answer: 'Autophagie ist ein Recyclingprozess der Zellen, bei dem beschädigte Zellbestandteile abgebaut werden. Fasten kann ihn anregen; ab welcher Fastendauer er beim Menschen messbar zunimmt, ist aber nicht gesichert. Feste Stundenangaben stammen überwiegend aus Tierversuchen.' },
+      { question: 'Bricht ein Schluck Milch im Kaffee das Fasten?', answer: 'Streng genommen ja, denn Milch liefert Energie und Eiweiß. Ein kleiner Schuss bringt allerdings nur wenige Kilokalorien. Wer es genau nehmen will, trinkt in der Fastenphase nur Wasser, ungesüßten Tee und schwarzen Kaffee.' },
     ],
     relatedSlugs: ['kalorienbedarf-rechner', 'makronaehrstoff-verteilung-rechner', 'schlafbedarfs-rechner'],
   },
@@ -1292,7 +1294,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'hypertrophy',
         options: [
-          { value: 'sedentary', label: 'Normal / Kein regelmäßiger Sport (DGE-Empfehlung: 0,8 g/kg)' },
+          { value: 'sedentary', label: 'Normal / Kein regelmäßiger Sport (DGE: 0,8 g/kg, ab 65 Jahren 1,0 g/kg)' },
           { value: 'endurance', label: 'Ausdauersportler / Laufen / Radfahren (1,2 - 1,4 g/kg)' },
           { value: 'hypertrophy', label: 'Kraftsport & Muskelaufbau (1,6 - 2,0 g/kg)' },
           { value: 'diet_cut', label: 'Diät / Fettabbau mit Muskelschutz (2,0 - 2,4 g/kg)' },
@@ -1325,7 +1327,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       };
     },
     formula: 'Proteinbedarf (g) = Körpergewicht (kg) × Eiweißfaktor (0,8 bis 2,4 g/kg)',
-    formulaExplanation: 'Während die DGE für Nicht-Sportler 0,8 g/kg empfiehlt, benötigen aktive Sportler zur Regeneration und zum Muskelaufbau mindestens 1,6 g/kg.',
+    formulaExplanation: 'Die DGE empfiehlt Erwachsenen von 19 bis unter 65 Jahren 0,8 g/kg und gibt ab 65 Jahren einen Schätzwert von 1,0 g/kg an. Die höheren Faktoren für Sportler sind Richtwerte aus der Sporternährung und keine DGE-Referenzwerte.',
     workedExample: {
       title: 'Beispiel: 78 kg Kraftsportler für Muskelaufbau (1,6 - 2,0 g/kg)',
       inputValues: [{ label: 'Gewicht', value: '78 kg' }, { label: 'Ziel', value: 'Muskelaufbau' }],
@@ -1333,12 +1335,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       result: 'ca. 140 Gramm Protein pro Tag',
     },
     content: {
-      intro: 'Dieser Bedarfsrechner ermittelt die optimale tägliche Proteinmenge in Gramm gestaffelt nach Sportart, Trainingsziel (Erhalt, Hypertrophie, Diät) und fettfreier Körpermasse.',
-      details: 'Für Ausdauersportler gelten 1,2 bis 1,4 g/kg, für Kraftsportler im Aufbau 1,6 bis 2,0 g/kg und während einer kalorienreduzierten Diät zum Muskelschutz 2,0 bis 2,4 g/kg fettfreier Masse.',
+      intro: 'Dieser Bedarfsrechner schätzt die tägliche Proteinmenge in Gramm aus Ihrem Körpergewicht und einer von vier Stufen für Alltag, Ausdauersport, Kraftsport oder Diät.',
+      details: 'Der Rechner multipliziert das Körpergewicht mit diesen Faktoren: ohne Sport 0,8 bis 1,0 g/kg, Ausdauersport 1,2 bis 1,4 g/kg, Kraftsport im Aufbau 1,6 bis 2,0 g/kg und während einer kalorienreduzierten Diät 2,0 bis 2,4 g/kg Körpergewicht. Als Hauptergebnis zeigt er die Mitte des Bereichs.',
     },
     faqs: [
-      { question: 'Kann der Körper mehr als 30 Gramm Protein pro Mahlzeit verwerten?', answer: 'Ja, die anabole Muskelproteinsynthese wird zwar bei rund 30 bis 40 g Protein maximal stimuliert, größere Proteinmengen werden im Magen-Darm-Trakt jedoch langsamer verdaut und über Stunden vollständig resorbiert.' },
-      { question: 'Schadet eine hohe Proteinzufuhr den Nieren?', answer: 'Bei nierengesunden Menschen zeigen Studien bei bis zu 2,5 g/kg keine negativen Auswirkungen auf die Nierenfunktion; eine ausreichende Flüssigkeitszufuhr zur Harnsäureausscheidung ist jedoch Pflicht.' },
+      { question: 'Kann der Körper mehr als 30 Gramm Protein pro Mahlzeit verwerten?', answer: 'Ja. Größere Portionen werden nicht „verschwendet“, sondern langsamer verdaut und über mehrere Stunden aufgenommen. Für den Muskelaufbau ist die Tagesmenge wichtiger als eine exakte Grenze pro Mahlzeit.' },
+      { question: 'Schadet eine hohe Proteinzufuhr den Nieren?', answer: 'Bei gesunden Nieren gibt es nach bisheriger Studienlage keine klaren Hinweise auf Schäden durch eiweißreiche Ernährung im üblichen Sportlerbereich. Beim Eiweißabbau entsteht Harnstoff, der über die Nieren ausgeschieden wird; trinken Sie daher ausreichend. Wer eine Nierenerkrankung hat, sollte die Eiweißmenge ärztlich abstimmen.' },
     ],
     relatedSlugs: ['kalorienbedarf-rechner', 'makronaehrstoff-verteilung-rechner', 'grundumsatz-bmr-rechner', 'koerperfettanteil-navy-rechner', 'bmi-rechner'],
   },
@@ -1351,7 +1353,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'gesundheit-fitness',
     subcategory: 'Erholung & Vitalität',
     metaTitle: 'Blutdruck Rechner – Systolisch & Diastolisch nach WHO',
-    metaDescription: 'Stufen Sie Ihre gemessenen Blutdruckwerte (systolisch und diastolisch in mmHg) nach den offiziellen Leitlinien der Deutschen Hochdruckliga und WHO ein.',
+    metaDescription: 'Stufen Sie Ihre gemessenen Blutdruckwerte (systolisch und diastolisch in mmHg) nach der ESH-Leitlinie 2023 ein – dieselben Grenzwerte wie in der bekannten WHO-Tabelle.',
     h1: 'Blutdruck Rechner – Blutdruckwerte nach WHO klassifizieren',
     shortDescription: 'Ordnet Blutdruckmessungen in Optimal, Normal, Hoch-Normal oder Hypertonie (Stufe 1 bis 3) ein.',
     searchKeywords: ['blutdruck rechner who tabelle', 'blutdruckwerte einstufung tabelle mmhg', 'hypertonie stufe 1 2 3 werte', 'ab wann hoher blutdruck gefährlich'],
@@ -1363,31 +1365,35 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const sys = parseInt(inputs.systolicMmHg, 10) || 125;
       const dia = parseInt(inputs.diastolicMmHg, 10) || 82;
 
-      let category = 'Normaler Blutdruck';
-      let advice = 'Alles im grünen Bereich. Regelmäßige Kontrollen genügen.';
-
-      if (sys < 120 && dia < 80) {
-        category = 'Optimaler Blutdruck';
-        advice = 'Hervorragender Wert! Herz und Gefäße werden minimal belastet.';
-      } else if (sys <= 129 && dia <= 84) {
-        category = 'Normaler Blutdruck';
-        advice = 'Gesunder Normalwert.';
-      } else if (sys <= 139 || dia <= 89) {
-        category = 'Hoch-normaler Blutdruck (Prähypertonie)';
-        advice = 'Grenzwertig erhöht. Empfehlung: Salzkonsum reduzieren, Ausdauersport und Gewichtsreduktion.';
-      } else if (sys <= 159 || dia <= 99) {
-        category = 'Hypertonie Grad 1 (Leichter Bluthochdruck)';
-        advice = 'Ärztliche Abklärung empfohlen. Lebensstiländerung und evtl. Medikation erforderlich.';
-      } else if (sys <= 179 || dia <= 109) {
-        category = 'Hypertonie Grad 2 (Mittelschwerer Bluthochdruck)';
-        advice = 'Zwingend behandlungsbedürftig. Bitte zeitnah einen Arzt konsultieren.';
-      } else {
+      // Einteilung der Praxiswerte nach ESH-Leitlinie 2023 (Grenzen wie ESC/ESH 2018):
+      // Es zählt immer der höher eingestufte der beiden Werte.
+      let category: string;
+      let advice: string;
+      if (sys >= 180 || dia >= 110) {
         category = 'Hypertonie Grad 3 (Schwerer Bluthochdruck)';
-        advice = 'Warnung: Sehr hohe Werte. Hohes Risiko für Gefäßschäden und Schlaganfall. Sofortige ärztliche Behandlung!';
+        advice = 'Sehr hohe Werte: bitte umgehend ärztlich abklären lassen. Bei Brustschmerz, Atemnot, Sehstörungen, Lähmungen oder Sprachstörungen sofort den Notruf 112 wählen.';
+      } else if (sys >= 160 || dia >= 100) {
+        category = 'Hypertonie Grad 2 (Mittelschwerer Bluthochdruck)';
+        advice = 'Bitte zeitnah ärztlich abklären lassen.';
+      } else if (sys >= 140 || dia >= 90) {
+        category = 'Hypertonie Grad 1 (Leichter Bluthochdruck)';
+        advice = 'Bestätigen sich die Werte bei wiederholten Messungen, ist eine ärztliche Abklärung empfohlen.';
+      } else if (sys >= 130 || dia >= 85) {
+        category = 'Hoch-normaler Blutdruck';
+        advice = 'Noch keine Hypertonie, aber regelmäßig kontrollieren. Weniger Salz, Bewegung und ein gesundes Gewicht wirken sich günstig aus.';
+      } else if (sys >= 120 || dia >= 80) {
+        category = 'Normaler Blutdruck';
+        advice = 'Normalwert. Gelegentliche Kontrollen genügen.';
+      } else {
+        category = 'Optimaler Blutdruck';
+        advice = 'Optimaler Bereich. Gelegentliche Kontrollen genügen.';
+      }
+      if (sys >= 140 && dia < 90) {
+        category += ' – isolierte systolische Hypertonie';
       }
 
       return {
-        primary: { id: 'category', label: 'Offizielle Blutdruck-Kategorie', value: 0, formattedValue: category, highlight: true },
+        primary: { id: 'category', label: 'Blutdruck-Kategorie (ESH 2023, Praxismessung)', value: 0, formattedValue: category, highlight: true },
         secondary: [
           { id: 'pulsePressure', label: 'Pulsdruck (Blutdruckamplitude)', value: sys - dia, formattedValue: `${sys - dia} mmHg` },
           { id: 'advice', label: 'Empfehlung', value: 0, formattedValue: advice },
@@ -1395,7 +1401,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         summaryText: `Ihre Werte von ${sys}/${dia} mmHg fallen in die Kategorie: ${category} (${advice}).`,
       };
     },
-    formula: 'Klassifikation nach Leitlinien der European Society of Hypertension (ESH) & DHL',
+    formula: 'Einteilung der Praxiswerte nach der Leitlinie der European Society of Hypertension (ESH) 2023; die Grenzwerte entsprechen der gemeinsamen ESC/ESH-Leitlinie von 2018',
     formulaExplanation: 'Maßgeblich für die Einstufung ist immer der jeweils höhere Einzelwert (Systole oder Diastole).',
     workedExample: {
       title: 'Beispiel: Messung 135 / 85 mmHg',
@@ -1404,8 +1410,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       result: 'Hoch-normaler Blutdruck',
     },
     content: {
-      intro: 'Dieser Rechner ordnet Ihre gemessenen systolischen und diastolischen Blutdruckwerte nach den Leitlinien der European Society of Cardiology (ESC/ESH) ein.',
-      details: 'Optimal: < 120 / < 80 mmHg; Normal: 120–129 / 80–84 mmHg; Hoch-normal: 130–139 / 85–89 mmHg. Ab 140 mmHg systolisch oder 90 mmHg diastolisch liegt arterielle Hypertonie (Grad 1) vor.',
+      intro: 'Dieser Rechner ordnet Ihre gemessenen systolischen und diastolischen Blutdruckwerte nach der Leitlinie der European Society of Hypertension (ESH) von 2023 ein. Sie verwendet dieselben Grenzwerte wie die gemeinsame ESC/ESH-Leitlinie von 2018 und die frühere WHO/ISH-Einteilung. Eine einzelne Messung ersetzt keine ärztliche Diagnose.',
+      details: 'Optimal: < 120 / < 80 mmHg; Normal: 120–129 / 80–84 mmHg; Hoch-normal: 130–139 / 85–89 mmHg. Ab 140 mmHg systolisch oder 90 mmHg diastolisch spricht die Leitlinie von Hypertonie (Grad 1), ab 160/100 von Grad 2 und ab 180/110 von Grad 3. Diese Grenzen gelten für Messungen in der Arztpraxis.',
     },
     faqs: [
       { question: 'Was bedeutet der systolische und der diastolische Wert?', answer: 'Der obere (systolische) Wert misst den maximalen Druck beim Zusammenziehen des Herzmuskels; der untere (diastolische) Wert misst den Dauerdruck in den Gefäßen während der Entspannungsphase.' },
@@ -1708,12 +1714,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'schwimmen-kalorienverbrauch-rechner',
     slug: 'schwimmen-kalorienverbrauch-rechner',
-    name: 'Schwimm-Kalorienrechner (nach Schwimmstil & Bahnen)',
+    name: 'Schwimm-Kalorienrechner (nach Schwimmstil & Dauer)',
     shortName: 'Schwimmen Kalorien',
     category: 'gesundheit-fitness',
     subcategory: 'Training & Sport',
     metaTitle: 'Schwimmen Kalorienverbrauch Rechner – Brust, Kraul, Bahnen',
-    metaDescription: 'Berechnen Sie den Kalorienverbrauch beim Schwimmen: Kraulen, Brustschwimmen, Rückenschwimmen und Delphin nach Körpergewicht, Bahnen und Schwimmdauer.',
+    metaDescription: 'Berechnen Sie den Kalorienverbrauch beim Schwimmen: Kraulen, Brustschwimmen, Rückenschwimmen und Delphin nach Körpergewicht und Schwimmdauer – mit Umrechnung von Bahnen in Minuten.',
     h1: 'Schwimmen Kalorienverbrauch Rechner – Kalorien beim Schwimmen ermitteln',
     shortDescription: 'Kalkuliert den Kalorienverbrauch für verschiedene Schwimmstile.',
     searchKeywords: ['schwimmen kalorienverbrauch rechner', 'wie viele kalorien verbrennt kraulen brustschwimmen', 'bahnen schwimmen kalorien', 'schwimmen abnehmen kalorienbedarf'],
@@ -1762,7 +1768,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       };
     },
     formula: 'Kalorien (kcal) = MET × Körpergewicht (kg) × Zeit (Stunden)',
-    formulaExplanation: 'Schwimmen beansprucht fast alle Muskelgruppen des Körpers gleichzeitig und ist dank des Wasserauftriebs extrem gelenkschonend.',
+    formulaExplanation: 'Die MET-Werte sind gerundete Durchschnittswerte in Anlehnung an das Compendium of Physical Activities. Technik, Tempo und Pausen verändern den tatsächlichen Verbrauch deutlich.',
     workedExample: {
       title: 'Beispiel: 45 Minuten moderates Brustschwimmen bei 72 kg (MET 6,0)',
       inputValues: [{ label: 'Gewicht', value: '72 kg' }, { label: 'Dauer', value: '45 Min (0,75 h)' }],
@@ -1774,8 +1780,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       details: 'Kalorienverbrauch = MET-Wert · Körpergewicht in kg · Dauer in Stunden. Kraulschwimmen zügig (MET ca. 10) verbrennt bei 80 kg Körpergewicht rund 800 kcal pro Stunde; Brustschwimmen moderat ca. 500 kcal/h.',
     },
     faqs: [
-      { question: 'Warum schont Schwimmen Sehnen und Gelenke besonders?', answer: 'Weil das Wasser das effektive Körpergewicht um rund 90 Prozent reduziert; Stoßbelastungen auf Knie, Hüfte und Wirbelsäule wie beim Laufen entfallen vollständig.' },
-      { question: 'Welcher Schwimmstil verbrennt am meisten Kalorien?', answer: 'Schmetterling (Delfin) mit bis zu 900 kcal pro Stunde, gefolgt von schnellem Kraulschwimmen und zügigem Brustschwimmen.' },
+      { question: 'Warum schont Schwimmen Sehnen und Gelenke besonders?', answer: 'Der Auftrieb trägt im Wasser einen großen Teil des Körpergewichts. Harte Stoßbelastungen auf Knie, Hüfte und Wirbelsäule wie bei jedem Laufschritt entfallen deshalb weitgehend.' },
+      { question: 'Welcher Schwimmstil verbrennt am meisten Kalorien?', answer: 'Schmetterling (Delfin) mit MET 13: bei 72 kg rund 936 kcal pro Stunde. Es folgen schnelles Kraulen (MET 10) sowie zügiges Brustschwimmen und moderates Kraulen (je MET 8). Kaum jemand schwimmt Delfin allerdings eine ganze Stunde am Stück.' },
     ],
     relatedSlugs: ['laufpace-rechner', 'schritt-distanz-kalorien-rechner', 'kalorienbedarf-rechner'],
   },
@@ -1783,12 +1789,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'radfahren-kalorien-watt-rechner',
     slug: 'radfahren-kalorien-watt-rechner',
-    name: 'Radfahr-Kalorien- & Watt-Rechner (Fahrrad & Ergometer)',
+    name: 'Radfahr-Kalorienrechner (nach Tempo, mit Watt-Umrechnung)',
     shortName: 'Radfahren Kalorien',
     category: 'gesundheit-fitness',
     subcategory: 'Training & Sport',
     metaTitle: 'Radfahren Kalorien Rechner – Kalorienverbrauch Fahrrad',
-    metaDescription: 'Berechnen Sie den Kalorienverbrauch beim Radfahren nach Geschwindigkeit, Steigung oder getretenen Watt auf dem Ergometer / Rennrad.',
+    metaDescription: 'Berechnen Sie den Kalorienverbrauch beim Radfahren nach Tempo, Fahrzeit und Körpergewicht – plus Faustregel, wie Sie Watt vom Ergometer oder Powermeter in kcal umrechnen.',
     h1: 'Radfahren Kalorien Rechner – Kalorienverbrauch auf dem Fahrrad berechnen',
     shortDescription: 'Ermittelt den Energieverbrauch beim Radeln nach Tempo oder Watt-Leistung.',
     searchKeywords: ['radfahren kalorien rechner', 'watt in kalorien fahrrad umrechnen', 'kalorienverbrauch fahrrad 20 kmh', 'ergometer kalorienverbrauch berechnen'],
@@ -1802,7 +1808,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         defaultValue: 'moderate',
         options: [
           { value: 'leisure', label: 'Gemütlich / Stadtverkehr (ca. 15 km/h, MET 4,0)' },
-          { value: 'moderate', label: 'Moderat / Alltagstempo (ca. 20 km/h, MET 6,8)' },
+          { value: 'moderate', label: 'Moderat / Alltagstempo (ca. 16–19 km/h, MET 6,8)' },
           { value: 'fast', label: 'Zügig / Sportlich (ca. 25 km/h, MET 10,0)' },
           { value: 'racing', label: 'Rennrad schnell (ca. 30 km/h, MET 12,0)' },
         ],
@@ -1826,7 +1832,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         primary: { id: 'burnedKcal', label: 'Verbrannte Kalorien', value: burnedKcal, formattedValue: `ca. ${formatNumber(burnedKcal, 0)} kcal`, highlight: true },
         secondary: [
           { id: 'burnedPerHour', label: 'Kalorien pro Stunde', value: met * w, formattedValue: `${formatNumber(met * w, 0)} kcal/Std.` },
-          { id: 'fatBurnGramEquivalent', label: 'Entspricht reinem Körperfett', value: burnedKcal / 7.7, formattedValue: `ca. ${formatNumber(burnedKcal / 7.7, 0)} g Fett` },
+          { id: 'fatBurnGramEquivalent', label: 'Energiegehalt von Fettgewebe (rechnerisch, ca. 7,7 kcal/g)', value: burnedKcal / 7.7, formattedValue: `ca. ${formatNumber(burnedKcal / 7.7, 0)} g` },
         ],
         summaryText: `Bei ${mins} Minuten Radfahren verbrennen Sie mit ${w} kg Körpergewicht ca. ${formatNumber(burnedKcal, 0)} kcal.`,
       };
@@ -1834,14 +1840,14 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     formula: 'Kalorien = MET × Körpergewicht (kg) × Stunden',
     formulaExplanation: 'Radfahren ist optimal für langes Grundlagenausdauertraining, da die Gelenke das eigene Körpergewicht nicht tragen müssen.',
     workedExample: {
-      title: 'Beispiel: 60 Minuten moderates Radeln (20 km/h) bei 75 kg',
-      inputValues: [{ label: 'Gewicht', value: '75 kg' }, { label: 'Tempo', value: '20 km/h (MET 6,8)' }],
+      title: 'Beispiel: 60 Minuten Radeln im Alltagstempo (16–19 km/h) bei 75 kg',
+      inputValues: [{ label: 'Gewicht', value: '75 kg' }, { label: 'Tempo', value: '16–19 km/h (MET 6,8)' }],
       steps: ['Kalorien = 6,8 × 75 kg × 1,0 h = 510 kcal'],
       result: '510 kcal pro Stunde',
     },
     content: {
-      intro: 'Auf dem Fahrrad lässt sich der Kalorienverbrauch über die mechanische Tretleistung in Watt (Powermeter) physikalisch exakt ermitteln.',
-      details: 'Formel: Energie (kcal) = (Durchschnittsleistung in Watt · Dauer in Stunden · 3,6) / Wirkungsgrad des menschlichen Körpers (ca. 0,24). Bei konstanten 200 Watt über eine Stunde werden exakt ca. 750 kcal Energie verbrannt.',
+      intro: 'Der Rechner schätzt Ihren Kalorienverbrauch auf dem Fahrrad aus Tempostufe, Fahrzeit und Körpergewicht. Die MET-Werte der vier Stufen entsprechen Durchschnittswerten aus dem Compendium of Physical Activities.',
+      details: 'Steigungen, Gegenwind, Reifen und Sitzposition berücksichtigt der Rechner nicht; wählen Sie bei viel Bergauf oder Gegenwind die nächsthöhere Stufe. Wer auf dem Ergometer oder mit Powermeter die Leistung in Watt kennt, kann den Verbrauch zusätzlich über die Watt-Faustregel weiter unten abschätzen.',
     },
     faqs: [
       { question: 'Warum ist die Kalorienberechnung mit Wattmessung genauer als über den Puls?', answer: 'Weil ein Powermeter die echte physikalische Arbeit an der Kurbel misst; der Puls schwankt hingegen stark durch Temperatur, Koffein, Schlafmangel oder Dehydration.' },
@@ -2014,15 +2020,15 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'kinderzuschlag-kiz-rechner',
     slug: 'kinderzuschlag-kiz-rechner',
-    name: 'Kinderzuschlag-Rechner (KiZ) (KiZ bis 292 € / Monat nach BKKG)',
+    name: 'Kinderzuschlag-Rechner (KiZ) (KiZ bis 297 € / Monat nach BKGG)',
     shortName: 'Kinderzuschlag KiZ',
     category: 'familie-schwangerschaft',
     subcategory: 'Elterngeld & Finanzen',
     metaTitle: 'Kinderzuschlag Rechner 2026 – KiZ Anspruch',
-    metaDescription: 'Prüfen Sie Ihren Anspruch auf den Kinderzuschlag (KiZ bis zu 292 Euro pro Kind und Monat) für erwerbstätige Eltern mit kleinem Einkommen.',
+    metaDescription: 'Prüfen Sie Ihren Anspruch auf den Kinderzuschlag (KiZ bis zu 297 Euro pro Kind und Monat) für erwerbstätige Eltern mit kleinem Einkommen.',
     h1: 'Kinderzuschlag Rechner – KiZ für Familien mit kleinem Einkommen',
     shortDescription: 'Ermittelt den Kinderzuschlag zur Vermeidung von Bürgergeld für arbeitende Familien.',
-    searchKeywords: ['kinderzuschlag rechner kiz', 'kinderzuschlag einkommensgrenzen 2026', 'kiz anspruch pruefen online', 'kinderzuschlag 292 euro'],
+    searchKeywords: ['kinderzuschlag rechner kiz', 'kinderzuschlag einkommensgrenzen 2026', 'kiz anspruch pruefen online', 'kinderzuschlag 297 euro'],
     inputs: [
       { id: 'childrenCount', label: 'Anzahl kindergeldberechtigter Kinder im Haushalt', type: 'number', defaultValue: 2, min: 1, max: 8, step: 1 },
       { id: 'parentsGrossIncome', label: 'Gemeinsames monatliches Bruttoeinkommen der Eltern', type: 'number', defaultValue: 2800, min: 900, max: 6000, step: 100, unit: '€' },
@@ -2071,8 +2077,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         };
       }
 
-      // Maximaler KiZ: bis zu 292 € pro Kind (Stand 2026)
-      const maxKizPerChild = 292;
+      // Maximaler KiZ: bis zu 297 € pro Kind seit 01.01.2025, 2026 unverändert (inkl. 25 € Sofortzuschlag;
+      // familienportal.de und BMBFSFJ-Einleger „Leistungen für Alleinerziehende 2026“, geprüft 2026-11-15)
+      const maxKizPerChild = 297;
       const maxTotalKiz = kids * maxKizPerChild;
 
       // Mindesteinkommensgrenze nach § 6a BKGG: 900 € Brutto für Paare, 600 € für Alleinerziehende
@@ -2111,42 +2118,42 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           { label: 'Kinder im Haushalt', value: `${kids}` },
           { label: 'Bruttoeinkommen Eltern', value: formatCurrency(gross) },
           { label: 'Monatliche Warmmiete', value: formatCurrency(rent) },
-          { label: 'Gesetzlicher Höchstsatz je Kind', value: '292,00 € / Monat' },
+          { label: 'Gesetzlicher Höchstsatz je Kind', value: `${formatCurrency(maxKizPerChild)} / Monat` },
         ],
         summaryText: calculatedKiz > 0
-          ? `Ihre Familie hat Anspruch auf ca. ${formatCurrency(calculatedKiz)} monatlichen Kinderzuschlag. Zudem sind Sie von den Kita-Gebühren befreit und erhalten Leistungen für Bildung und Teilhabe!`
+          ? `Nach dieser vereinfachten Schätzung kommen für Ihre Familie ca. ${formatCurrency(calculatedKiz)} Kinderzuschlag im Monat in Betracht. Mit KiZ-Bewilligung können Sie zudem die Befreiung von Kita-Gebühren und Leistungen für Bildung und Teilhabe beantragen.`
           : 'Aufgrund der Einkommenshöhe besteht voraussichtlich kein Anspruch auf den Kinderzuschlag.',
       };
     },
-    formula: 'KiZ = Maximalsatz (292 € je Kind) abzüglich anrechenbares Elterneinkommen',
-    formulaExplanation: 'Der Kinderzuschlag unterstützt erwerbstätige Eltern, deren Einkommen zwar für den eigenen Lebensunterhalt reicht, aber nicht für den der gesamten Familie (§ 6a BKKG).',
+    formula: 'KiZ ≈ Kinder × 297 € − 45 % × (Bruttoeinkommen − (1.600 € + Warmmiete)), mindestens 0 €',
+    formulaExplanation: 'Der Kinderzuschlag unterstützt erwerbstätige Eltern, deren Einkommen zwar für den eigenen Lebensunterhalt reicht, aber nicht für den der gesamten Familie (§ 6a BKGG). Erwerbseinkommen oberhalb des elterlichen Bedarfs mindert ihn zu 45 % (§ 6a Abs. 6 BKGG). Der Rechner bildet den Elternbedarf vereinfacht als 1.600 € plus Warmmiete ab und rechnet mit dem Bruttoeinkommen; die Familienkasse nutzt das bereinigte Einkommen und den genauen Bedarf.',
     workedExample: {
       title: 'Beispiel: 2 Kinder bei 2.800 € Familieneinkommen und 780 € Warmmiete',
       inputValues: [{ label: 'Kinder', value: '2' }, { label: 'Einkommen', value: '2.800 €' }, { label: 'Warmmiete', value: '780 €' }],
-      steps: ['Maximalanspruch: 2 × 292 € = 584 €', 'Geringe Anrechnung des Elterneinkommens', 'Zuschlag: rund 380 bis 500 € monatlich'],
-      result: 'ca. 450,00 € monatlicher Kinderzuschlag',
+      steps: ['Maximalanspruch: 2 × 297 € = 594 €', 'Vereinfachter Elternbedarf: 1.600 € + 780 € Warmmiete = 2.380 €', 'Überhang 2.800 € − 2.380 € = 420 €, davon 45 % = 189 € Anrechnung', 'Kinderzuschlag: 594 € − 189 € = 405 €'],
+      result: 'ca. 405,00 € monatlicher Kinderzuschlag',
     },
     content: {
       intro: 'Der Kinderzuschlag (KiZ nach § 6a BKGG) unterstützt Familien mit geringem Erwerbseinkommen, damit diese keinen Bürgergeld-Anspruch geltend machen müssen.',
-      details: 'Voraussetzung: Die Eltern verfügen über ein Mindesteinkommen (900 € für Paare, 600 € für Alleinerziehende), das jedoch nicht für die gesamte Familie ausreicht. Der KiZ beträgt bis zu 292 € monatlich je Kind.',
+      details: 'Voraussetzung: Die Eltern verfügen über ein Mindesteinkommen (900 € für Paare, 600 € für Alleinerziehende), das jedoch nicht für die gesamte Familie ausreicht. Der KiZ beträgt seit 2025 und auch 2026 bis zu 297 € monatlich je Kind.',
     },
     faqs: [
-      { question: 'Welche Zusatzleistungen schaltet die Bewilligung des Kinderzuschlags frei?', answer: 'Automatische Befreiung von den Kita-Gebühren sowie Anspruch auf Leistungen für Bildung und Teilhabe (BuT: kostenloses Schulmittagessen, 195 € Schulbedarfspaket, Klassenfahrten).' },
+      { question: 'Welche Zusatzleistungen schaltet die Bewilligung des Kinderzuschlags frei?', answer: 'Die Befreiung von den Kita-Gebühren (auf Antrag beim Jugendamt bzw. Kita-Träger) sowie Leistungen für Bildung und Teilhabe (BuT: kostenloses Mittagessen in Schule und Kita, 195 € Schulbedarfspaket pro Schuljahr, Klassenfahrten).' },
       { question: 'Wo wird der Kinderzuschlag beantragt?', answer: 'Online bei der zuständigen Familienkasse der Bundesagentur für Arbeit über das Portal Arbeitsagentur.de.' },
     ],
     relatedSlugs: ['kindergeld-rechner-2026', 'schulbedarfspaket-bu-t-rechner', 'unterhaltsvorschuss-rechner'],
     trustMeta: {
       legalBasis: '§ 6a Bundeskindergeldgesetz (BKGG) & Bundesministerium für Familie, Senioren, Frauen und Jugend',
-      sourceName: 'Bundesagentur für Arbeit (Familienkasse) / BMFSFJ',
-      sourceUrl: 'https://www.arbeitsagentur.de/familie-und-kinder/kiz-kinderzuschlag-verstehen',
-      lastReviewed: '2026-01-01',
+      sourceName: 'Familienportal des Bundes (BMBFSFJ) / Familienkasse',
+      sourceUrl: 'https://familienportal.de/familienportal/familienleistungen/kinderzuschlag',
+      lastReviewed: '2026-11-15',
     },
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: '§ 6a BKGG (KiZ-Höchstbetrag 2026)',
-      sourceUrl: 'https://www.arbeitsagentur.de/familie-und-kinder/kiz-kinderzuschlag-verstehen',
-      lastVerified: '2026-01-01',
+      source: '§ 6a BKGG; KiZ-Höchstbetrag 297 € (familienportal.de, BMBFSFJ-Einleger „Leistungen für Alleinerziehende 2026“)',
+      sourceUrl: 'https://familienportal.de/familienportal/familienleistungen/kinderzuschlag',
+      lastVerified: '2026-11-15',
     },
   },
 
@@ -2211,8 +2218,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       details: 'Die Höhe richtet sich nach dem gesetzlichen Mindestunterhalt abzüglich des vollen Kindergeldes für ein erstes Kind (§ 2 UVG). 2026 beträgt der Mindestunterhalt 486 € / 558 € / 653 € und das Kindergeld 259 €; daraus ergeben sich 227 € (0–5 Jahre), 299 € (6–11 Jahre) und 394 € (12–17 Jahre) im Monat.',
     },
     faqs: [
-      { question: 'Bis zu welchem Alter wird Unterhaltsvorschuss gezahlt?', answer: 'Bis zum 18. Lebensjahr des Kindes; für Kinder von 12 bis 17 Jahren jedoch nur, wenn das Kind nicht auf Bürgergeld angewiesen ist oder der alleinerziehende Elternteil mind. 600 € brutto verdient.' },
-      { question: 'Muss der säumige Elternteil den Unterhaltsvorschuss zurückzahlen?', answer: 'Ja, das Jugendamt nimmt den unterhaltspflichtigen Elternteil im Wege des Regresses in voller Höhe in Regress und fordert die verauslagten Gelder konsequent zurück.' },
+      { question: 'Bis zu welchem Alter wird Unterhaltsvorschuss gezahlt?', answer: 'Bis zum 18. Lebensjahr des Kindes; für Kinder von 12 bis 17 Jahren jedoch nur, wenn das Kind keine Bürgergeld-Leistungen bezieht, der Vorschuss die Hilfebedürftigkeit beendet oder der alleinerziehende Elternteil im Bürgergeld-Bezug mind. 600 € brutto verdient (§ 1 Abs. 1a UVG).' },
+      { question: 'Muss der säumige Elternteil den Unterhaltsvorschuss zurückzahlen?', answer: 'Grundsätzlich ja: Mit der Zahlung geht der Unterhaltsanspruch des Kindes in Höhe des Vorschusses auf das Land über (§ 7 UVG), und das Jugendamt fordert das Geld vom unterhaltspflichtigen Elternteil zurück, soweit dieser leistungsfähig ist.' },
     ],
     relatedSlugs: ['duesseldorfer-tabelle-rechner', 'kindergeld-rechner-2026', 'kinderzuschlag-kiz-rechner'],
     isTimeSensitive: true,
@@ -2337,12 +2344,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
   {
     id: 'ehegattenunterhalt-trennungsunterhalt-rechner',
     slug: 'ehegattenunterhalt-trennungsunterhalt-rechner',
-    name: 'Trennungsunterhalt-Rechner (3/7-Methode & Halbteilungsgrundsatz)',
+    name: 'Trennungsunterhalt-Rechner (45-%-Quote statt 3/7-Methode)',
     shortName: 'Trennungsunterhalt-Rechner',
     category: 'familie-schwangerschaft',
     subcategory: 'Elterngeld & Finanzen',
-    metaTitle: 'Trennungsunterhalt-Rechner: Unterhalt nach 3/7-Methode',
-    metaDescription: 'Berechnen Sie den gesetzlichen Trennungsunterhalt nach § 1361 BGB nach der anerkannten 3/7-Methode (45 % Erwerbstätigenbonus) aus der Differenz der bereinigten Nettoeinkommen.',
+    metaTitle: 'Trennungsunterhalt-Rechner 2026: 45-%-Quote & 3/7',
+    metaDescription: 'Berechnen Sie den Trennungsunterhalt nach § 1361 BGB mit der 45-%-Quote der Düsseldorfer Tabelle 2026, mit 3/7-Vergleich und 1.600 € Selbstbehalt.',
     h1: 'Trennungsunterhalt Rechner – Unterhalt bei Trennung kalkulieren',
     shortDescription: 'Ermittelt den Unterhaltsanspruch des wirtschaftlich schwächeren Ehepartners nach Trennung.',
     searchKeywords: ['trennungsunterhalt rechner 3 7 methode', 'ehegattenunterhalt berechnen einkommensdifferenz', 'paragraph 1361 bgb trennungsunterhalt formel', 'selbstbehalt ehegatte unterhalt'],
@@ -2354,14 +2361,14 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const net1 = inputs.netIncomePartner1 !== undefined && inputs.netIncomePartner1 !== '' ? Math.max(0, parseFloat(inputs.netIncomePartner1) || 0) : 3200;
       const net2 = inputs.netIncomePartner2 !== undefined && inputs.netIncomePartner2 !== '' ? Math.max(0, parseFloat(inputs.netIncomePartner2) || 0) : 1200;
 
-      // 3/7-Methode bzw. 45 % nach den Leitlinien der Oberlandesgerichte:
-      // Unterhalt = (Netto1 - Netto2) × (3 / 7) bzw. × 0.45 (Erwerbstätigenbonus 10%)
+      // Düsseldorfer Tabelle 2026, Anm. B.I.1 b: 45 % der Differenz der anrechenbaren Erwerbseinkommen
+      // (Erwerbstätigenbonus 1/10). Die ältere 3/7-Quote wird nur noch zum Vergleich ausgegeben.
+      // (Bis 11/2026 rechnete der Rechner mit dem Mittelwert aus 3/7 und 45 %; das entspricht keiner Leitlinie.)
       const diff = Math.max(0, net1 - net2);
       const maintenance37 = diff * (3 / 7);
-      const maintenance45 = diff * 0.45;
-      const finalMaintenance = (maintenance37 + maintenance45) / 2;
+      const finalMaintenance = diff * 0.45;
 
-      // Selbstbehalt gegenüber getrennt lebendem Ehegatten: ca. 1.600 €
+      // DT 2026 Anm. B.II: Selbstbehalt gegenüber getrennt lebendem/geschiedenem Ehegatten 1.600 € (erwerbstätig)
       const selbstbehalt = 1600;
       const cappedMaintenance = Math.max(0, Math.min(finalMaintenance, net1 - selbstbehalt));
 
@@ -2371,24 +2378,25 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           { id: 'diff', label: 'Einkommensdifferenz beider Partner', value: diff, formattedValue: formatCurrency(diff) },
           { id: 'net1After', label: 'Verbleibend bei Partner 1', value: net1 - cappedMaintenance, formattedValue: formatCurrency(net1 - cappedMaintenance) },
           { id: 'net2After', label: 'Gesamteinkommen Partner 2 (Einkommen + Unterhalt)', value: net2 + cappedMaintenance, formattedValue: formatCurrency(net2 + cappedMaintenance) },
+          { id: 'compare37', label: 'Zum Vergleich: ältere 3/7-Quote (vor Selbstbehalt)', value: maintenance37, formattedValue: formatCurrency(maintenance37) },
         ],
-        summaryText: `Aus der Einkommensdifferenz von ${formatCurrency(diff)} ergibt sich ein monatlicher Trennungsunterhalt von ca. ${formatCurrency(cappedMaintenance)}. Nach Zahlung verfügen beide Partner über ein faires Budget.`,
+        summaryText: `Aus der Einkommensdifferenz von ${formatCurrency(diff)} ergibt sich nach der 45-%-Quote der Düsseldorfer Tabelle 2026 ein monatlicher Trennungsunterhalt von ca. ${formatCurrency(cappedMaintenance)}${cappedMaintenance < finalMaintenance ? ` (gekappt durch den Selbstbehalt von ${formatCurrency(selbstbehalt)})` : ''}.`,
       };
     },
-    formula: 'Trennungsunterhalt = (Bereinigtes Netto 1 - Bereinigtes Netto 2) × 3/7 (bzw. 45 %)',
-    formulaExplanation: 'Nach § 1361 BGB kann ein Ehegatte von dem anderen den nach den Lebensverhältnissen angemessenen Unterhalt verlangen. Kindesunterhalt hat gesetzlich Vorrang und wird vorab abgezogen.',
+    formula: 'Trennungsunterhalt = (Bereinigtes Netto 1 − Bereinigtes Netto 2) × 45 %, höchstens Netto 1 − 1.600 € Selbstbehalt',
+    formulaExplanation: 'Nach § 1361 BGB kann ein Ehegatte von dem anderen den nach den Lebensverhältnissen angemessenen Unterhalt verlangen. Die Düsseldorfer Tabelle 2026 (Anm. B.I) setzt dafür 45 % der Differenz der anrechenbaren Erwerbseinkommen an. Kindesunterhalt hat Vorrang und wird vorab abgezogen.',
     workedExample: {
       title: 'Beispiel: Partner 1 verdient 3.200 €, Partner 2 verdient 1.200 €',
       inputValues: [{ label: 'Partner 1', value: '3.200 €' }, { label: 'Partner 2', value: '1.200 €' }],
-      steps: ['Differenz = 3.200 € - 1.200 € = 2.000 €', '45 % von 2.000 € = 900,00 € Unterhalt', 'Selbstbehalt von 1.600 € bleibt gewahrt (3.200 - 900 = 2.300 €)'],
+      steps: ['Differenz = 3.200 € − 1.200 € = 2.000 €', '45 % von 2.000 € = 900,00 € Unterhalt', 'Selbstbehalt von 1.600 € bleibt gewahrt (3.200 € − 900 € = 2.300 €)'],
       result: 'ca. 900,00 € monatlicher Trennungsunterhalt',
     },
     content: {
-      intro: 'Dieser Rechner kalkuliert den Anspruch auf Trennungsunterhalt (§ 1361 BGB) für das Trennungsjahr sowie den nachehelichen Unterhalt nach Rechtskraft der Scheidung.',
-      details: 'Berechnung nach dem Halbteilungsgrundsatz (3/7- bzw. 45-%-Regel): Der bedürftige Partner erhält 45 Prozent der Differenz der bereinigten Erwerbseinkommen beider Eheleute (nach Erwerbstätigenbonus).',
+      intro: 'Dieser Rechner schätzt den Trennungsunterhalt (§ 1361 BGB) ab der Trennung bis zur Scheidung. Nachehelicher Unterhalt folgt derselben Quote, setzt aber einen eigenen Unterhaltstatbestand (§§ 1570 ff. BGB) voraus und kann befristet oder herabgesetzt werden (§ 1578b BGB).',
+      details: 'Berechnung nach Anm. B.I der Düsseldorfer Tabelle 2026: Der wirtschaftlich schwächere Partner erhält 45 Prozent der Differenz der bereinigten Erwerbseinkommen beider Eheleute. Das ist die Hälfte der Differenz, nachdem vorab ein Zehntel als Erwerbstätigenbonus abgezogen wurde (0,9 × 0,5 = 0,45). Dem Zahlenden müssen mindestens 1.600 € (erwerbstätig) bzw. 1.475 € (nicht erwerbstätig) bleiben.',
     },
     faqs: [
-      { question: 'Kann auf Trennungsunterhalt vorab vertraglich verzichtet werden?', answer: 'Nein, nach § 1361 Abs. 4 Satz 4 BGB ist ein Verzicht auf Trennungsunterhalt für die Zukunft im Voraus absolut unwirksam, um Sozialhilfebedürftigkeit zu verhindern.' },
+      { question: 'Kann auf Trennungsunterhalt vorab vertraglich verzichtet werden?', answer: 'Nein, ein Verzicht auf künftigen Trennungsunterhalt ist unwirksam (§ 1361 Abs. 4 Satz 4 i. V. m. § 1360a Abs. 3 und § 1614 Abs. 1 BGB). Nur auf bereits fällige Rückstände kann verzichtet werden.' },
       { question: 'Wann entfällt der nacheheliche Unterhalt?', answer: 'Wenn der geschiedene Partner wieder heiratet (§ 1586 BGB), in einer verfestigten neuen Lebensgemeinschaft lebt (§ 1579 BGB) oder seinen Lebensbedarf aus eigenen Einkünften decken kann.' },
     ],
     relatedSlugs: ['duesseldorfer-tabelle-rechner', 'unterhaltsvorschuss-rechner', 'teilzeit-gehaltsrechner'],
@@ -2891,32 +2899,34 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       // Junge = (Größe Vater + Größe Mutter + 13 cm) / 2
       // Mädchen = (Größe Vater + Größe Mutter - 13 cm) / 2
       const targetHeight = isBoy ? (fH + mH + 13) / 2 : (fH + mH - 13) / 2;
-      const minRange = targetHeight - 5;
-      const maxRange = targetHeight + 5;
+      // Zielgrößenbereich ± 8,5 cm (≈ 2 Standardabweichungen), AWMF-Leitlinie 174-002 „Diagnostik des
+      // Wachstumshormonmangels im Kindes- und Jugendalter“ (2022). Bis 11/2026 stand hier fälschlich ± 5 cm.
+      const minRange = targetHeight - 8.5;
+      const maxRange = targetHeight + 8.5;
 
       return {
-        primary: { id: 'targetHeight', label: 'Prognostizierte Endgröße als Erwachsener', value: targetHeight, formattedValue: `ca. ${formatNumber(targetHeight, 1)} cm`, highlight: true },
+        primary: { id: 'targetHeight', label: 'Genetische Zielgröße (Erwachsenengröße)', value: targetHeight, formattedValue: `ca. ${formatNumber(targetHeight, 1)} cm`, highlight: true },
         secondary: [
-          { id: 'normalRange', label: 'Genetischer Schwankungsbereich (± 5 cm)', value: 0, formattedValue: `${formatNumber(minRange, 0)} bis ${formatNumber(maxRange, 0)} cm` },
+          { id: 'normalRange', label: 'Zielgrößenbereich (± 8,5 cm)', value: 0, formattedValue: `${formatNumber(minRange, 1)} bis ${formatNumber(maxRange, 1)} cm` },
           { id: 'midparent', label: 'Eltern-Mittelwert', value: (fH + mH) / 2, formattedValue: `${formatNumber((fH + mH) / 2, 1)} cm` },
         ],
-        summaryText: `Auf Basis der Elterngrößen (${fH} cm Vater, ${mH} cm Mutter) wird Ihr ${isBoy ? 'Sohn' : 'Ihre Tochter'} voraussichtlich ca. ${formatNumber(targetHeight, 1)} cm groß (${formatNumber(minRange, 0)} bis ${formatNumber(maxRange, 0)} cm).`,
+        summaryText: `Aus den Elterngrößen (${fH} cm Vater, ${mH} cm Mutter) ergibt sich für ${isBoy ? 'Ihren Sohn' : 'Ihre Tochter'} eine genetische Zielgröße von ca. ${formatNumber(targetHeight, 1)} cm; der übliche Zielgrößenbereich reicht von ${formatNumber(minRange, 1)} bis ${formatNumber(maxRange, 1)} cm.`,
       };
     },
-    formula: 'Zielgröße = (Größe Vater + Größe Mutter ± 13 cm) / 2 [Tanner-Methode]',
-    formulaExplanation: 'Rund 80 % der Körpergröße eines Menschen sind genetisch determiniert. Ernährung und Gesundheit in der Kindheit bestimmen, ob das volle genetische Potenzial ausgeschöpft wird.',
+    formula: 'Zielgröße = (Größe Vater + Größe Mutter ± 13 cm) / 2 [Tanner-Methode], Zielgrößenbereich ± 8,5 cm',
+    formulaExplanation: 'Die Körpergröße wird zu einem großen Teil vererbt. Ernährung, Gesundheit und Entwicklungstempo in Kindheit und Pubertät bestimmen mit, wo im Zielgrößenbereich ein Kind am Ende landet.',
     workedExample: {
       title: 'Beispiel: Vater 182 cm, Mutter 168 cm, Kind ist ein Junge',
       inputValues: [{ label: 'Vater', value: '182 cm' }, { label: 'Mutter', value: '168 cm' }, { label: 'Geschlecht', value: 'Junge' }],
-      steps: ['(182 + 168 + 13) / 2 = 363 / 2 = 181,5 cm', 'Toleranzbereich: 176,5 bis 186,5 cm'],
+      steps: ['(182 + 168 + 13) / 2 = 363 / 2 = 181,5 cm', 'Zielgrößenbereich ± 8,5 cm: 173 bis 190 cm'],
       result: 'ca. 181,5 cm Endgröße',
     },
     content: {
       intro: 'Die Zielgrößenformel nach Tanner prognostiziert die statistische Erwachsenengröße eines Kindes auf Basis der biologischen Elterngrößen.',
-      details: 'Jungen: [(Größe Vater + Größe Mutter + 13 cm) / 2] ± 5 cm. Mädchen: [(Größe Vater + Größe Mutter - 13 cm) / 2] ± 5 cm. Die Spanne von ± 5 cm deckt normale genetische Streuungen ab.',
+      details: 'Jungen: (Größe Vater + Größe Mutter + 13 cm) / 2. Mädchen: (Größe Vater + Größe Mutter − 13 cm) / 2. Um diese Zielgröße legt die pädiatrische Leitlinie (AWMF 174-002) einen Zielgrößenbereich von ± 8,5 cm, der etwa zwei Standardabweichungen entspricht.',
     },
     faqs: [
-      { question: 'Welche Umweltfaktoren beeinflussen die Endgröße neben den Genen?', answer: 'Ausgewogene Ernährung (Protein, Kalzium, Zink, Vitamin D), ausreichender Schlaf (Wachstumshormon Somatotropin wird überwiegend im Tiefschlaf ausgeschüttet) und das Ausbleiben schwerer chronischer Krankheiten.' },
+      { question: 'Welche Umweltfaktoren beeinflussen die Endgröße neben den Genen?', answer: 'Vor allem eine ausreichende, ausgewogene Ernährung, genug Schlaf und das Ausbleiben schwerer chronischer Krankheiten. Fehlen diese Bedingungen über längere Zeit, kann ein Kind unter seiner genetischen Zielgröße bleiben.' },
       { question: 'Wie lässt sich die Endgröße medizinisch exakter bestimmen?', answer: 'Über ein Röntgenbild der linken Handwurzelknochen: Ein Radiologe oder Endokrinologe beurteilt den Verknöcherungsgrad der Wachstumsfugen (Epiphysenfugen).' },
     ],
     relatedSlugs: ['kindersitz-groesse-i-size-rechner', 'geburtstermin-rechner', 'schwangerschaftswoche-ssw-rechner', 'windelbudget-rechner'],
@@ -3293,7 +3303,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'familie-schwangerschaft',
     subcategory: 'Bildung & Betreuung',
     metaTitle: 'Kita-Gebühren Rechner – Elternbeiträge nach Einkommen',
-    metaDescription: 'Ermitteln Sie die monatlichen Kita-Kosten für Krippe oder Kindergarten nach Familieneinkommen, Betreuungsstunden und Bundesland-Beitragsfreiheit.',
+    metaDescription: 'Schätzen Sie die monatlichen Kita-Kosten für Krippe oder Kindergarten nach Familieneinkommen, Betreuungsstunden und Essensgeld, mit Überblick zur Beitragsfreiheit der Länder.',
     h1: 'Kita-Gebühren Rechner – Monatliche Kita-Kosten ermitteln',
     shortDescription: 'Schätzt die einkommensabhängigen Elternbeiträge für die Kinderbetreuung.',
     searchKeywords: ['kita gebuehren rechner einkommen', 'kindergarten kosten pro monat tabelle', 'beitragsfreie kita bundeslaender', 'elternbeitrag krippe rechner'],
@@ -3318,9 +3328,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const hours = inputs.hoursPerDay !== undefined && inputs.hoursPerDay !== '' ? Math.max(0, parseFloat(inputs.hoursPerDay) || 0) : 8;
       const lunch = inputs.lunchCateringMonthly !== undefined && inputs.lunchCateringMonthly !== '' ? Math.max(0, parseFloat(inputs.lunchCateringMonthly) || 0) : 75;
 
-      // Typische kommunale Einkommensstaffel in Deutschland:
-      // Krippe: ca. 4 % bis 6 % des Monatseinkommens
-      // Kindergarten: ca. 2,5 % bis 4 % (in mehreren Bundesländern wie Berlin, Hamburg, Hessen, RP, Nds ganz oder teilweise beitragsfrei!)
+      // Modellstaffel (keine amtliche Größe): Krippe 4,5 %, Kindergarten 3,0 % des Brutto-Monatseinkommens bei 8 Std./Tag.
+      // Echte Beiträge legen Länder, Kommunen und Träger fest; Beitragsfreiheit der Länder wird hier nicht abgebildet.
       const monthlyGross = income / 12;
       let feePct = isU3 ? 0.045 : 0.030;
       const hoursFactor = hours / 8;
@@ -3334,11 +3343,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           { id: 'lunch', label: 'Verpflegungsgeld (Essen)', value: lunch, formattedValue: formatCurrency(lunch) },
           { id: 'yearlyCost', label: 'Gesamtkosten pro Jahr', value: totalMonthlyCost * 12, formattedValue: formatCurrency(totalMonthlyCost * 12) },
         ],
-        summaryText: `Bei einem Einkommen von ${formatCurrency(income)} zahlen Sie ca. ${formatCurrency(totalMonthlyCost)} monatlich für den Kita-Platz (${formatCurrency(baseFee)} Betreuung + ${formatCurrency(lunch)} Verpflegung).`,
+        summaryText: `Bei einem Einkommen von ${formatCurrency(income)} ergibt die Modellstaffel ca. ${formatCurrency(totalMonthlyCost)} monatlich für den Kita-Platz (${formatCurrency(baseFee)} Betreuung + ${formatCurrency(lunch)} Verpflegung). In beitragsfreien Ländern fällt meist nur das Essensgeld an.`,
       };
     },
     formula: 'Kita-Kosten = Einkommensabhängiger Staffelbeitrag + Essensgeld',
-    formulaExplanation: 'In Deutschland legen Städte und Gemeinden die Kita-Gebühren autonom fest. In Berlin, Hamburg, Rheinland-Pfalz, Hessen und Niedersachsen sind die Betreuungsbeiträge für Ü3-Kinder ganz oder stundenweise beitragsfrei.',
+    formulaExplanation: 'Der Rechner nutzt eine Modellstaffel: 4,5 % (Krippe) bzw. 3,0 % (Kindergarten) des Brutto-Monatseinkommens bei 8 Stunden, anteilig für kürzere oder längere Zeiten, plus Essensgeld. Die tatsächlichen Beiträge legen Länder, Kommunen und Träger fest; mehrere Länder haben sie ganz oder teilweise abgeschafft.',
     workedExample: {
       title: 'Beispiel: 65.000 € Familieneinkommen, Kindergarten ganztags (8h)',
       inputValues: [{ label: 'Einkommen', value: '65.000 €' }, { label: 'Betreuung', value: '8 Stunden' }],
@@ -3347,11 +3356,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Elternbeiträge für Krippe, Kindergarten und Hort variieren in Deutschland extrem je nach Bundesland, Kommune und elterlichem Jahreseinkommen.',
-      details: 'Einige Bundesländer (z. B. Berlin, Hamburg, Hessen teilweise) haben die Kita-Gebühren für Kinder ab 3 Jahren komplett abgeschafft; in anderen Kommunen staffeln sich die Beiträge nach Einkommen bis zu 600 € monatlich.',
+      details: 'Berlin und Mecklenburg-Vorpommern erheben für die Kindertagesbetreuung keine Elternbeiträge mehr; andere Länder befreien bestimmte Altersjahre oder Stundenumfänge. Wo Beiträge anfallen, staffeln viele Kommunen sie nach Einkommen, Betreuungszeit und Kinderzahl, die Spannen unterscheiden sich von Ort zu Ort erheblich.',
     },
     faqs: [
-      { question: 'Sind Geschwisterkinder von Kita-Beiträgen befreit?', answer: 'In den allermeisten kommunalen Satzungen ist das zweite Kind beitragsermäßigt (meist 50 % Ersparnis) und das dritte Kind vollkommen gebührenfrei.' },
-      { question: 'Kann man Kita-Kosten von der Steuer absetzen?', answer: 'Ja, nach § 10 Abs. 1 Nr. 5 EStG können zwei Drittel der reinen Betreuungskosten (ohne Verpflegung), maximal 4.000 € pro Kind und Jahr, als Sonderausgaben geltend gemacht werden.' },
+      { question: 'Sind Geschwisterkinder von Kita-Beiträgen befreit?', answer: 'Das regelt jede Kommune bzw. jedes Land selbst. Häufig gibt es Ermäßigungen für das zweite und eine Befreiung ab dem dritten gleichzeitig betreuten Kind; Höhe und Bedingungen stehen in der örtlichen Beitragssatzung.' },
+      { question: 'Kann man Kita-Kosten von der Steuer absetzen?', answer: 'Ja, seit 2025 sind nach § 10 Abs. 1 Nr. 5 EStG 80 % der reinen Betreuungskosten (ohne Verpflegung), höchstens 4.800 € pro Kind und Jahr, als Sonderausgaben abziehbar, wenn Sie per Überweisung gezahlt haben.' },
     ],
     relatedSlugs: ['kinderbetreuungskosten-absetzen-rechner', 'kindergeld-rechner-2026', 'teilzeit-gehaltsrechner', 'taschengeld-empfehlung-rechner'],
   },
@@ -3528,15 +3537,15 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Wer hat Anspruch auf das Schulbedarfspaket?', answer: 'Kinder, deren Eltern Bürgergeld, Sozialhilfe, Kinderzuschlag (KiZ), Wohngeld oder Asylbewerberleistungen beziehen.' },
-      { question: 'Muss man für das Schulbedarfspaket Kassenbons vorlegen?', answer: 'In der Regel nein, es handelt sich um eine zweckgebundene Pauschale; bei Kindern ab 15 Jahren verlangt das Amt jedoch eine aktuelle Schulbescheinigung.' },
+      { question: 'Muss man für das Schulbedarfspaket Kassenbons vorlegen?', answer: 'In der Regel nein, es handelt sich um eine Pauschale ohne Einzelnachweis. Das Amt kann aber eine Schulbescheinigung verlangen, vor allem bei älteren Schülerinnen und Schülern, deren Schulbesuch nicht mehr selbstverständlich ist.' },
     ],
     relatedSlugs: ['kinderzuschlag-kiz-rechner', 'buergergeld-anspruch-rechner', 'taschengeld-empfehlung-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Bundesministerium für Arbeit und Soziales (§ 28 Abs. 3 SGB II)',
+      source: '§ 28 Abs. 3 SGB II; Schulbedarf 2026 unverändert 130 € + 65 € (BMBFSFJ-Einleger „Leistungen für Alleinerziehende 2026“, familienportal.de)',
       sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/__28.html',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-11-15',
     }
   },
 
@@ -3571,19 +3580,25 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const days = inputs.sickDaysClaimed !== undefined && inputs.sickDaysClaimed !== '' ? Math.max(0, parseInt(inputs.sickDaysClaimed, 10) || 0) : 5;
       const isSingle = inputs.parentStatus === 'single';
 
-      // Kinderkrankengeld beträgt ca. 90 % des ausgefallenen Nettoentgelts
+      // § 45 Abs. 2 Satz 3 SGB V: 90 % des ausgefallenen Nettoarbeitsentgelts (100 % bei Einmalzahlungen in den
+      // letzten 12 Monaten), höchstens 70 % der Beitragsbemessungsgrenze (§ 223 Abs. 3 SGB V) je Kalendertag.
+      // Bis 11/2026 fehlte diese Höchstgrenze im Rechner.
       const dailyNet = net / 30;
-      const dailyKinderkrankengeld = dailyNet * 0.90;
+      const dailyCap = (LEGAL_VALUES_2026.bbgKrankenversicherungJahr.value / 360) * 0.7;
+      const dailyKinderkrankengeld = Math.min(dailyNet * 0.90, dailyCap);
+      const capApplied = dailyNet * 0.90 > dailyCap;
       const totalPayout = dailyKinderkrankengeld * days;
+      // § 45 Abs. 2a SGB V: für 2026 15 Arbeitstage je Kind und Elternteil (Alleinerziehende 30), höchstens 35 bzw. 70
       const maxDaysAllowed = isSingle ? 30 : 15;
 
       return {
-        primary: { id: 'totalPayout', label: `Kinderkrankengeld für ${days} Tage`, value: totalPayout, formattedValue: formatCurrency(totalPayout), highlight: true },
+        primary: { id: 'totalPayout', label: `Kinderkrankengeld für ${days} Tage (vor Sozialabgaben)`, value: totalPayout, formattedValue: formatCurrency(totalPayout), highlight: true },
         secondary: [
-          { id: 'dailyRate', label: 'Tägliches Kinderkrankengeld (ca. 90 % Netto)', value: dailyKinderkrankengeld, formattedValue: formatCurrency(dailyKinderkrankengeld) },
-          { id: 'maxDays', label: 'Maximaler Jahresanspruch je Kind', value: maxDaysAllowed, formattedValue: `${maxDaysAllowed} Arbeitstage` },
+          { id: 'dailyRate', label: capApplied ? 'Tägliches Kinderkrankengeld (Höchstbetrag 2026)' : 'Tägliches Kinderkrankengeld (90 % des Nettos)', value: dailyKinderkrankengeld, formattedValue: formatCurrency(dailyKinderkrankengeld) },
+          { id: 'dailyCap', label: 'Höchstbetrag pro Tag 2026 (70 % der BBG)', value: dailyCap, formattedValue: formatCurrency(dailyCap) },
+          { id: 'maxDays', label: 'Maximaler Jahresanspruch je Kind 2026', value: maxDaysAllowed, formattedValue: `${maxDaysAllowed} Arbeitstage` },
         ],
-        summaryText: `Für ${days} Kinderkrankentage zahlt die gesetzliche Krankenkasse ca. ${formatCurrency(totalPayout)} (${formatCurrency(dailyKinderkrankengeld)}/Tag). Sie haben pro Kalenderjahr Anspruch auf bis zu ${maxDaysAllowed} Tage.`,
+        summaryText: `Für ${days} Kinderkrankentage zahlt die gesetzliche Krankenkasse ca. ${formatCurrency(totalPayout)} (${formatCurrency(dailyKinderkrankengeld)}/Tag${capApplied ? ', gedeckelt auf den Höchstbetrag' : ''}); davon gehen noch Beiträge zur Renten-, Arbeitslosen- und Pflegeversicherung ab. 2026 haben Sie je Kind Anspruch auf bis zu ${maxDaysAllowed} Arbeitstage.`,
       };
     },
     formula: 'Kinderkrankengeld = Ausgefallenes Nettoentgelt pro Tag × 90 % × Krankheitstage',
@@ -3603,6 +3618,13 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       { question: 'Benötigt man ab dem ersten Tag ein ärztliches Attest?', answer: 'Ja, für den Bezug von Kinderkrankengeld muss der Kinderarzt ab Tag 1 eine "Ärztliche Bescheinigung für den Bezug von Krankengeld bei Erkrankung eines Kindes" ausstellen.' },
     ],
     relatedSlugs: ['krankengeld-rechner', 'teilzeit-gehaltsrechner', 'urlaubstage-rechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: '§ 45 Abs. 2 und 2a SGB V (2026: 15 bzw. 30 Arbeitstage je Kind, höchstens 35 bzw. 70); Höchstbetrag 70 % der BBG',
+      sourceUrl: 'https://www.gesetze-im-internet.de/sgb_5/__45.html',
+      lastVerified: '2026-11-15',
+    },
   },
 
   {
@@ -3843,10 +3865,10 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
     category: 'familie-schwangerschaft',
     subcategory: 'Bildung & Betreuung',
     metaTitle: 'Kinderbetreuungskosten Rechner – Kita, Hort',
-    metaDescription: 'Berechnen Sie Ihre Steuerersparnis durch Kinderbetreuungskosten: 2/3 der Kosten bis maximal 4.000 Euro pro Kind und Jahr als Sonderausgaben abziehbar.',
+    metaDescription: 'Berechnen Sie Ihre Steuerersparnis durch Kinderbetreuungskosten: seit 2025 sind 80 % der Kosten, höchstens 4.800 Euro pro Kind und Jahr, als Sonderausgaben abziehbar.',
     h1: 'Kinderbetreuungskosten Rechner – Steuerersparnis für Kita & Hort',
     shortDescription: 'Ermittelt den steuerlichen Sonderausgabenabzug für Betreuungsaufwendungen.',
-    searchKeywords: ['kinderbetreuungskosten absetzen rechner', 'paragraph 10 estg sonderausgaben kinderbetreuung 4000 euro', 'tagesmutter steuerlich absetzbar rechner', 'kita kosten steuerersparnis'],
+    searchKeywords: ['kinderbetreuungskosten absetzen rechner', 'paragraph 10 estg sonderausgaben kinderbetreuung 4800 euro', 'tagesmutter steuerlich absetzbar rechner', 'kita kosten steuerersparnis'],
     inputs: [
       { id: 'actualCareCostsYearly', label: 'Tatsächliche Betreuungskosten pro Kind im Jahr (ohne Essensgeld)', type: 'number', defaultValue: 3600, min: 200, step: 200, unit: '€' },
       { id: 'taxRatePct', label: 'Persönlicher Grenzsteuersatz der Eltern', type: 'number', defaultValue: 35, min: 14, max: 45, step: 1, unit: '%' },
@@ -3855,37 +3877,47 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const costs = inputs.actualCareCostsYearly !== undefined && inputs.actualCareCostsYearly !== '' ? Math.max(0, parseFloat(inputs.actualCareCostsYearly) || 0) : 3600;
       const rate = (inputs.taxRatePct !== undefined && inputs.taxRatePct !== '' ? Math.max(0, parseFloat(inputs.taxRatePct) || 0) : 35) / 100;
 
-      // Nach § 10 Abs. 1 Nr. 5 EStG: Zwei Drittel der Aufwendungen, maximal 4.000 € je Kind
-      const twoThirds = costs * (2 / 3);
-      const deductibleAmount = Math.min(4000, twoThirds);
+      // § 10 Abs. 1 Nr. 5 EStG i. d. F. ab VZ 2025: 80 % der Aufwendungen, höchstens 4.800 € je Kind
+      // (geprüft auf gesetze-im-internet.de, 2026-11-15; bis 11/2026 rechnete der Rechner noch mit 2/3 und 4.000 €)
+      const ABZUGSQUOTE = 0.8;
+      const HOECHSTBETRAG = 4800;
+      const quotaAmount = costs * ABZUGSQUOTE;
+      const deductibleAmount = Math.min(HOECHSTBETRAG, quotaAmount);
       const taxSaving = deductibleAmount * rate;
 
       return {
-        primary: { id: 'taxSaving', label: 'Jährliche Steuerersparnis', value: taxSaving, formattedValue: formatCurrency(taxSaving), highlight: true },
+        primary: { id: 'taxSaving', label: 'Jährliche Steuerersparnis (ohne Soli/Kirchensteuer)', value: taxSaving, formattedValue: formatCurrency(taxSaving), highlight: true },
         secondary: [
           { id: 'deductibleAmount', label: 'Als Sonderausgaben abzugsfähiger Betrag', value: deductibleAmount, formattedValue: formatCurrency(deductibleAmount) },
-          { id: 'twoThirds', label: 'Zwei-Drittel-Betrag (vor Kappung)', value: twoThirds, formattedValue: formatCurrency(twoThirds) },
-          { id: 'maxAllowed', label: 'Gesetzlicher Höchstbetrag je Kind', value: 4000, formattedValue: '4.000,00 €' },
+          { id: 'quotaAmount', label: '80-%-Betrag (vor Kappung)', value: quotaAmount, formattedValue: formatCurrency(quotaAmount) },
+          { id: 'maxAllowed', label: 'Gesetzlicher Höchstbetrag je Kind', value: HOECHSTBETRAG, formattedValue: formatCurrency(HOECHSTBETRAG) },
         ],
-        summaryText: `Von ${formatCurrency(costs)} Betreuungskosten können Sie ${formatCurrency(deductibleAmount)} als Sonderausgaben geltend machen. Das bringt Ihnen rund ${formatCurrency(taxSaving)} Einkommensteuerersparnis zurück!`,
+        summaryText: `Von ${formatCurrency(costs)} Betreuungskosten können Sie ${formatCurrency(deductibleAmount)} als Sonderausgaben geltend machen. Bei ${formatPercent(rate * 100, 0)} Grenzsteuersatz mindert das Ihre Einkommensteuer um rund ${formatCurrency(taxSaving)}.`,
       };
     },
-    formula: 'Abzug = min(4.000 €, Betreuungskosten × 2/3); Ersparnis = Abzug × Grenzsteuersatz',
-    formulaExplanation: 'Begünstigt sind Dienstleistungen für Kinder bis zum 14. Lebensjahr wie Kita, Kindergarten, Hort, Tagesmutter, Babysitter oder Au-Pair. Nicht abziehbar sind Kosten für Verpflegung, Freizeit und Sportunterricht.',
+    formula: 'Abzug = min(4.800 €, Betreuungskosten × 80 %); Ersparnis = Abzug × Grenzsteuersatz',
+    formulaExplanation: 'Begünstigt sind Betreuungsleistungen für Kinder, die das 14. Lebensjahr noch nicht vollendet haben (bei vor dem 25. Geburtstag eingetretener Behinderung auch länger), etwa Kita, Kindergarten, Hort, Tagesmutter, Babysitter oder Au-pair. Nicht abziehbar sind Unterricht, die Vermittlung besonderer Fähigkeiten sowie sportliche und andere Freizeitbetätigungen (§ 10 Abs. 1 Nr. 5 Satz 2 EStG).',
     workedExample: {
       title: 'Beispiel: 3.600 € Kita-Gebühren bei 35 % Grenzsteuersatz',
       inputValues: [{ label: 'Kita-Kosten', value: '3.600 €' }, { label: 'Steuersatz', value: '35 %' }],
-      steps: ['2/3 von 3.600 € = 2.400,00 € Sonderausgaben', 'Steuerersparnis: 2.400 € × 0,35 = 840,00 €'],
-      result: '840,00 € Steuererstattung',
+      steps: ['80 % von 3.600 € = 2.880,00 € Sonderausgaben (unter dem Höchstbetrag von 4.800 €)', 'Steuerersparnis: 2.880 € × 0,35 = 1.008,00 €'],
+      result: '1.008,00 € Steuerersparnis',
     },
     content: {
-      intro: 'Erwerbsbedingte Kinderbetreuungskosten können nach § 10 Abs. 1 Nr. 5 EStG steuermindernd als Sonderausgaben in der Einkommensteuererklärung geltend gemacht werden.',
-      details: 'Steuerlich anerkannt werden zwei Drittel (66,6 %) der tatsächlichen Aufwendungen für Kindertagesstätte, Krippe, Tagesmutter oder Babysitter, maximal bis zu einem Höchstbetrag von 4.000 Euro je Kind und Kalenderjahr.',
+      intro: 'Kinderbetreuungskosten können nach § 10 Abs. 1 Nr. 5 EStG als Sonderausgaben in der Einkommensteuererklärung geltend gemacht werden, unabhängig davon, ob die Eltern erwerbstätig sind.',
+      details: 'Seit dem Veranlagungszeitraum 2025 werden 80 % der Aufwendungen für Kindertagesstätte, Krippe, Tagesmutter oder Babysitter anerkannt, höchstens 4.800 Euro je Kind und Kalenderjahr. Voraussetzung sind eine Rechnung und die Zahlung auf das Konto des Leistungserbringers.',
     },
     faqs: [
-      { question: 'Können Verpflegungskosten (Essen in der Kita) abgesetzt werden?', answer: 'Nein, Aufwendungen für Mahlzeiten, Spiel- oder Bastelgeld sowie Musikunterricht und Sportvereine sind gesetzlich ausdrücklich vom Steuerabzug ausgeschlossen.' },
+      { question: 'Können Verpflegungskosten (Essen in der Kita) abgesetzt werden?', answer: 'Nein. Begünstigt sind nur die Betreuungsleistungen; Essensgeld gehört nicht dazu und muss aus einem Gesamtbescheid herausgerechnet werden. Ausdrücklich ausgeschlossen sind laut Gesetz außerdem Unterricht (z. B. Musikschule) sowie Sport- und andere Freizeitaktivitäten.' },
       { question: 'Ist Barzahlung an die Tagesmutter steuerlich zulässig?', answer: 'Nein, Voraussetzung für den steuerlichen Abzug ist zwingend eine ordnungsgemäße Rechnung oder ein Gebührenbescheid und die unbare Überweisung auf das Konto des Betreibers.' },
     ],
     relatedSlugs: ['kita-gebuehren-rechner', 'kindergeld-rechner-2026', 'teilzeit-gehaltsrechner'],
+    isTimeSensitive: true,
+    timeSensitiveMeta: {
+      year: 2026,
+      source: '§ 10 Abs. 1 Nr. 5 EStG (80 %, höchstens 4.800 € je Kind, ab Veranlagungszeitraum 2025)',
+      sourceUrl: 'https://www.gesetze-im-internet.de/estg/__10.html',
+      lastVerified: '2026-11-15',
+    },
   },
 ];

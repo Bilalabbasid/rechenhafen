@@ -284,7 +284,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Gilt die Entfernungspauschale für Hin- und Rückfahrt?', answer: 'Nein, das Steuerrecht erkennt grundsätzlich nur die einfache Entfernung (kürzeste Straßenverbindung) zwischen Wohnung und Arbeitsstätte an.' },
-      { question: 'Gibt es einen Höchstbetrag bei der Pendlerpauschale?', answer: 'Für Fahrten mit dem eigenen PKW gilt keine Obergrenze; für alle anderen Verkehrsmittel (ÖPNV, Fahrrad, Fahrgemeinschaft als Mitfahrer) ist der Abzug auf maximal 4.500 € im Kalenderjahr gedeckelt.' },
+      { question: 'Gibt es einen Höchstbetrag bei der Pendlerpauschale?', answer: 'Für Fahrten mit dem eigenen PKW gilt keine Obergrenze; für alle anderen Verkehrsmittel (ÖPNV, Fahrrad, Fahrgemeinschaft als Mitfahrer) ist der Abzug auf maximal 4.500 € im Kalenderjahr gedeckelt. Ausnahme: Höhere tatsächliche Kosten für öffentliche Verkehrsmittel dürfen nach § 9 Abs. 2 Satz 2 EStG angesetzt werden, soweit sie die Pauschale übersteigen.' },
     ],
     relatedSlugs: ['fahrtkostenrechner', 'spritkostenrechner', 'auto-gesamtkosten-rechner', 'dienstfahrrad-jobrad-rechner', 'arbeitstage-rechner'],
     isTimeSensitive: true,
@@ -487,17 +487,17 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Multiplikation des durchschnittlichen Stromverbrauchs mit dem jeweiligen Stromtarif an der Wallbox oder Schnellladesäule.',
     workedExample: {
       title: 'Beispiel: 17,5 kWh/100 km bei 0,38 €/kWh Strompreis',
-      description: 'Kosten pro 100 km: 6,65 €. Volle Ladung eines 64-kWh-Akkus: 24,32 € (Reichweite ca. 365 km).',
+      description: 'Kosten pro 100 km: 6,65 €. Volle Ladung eines 64-kWh-Akkus: 24,32 € (rechnerische Reichweite ca. 366 km).',
       inputs: { distance: 100, consumptionKwh: 17.5, pricePerKwh: 0.38, batterySize: 64 },
       resultSummary: '6,65 € / 100 km',
     },
     content: {
-      intro: 'Dieser Rechner vergleicht die Ladekosten eines Elektroautos an der heimischen Wallbox mit den Kosten an öffentlichen AC- und DC-Schnellladesäulen. Mehr erfahren: [Was kostet ein E-Auto auf 100 km?](/ratgeber/e-auto-kosten-100-km/)',
-      details: 'Ladekosten = (Verbrauch in kWh/100 km / 100) · Distanz · Strompreis pro kWh · (1 + Ladeverlustfaktor). Typische Ladeverluste betragen an der Wallbox etwa 8 bis 12 Prozent, an der Haushaltssteckdose bis zu 20 Prozent.',
+      intro: 'Dieser Rechner ermittelt die Ladekosten eines Elektroautos für den Strompreis, den Sie eintragen: Ihren Haushaltstarif an der Wallbox oder den kWh-Preis einer öffentlichen AC- oder DC-Ladesäule. Mehr erfahren: [Was kostet ein E-Auto auf 100 km?](/ratgeber/e-auto-kosten-100-km/)',
+      details: 'Ladekosten = (Verbrauch in kWh/100 km / 100) · Distanz · Strompreis pro kWh. Ladeverluste rechnet der Rechner nicht gesondert ein: Geben Sie den Verbrauch ab Zähler oder Wallbox ein, sind sie bereits enthalten; der Bordcomputer-Wert liegt meist darunter.',
     },
     faqs: [
-      { question: 'Was kostet das Laden an öffentlichen Schnellladern (DC)?', answer: 'Während Haushaltsstrom meist um 30–36 Cent/kWh kostet, liegen die Preise an Autobahn-Schnellladern (HPC) ohne Vertrag oder Grundgebühr oft bei 60 bis 85 Cent/kWh.' },
-      { question: 'Wie berechnet man den realen Stromverbrauch inklusive Ladeverlusten?', answer: 'Messen Sie den Strombezug am Stromzähler vor der Wallbox: Wenn 50 kWh im Akku ankommen, wurden meist ca. 55 kWh aus dem Netz bezogen.' },
+      { question: 'Was kostet das Laden an öffentlichen Schnellladern (DC)?', answer: 'Das hängt von Anbieter, Tarif und Ladesäule ab; Ad-hoc-Preise an Schnellladern liegen meist deutlich über einem Haushaltstarif. Rechenbeispiel mit angenommenen Preisen: Bei 0,35 €/kWh zu Hause und 0,69 €/kWh am Schnelllader kosten 18 kWh/100 km 6,30 € bzw. 12,42 €.' },
+      { question: 'Wie berechnet man den realen Stromverbrauch inklusive Ladeverlusten?', answer: 'Messen Sie den Strombezug am Stromzähler vor der Wallbox und vergleichen Sie ihn mit der Energie, die das Auto als geladen anzeigt. Beispiel: Zeigt der Zähler 55 kWh, während 50 kWh im Akku ankommen, gehen rund 9 % des bezogenen Stroms verloren, und Sie sollten mit dem um 10 % höheren Zählerverbrauch rechnen.' },
     ],
     relatedSlugs: ['thg-quote-rechner', 'spritkostenrechner', 'co2-auto-rechner', 'stromkostenrechner', 'hybrid-auto-kosten-rechner'],
     isTimeSensitive: true,
@@ -536,7 +536,7 @@ export const AUTO_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Der Fahrzeitrechner kalkuliert die reine Reisezeit aus gefahrener Distanz und Durchschnittsgeschwindigkeit und integriert geplante Pausenzeiten.',
-      details: 'Reisezeit = (Distanz / Geschwindigkeit) + Pausenzeiten. Bei Autobahnfahrten sinkt die reale Durchschnittsgeschwindigkeit durch Baustellen, Tempolimits und LKW-Überholmanöver meist auf 100–115 km/h.',
+      details: 'Reisezeit = (Distanz / Geschwindigkeit) + Pausenzeiten. Auch auf der Autobahn liegt die reale Durchschnittsgeschwindigkeit wegen Baustellen, Tempolimits, Verkehr und Ortsdurchfahrten am Anfang und Ende der Route meist deutlich unter dem Tempo, das Sie auf freier Strecke fahren.',
     },
     faqs: [
       { question: 'Welche Pausenregelung gilt für gewerbliche Berufskraftfahrer?', answer: 'Nach EU-Verordnung 561/2006 müssen LKW- und Busfahrer nach spätestens 4,5 Stunden Lenkzeit eine ununterbrochene Fahrtunterbrechung von mindestens 45 Minuten einlegen.' },

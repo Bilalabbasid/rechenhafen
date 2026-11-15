@@ -3038,10 +3038,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Ein Balkonkraftwerk (Stecker-Solargerät bis 800 Watt Wechselrichterleistung) erzeugt direkt nutzbaren Solarstrom für den eigenen Haushaltsbedarf.',
-      details: 'Ertrag = Modulleistung in kWp · Globalstrahlung · Ausrichtungsfaktor. Eine 800-Watt-Anlage erzeugt in Deutschland je nach Ausrichtung ca. 600 bis 850 kWh Strom pro Jahr und spart bei hoher Eigenverbrauchsquote 200 bis 300 Euro Stromkosten.',
+      details: 'Der Rechner setzt einen pauschalen Jahresertrag von 880 kWh je kWp Modulleistung an (Ertrag = Modulleistung in kWp × 880 kWh). Ausrichtung, Neigung und Verschattung werden nicht einzeln berücksichtigt – eine steil nach Süden ausgerichtete, unverschattete Anlage liegt meist darüber, eine Ost-, West- oder senkrecht montierte Balkonanlage oft darunter. Die Ersparnis ergibt sich nur aus dem selbst verbrauchten Anteil, multipliziert mit Ihrem Strompreis.',
     },
     faqs: [
-      { question: 'Darf man ein Balkonkraftwerk ohne Genehmigung des Vermieters installieren?', answer: 'Nach dem Solarpaket I und der BGB-Mietrechtsreform 2024 gehört die Errichtung eines Balkonkraftwerks zu den privilegierten Maßnahmen: Vermieter dürfen die Zustimmung nur noch aus triftigen Gründen verweigern.' },
+      { question: 'Darf man ein Balkonkraftwerk ohne Genehmigung des Vermieters installieren?', answer: 'Nein, die Erlaubnis des Vermieters ist weiterhin nötig. Seit Oktober 2024 zählen Steckersolargeräte aber zu den baulichen Veränderungen, deren Erlaubnis Mieter nach § 554 Abs. 1 BGB verlangen können. Der Vermieter darf nur ablehnen, wenn ihm die Veränderung auch unter Würdigung der Interessen des Mieters nicht zugemutet werden kann.' },
       { question: 'Muss ein Balkonkraftwerk beim Netzbetreiber angemeldet werden?', answer: 'Seit dem Solarpaket I genügt eine unbürokratische Registrierung im Marktstammdatenregister der Bundesnetzagentur; eine separate Anmeldung beim Netzbetreiber entfällt.' },
     ],
     relatedSlugs: ['photovoltaik-amortisation-rechner', 'stromkosten-geraete-rechner', 'stromkostenrechner'],
@@ -3049,7 +3049,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Solarpaket I / VDE 0100-551-1 / EEG',
-      sourceUrl: 'https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/Balkonkraftwerke/start.html',
+      sourceUrl: 'https://www.bundesnetzagentur.de/SharedDocs/Pressemitteilungen/DE/2024/20240328_MaStR_Reg.html',
       lastVerified: '2026-01-15',
     },
   },
@@ -3070,8 +3070,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'peakPowerKwp', label: 'Anlagengröße in Kilowatt-Peak (kWp)', type: 'number', defaultValue: 10, min: 3, max: 30, step: 1, unit: 'kWp' },
       { id: 'totalCost', label: 'Investitionskosten komplett inkl. Montage (netto, 0% MwSt.)', type: 'number', defaultValue: 15500, min: 4000, step: 500, unit: '€' },
       { id: 'householdDemandKwh', label: 'Jährlicher Stromverbrauch im Haushalt', type: 'number', defaultValue: 4500, min: 1000, step: 250, unit: 'kWh' },
-      { id: 'selfConsumptionPct', label: 'Eigenverbrauchsanteil an PV-Erzeugung (mit Speicher üblich ca. 35 - 45 %)', type: 'number', defaultValue: 35, min: 15, max: 70, step: 5, unit: '%' },
-      { id: 'feedInTariffCent', label: 'EEG-Einspeisevergütung in Cent pro kWh', type: 'number', defaultValue: 8.03, min: 5, max: 12, step: 0.1, unit: 'ct/kWh' },
+      { id: 'selfConsumptionPct', label: 'Eigenverbrauchsanteil an der PV-Erzeugung (mit Speicher höher als ohne)', type: 'number', defaultValue: 35, min: 15, max: 70, step: 5, unit: '%' },
+      { id: 'feedInTariffCent', label: 'EEG-Einspeisevergütung in Cent pro kWh', type: 'number', defaultValue: 7.7, min: 0, max: 12, step: 0.01, unit: 'ct/kWh', helpText: 'Vorbelegt: 7,70 ct/kWh laut Bundesnetzagentur für Teileinspeisung bis 10 kW bei Inbetriebnahme von August bis Dezember 2026. Maßgeblich ist der Satz zum Inbetriebnahmedatum Ihrer Anlage.' },
       { id: 'gridPriceCent', label: 'Bezugsstrompreis in Cent pro kWh', type: 'number', defaultValue: 36, min: 20, max: 60, step: 1, unit: 'ct/kWh' },
     ],
     calculate: (inputs) => {
@@ -3079,7 +3079,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const cost = inputs.totalCost !== undefined && inputs.totalCost !== '' ? Math.max(0, parseFloat(inputs.totalCost) || 0) : 15500;
       const demand = inputs.householdDemandKwh !== undefined && inputs.householdDemandKwh !== '' ? Math.max(0, parseFloat(inputs.householdDemandKwh) || 0) : 4500;
       const selfPct = inputs.selfConsumptionPct !== undefined && inputs.selfConsumptionPct !== '' ? Math.max(0, Math.min(100, parseFloat(inputs.selfConsumptionPct) || 0)) / 100 : 0.35;
-      const feedInPrice = (inputs.feedInTariffCent !== undefined && inputs.feedInTariffCent !== '' ? Math.max(0, parseFloat(inputs.feedInTariffCent) || 0) : 8.03) / 100;
+      const feedInPrice = (inputs.feedInTariffCent !== undefined && inputs.feedInTariffCent !== '' ? Math.max(0, parseFloat(inputs.feedInTariffCent) || 0) : 7.7) / 100;
       const gridPrice = (inputs.gridPriceCent !== undefined && inputs.gridPriceCent !== '' ? Math.max(0, parseFloat(inputs.gridPriceCent) || 0) : 36) / 100;
       const totalGen = kwp * 950; // ca. 950 kWh pro kWp im D-Schnitt
       const selfConsumed = totalGen * selfPct;
@@ -3115,15 +3115,15 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     workedExample: {
       title: 'Beispiel: 10 kWp Anlage für 15.500 € erzeugt 9.500 kWh Strom',
       inputValues: [{ label: 'Größe', value: '10 kWp' }, { label: 'Kosten', value: '15.500 €' }, { label: 'Eigenverbrauch', value: '35 %' }],
-      steps: ['Eigenverbrauch: 3.325 kWh × 0,36 € = 1.197,00 €', 'Einspeisung: 6.175 kWh × 0,0803 € = 495,85 €', 'Gesamtnutzen = 1.692,85 € pro Jahr', 'Amortisation: 15.500 € / 1.692,85 € ≈ 9,2 Jahre'],
-      result: '1.692,85 € jährlicher Nutzen (9,2 Jahre Amortisation)',
+      steps: ['Erzeugung: 10 kWp × 950 kWh = 9.500 kWh', 'Eigenverbrauch: 3.325 kWh × 0,36 € = 1.197,00 €', 'Einspeisung: 6.175 kWh × 0,077 € = 475,48 €', 'Gesamtnutzen = 1.672,48 € pro Jahr', 'Amortisation: 15.500 € / 1.672,48 € ≈ 9,3 Jahre'],
+      result: '1.672,48 € jährlicher Nutzen (9,3 Jahre Amortisation)',
     },
     content: {
-      intro: 'Dieser Wirtschaftlichkeitsrechner berechnet die Amortisationsdauer einer Dachanlagen-Photovoltaik inklusive Batteriespeicher, Eigenverbrauch und Einspeisevergütung nach dem EEG.',
-      details: 'Amortisationszeit = Anschaffungskosten / jährliche Gesamtersparnis (eingesparte Netzstromkosten + EEG-Einspeisevergütung). Eine typische 10-kWp-Anlage mit Speicher amortisiert sich nach etwa 8 bis 12 Jahren.',
+      intro: 'Dieser Wirtschaftlichkeitsrechner berechnet die Amortisationsdauer einer Photovoltaik-Dachanlage aus Eigenverbrauch und Einspeisevergütung nach dem EEG. Einen Batteriespeicher bilden Sie über einen höheren Eigenverbrauchsanteil ab; Speicherkosten rechnen Sie in die Investitionskosten ein.',
+      details: 'Amortisationszeit = Anschaffungskosten / jährlicher Nutzen (eingesparte Netzstromkosten + EEG-Einspeisevergütung). Der Rechner setzt pauschal 950 kWh Ertrag je kWp und Jahr an und rechnet ohne Preissteigerungen, Wartung, Versicherung oder Leistungsverlust der Module.',
     },
     faqs: [
-      { question: 'Wie hoch ist die EEG-Einspeisevergütung für Überschusseinspeisung?', answer: 'Für Neuanlagen bis 10 kWp liegt die gesetzliche Einspeisevergütung bei rund 8 Cent je kWh, garantiert fest über 20 Kalenderjahre plus Inbetriebnahmejahr.' },
+      { question: 'Wie hoch ist die EEG-Einspeisevergütung für Überschusseinspeisung?', answer: 'Für Anlagen mit Teileinspeisung bis 10 kW, die zwischen dem 1. August und dem 31. Dezember 2026 in Betrieb gehen, nennt die Bundesnetzagentur 7,70 ct/kWh. Der Satz gilt fest für 20 Kalenderjahre plus das Inbetriebnahmejahr; für spätere Inbetriebnahmen veröffentlicht die Bundesnetzagentur jeweils neue, abgesenkte Sätze.' },
       { question: 'Gilt auf Photovoltaikanlagen die Mehrwertsteuerbefreiung?', answer: 'Ja, nach § 12 Abs. 3 UStG gilt für den Kauf und die Installation von PV-Anlagen und Heimspeichern auf Wohngebäuden ein Nullsteuersatz (0 % Mehrwertsteuer).' },
     ],
     relatedSlugs: ['klimaanlage-stromkosten-rechner', 'balkonkraftwerk-ertrag-rechner', 'waermepumpe-stromkosten-rechner', 'elektroauto-ladekosten-rechner'],
@@ -3131,8 +3131,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'Erneuerbare-Energien-Gesetz (EEG Vergütungssätze) / Bundesnetzagentur',
-      sourceUrl: 'https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/EEG_Einspeiseverguetung/start.html',
-      lastVerified: '2026-01-15',
+      sourceUrl: 'https://www.bundesnetzagentur.de/DE/Fachthemen/ElektrizitaetundGas/ErneuerbareEnergien/EEG_Foerderung/start.html',
+      lastVerified: '2026-11-15',
     },
   },
 
@@ -3373,7 +3373,6 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         qualifications: [
           'Emissionen werden einheitlich auf Well-to-Wheel Lebenszyklus-Basis (CO₂e inkl. Vorkette nach UBA GEMIS) verglichen.',
           'Anschaffungs- und Investitionskosten (Heizungstausch) sind in diesem jährlichen Betriebs- und Verbrauchskostenvergleich nicht enthalten.',
-          'Wärmepumpen mit zertifiziertem 100% Ökostrom emittieren im Betrieb 0 g direkte Emissionen und ca. 0,12 t CO₂e/Jahr in der Anlagenvorkette.',
         ],
       };
     },
@@ -3383,7 +3382,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       title: 'Beispiel: 18.000 kWh Nutzwärmebedarf im Einfamilienhaus',
       description: 'Vergleich der jährlichen Energiekosten zwischen Wärmepumpe (JAZ 3,6 bei 28 ct), Fernwärme (12,5 ct), Gas (11 ct), Pellets (320 €/t) und Öl (1,05 €/l).',
       inputs: { heatDemandKwh: 18000, gasPriceCent: 11, oilPricePerLiter: 1.05, pelletPricePerTon: 320, heatPumpJaz: 3.6, heatPumpPowerPrice: 28, districtHeatingPriceCent: 12.5, includeMaintenance: false },
-      resultSummary: 'Wärmepumpe: ca. 1.400,00 € (spart ca. 752 € ggü. Gas und 746 € ggü. Öl)',
+      resultSummary: 'Wärmepumpe: ca. 1.400,00 € (spart ca. 752 € ggü. Gas und 748 € ggü. Öl)',
     },
     content: {
       intro: 'Dieser Systemvergleich stellt die jährlichen Brennstoff- und Betriebskosten sowie die Treibhausgasemissionen von fünf gängigen Heiztechnologien (Wärmepumpe, Fernwärme, Holzpellets, Gasbrennwert, Ölbrennwert) transparent gegenüber.',
@@ -3391,8 +3390,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Wie wird Nutzwärme in Brennstoffbedarf umgerechnet?', answer: 'Der Nutzwärmebedarf ist die Wärmeenergie, die tatsächlich den Wohnräumen zugutekommt. Da jede Heizung Wandlungs- und Abgasverluste aufweist, muss mehr Energie zugeführt werden: Gasbrennwert arbeitet mit ca. 92 % Jahresnutzungsgrad, Ölbrennwert mit ca. 88 %, moderne Pelletkessel mit ca. 90 % und Fernwärme-Übergabestationen mit ca. 98 %. Bei einer Wärmepumpe wird Umweltwärme genutzt: Eine JAZ von 3,6 erzeugt aus 1 kWh Strom 3,6 kWh Nutzwärme.' },
-      { question: 'Wie entwickelt sich der CO₂-Preis für fossile Heizungen?', answer: 'Nach dem Brennstoffemissionshandelsgesetz (BEHG) steigt der nationale CO₂-Preis 2026 im Korridor von 55 bis 65 € pro Tonne. Ab 2027 greift der europäische Emissionshandel ETS-2, wodurch sich fossile Brennstoffe wie Gas und Heizöl schrittweise weiter verteuern.' },
-      { question: 'Welche Fördermittel gibt es für den Umstieg auf erneuerbare Heizungen?', answer: 'Über die Bundesförderung für effiziente Gebäude (KfW-Programm 458) erhalten selbstnutzende Eigentümer beim Tausch einer alten fossilen Heizung gegen eine Wärmepumpe oder Biomasseheizung bis zu 70 % der förderfähigen Kosten bezuschusst (Grundförderung 30 % + Klimageschwindigkeitsbonus 20 % + Einkommensbonus 30 %, maximal gedeckelt).' },
+      { question: 'Wie entwickelt sich der CO₂-Preis für fossile Heizungen?', answer: 'Nach § 10 Abs. 2 des Brennstoffemissionshandelsgesetzes (BEHG) gilt für 2026 ein Preiskorridor von 55 bis 65 € pro Tonne CO₂. Der europäische Emissionshandel für Gebäude und Verkehr (EU-ETS 2) sollte ursprünglich 2027 starten; laut Deutscher Emissionshandelsstelle (DEHSt) wurde der Beginn der Regelphase auf 2028 verschoben. Wie der nationale CO₂-Preis für 2027 festgelegt wird, regelt der Gesetzgeber gesondert – den aktuellen Stand finden Sie bei der DEHSt.' },
+      { question: 'Welche Fördermittel gibt es für den Umstieg auf erneuerbare Heizungen?', answer: 'Über die Heizungsförderung der KfW (Programm 458) gibt es eine Grundförderung von 30 % der förderfähigen Kosten. Selbstnutzende Eigentümer können einen Klimageschwindigkeitsbonus von 16 % (beim Ersatz z. B. einer funktionstüchtigen Öl-, Kohle- oder Gas-Etagenheizung oder einer mindestens 20 Jahre alten Gas- oder Biomasseheizung) und je nach zu versteuerndem Haushaltseinkommen einen Einkommensbonus erhalten. Insgesamt sind in der Regel höchstens 70 % möglich, bei sehr niedrigem Einkommen 80 %; im Einfamilienhaus sind die förderfähigen Kosten auf 28.000 € begrenzt. Laut KfW sinken Klimageschwindigkeitsbonus und Förderhöchstbetrag ab dem 1. Februar 2027 schrittweise (Stand: November 2026).' },
     ],
     relatedSlugs: ['gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'oelheizung-verbrauch-rechner', 'pelletheizung-verbrauch-rechner', 'waermepumpe-stromkosten-rechner', 'co2-preis-rechner'],
     trustMeta: {
@@ -3437,7 +3436,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           { id: 'monthlyCost', label: 'Monatliche Kosten', value: yearlyCost / 12, formattedValue: formatCurrency(yearlyCost / 12) },
           { id: 'yearlyKwh', label: 'Stromverbrauch Warmwasser pro Jahr', value: dailyKwh * 365, formattedValue: `${formatNumber(dailyKwh * 365, 0)} kWh` },
         ],
-        summaryText: `Ein 21-kW-Durchlauferhitzer kostet für ${p} Personen bei ${mins} Min. Duschzeit ca. ${formatCurrency(yearlyCost)} Strom im Jahr (${formatCurrency(costPerShower)} pro Duschgang).`,
+        summaryText: `Ein ${formatNumber(kw, 0)}-kW-Durchlauferhitzer kostet für ${p} ${p === 1 ? 'Person' : 'Personen'} bei ${mins} Min. Duschzeit ca. ${formatCurrency(yearlyCost)} Strom im Jahr (${formatCurrency(costPerShower)} pro Duschgang).`,
         directAnswer: `Die jährlichen Warmwasserkosten für ${p} ${p === 1 ? 'Person' : 'Personen'} betragen ca. ${formatCurrency(yearlyCost)} (${formatCurrency(costPerShower)} pro Duschgang).`,
         basisSummary: [
           { label: 'Personen', value: `${p}` },
@@ -3456,11 +3455,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       result: '0,88 € pro Duschgang',
     },
     content: {
-      intro: 'Die Warmwasserbereitung macht in deutschen Haushalten etwa 12 bis 18 Prozent des gesamten häuslichen Energiebedarfs aus.',
-      details: 'Zur Erwärmung von 1 Liter Wasser um 1 Kelvin werden 1,16 Wattstunden Energie benötigt. Um 100 Liter Wasser von 10 °C auf 45 °C Duschtemperatur zu erhitzen, fallen exakt 4,06 kWh Energie an.',
+      intro: 'Dieser Rechner ermittelt die Stromkosten fürs Duschen mit einem elektrischen Durchlauferhitzer – pro Duschgang, pro Monat und pro Jahr für den ganzen Haushalt.',
+      details: 'Zur Erwärmung von 1 Liter Wasser um 1 Kelvin werden rund 1,16 Wattstunden Energie benötigt. Um 100 Liter Wasser von 10 °C auf 45 °C Duschtemperatur zu erhitzen, fallen damit rund 4,06 kWh Energie an (ohne Leitungs- und Geräteverluste).',
     },
     faqs: [
-      { question: 'Ist Duschen mit Durchlauferhitzer teurer als mit Zentralheizung?', answer: 'Ja, da Haushaltsstrom (ca. 35 ct/kWh) etwa drei- bis viermal so viel kostet wie Erdgas oder Wärmepumpenstrom (ca. 9 bis 12 ct/kWh Nutzwärme).' },
+      { question: 'Ist Duschen mit Durchlauferhitzer teurer als mit Zentralheizung?', answer: 'Meist ja, weil eine Kilowattstunde Haushaltsstrom in der Regel deutlich mehr kostet als eine Kilowattstunde Wärme aus Gas oder aus einer Wärmepumpe. Ein Rechenbeispiel mit Beispielpreisen: Bei 36 ct/kWh Strom kostet 1 kWh Warmwasser aus dem Durchlauferhitzer rund 36 ct; eine Wärmepumpe mit Jahresarbeitszahl 3 und 28 ct/kWh Wärmepumpenstrom liefert dieselbe kWh für rund 9,3 ct. Vergleichen Sie mit Ihren eigenen Tarifpreisen – die Speicher- und Leitungsverluste einer zentralen Warmwasserbereitung verringern den Abstand.' },
       { question: 'Wie viel Energie spart ein Sparduschkopf?', answer: 'Ein wassersparender Duschkopf reduziert den Durchfluss von 12–15 Liter/Minute auf 6–8 Liter/Minute und halbiert damit die Warmwasserkosten beim Duschen ohne Komfortverlust.' },
     ],
     relatedSlugs: ['stromkosten-geraete-rechner', 'wasserverbrauch-haushalt-rechner', 'waermepumpe-stromkosten-rechner'],
@@ -3566,7 +3565,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       };
     },
     formula: 'Kosten/Waschgang = (kWh × Strompreis) + (Liter / 1.000 × Wasserpreis) + Waschmittel',
-    formulaExplanation: 'Den Löwenanteil des Stroms verbraucht die Heizspirale zur Erwärmung des Waschwassers. Waschen bei 30 °C spart rund 60 % Energie gegenüber 60 °C.',
+    formulaExplanation: 'Den Löwenanteil des Stroms verbraucht die Heizspirale zur Erwärmung des Waschwassers. Je niedriger die Waschtemperatur, desto weniger Strom braucht ein Waschgang.',
     workedExample: {
       title: 'Beispiel: 0,85 kWh Strom, 50 Liter Wasser bei 36 ct/kWh und 4,80 €/m³ Wasser',
       inputValues: [{ label: 'Strom', value: '0,85 kWh' }, { label: 'Wasser', value: '50 Liter' }, { label: 'Waschmittel', value: '0,22 €' }],
@@ -3575,11 +3574,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Kostenrechner erfasst die Ausgaben pro Waschgang aus Stromverbrauch, Frisch- und Abwasserkosten sowie dem Waschmittel.',
-      details: 'Kosten pro Waschgang = (Stromverbrauch in kWh · Strompreis) + (Wasserverbrauch in m³ · Wasserpreis) + Waschmittelpreis (ca. 0,15–0,25 €). Ein 60°C-Waschgang verbraucht fast doppelt so viel Strom wie ein 40°C-Waschgang.',
+      details: 'Kosten pro Waschgang = (Stromverbrauch in kWh · Strompreis) + (Wasserverbrauch in m³ · Wasserpreis) + Waschmittelpreis (ca. 0,15–0,25 €).',
     },
     faqs: [
-      { question: 'Wie viel Strom spart das Eco-40-60-Programm?', answer: 'Eco-Programme waschen mit niedrigerer Temperatur über eine längere Zeitdauer (Aufweicheffekt) und sparen so rund 30 bis 50 Prozent der Heizenergie im Vergleich zum Normalprogramm.' },
-      { question: 'Wie viel kostet ein durchschnittlicher Waschgang in Deutschland?', answer: 'Bei modernen Waschmaschinen (Klasse A) kostet eine Ladung Buntwäsche inklusive Strom, Wasser und Waschmittel etwa 0,40 bis 0,60 Euro.' },
+      { question: 'Wie viel Strom spart das Eco-40-60-Programm?', answer: 'Eco-Programme waschen mit niedrigerer Temperatur über eine längere Zeitdauer und sparen so Heizenergie. Wie viel genau, hängt vom Gerät ab: Der Stromverbrauch im Eco-40-60-Programm steht auf dem Energielabel (in kWh pro 100 Waschzyklen) – teilen Sie ihn durch 100 und tragen Sie ihn oben als Verbrauch pro Waschgang ein.' },
+      { question: 'Wie viel kostet ein Waschgang?', answer: 'Mit den Vorgabewerten dieses Rechners (0,85 kWh, 50 Liter, 0,22 € Waschmittel, 36 ct/kWh und 4,80 €/m³) kostet ein Waschgang rund 0,77 €: etwa 0,31 € Strom, 0,24 € Wasser und Abwasser sowie 0,22 € Waschmittel. Mit den Werten Ihres Geräts und Ihrer Tarife kann das Ergebnis deutlich abweichen.' },
     ],
     relatedSlugs: ['trockner-kosten-rechner', 'spuelmaschine-kosten-rechner', 'wasserverbrauch-haushalt-rechner'],
   },
@@ -3629,8 +3628,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     workedExample: {
       title: 'Beispiel: 3 Trocknungen pro Woche bei 36 ct/kWh',
       inputValues: [{ label: 'Gerät', value: 'Wärmepumpentrockner (1,4 kWh)' }, { label: 'Wäschen/Woche', value: '3' }],
-      steps: ['Pro Durchgang: 1,4 kWh × 0,36 € = 0,50 €', 'Jährlich: 3 × 52 × 0,50 € = 78,00 € (Kondenstrockner: ca. 224,64 €)'],
-      result: '78,00 €/Jahr (spart ca. 146 € jährlich)',
+      steps: ['Pro Durchgang: 1,4 kWh × 0,36 € = 0,504 € (≈ 0,50 €)', 'Jährlich: 3 × 52 = 156 Durchgänge × 0,504 € = 78,62 € (Kondenstrockner: 224,64 €)'],
+      result: '78,62 €/Jahr (spart ca. 146 € jährlich)',
     },
     content: {
       intro: 'Wäschetrockner gehören zu den energieintensivsten Haushaltsgeräten; moderne Wärmepumpentrockner verbrauchen jedoch nur einen Bruchteil alter Kondenstrockner.',
@@ -3638,7 +3637,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Wie funktioniert ein Wärmepumpentrockner?', answer: 'Er nutzt ein geschlossenes Kältemittelsystem: Die Wärme der feuchten Abluft wird nicht an den Raum abgegeben, sondern über die Wärmepumpe zurückgewonnen und erneut zum Heizen genutzt.' },
-      { question: 'Wie viel Geld spart man pro Jahr durch den Umstieg auf einen Wärmepumpentrockner?', answer: 'Bei 160 Trocknungszyklen im Jahr spart ein Wärmepumpentrockner rund 120 bis 160 Euro Stromkosten pro Jahr; die Mehrkosten beim Kauf haben sich nach 2 bis 3 Jahren amortisiert.' },
+      { question: 'Wie viel Geld spart man pro Jahr durch den Umstieg auf einen Wärmepumpentrockner?', answer: 'Mit den Verbrauchswerten dieses Rechners (1,4 statt 4,0 kWh pro Durchgang) spart ein Wärmepumpentrockner bei 160 Trocknungen im Jahr 416 kWh; bei 36 ct/kWh sind das rund 150 € pro Jahr. Ob sich ein höherer Kaufpreis lohnt, ergibt sich aus Aufpreis ÷ jährlicher Ersparnis.' },
     ],
     relatedSlugs: ['waschmaschine-kosten-rechner', 'spuelmaschine-kosten-rechner', 'stromkosten-geraete-rechner'],
   },
@@ -3686,16 +3685,16 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       };
     },
     formula: 'Kosten/Spülgang = (kWh × Strompreis) + (Liter × Wasserpreis) + Spültab',
-    formulaExplanation: 'Studien der Universität Bonn belegen, dass eine moderne Geschirrspülmaschine rund 50 % weniger Wasser und 30 % weniger Energie benötigt als das Spülen von Hand.',
+    formulaExplanation: 'Wasser und Abwasser rechnet der Rechner fest mit 4,80 € pro m³. Der Vergleich mit dem Handabwasch nutzt einen fest hinterlegten Pauschalwert von 0,85 € pro Spülladung und ist deshalb nur eine grobe Orientierung.',
     workedExample: {
       title: 'Beispiel: 0,82 kWh Strom, 10 l Wasser, 0,15 € Tab bei 36 ct/kWh',
       inputValues: [{ label: 'Strom', value: '0,82 kWh' }, { label: 'Wasser', value: '10 Liter' }, { label: 'Tab', value: '0,15 €' }],
-      steps: ['Strom: 0,82 × 0,36 € = 0,30 €', 'Wasser: 0,01 m³ × 4,80 € = 0,05 €', 'Tab: 0,15 €', 'Summe = 0,50 € pro Spülgang'],
-      result: '0,50 € pro Spülgang',
+      steps: ['Strom: 0,82 × 0,36 € = 0,2952 €', 'Wasser: 0,01 m³ × 4,80 € = 0,048 €', 'Tab: 0,15 €', 'Summe = 0,4932 € ≈ 0,49 € pro Spülgang'],
+      result: '0,49 € pro Spülgang',
     },
     content: {
       intro: 'Dieser Rechner vergleicht die Gesamtkosten eines Geschirrspülers pro Spülgang mit dem manuellen Abwaschen von Hand im Spülbecken.',
-      details: 'Entgegen landläufiger Meinung verbraucht ein moderner Geschirrspüler im Eco-Modus nur 9 bis 11 Liter Wasser und ca. 0,8 kWh Strom – von Hand benötigt man für dieselbe Geschirrmenge meist über 30 bis 40 Liter Warmwasser.',
+      details: 'Kosten pro Spülgang = Strom (kWh × Strompreis) + Wasser (Liter ÷ 1.000 × 4,80 €) + Tab bzw. Pulver und Klarspüler. Die Verbrauchswerte Ihres Geräts für das Eco-Programm stehen auf dem Energielabel bzw. im Produktdatenblatt.',
     },
     faqs: [
       { question: 'Muss man Geschirr vor dem Einräumen unter fließendem Wasser vorspülen?', answer: 'Nein, das Vorspülen verschwendet unnötig warmes Trinkwasser; es genügt vollkommen, grobe Speisereste mit der Gabel in den Müll zu streifen.' },
@@ -4198,7 +4197,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortDescription: 'Berechnet den Jahresbedarf an Holzpellets aus Heizwärmebedarf oder bisherigem Ölverbrauch.',
     searchKeywords: ['pelletheizung rechner verbrauch', 'holzpellets tonnen pro jahr einfamilienhaus', 'pelletkosten pro tonne', 'pellets statt heizoel umrechnen'],
     inputs: [
-      { id: 'heatDemandKwh', label: 'Jährlicher Heizenergiebedarf in kWh (oder bisherige Liter Öl × 10)', type: 'number', defaultValue: 18000, min: 4000, step: 1000, unit: 'kWh' },
+      { id: 'heatDemandKwh', label: 'Jährlicher Heizwärmebedarf in kWh (Umrechnung aus Heizöl: siehe Tabelle unten)', type: 'number', defaultValue: 18000, min: 4000, step: 1000, unit: 'kWh' },
       { id: 'pelletPricePerTon', label: 'Pelletpreis pro Tonne (lose Ware inkl. Anlieferung)', type: 'number', defaultValue: 320, min: 180, max: 600, step: 10, unit: '€/t' },
     ],
     calculate: (inputs) => {
@@ -4230,12 +4229,12 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     workedExample: {
       title: 'Beispiel: 18.000 kWh Wärmebedarf bei 320 € pro Tonne Pellets',
       inputValues: [{ label: 'Wärmebedarf', value: '18.000 kWh' }, { label: 'Pelletpreis', value: '320 €/t' }],
-      steps: ['Bedarf = 18.000 / 4,4 ≈ 4.090 kg = 4,09 Tonnen', 'Kosten = 4,09 t × 320 € = 1.308,80 € pro Jahr'],
-      result: 'ca. 1.308,80 € pro Jahr (4,09 Tonnen)',
+      steps: ['Bedarf = 18.000 / 4,4 ≈ 4.091 kg ≈ 4,09 Tonnen', 'Kosten = 4,0909 t × 320 € ≈ 1.309,09 € pro Jahr'],
+      result: 'ca. 1.309,09 € pro Jahr (4,09 Tonnen)',
     },
     content: {
       intro: 'Holzpellets sind ein regenerativer Festbrennstoff aus gepressten Holzspänen mit hohem Energiegehalt und stabiler Verbrennungseffizienz.',
-      details: '2 Kilogramm genormte Holzpellets (ENplus A1) entsprechen dem Energiegehalt von exakt 1 Liter Heizöl oder 1 m³ Erdgas (ca. 4,9 kWh/kg Heizwert). Pellets unterliegen nicht der nationalen fossilen CO₂-Abgabe.',
+      details: '2 Kilogramm genormte Holzpellets (ENplus A1) entsprechen vom Energiegehalt her rund 1 Liter Heizöl oder 1 m³ Erdgas (ca. 4,9 kWh/kg Heizwert). Pellets unterliegen nicht der nationalen fossilen CO₂-Abgabe.',
     },
     faqs: [
       { question: 'Wie viel Lagerraum benötigt ein Jahresvorrat an Holzpellets?', answer: 'Für ein typisches Einfamilienhaus mit 4 bis 5 Tonnen Jahresbedarf wird ein trockener Lagerraum oder Gewebetank mit ca. 8 bis 10 Kubikmetern Raumvolumen benötigt.' },
@@ -4544,7 +4543,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       };
     },
     formula: 'Monatsbudget = (Erwachsene × Satz_Erwachsener) + (Kinder × Satz_Kind)',
-    formulaExplanation: 'Basierend auf den statistischen Konsumausgaben privater Haushalte in Deutschland (EVS / Destatis).',
+    formulaExplanation: 'Die Monatssätze je Erwachsenem und Kind sind Planungsannahmen dieses Rechners für drei Einkaufsstile, keine amtlichen Durchschnittswerte.',
     workedExample: {
       title: 'Beispiel: 2 Erwachsene + 1 Kind (Ausgewogener Einkaufsstil)',
       inputValues: [{ label: 'Erwachsene', value: '2' }, { label: 'Kinder', value: '1' }, { label: 'Stil', value: 'Ausgewogen' }],
@@ -4553,10 +4552,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Haushaltsbudgetrechner ermittelt die monatlichen und wöchentlichen Ausgaben für Ernährung, Supermarkteinkäufe und Drogeriewaren basierend auf der Haushaltsgröße.',
-      details: 'Statistisches Bundesamt: Ein Single gibt in Deutschland im Schnitt rund 220 bis 300 € monatlich für Nahrungsmittel und Getränke aus; bei sparsamer Wirtschaftsweise reichen oft 160 bis 200 €.',
+      details: 'Zum Vergleich: Nach den Laufenden Wirtschaftsrechnungen 2024 des Statistischen Bundesamts gaben Einpersonenhaushalte im Schnitt 270 € pro Monat für Nahrungsmittel, Getränke und Tabakwaren aus, alle Haushalte zusammen 457 €.',
     },
     faqs: [
-      { question: 'Welche Faustregel gilt für das Wocheneinkaufsbudget pro Person?', answer: 'Als Faustformel gelten ca. 45 bis 65 Euro pro erwachsener Person und Woche für einen ausgewogenen, selbstgekochten Speiseplan.' },
+      { question: 'Welche Faustregel gilt für das Wocheneinkaufsbudget pro Person?', answer: 'Eine allgemein gültige Faustregel gibt es nicht. Die Monatssätze dieses Rechners entsprechen pro Erwachsenem rund 51 € (sehr sparsam), 72 € (ausgewogen) und 97 € (Bio) pro Woche; für Kinder rund 31 €, 44 € und 60 €.' },
       { question: 'Wie spart man beim Lebensmitteleinkauf am effektivsten?', answer: 'Wochenplan schreiben, zielgerichtet nach Einkaufszettel einkaufen, Saisonware bevorzugen und Lebensmittelverschwendung durch gezieltes Reste-Kochen vermeiden.' },
     ],
     relatedSlugs: ['stromkosten-geraete-rechner', 'spuelmaschine-kosten-rechner', 'notgroschen-rechner'],
@@ -4581,15 +4580,16 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const val = inputs.endenergieKwh !== undefined && inputs.endenergieKwh !== '' ? Math.max(0, parseFloat(inputs.endenergieKwh) || 0) : 115;
       let klasse = 'D';
       let description = 'Durchschnittlich gedämmtes Mehrfamilienhaus / teilsaniert';
-      if (val < 30) { klasse = 'A+'; description = 'Passivhaus / KfW 40 / Höchster Effizienzstandard'; }
-      else if (val < 50) { klasse = 'A'; description = 'KfW 55 Neubau / Sehr geringer Energiebedarf'; }
-      else if (val < 75) { klasse = 'B'; description = 'Guter Neubaustandard / KfW 70'; }
-      else if (val < 100) { klasse = 'C'; description = 'Gut modernisierter Altbau'; }
-      else if (val < 130) { klasse = 'D'; description = 'Teilsaniert / Durchschnittlicher Gebäudebestand'; }
-      else if (val < 160) { klasse = 'E'; description = 'Geringfügig modernisiert / Verbesserungsbedarf'; }
-      else if (val < 200) { klasse = 'F'; description = 'Umfassend sanierungsbedürftig'; }
-      else if (val < 250) { klasse = 'G'; description = 'Hoher Energieverbrauch / Ungedämmter Altbau'; }
-      else { klasse = 'H'; description = 'Extrem hoher Verbrauch / Sanierungsdringlichkeit!'; }
+      // Grenzen nach Anlage 10 GModG (vormals GEG): Klasse gilt bis einschließlich des Grenzwerts (≤ 30, ≤ 50, …, > 250).
+      if (val <= 30) { klasse = 'A+'; description = 'Sehr niedriger Endenergiebedarf'; }
+      else if (val <= 50) { klasse = 'A'; description = 'Sehr geringer Endenergiebedarf'; }
+      else if (val <= 75) { klasse = 'B'; description = 'Geringer Endenergiebedarf'; }
+      else if (val <= 100) { klasse = 'C'; description = 'Eher geringer Endenergiebedarf'; }
+      else if (val <= 130) { klasse = 'D'; description = 'Mittlerer Endenergiebedarf'; }
+      else if (val <= 160) { klasse = 'E'; description = 'Erhöhter Endenergiebedarf'; }
+      else if (val <= 200) { klasse = 'F'; description = 'Hoher Endenergiebedarf'; }
+      else if (val <= 250) { klasse = 'G'; description = 'Sehr hoher Endenergiebedarf'; }
+      else { klasse = 'H'; description = 'Höchste Verbrauchsklasse'; }
 
       return {
         primary: { id: 'klasse', label: 'Offizielle Energieeffizienzklasse', value: 0, formattedValue: `Klasse ${klasse}`, highlight: true },
@@ -4601,25 +4601,25 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         directAnswer: `Das Gebäude erreicht mit einem Endenergiekennwert von ${formatNumber(val, 1)} kWh/(m²·a) die Energieeffizienzklasse ${klasse}.`,
         basisSummary: [
           { label: 'Endenergie-Kennwert', value: `${formatNumber(val, 1)} kWh/(m²·a)` },
-          { label: 'Einstufungsgrundlage', value: 'Gebäudeenergiegesetz (GEG) Anlage 10' },
+          { label: 'Einstufungsgrundlage', value: 'Anlage 10 Gebäudemodernisierungsgesetz (GModG, vormals GEG)' },
         ],
       };
     },
-    formula: 'Einstufung nach Anlage 10 des Gebäudeenergiegesetzes (GEG)',
-    formulaExplanation: 'Der Energieausweis teilt Wohngebäude in 9 Effizienzklassen von A+ (< 30 kWh/m²a) bis H (> 250 kWh/m²a) ein.',
+    formula: 'Einstufung nach Anlage 10 des Gebäudemodernisierungsgesetzes (GModG, vormals Gebäudeenergiegesetz GEG)',
+    formulaExplanation: 'Der Energieausweis teilt Wohngebäude in 9 Effizienzklassen von A+ (bis 30 kWh/(m²·a)) bis H (über 250 kWh/(m²·a)) ein. Jede Klasse reicht bis einschließlich ihres Grenzwerts.',
     workedExample: {
       title: 'Beispiel: 115 kWh/(m²·a) Endenergiebedarf',
       inputValues: [{ label: 'Kennwert', value: '115 kWh/(m²·a)' }],
-      steps: ['Bereich 100 bis 130 kWh/(m²·a) entspricht Klasse D', 'Typisch für teilsanierte Bestandsgebäude der 80er/90er Jahre'],
+      steps: ['115 kWh/(m²·a) liegt über 100 und bis 130 kWh/(m²·a)', 'Damit gilt Klasse D'],
       result: 'Energieeffizienzklasse D',
     },
     content: {
-      intro: 'Der Energieeffizienzklasse-Rechner ordnet ein Wohngebäude anhand seines Endenergiebedarfs in kWh/(m²·a) den Klassen A+ bis H des Gebäudeenergiegesetzes (GEG) zu.',
-      details: 'Klasse A+ entspricht < 30 kWh/(m²·a), A < 50 kWh/(m²·a), B < 75 kWh/(m²·a). Ab Klasse F (> 160 kWh/(m²·a)) bis H (> 250 kWh/(m²·a)) liegt gravierender Sanierungsbedarf vor.',
+      intro: 'Der Energieeffizienzklasse-Rechner ordnet ein Wohngebäude anhand seines Endenergiekennwerts in kWh/(m²·a) den Klassen A+ bis H nach Anlage 10 des Gebäudemodernisierungsgesetzes (GModG, früher Gebäudeenergiegesetz GEG) zu.',
+      details: 'Klasse A+ gilt bis 30 kWh/(m²·a), A bis 50, B bis 75, C bis 100, D bis 130, E bis 160, F bis 200 und G bis 250 kWh/(m²·a); darüber liegt Klasse H. Bezugsfläche ist die Gebäudenutzfläche, nicht die Wohnfläche.',
     },
     faqs: [
-      { question: 'Wo findet man die Energieeffizienzklasse einer Immobilie?', answer: 'Auf Seite 1 des offiziellen Energieausweises (Bedarfs- oder Verbrauchsausweis), der bei Verkauf oder Neuvermietung gesetzlich vorgelegt werden muss.' },
-      { question: 'Welche Effizienzklassen drohen bei künftigen EU-Sanierungsvorgaben (EPBD)?', answer: 'Die EU-Gebäuderichtlinie zielt darauf ab, Gebäude mit den schlechtesten Effizienzklassen G und H schrittweise über Sanierungsfahrpläne auf höhere Standards anzuheben.' },
+      { question: 'Wo findet man die Energieeffizienzklasse einer Immobilie?', answer: 'Im Energieausweis (Bedarfs- oder Verbrauchsausweis) auf der Seite mit dem Farbband des Energiekennwerts. Bei Verkauf oder Neuvermietung muss der Ausweis Interessenten vorgelegt werden.' },
+      { question: 'Was bedeutet die EU-Gebäuderichtlinie (EPBD) für schlechte Effizienzklassen?', answer: 'Die überarbeitete EU-Gebäuderichtlinie verpflichtet die Mitgliedstaaten, den durchschnittlichen Energieverbrauch des Wohngebäudebestands schrittweise zu senken, wobei ein großer Teil der Einsparung aus den Gebäuden mit der schlechtesten Effizienz kommen soll. Eine unmittelbare Sanierungspflicht für ein einzelnes Wohnhaus folgt daraus nicht; entscheidend ist, wie Deutschland die Richtlinie umsetzt.' },
     ],
     relatedSlugs: ['waermepumpe-stromkosten-rechner', 'gasverbrauch-kwh-m3-rechner', 'heizkostenvergleich-rechner'],
   },

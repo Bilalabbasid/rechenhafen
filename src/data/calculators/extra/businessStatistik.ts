@@ -279,7 +279,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Der Deckungsbeitrag (DB) ist der Geldbetrag, der nach Abzug der variablen Kosten vom Umsatzerlös zur Deckung der fixen Unternehmenskosten verbleibt.',
-      details: 'Deckungsbeitrag I = Umsatzerlöse - variable Kosten. Deckungsbeitrag in % (Deckungsbeitragsquote) = (DB / Umsatz) · 100. Produkte mit negativem Deckungsbeitrag verursachen bei jedem Verkauf Verluste und müssen eliminiert werden.',
+      details: 'Deckungsbeitrag I = Umsatzerlöse - variable Kosten. Deckungsbeitrag in % (Deckungsbeitragsquote) = (DB / Umsatz) · 100. Produkte mit negativem Deckungsbeitrag vergrößern mit jedem Verkauf den Verlust. Sie gehören auf den Prüfstand: Preis erhöhen, Kosten senken oder auslisten, sofern sie nicht bewusst als Lockangebot andere Verkäufe tragen.',
     },
     faqs: [
       { question: 'Was ist die mehrstufige Deckungsbeitragsrechnung?', answer: 'Sie spaltet die Fixkosten hierarchisch auf: Zuerst Erzeugnisfixkosten, dann Produktgruppenfixkosten, Bereichsfixkosten und schließlich Unternehmensfixkosten, um echte Verlustbringer aufzudecken.' },
@@ -769,7 +769,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Der operative Cashflow (Mittelzufluss aus laufender Geschäftstätigkeit) beziffert die tatsächliche Innenfinanzierungskraft und Liquiditätsgenerierung eines Unternehmens.',
-      details: 'Praktikerkennzahl (indirekte Methode): Jahresüberschuss + Abschreibungen + Zuführung zu Rückstellungen = Cashflow. Der Cashflow kann durch buchhalterische Gestaltungstricks kaum manipuliert werden ("Profit is an opinion, cash is a fact").',
+      details: 'Praktikerkennzahl (indirekte Methode): Jahresüberschuss + Abschreibungen + Zuführung zu Rückstellungen = Cashflow. Abschreibungsmethoden beeinflussen den Gewinn, aber nicht diesen Cashflow. Ganz frei von Ermessen ist die Kennzahl trotzdem nicht, denn die Höhe der Rückstellungen schätzt das Unternehmen selbst.',
     },
     faqs: [
       { question: 'Was ist der Free Cashflow (FCF)?', answer: 'Der freie Cashflow ist der operative Cashflow abzüglich der notwendigen Investitionen in Sachanlagen (CapEx); dieses Geld steht frei für Dividendenzahlungen oder Schuldentilgung bereit.' },
@@ -785,7 +785,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     category: "business",
     subcategory: "Finanzanalyse & Rentabilität",
     metaTitle: 'Liquiditätsgrad Rechner – Barliquidität, Quick Ratio',
-    metaDescription: 'Berechnen Sie die Liquidität 1. Grades (Cash Ratio, Ziel 20-30 %), 2. Grades (Quick Ratio, Ziel 100 %) und 3.',
+    metaDescription: 'Berechnen Sie die Liquidität 1. Grades (Cash Ratio), 2. Grades (Quick Ratio) und 3. Grades (Current Ratio) und vergleichen Sie sie mit den üblichen Faustregeln.',
     h1: 'Liquiditätsgrade Rechner – Zahlungsfähigkeit 1., 2. & 3. Grades prüfen',
     shortDescription: 'Berechnet Cash Ratio, Quick Ratio und Current Ratio nach Bilanz.',
     searchKeywords: ["liquiditaetsgrade rechner 1 2 3 grad formel","barliquiditaet cash ratio quick ratio current ratio","zahlungsfaehigkeit unternehmen bilanzpruefung","liquiditaet 2 grades 100 prozent zielwert"],
@@ -888,10 +888,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Liquiditätsgrade (1., 2. und 3. Grades) analysieren die Fähigkeit eines Unternehmens, seinen kurzfristigen Zahlungsverpflichtungen jederzeit pünktlich nachzukommen.',
-      details: 'Barliquidität (1. Grad, Cash Ratio) = Flüssige Mittel / kurzfristige Verbindlichkeiten (Ziel: 20–30 %). Einzugsbedingte Liquidität (2. Grad, Quick Ratio) = (Flüssige Mittel + Forderungen) / Verbindlichkeiten (Ziel: 100–120 %).',
+      details: 'Barliquidität (1. Grad, Cash Ratio) = Flüssige Mittel / kurzfristige Verbindlichkeiten (Faustregel: 20–30 %). Einzugsbedingte Liquidität (2. Grad, Quick Ratio) = (Flüssige Mittel + Forderungen) / Verbindlichkeiten (Faustregel: 100–120 %). Diese Werte sind Lehrbuch-Faustregeln, keine gesetzlichen Grenzen.',
     },
     faqs: [
-      { question: 'Was misst die Current Ratio (Liquidität 3. Grades)?', answer: 'Current Ratio = Gesamtes Umlaufvermögen (inkl. Vorräte) / kurzfristige Verbindlichkeiten; sie sollte mindestens 150 bis 200 Prozent betragen.' },
+      { question: 'Was misst die Current Ratio (Liquidität 3. Grades)?', answer: 'Current Ratio = Gesamtes Umlaufvermögen (inkl. Vorräte) / kurzfristige Verbindlichkeiten; als Faustregel gelten 150 bis 200 Prozent („Two-to-one-Rule“).' },
       { question: 'Warum zählt man das Warenlager beim Quick Ratio (2. Grad) nicht mit?', answer: 'Weil Vorräte und Rohstoffe nicht sofort zu Geld gemacht werden können und bei Notverkäufen erhebliche Wertabschläge drohen.' },
     ],
     relatedSlugs: ['skonto-jahreszins-rechner', 'working-capital-rechner', 'cashflow-rechner', 'skontorechner'],
@@ -1941,7 +1941,9 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           { id: 'creditDaysDisplay', label: 'Finanzierungszeitraum', value: creditDays, formattedValue: creditDays + ' Tage' },
         ],
         summaryText: skPct > 0
-          ? 'Durch Skonto sparen Sie ' + formatCurrency(skontoSavingsEuro) + '. Das entspricht einem effektiven Jahreszins von ' + formatPercent(effZinsExact) + ' p.a.! Selbst bei Finanzierung über Kontokorrent (' + creditZins + ' % Zins) sparen Sie immer noch ' + formatCurrency(netAdvantageEuro) + ' unterm Strich.'
+          ? 'Durch Skonto sparen Sie ' + formatCurrency(skontoSavingsEuro) + '. Das entspricht einem effektiven Jahreszins von ' + formatPercent(effZinsExact) + ' p.a.' + (netAdvantageEuro >= 0
+            ? ' Selbst bei Finanzierung über Kontokorrent (' + formatPercent(creditZins) + ' Zins) bleibt ein Vorteil von ' + formatCurrency(netAdvantageEuro) + '.'
+            : ' Bei Finanzierung über Kontokorrent (' + formatPercent(creditZins) + ' Zins) kosten die Bankzinsen ' + formatCurrency(-netAdvantageEuro) + ' mehr, als das Skonto bringt.')
           : 'Bei 0 % Skonto gibt es keinen Skontoabzug (Rechnungsbetrag voll fällig nach ' + netDays + ' Tagen).',
       };
     },
@@ -1975,7 +1977,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Warum gewähren Lieferanten so teures Skonto?', answer: 'Weil Lieferanten dadurch sofortige Liquidität erhalten, Mahnverfahren und Ausfallrisiken (Delkredere) drastisch reduzieren und Buchhaltungskosten sparen.' },
-      { question: 'Was sollte man tun, wenn die Bank keine Kreditlinie für Skonto gewährt?', answer: 'Verhandeln Sie mit der Hausbank: Banken finanzieren Skontolinien gerne, da sie die wirtschaftliche Rentabilität für das Unternehmen unmittelbar einsehen.' },
+      { question: 'Was sollte man tun, wenn die Bank keine Kreditlinie für Skonto gewährt?', answer: 'Sprechen Sie mit der Hausbank über eine Erhöhung der Kontokorrentlinie und belegen Sie mit Ihren Lieferantenrechnungen, wie viel Skonto Sie jährlich verschenken. Alternativ lässt sich oft mit dem Lieferanten ein längeres Skontoziel vereinbaren.' },
     ],
     relatedSlugs: ['skontorechner', 'liquiditaetsgrad-rechner', 'rabattrechner'],
   },
@@ -2112,7 +2114,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     category: "business",
     subcategory: "Kostenrechnung & Controlling",
     metaTitle: 'Lagerumschlag Rechner – Umschlagshäufigkeit',
-    metaDescription: 'Berechnen Sie die Lagerumschlagshäufigkeit (Wareneinsatz / Ø Lagerbestand) und die durchschnittliche Lagerdauer in Tagen zur Optimierung des gebundenen.',
+    metaDescription: 'Berechnen Sie die Lagerumschlagshäufigkeit (Wareneinsatz / Ø Lagerbestand) und die durchschnittliche Lagerdauer in Tagen, um das im Lager gebundene Kapital zu senken.',
     h1: 'Lagerumschlag Rechner – Umschlagshäufigkeit & Verweildauer berechnen',
     shortDescription: 'Ermittelt wie oft sich das Lager pro Jahr dreht und die Lagerdauer.',
     searchKeywords: ["lagerumschlagshaeufigkeit rechner formel wareneinsatz lagerbestand","durchschnittliche lagerdauer tage 360 durch umschlag","lagerbestand optimieren bwl kennzahl","kapitalbindung lager reduzieren"],
@@ -2322,13 +2324,13 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser betriebswirtschaftliche Stundensatzkalkulator ermittelt den erforderlichen Netto-Verrechnungssatz pro Stunde für Freiberufler, Berater und Agenturen.',
-      details: 'Kalkulation: (Privater Lebensunterhalt + Vorsorgeaufwand + betriebliche Fixkosten + Risikogewinnaufschlag) / (Verfügbare Jahresarbeitstage · fakturierbare Stunden pro Tag).',
+      details: 'Kalkulation im Rechner: (Wunsch-Netto × 1,65 als pauschaler Aufschlag für Steuern, Kranken-/Pflegeversicherung und Altersvorsorge + Betriebsausgaben) / ((260 − freie Tage) × 8 Stunden × Auslastungsquote). Ein zusätzlicher Gewinn- oder Risikoaufschlag ist nicht enthalten.',
     },
     faqs: [
       { question: 'Wie viele Stunden pro Tag kann ein Dienstleister durchschnittlich fakturieren?', answer: 'In der Realität selten mehr als 5 bis 6 Stunden pro Tag; die restliche Zeit entfällt zwingend auf Akquise, Kundenberatung, Buchhaltung, Weiterbildung und Büroorganisation.' },
       { question: 'Warum führt die Formel "Gehalt durch 160 Stunden" bei Selbstständigen in den Ruin?', answer: 'Weil sie ignoriert, dass Selbstständige keinen Arbeitgeberzuschuss zur Kranken- und Rentenversicherung erhalten, Urlaub und Feiertage unbezahlt sind und administrative Zeiten nicht abgerechnet werden können.' },
     ],
-    relatedSlugs: ['stundensatz-kalkulation-freiberufler-rechner', 'teilzeit-gehaltsrechner', 'deckungsbeitrag-rechner', 'umsatzrentabilitaet-rechner'],
+    relatedSlugs: ['teilzeit-gehaltsrechner', 'deckungsbeitrag-rechner', 'umsatzrentabilitaet-rechner'],
   },
   {
     id: "mittelwert-median-modus-rechner",

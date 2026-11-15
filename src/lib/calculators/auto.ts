@@ -508,7 +508,7 @@ export function calculateTravelTime(inputs: Record<string, any>): CalculationRes
       highlight: true,
     },
     secondary: [
-      { id: 'pureDriving', label: 'Reine Fahrzeit', value: drivingHoursDecimal, formattedValue: `${Math.floor(drivingHoursDecimal)} Std. ${Math.round((drivingHoursDecimal % 1) * 60)} Min.` },
+      { id: 'pureDriving', label: 'Reine Fahrzeit', value: drivingHoursDecimal, formattedValue: `${Math.floor(Math.round(drivingHoursDecimal * 60) / 60)} Std. ${Math.round(drivingHoursDecimal * 60) % 60} Min.` },
       { id: 'breaks', label: 'Eingeplante Pausen', value: breakMinutes, formattedValue: `${breakMinutes} Minuten` },
       { id: 'speed', label: 'Durchschnittstempo', value: speed, formattedValue: `${formatNumber(speed, 0)} km/h` },
     ],

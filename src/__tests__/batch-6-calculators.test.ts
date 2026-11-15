@@ -122,9 +122,9 @@ describe('Batch 6 Calculators Quality and Regression Suite', () => {
         netIncomePartner2: '0',
       });
       expect(res?.error).toBeUndefined();
-      // diff is 3200 - 0 = 3200; (3200 * 3/7 + 3200 * 0.45)/2 = (1371.43 + 1440)/2 = 1405.71
-      // capped by 3200 - 1600 = 1600.
-      expect(res?.primary.value).toBeCloseTo(1405.71, 1);
+      // diff is 3200 - 0 = 3200; 45 % (Düsseldorfer Tabelle 2026, Anm. B.I) = 1440
+      // capped by 3200 - 1600 = 1600 → not binding.
+      expect(res?.primary.value).toBeCloseTo(1440, 1);
     });
 
     it('schlafbedarfs-rechner preserves wakeHour: 0 (midnight) and wakeMinute: 0', () => {

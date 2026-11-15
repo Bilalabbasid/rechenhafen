@@ -515,10 +515,10 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Dividendenrendite misst die laufende Ausschüttung einer Aktie bezogen auf ihren aktuellen Börsenkurs.',
-      details: 'Dividendenrendite = (Dividende je Aktie / Aktienkurs) · 100. Eine Aktie mit 3 € Dividende bei 60 € Kurs hat eine Dividendenrendite von 5,0 %. Reinvestierte Dividenden tragen historisch maßgeblich zum Gesamterfolg von Aktienportfolios bei.',
+      details: 'Dividendenrendite = (Dividende je Aktie / Aktienkurs) · 100. Eine Aktie mit 3 € Dividende bei 60 € Kurs hat eine Dividendenrendite von 5,0 %. Die Kennzahl zeigt nur den laufenden Ertrag; Kursgewinne oder -verluste sind darin nicht enthalten.',
     },
     faqs: [
-      { question: 'Wann wird die Dividende in Deutschland ausgezahlt?', answer: 'Bei deutschen Aktiengesellschaften (AG) wird die Dividende einmal jährlich am dritten Werktag nach der ordentlichen Hauptversammlung (§ 58 Abs. 4 AktG) gutgeschrieben.' },
+      { question: 'Wann wird die Dividende in Deutschland ausgezahlt?', answer: 'Die meisten deutschen Aktiengesellschaften zahlen einmal im Jahr nach der Hauptversammlung. Der Anspruch ist am dritten Geschäftstag nach dem Gewinnverwendungsbeschluss fällig, sofern Beschluss oder Satzung keinen späteren Tag festlegen (§ 58 Abs. 4 Satz 2 und 3 AktG).' },
       { question: 'Ist eine extrem hohe Dividendenrendite immer ein gutes Zeichen?', answer: 'Nicht zwingend: Eine ungewöhnlich hohe Dividendenrendite (> 8 %) entsteht oft durch einen drastischen Kurseinbruch der Aktie wegen operativer Krisen, was Vorbote einer Dividendenkürzung sein kann.' },
     ],
     relatedSlugs: ['renditerechner', 'etf-sparplan-rechner', 'zinseszinsrechner', 'kapitalertragsteuer-rechner'],
@@ -588,7 +588,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     category: 'finanzen',
     subcategory: 'Ruhestand & Entnahme',
     metaTitle: 'Finanzielle Freiheit Rechner – FIRE-Zahl & 4%-Regel',
-    metaDescription: 'Berechnen Sie Ihre persönliche FIRE-Zahl für finanzielle Freiheit: Das 25-fache Ihrer Jahresausgaben nach der wissenschaftlichen Trinity-Studie.',
+    metaDescription: 'Berechnen Sie Ihre persönliche FIRE-Zahl für finanzielle Freiheit: Das 25-fache Ihrer Jahresausgaben nach der 4-%-Regel aus der US-amerikanischen Trinity-Studie.',
     h1: 'Finanzielle Freiheit Rechner (FIRE-Bewegung)',
     shortDescription: 'Kalkuliert die erforderliche Vermögensgröße für den vorzeitigen Ruhestand basierend auf jährlichen Lebenshaltungskosten.',
     searchKeywords: ['finanzielle freiheit rechner', 'fire rechner 4 prozent regel', 'trinity study rechner', 'fruehrente vermoegen berechnen'],
@@ -630,7 +630,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       };
     },
     formula: 'FIRE-Vermögen = Jahresausgaben / (Entnahmerate / 100)',
-    formulaExplanation: 'Nach der Trinity-Studie hielt ein Aktien-/Anleihen-Portfolio bei 3,5 % bis 4,0 % Entnahme über 30 Jahre stand.',
+    formulaExplanation: 'In der Trinity-Studie (US-Daten 1926 bis 1995) reichte ein gemischtes Aktien-/Anleihen-Depot bei 4 % inflationsangepasster Entnahme in den meisten untersuchten 30-Jahres-Zeiträumen. Eine Garantie für die Zukunft ist das nicht.',
     workedExample: {
       title: 'Beispiel: 2.200 € Monatsausgaben bei 3,5 % Entnahme',
       description: 'Jahresausgaben: 26.400 €. FIRE-Zahl: ca. 754.286 €.',
@@ -642,7 +642,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       details: 'Basierend auf der Trinity-Studie gilt eine sichere Entnahmerate (Safe Withdrawal Rate, SWR) von 3,5 bis 4,0 Prozent p.a. Das FIRE-Vermögen entspricht dem 25- bis 28-Fachen der jährlichen Gesamtausgaben.',
     },
     faqs: [
-      { question: 'Was besagt die bekannte 4-Prozent-Regel?', answer: 'Wer im ersten Ruhestandsjahr 4 % seines Aktien/Anleihen-Portfolios entnimmt und den Betrag in den Folgejahren inflationsbereinigt anpasst, hatte in den letzten 100 Jahren eine 95-prozentige Wahrscheinlichkeit, dass das Geld 30 Jahre lang reichte.' },
+      { question: 'Was besagt die bekannte 4-Prozent-Regel?', answer: 'Wer im ersten Ruhestandsjahr 4 % seines Aktien-/Anleihen-Depots entnimmt und den Betrag danach jährlich an die Inflation anpasst, kam in der Trinity-Studie mit US-Marktdaten von 1926 bis 1995 in der großen Mehrheit der 30-Jahres-Zeiträume aus (häufig zitiert: rund 95 %). Deutsche Steuern, Depotkosten und künftige Renditen sind darin nicht abgebildet.' },
       { question: 'Was ist Lean-FIRE vs. Fat-FIRE?', answer: 'Lean-FIRE zielt auf finanzielle Freiheit bei sehr sparsamem Lebensstil ab; Fat-FIRE kalkuliert mit großzügigen Budgets von 4.000 € oder mehr pro Monat im Ruhestand.' },
     ],
     relatedSlugs: ['ewige-rente-rechner', 'etf-sparplan-rechner', 'zinseszinsrechner'],
@@ -708,7 +708,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Mit dem Freistellungsauftrag schöpfen Sparer und Anleger den gesetzlichen Sparer-Pauschbetrag aus, um Kapitalerträge ohne Steuerabzug zu erhalten.',
-      details: 'Nach § 20 Abs. 9 EStG beträgt der Sparer-Pauschbetrag 1.000 € für Alleinstehende und 2.000 € für zusammenveranlagte Ehegatten. Ersparnis: Bis zu 263,75 € (Single) bzw. 527,50 € (Verheiratete) pro Jahr.',
+      details: 'Nach § 20 Abs. 9 EStG beträgt der Sparer-Pauschbetrag 1.000 € für Alleinstehende und 2.000 € für zusammenveranlagte Ehegatten. Ersparnis ohne Kirchensteuer: bis zu 263,75 € (Single) bzw. 527,50 € (Verheiratete) pro Jahr. Mit Kirchensteuer rechnet der Rechner mit 9 % Kirchensteuersatz (27,99 % Gesamtbelastung).',
     },
     faqs: [
       { question: 'Kann man den Freistellungsauftrag auf mehrere Banken aufteilen?', answer: 'Ja, Sie können Ihren Freibetrag beliebig auf verschiedene Banken und Broker verteilen, solange die Gesamtsumme 1.000 € bzw. 2.000 € nicht übersteigt.' },
@@ -1233,11 +1233,11 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 6.274 € Kostenverlust',
     },
     content: {
-      intro: 'Dieser Kostenrechner quantifiziert, wie stark prozentuale Depotgebühren, Orderkosten und Fonds-TER das Endvermögen über die Jahre schmälern.',
-      details: 'Laufende Gebühren mindern nicht nur den unmittelbaren Barwert, sondern entziehen dem Depot kontinuierlich künftiges Zinseszins-Potenzial. 1 % Mehrkosten pro Jahr kann über 30 Jahre rund 25 % des Endkapitals vernichten.',
+      intro: 'Dieser Kostenrechner zeigt, wie stark die laufenden Fondskosten (TER) und eine feste jährliche Depotgebühr in Euro das Endvermögen über die Jahre schmälern. Ordergebühren und Ausgabeaufschläge rechnet er nicht mit.',
+      details: 'Laufende Gebühren mindern nicht nur den unmittelbaren Barwert, sondern entziehen dem Depot kontinuierlich künftiges Zinseszins-Potenzial. Bei 7 % Bruttorendite kostet 1 Prozentpunkt Mehrkosten pro Jahr über 30 Jahre rund ein Viertel des Endkapitals.',
     },
     faqs: [
-      { question: 'Warum sind Neobroker oft so viel günstiger als Filialbanken?', answer: 'Moderne Neobroker verzichten auf Filialnetze, wickeln Orders rein digital ab und erhalten Rückvergütungen (Payment for Order Flow) von Handelsplätzen.' },
+      { question: 'Warum sind Neobroker oft so viel günstiger als Filialbanken?', answer: 'Neobroker verzichten auf Filialen und wickeln alles digital ab. Bis Ende Juni 2026 finanzierten sich viele zusätzlich über Rückvergütungen von Handelspartnern (Payment for Order Flow). Seit dem 1. Juli 2026 ist das auch in Deutschland verboten (Art. 39a MiFIR); laut BaFin dürfen sich Broker seitdem nicht mehr für die Weiterleitung von Kundenorders bezahlen lassen.' },
       { question: 'Wie wirken sich Ausgabeaufschläge bei aktiv gemanagten Fonds aus?', answer: 'Ein Ausgabeaufschlag von 5 % bedeutet, dass von 10.000 € Einzahlung nur 9.524 € investiert werden; der Fonds muss zunächst rund 5,3 % Rendite erwirtschaften, nur um die Anfangskosten auszugleichen.' },
     ],
     relatedSlugs: ['etf-sparplan-rechner', 'renditerechner', 'zinseszinsrechner'],
@@ -1325,15 +1325,17 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       const amount = !isNaN(rawAmount) ? Math.max(0, rawAmount) : 10000;
       if (r <= 0) return { primary: { id: 'years', label: 'Verdopplungszeit', value: 0, formattedValue: 'Nie' }, error: 'Rendite muss positiv sein.' };
       const exactYears = Math.log(2) / Math.log(1 + r / 100);
-      const y = Math.floor(exactYears);
-      const m = Math.round((exactYears - y) * 12);
+      // Erst auf ganze Monate runden, dann aufteilen: sonst entstehen Ausgaben wie "9 Jahre und 12 Monate".
+      const totalMonths = Math.round(exactYears * 12);
+      const y = Math.floor(totalMonths / 12);
+      const m = totalMonths % 12;
       return {
-        primary: { id: 'years', label: 'Exakte Verdopplungszeit', value: exactYears, formattedValue: `${y} Jahre und ${m} Monate`, highlight: true },
+        primary: { id: 'years', label: 'Exakte Verdopplungszeit', value: exactYears, formattedValue: `${y} Jahre und ${m} ${m === 1 ? 'Monat' : 'Monate'}`, highlight: true },
         secondary: [
           { id: 'exactDec', label: 'In Dezimaljahren', value: exactYears, formattedValue: `${formatNumber(exactYears, 2)} Jahre` },
           { id: 'doubled', label: 'Verdoppelter Endbetrag', value: amount * 2, formattedValue: formatCurrency(amount * 2) },
         ],
-        summaryText: `Bei einer Rendite von ${formatPercent(r)} p.a. verdoppelt sich Ihr Erspartes in exakt ${y} Jahren und ${m} Monaten.`,
+        summaryText: `Bei einer Rendite von ${formatPercent(r)} p.a. verdoppelt sich Ihr Erspartes in rund ${y} Jahren und ${m} ${m === 1 ? 'Monat' : 'Monaten'}.`,
       };
     },
     formula: 'Laufzeit (Jahre) = ln(2) / ln(1 + p/100)',
@@ -1414,12 +1416,12 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: 'ca. 243.000 € Endvermögen',
     },
     content: {
-      intro: 'Dieser Rechner vergleicht die Steuer- und Vermögensentwicklung von wiederanlegenden (thesaurierenden) und auszahlenden (ausschüttenden) Investmentfonds.',
-      details: 'Seit der Investmentsteuerreform 2018 unterliegen thesaurierende Fonds der jährlichen Vorabpauschale nach dem Basiszins der Bundesbank. Ausschütter nutzen den Sparer-Pauschbetrag durch direkte Dividendenzahlungen oft einfacher aus.',
+      intro: 'Dieser Rechner zeigt das Endvermögen eines Sparplans, bei dem alle Ausschüttungen im Fonds bleiben (thesaurierend) oder sofort wieder angelegt werden. Vor Steuern ist das Ergebnis für beide Varianten gleich; Steuern und Kosten rechnet er nicht ein.',
+      details: 'Seit der Investmentsteuerreform 2018 unterliegen thesaurierende Fonds der jährlichen Vorabpauschale. Sie hängt vom Basiszins ab, den das Bundesfinanzministerium jedes Jahr aus Zinsstrukturdaten der Bundesbank bekannt gibt. Ausschütter nutzen den Sparer-Pauschbetrag durch direkte Dividendenzahlungen oft einfacher aus.',
     },
     faqs: [
-      { question: 'Was ist die Vorabpauschale bei thesaurierenden ETFs?', answer: 'Eine fiktive Mindestertragsbesteuerung zu Jahresbeginn: Sie errechnet sich aus Basisertrag (70 % des Basiszinses × Portfoliowert) abzüglich tatsächlicher Ausschüttungen, gedeckelt auf den tatsächlichen Wertzuwachs.' },
-      { question: 'Wann lohnt sich ein ausschüttender ETF mehr als ein Thesaurierer?', answer: 'Solange der Sparer-Pauschbetrag (1.000 € / 2.000 €) noch nicht anderweitig voll ausgeschöpft ist, lassen sich Dividenden bis zu dieser Grenze steuerfrei vereinnahmen und sofort wiederanlegen.' },
+      { question: 'Was ist die Vorabpauschale bei thesaurierenden ETFs?', answer: 'Eine fiktive Mindestbesteuerung nach § 18 InvStG: Basisertrag (Fondswert am Jahresanfang × 70 % des Basiszinses) abzüglich der Ausschüttungen des Jahres, höchstens aber der tatsächliche Wertzuwachs plus Ausschüttungen. Sie gilt am ersten Werktag des Folgejahres als zugeflossen.' },
+      { question: 'Wann lohnt sich ein ausschüttender ETF mehr als ein Thesaurierer?', answer: 'Wenn der Sparer-Pauschbetrag (1.000 € / 2.000 €) sonst ungenutzt bliebe: Ausschüttungen nutzen ihn jedes Jahr, beim Thesaurierer wird er nur in Höhe der Vorabpauschale beansprucht und der übrige Wertzuwachs erst beim Verkauf versteuert. Wer ohnehin Erträge über dem Freibetrag hat, schiebt mit einem Thesaurierer Steuern in die Zukunft und lässt sie länger mitwachsen.' },
     ],
     relatedSlugs: ['etf-sparplan-rechner', 'freistellungsauftrag-rechner', 'zinseszinsrechner'],
   },
@@ -1469,11 +1471,11 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Rentenlücke ist die Differenz zwischen Ihrem gewünschten Nettoeinkommen im Ruhestand und der voraussichtlichen gesetzlichen Nettorente.',
-      details: 'Die gesetzliche Rente liegt für Standardrentner (Eckrentner mit 45 Beitragsjahren) vor Steuern bei rund 48 Prozent des Durchschnittsentgelts. Nach Abzug von Kranken- und Pflegeversicherungsbeiträgen (ca. 11–12 %) und Einkommensteuer verbleibt eine erhebliche Deckungslücke.',
+      details: 'Die gesetzliche Rente liegt für Standardrentner (Eckrentner mit 45 Beitragsjahren) vor Steuern bei rund 48 Prozent des Durchschnittsentgelts. Nach Abzug von Kranken- und Pflegeversicherungsbeiträgen (2026 rund 12,4 % mit Kindern, rund 13 % ohne Kinder, jeweils mit durchschnittlichem Zusatzbeitrag) und Einkommensteuer verbleibt eine erhebliche Deckungslücke.',
     },
     faqs: [
-      { question: 'Wie viel Prozent des letzten Nettoeinkommens benötigt man im Ruhestand?', answer: 'Finanzplaner kalkulieren in der Regel mit 75 bis 85 Prozent des letzten Nettoeinkommens, da Berufsaufwendungen (Pendeln, Arbeitskleidung) entfallen, aber Gesundheits- und Freizeitkosten steigen können.' },
-      { question: 'Wird die gesetzliche Rente in voller Höhe versteuert?', answer: 'Für Neurentner steigt der Besteuerungsanteil der Rente jährlich schrittweise an; ab dem Jahrgang 2058 (bzw. nach geplanten Reformen 2040) wird die Rente zu 100 % der Einkommensteuer unterliegen.' },
+      { question: 'Wie viel Prozent des letzten Nettoeinkommens benötigt man im Ruhestand?', answer: 'Eine häufig genannte Faustregel sind 75 bis 85 Prozent des letzten Nettoeinkommens; Ihr tatsächlicher Bedarf kann deutlich abweichen, da Berufsaufwendungen (Pendeln, Arbeitskleidung) entfallen, aber Gesundheits- und Freizeitkosten steigen können.' },
+      { question: 'Wird die gesetzliche Rente in voller Höhe versteuert?', answer: 'Nein, maßgeblich ist das Jahr des Rentenbeginns. Wer 2026 in Rente geht, versteuert 84 % der Bruttorente; der Anteil steigt für jeden späteren Rentenjahrgang um 0,5 Prozentpunkte. Erst bei Rentenbeginn ab 2058 ist die Rente zu 100 % steuerpflichtig (§ 22 Nr. 1 Satz 3 Buchst. a Doppelbuchst. aa EStG).' },
     ],
     relatedSlugs: ['renteneintritt-rechner', 'spardauer-rechner', 'etf-sparplan-rechner', 'betriebliche-altersvorsorge-rechner', 'ewige-rente-rechner', 'finanzielle-freiheit-rechner'],
   },
@@ -1529,7 +1531,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     formula: 'Gewinn = Gewicht × (Verkaufspreis - Kaufpreis)',
     formulaExplanation: 'Physisches Gold ist in Deutschland nach 1 Jahr Haltedauer steuerfrei (§ 23 EStG).',
     workedExample: {
-      title: 'Beispiel: 1 Unze (31,1 g) Gold gekauft zu 55 €/g, heute 75 €/g',
+      title: 'Beispiel: 1 Unze (31,1 g) Gold, Kauf zu 55 €/g, Bewertung zu 75 €/g (Beispielpreise)',
       description: 'Gewinn: +622,07 € (+36,36 %).',
       inputs: { weightGram: 31.1035, buyPrice: 55, currentPrice: 75 },
       resultSummary: '+622,07 € Gewinn (+36,4 %)',
@@ -1539,8 +1541,8 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       details: 'Gewinne aus physischem Gold (Münzen, Barren) sind in Deutschland nach § 23 Abs. 1 Nr. 2 EStG nach einer Haltedauer von mehr als einem Jahr vollkommen steuerfrei (keine Abgeltungsteuer).',
     },
     faqs: [
-      { question: 'Gilt die Steuerfreiheit nach 1 Jahr auch für Gold-ETCs wie Xetra-Gold oder Euwax Gold?', answer: 'Ja, nach ständiger BFH-Rechtsprechung sind physisch hinterlegte Gold-Inhaberschuldverschreibungen mit Lieferanspruch nach 1 Jahr Haltedauer steuerfrei veräußerbar.' },
-      { question: 'Wie hoch sind die typischen Ankauf-Verkauf-Spannen (Spread) bei Goldmünzen?', answer: 'Bei gängigen 1-Unzen-Anlagemünzen (Krügerrand, Maple Leaf) liegt der Spread oft bei 2 bis 4 %; bei kleinen Stückelungen (1 Gramm) kann er über 15 % betragen.' },
+      { question: 'Gilt die Steuerfreiheit nach 1 Jahr auch für Gold-ETCs wie Xetra-Gold oder Euwax Gold?', answer: 'Für Xetra-Gold hat der Bundesfinanzhof entschieden, dass Gewinne wie bei physischem Gold nach mehr als einem Jahr steuerfrei sind, weil das Wertpapier einen Anspruch auf Lieferung von Gold verbrieft (Urteile vom 12. Mai 2015, VIII R 4/15 und VIII R 35/14). Ob das für ein anderes Produkt gilt, hängt von dessen Bedingungen ab, vor allem von voller Golddeckung und Lieferanspruch. Prüfen Sie das im Prospekt oder fragen Sie Ihre Steuerberatung.' },
+      { question: 'Wie hoch sind die typischen Ankauf-Verkauf-Spannen (Spread) bei Goldmünzen?', answer: 'Der Spread ist bei gängigen 1-Unzen-Anlagemünzen und größeren Barren am niedrigsten und steigt bei kleinen Stückelungen (z. B. 1-Gramm-Barren) deutlich an, weil Prägung und Handling je Gramm teurer sind. Vergleichen Sie vor dem Kauf An- und Verkaufspreis desselben Händlers.' },
     ],
     relatedSlugs: ['inflationsrechner', 'renditerechner', 'kaufkraftverlust-rechner'],
   },
@@ -2667,7 +2669,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       const y = Math.floor(m / 12);
       const remM = m % 12;
       return {
-        primary: { id: 'time', label: 'Kreditlaufzeit', value: m / 12, formattedValue: `${y} Jahre und ${remM} Monate`, highlight: true },
+        primary: { id: 'time', label: 'Kreditlaufzeit', value: m / 12, formattedValue: `${y} ${y === 1 ? 'Jahr' : 'Jahre'} und ${remM} ${remM === 1 ? 'Monat' : 'Monate'}`, highlight: true },
         secondary: [
           { id: 'months', label: 'Anzahl Monatsraten', value: m, formattedValue: `${m} Raten` },
           { id: 'interest', label: 'Gesamtzinskosten', value: (rate * m) - loan, formattedValue: formatCurrency((rate * m) - loan) },

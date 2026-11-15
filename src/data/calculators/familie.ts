@@ -32,7 +32,7 @@ export const FAMILIE_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die erweiterte Naegele-Regel berechnet den voraussichtlichen Entbindungstermin (ET) ausgehend vom ersten Tag der letzten Periode und der individuellen Zyklusdauer.',
-      details: 'Klassische Naegele-Formel: Erster Tag der letzten Periode + 7 Tage - 3 Monate + 1 Jahr. Weicht der Zyklus von 28 Tagen ab, wird die Differenz (Zykluslänge - 28) taggenau addiert oder subtrahiert. Nur ca. 4 Prozent aller Babys kommen exakt am errechneten Termin zur Welt.',
+      details: 'Klassische Naegele-Formel: Erster Tag der letzten Periode + 7 Tage - 3 Monate + 1 Jahr. Weicht der Zyklus von 28 Tagen ab, wird die Differenz (Zykluslänge - 28) taggenau addiert oder subtrahiert. Der errechnete Termin ist ein Orientierungswert: Nur ein kleiner Teil der Babys kommt genau an diesem Tag zur Welt.',
     },
     faqs: [
       { question: 'Wie berechnet man den Termin bei bekanntem Empfängnisdatum (Zeugungstag)?', answer: 'Bei bekanntem Eisprung oder Inseminationstag rechnet man: Empfängnistag + 266 Tage (38 Wochen reale Tragzeit).' },

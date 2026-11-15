@@ -4,6 +4,11 @@ import { EINHEITEN_PAGE_CONTENT } from './einheiten';
 import { GELD_PAGE_CONTENT } from './geld';
 import { ARBEIT_PAGE_CONTENT } from './arbeit';
 import { WOHNEN_PAGE_CONTENT } from './wohnen';
+import { AUTO_PAGE_CONTENT } from './auto';
+import { HAUSHALT_PAGE_CONTENT } from './haushalt';
+import { FAMILIE_PAGE_CONTENT } from './familie';
+import { GESUNDHEIT_PAGE_CONTENT } from './gesundheit';
+import { FINANZEN_BUSINESS_PAGE_CONTENT } from './finanzenBusiness';
 
 /** Date of the last content batch; pages with an overlay report it as their content update. */
 export const PAGE_CONTENT_UPDATED_AT = '2026-11-15';
@@ -15,4 +20,9 @@ export const PAGE_CONTENT: PageContentMap = {
   ...GELD_PAGE_CONTENT,
   ...ARBEIT_PAGE_CONTENT,
   ...WOHNEN_PAGE_CONTENT,
+  ...AUTO_PAGE_CONTENT,
+  ...HAUSHALT_PAGE_CONTENT,
+  ...FAMILIE_PAGE_CONTENT,
+  ...GESUNDHEIT_PAGE_CONTENT,
+  ...FINANZEN_BUSINESS_PAGE_CONTENT,
 };

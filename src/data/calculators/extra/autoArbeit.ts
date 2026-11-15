@@ -669,7 +669,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
     metaTitle: 'Leasingfaktor Rechner – Leasingangebote objektiv vergleichen',
-    metaDescription: 'Berechnen Sie den Leasingfaktor und Gesamtkostenfaktor für Auto-Leasingangebote. Erkennen Sie echte Leasing-Schnäppchen (Faktor unter 0,7).',
+    metaDescription: 'Berechnen Sie den Leasingfaktor und Gesamtkostenfaktor für Auto-Leasingangebote. Mit Einordnung nach gängiger Faustregel (Gesamtfaktor unter 0,8 = sehr gut).',
     h1: 'Leasingfaktor Rechner – Leasing-Deals objektiv vergleichen',
     shortDescription: 'Ermittelt den Leasingfaktor zur fairen Bewertung von Auto-Leasingverträgen.',
     searchKeywords: ['leasingfaktor rechner', 'leasingfaktor formel berechnen', 'guter leasingfaktor schnaeppchen', 'gesamtleasingfaktor rechner'],
@@ -710,20 +710,20 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       };
     },
     formula: 'Leasingfaktor = (Monatsrate / Bruttolistenpreis) × 100',
-    formulaExplanation: 'Ein Leasingfaktor unter 0,7 gilt am Automarkt als hervorragendes Angebot. Ab 1,1 gilt ein Leasingvertrag als teuer.',
+    formulaExplanation: 'Die Bewertung des Rechners richtet sich nach dem Gesamtleasingfaktor und folgt einer verbreiteten Faustregel, keiner Norm: unter 0,6 außergewöhnlich günstig, unter 0,8 sehr gut, unter 1,1 marktüblich, ab 1,1 eher teuer.',
     workedExample: {
       title: 'Beispiel: 320 € Rate bei 42.000 € BLP über 36 Monate',
-      inputValues: [{ label: 'Rate', value: '320 €' }, { label: 'BLP', value: '42.000 €' }],
-      steps: ['Leasingfaktor = (320 € / 42.000 €) × 100 = 0,76', 'Gilt als sehr gutes Schnäppchen'],
-      result: 'Leasingfaktor 0,76',
+      inputValues: [{ label: 'Rate', value: '320 €' }, { label: 'BLP', value: '42.000 €' }, { label: 'Überführung', value: '990 €' }],
+      steps: ['Leasingfaktor = (320 € / 42.000 €) × 100 = 0,76', 'Gesamtleasingfaktor = (320 € + 990 € / 36) / 42.000 € × 100 = 0,83', 'Bewertung nach dem Gesamtfaktor: Guter Marktdurchschnitt'],
+      result: 'Leasingfaktor 0,76 (Gesamtfaktor 0,83)',
     },
     content: {
       intro: 'Der Leasingfaktor normiert Leasingraten auf den Bruttolistenpreis und ermöglicht den objektiven Vergleich von Leasingangeboten unabhängig vom Fahrzeugmodell.',
-      details: 'Leasingfaktor = (Monatliche Rate / Bruttolistenpreis) · 100. Bei Sonderzahlungen ermittelt der Gesamtkosten-Leasingfaktor: [(Rate + (Sonderzahlung / Laufzeit)) / Listenpreis] · 100. Werte unter 0,7 gelten als Schnäppchen, über 1,1 als teuer.',
+      details: 'Leasingfaktor = (Monatliche Rate / Bruttolistenpreis) · 100. Der Gesamtleasingfaktor verteilt Sonderzahlung und Überführungskosten auf die Laufzeit: [(Rate + Sonderzahlung / Laufzeit + Überführung / Laufzeit) / Listenpreis] · 100. Nach gängiger Faustregel gelten Gesamtfaktoren unter 0,8 als sehr gut, ab 1,1 als teuer.',
     },
     faqs: [
-      { question: 'Was ist ein guter Leasingfaktor für Privatkunden?', answer: 'Ein Leasingfaktor unter 0,8 gilt als gutes Angebot, unter 0,6 als echtes Top-Schnäppchen. Werte über 1,0 entsprechen dem regulären Marktstandard ohne besondere Rabatte.' },
-      { question: 'Was bedeutet Kilometerleasing vs. Restwertleasing?', answer: 'Privatkunden sollten immer Kilometerleasing wählen: Hier tragen Sie kein Restwertrisiko am Laufzeitende, sondern zahlen nur eventuelle Mehrkilometer und echte Schäden.' },
+      { question: 'Was ist ein guter Leasingfaktor für Privatkunden?', answer: 'Als Faustregel gilt ein Gesamtleasingfaktor unter 0,8 als sehr gutes Angebot und unter 0,6 als außergewöhnlich günstig; zwischen 0,8 und 1,1 liegt der übliche Bereich. Eine amtliche Grenze gibt es nicht.' },
+      { question: 'Was bedeutet Kilometerleasing vs. Restwertleasing?', answer: 'Beim Kilometerleasing tragen Sie kein Restwertrisiko am Laufzeitende, sondern zahlen Mehrkilometer und Schäden über normale Abnutzung hinaus. Beim Restwertleasing haften Sie für die Differenz, wenn das Auto bei Rückgabe weniger wert ist als vertraglich kalkuliert; für Privatkunden ist Kilometerleasing deshalb meist die besser planbare Variante.' },
     ],
     relatedSlugs: ['ballonfinanzierung-rechner', 'auto-gesamtkosten-rechner', 'auto-wertverlust-rechner', 'autokreditrechner'],
   },
@@ -774,7 +774,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       };
     },
     formula: 'Vollkosten = Wertverlust + Kraftstoff + Versicherung + Steuer + Wartung',
-    formulaExplanation: 'Laut ADAC-Vollkostenrechnung unterschätzen die meisten Autofahrer die tatsächlichen Kosten ihres Pkw um fast 50 %, weil der schleichende Wertverlust nicht wahrgenommen wird.',
+    formulaExplanation: 'Der Wertverlust wird pauschal mit 10 % des Kaufpreises pro Jahr angesetzt; alle übrigen Posten stammen aus Ihren Eingaben. Weil der Wertverlust nicht als Rechnung auftaucht, wird er im Alltag leicht übersehen.',
     workedExample: {
       title: 'Beispiel: 30.000 € Auto bei 15.000 km pro Jahr',
       inputValues: [{ label: 'Kaufpreis', value: '30.000 €' }, { label: 'Kilometer', value: '15.000 km' }],
@@ -783,11 +783,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die realen Vollkosten eines Autos (Total Cost of Ownership) erfassen neben dem Kraftstoff den massiven Wertverlust, Versicherung, Kfz-Steuer, Inspektionen und Verschleiß.',
-      details: 'Der ADAC beziffert die realen Gesamtkosten eines Mittelklassewagens typischerweise auf 50 bis 80 Cent pro gefahrenem Kilometer. Der Wertverlust macht dabei in den ersten Jahren über 40 % der Gesamtkosten aus.',
+      details: 'Vollkosten pro Jahr = 10 % des Kaufpreises (Wertverlust) + Kraftstoff- bzw. Stromkosten + Versicherung + Kfz-Steuer + Wartung und Reifen. Teilt man die Summe durch die Jahreskilometer, erhält man die Kosten je Kilometer, die sich mit Bahn-, Carsharing- oder Leasingangeboten vergleichen lassen.',
     },
     faqs: [
-      { question: 'Welcher Kostenfaktor wird beim Autokauf am häufigsten unterschätzt?', answer: 'Der Wertverlust: Ein Neuwagen verliert im ersten Jahr im Schnitt 20 bis 25 Prozent seines Listenpreises, ohne dass dafür eine Rechnung im Briefkasten landet.' },
-      { question: 'Wie hoch sind die durchschnittlichen Werkstatt- und Reifenkosten pro Jahr?', answer: 'Für Inspektionen, Ölwechsel, Verschleißteile (Bremsen, Scheibenwischer) und Reifenwechsel fallen bei durchschnittlicher Fahrleistung 600 bis 1.200 € jährlich an.' },
+      { question: 'Welcher Kostenfaktor wird beim Autokauf am häufigsten unterschätzt?', answer: 'Der Wertverlust: Er kommt nie als Rechnung, sondern zeigt sich erst beim Verkauf. Gerade bei Neuwagen ist er in den ersten Jahren am höchsten; unser Auto-Wertverlust-Rechner rechnet für das erste Jahr mit einer Annahme von 25 %.' },
+      { question: 'Wie hoch sind die durchschnittlichen Werkstatt- und Reifenkosten pro Jahr?', answer: 'Das hängt stark von Modell, Alter und Fahrleistung ab. Der Rechner nutzt 600 € als Vorgabewert; genauer wird es, wenn Sie die Werkstatt-, TÜV- und Reifenrechnungen der letzten zwei bis drei Jahre addieren und durch die Jahre teilen.' },
     ],
     relatedSlugs: ['spritkostenrechner', 'fahrtkostenrechner', 'auto-wertverlust-rechner', 'pendlerpauschale-rechner', 'kraftstoffverbrauch-rechner', 'motorrad-unterhaltskosten-rechner'],
   },
@@ -795,12 +795,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'auto-wertverlust-rechner',
     slug: 'auto-wertverlust-rechner',
-    name: 'Auto Wertverlust-Rechner (nach Schwacke & Alter)',
+    name: 'Auto Wertverlust-Rechner (Restwert nach Alter)',
     shortName: 'Auto Wertverlust',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
     metaTitle: 'Auto-Wertverlust-Rechner: Restwert nach Jahren schätzen',
-    metaDescription: 'Berechnen Sie den Wertverlust und den verbleibenden Restwert Ihres Autos nach Alter und Kilometern anhand anerkannter Marktdaten.',
+    metaDescription: 'Schätzen Sie Wertverlust und Restwert Ihres Autos nach Alter: pauschale Durchschnittskurve mit Restwert, Verlust pro Monat und Wertminderung in Prozent.',
     h1: 'Auto Wertverlust Rechner – Wertminderung von Neu- und Gebrauchtwagen',
     shortDescription: 'Schätzt den Restwert von Fahrzeugen nach der typischen Wertverlustkurve.',
     searchKeywords: ['auto wertverlust rechner', 'restwert auto berechnen jahre', 'schwacke liste wertverlust kurve', 'wertverlust neuwagen erstes jahr'],
@@ -812,16 +812,13 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const orig = inputs.originalPrice !== undefined && inputs.originalPrice !== '' ? Math.max(0, parseFloat(inputs.originalPrice) || 0) : 35000;
       const years = inputs.ageYears !== undefined && inputs.ageYears !== '' ? Math.max(1, parseInt(inputs.ageYears, 10) || 1) : 4;
 
-      // Typische Schwacke-Kurve:
-      // Jahr 1: -25% (Restwert 75%)
-      // Jahr 2: -15% (Restwert 60%)
-      // Jahr 3: -10% (Restwert 50%)
-      // Jahr 4: -7% (Restwert 43%)
-      // Ab Jahr 5: ca. -5% p.a.
+      // Pauschale Durchschnittskurve (Annahme, keine Marktdaten einzelner Modelle):
+      // Jahr 1: Restwert 75 %, Jahr 2: 60 %, Jahr 3: 50 %, Jahr 4: 43 %, danach weiter fallend
+      // bis 19 % nach 10 Jahren; ab Jahr 11 je 2 Prozentpunkte weniger, mindestens 10 %.
       const factors: Record<number, number> = {
         1: 0.75, 2: 0.60, 3: 0.50, 4: 0.43, 5: 0.38, 6: 0.33, 7: 0.29, 8: 0.25, 9: 0.22, 10: 0.19,
       };
-      const factor = factors[Math.min(years, 10)] || Math.max(0.10, 0.19 - (years - 10) * 0.02);
+      const factor = years <= 10 ? factors[years] : Math.max(0.10, 0.19 - (years - 10) * 0.02);
       const remainingValue = orig * factor;
       const lossTotal = orig - remainingValue;
       const lossPerMonth = lossTotal / (years * 12);
@@ -836,8 +833,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         summaryText: `Nach ${years} Jahren hat das Fahrzeug ca. ${formatPercent((1 - factor) * 100, 1)} seines Wertes verloren. Der geschätzte Restwert beträgt ${formatCurrency(remainingValue)} (Wertverlust: ${formatCurrency(lossPerMonth)}/Monat).`,
       };
     },
-    formula: 'Restwert = Anschaffungspreis × Restwertfaktor nach Schwacke-Kurve',
-    formulaExplanation: 'Ein Neuwagen verliert im ersten Jahr rund 25 % seines Listenpreises. Nach drei Jahren ist ein Pkw meist nur noch rund 50 % des Neupreises wert.',
+    formula: 'Restwert = Anschaffungspreis × Restwertfaktor der pauschalen Durchschnittskurve',
+    formulaExplanation: 'Der Rechner unterstellt 25 % Wertverlust im ersten Jahr und 50 % nach drei Jahren. Das ist eine Durchschnittsannahme; Modell, Kilometerstand und Zustand können den echten Marktwert deutlich verschieben.',
     workedExample: {
       title: 'Beispiel: 35.000 € Neuwagen nach 4 Jahren',
       inputValues: [{ label: 'Neupreis', value: '35.000 €' }, { label: 'Alter', value: '4 Jahre' }],
@@ -846,7 +843,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Der Wertverlust ist der größte Einzelkostenblock bei Neu- und jungen Gebrauchtwagen in den ersten fünf Betriebsjahren.',
-      details: 'Faustformel für den Wertverlust: ca. 25 % im ersten Jahr, danach jährlich etwa 5 bis 8 % des Restwerts. Nach fünf Jahren ist ein Fahrzeug typischerweise nur noch rund 40 bis 45 % des ursprünglichen Listenpreises wert.',
+      details: 'Die hinterlegte Kurve: 75 % Restwert nach einem Jahr, 60 % nach zwei, 50 % nach drei, 43 % nach vier und 38 % nach fünf Jahren; nach zehn Jahren bleiben 19 %. Kilometerstand und Ausstattung fließen nicht ein.',
     },
     faqs: [
       { question: 'Welche Faktoren beschleunigen den Wertverlust eines Autos?', answer: 'Hohe jährliche Kilometerleistung, unpopuläre Farben, Raucherfahrzeuge, fehlende lückenlose Scheckheftpflege sowie drohende Fahrverbote oder Modellwechsel.' },
@@ -863,9 +860,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
     metaTitle: 'Bremsweg Rechner – Reaktionsweg, Bremsweg',
-    metaDescription: 'Berechnen Sie Reaktionsweg, Bremsweg und Anhalteweg nach den amtlichen Fahrschulformeln für Normalbremsung und Gefahrenbremsung.',
+    metaDescription: 'Berechnen Sie Reaktionsweg, Bremsweg und Anhalteweg nach den Faustformeln der Fahrschule für Normalbremsung und Gefahrenbremsung.',
     h1: 'Bremsweg Rechner – Anhalteweg & Reaktionsweg Formel',
-    shortDescription: 'Ermittelt den Brems- und Anhalteweg nach den amtlichen TÜV- und Fahrschulformeln.',
+    shortDescription: 'Ermittelt Reaktions-, Brems- und Anhalteweg nach den Faustformeln aus dem Fahrschulunterricht.',
     searchKeywords: ['bremsweg rechner', 'anhalteweg formel fahrschule', 'reaktionsweg geschwindigkeit berechnen', 'gefahrenbremsung bremsweg formel'],
     inputs: [
       { id: 'speedKmh', label: 'Fahrgeschwindigkeit in km/h', type: 'number', defaultValue: 100, min: 10, max: 300, step: 10, unit: 'km/h' },
@@ -1016,7 +1013,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
     metaTitle: 'Promillerechner – Alkohol Promille (Widmark-Formel)',
-    metaDescription: 'Berechnen Sie den Blutalkoholspiegel in Promille (‰) nach der wissenschaftlichen Widmark-Formel und ermitteln Sie die exakte Abbauzeit bis 0,0 Promille.',
+    metaDescription: 'Berechnen Sie den Blutalkoholspiegel in Promille (‰) nach der Widmark-Formel und schätzen Sie die rechnerische Abbauzeit bis 0,0 Promille.',
     h1: 'Promillerechner – Promillewert & Alkoholabbau berechnen',
     shortDescription: 'Ermittelt die Blutalkoholkonzentration nach Getränkemenge, Körpergewicht und Geschlecht.',
     searchKeywords: ['promillerechner widmark formel', 'alkohol promille berechnen rechner', 'wie lange dauert alkoholabbau', '0 5 promille grenze auto'],
@@ -1050,7 +1047,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const r = isMale ? 0.68 : 0.55;
       // Theoretischer Maximalwert
       const maxPromille = pureAlcoholGrams / (weight * r);
-      // Abbau im Körper ca. 0,15 ‰ pro Stunde (beginnend ca. 1 Std nach Trinkbeginn)
+      // Abbau im Körper ca. 0,15 ‰ pro Stunde (vereinfachend ab 0,5 Std nach Trinkbeginn)
       const degradedHours = Math.max(0, hours - 0.5);
       const currentPromille = Math.max(0, maxPromille - (degradedHours * 0.15));
       const hoursUntilSober = currentPromille / 0.15;
@@ -1058,11 +1055,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       return {
         primary: { id: 'currentPromille', label: 'Aktueller Promillewert', value: currentPromille, formattedValue: `${formatNumber(currentPromille, 2)} ‰`, highlight: true },
         secondary: [
-          { id: 'hoursUntilSober', label: 'Dauer bis zur vollständigen Nüchternheit', value: hoursUntilSober, formattedValue: `ca. ${formatNumber(hoursUntilSober, 1)} Stunden` },
+          { id: 'hoursUntilSober', label: 'Rechnerische Dauer bis 0,0 ‰ (Schätzung)', value: hoursUntilSober, formattedValue: `ca. ${formatNumber(hoursUntilSober, 1)} Stunden` },
           { id: 'pureAlcohol', label: 'Aufgenommener Reinalkohol', value: pureAlcoholGrams, formattedValue: `${formatNumber(pureAlcoholGrams, 1)} Gramm` },
           { id: 'maxPromille', label: 'Maximaler Spitzenwert', value: maxPromille, formattedValue: `${formatNumber(maxPromille, 2)} ‰` },
         ],
-        summaryText: `Ihr aktueller Blutalkoholspiegel liegt bei ca. ${formatNumber(currentPromille, 2)} ‰. Es dauert noch rund ${formatNumber(hoursUntilSober, 1)} Stunden, bis Sie wieder absolut fahrtüchtig sind (0,0 ‰).`,
+        summaryText: `Ihr aktueller Blutalkoholspiegel liegt bei ca. ${formatNumber(currentPromille, 2)} ‰. Rechnerisch dauert es noch rund ${formatNumber(hoursUntilSober, 1)} Stunden bis 0,0 ‰. Das ist eine grobe Schätzung und keine Aussage über Ihre Fahrtüchtigkeit.`,
       };
     },
     formula: 'Blutalkohol = Reinalkohol in g / (Körpergewicht in kg × Reduktionsfaktor) - Abbau',
@@ -1075,7 +1072,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Widmark-Formel berechnet die theoretische Blutalkoholkonzentration (BAK) in Promille anhand von getrunkener Alkoholmenge, Körpergewicht und Geschlecht.',
-      details: 'Formel: c = A / (p · r), wobei A die reine Alkoholmasse in Gramm ist, p das Körpergewicht und r der Reduktionsfaktor (0,70 bei Männern, 0,60 bei Frauen wegen höherem Körperfettanteil). Der biologische Abbau beträgt ca. 0,10 bis 0,15 ‰ pro Stunde.',
+      details: 'Formel: c = A / (p · r), wobei A die reine Alkoholmasse in Gramm ist, p das Körpergewicht und r der Reduktionsfaktor (im Rechner 0,68 bei Männern und 0,55 bei Frauen, wegen des im Mittel höheren Körperfettanteils). Der biologische Abbau beträgt ca. 0,10 bis 0,15 ‰ pro Stunde; der Rechner zieht 0,15 ‰ pro Stunde ab 30 Minuten nach Trinkbeginn ab.',
     },
     faqs: [
       { question: 'Kann man den Alkoholabbau durch Kaffee, Duschen oder Sport beschleunigen?', answer: 'Nein, die Leber baut Alkohol mit einer konstanten Rate von etwa 0,1 bis 0,15 Promille pro Stunde über das Enzym Alkoholdehydrogenase (ADH) ab; dieser biologische Prozess lässt sich nicht beschleunigen.' },
@@ -1087,12 +1084,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'anhaenger-stuetzlast-rechner',
     slug: 'anhaenger-stuetzlast-rechner',
-    name: 'Anhänger Stützlast & Anhängelast-Rechner (StVZO)',
+    name: 'Anhänger-Stützlast-Rechner (§ 44 StVZO)',
     shortName: 'Stützlast Anhänger',
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
     metaTitle: 'Anhänger-Stützlast-Rechner: Mindest- & Maximalstützlast',
-    metaDescription: 'Berechnen Sie die gesetzliche Mindeststützlast (4 % des tatsächlichen Anhängergewichts nach § 44 StVZO) und prüfen Sie die maximale Anhängelast.',
+    metaDescription: 'Berechnen Sie die gesetzliche Mindeststützlast (4 % des tatsächlichen Anhängergewichts nach § 44 StVZO) und die höchstzulässige Stützlast Ihres Gespanns.',
     h1: 'Anhänger Stützlast Rechner – Mindest- und Maximallast ermitteln',
     shortDescription: 'Prüft die vorschriftsmäßige Stützlast und Gewichtsverteilung für PKW-Anhänger und Wohnwagen.',
     searchKeywords: ['anhaenger stuetzlast rechner', 'mindeststuetzlast stvzo 4 prozent', 'anhaengelast pkw rechner', 'stuetzlast wohnwagen berechnen'],
@@ -1130,7 +1127,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Stützlast ist die vertikale Kraft, die die Anhängerdeichsel auf die Anhängerkupplung des Zugfahrzeugs ausübt, und ist essenziell für die Fahrstabilität.',
-      details: 'Die gesetzliche Mindeststützlast nach § 44 StVZO beträgt 4 Prozent des tatsächlichen Anhängergewichts (mindestens 25 kg). Weder die maximale Stützlast des PKW noch die des Anhängers darf überschritten werden.',
+      details: 'Die gesetzliche Mindeststützlast nach § 44 Abs. 3 StVZO beträgt 4 Prozent des tatsächlichen Gesamtgewichts des Anhängers, braucht aber nicht mehr als 25 kg zu betragen. Weder die maximale Stützlast des Pkw noch die des Anhängers darf überschritten werden.',
     },
     faqs: [
       { question: 'Was passiert bei zu geringer oder negativer Stützlast?', answer: 'Der Anhänger neigt schon bei geringen Geschwindigkeiten zum gefährlichen Schlingern und Ausbrechen, da die Hinterachse des Zugfahrzeugs entlastet wird.' },
@@ -1147,9 +1144,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'auto-verkehr',
     subcategory: 'Fahrt & Navigation',
     metaTitle: 'Reifenrechner – Abrollumfang & Tachoabweichung berechnen',
-    metaDescription: 'Berechnen Sie Abrollumfang, Durchmesser und die Tachoabweichung beim Wechsel auf neue Reifengrößen und Felgen gemäß ECE-Norm.',
+    metaDescription: 'Berechnen Sie Abrollumfang und Tachoabweichung beim Wechsel auf neue Reifengrößen und Felgen und sehen Sie, in welche Richtung sich die Tachoanzeige verschiebt.',
     h1: 'Reifenrechner – Abrollumfang & Tachoabweichung berechnen',
-    shortDescription: 'Vergleicht zwei Reifengrößen und prüft die gesetzliche Zulässigkeit der Tachoanzeige.',
+    shortDescription: 'Vergleicht zwei Reifengrößen und zeigt, wie sich Abrollumfang und Tachoanzeige verändern.',
     searchKeywords: ['reifenrechner abrollumfang', 'tachoabweichung berechnen neue reifen', 'reifengroesse felgen umrechnen', 'abrollumfang rechner tüv'],
     inputs: [
       { id: 'widthOld', label: 'Bisherige Reifenbreite in mm (z. B. 205)', type: 'number', defaultValue: 205, min: 135, max: 355, step: 10, unit: 'mm' },
@@ -1178,11 +1175,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const speedShownAt100 = 100 / (1 + (diffCircPct / 100));
       const tachoDiff = speedShownAt100 - 100;
 
+      // Der Rechner kennt die werksseitige Voreilung des Tachos nicht. Er zeigt nur, in welche Richtung
+      // sich die Anzeige gegenüber den bisherigen Reifen verschiebt; ob die Größe zulässig ist, regeln
+      // Fahrzeugpapiere, CoC bzw. Reifenfreigabe und ggf. die Prüforganisation.
       let permissible = true;
-      let reason = 'Gesetzlich im Rahmen (Tacho geht vor oder max. +10 % + 4 km/h)';
+      let reason = 'Tacho zeigt eher mehr an als bisher, die Anzeige wird nicht zu niedrig';
       if (tachoDiff < 0) {
         permissible = false;
-        reason = 'Unzulässig! Tacho darf nach § 57 StVZO niemals zu wenig anzeigen.';
+        reason = 'Tacho zeigt weniger an als mit den bisherigen Reifen; ob er dann noch vorgeht, hängt von seiner werksseitigen Voreilung ab';
       }
 
       return {
@@ -1190,22 +1190,22 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         secondary: [
           { id: 'speedShown', label: 'Tachoanzeige bei realen 100 km/h', value: speedShownAt100, formattedValue: `${formatNumber(speedShownAt100, 1)} km/h` },
           { id: 'circNew', label: 'Neuer Abrollumfang', value: circ2Mm, formattedValue: `${formatNumber(circ2Mm, 0)} mm` },
-          { id: 'status', label: 'TÜV-Zulässigkeit', value: 0, formattedValue: permissible ? 'Zulässig' : 'Tachoangleichung erforderlich!' },
+          { id: 'status', label: 'Tacho-Einschätzung', value: 0, formattedValue: permissible ? 'Anzeige verschiebt sich nach oben (unkritisch)' : 'Anzeige verschiebt sich nach unten (prüfen)' },
         ],
         summaryText: `Der Abrollumfang ändert sich um ${formatPercent(diffCircPct, 1)}. Bei real 100 km/h zeigt Ihr Tacho ${formatNumber(speedShownAt100, 1)} km/h an (${reason}).`,
       };
     },
     formula: 'Abrollumfang = [(2 × Flanke) + (Felge in Zoll × 25,4 mm)] × π',
-    formulaExplanation: 'Nach § 57 StVZO und ECE R39 darf der Tacho niemals nachgehen (zu wenig anzeigen) und maximal um 10 % + 4 km/h vorgehen.',
+    formulaExplanation: 'Für die Typgenehmigung verlangt die ECE-Regelung Nr. 39, dass der Tacho nie weniger als die tatsächliche Geschwindigkeit anzeigt und höchstens um 10 % + 4 km/h vorgeht. Der Rechner nimmt an, dass der Tacho mit den bisherigen Reifen exakt anzeigte.',
     workedExample: {
       title: 'Beispiel: 205/55 R16 auf 225/45 R17',
       inputValues: [{ label: 'Alt', value: '205/55 R16' }, { label: 'Neu', value: '225/45 R17' }],
-      steps: ['Durchmesser alt: 631,9 mm', 'Durchmesser neu: 634,3 mm', 'Umfangsdifferenz: nur +0,4 %', 'Tachoanzeige: 99,6 km/h bei echten 100 km/h'],
-      result: '+0,4 % Abweichung (unkritisch)',
+      steps: ['Durchmesser alt: 631,9 mm', 'Durchmesser neu: 634,3 mm', 'Umfangsdifferenz: +0,4 %', 'Tachoanzeige: 99,6 km/h bei echten 100 km/h, also 0,4 km/h weniger als mit den alten Reifen'],
+      result: '+0,4 % Abweichung (geringe Verschiebung nach unten)',
     },
     content: {
       intro: 'Beim Wechsel auf alternative Felgen- und Reifengrößen ermittelt dieser Rechner die Abweichung des Abrollumfangs und die resultierende Tachoabweichung.',
-      details: 'Nach ECE-Regelung 39 darf der Tacho niemals zu wenig anzeigen (Gefahr unbemerkter Geschwindigkeitsüberschreitung) und maximal um 10 % + 4 km/h nach oben abweichen. Bei Umfangsdifferenzen über -2,5 % oder +1,5 % ist meist eine Tachoangleichung Pflicht.',
+      details: 'Nach ECE-Regelung 39 darf der Tacho niemals zu wenig anzeigen (Gefahr unbemerkter Geschwindigkeitsüberschreitung) und maximal um 10 % + 4 km/h nach oben abweichen. Ob eine andere Reifengröße gefahren werden darf, ergibt sich nicht aus dem Abrollumfang allein, sondern aus den Fahrzeugpapieren, der Übereinstimmungsbescheinigung (CoC) oder einer Reifenfreigabe.',
     },
     faqs: [
       { question: 'Wie liest man eine Reifengröße wie 205/55 R16 ab?', answer: '205 ist die Reifenbreite in mm; 55 ist das Flankenverhältnis in Prozent der Breite (112,75 mm); R steht für Radialbauweise; 16 ist der Felgendurchmesser in Zoll.' },
@@ -1233,16 +1233,19 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'guaranteed',
         options: [
-          { value: 'guaranteed', label: 'Garantierte Festprämie (sofortige Auszahlung, ca. 90 - 110 €)' },
-          { value: 'variable', label: 'Variable Börsenprämie mit Risikoabzug (ca. 110 - 140 €)' },
+          { value: 'guaranteed', label: 'Festprämie (Beispielwert 95 €/Jahr)' },
+          { value: 'variable', label: 'Variable Prämie (Beispielwert 125 €/Jahr, nicht garantiert)' },
         ],
       },
       { id: 'holdingYears', label: 'Betrachtungszeitraum in Jahren', type: 'number', defaultValue: 3, min: 1, max: 8, step: 1, unit: 'Jahre' },
+      { id: 'customPremium', label: 'Prämie laut Ihrem Angebot (optional)', type: 'number', defaultValue: 0, min: 0, max: 1000, step: 5, unit: '€/Jahr', helpText: '0 = Beispielwert des gewählten Modells verwenden. Aktuelle Prämien nennen die Anbieter; sie ändern sich laufend.' },
     ],
     calculate: (inputs) => {
       const isGuaranteed = inputs.payoutModel === 'guaranteed';
       const years = parseInt(inputs.holdingYears, 10) || 3;
-      const yearlyAmount = isGuaranteed ? 95 : 125;
+      // 95 € / 125 € sind reine Beispielwerte, keine Marktpreise. Eine eigene Angebotsprämie hat Vorrang.
+      const custom = Math.max(0, parseFloat(inputs.customPremium) || 0);
+      const yearlyAmount = custom > 0 ? custom : isGuaranteed ? 95 : 125;
       const totalAmount = yearlyAmount * years;
 
       return {
@@ -1251,15 +1254,15 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { id: 'totalAmount', label: `Gesamtertrag über ${years} Jahre`, value: totalAmount, formattedValue: formatCurrency(totalAmount) },
           { id: 'monthlyEquivalent', label: 'Rechnerischer Monatsbeitrag', value: yearlyAmount / 12, formattedValue: formatCurrency(yearlyAmount / 12) },
         ],
-        summaryText: `Für Ihr E-Auto erhalten Sie jährlich ca. ${formatCurrency(yearlyAmount)} THG-Prämie (Summe über ${years} Jahre: ${formatCurrency(totalAmount)}).`,
+        summaryText: `Bei ${formatCurrency(yearlyAmount)} THG-Prämie pro Jahr${custom > 0 ? ' (Ihr Angebot)' : ' (Beispielwert)'} ergeben sich über ${years} Jahre ${formatCurrency(totalAmount)}.`,
       };
     },
     formula: 'Ertrag = Jährliche THG-Quote × Haltejahre',
-    formulaExplanation: 'Nach § 37a BImSchG müssen Mineralölkonzerne ihre CO2-Emissionen mindern oder Strafen zahlen. Halter reiner E-Autos können ihr eingespartes CO2 über THG-Vermittler verkaufen.',
+    formulaExplanation: 'Nach § 37a BImSchG müssen Unternehmen, die Kraftstoffe in Verkehr bringen, die Treibhausgasemissionen ihrer Kraftstoffe um eine gesetzliche Quote mindern; wer sie verfehlt, zahlt eine Abgabe. Strom für reine E-Autos kann darauf angerechnet werden, deshalb kaufen Vermittler die Quote von Haltern.',
     workedExample: {
-      title: 'Beispiel: Garantierte Festprämie über 3 Jahre Haltedauer',
-      inputValues: [{ label: 'Modell', value: 'Festprämie (95 €)' }, { label: 'Jahre', value: '3 Jahre' }],
-      steps: ['Jährlich = 95,00 €', 'Summe = 3 × 95,00 € = 285,00 € steuerfrei'],
+      title: 'Beispiel: Festprämie (Beispielwert) über 3 Jahre Haltedauer',
+      inputValues: [{ label: 'Modell', value: 'Festprämie (Beispielwert 95 €)' }, { label: 'Jahre', value: '3 Jahre' }],
+      steps: ['Jährlich = 95,00 € (Beispielwert)', 'Summe = 3 × 95,00 € = 285,00 €'],
       result: '285,00 € Gesamterlös',
     },
     content: {
@@ -1267,10 +1270,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       details: 'Mineralölkonzerne sind gesetzlich verpflichtet, ihre CO₂-Emissionen zu senken. Halter von E-Autos können ihr pauschaliertes CO₂-Einsparpotenzial an Zwischenhändler (Quotenvermittler) verkaufen.',
     },
     faqs: [
-      { question: 'Müssen Privatpersonen die THG-Quote versteuern?', answer: 'Nein, nach Verfügung des Bundesfinanzministeriums (BMF) sind Einnahmen aus der Veräußerung der THG-Quote bei im Privatvermögen gehaltenen Elektroautos vollkommen steuerfrei.' },
-      { question: 'Kann man die THG-Prämie auch für geleaste E-Autos beantragen?', answer: 'Ja, berechtigt ist derjenige, der im Fahrzeugschein (Zulassungsbescheinigung Teil I) als Fahrzeughalter eingetragen ist – bei Leasingverträgen ist das fast immer der Leasingnehmer.' },
+      { question: 'Müssen Privatpersonen die THG-Quote versteuern?', answer: 'Nach der 2022 bekannt gewordenen Auffassung der Finanzverwaltung ist die Prämie bei einem E-Auto im Privatvermögen nicht einkommensteuerpflichtig. Gehört das Fahrzeug zum Betriebsvermögen, ist sie eine Betriebseinnahme. Im Zweifel klärt das Finanzamt oder eine Steuerberatung den Einzelfall.' },
+      { question: 'Kann man die THG-Prämie auch für geleaste E-Autos beantragen?', answer: 'Ja, berechtigt ist derjenige, der in der Zulassungsbescheinigung Teil I als Halter eingetragen ist. Bei privaten Leasingverträgen ist das in der Regel der Leasingnehmer; ein Blick in die Zulassungsbescheinigung klärt es.' },
     ],
-    relatedSlugs: ['elektroauto-ladekosten-rechner', 'elektroauto-ladekosten-rechner', 'kfz-steuer-rechner'],
+    relatedSlugs: ['elektroauto-ladekosten-rechner', 'kfz-steuer-rechner', 'auto-gesamtkosten-rechner'],
   },
 
   {
@@ -1490,7 +1493,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
   {
     id: 'hybrid-auto-kosten-rechner',
     slug: 'hybrid-auto-kosten-rechner',
-    name: 'Plug-in-Hybrid-Rechner (Benzin vs. Strom & 0,5 % Regel)',
+    name: 'Plug-in-Hybrid-Rechner (Strom- vs. Benzinkosten)',
     shortName: 'Hybrid Auto Kosten',
     category: 'auto-verkehr',
     subcategory: 'Kosten & Steuern',
@@ -1508,7 +1511,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       { id: 'yearlyMileageKm', label: 'Jährliche Gesamtfahrleistung in km', type: 'number', defaultValue: 15000, min: 2000, step: 1000, unit: 'km' },
     ],
     calculate: (inputs) => {
-      const elPct = (parseFloat(inputs.electricSharePct) || 60) / 100;
+      // 0 % E-Anteil ist ein gültiger Wert (Akku wird nie geladen) und darf nicht auf 60 % zurückfallen.
+      const elPctRaw = parseFloat(inputs.electricSharePct);
+      const elPct = Math.min(100, Math.max(0, Number.isFinite(elPctRaw) ? elPctRaw : 60)) / 100;
       const elKwh = parseFloat(inputs.electricKwh100Km) || 20;
       const gasLiters = parseFloat(inputs.fuelLiters100Km) || 7.5;
       const powerCent = parseFloat(inputs.powerPriceCent) || 34;
@@ -1530,7 +1535,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { id: 'costEl100', label: 'Reine Stromkosten auf 100 km (E-Modus)', value: costEl100, formattedValue: formatCurrency(costEl100) },
           { id: 'costGas100', label: 'Reine Benzinkosten auf 100 km (Verbrenner-Modus)', value: costGas100, formattedValue: formatCurrency(costGas100) },
         ],
-        summaryText: `Bei ${formatPercent(elPct * 100, 0)} Elektroanteil zahlen Sie im Schnitt ${formatCurrency(mixedCost100)} auf 100 km. Das spart jährlich ca. ${formatCurrency(yearlySaving)} gegenüber reinem Benzinbetrieb.`,
+        summaryText: `Bei ${formatPercent(elPct * 100, 0)} Elektroanteil zahlen Sie im Schnitt ${formatCurrency(mixedCost100)} auf 100 km. ${yearlySaving >= 0 ? `Das spart jährlich ca. ${formatCurrency(yearlySaving)} gegenüber reinem Benzinbetrieb.` : `Das kostet jährlich ca. ${formatCurrency(-yearlySaving)} mehr als reiner Benzinbetrieb, weil der Strompreis pro 100 km höher liegt.`}`,
       };
     },
     formula: 'Mischkosten/100km = (Stromkosten/100km × E-Quote) + (Benzinkosten/100km × Verbrennerquote)',
@@ -1546,8 +1551,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       details: 'Kosten = (E-Anteil · Stromkosten/100 km) + (Benzin-Anteil · Spritkosten/100 km). Plug-in-Hybride sind wirtschaftlich nur dann sinnvoll, wenn sie regelmäßig an der heimischen Steckdose geladen und überwiegend im E-Modus bewegt werden.',
     },
     faqs: [
-      { question: 'Warum verbrauchen Plug-in-Hybride auf Langstrecken oft mehr als reine Verbrenner?', answer: 'Weil auf der Autobahn nach Entleerung des Akkus das hohe Zusatzgewicht der Batterie (oft 200 bis 400 kg) permanent mit dem Verbrennungsmotor mitgeschleppt werden muss.' },
-      { question: 'Wann qualifiziert sich ein Plug-in-Hybrid für das E-Kennzeichen?', answer: 'Er muss entweder maximal 50 Gramm CO₂ pro Kilometer ausstoßen oder eine rein elektrische Mindestreichweite von mindestens 80 Kilometern aufweisen.' },
+      { question: 'Warum verbrauchen Plug-in-Hybride auf Langstrecken oft mehr als reine Verbrenner?', answer: 'Weil nach Entleerung des Akkus das Zusatzgewicht von Batterie und Elektromotor allein vom Verbrennungsmotor mitbewegt werden muss. Der Rechner bildet das über den Benzinverbrauch bei leerem Akku ab; tragen Sie dort Ihren realen Langstreckenwert ein.' },
+      { question: 'Wann qualifiziert sich ein Plug-in-Hybrid für das E-Kennzeichen?', answer: 'Nach § 3 Abs. 2 EmoG muss er laut Übereinstimmungsbescheinigung höchstens 50 g CO₂ pro km ausstoßen oder rein elektrisch mindestens 40 km weit kommen. Das EmoG tritt nach § 8 Abs. 2 mit Ablauf des 31.12.2026 außer Kraft, sofern es nicht verlängert wird. Die 80-km-Grenze betrifft dagegen die 0,5-%-Regel für Dienstwagen.' },
     ],
     relatedSlugs: ['dienstwagen-1-prozent-rechner', 'spritkostenrechner', 'elektroauto-ladekosten-rechner'],
   },
@@ -1607,12 +1612,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       result: '80,86 € pro Person im Monat',
     },
     content: {
-      intro: 'Dieser Kostenverteiler teilt Kraftstoff- und Abnutzungskosten von Fahrgemeinschaften unter Berücksichtigung von Umwegen und wechselnden Mitfahrern auf.',
-      details: 'Kosten pro Mitfahrer = Gesamtkosten / Personenanzahl. Rechtlich gilt: Das Mitnehmen von Kollegen gegen reine Kostenbeteiligung stellt keinen gewerblichen Personentransport nach dem Personenbeförderungsgesetz (PBefG) dar.',
+      intro: 'Dieser Kostenverteiler teilt Kraftstoff- und Abnutzungskosten einer festen Pendler-Fahrgemeinschaft gleichmäßig auf alle Insassen einschließlich Fahrer auf.',
+      details: 'Kosten pro Mitfahrer = Gesamtkosten / Personenanzahl. Rechtlich gilt: Nach § 1 Abs. 2 Satz 1 Nr. 1 PBefG fällt die Mitnahme im Pkw nicht unter das Personenbeförderungsgesetz, wenn sie unentgeltlich ist oder das Gesamtentgelt je gefahrenem Kilometer den Betrag nach § 5 Abs. 2 Satz 1 Bundesreisekostengesetz (30 Cent) nicht übersteigt.',
     },
     faqs: [
-      { question: 'Sind Mitfahrer in einer Fahrgemeinschaft bei Unfällen versichert?', answer: 'Ja, Mitfahrer sind über die gesetzliche Kfz-Haftpflichtversicherung des Fahrers geschützt. Auf dem direkten Arbeitsweg greift zudem die gesetzliche Unfallversicherung (Berufsgenossenschaft).' },
-      { question: 'Darf der Fahrer mehr Geld verlangen, als der Sprit kostet?', answer: 'Eine Kostenbeteiligung an Sprit und Verschleiß (z. B. 0,20 bis 0,30 € pro Personenkilometer) ist zulässig; ein Gewinn darf jedoch nicht erzielt werden, da sonst der Versicherungsschutz erlöschen kann.' },
+      { question: 'Sind Mitfahrer in einer Fahrgemeinschaft bei Unfällen versichert?', answer: 'Ja, Personenschäden der Mitfahrer deckt die Kfz-Haftpflichtversicherung des Fahrzeugs. Auf dem Arbeitsweg greift zudem die gesetzliche Unfallversicherung; nach § 8 Abs. 2 Nr. 2 Buchst. b SGB VII bleibt auch ein Umweg versichert, der nötig ist, um Kollegen für die Fahrgemeinschaft abzuholen.' },
+      { question: 'Darf der Fahrer mehr Geld verlangen, als der Sprit kostet?', answer: 'Ja, aber begrenzt: Das Personenbeförderungsgesetz greift nicht, solange alle Mitfahrer zusammen höchstens 30 Cent je gefahrenem Kilometer zahlen (§ 1 Abs. 2 PBefG i. V. m. § 5 Abs. 2 BRKG). Wer mehr kassiert, bewegt sich in Richtung genehmigungspflichtiger Personenbeförderung; Fragen zum Versicherungsschutz klären Sie dann mit Ihrem Kfz-Versicherer.' },
     ],
     relatedSlugs: ['pendlerpauschale-rechner', 'spritkostenrechner', 'fahrtkostenrechner'],
   },
@@ -1847,8 +1852,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const l100 = inputs.fuelConsumptionL100 !== undefined && inputs.fuelConsumptionL100 !== '' ? Math.max(0, parseFloat(inputs.fuelConsumptionL100) || 0) : 4.8;
       const maint = inputs.maintenanceYearly !== undefined && inputs.maintenanceYearly !== '' ? Math.max(0, parseFloat(inputs.maintenanceYearly) || 0) : 350;
 
-      // Motorradsteuer: 1,84 € je angefangene 25 cm³ Hubraum p.a.
-      const fullTax = Math.ceil(cc / 25) * 1.84;
+      // Motorradsteuer: 1,84 € je angefangene 25 cm³ Hubraum p.a. (§ 9 Abs. 1 Nr. 1 KraftStG).
+      // Leichtkrafträder (bis 125 cm³, max. 11 kW) sind zulassungsfrei (§ 3 Abs. 3 Nr. 1 Buchst. c FZV)
+      // und damit nach § 3 Nr. 1 KraftStG steuerfrei.
+      const fullTax = cc <= 125 ? 0 : Math.ceil(cc / 25) * 1.84;
       const seasonTax = fullTax * (months / 12);
       const seasonInsurance = insFull * (months / 12);
       const fuelCost = (km / 100) * l100 * 1.80; // ca. 1,80 €/l Super
@@ -1867,7 +1874,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       };
     },
     formula: 'Saisonkosten = (Steuer + Versicherung) × (Monate / 12) + Sprit + Wartung',
-    formulaExplanation: 'Motorräder zahlen 1,84 € KFZ-Steuer je angefangene 25 cm³ Hubraum jährlich. Bei Saisonkennzeichen werden Steuer und Versicherung taggenau anteilig berechnet.',
+    formulaExplanation: 'Motorräder über 125 cm³ zahlen 1,84 € Kfz-Steuer je angefangene 25 cm³ Hubraum jährlich; Leichtkrafträder bis 125 cm³ setzt der Rechner steuerfrei an. Steuer und Versicherung werden monatsanteilig gerechnet, der Sprit mit festen 1,80 € je Liter.',
     workedExample: {
       title: 'Beispiel: 650 cm³ Bike für 8 Monate Saison bei 5.000 km',
       inputValues: [{ label: 'Hubraum', value: '650 cm³' }, { label: 'Saison', value: '8 Monate' }, { label: 'Kilometer', value: '5.000 km' }],
@@ -1876,11 +1883,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Rechner kalkuliert die jährlichen Fix- und Betriebskosten eines Motorrads inklusive Saisonkennzeichen, Haftpflicht, Teilkasko, Reifenverschleiß und Service.',
-      details: 'Motorradreifen haben durch die weicheren Gummimischungen eine deutlich kürzere Lebensdauer als Autoreifen (oft nur 4.000 bis 8.000 km), was die kilometerabhängigen Kosten dominiert.',
+      details: 'Motorradreifen halten wegen weicherer Gummimischungen meist deutlich weniger Kilometer als Autoreifen. Wer viel fährt, sollte die Reifenkosten deshalb großzügig im Feld für Wartung, Reifen und TÜV ansetzen.',
     },
     faqs: [
-      { question: 'Wie viel spart ein Saisonkennzeichen beim Motorrad?', answer: 'Bei Zulassung von z. B. April bis Oktober (7 Monate) zahlen Sie genau 7/12 der jährlichen Kfz-Steuer und Versicherungsprämie; in den Ruhemonaten besteht beitragsfreie Ruheversicherung.' },
-      { question: 'Wie berechnet sich die Kfz-Steuer für Motorräder?', answer: 'Nach § 8 KraftStG zahlen Motorräder über 125 cm³ Hubraum 1,84 € je angefangene 25 cm³ Hubraum pro vollem Kalenderjahr.' },
+      { question: 'Wie viel spart ein Saisonkennzeichen beim Motorrad?', answer: 'Die Kfz-Steuer fällt bei Zulassung von z. B. April bis Oktober nur für diese 7 Monate an. Bei der Versicherung kalkulieren viele Versicherer einen eigenen Saisontarif, der nicht immer genau 7/12 des Jahresbeitrags beträgt; der Rechner nimmt vereinfachend den anteiligen Betrag an.' },
+      { question: 'Wie berechnet sich die Kfz-Steuer für Motorräder?', answer: 'Nach § 9 Abs. 1 Nr. 1 KraftStG kosten Krafträder mit Hubkolbenmotor 1,84 € je angefangene 25 cm³ Hubraum im Jahr. Leichtkrafträder bis 125 cm³ sind zulassungsfrei und dadurch nach § 3 Nr. 1 KraftStG von der Steuer befreit.' },
     ],
     relatedSlugs: ['kfz-steuer-rechner', 'spritkostenrechner', 'bremsweg-rechner'],
   },
