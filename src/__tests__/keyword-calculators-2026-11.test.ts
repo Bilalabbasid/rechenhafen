@@ -185,3 +185,60 @@ describe('pq-Formel-Rechner', () => {
     }
   });
 });
+
+describe('Brutto-Netto-Rechner: Stundenlohn, Werkstudent, Übergangsbereich, Minijob', () => {
+  const base = { taxYear: '2026', taxClass: '1', children: '0', age: 30, federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 };
+  const bn = (inp: Record<string, any>) => run('brutto-netto-rechner', { ...base, ...inp });
+  const val = (r: any, id: string) => Number(r.secondary.find((s: any) => s.id === id)?.value);
+
+  it('hourly wage × weekly hours × 13/3 gives the same result as the monthly salary', () => {
+    const hourly = bn({ grossSalary: 15, period: 'hour', weeklyHours: 40 });
+    const monthly = bn({ grossSalary: 2600, period: 'month' });
+    expect(val(hourly, 'monthlyGross')).toBeCloseTo(2600, 6);
+    expect(Number(hourly.primary.value)).toBeCloseTo(Number(monthly.primary.value), 6);
+    expect(val(hourly, 'hourlyNet')).toBeCloseTo(Number(monthly.primary.value) / (40 * 13 / 3), 6);
+    expect(bn({ grossSalary: 15, period: 'hour', weeklyHours: 0 }).error).toBeDefined();
+  });
+
+  it('regular salaries above 2.000 € are unchanged by the new rules', () => {
+    const r = bn({ grossSalary: 3800, period: 'month' });
+    expect(val(r, 'socialTotal')).toBeCloseTo(3800 * (0.093 + 0.013 + (0.146 + 0.029) / 2 + 0.024), 1);
+  });
+
+  it('Übergangsbereich: same employee contributions as the Midijob-Rechner, no jump at 2.000 €', () => {
+    const r = bn({ grossSalary: 1500, period: 'month', children: '1' });
+    const midi = run('midijob-rechner', { earnings: 1500, taxYear: '2026' });
+    const midiSocial = Number(midi.secondary!.find((s) => /Sozialabgaben/.test(s.label))!.value);
+    expect(val(r, 'socialTotal')).toBeCloseTo(midiSocial, 2);
+    const a = Number(bn({ grossSalary: 2000, period: 'month' }).primary.value);
+    const b = Number(bn({ grossSalary: 2001, period: 'month' }).primary.value);
+    expect(Math.abs(b - a)).toBeLessThan(2);
+  });
+
+  it('Werkstudent pays only pension insurance', () => {
+    const r = bn({ grossSalary: 2500, period: 'month', employmentType: 'werkstudent', age: 22 });
+    expect(val(r, 'krankenversicherung')).toBe(0);
+    expect(val(r, 'pflegeversicherung')).toBe(0);
+    expect(val(r, 'arbeitslosenversicherung')).toBe(0);
+    expect(val(r, 'rentenversicherung')).toBeCloseTo(2500 * 0.093, 6);
+    // in the Übergangsbereich the pension contribution is reduced
+    const low = bn({ grossSalary: 1200, period: 'month', employmentType: 'werkstudent', age: 22 });
+    expect(val(low, 'rentenversicherung')).toBeLessThan(1200 * 0.093);
+    expect(val(low, 'lohnsteuer')).toBe(0);
+  });
+
+  it('up to 603 € it is a Minijob: no wage tax, only 3,6 % pension insurance', () => {
+    const r = bn({ grossSalary: 500, period: 'month' });
+    expect(val(r, 'lohnsteuer')).toBe(0);
+    expect(val(r, 'socialTotal')).toBeCloseTo(18, 6);
+    expect(r.warning).toMatch(/Minijob/);
+  });
+
+  it('page texts and FAQs carry numbers from the engine', () => {
+    const c = getCalculatorBySlug('brutto-netto-rechner')!;
+    expect(c.metaTitle).toMatch(/Stundenlohn/);
+    expect(c.metaTitle).toMatch(/Werkstudent/);
+    const net15 = bn({ grossSalary: 15, period: 'hour', weeklyHours: 40 }).primary.formattedValue!;
+    expect(c.faqs.find((f) => f.question.includes('15 € Stundenlohn'))!.answer).toContain(net15);
+  });
+});

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 import { RETIRED_CALCULATORS, isCalculatorRetired } from '@/data/seo/retired-calculators';
 import { TAX_CONFIG_2025 } from '@/data/regulated/tax';
-import { calculateNettoBrutto } from '@/lib/calculators/steuernGehalt';
+import { calculateNettoBrutto, calculateBruttoNetto } from '@/lib/calculators/steuernGehalt';
 import type { CalculationResult, CalculatorDefinition } from '@/types/calculator';
 
 /**
@@ -51,7 +51,7 @@ describe('brutto-netto-rechner absorbs sozialabgaben-rechner', () => {
     expect(val(res, 'rentenversicherung')).toBeCloseTo(3800 * 0.093, 8);
     expect(val(res, 'arbeitslosenversicherung')).toBeCloseTo(3800 * 0.013, 8);
     expect(val(res, 'socialTotal')).toBeCloseTo(826.5, 8);
-    expect(Number(res.primary.value)).toBeCloseTo(2492.25, 8);
+    expect(Number(res.primary.value)).toBeCloseTo(2497.42, 8);
     expect(item(res, 'krankenversicherung')?.helpText).toContain('Zusatzbeitrag');
     expect(item(res, 'pflegeversicherung')?.helpText).toContain('Kinderlosenzuschlag');
     // AG details stay hidden by default, AG total is always shown
@@ -72,7 +72,7 @@ describe('brutto-netto-rechner absorbs sozialabgaben-rechner', () => {
     expect(val(res, 'employerTotal')).toBeCloseTo(3800 + 803.7 + 110.2, 8);
     expect(val(res, 'employerTotalYear')).toBeCloseTo(4713.9 * 12, 6);
     // Netto unverändert durch den Schalter
-    expect(Number(res.primary.value)).toBeCloseTo(2492.25, 8);
+    expect(Number(res.primary.value)).toBeCloseTo(2497.42, 8);
     // String 'true' from URL state works too
     expect(item(bn.calculate({ ...base, showEmployerShare: 'true' }), 'agSocialTotal')).toBeDefined();
   });
@@ -82,14 +82,14 @@ describe('brutto-netto-rechner absorbs sozialabgaben-rechner', () => {
     expect(val(res, 'pflegeversicherung')).toBeCloseTo(4000 * (0.023 - 2 * 0.0025), 8); // 72 €
     expect(val(res, 'pvKinderAnpassung')).toBeCloseTo(-20, 8);
     expect(val(res, 'agPflegeversicherung')).toBeCloseTo(4000 * 0.013, 8);
-    // Lohnsteuer: VSP = 48.000 × (9,3 % + 8,6 % + 2,3 %) = 9.696 €; zvE = 48.000 − 1.230 − 36 − 9.696 = 37.038 €
-    const z = (37038 - 17799) / 10000;
+    // Lohnsteuer (PAP 2026): VSP = 48.000 × (9,3 % + 8,45 % + 2,3 % − 2 × 0,25 %) = 9.384 €; zvE = 48.000 − 1.230 − 36 − 9.384 = 37.350 €
+    const z = (37350 - 17799) / 10000;
     const est = Math.floor((173.1 * z + 2397) * z + 1034.87);
-    expect(est).toBe(6287);
+    expect(est).toBe(6382);
     const lst = Math.round((est / 12) * 100) / 100;
     expect(val(res, 'lohnsteuer')).toBeCloseTo(lst, 8);
     expect(Number(res.primary.value)).toBeCloseTo(4000 - (350 + 72 + 372 + 52) - lst, 8);
-    expect(Number(res.primary.value)).toBeCloseTo(2630.08, 8);
+    expect(Number(res.primary.value)).toBeCloseTo(2622.17, 8);
   });
 
   it('caps the PV Kinderabschlag at four children (5 Kinder → 0,8 %) and handles 1 child / under 23', () => {
@@ -141,10 +141,15 @@ describe('brutto-netto-rechner absorbs sozialabgaben-rechner', () => {
     const huge = bn.calculate({ ...base, grossSalary: 10_000_000 });
     expect(Number.isFinite(Number(huge.primary.value))).toBe(true);
     // Leerer Zusatzbeitrag → amtlicher Durchschnitt
-    expect(Number(bn.calculate({ ...base, kvZusatzbeitrag: '' }).primary.value)).toBeCloseTo(2492.25, 8);
+    expect(Number(bn.calculate({ ...base, kvZusatzbeitrag: '' }).primary.value)).toBeCloseTo(2497.42, 8);
     // Netto-Brutto-Inversion nutzt dieselbe Engine weiter
     const inv = calculateNettoBrutto({ desiredNet: 2500, taxClass: '1', taxYear: '2026' });
-    expect(Number(inv.primary.value)).toBeCloseTo(3814.28, 0);
+    // Round trip: the gross found by the inversion gives back 2.500 € net
+    const gross = Number(inv.primary.value);
+    expect(gross).toBeGreaterThan(3700);
+    expect(gross).toBeLessThan(3900);
+    const back = calculateBruttoNetto({ desiredNet: 2500, taxClass: '1', taxYear: '2026', grossSalary: gross, period: 'month' });
+    expect(Number(back.primary.value)).toBeCloseTo(2500, 0);
   });
 });
 

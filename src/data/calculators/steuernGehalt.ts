@@ -18,6 +18,59 @@ import {
 } from '@/lib/calculators/steuernGehalt';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 
+// Stundenlohn- und Werkstudent-Beispiele: mit derselben Funktion berechnet wie das Rechnerergebnis.
+const BN_DEFAULTS = { taxYear: '2026', taxClass: '1', children: '0', age: 30, federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 };
+function bnExample(inputs: Record<string, any>) {
+  const r = calculateBruttoNetto({ ...BN_DEFAULTS, ...inputs });
+  const find = (id: string) => r.secondary?.find((x) => x.id === id);
+  return { gross: find('monthlyGross')?.formattedValue ?? '', net: r.primary.formattedValue ?? '', perHour: find('hourlyNet')?.formattedValue ?? '' };
+}
+const BN_HOUR: Record<number, ReturnType<typeof bnExample>> = Object.fromEntries(
+  [13.9, 15, 18, 20, 25].map((h) => [h, bnExample({ grossSalary: h, period: 'hour', weeklyHours: 40 })]),
+);
+const BN_WS: Record<number, ReturnType<typeof bnExample>> = Object.fromEntries(
+  [800, 1200, 1600, 2000, 2500].map((g) => [g, bnExample({ grossSalary: g, period: 'month', employmentType: 'werkstudent', age: 22 })]),
+);
+// Höchstes Monatsbrutto (in 10-€-Schritten), bei dem ein Werkstudent in Steuerklasse 1 keine Lohnsteuer zahlt.
+const WS_TAXFREE_UP_TO = (() => {
+  let last = 0;
+  for (let g = 610; g <= 2500; g += 10) {
+    const r = calculateBruttoNetto({ ...BN_DEFAULTS, age: 22, grossSalary: g, period: 'month', employmentType: 'werkstudent' });
+    if (Number(r.secondary?.find((x) => x.id === 'lohnsteuer')?.value ?? 1) === 0) last = g;
+    else break;
+  }
+  return formatCurrency(last).replace(',00', '');
+})();
+function bnDetail(inputs: Record<string, any>) {
+  const full = { ...BN_DEFAULTS, ...inputs };
+  const r = calculateBruttoNetto(full);
+  const f = (id: string) => r.secondary?.find((x) => x.id === id)?.formattedValue ?? '';
+  return {
+    inputs: full,
+    net: r.primary.formattedValue ?? '',
+    gross: f('monthlyGross'), perHour: f('hourlyNet'),
+    social: f('socialTotal'), rv: f('rentenversicherung'), av: f('arbeitslosenversicherung'), kv: f('krankenversicherung'), pv: f('pflegeversicherung'),
+    lst: f('lohnsteuer'), solz: f('solidaritaetszuschlag') || f('solz'),
+    vsp: formatCurrency(Number(r.taxDetails?.vorsorgepauschale ?? 0)).replace(',00', ''),
+    agKv: f('agKrankenversicherung'), agPv: f('agPflegeversicherung'), agRv: f('agRentenversicherung'), agAv: f('agArbeitslosenversicherung'),
+    agSocial: f('agSocialTotal'), umlagen: f('agUmlagen'), employerTotal: f('employerTotal'), employerTotalYear: f('employerTotalYear'),
+  };
+}
+const BN_EX = {
+  main: bnDetail({ grossSalary: 3800, period: 'month' }),
+  y2025: bnDetail({ grossSalary: 3800, period: 'month', taxYear: '2025', kvZusatzbeitrag: 2.5 }),
+  employer: bnDetail({ grossSalary: 3800, period: 'month', showEmployerShare: true }),
+  sachsen: bnDetail({ grossSalary: 4000, period: 'month', taxClass: '4', children: '3', age: 38, federalState: 'sachsen' }),
+  hourly: bnDetail({ grossSalary: 15, period: 'hour', weeklyHours: 40 }),
+  werkstudent: bnDetail({ grossSalary: 1200, period: 'month', employmentType: 'werkstudent', age: 22 }),
+};
+const STUNDENLOHN_TABLE =
+  'Beispiele für 40 Wochenstunden, Steuerklasse 1, keine Kinder (2026):\n' +
+  [13.9, 15, 18, 20, 25].map((h) => `- **${formatCurrency(h)} pro Stunde:** ${BN_HOUR[h].gross} brutto → ${BN_HOUR[h].net} netto im Monat (${BN_HOUR[h].perHour} netto pro Stunde)`).join('\n');
+const WERKSTUDENT_TABLE =
+  'Beispiele Werkstudent, Steuerklasse 1 (2026):\n' +
+  [800, 1200, 1600, 2000, 2500].map((g) => `- **${BN_WS[g].gross} brutto:** ${BN_WS[g].net} netto`).join('\n');
+
 // Abfindungsrechner: Beispiele und Tabelle werden mit derselben Funktion erzeugt wie das Rechnerergebnis.
 function abfindungSecondary(r: ReturnType<typeof calculateAbfindung>, id: string): number {
   return (r.secondary?.find((x) => x.id === id)?.value as number) ?? 0;
@@ -57,9 +110,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Brutto-Netto-Rechner',
     category: 'steuern-gehalt',
     subcategory: 'Gehalt & Lohn',
-    metaTitle: 'Brutto-Netto-Rechner 2026 mit Sozialabgaben AN & AG',
-    metaDescription: 'Kostenloser Brutto-Netto-Rechner 2026: Netto, Lohnsteuer und jede Sozialabgabe einzeln – KV, PV, RV, AV – auf Wunsch mit Arbeitgeberanteil.',
-    h1: 'Brutto-Netto-Rechner 2026: Nettogehalt und Sozialabgaben berechnen',
+    metaTitle: 'Brutto-Netto-Rechner 2026: Gehalt, Stundenlohn, Werkstudent',
+    metaDescription: 'Kostenloser Brutto-Netto-Rechner 2026: Netto aus Gehalt oder Stundenlohn, auch für Werkstudenten und Midijobs – mit Lohnsteuer und jeder Sozialabgabe.',
+    h1: 'Brutto-Netto-Rechner 2026: Nettogehalt berechnen – auch für Stundenlohn und Werkstudenten',
     shortDescription: 'Berechnet Ihr Nettogehalt nach Steuerklasse und zeigt jede Sozialabgabe einzeln: Kranken- und Pflegeversicherung mit Zusatzbeitrag und Kinderzuschlag, Renten- und Arbeitslosenversicherung. Auf Wunsch mit Arbeitgeberanteil und Arbeitgeber-Gesamtkosten.',
     searchKeywords: [
       'brutto netto rechner',
@@ -74,6 +127,15 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       'krankenversicherung arbeitnehmer anteil',
       'kinderlosenzuschlag pflegeversicherung',
       'kirchensteuer rechner',
+      'netto gehaltsrechner',
+      'gehalt netto rechner',
+      'brutto netto rechner stundenlohn',
+      'stundenlohn netto rechner',
+      'netto stundenlohn berechnen',
+      'brutto netto rechner werkstudent',
+      'werkstudent netto rechner',
+      'brutto netto werkstudent',
+      'midijob brutto netto',
     ],
     inputs: [
       {
@@ -94,6 +156,8 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         min: 100,
         step: 50,
         unit: '€',
+        conditionalLabels: [{ condition: { field: 'period', value: 'hour' }, label: 'Stundenlohn brutto', unit: '€/h' }],
+        convertOnChange: { field: 'period', factors: { month: 1, year: 12, hour: 3 / 520 }, decimals: 2 },
       },
       {
         id: 'period',
@@ -103,7 +167,31 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         options: [
           { value: 'month', label: 'Monatlich' },
           { value: 'year', label: 'Jährlich' },
+          { value: 'hour', label: 'Stundenlohn' },
         ],
+      },
+      {
+        id: 'weeklyHours',
+        label: 'Wochenstunden',
+        type: 'number',
+        defaultValue: 40,
+        min: 1,
+        max: 80,
+        step: 0.5,
+        unit: 'h',
+        helpText: 'Vertragliche Arbeitszeit pro Woche. Der Monat wird wie in der Lohnabrechnung mit 13/3 ≈ 4,33 Wochen gerechnet.',
+        dependsOn: { field: 'period', value: 'hour' },
+      },
+      {
+        id: 'employmentType',
+        label: 'Beschäftigung',
+        type: 'select',
+        defaultValue: 'standard',
+        options: [
+          { value: 'standard', label: 'Arbeitnehmer (regulär)' },
+          { value: 'werkstudent', label: 'Werkstudent (im Semester max. 20 Std./Woche)' },
+        ],
+        helpText: 'Werkstudenten zahlen nur Rentenversicherung, keine Kranken-, Pflege- und Arbeitslosenversicherung. Bis 603 € im Monat gilt in jedem Fall der Minijob.',
       },
       {
         id: 'taxClass',
@@ -177,6 +265,18 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         ],
       },
       {
+        id: 'pkvMonthly',
+        label: 'PKV-Beitrag pro Monat (Kranken- und Pflegeversicherung)',
+        type: 'number',
+        defaultValue: 0,
+        min: 0,
+        max: 3000,
+        step: 10,
+        unit: '€',
+        helpText: 'Gesamtbeitrag laut Versicherungsschein. Der Arbeitgeber zahlt davon die Hälfte, höchstens rund 613 € (2026). Der Eigenanteil mindert Netto und Lohnsteuer.',
+        dependsOn: { field: 'healthInsuranceType', value: 'private' },
+      },
+      {
         id: 'kvZusatzbeitrag',
         label: 'GKV-Zusatzbeitragssatz',
         type: 'number',
@@ -200,34 +300,50 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Vom Bruttogehalt werden die Sozialversicherungsbeiträge des Arbeitnehmers bis zur Beitragsbemessungsgrenze abgezogen: KV 7,3 % plus halber Zusatzbeitrag, PV 1,8 % (Sachsen 2,3 %) plus 0,6 % Kinderlosenzuschlag oder minus 0,25 Punkte je Kind ab dem zweiten, RV 9,3 %, AV 1,3 %. Die Lohnsteuer folgt dem Tarif nach § 32a EStG nach Abzug der Vorsorgepauschale (§ 39b EStG), des Arbeitnehmer-Pauschbetrags und des Sonderausgaben-Pauschbetrags. Der Arbeitgeber zahlt dieselben Anteile für KV, RV und AV, bei der PV ohne Kinderlosenzuschlag, dazu Umlagen.',
     workedExample: {
       title: 'Beispiel: 3.800 € Monatsbrutto in Steuerklasse 1, kinderlos (2026)',
-      description: 'Vollständige Eingabeparameter: 3.800 € Monatsbrutto (45.600 € jährlich), Steuerklasse 1, keine Kinder, Alter 30 Jahre, gesetzlich versichert (GKV) mit dem durchschnittlichen Zusatzbeitrag 2026 von 2,9 %, Bundesland Standard, keine Kirchensteuer (Abrechnungsjahr 2026).\n- Sozialabgaben AN: RV (9,3 % = 353,40 €), AV (1,3 % = 49,40 €), KV (8,75 % = 332,50 €), PV (2,4 % = 91,20 € inkl. 0,6 % Kinderlosenzuschlag). Gesamt-SV: 826,50 € monatlich.\n- Vorsorgepauschale nach § 39b EStG: 8.983 € jährlich (RV 4.240,80 € + KV/PV 4.742,40 €).\n- Steuerliche Bemessungsgrundlage: 45.600 € − 1.230 € (Werbungskosten) − 36 € (Sonderausgaben) − 8.983 € (Vorsorgepauschale) = 35.351 €.\n- Lohnsteuer 2026: 5.775 € jährlich → 481,25 € monatlich.\n- Solidaritätszuschlag: 0,00 € (Freigrenze 20.350 €).\n- Nettoverdienst 2026: 3.800,00 € − 826,50 € − 481,25 € = 2.492,25 € monatlich (im Jahr 2025 mit 2,5 % Zusatzbeitrag: 2.489,35 € monatlich).',
-      inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 },
-      resultSummary: '2.492,25 € Netto pro Monat (im Tarif 2026) bzw. 2.489,35 € (im Tarif 2025)',
+      description: `Eingaben: 3.800 € Monatsbrutto, Steuerklasse 1, keine Kinder, 30 Jahre, gesetzlich versichert mit dem durchschnittlichen Zusatzbeitrag 2026 von 2,9 %, keine Kirchensteuer.
+- Sozialabgaben AN: RV ${BN_EX.main.rv}, AV ${BN_EX.main.av}, KV ${BN_EX.main.kv}, PV ${BN_EX.main.pv} (inkl. 0,6 % Kinderlosenzuschlag), zusammen ${BN_EX.main.social}.
+- Vorsorgepauschale nach § 39b EStG: ${BN_EX.main.vsp} im Jahr (ab 2026 ohne Mindestvorsorgepauschale).
+- Lohnsteuer: ${BN_EX.main.lst} im Monat, Solidaritätszuschlag: ${BN_EX.main.solz}.
+- Netto: ${BN_EX.main.net} im Monat (2025: ${BN_EX.y2025.net}).`,
+      inputs: BN_EX.main.inputs,
+      resultSummary: `${BN_EX.main.net} Netto pro Monat (im Tarif 2026) bzw. ${BN_EX.y2025.net} (im Tarif 2025)`,
     },
     workedExamples: [
       {
         title: 'Beispiel 1: 3.800 € Monatsbrutto im Tarif 2026 (Steuerklasse 1, 30 Jahre, kinderlos)',
-        description: 'Sozialabgaben 826,50 € (RV 353,40 €, AV 49,40 €, KV 332,50 € bei 2,9 % Zusatzbeitrag, PV 91,20 €), Vorsorgepauschale nach § 39b EStG 8.983 €, Lohnsteuer 481,25 €, SolZ 0 €. Ausgezahltes Netto: 2.492,25 €.',
-        inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 },
-        resultSummary: '2.492,25 € Netto pro Monat',
+        description: `Sozialabgaben ${BN_EX.main.social} (RV ${BN_EX.main.rv}, AV ${BN_EX.main.av}, KV ${BN_EX.main.kv} bei 2,9 % Zusatzbeitrag, PV ${BN_EX.main.pv}), Vorsorgepauschale nach § 39b EStG ${BN_EX.main.vsp}, Lohnsteuer ${BN_EX.main.lst}, SolZ ${BN_EX.main.solz}. Ausgezahltes Netto: ${BN_EX.main.net}.`,
+        inputs: BN_EX.main.inputs,
+        resultSummary: `${BN_EX.main.net} Netto pro Monat`,
       },
       {
         title: 'Beispiel 2: Dasselbe Gehaltsszenario im Vorjahr 2025 (Steuerklasse 1, kinderlos)',
-        description: 'Im Abrechnungsjahr 2025 galten ein Grundfreibetrag von 12.096 € und ein durchschnittlicher Zusatzbeitrag von 2,5 %. Bei identischen 3.800 € Brutto betrugen die Sozialabgaben 818,90 €, die monatliche Lohnsteuer 491,75 € und das Netto 2.489,35 € monatlich.',
-        inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2025', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.5 },
-        resultSummary: '2.489,35 € Netto pro Monat',
+        description: `Im Abrechnungsjahr 2025 galten ein Grundfreibetrag von 12.096 €, ein durchschnittlicher Zusatzbeitrag von 2,5 % und noch die Mindestvorsorgepauschale. Bei identischen 3.800 € Brutto betrugen die Sozialabgaben ${BN_EX.y2025.social}, die monatliche Lohnsteuer ${BN_EX.y2025.lst} und das Netto ${BN_EX.y2025.net} monatlich.`,
+        inputs: BN_EX.y2025.inputs,
+        resultSummary: `${BN_EX.y2025.net} Netto pro Monat`,
       },
       {
         title: 'Beispiel 3: Arbeitgeberanteil und Gesamtkosten bei 3.800 € Brutto (2026)',
-        description: 'Mit dem Schalter „Arbeitgeberanteile einzeln anzeigen“: Der Arbeitgeber zahlt KV 332,50 €, PV 68,40 € (ohne Kinderlosenzuschlag), RV 353,40 € und AV 49,40 €, zusammen 803,70 €. Dazu kommen 110,20 € Umlagen (U1, U2, Insolvenzgeld, Berufsgenossenschaft als Richtwerte). Sozialversicherung gesamt (AN + AG): 1.630,20 €.',
-        inputs: { grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9, showEmployerShare: true },
-        resultSummary: '4.713,90 € Arbeitgeber-Gesamtkosten pro Monat (56.566,80 € im Jahr)',
+        description: `Mit dem Schalter „Arbeitgeberanteile einzeln anzeigen“: Der Arbeitgeber zahlt KV ${BN_EX.employer.agKv}, PV ${BN_EX.employer.agPv} (ohne Kinderlosenzuschlag), RV ${BN_EX.employer.agRv} und AV ${BN_EX.employer.agAv}, zusammen ${BN_EX.employer.agSocial}. Dazu kommen ${BN_EX.employer.umlagen} Umlagen (U1, U2, Insolvenzgeld, Berufsgenossenschaft als Richtwerte).`,
+        inputs: BN_EX.employer.inputs,
+        resultSummary: `${BN_EX.employer.employerTotal} Arbeitgeber-Gesamtkosten pro Monat (${BN_EX.employer.employerTotalYear} im Jahr)`,
       },
       {
         title: 'Beispiel 4: 4.000 € Brutto in Sachsen, Steuerklasse 4, drei Kinder (2026)',
-        description: 'In Sachsen trägt der Arbeitnehmer 2,3 % Pflegeversicherung. Für das 2. und 3. Kind sinkt der Satz um je 0,25 Punkte auf 1,8 %: PV 72,00 € statt 92,00 €. Weitere Abzüge: KV 350,00 € (davon 58,00 € Zusatzbeitrag), RV 372,00 €, AV 52,00 €, Lohnsteuer 523,92 €. Sozialabgaben gesamt: 846,00 €.',
-        inputs: { grossSalary: 4000, taxClass: '4', children: '3', age: 38, taxYear: '2026', federalState: 'sachsen', churchTax: 'no', healthInsuranceType: 'statutory', kvZusatzbeitrag: 2.9 },
-        resultSummary: '2.630,08 € Netto pro Monat',
+        description: `In Sachsen trägt der Arbeitnehmer 2,3 % Pflegeversicherung. Für das 2. und 3. Kind sinkt der Satz um je 0,25 Punkte auf 1,8 %: PV ${BN_EX.sachsen.pv}. Weitere Abzüge: KV ${BN_EX.sachsen.kv}, RV ${BN_EX.sachsen.rv}, AV ${BN_EX.sachsen.av}, Lohnsteuer ${BN_EX.sachsen.lst}. Sozialabgaben gesamt: ${BN_EX.sachsen.social}.`,
+        inputs: BN_EX.sachsen.inputs,
+        resultSummary: `${BN_EX.sachsen.net} Netto pro Monat`,
+      },
+      {
+        title: 'Beispiel 5: 15 € Stundenlohn bei 40 Wochenstunden (2026)',
+        description: `15 € × 40 Stunden × 13/3 = ${BN_EX.hourly.gross} brutto im Monat. In Steuerklasse 1 ohne Kinder bleiben ${BN_EX.hourly.net} netto, das sind ${BN_EX.hourly.perHour} pro Stunde.`,
+        inputs: BN_EX.hourly.inputs,
+        resultSummary: `${BN_EX.hourly.net} Netto pro Monat (${BN_EX.hourly.perHour} pro Stunde)`,
+      },
+      {
+        title: 'Beispiel 6: Werkstudent mit 1.200 € brutto (2026)',
+        description: `Als Werkstudent zahlen Sie nur Rentenversicherung, im Übergangsbereich reduziert: ${BN_EX.werkstudent.rv}. Lohnsteuer fällt in Steuerklasse 1 nicht an (${BN_EX.werkstudent.lst}).`,
+        inputs: BN_EX.werkstudent.inputs,
+        resultSummary: `${BN_EX.werkstudent.net} Netto pro Monat`,
       },
     ],
     content: {
@@ -238,12 +354,16 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
           content: 'Der Arbeitnehmer zahlt 2026 diese Anteile vom Brutto:\n- **Krankenversicherung**: 7,3 % plus die Hälfte des Zusatzbeitrags Ihrer Kasse (Durchschnitt 2026: 2,9 %, also 1,45 %). Der Zusatzbeitrag steht als eigene Zeile im Ergebnis.\n- **Pflegeversicherung**: 1,8 %, in Sachsen 2,3 %. Ohne Kind zahlen Sie ab 23 Jahren 0,6 % Kinderlosenzuschlag. Ab dem 2. Kind unter 25 Jahren sinkt Ihr Satz um 0,25 Punkte je Kind, höchstens für vier Kinder.\n- **Rentenversicherung**: 9,3 %.\n- **Arbeitslosenversicherung**: 1,3 %.\n\nKV und PV werden höchstens bis 5.812,50 € Monatsbrutto berechnet, RV und AV bis 8.450 € (Beitragsbemessungsgrenzen 2026). Was darüber liegt, ist beitragsfrei. Bei 3.800 € Brutto, kinderlos, 30 Jahre, ergeben sich 826,50 € Sozialabgaben.',
         },
         {
-          title: 'Arbeitgeberanteil und Arbeitgeber-Gesamtkosten',
-          content: 'Aktivieren Sie „Arbeitgeberanteile einzeln anzeigen“. Der Arbeitgeber zahlt bei KV, RV und AV denselben Anteil wie Sie. Bei der Pflegeversicherung zahlt er 1,8 % (Sachsen 1,3 %), den Kinderlosenzuschlag tragen Sie allein. Hinzu kommen Umlagen für Lohnfortzahlung (U1), Mutterschutz (U2), Insolvenzgeld und die Berufsgenossenschaft. Diese setzt der Rechner mit Richtwerten an; Ihre Krankenkasse und BG können abweichen.\n\nBei 3.800 € Brutto kostet die Stelle den Arbeitgeber rund 4.713,90 € im Monat. Wenn Sie nur die Lohnnebenkosten eines Arbeitgebers brauchen, nutzen Sie den [Arbeitgeberkosten-Rechner](/rechner/arbeitgeberkosten-rechner/).',
+          title: 'Netto aus dem Stundenlohn berechnen',
+          content: 'Wählen Sie beim Abrechnungszeitraum „Stundenlohn“ und tragen Sie Ihre Wochenstunden ein. Der Rechner macht daraus das Monatsbrutto: **Stundenlohn × Wochenstunden × 13/3**. Die 13/3 (≈ 4,33) stehen für 13 Wochen pro Quartal – so rechnen auch Lohnabrechnungen. Zusätzlich sehen Sie Ihren Nettolohn pro Stunde.\n\n' + STUNDENLOHN_TABLE,
         },
         {
-          title: 'Kirchensteuer und was Sie mit dem Ergebnis tun',
-          content: 'Die Kirchensteuer beträgt 8 % der Lohnsteuer in Bayern und Baden-Württemberg, sonst 9 %. Gezahlte Kirchensteuer ist als Sonderausgabe absetzbar. Der Rechner zeigt dafür die ungefähre Steuerersparnis pro Jahr, die über die Steuererklärung zurückkommt.\n\nSo nutzen Sie das Ergebnis:\n- Tragen Sie den Zusatzbeitrag Ihrer eigenen Krankenkasse ein und vergleichen Sie das Netto mit Ihrer Lohnabrechnung.\n- Für Gehaltsverhandlungen rechnen Sie mit dem [Netto-Brutto-Rechner](/rechner/netto-brutto-rechner/) vom Wunsch-Netto zurück.\n- Ihre Jahressteuer inklusive Soli prüfen Sie im [Einkommensteuerrechner](/rechner/einkommensteuerrechner/).\n- Verdienen Sie bis 2.000 € im Monat, gilt der Übergangsbereich: dafür ist der [Midijob-Rechner](/rechner/midijob-rechner/) genauer.',
+          title: 'Werkstudent, Midijob und Minijob',
+          content: 'Wer ordentlich studiert und im Semester höchstens 20 Stunden pro Woche arbeitet, ist als Werkstudent in der Kranken-, Pflege- und Arbeitslosenversicherung versicherungsfrei (Werkstudentenprivileg, § 6 Abs. 1 Nr. 3 SGB V). Es fällt nur der Rentenversicherungsbeitrag von 9,3 % an – zwischen 603,01 € und 2.000 € sogar reduziert. Lohnsteuer wird ganz normal nach Steuerklasse berechnet; bis rund ' + WS_TAXFREE_UP_TO + ' im Monat bleibt sie in Steuerklasse 1 bei null. Bis 603 € im Monat ist der Job ein Minijob.\n\n' + WERKSTUDENT_TABLE + '\n\n**Übergangsbereich (Midijob):** ' + 'Liegt das Monatsbrutto zwischen 603,01 € und 2.000 €, zahlen Sie im Übergangsbereich (Midijob) reduzierte Sozialabgaben: Die Beiträge werden auf eine geringere Bemessungsgrundlage berechnet (§ 20 Abs. 2a SGB IV). Der Rechner berücksichtigt das automatisch, die Rentenansprüche bleiben trotzdem voll erhalten. Details zeigt der [Midijob-Rechner](/rechner/midijob-rechner/).',
+        },
+        {
+          title: 'Arbeitgeberkosten, Kirchensteuer und was Sie mit dem Ergebnis tun',
+          content: 'Aktivieren Sie „Arbeitgeberanteile einzeln anzeigen“. Der Arbeitgeber zahlt bei KV, RV und AV denselben Anteil wie Sie. Bei der Pflegeversicherung zahlt er 1,8 % (Sachsen 1,3 %), den Kinderlosenzuschlag tragen Sie allein. Hinzu kommen Umlagen für Lohnfortzahlung (U1), Mutterschutz (U2), Insolvenzgeld und die Berufsgenossenschaft. Diese setzt der Rechner mit Richtwerten an; Ihre Krankenkasse und BG können abweichen.\n\nBei 3.800 € Brutto kostet die Stelle den Arbeitgeber rund 4.713,90 € im Monat. Wenn Sie nur die Lohnnebenkosten eines Arbeitgebers brauchen, nutzen Sie den [Arbeitgeberkosten-Rechner](/rechner/arbeitgeberkosten-rechner/).' + '\n\n' + 'Die Kirchensteuer beträgt 8 % der Lohnsteuer in Bayern und Baden-Württemberg, sonst 9 %. Gezahlte Kirchensteuer ist als Sonderausgabe absetzbar. Der Rechner zeigt dafür die ungefähre Steuerersparnis pro Jahr, die über die Steuererklärung zurückkommt.\n\nSo nutzen Sie das Ergebnis:\n- Tragen Sie den Zusatzbeitrag Ihrer eigenen Krankenkasse ein und vergleichen Sie das Netto mit Ihrer Lohnabrechnung.\n- Für Gehaltsverhandlungen rechnen Sie mit dem [Netto-Brutto-Rechner](/rechner/netto-brutto-rechner/) vom Wunsch-Netto zurück.\n- Ihre Jahressteuer inklusive Soli prüfen Sie im [Einkommensteuerrechner](/rechner/einkommensteuerrechner/).\n- Verdienen Sie bis 2.000 € im Monat, gilt der Übergangsbereich: dafür ist der [Midijob-Rechner](/rechner/midijob-rechner/) genauer.',
         },
       ],
       details: 'In Deutschland setzt sich die Gehaltsdifferenz aus zwei großen Blöcken zusammen: Den Steuern (Lohnsteuer, ggf. Solidaritätszuschlag und Kirchensteuer) und den Sozialabgaben (Kranken-, Pflege-, Renten- und Arbeitslosenversicherung). Die Lohnsteuer wird nach den amtlichen BMF-Programmablaufplänen für den Lohnsteuerabzug 2026 bzw. 2025 ermittelt. Dabei wird die gesetzliche Vorsorgepauschale nach § 39b Abs. 2 Satz 5 Nr. 3 EStG angesetzt (bestehend aus Teilbeträgen für Rentenversicherung, Kranken- und Pflegeversicherung sowie dem Abgleich mit der Mindestvorsorgepauschale). Besondere Einzelfälle wie Beamtenbeihilfe, freiwillige GKV-Mitgliedschaft über der Versicherungspflichtgrenze mit Firmenzahler-Zuschuss oder pauschal besteuerte Sachbezüge werden in dieser Standardberechnung für Angestellte nicht abgebildet.',
@@ -251,10 +371,10 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Welche Abzüge fallen vom Bruttogehalt an?', answer: 'In Deutschland werden Lohnsteuer, ggf. Solidaritätszuschlag und Kirchensteuer sowie vier Sozialversicherungsbeiträge abgezogen: Rentenversicherung (9,3 % AN-Anteil), Krankenversicherung (7,3 % + halber Zusatzbeitrag), Pflegeversicherung (1,8 % zzgl. eventuellem Kinderlosenzuschlag von 0,6 % ab 23 Jahren) und Arbeitslosenversicherung (1,3 %).' },
       { question: 'Wie hoch sind die Sozialabgaben 2026 für Arbeitnehmer?', answer: 'Kinderlos ab 23 Jahren und mit dem durchschnittlichen Zusatzbeitrag von 2,9 % zahlen Sie 21,75 % Ihres Bruttos: RV 9,3 %, KV 8,75 %, PV 2,4 % und AV 1,3 %. Bei 3.800 € Brutto sind das 826,50 € im Monat. Über den Beitragsbemessungsgrenzen (KV/PV 5.812,50 €, RV/AV 8.450 € im Monat) steigen die Beiträge nicht weiter.' },
-      { question: 'Wie viel zahlt der Arbeitgeber zusätzlich zum Bruttogehalt?', answer: 'Der Arbeitgeber zahlt rund 21 % des Bruttos als eigenen Anteil zur Sozialversicherung, dazu Umlagen für Lohnfortzahlung, Mutterschutz, Insolvenzgeld und Unfallversicherung. Bei 3.800 € Brutto liegen seine Gesamtkosten bei rund 4.713,90 € im Monat. Aktivieren Sie im Rechner „Arbeitgeberanteile einzeln anzeigen“, um jeden Posten zu sehen.' },
-      { question: 'Wie wirken sich Kinder auf die Pflegeversicherung aus?', answer: 'Ohne Kind zahlen Sie ab 23 Jahren 0,6 % Kinderlosenzuschlag, also 2,4 % statt 1,8 %. Mit einem Kind entfällt der Zuschlag. Ab dem zweiten Kind unter 25 Jahren sinkt Ihr Anteil um 0,25 Punkte je Kind, bei fünf Kindern auf 0,8 %.' },
+      { question: 'Wie viel netto bleibt bei 15 € Stundenlohn?', answer: `Bei 15 € brutto pro Stunde und 40 Wochenstunden sind das ${BN_HOUR[15].gross} brutto im Monat (Stundenlohn × Wochenstunden × 4,33). In Steuerklasse 1 ohne Kinder (2026) bleiben ${BN_HOUR[15].net} netto, rund ${BN_HOUR[15].perHour} pro Stunde. Bei 18 € sind es ${BN_HOUR[18].net}, bei 20 € ${BN_HOUR[20].net} netto im Monat.` },
+      { question: 'Welche Abzüge hat ein Werkstudent?', answer: `Nur Rentenversicherung und gegebenenfalls Lohnsteuer. Kranken-, Pflege- und Arbeitslosenversicherung entfallen (Werkstudentenprivileg). In Steuerklasse 1 fällt 2026 bis etwa ${WS_TAXFREE_UP_TO} Monatsbrutto keine Lohnsteuer an. Bei ${BN_WS[1200].gross} brutto bleiben rund ${BN_WS[1200].net} netto, bei ${BN_WS[2000].gross} sind es ${BN_WS[2000].net}.` },
       { question: 'Welche Steuerklasse gilt für mich?', answer: 'Steuerklasse 1 gilt für Ledige, Geschiedene und dauernd Getrenntlebende. Steuerklasse 2 für Alleinerziehende (inkl. Entlastungsbetrag von 4.260 € nach § 24b EStG). Verheiratete wählen zwischen 4/4 (Standard bei ähnlichem Einkommen) oder 3/5 (höheres Netto beim Besserverdiener in Steuerklasse 3). Steuerklasse 6 gilt für einen Zweitjob.' },
-      { question: 'Warum weicht der Nettolohn 2026 vom Vorjahr 2025 ab?', answer: 'Im Steuerjahr 2026 wurde der steuerliche Grundfreibetrag auf 12.348 € angehoben (Vorjahr: 12.096 €), wodurch die Lohnsteuer bei gleichem Bruttoverdienst sinkt. Gleichzeitig stieg der durchschnittliche Zusatzbeitrag der Krankenkassen von 2,5 % auf 2,9 %, was den Krankenversicherungsbeitrag erhöht. Bei 3.800 € Monatsbrutto verbleiben im Tarif 2026 ca. 2.492,25 € Netto gegenüber ca. 2.489,35 € im Tarif 2025.' },
+      { question: 'Warum zahle ich bei 1.500 € brutto weniger Sozialabgaben als erwartet?', answer: 'Weil Sie im Übergangsbereich zwischen 603,01 € und 2.000 € liegen. Dort werden Ihre Beiträge auf eine reduzierte Bemessungsgrundlage berechnet. Je näher das Gehalt an 603 € liegt, desto größer die Entlastung; ab 2.000 € gelten die vollen Sätze.' },
     ],
     relatedSlugs: ['netto-brutto-rechner',
       'einkommensteuerrechner',

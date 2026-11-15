@@ -70,22 +70,23 @@ describe('2026 tax config values', () => {
 });
 
 describe('brutto-netto-rechner with the 2026 Zusatzbeitrag', () => {
-  it('3.800 € Steuerklasse 1, kinderlos, 30 Jahre → 2.492,25 € netto (published worked example)', () => {
+  it('3.800 € Steuerklasse 1, kinderlos, 30 Jahre → 2.497,42 € netto (published worked example)', () => {
     const gross = 3800;
     // SV AN: RV 9,3 %, AV 1,3 %, KV (14,6 + 2,9) / 2 = 8,75 %, PV 1,8 % + 0,6 % Kinderlosenzuschlag
     const kv = gross * 0.0875;
     const sv = gross * 0.093 + gross * 0.013 + kv + gross * 0.024;
-    // Vorsorgepauschale: RV 9,3 % + KV (14,6 − 0,3 + 2,9) / 2 = 8,6 % + PV 1,8 % auf 45.600 €
-    const vsp = Math.round(45600 * 0.093 + 45600 * 0.086 + 45600 * 0.018);
+    // Vorsorgepauschale nach PAP 2026: RV 9,3 % + KV (7 % + 2,9 % / 2) = 8,45 % + PV 1,8 % + 0,6 % kinderlos, aufgerundet;
+    // AV-Teilbetrag greift nicht, weil KV/PV allein schon über 1.900 € liegen. Keine Mindestvorsorgepauschale mehr.
+    const vsp = Math.ceil(4240.8 + 4947.6);
     const zvE = 45600 - 1230 - 36 - vsp;
     const lst = Math.round((est2026Zone3(zvE) / 12) * 100) / 100;
 
     expect(kv).toBeCloseTo(332.5, 10);
     expect(sv).toBeCloseTo(826.5, 10);
-    expect(vsp).toBe(8983);
-    expect(zvE).toBe(35351);
-    expect(est2026Zone3(zvE)).toBe(5775);
-    expect(lst).toBe(481.25);
+    expect(vsp).toBe(9189);
+    expect(zvE).toBe(35145);
+    expect(est2026Zone3(zvE)).toBe(5713);
+    expect(lst).toBe(476.08);
 
     const inputs = { grossSalary: gross, taxClass: '1', children: '0', age: 30, taxYear: '2026', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory' };
     // Default Zusatzbeitrag equals the official average, so leaving the field empty gives the same result
@@ -93,18 +94,18 @@ describe('brutto-netto-rechner with the 2026 Zusatzbeitrag', () => {
       expect(val(res, 'krankenversicherung')).toBeCloseTo(kv, 8);
       expect(val(res, 'lohnsteuer')).toBeCloseTo(lst, 8);
       expect(Number(res.primary.value)).toBeCloseTo(gross - sv - lst, 8);
-      expect(Number(res.primary.value)).toBeCloseTo(2492.25, 8);
+      expect(Number(res.primary.value)).toBeCloseTo(2497.42, 8);
     }
 
     const calc = getCalculatorBySlug('brutto-netto-rechner')!;
     expect(calc.inputs.find((i) => i.id === 'kvZusatzbeitrag')?.defaultValue).toBe(2.9);
-    expect(calc.workedExample?.resultSummary).toContain('2.492,25 €');
+    expect(calc.workedExample?.resultSummary).toMatch(/2\.497,42\s€/);
   });
 
-  it('3.800 € in 2025 still uses 2,5 % → 2.489,35 € netto', () => {
+  it('3.800 € in 2025 still uses 2,5 % → 2.494,52 € netto', () => {
     const res = calculateBruttoNetto({ grossSalary: 3800, taxClass: '1', children: '0', age: 30, taxYear: '2025', federalState: 'other', churchTax: 'no', healthInsuranceType: 'statutory' });
     expect(val(res, 'krankenversicherung')).toBeCloseTo(3800 * 0.0855, 8);
-    expect(Number(res.primary.value)).toBeCloseTo(2489.35, 8);
+    expect(Number(res.primary.value)).toBeCloseTo(2494.52, 8);
   });
 
   it('employer total includes the 0,15 % Insolvenzgeldumlage', () => {

@@ -42,6 +42,45 @@ export function computeEStSingle(zvE: number, config: TaxYearConfig): number {
 }
 
 /**
+ * Lohnsteuer in den Steuerklassen V und VI (§ 39b Abs. 2 Satz 7 EStG, PAP-Unterprogramme MST5-6 und UP5-6).
+ * Grenzwerte W1–W3 je Jahr laut PAP bzw. Gesetzestext.
+ */
+const STKL5_GRENZEN: Record<number, [number, number, number]> = {
+  2025: [13785, 34240, 222260],
+  2026: [14071, 34939, 222260],
+};
+
+function up5und6(zx: number, config: TaxYearConfig): number {
+  const st1 = computeEStSingle(Math.floor(zx * 1.25), config);
+  const st2 = computeEStSingle(Math.floor(zx * 0.75), config);
+  const diff = (st1 - st2) * 2;
+  const mist = Math.floor(zx * 0.14);
+  return mist > diff ? mist : diff;
+}
+
+export function computeLohnsteuerStkl5und6(zvE: number, config: TaxYearConfig): number {
+  const [w1, w2, w3] = STKL5_GRENZEN[config.year] ?? STKL5_GRENZEN[2026];
+  const zzx = Math.max(0, Math.floor(zvE));
+  if (zzx > w2) {
+    let st = up5und6(w2, config);
+    if (zzx > w3) {
+      st = st + Math.floor((w3 - w2) * 0.42);
+      st = st + Math.floor((zzx - w3) * 0.45);
+    } else {
+      st = st + Math.floor((zzx - w2) * 0.42);
+    }
+    return st;
+  }
+  let st = up5und6(zzx, config);
+  if (zzx > w1) {
+    const vergl = st;
+    const hoch = up5und6(w1, config) + Math.floor((zzx - w1) * 0.42);
+    st = hoch < vergl ? hoch : vergl;
+  }
+  return st;
+}
+
+/**
  * Berechnet den Grenzsteuersatz bei einem gegebenen zvE
  */
 export function computeMarginalTaxRate(zvE: number, config: TaxYearConfig): number {
@@ -349,8 +388,18 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   }
   const rawGross = parsedGross;
   const isAnnual = inputs.period === 'year';
-  const monthlyGross = isAnnual ? rawGross / 12 : rawGross;
-  const annualGross = isAnnual ? rawGross : rawGross * 12;
+  const isHourly = inputs.period === 'hour';
+  const weeklyHours = readNumberInput(inputs.weeklyHours);
+  if (isHourly && (weeklyHours === null || !Number.isFinite(weeklyHours) || weeklyHours <= 0 || weeklyHours > 80)) {
+    return {
+      primary: { id: 'monthlyNet', label: 'Netto pro Monat', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihre Wochenstunden ein (mehr als 0 und höchstens 80).',
+    };
+  }
+  // Stundenlohn: Monat = Stundenlohn × Wochenstunden × 13/3 (13 Wochen je Quartal, wie in der Lohnabrechnung üblich)
+  const monthlyGross = isHourly ? rawGross * (weeklyHours as number) * (13 / 3) : isAnnual ? rawGross / 12 : rawGross;
+  const annualGross = monthlyGross * 12;
+  const isWerkstudent = inputs.employmentType === 'werkstudent';
 
   const taxClass = String(inputs.taxClass || '1');
   const hasChurchTax = inputs.churchTax === 'yes' || inputs.churchTax === true;
@@ -359,6 +408,8 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   const numChildren = Math.max(0, parseInt(inputs.children || '0', 10) || 0);
   const age = Math.max(0, parseInt(inputs.age || '30', 10) || 0);
   const isPrivateKv = inputs.healthInsuranceType === 'private';
+  const pkvMonthlyRaw = readNumberInput(inputs.pkvMonthly);
+  const pkvMonthly = isPrivateKv && pkvMonthlyRaw !== null && Number.isFinite(pkvMonthlyRaw) ? Math.max(0, pkvMonthlyRaw) : 0;
   const parsedZusatz = readNumberInput(inputs.kvZusatzbeitrag);
   const kvZusatz = parsedZusatz !== null && Number.isFinite(parsedZusatz)
     ? Math.max(0, parsedZusatz)
@@ -394,8 +445,8 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   }
 
   // Aufteilung KV: allgemeiner Beitrag und Zusatzbeitrag (je zur Hälfte AN/AG)
-  const anKvAllgemein = isPrivateKv ? 0 : kvGross * (config.beitragssatzKrankenversicherungAllgemein / 2);
-  const anKvZusatz = isPrivateKv ? 0 : anKv - anKvAllgemein;
+  let anKvAllgemein = isPrivateKv ? 0 : kvGross * (config.beitragssatzKrankenversicherungAllgemein / 2);
+  let anKvZusatz = isPrivateKv ? 0 : anKv - anKvAllgemein;
 
   // Pflegeversicherung
   let anPvBaseRate = 0;
@@ -415,39 +466,111 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
     }
     anPv = kvGross * Math.max(0, anPvBaseRate + pvAdjustmentRate);
   }
-  const anPvBase = kvGross * anPvBaseRate;
+  let anPvBase = kvGross * anPvBaseRate;
+
+  // --- BESCHÄFTIGUNGSART: Minijob, Übergangsbereich (Midijob), Werkstudent ---
+  const isMinijob = monthlyGross > 0 && monthlyGross <= config.minijobGrenze;
+  const isUebergang = !isMinijob && monthlyGross <= config.midijobObergrenze;
+  const ub = isUebergang ? computeUebergangsbereich(monthlyGross, config) : null;
+  const rvRate = config.beitragssatzRentenversicherung;
+  const avRate = config.beitragssatzArbeitslosenversicherung;
+
+  if (isMinijob) {
+    // Minijob (§ 8 SGB IV): AN zahlt nur den RV-Eigenanteil, AG Pauschalbeiträge; Lohnsteuer pauschal durch den AG.
+    anRv = monthlyGross * config.minijobRvEigenanteil;
+    agRv = monthlyGross * config.minijobPauschaleRv;
+    anAv = 0; agAv = 0; anPv = 0; agPv = 0; anPvBase = 0;
+    anKv = 0; anKvAllgemein = 0; anKvZusatz = 0;
+    agKv = isPrivateKv ? 0 : monthlyGross * config.minijobPauschaleKv;
+  } else if (isWerkstudent) {
+    // Werkstudentenprivileg (§ 6 Abs. 1 Nr. 3 SGB V, § 20 Abs. 1 SGB XI, § 27 Abs. 4 SGB III): nur Rentenversicherung.
+    anKv = 0; agKv = 0; anKvAllgemein = 0; anKvZusatz = 0;
+    anPv = 0; agPv = 0; anPvBase = 0;
+    anAv = 0; agAv = 0;
+    if (ub) {
+      anRv = ub.beArbeitnehmer * (rvRate / 2);
+      agRv = ub.beGesamt * rvRate - anRv;
+    }
+  } else if (ub) {
+    // Übergangsbereich (§ 20 Abs. 2a SGB IV): reduzierte AN-Beiträge, AG-Anteil = Gesamtbeitrag − AN-Anteil.
+    anRv = ub.beArbeitnehmer * (rvRate / 2);
+    agRv = ub.beGesamt * rvRate - anRv;
+    anAv = ub.beArbeitnehmer * (avRate / 2);
+    agAv = ub.beGesamt * avRate - anAv;
+    if (!isPrivateKv) {
+      const kvRate = config.beitragssatzKrankenversicherungAllgemein + kvZusatz / 100;
+      anKv = ub.beArbeitnehmer * (kvRate / 2);
+      agKv = ub.beGesamt * kvRate - anKv;
+      anKvAllgemein = ub.beArbeitnehmer * (config.beitragssatzKrankenversicherungAllgemein / 2);
+      anKvZusatz = anKv - anKvAllgemein;
+      anPvBase = ub.beArbeitnehmer * anPvBaseRate;
+      // Kinderlosenzuschlag bzw. Kinderabschlag auf die beitragspflichtige Einnahme insgesamt
+      anPv = Math.max(0, anPvBase + ub.beGesamt * pvAdjustmentRate);
+      agPv = ub.beGesamt * config.beitragssatzPflegeversicherung - anPvBase;
+    }
+  }
+  // Private Krankenversicherung: AN zahlt den Beitrag selbst, der AG zahlt einen steuerfreien Zuschuss von der Hälfte,
+  // höchstens die Hälfte des GKV-Höchstbeitrags (§ 257 SGB V) bzw. des PV-Höchstbeitrags (§ 61 SGB XI).
+  let pkvZuschuss = 0;
+  if (isPrivateKv && !isMinijob && !isWerkstudent && pkvMonthly > 0) {
+    const maxKv = config.bbgKrankenversicherungMonat * (config.beitragssatzKrankenversicherungAllgemein + config.zusatzbeitragKrankenversicherungDurchschnitt) / 2;
+    const maxPv = config.bbgKrankenversicherungMonat * (state === 'sachsen' ? config.pflegeSachsenAnteilAG : config.beitragssatzPflegeversicherung / 2);
+    pkvZuschuss = Math.min(pkvMonthly / 2, maxKv + maxPv);
+    anKv = pkvMonthly - pkvZuschuss;
+    agKv = pkvZuschuss;
+  }
   const anPvAdjustment = anPv - anPvBase;
 
   const monthlySocialAN = anRv + anAv + anKv + anPv;
   const annualSocialAN = monthlySocialAN * 12;
 
   // --- LOHNSTEUER (JÄHRLICH) NACH § 39b Abs. 2 Satz 5 Nr. 3 EStG ---
-  // 1. Teilbetrag Rentenversicherung (§ 39b Abs. 2 Satz 5 Nr. 3 Buchstabe a EStG)
-  const vsp1 = Math.min(annualGross, config.bbgRentenversicherungJahr) * (config.beitragssatzRentenversicherung / 2);
+  // Vorsorgepauschale wie im Programmablaufplan (PAP) des BMF. Bemessungsgrundlage ist immer der volle
+  // Arbeitslohn: Der Übergangsbereich ist steuerlich unbeachtlich (BMF-Schreiben vom 14.08.2025, Rn. 7).
+  const isSachsen = state === 'sachsen';
+  // Teilbeträge in Euro und Cent (PAP: 2 Dezimalstellen, abgerundet); kleine Toleranz gegen Gleitkommafehler
+  const toCent = (x: number) => Math.floor(x * 100 + 1e-6) / 100;
 
-  // 2. Teilbetrag Kranken- und Pflegeversicherung (§ 39b Abs. 2 Satz 5 Nr. 3 Buchstabe b & c EStG)
-  let vspKpv = 0;
-  if (!isPrivateKv) {
-    // Ermäßigter Beitragssatz nach § 241 SGB V (um 0,3 % vermindert) zzgl. kassenindividuellem Zusatzbeitrag
-    const vspKvRateAN = (config.beitragssatzKrankenversicherungAllgemein - 0.003 + kvZusatz / 100) / 2;
-    const vspKv = Math.min(annualGross, config.bbgKrankenversicherungJahr) * vspKvRateAN;
-    const isSachsen = state === 'sachsen';
-    const vspPvRateAN = isSachsen ? config.pflegeSachsenAnteilAN : (config.beitragssatzPflegeversicherung / 2);
-    const vspPv = Math.min(annualGross, config.bbgKrankenversicherungJahr) * vspPvRateAN;
-    vspKpv = vspKv + vspPv;
+  // 1. Teilbetrag Rentenversicherung (Buchst. a) – nur wenn ein AN-Beitrag zur RV gezahlt wird
+  const vspR = isMinijob ? 0 : toCent(Math.min(annualGross, config.bbgRentenversicherungJahr) * (config.beitragssatzRentenversicherung / 2));
+
+  // 2. Teilbetrag Kranken- und Pflegeversicherung (Buchst. b, c): KVSATZAN = KVZ/2 + 7 % (ermäßigter Satz 14,0 %, § 243 SGB V),
+  //    PVSATZAN = 1,8 % (Sachsen 2,3 %) + 0,6 % kinderlos bzw. − 0,25 % je Kind ab dem 2. Kind.
+  //    Werkstudenten/Studenten zahlen keinen AN-Anteil zur KV/PV → kein Teilbetrag (BMF a. a. O., Rn. 16).
+  let vspKvPv = 0;
+  if (!isPrivateKv && !isWerkstudent && !isMinijob) {
+    const kvSatzAn = kvZusatz / 100 / 2 + 0.07;
+    const pvSatzAn = (isSachsen ? config.pflegeSachsenAnteilAN : config.beitragssatzPflegeversicherung / 2) + pvAdjustmentRate;
+    vspKvPv = toCent(Math.min(annualGross, config.bbgKrankenversicherungJahr) * (kvSatzAn + Math.max(0, pvSatzAn)));
+  } else if (isPrivateKv && !isWerkstudent && !isMinijob) {
+    // PKV: tatsächlicher Basisbeitrag abzüglich steuerfreiem AG-Zuschuss (PAP: PKPV − PKPVAGZ)
+    vspKvPv = toCent(Math.max(0, (pkvMonthly - pkvZuschuss) * 12));
   }
 
-  // 3. Mindestvorsorgepauschale (§ 39b Abs. 2 Satz 5 Nr. 3 Buchstabe d EStG)
-  const minVspLimit = taxClass === '3' ? 3000 : 1900;
-  const minVsp = Math.min(minVspLimit, annualGross * 0.12);
-
-  // Gesetzliche Vorsorgepauschale insgesamt (auf volle Euro gerundet)
-  const vorsorgepauschale = Math.round(vsp1 + Math.max(vspKpv, minVsp));
+  let vorsorgepauschale: number;
+  if (config.year >= 2026) {
+    // Ab 2026: keine Mindestvorsorgepauschale mehr (BMF a. a. O., Rn. 25). Neuer Teilbetrag Arbeitslosenversicherung
+    // (Buchst. e, 1,3 %) in den Steuerklassen I–V, soweit er mit KV/PV zusammen 1.900 € nicht übersteigt.
+    let vsp = vspR + vspKvPv;
+    const isAvPflichtig = !isWerkstudent && !isMinijob;
+    if (isAvPflichtig && taxClass !== '6') {
+      const vspAlv = toCent(Math.min(annualGross, config.bbgRentenversicherungJahr) * (config.beitragssatzArbeitslosenversicherung / 2));
+      const vspN = vspR + Math.min(1900, vspAlv + vspKvPv);
+      if (vspN > vsp) vsp = vspN;
+    }
+    vorsorgepauschale = Math.ceil(vsp - 1e-9);
+  } else {
+    // Bis 2025: Mindestvorsorgepauschale 12 % des Arbeitslohns, höchstens 1.900 € (Steuerklasse III: 3.000 €)
+    const minVsp = Math.min(taxClass === '3' ? 3000 : 1900, annualGross * 0.12);
+    vorsorgepauschale = Math.ceil(vspR + Math.max(vspKvPv, toCent(minVsp)) - 1e-9);
+  }
   const werbungskostenpauschale = 1230; // § 9a Satz 1 Nr. 1a EStG
   const sonderausgabenpauschbetrag = 36; // § 10c EStG
 
-  // Ermittlung des fiktiven zu versteuernden Einkommens (zvE) je nach Steuerklasse
-  let taxableBase = Math.max(0, annualGross - werbungskostenpauschale - sonderausgabenpauschbetrag - vorsorgepauschale);
+  // Ermittlung des fiktiven zu versteuernden Einkommens (zvE) je nach Steuerklasse (PAP: MZTABFB).
+  // Steuerklasse VI: kein Arbeitnehmer-Pauschbetrag und kein Sonderausgaben-Pauschbetrag.
+  const tabFreibetraege = taxClass === '6' ? 0 : werbungskostenpauschale + sonderausgabenpauschbetrag;
+  const taxableBase = Math.max(0, Math.floor(annualGross - tabFreibetraege - vorsorgepauschale));
 
   let annualLohnsteuer = 0;
   if (taxClass === '1' || taxClass === '4') {
@@ -459,13 +582,12 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   } else if (taxClass === '3') {
     // Splittingverfahren
     annualLohnsteuer = computeEStSingle(Math.floor(taxableBase / 2), config) * 2;
-  } else if (taxClass === '5') {
-    // Steuerklasse 5: Hohe Progression (Grundfreibetrag entfällt für AN)
-    annualLohnsteuer = computeEStSingle(taxableBase + config.grundfreibetrag, config) * 1.05;
-  } else if (taxClass === '6') {
-    // Zweitjob ohne Grundfreibetrag
-    annualLohnsteuer = computeEStSingle(taxableBase + config.grundfreibetrag, config);
+  } else if (taxClass === '5' || taxClass === '6') {
+    // Steuerklassen V und VI nach § 39b Abs. 2 Satz 7 EStG (PAP: MST5-6)
+    annualLohnsteuer = computeLohnsteuerStkl5und6(taxableBase, config);
   }
+  // Minijob: Regelfall Pauschalsteuer von 2 %, die der Arbeitgeber trägt (§ 40a Abs. 2 EStG)
+  if (isMinijob) annualLohnsteuer = 0;
 
   const monthlyLohnsteuer = Math.round((annualLohnsteuer / 12) * 100) / 100;
 
@@ -494,7 +616,8 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   const agSvTotal = agRv + agAv + agKv + agPv;
   const umlageRate = config.umlageU1 + config.umlageU2 + config.umlageU3Insolvenzgeld + config.berufsgenossenschaftDurchschnitt;
   const agUmlagen = monthlyGross * umlageRate;
-  const monthlyEmployerTotal = monthlyGross + agSvTotal + agUmlagen;
+  const agPauschsteuer = isMinijob ? monthlyGross * config.minijobPauschsteuer : 0;
+  const monthlyEmployerTotal = monthlyGross + agSvTotal + agUmlagen + agPauschsteuer;
 
   // Kirchensteuer als Sonderausgabe (§ 10 Abs. 1 Nr. 4 EStG): grobe Erstattung über die Steuererklärung
   let churchRefundMarginal = 0;
@@ -504,24 +627,55 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   const churchRefundYear = annualChurchTax * (churchRefundMarginal / 100);
 
   const pct = (rate: number) => formatPercent(rate * 100, 3);
-  const kvHelp = isPrivateKv
-    ? 'Privat versichert: Ihren PKV-Beitrag und den Arbeitgeberzuschuss rechnet der Rechner nicht ein.'
-    : `${pct(config.beitragssatzKrankenversicherungAllgemein / 2)} allgemeiner Beitrag (${formatCurrency(anKvAllgemein)}) + ${pct(kvZusatz / 200)} Zusatzbeitrag (${formatCurrency(anKvZusatz)}), höchstens bis ${formatCurrency(config.bbgKrankenversicherungMonat)} Brutto (BBG).`;
-  let pvHelp = isPrivateKv
-    ? 'Privat versichert: private Pflegepflichtversicherung wird nicht berechnet.'
-    : `Grundbeitrag ${pct(anPvBaseRate)} (${formatCurrency(anPvBase)})`;
-  if (!isPrivateKv && pvAdjustmentRate > 0) pvHelp += ` + Kinderlosenzuschlag ${pct(pvAdjustmentRate)} (${formatCurrency(anPvAdjustment)}).`;
-  else if (!isPrivateKv && pvAdjustmentRate < 0) pvHelp += ` − Abschlag für ${numChildren} Kinder (${formatCurrency(Math.abs(anPvAdjustment))}).`;
-  else if (!isPrivateKv) pvHelp += numChildren === 1 ? ', kein Kinderlosenzuschlag mit 1 Kind.' : ', kein Kinderlosenzuschlag unter 23 Jahren.';
+  const noKvPv = isMinijob || isWerkstudent;
+  const kvHelp = isMinijob
+    ? 'Minijob: Sie zahlen keinen eigenen KV-Beitrag. Der Arbeitgeber zahlt eine Pauschale von 13 %, wenn Sie gesetzlich versichert sind.'
+    : isWerkstudent
+      ? 'Werkstudent: in der Kranken- und Pflegeversicherung versicherungsfrei (§ 6 Abs. 1 Nr. 3 SGB V). Ihre studentische Krankenversicherung zahlen Sie separat.'
+      : isPrivateKv
+        ? (pkvMonthly > 0
+          ? `Privat versichert: ${formatCurrency(pkvMonthly)} PKV-Beitrag abzüglich ${formatCurrency(pkvZuschuss)} Arbeitgeberzuschuss. Der Eigenanteil mindert auch die Lohnsteuer (Vorsorgepauschale).`
+          : 'Privat versichert: Tragen Sie Ihren monatlichen PKV-Beitrag ein. Ohne Beitrag rechnet der Rechner ab 2026 mit zu hoher Lohnsteuer, weil die Mindestvorsorgepauschale entfallen ist.')
+        : `${pct(config.beitragssatzKrankenversicherungAllgemein / 2)} allgemeiner Beitrag (${formatCurrency(anKvAllgemein)}) + ${pct(kvZusatz / 200)} Zusatzbeitrag (${formatCurrency(anKvZusatz)})${ub ? `, berechnet auf die reduzierte Bemessungsgrundlage im Übergangsbereich (${formatCurrency(ub.beArbeitnehmer)})` : `, höchstens bis ${formatCurrency(config.bbgKrankenversicherungMonat)} Brutto (BBG)`}.`;
+  let pvHelp = noKvPv
+    ? 'Keine Beiträge zur Pflegeversicherung.'
+    : isPrivateKv
+      ? 'Privat versichert: private Pflegepflichtversicherung wird nicht berechnet.'
+      : `Grundbeitrag ${pct(anPvBaseRate)} (${formatCurrency(anPvBase)})`;
+  if (!noKvPv && !isPrivateKv && pvAdjustmentRate > 0) pvHelp += ` + Kinderlosenzuschlag ${pct(pvAdjustmentRate)} (${formatCurrency(anPvAdjustment)}).`;
+  else if (!noKvPv && !isPrivateKv && pvAdjustmentRate < 0) pvHelp += ` − Abschlag für ${numChildren} Kinder (${formatCurrency(Math.abs(anPvAdjustment))}).`;
+  else if (!noKvPv && !isPrivateKv) pvHelp += numChildren === 1 ? ', kein Kinderlosenzuschlag mit 1 Kind.' : ', kein Kinderlosenzuschlag unter 23 Jahren.';
+  const rvHelp = isMinijob
+    ? `Minijob: Eigenanteil ${pct(config.minijobRvEigenanteil)} (Befreiung auf Antrag möglich).`
+    : ub
+      ? `${pct(rvRate / 2)} auf die reduzierte Bemessungsgrundlage im Übergangsbereich (${formatCurrency(ub.beArbeitnehmer)} statt ${formatCurrency(monthlyGross)}).`
+      : `${pct(rvRate / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).`;
+  const employmentLabel = isMinijob
+    ? `Minijob (bis ${formatCurrency(config.minijobGrenze)}): keine Lohnsteuer für Sie, nur ${pct(config.minijobRvEigenanteil)} Rentenversicherung`
+    : isWerkstudent
+      ? `Werkstudent: nur Rentenversicherung${ub ? ', im Übergangsbereich reduziert' : ''}`
+      : ub
+        ? `Übergangsbereich (Midijob, ${formatCurrency(config.minijobGrenze + 0.01)} bis ${formatCurrency(config.midijobObergrenze)}): reduzierte Sozialabgaben`
+        : 'Sozialversicherungspflichtige Beschäftigung';
+  const hoursPerMonth = isHourly ? (weeklyHours as number) * (13 / 3) : 0;
 
-  const secondary: ResultItem[] = [
+  const secondary: ResultItem[] = [];
+  if (isHourly) {
+    const netPerHour = hoursPerMonth > 0 ? monthlyNet / hoursPerMonth : 0;
+    secondary.push(
+      { id: 'hourlyNet', label: 'Netto pro Stunde', value: netPerHour, formattedValue: formatCurrency(netPerHour), helpText: `Bei ${formatNumber(weeklyHours as number, 2)} Wochenstunden sind das rund ${formatNumber(hoursPerMonth, 2)} Stunden im Monat (× 13/3 Wochen).` },
+      { id: 'hoursPerMonth', label: 'Arbeitsstunden pro Monat', value: hoursPerMonth, formattedValue: formatNumber(hoursPerMonth, 2) },
+    );
+  }
+  secondary.push(
+    { id: 'employment', label: 'Beschäftigungsart', value: employmentLabel, formattedValue: employmentLabel },
     { id: 'annualNet', label: 'Netto pro Jahr', value: annualNet, formattedValue: formatCurrency(annualNet) },
     { id: 'monthlyGross', label: 'Brutto pro Monat', value: monthlyGross, formattedValue: formatCurrency(monthlyGross) },
     { id: 'totalDeductions', label: 'Gesamtabzüge monatlich', value: monthlyDeductions, formattedValue: formatCurrency(monthlyDeductions) },
     { id: 'lohnsteuer', label: 'Lohnsteuer', value: monthlyLohnsteuer, formattedValue: formatCurrency(monthlyLohnsteuer) },
     { id: 'solz', label: 'Solidaritätszuschlag', value: monthlySolz, formattedValue: formatCurrency(monthlySolz) },
     { id: 'kirchensteuer', label: churchTaxRate > 0 ? `Kirchensteuer (${churchTaxRate} %)` : 'Kirchensteuer', value: monthlyChurchTax, formattedValue: formatCurrency(monthlyChurchTax) },
-  ];
+  );
   if (churchRefundYear > 0) {
     secondary.push({
       id: 'kirchensteuerErstattung',
@@ -552,8 +706,8 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
     });
   }
   secondary.push(
-    { id: 'rentenversicherung', label: 'Rentenversicherung (AN)', value: anRv, formattedValue: formatCurrency(anRv), helpText: `${pct(config.beitragssatzRentenversicherung / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).` },
-    { id: 'arbeitslosenversicherung', label: 'Arbeitslosenversicherung (AN)', value: anAv, formattedValue: formatCurrency(anAv), helpText: `${pct(config.beitragssatzArbeitslosenversicherung / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).` },
+    { id: 'rentenversicherung', label: 'Rentenversicherung (AN)', value: anRv, formattedValue: formatCurrency(anRv), helpText: rvHelp },
+    { id: 'arbeitslosenversicherung', label: 'Arbeitslosenversicherung (AN)', value: anAv, formattedValue: formatCurrency(anAv), helpText: noKvPv ? 'Keine Beiträge zur Arbeitslosenversicherung.' : ub ? `${pct(avRate / 2)} auf die reduzierte Bemessungsgrundlage im Übergangsbereich.` : `${pct(avRate / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).` },
     { id: 'netQuota', label: 'Nettoquote vom Brutto', value: netQuota, formattedValue: formatPercent(netQuota) },
     { id: 'taxQuota', label: 'Steuerabzugsquote', value: taxQuota, formattedValue: formatPercent(taxQuota) },
     { id: 'socialQuota', label: 'Sozialabgabenquote', value: socialQuota, formattedValue: formatPercent(socialQuota) },
@@ -561,7 +715,7 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
 
   if (showEmployerShare) {
     secondary.push(
-      { id: 'agKrankenversicherung', label: 'Krankenversicherung (AG)', value: agKv, formattedValue: formatCurrency(agKv), helpText: isPrivateKv ? 'PKV-Zuschuss des Arbeitgebers nicht berücksichtigt.' : 'Gleicher Anteil wie beim Arbeitnehmer, inkl. halbem Zusatzbeitrag.' },
+      { id: 'agKrankenversicherung', label: 'Krankenversicherung (AG)', value: agKv, formattedValue: formatCurrency(agKv), helpText: isPrivateKv ? (pkvZuschuss > 0 ? 'Steuerfreier Arbeitgeberzuschuss zur privaten Kranken- und Pflegeversicherung.' : 'Ohne PKV-Beitrag kein Arbeitgeberzuschuss berechnet.') : 'Gleicher Anteil wie beim Arbeitnehmer, inkl. halbem Zusatzbeitrag.' },
       { id: 'agPflegeversicherung', label: 'Pflegeversicherung (AG)', value: agPv, formattedValue: formatCurrency(agPv), helpText: 'Ohne Kinderlosenzuschlag – den zahlt allein der Arbeitnehmer.' },
       { id: 'agRentenversicherung', label: 'Rentenversicherung (AG)', value: agRv, formattedValue: formatCurrency(agRv) },
       { id: 'agArbeitslosenversicherung', label: 'Arbeitslosenversicherung (AG)', value: agAv, formattedValue: formatCurrency(agAv) },
@@ -589,7 +743,19 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
       formattedValue: formatCurrency(monthlyNet),
     },
     secondary,
-    summaryText: `Von ${formatCurrency(monthlyGross)} brutto bleiben ${formatCurrency(monthlyNet)} netto im Monat. Abgezogen werden ${formatCurrency(monthlyTaxTotal)} Steuern und ${formatCurrency(monthlySocialAN)} Sozialabgaben (KV ${formatCurrency(anKv)}, PV ${formatCurrency(anPv)}, RV ${formatCurrency(anRv)}, AV ${formatCurrency(anAv)}). Ihr Arbeitgeber zahlt insgesamt rund ${formatCurrency(monthlyEmployerTotal)}.`,
+    summaryText:
+      (isHourly ? `Bei ${formatCurrency(rawGross)} Stundenlohn und ${formatNumber(weeklyHours as number, 2)} Wochenstunden sind das ${formatCurrency(monthlyGross)} brutto im Monat. ` : '') +
+      `Von ${formatCurrency(monthlyGross)} brutto bleiben ${formatCurrency(monthlyNet)} netto im Monat${isHourly && hoursPerMonth > 0 ? ` (${formatCurrency(monthlyNet / hoursPerMonth)} netto pro Stunde)` : ''}. ` +
+      (isMinijob
+        ? `Als Minijob zahlen Sie keine Lohnsteuer und nur ${formatCurrency(anRv)} Rentenversicherung. `
+        : isWerkstudent
+          ? `Als Werkstudent zahlen Sie nur Rentenversicherung (${formatCurrency(anRv)}) und ${formatCurrency(monthlyTaxTotal)} Steuern. `
+          : `Abgezogen werden ${formatCurrency(monthlyTaxTotal)} Steuern und ${formatCurrency(monthlySocialAN)} Sozialabgaben (KV ${formatCurrency(anKv)}, PV ${formatCurrency(anPv)}, RV ${formatCurrency(anRv)}, AV ${formatCurrency(anAv)})${ub ? ', reduziert im Übergangsbereich' : ''}. `) +
+      `Ihr Arbeitgeber zahlt insgesamt rund ${formatCurrency(monthlyEmployerTotal)}.`,
+    taxDetails: { vorsorgepauschale, taxableBase, annualLohnsteuer, tabFreibetraege },
+    warning: isMinijob
+      ? `Bis ${formatCurrency(config.minijobGrenze)} im Monat ist das ein Minijob. Die genauen Abgaben zeigt der Minijob-Rechner.`
+      : undefined,
   };
 }
 

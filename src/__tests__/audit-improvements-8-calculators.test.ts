@@ -55,12 +55,12 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
         kvZusatzbeitrag: 2.5,
       });
 
-      // BMF 2026 PAP verification for 3.800 € monthly gross:
-      // Tax: 483.50 €
-      // Net: 2497.60 €
-      expect(result2026.primary.value).toBeCloseTo(2497.60, 2);
+      // PAP 2026 for 3.800 € monthly gross with 2,5 % Zusatzbeitrag (StKl 1, kinderlos):
+      // VSP = ceil(4.240,80 + 45.600 × (7 % + 1,25 % + 2,4 %)) = 9.098 €; zvE = 35.236 € → 5.740 € → 478,33 €
       const taxItem = result2026.secondary?.find((s: any) => s.id === 'lohnsteuer');
-      expect(taxItem?.value).toBeCloseTo(483.50, 2);
+      expect(taxItem?.value).toBeCloseTo(478.33, 2);
+      // Social insurance with 2,5 % Zusatzbeitrag: 3.800 × (9,3 + 1,3 + 7,3 + 1,25 + 2,4) % = 818,90 €
+      expect(result2026.primary.value).toBeCloseTo(3800 - 818.9 - 478.33, 2);
     });
 
     it('calculates 2025 BMF payroll tax for 3.800 € gross aligning with the 2025 worked example (~2489 € net)', () => {
@@ -76,10 +76,10 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
         kvZusatzbeitrag: 2.5,
       });
 
-      // In 2025 with Grundfreibetrag 12.096 € and RV 9.3%, Lohnsteuer is 491.75 €, Netto is 2.489,35 €
-      expect(result2025.primary.value).toBeCloseTo(2489.35, 1);
+      // In 2025 with Grundfreibetrag 12.096 € and RV 9.3%, Lohnsteuer is 486.58 €, Netto is 2.494,52 € (PAP 2025: KV-Teilbetrag 7 % + KVZ/2, PV incl. Kinderlosenzuschlag)
+      expect(result2025.primary.value).toBeCloseTo(2494.52, 1);
       const taxItem = result2025.secondary?.find((s: any) => s.id === 'lohnsteuer');
-      expect(taxItem?.value).toBeCloseTo(491.75, 1);
+      expect(taxItem?.value).toBeCloseTo(486.58, 1);
     });
   });
 
@@ -308,7 +308,7 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
 
     const expectedTitles: Record<string, string> = {
       'spritkostenrechner': 'Spritkostenrechner: Fahrtkosten mit Maut & Mitfahrern',
-      'brutto-netto-rechner': 'Brutto-Netto-Rechner 2026 mit Sozialabgaben AN & AG',
+      'brutto-netto-rechner': 'Brutto-Netto-Rechner 2026: Gehalt, Stundenlohn, Werkstudent',
       'gasverbrauch-kwh-m3-rechner': 'Gasverbrauch berechnen: Zählerstände & m³ in kWh',
       'gaskostenrechner': 'Gaskostenrechner: kWh, m³, Grundpreis & Monatskosten',
       'kies-splitt-rechner': 'Splittrechner: Wie viel Splitt brauche ich?',
