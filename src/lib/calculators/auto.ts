@@ -411,14 +411,12 @@ export function calculateCommuterAllowance(inputs: Record<string, any>): Calcula
 
   const effectiveWorkdays = Math.max(0, workdays - homeOfficeDays);
 
-  const rateFirst20 = GERMAN_DATA_2026.pendlerpauschale_standard.value; // 0.30 €
-  const rateFrom21 = GERMAN_DATA_2026.pendlerpauschale_fernpendler.value; // 0.38 €
+  // Seit 2026 einheitlich 0,38 € ab dem ersten vollen Entfernungskilometer (§ 9 Abs. 1 Satz 3 Nr. 4 EStG
+  // i. d. F. Steueränderungsgesetz 2025); bis 2025 galten 0,30 € für die ersten 20 km.
+  const ratePerKm = GERMAN_DATA_2026.pendlerpauschale_standard.value;
 
-  const kmFirst20 = Math.min(20, distanceKm);
-  const kmOver20 = Math.max(0, distanceKm - 20);
-
-  const allowancePerDay = (kmFirst20 * rateFirst20) + (kmOver20 * rateFrom21);
-  let totalAllowancePerYear = allowancePerDay * effectiveWorkdays;
+  const allowancePerDay = Math.round(distanceKm * ratePerKm * 100) / 100;
+  let totalAllowancePerYear = Math.round(allowancePerDay * effectiveWorkdays * 100) / 100;
 
   let isCapped = false;
   if (transportMode === 'public' && totalAllowancePerYear > 4500) {
@@ -437,8 +435,7 @@ export function calculateCommuterAllowance(inputs: Record<string, any>): Calcula
     secondary: [
       { id: 'effectiveDays', label: 'Anerkannte Fahrt-Tage (abzgl. Homeoffice)', value: effectiveWorkdays, formattedValue: `${effectiveWorkdays} Tage` },
       { id: 'perDay', label: 'Pauschale pro tatsächlichem Pendeltag', value: allowancePerDay, formattedValue: formatCurrency(allowancePerDay) },
-      { id: 'rate20', label: 'Kilometer 1 bis 20 (0,30 €/km)', value: kmFirst20 * rateFirst20, formattedValue: formatCurrency(kmFirst20 * rateFirst20) },
-      { id: 'rateOver20', label: 'Kilometer ab 21 (0,38 €/km)', value: kmOver20 * rateFrom21, formattedValue: formatCurrency(kmOver20 * rateFrom21) },
+      { id: 'ratePerKm', label: 'Pauschale je Entfernungskilometer (ab dem 1. km)', value: ratePerKm, formattedValue: `${formatCurrency(ratePerKm)}/km` },
       { id: 'modeNotice', label: 'Verkehrsmittel & Höchstbetrag', value: transportMode === 'public' ? (isCapped ? 'Auf 4.500 € gedeckelt' : 'ÖPNV (max. 4.500 €)') : 'PKW (ohne Obergrenze)', formattedValue: transportMode === 'public' ? (isCapped ? '4.500 € Obergrenze greift' : 'ÖPNV / Fahrgemeinschaft') : 'Eigener PKW (unbegrenzt)' },
     ],
     summaryText: `Bei einer einfachen Strecke von ${distanceKm} km zur Arbeitsstätte und ${effectiveWorkdays} Pendeltagen im Jahr beträgt die Entfernungspauschale ${formatCurrency(totalAllowancePerYear)} als Werbungskosten.${isCapped ? ' (Auf die gesetzliche ÖPNV-Höchstgrenze von 4.500 € begrenzt).' : ''}`,

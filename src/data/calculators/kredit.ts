@@ -455,7 +455,7 @@ export const KREDIT_CALCULATORS: CalculatorDefinition[] = [
       details: 'Bereits eine einmalige Sondertilgung von 5.000 € zu Beginn eines Darlehens kann über eine 15-jährige Laufzeit Zinskosten im vierstelligen Bereich einsparen und die Entschuldung um viele Monate beschleunigen.',
     },
     faqs: [
-      { question: 'Wie viel Prozent Sondertilgung sind bei Baufinanzierungen üblich?', answer: 'Die meisten Kreditinstitute gewähren heute 5 Prozent der ursprünglichen Kreditsumme pro Kalenderjahr als kostenfreie Sondertilgungsoption.' },
+      { question: 'Wie viel Prozent Sondertilgung sind bei Baufinanzierungen üblich?', answer: 'Eine gesetzliche Vorgabe gibt es nicht: Ob und in welcher Höhe Sie während der Zinsbindung kostenlos sondertilgen dürfen, steht allein im Darlehensvertrag. Angebote nennen das Recht meist als Prozentsatz der ursprünglichen Darlehenssumme pro Jahr, zum Beispiel 5 %. Fragen Sie vor Abschluss gezielt danach, wenn Sie größere Einmalzahlungen erwarten.' },
       { question: 'Verringert eine Sondertilgung die Monatsrate oder die Laufzeit?', answer: 'Bei klassischen Annuitätendarlehen bleibt die vertragliche Monatsrate konstant, wodurch sich die Restschuld am Ende der Zinsbindung drastisch reduziert und die Gesamtlaufzeit verkürzt.' },
     ],
     relatedSlugs: ['tilgungsrechner', 'kreditrechner', 'restschuld-rechner'],

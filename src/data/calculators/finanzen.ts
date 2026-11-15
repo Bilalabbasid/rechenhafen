@@ -9,6 +9,13 @@ import {
 } from '@/lib/calculators/finanzen';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
+// ETF-Sparplan-Beispiel: dieselbe Rechnung wie der Rechner (Zinseszins monatlich mit Rendite minus TER).
+const ETF_EX = (() => {
+  const r = calculateCompoundInterest({ monthlyContribution: 250, initialAmount: 1000, annualRate: 7.0 - 0.2, compoundFrequency: '12', years: 20 });
+  const find = (id: string) => Number(r.secondary?.find((s) => s.id === id)?.value ?? 0);
+  return { end: Number(r.primary.value), deposits: find('totalDeposits'), gain: find('totalInterest') };
+})();
+
 export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'zinseszinsrechner',
@@ -127,7 +134,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     inputs: [
       { id: 'monthlyContribution', label: 'Monatliche ETF-Sparrate', type: 'number', defaultValue: 250, min: 0, step: 25, unit: '€', helpText: 'Regelmäßige Sparrate (0 € für reine Einmalanlagen ohne monatliche Sparrate).' },
       { id: 'initialAmount', label: 'Einmalige Anfangsinvestition', type: 'number', defaultValue: 1000, min: 0, step: 500, unit: '€', helpText: 'Einmaliges Startkapital (0 € bei reinem Ratensparen).' },
-      { id: 'annualRate', label: 'Erwartete Marktrendite p.a.', type: 'number', defaultValue: 7.0, min: 0, max: 20, step: 0.5, unit: '%', helpText: 'Historischer MSCI World Durchschnitt: ca. 7–8 % p.a.' },
+      { id: 'annualRate', label: 'Erwartete Marktrendite p.a.', type: 'number', defaultValue: 7.0, min: 0, max: 20, step: 0.5, unit: '%', helpText: 'Beispielwert, keine Prognose: Künftige Renditen sind nicht garantiert. Rechnen Sie zum Vergleich auch mit niedrigeren Werten.' },
       { id: 'terPercent', label: 'Laufende Kosten des ETFs (TER)', type: 'number', defaultValue: 0.20, min: 0, max: 2, step: 0.05, unit: '%', helpText: 'Breit gestreute World-ETFs: ca. 0,15 % bis 0,25 %' },
       { id: 'years', label: 'Anlagehorizont in Jahren', type: 'number', defaultValue: 20, min: 1, max: 50, step: 1, unit: 'Jahre' },
     ],
@@ -153,14 +160,14 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     formula: 'Netto-Rendite = Marktrendite - Gesamtkostenquote (TER)',
     formulaExplanation: 'Zinseszinsrechnung auf monatlicher Basis mit um die TER reduzierter Effektivrendite.',
     workedExample: {
-      title: 'Beispiel: 250 € monatlich bei 7 % Bruttorendite und 0,2 % TER über 20 Jahre',
-      description: 'Eingezahlt: 61.000 €. Endvermögen: ca. 138.500 €. Reingewinn: ca. 77.500 €.',
+      title: 'Beispiel: 250 € monatlich bei 7 % Beispielrendite und 0,2 % TER über 20 Jahre',
+      description: `Eingezahlt: ${formatCurrency(ETF_EX.deposits)}. Endvermögen: ${formatCurrency(ETF_EX.end)}. Erträge: ${formatCurrency(ETF_EX.gain)}. Vor Steuern und bei gleichbleibender Rendite.`,
       inputs: { monthlyContribution: 250, initialAmount: 1000, annualRate: 7.0, terPercent: 0.2, years: 20 },
-      resultSummary: 'ca. 138.500 €',
+      resultSummary: formatCurrency(ETF_EX.end),
     },
     content: {
       intro: 'Ein breit diversifizierter ETF-Sparplan (z. B. auf den MSCI World oder FTSE All-World) ermöglicht langfristigen Vermögensaufbau über regelmäßige monatliche Sparraten.',
-      details: 'Der Rechner berücksichtigt die Gesamtkostenquote (TER), erwartete Marktrenditen und den Cost-Average-Effekt. Bei historisch langfristigen Aktienmarktrenditen von real ca. 6 bis 8 % p.a. bildet der Sparplan einen Kernbaustein der privaten Altersvorsorge. Berechnen Sie die steuerliche Belastung Ihrer Erträge und realisierten Kursgewinne mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und optimieren Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
+      details: 'Der Rechner berücksichtigt die Gesamtkostenquote (TER) und eine von Ihnen gewählte, gleichbleibende Rendite. Echte Kurse schwanken; die eingegebene Rendite ist ein Beispielwert und keine Prognose. Berechnen Sie die steuerliche Belastung Ihrer Erträge und realisierten Kursgewinne mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und optimieren Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
     },
     faqs: [
       { question: 'Was bedeutet die Gesamtkostenquote (TER)?', answer: 'Die Total Expense Ratio (TER) beziffert die laufenden jährlichen Fondskosten (Management, Verwaltung), die direkt dem Fondsvermögen entnommen werden (typisch 0,07 % bis 0,25 % bei Standard-ETFs).' },
@@ -362,7 +369,7 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Inflation misst die prozentuale Teuerung von Waren und Dienstleistungen anhand des Verbraucherpreisindex (VPI) des Statistischen Bundesamtes.',
-      details: 'Formel für künftige Preise: Endpreis = Startpreis · (1 + Inflation/100)^Jahre. Bei einer durchschnittlichen Inflation von 2,5 % pro Jahr verdoppeln sich die Lebenshaltungskosten in knapp 29 Jahren.',
+      details: 'Formel für künftige Preise: Endpreis = Startpreis · (1 + Inflation/100)^Jahre. Bei einer durchschnittlichen Inflation von 2,5 % pro Jahr verdoppeln sich die Lebenshaltungskosten in gut 28 Jahren (ln 2 ÷ ln 1,025 ≈ 28,1).',
     },
     faqs: [
       { question: 'Was ist der Unterschied zwischen gefühlter und statistischer Inflation?', answer: 'Der offizielle VPI basiert auf einem repräsentativen Warenkorb. Produkte des täglichen Bedarfs (Lebensmittel, Energie), die häufig gekauft werden, prägen die gefühlte Inflation stärker als langlebige Güter.' },

@@ -89,7 +89,14 @@ export function expectScopedSitemapLastmod(slugs: string[], date = '2026-10-25')
     .map((e) => e.url);
   for (const s of slugs) {
     expect(entries.some((e) => e.url === url(s)), s).toBe(true);
-    expect(bumped).toContain(url(s));
+    // A later page-content update (contentUpdatedAt) legitimately moves lastmod past the review date.
+    const contentDate = getCalc(s).contentUpdatedAt;
+    if (contentDate && contentDate > date) {
+      const entry = entries.find((e) => e.url === url(s))!;
+      expect(new Date(entry.lastModified as Date).toISOString().startsWith(contentDate), s).toBe(true);
+    } else {
+      expect(bumped).toContain(url(s));
+    }
   }
   const allowed = [...ALL_SEO_CTR_SLUGS, ...RANKING_GAP_SLUGS, ...LASTMOD_2026_10_25_DATA_REVIEW_SLUGS].map(url);
   for (const u of bumped) expect(allowed).toContain(u);

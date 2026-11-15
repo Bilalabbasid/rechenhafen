@@ -184,6 +184,8 @@ export interface CalculatorDefinition {
   rechtsstand?: string;
   legalBasis?: LegalBasisLink[];
   assumptions?: string[];
+  /** ISO date of the last editorial content update (set from page-content overlays). Used for sitemap lastmod. */
+  contentUpdatedAt?: string;
 }
 
 export interface CategoryDefinition {

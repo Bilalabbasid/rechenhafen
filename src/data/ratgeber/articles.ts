@@ -891,9 +891,9 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       'Millionen Berufstätige in Deutschland pendeln täglich zur Arbeit. Doch die wenigsten kennen ihre tatsächlichen monatlichen Mobilitätskosten. Wer nur die Benzinkosten kalkuliert, übersieht Reifenverschleiß, Wertverlust und Inspektionen. Erfahren Sie, wie Sie Ihre echten Kosten berechnen und wie viel die Steuer über die Pendlerpauschale erstattet.',
     keyTakeaways: [
       'Echte Pkw-Gesamtkosten liegen meist zwischen 0,35 € und 0,65 € pro gefahrenem Kilometer (inklusive Wertverlust, Versicherung und Verschleiß).',
-      'Die steuerliche Pendlerpauschale (§ 9 Abs. 1 Nr. 4 EStG) beträgt 0,30 € für die ersten 20 km und 0,38 € ab dem 21. Entfernungskilometer der einfachen Strecke.',
+      'Die steuerliche Pendlerpauschale (§ 9 Abs. 1 Nr. 4 EStG) beträgt seit 2026 einheitlich 0,38 € je Entfernungskilometer der einfachen Strecke, schon ab dem ersten Kilometer (bis 2025: 0,30 € für die ersten 20 km).',
       'Die Pendlerpauschale mindert als Werbungskosten das zu versteuernde Einkommen – sie wird nicht 1:1 vom Finanzamt auf das Bankkonto erstattet.',
-      'Wer 30 km einfache Strecke an 220 Tagen pendelt, erzielt Werbungskosten von über 2.150 € und überschreitet den Arbeitnehmer-Pauschbetrag deutlich.',
+      'Wer 30 km einfache Strecke an 220 Tagen pendelt, erzielt Werbungskosten von über 2.500 € und überschreitet den Arbeitnehmer-Pauschbetrag deutlich.',
     ],
     primaryCalculator: {
       slug: 'pendlerpauschale-rechner',
@@ -931,17 +931,17 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         paragraphs: [
           'Für die Einkommensteuererklärung gilt das Prinzip der Entfernungspauschale:',
           '1. Es zählt nur die einfache Wegstrecke (die kürzeste Straßenverbindung zwischen Wohnung und erster Tätigkeitsstätte), nicht der Hin- und Rückweg.',
-          '2. Staffelung: 0,30 € je Kilometer für die ersten 20 Kilometer; 0,38 € je Kilometer ab dem 21. Kilometer.',
+          '2. Satz: seit 2026 0,38 € je vollem Entfernungskilometer ab dem ersten Kilometer (Steueränderungsgesetz 2025). Bis 2025 galten 0,30 € für die ersten 20 Kilometer und 0,38 € ab dem 21. Kilometer.',
           '3. Verkehrsmittelunabhängig: Die Pauschale gilt gleichermaßen für Pkw, Motorrad, Fahrrad, ÖPNV oder Fußgänger (Ausnahme: Flugzeuge).',
           '4. Deckelung: Bei Nutzung öffentlicher Verkehrsmittel oder Fahrgemeinschaften gilt ein Höchstbetrag von 4.500 € pro Kalenderjahr, es sei denn, der eigene Pkw wird genutzt.',
         ],
         table: {
           headers: ['Einfache Entfernung', 'Arbeitstage/Jahr', 'Jährliche Werbungskosten', 'Steuerersparnis (bei 35 % Grenzsteuersatz)'],
           rows: [
-            ['15 km', '220 Tage', '990 € (unter Pauschbetrag)', '0 € (durch 1.230 € Pauschbetrag abgegolten)'],
-            ['30 km', '220 Tage', '2.156 € (1.320 € + 836 €)', 'ca. 324 € echte Steuererstattung'],
-            ['50 km', '220 Tage', '3.828 € (1.320 € + 2.508 €)', 'ca. 909 € echte Steuererstattung'],
-            ['75 km', '220 Tage', '5.918 € (1.320 € + 4.598 €)', 'ca. 1.640 € echte Steuererstattung'],
+            ['15 km', '220 Tage', '1.254 € (knapp über dem Pauschbetrag)', 'ca. 8 € (fast ganz durch den 1.230 € Pauschbetrag abgegolten)'],
+            ['30 km', '220 Tage', '2.508 € (30 km × 0,38 € × 220)', 'ca. 447 € echte Steuererstattung'],
+            ['50 km', '220 Tage', '4.180 € (50 km × 0,38 € × 220)', 'ca. 1.033 € echte Steuererstattung'],
+            ['75 km', '220 Tage', '6.270 € (75 km × 0,38 € × 220)', 'ca. 1.764 € echte Steuererstattung'],
           ],
         },
       },
@@ -949,26 +949,26 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
     workedExample: {
       title: 'Beispiel: Pendelkosten bei 35 km Arbeitsweg und 210 Arbeitstagen',
       scenario: 'Eine Arbeitnehmerin fährt an 210 Tagen im Jahr mit dem Pkw zur Arbeit. Die einfache Strecke beträgt 35 Kilometer (Hin- und Rückweg: 70 km täglich). Ihr Fahrzeug verbraucht 6,5 Liter Benzin auf 100 km bei einem Benzinpreis von 1,80 €/Liter.',
-      formula: 'Werbungskosten = [(20 km × 0,30 €) + (Restkilometer × 0,38 €)] × Arbeitstage',
+      formula: 'Werbungskosten = Entfernungskilometer × 0,38 € × Arbeitstage (ab 2026)',
       steps: [
         {
           label: 'Schritt 1: Reale Spritkosten berechnen',
           calculation: '70 km × 210 Tage = 14.700 km Fahrleistung. (14.700 km ÷ 100) × 6,5 l × 1,80 € = 1.719,90 € Sprit pro Jahr (143,33 €/Monat).',
         },
         {
-          label: 'Schritt 2: Pendlerpauschale für 35 km Staffelung berechnen',
-          calculation: '(20 km × 0,30 €) + (15 km × 0,38 €) = 6,00 € + 5,70 € = 11,70 € Pauschale pro Arbeitstag.',
+          label: 'Schritt 2: Pendlerpauschale für 35 km berechnen',
+          calculation: '35 km × 0,38 € = 13,30 € Pauschale pro Arbeitstag.',
         },
         {
           label: 'Schritt 3: Jahreswerbungskosten ermitteln',
-          calculation: '11,70 €/Tag × 210 Arbeitstage = 2.457,00 € steuerliche Werbungskosten.',
+          calculation: '13,30 €/Tag × 210 Arbeitstage = 2.793,00 € steuerliche Werbungskosten.',
         },
         {
           label: 'Schritt 4: Netto-Steuererstattung berechnen',
-          calculation: 'Werbungskosten übersteigen Arbeitnehmer-Pauschbetrag (1.230 €) um 1.227 €. Bei 35 % Grenzsteuer: 1.227 € × 35 % = ca. 429 € Steuererstattung.',
+          calculation: 'Werbungskosten übersteigen Arbeitnehmer-Pauschbetrag (1.230 €) um 1.563 €. Bei 35 % Grenzsteuer: 1.563 € × 35 % = ca. 547 € Steuererstattung.',
         },
       ],
-      resultSummary: 'Tatsächliche Spritkosten: 143 €/Monat. Das Finanzamt erstattet über die Einkommensteuer rund 429 € im Jahr zurück.',
+      resultSummary: 'Tatsächliche Spritkosten: 143 €/Monat. Das Finanzamt erstattet über die Einkommensteuer rund 547 € im Jahr zurück.',
     },
     commonMistakes: [
       {
@@ -976,7 +976,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         correction: 'Das Finanzamt erkennt nur die einfache Entfernung (Wegstrecke) an, nicht die gesamte Fahrleistung beider Richtungen.',
       },
       {
-        mistake: 'Glauben, das Finanzamt zahle 30 bzw. 38 Cent pro Kilometer direkt bar aus.',
+        mistake: 'Glauben, das Finanzamt zahle 38 Cent pro Kilometer direkt bar aus.',
         correction: 'Die Pauschale ist ein Absetzbetrag vom Einkommen. Die echte Auszahlung entspricht der Pauschale multipliziert mit dem persönlichen Grenzsteuersatz.',
       },
     ],
@@ -991,7 +991,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       },
       {
         question: 'Darf ich die Pendlerpauschale auch ansetzen, wenn ich mit dem Deutschlandticket fahre?',
-        answer: 'Ja! Die Entfernungspauschale ist verkehrsmittelunabhängig. Sie können die vollen 0,30 € / 0,38 € ansetzen, selbst wenn Ihre tatsächlichen Ticketkosten (z. B. 49 bzw. 58 Euro/Monat) viel niedriger waren.',
+        answer: 'Ja! Die Entfernungspauschale ist verkehrsmittelunabhängig. Sie können die vollen 0,38 € je Entfernungskilometer ansetzen, selbst wenn Ihre tatsächlichen Ticketkosten (z. B. 49 bzw. 58 Euro/Monat) viel niedriger waren.',
       },
     ],
     officialSources: [

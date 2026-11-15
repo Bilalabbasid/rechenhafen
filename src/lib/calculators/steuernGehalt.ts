@@ -961,10 +961,11 @@ export function calculateArbeitgeberkosten(inputs: Record<string, any>): Calcula
 
   const agSvTotal = agRv + agAv + agKv + agPv;
 
-  // Umlagen
-  const u1 = monthlyGross * config.umlageU1;
-  const u2 = monthlyGross * config.umlageU2;
-  const u3 = monthlyGross * config.umlageU3Insolvenzgeld;
+  // Umlagen: U1, U2 und Insolvenzgeldumlage bemessen sich nach dem rentenversicherungspflichtigen Entgelt
+  // (höchstens bis zur BBG der Rentenversicherung). Die Unfallversicherung (BG) bleibt als Durchschnittssatz auf dem Brutto.
+  const u1 = rvGross * config.umlageU1;
+  const u2 = rvGross * config.umlageU2;
+  const u3 = rvGross * config.umlageU3Insolvenzgeld;
   const bg = monthlyGross * config.berufsgenossenschaftDurchschnitt;
 
   const totalUmlagen = u1 + u2 + u3 + bg;
@@ -985,6 +986,9 @@ export function calculateArbeitgeberkosten(inputs: Record<string, any>): Calcula
       { id: 'umlagen', label: 'Umlagen U1, U2, U3 & Berufsgenossenschaft', value: totalUmlagen, formattedValue: formatCurrency(totalUmlagen) },
       { id: 'costFactor', label: 'Lohnnebenkosten-Aufschlag', value: additionalCostPercentage, formattedValue: formatPercent(additionalCostPercentage) },
     ],
+    warning: monthlyGross > 0 && monthlyGross <= config.midijobObergrenze
+      ? `Bis ${formatCurrency(config.midijobObergrenze)} Brutto gelten Sonderregeln: Minijobs bis ${formatCurrency(config.minijobGrenze)} mit Pauschalabgaben, darüber der Übergangsbereich (Midijob), in dem der Arbeitgeber mehr als die Hälfte der Beiträge trägt. Diese Werte berechnet der Rechner nicht; nutzen Sie dafür den Minijob-Rechner oder den Brutto-Netto-Rechner mit Arbeitgeberanteil.`
+      : undefined,
   };
 }
 
@@ -1100,13 +1104,29 @@ export function calculateMidijob(inputs: Record<string, any>): CalculationResult
   const gross = Math.max(config.minijobGrenze + 0.01, Math.min(config.midijobObergrenze, rawEarnings));
 
   // Übergangsbereich nach § 20 Abs. 2a SGB IV: Arbeitnehmeranteil auf die reduzierte beitragspflichtige Einnahme
-  const { beArbeitnehmer: reducedBase, anBeitrag: anSocial } = computeUebergangsbereich(gross, config);
+  const { beArbeitnehmer: reducedBase } = computeUebergangsbereich(gross, config);
 
-  // Lohnsteuer im Übergangsbereich
-  const estAnnual = computeEStSingle(Math.max(0, gross * 12 - anSocial * 12 - 1230), config);
-  const monthlyLSt = estAnnual / 12;
+  // Arbeitnehmerwerte aus dem Brutto-Netto-Rechner: Übergangsbereich in der SV (inkl. Kinderlosenzuschlag),
+  // Lohnsteuer nach PAP vom vollen Arbeitslohn (der Übergangsbereich ist steuerlich unbeachtlich).
+  const bn = calculateBruttoNetto({
+    taxYear,
+    grossSalary: gross,
+    period: 'month',
+    taxClass: inputs.taxClass ?? '1',
+    children: inputs.children ?? '0',
+    age: inputs.age ?? 30,
+    churchTax: inputs.churchTax ?? 'no',
+    federalState: inputs.federalState ?? 'other',
+    healthInsuranceType: 'statutory',
+    kvZusatzbeitrag: inputs.kvZusatzbeitrag ?? config.zusatzbeitragKrankenversicherungDurchschnitt * 100,
+    showEmployerShare: true,
+  });
+  const bnValue = (id: string) => Number(bn.secondary?.find((s) => s.id === id)?.value ?? 0);
+  const anSocial = bnValue('socialTotal');
+  const monthlyLSt = bnValue('lohnsteuer') + bnValue('solz') + bnValue('kirchensteuer');
+  const agSocial = bnValue('agSocialTotal');
 
-  const netEarnings = Math.max(0, gross - anSocial - monthlyLSt);
+  const netEarnings = Math.max(0, Number(bn.primary.value) || 0);
   const effectiveSocialRate = (anSocial / gross) * 100;
 
   return {
@@ -1119,9 +1139,10 @@ export function calculateMidijob(inputs: Record<string, any>): CalculationResult
     secondary: [
       { id: 'gross', label: 'Midijob-Bruttogehalt', value: gross, formattedValue: formatCurrency(gross) },
       { id: 'anSocial', label: 'Ermäßigte Sozialabgaben (AN)', value: anSocial, formattedValue: formatCurrency(anSocial) },
-      { id: 'monthlyLSt', label: 'Lohnsteuer', value: monthlyLSt, formattedValue: formatCurrency(monthlyLSt) },
+      { id: 'monthlyLSt', label: 'Lohnsteuer (inkl. Soli und Kirchensteuer)', value: monthlyLSt, formattedValue: formatCurrency(monthlyLSt) },
       { id: 'reducedBase', label: 'Beitragspflichtige Einnahme Arbeitnehmer (§ 20 Abs. 2a SGB IV)', value: reducedBase, formattedValue: formatCurrency(reducedBase) },
       { id: 'effectiveRate', label: 'Effektiver Sozialabgabensatz', value: effectiveSocialRate, formattedValue: formatPercent(effectiveSocialRate) },
+      { id: 'agSocial', label: 'Sozialabgaben des Arbeitgebers', value: agSocial, formattedValue: formatCurrency(agSocial) },
       { id: 'fullRVPension', label: 'Voller Rentenanspruch trotz reduzierter Beiträge', value: 100, formattedValue: 'Ja (100 % Rentenanspruch)' },
     ],
   };
@@ -1161,18 +1182,29 @@ export function calculateBonusNetto(inputs: Record<string, any>): CalculationRes
     };
   }
 
-  // BMF-Methode: Steuerberechnung auf Jahresbasis mit und ohne Bonus
-  const estWithoutBonus = computeEStSingle(Math.max(0, regularGrossYear - 1230 - regularGrossYear * 0.18), config);
-  const estWithBonus = computeEStSingle(Math.max(0, (regularGrossYear + bonus) - 1230 - (regularGrossYear + bonus) * 0.18), config);
-  const taxOnBonus = estWithBonus - estWithoutBonus;
-
-  // Sozialabgaben auf Einmalzahlung (Differenz bis BBG)
-  const remainingRvCapacity = Math.max(0, config.bbgRentenversicherungJahr - regularGrossYear);
-  const bonusRvGross = Math.min(bonus, remainingRvCapacity);
-  const svOnBonus = bonusRvGross * (config.beitragssatzRentenversicherung / 2 + config.beitragssatzArbeitslosenversicherung / 2);
+  // Sonstiger Bezug wie in der Lohnabrechnung (§ 39b Abs. 3 EStG): Jahreswerte mit und ohne Bonus vergleichen.
+  // Lohnsteuer (PAP inkl. Vorsorgepauschale), Soli, Kirchensteuer und alle vier Sozialversicherungen
+  // kommen aus dem Brutto-Netto-Rechner; die Beitragsbemessungsgrenzen wirken über das Jahresentgelt.
+  const bnInputs = {
+    taxYear,
+    period: 'year',
+    taxClass: inputs.taxClass ?? '1',
+    children: inputs.children ?? '0',
+    age: inputs.age ?? 30,
+    churchTax: inputs.churchTax ?? 'no',
+    federalState: inputs.federalState ?? 'other',
+    healthInsuranceType: inputs.healthInsuranceType ?? 'statutory',
+    pkvMonthly: inputs.pkvMonthly ?? 0,
+    kvZusatzbeitrag: inputs.kvZusatzbeitrag ?? config.zusatzbeitragKrankenversicherungDurchschnitt * 100,
+  };
+  const without = calculateBruttoNetto({ ...bnInputs, grossSalary: regularGrossYear });
+  const withBonus = calculateBruttoNetto({ ...bnInputs, grossSalary: regularGrossYear + bonus });
+  const bnValue = (r: CalculationResult, id: string) => Number(r.secondary?.find((s) => s.id === id)?.value ?? 0);
+  const netBonus = Math.max(0, bnValue(withBonus, 'annualNet') - bnValue(without, 'annualNet'));
+  const svOnBonus = (bnValue(withBonus, 'socialTotal') - bnValue(without, 'socialTotal')) * 12;
+  const taxOnBonus = bonus - netBonus - svOnBonus;
 
   const totalDeductionsOnBonus = taxOnBonus + svOnBonus;
-  const netBonus = Math.max(0, bonus - totalDeductionsOnBonus);
   const deductionPercentage = bonus > 0 ? (totalDeductionsOnBonus / bonus) * 100 : 0;
 
   return {

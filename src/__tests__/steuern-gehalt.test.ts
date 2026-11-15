@@ -268,6 +268,24 @@ describe('Steuern & Gehalt — German Statutory Tax & Payroll Engine', () => {
     });
   });
 
+  describe('7b. Bonus-Netto (sonstiger Bezug)', () => {
+    it('equals the annual net with bonus minus without bonus, incl. KV/PV', () => {
+      const base = { taxYear: '2026', period: 'year', taxClass: '1', children: '0', age: 30, churchTax: 'no' };
+      const without = calculateBruttoNetto({ ...base, grossSalary: 48000 });
+      const withBonus = calculateBruttoNetto({ ...base, grossSalary: 52000 });
+      const annualNet = (r: typeof without) => Number(r.secondary?.find((s) => s.id === 'annualNet')?.value);
+      const res = calculateBonusNetto({ regularGrossYear: 48000, bonus: 4000, taxYear: '2026' });
+      expect(Number(res.primary.value)).toBeCloseTo(annualNet(withBonus) - annualNet(without), 6);
+      // KV und PV fallen unterhalb der BBG mit an: mehr als nur RV + AV (10,6 %)
+      expect(Number(res.secondary?.find((s) => s.id === 'svOnBonus')?.value)).toBeGreaterThan(4000 * 0.106 + 1);
+    });
+
+    it('charges only RV/AV on a bonus above the KV/PV ceiling', () => {
+      const res = calculateBonusNetto({ regularGrossYear: 75000, bonus: 5000, taxYear: '2026' });
+      expect(Number(res.secondary?.find((s) => s.id === 'svOnBonus')?.value)).toBeCloseTo(5000 * 0.106, 2);
+    });
+  });
+
   describe('8. Abfindungsrechner Fünftelregelung § 34 EStG', () => {
     it('calculates significant tax savings via Fünftelregelung', () => {
       const res = calculateAbfindung({

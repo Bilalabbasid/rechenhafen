@@ -5,6 +5,13 @@ import { getAllArticles } from '@/data/ratgeber/articles';
 import { isCalculatorIndexable } from '@/data/seo/indexable-calculators';
 import { SITE_LAST_UPDATED } from '@/data/home';
 
+/** Later of two ISO dates (either may be missing). */
+function latestDate(a?: string, b?: string): string | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return a > b ? a : b;
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://rechenhafen.de';
   // Stable release date of the current platform redesign
@@ -56,7 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const calculatorPages: MetadataRoute.Sitemap = ALL_CALCULATORS.filter((calc) =>
     isCalculatorIndexable(calc.slug),
   ).map((calc) => {
-    const lastRev = calc.trustMeta?.lastReviewed || calc.timeSensitiveMeta?.lastVerified;
+    const lastRev = latestDate(calc.trustMeta?.lastReviewed || calc.timeSensitiveMeta?.lastVerified, calc.contentUpdatedAt);
     return {
       url: `${baseUrl}/rechner/${calc.slug}/`,
       lastModified: lastRev ? new Date(lastRev) : platformUpdateDate,

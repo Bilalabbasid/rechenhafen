@@ -261,6 +261,16 @@ describe('Batch 2 Calculators Comprehensive QA Suite (50 Calculators)', () => {
       expect(resZeroDays.secondary?.find((s) => s.id === 'perDay')?.value).toBe(0);
     });
 
+    it('effektivzins-kredit-rechner solves the PAngV rate (5 % Sollzins → 5,12 %, Disagio raises it)', () => {
+      const calc = getCalculatorDefinitionBySlug('effektivzins-kredit-rechner')!;
+      const plain = calc.calculate({ loanAmount: 20000, nominalRate: 5, disagioPct: 0, months: 48 });
+      expect(Number(plain.primary.value)).toBeCloseTo((Math.pow(1 + 0.05 / 12, 12) - 1) * 100, 6);
+      expect(plain.primary.formattedValue).toBe('5,12 %');
+      const withDisagio = calc.calculate({ loanAmount: 20000, nominalRate: 5, disagioPct: 2, months: 48 });
+      // Annuitätendarlehen: 2 % Disagio über 4 Jahre wirken deutlich stärker als 2 % ÷ 4 Jahre
+      expect(Number(withDisagio.primary.value)).toBeGreaterThan(Number(plain.primary.value) + 0.5);
+    });
+
     it('verdopplungszeit-rechner returns error for non-positive interest rate', () => {
       const calc = getCalculatorDefinitionBySlug('verdopplungszeit-rechner')!;
       const result = calc.calculate({ interestRate: 0, initialAmount: 10000 });

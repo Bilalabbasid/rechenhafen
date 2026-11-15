@@ -452,7 +452,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
         primary: { id: 'fraction', label: 'Gekürzter Bruch', value: dec, formattedValue: `${sN} / ${sD}`, highlight: true },
         secondary: [
           { id: 'decimal', label: 'Als Dezimalzahl', value: dec, formattedValue: formatNumber(dec, 4) },
-          { id: 'mixed', label: 'Als gemischte Zahl', value: dec, formattedValue: Math.abs(sN) >= sD ? `${Math.trunc(sN / sD)} ${Math.abs(sN % sD)}/${sD}` : `${sN}/${sD}` },
+          { id: 'mixed', label: 'Als gemischte Zahl', value: dec, formattedValue: sD === 1 ? `${sN}` : Math.abs(sN) >= sD ? `${Math.trunc(sN / sD)} ${Math.abs(sN % sD)}/${sD}` : `${sN}/${sD}` },
         ],
         summaryText: `Das Ergebnis der Rechnung ist ${sN}/${sD} (entspricht dezimal ${formatNumber(dec, 4)}).`,
       };
@@ -706,7 +706,7 @@ export const MATHEMATIK_CALCULATORS: CalculatorDefinition[] = [
     shortDescription: 'Ermittelt das arithmetische Mittel, den Zentralwert (Median) und Kennzahlen einer Zahlenreihe.',
     searchKeywords: ['durchschnittsrechner', 'mittelwert berechnen', 'median rechner', 'notendurchschnitt rechner online'],
     inputs: [
-      { id: 'numbers', label: 'Zahlen eingeben (mit Komma, Semikolon oder Leerzeichen getrennt)', type: 'number', defaultValue: 0, placeholder: 'z.B. 12; 25; 34; 18; 40', helpText: 'Geben Sie Ihre Zahlenfolge ein' },
+      { id: 'numbers', label: 'Zahlen eingeben (mit Semikolon oder Leerzeichen getrennt, Dezimalzahlen mit Komma)', type: 'text', defaultValue: '10; 20; 30; 40; 50', placeholder: 'z.B. 12; 25; 34,5; 18; 40', helpText: 'Geben Sie Ihre Zahlenfolge ein' },
     ],
     calculate: calculateAverage,
     formula: 'Mittelwert (x̄) = (x₁ + x₂ + ... + xₙ) / n',

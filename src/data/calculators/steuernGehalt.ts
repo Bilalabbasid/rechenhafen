@@ -1,4 +1,4 @@
-import { CalculatorDefinition } from '@/types/calculator';
+import { CalculatorDefinition, CalculationResult } from '@/types/calculator';
 import {
   calculateBruttoNetto,
   calculateNettoBrutto,
@@ -70,6 +70,18 @@ const STUNDENLOHN_TABLE =
 const WERKSTUDENT_TABLE =
   'Beispiele Werkstudent, Steuerklasse 1 (2026):\n' +
   [800, 1200, 1600, 2000, 2500].map((g) => `- **${BN_WS[g].gross} brutto:** ${BN_WS[g].net} netto`).join('\n');
+
+// Beispiele für Netto-Brutto-, Grenzsteuersatz-, Midijob- und Bonus-Rechner: mit derselben Funktion berechnet wie das Ergebnis.
+const findSec = (r: CalculationResult, id: string) => r.secondary?.find((x) => x.id === id);
+const NB_EX = calculateNettoBrutto({ desiredNet: 2500, period: 'month', taxClass: '1', taxYear: '2026' });
+const GS_EX = calculateGrenzsteuersatz({ taxableIncome: 50000, taxYear: '2026', tariffType: 'single' });
+const GS_RAISE = [3000, 4500, 6500].map((g) => {
+  const before = Number(calculateBruttoNetto({ ...BN_DEFAULTS, grossSalary: g, period: 'month' }).primary.value);
+  const after = Number(calculateBruttoNetto({ ...BN_DEFAULTS, grossSalary: g + 100, period: 'month' }).primary.value);
+  return { g, keep: after - before };
+});
+const MIDI_EX = calculateMidijob({ earnings: 1200, taxYear: '2026' });
+const BONUS_EX = calculateBonusNetto({ regularGrossYear: 48000, bonus: 4000, taxYear: '2026' });
 
 // Abfindungsrechner: Beispiele und Tabelle werden mit derselben Funktion erzeugt wie das Rechnerergebnis.
 function abfindungSecondary(r: ReturnType<typeof calculateAbfindung>, id: string): number {
@@ -460,9 +472,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Da der deutsche Steuertarif progressiv verläuft und nicht linear umkehrbar ist, ermittelt ein numerisches Bisektionsverfahren das voraussichtlich benötigte Bruttogehalt rechnerisch.',
     workedExample: {
       title: 'Beispiel: 2.500 € Wunsch-Netto in Steuerklasse 1 (2026)',
-      description: 'Um 2.500 € netto ausgezahlt zu bekommen, ist bei Steuerklasse 1 (kinderlos, durchschnittlicher Zusatzbeitrag 2026 von 2,9 %) ein monatliches Bruttogehalt von rund 3.814 € erforderlich.',
+      description: `Um 2.500 € netto ausgezahlt zu bekommen, ist bei Steuerklasse 1 (kinderlos, durchschnittlicher Zusatzbeitrag 2026 von 2,9 %) ein monatliches Bruttogehalt von rund ${NB_EX.primary.formattedValue} erforderlich.`,
       inputs: { desiredNet: 2500, taxClass: '1', taxYear: '2026' },
-      resultSummary: 'ca. 3.814,28 € Brutto monatlich erforderlich',
+      resultSummary: `ca. ${NB_EX.primary.formattedValue} Brutto monatlich erforderlich`,
     },
     content: {
       intro: 'Bei Gehaltsverhandlungen wird fast immer über das Bruttogehalt gesprochen – für Ihren Lebensstandard zählt jedoch das Geld auf dem Konto. Dieser Rechner ermittelt sofort das nötige Brutto.',
@@ -698,9 +710,9 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Der Grenzsteuersatz ist die mathematische Ableitung der Steuerfunktion nach § 32a EStG an der Stelle des aktuellen zvE.',
     workedExample: {
       title: 'Beispiel: 50.000 € zvE im Grundtarif (2026)',
-      description: 'Grenzsteuersatz: 35,10 %. Durchschnittssteuersatz: 20,53 %. Auf zusätzliche 1.000 € Gehalt fallen ca. 351 € Einkommensteuer an.',
+      description: `Grenzsteuersatz: ${GS_EX.primary.formattedValue}. Durchschnittssteuersatz: ${findSec(GS_EX, 'avgRate')?.formattedValue}. Auf zusätzliche 1.000 € zu versteuerndes Einkommen fallen ${findSec(GS_EX, 'taxOn1000')?.formattedValue} Einkommensteuer an.`,
       inputs: { taxableIncome: 50000, taxYear: '2026' },
-      resultSummary: '35,10 % Grenzsteuersatz | 20,53 % Durchschnittssatz',
+      resultSummary: `${GS_EX.primary.formattedValue} Grenzsteuersatz | ${findSec(GS_EX, 'avgRate')?.formattedValue} Durchschnittssatz`,
     },
     content: {
       intro: 'Lohnt sich eine Gehaltserhöhung oder Mehrarbeit steuerlich? Mit dem Grenzsteuersatz-Rechner sehen Sie sofort, welcher Prozentsatz vom nächsten verdienten Euro an das Finanzamt fließt.',
@@ -708,7 +720,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Was bedeutet kalte Progression?', answer: 'Kalte Progression beschreibt den Effekt, wenn eine Gehaltserhöhung lediglich die Inflation ausgleicht, der Arbeitnehmer durch den progressiven Steuertarif aber prozentual höher besteuert wird und die reale Kaufkraft sinkt. Der Gesetzgeber passt die Tarifgrenzen daher regelmäßig an.' },
-      { question: 'Kann eine Gehaltserhöhung dazu führen, dass man netto weniger hat als vorher?', answer: 'Nein, bei regulären Arbeitslöhnen im deutschen Steuertarif ist das mathematisch ausgeschlossen, weil der Grenzsteuersatz nie 100 % erreicht (Höchstsatz 45 %). Man behält von jedem Mehr-Euro immer mindestens 55 Cent netto.' },
+      { question: 'Kann eine Gehaltserhöhung dazu führen, dass man netto weniger hat als vorher?', answer: `Bei der Einkommensteuer nicht: Der Grenzsteuersatz erreicht höchstens 45 %, zuzüglich Soli und gegebenenfalls Kirchensteuer. Als Arbeitnehmer zahlen Sie auf die Erhöhung aber auch Sozialabgaben, deshalb bleibt weniger als die Steuer allein vermuten lässt. In Steuerklasse 1 (kinderlos, ohne Kirchensteuer) bleiben 2026 von 100 € mehr Monatsbrutto bei ${formatCurrency(GS_RAISE[0].g)} Brutto ${formatCurrency(GS_RAISE[0].keep)}, bei ${formatCurrency(GS_RAISE[1].g)} ${formatCurrency(GS_RAISE[1].keep)} und bei ${formatCurrency(GS_RAISE[2].g)} ${formatCurrency(GS_RAISE[2].keep)}. Weniger Netto als vorher ist nur durch Effekte außerhalb der Lohnabrechnung möglich, etwa wenn einkommensabhängige Leistungen wie Wohngeld wegfallen.` },
     ],
     relatedSlugs: ['einkommensteuerrechner', 'brutto-netto-rechner', 'gehaltserhoehung-rechner', 'gewerbesteuer-rechner'],
     isTimeSensitive: true,
@@ -1001,7 +1013,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Was kostet eine Neueinstellung wirklich? Für Unternehmen und Selbstständige ist das Bruttogehalt nur ein Teil der Wahrheit. Dieser Rechner ermittelt die vollständigen Lohnnebenkosten.',
-      details: 'In der Praxis schlagen die gesetzlichen Lohnnebenkosten in Deutschland mit rund 20 % bis 23 % auf das Bruttogehalt zu Buche. Hinzu kommen betriebliche Kosten wie Arbeitsplatz, Softwarelizenzen und Fortbildungen.',
+      details: 'Die Sozialversicherungsbeiträge des Arbeitgebers werden bis zu den Beitragsbemessungsgrenzen berechnet, die Umlagen U1, U2 und die Insolvenzgeldumlage bis zur Grenze der Rentenversicherung. Hinzu kommen betriebliche Kosten wie Arbeitsplatz, Softwarelizenzen und Fortbildungen. Für Minijobs und Midijobs bis 2.000 € gelten eigene Regeln, die dieser Rechner nicht abbildet: Nutzen Sie dafür den [Minijob-Rechner](/rechner/minijob-rechner/) oder den [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) mit Arbeitgeberanteil.',
     },
     faqs: [
       { question: 'Was sind die Umlagen U1, U2 und U3?', answer: 'Die Umlage U1 finanziert die Erstattung von Arbeitgeberkosten bei Krankheit (für Betriebe bis 30 Mitarbeiter). Die Umlage U2 erstattet Mutterschutzaufwendungen. Die Umlage U3 (Insolvenzgeldumlage) sichert das Insolvenzgeld; ihr Satz beträgt 2026 gesetzlich 0,15 % (§ 360 SGB III). U1 und U2 legt jede Krankenkasse in ihrer Satzung selbst fest, der Rechner setzt dafür Durchschnittswerte an.' },
@@ -1124,15 +1136,30 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
           { value: '2025', label: '2025 (Übergangsbereich: 556,01 € bis 2.000 €)' },
         ],
       },
+      {
+        id: 'children',
+        label: 'Kinder (für die Pflegeversicherung)',
+        type: 'select',
+        defaultValue: '0',
+        options: [
+          { value: '0', label: 'Keine Kinder' },
+          { value: '1', label: '1 Kind' },
+          { value: '2', label: '2 Kinder' },
+          { value: '3', label: '3 Kinder' },
+          { value: '4', label: '4 Kinder' },
+          { value: '5', label: '5 oder mehr Kinder' },
+        ],
+        helpText: 'Kinderlose ab 23 Jahren zahlen 0,6 % Zuschlag zur Pflegeversicherung, ab dem 2. Kind sinkt der Beitrag. Gerechnet wird mit Steuerklasse 1, ohne Kirchensteuer.',
+      },
     ],
     calculate: calculateMidijob,
     formula: 'Beitragspflichtige Einnahme AN = 2.000 / (2.000 - MinijobGrenze) · (Entgelt - MinijobGrenze)',
     formulaExplanation: 'Nach § 20 Abs. 2a SGB IV zahlen Arbeitnehmer ihren Beitragsanteil nur auf eine reduzierte beitragspflichtige Einnahme, die von 0 € an der Minijob-Grenze auf das volle Entgelt bei 2.000 € ansteigt. Der Faktor F (2026: 0,6619) bestimmt die Einnahme für den Gesamtbeitrag und damit den Arbeitgeberanteil.',
     workedExample: {
       title: 'Beispiel: 1.200 € Brutto im Midijob (2026)',
-      description: 'Beitragspflichtige Einnahme Arbeitnehmer: 2.000 ÷ 1.397 × (1.200 − 603) = 854,69 €. Effektiver Sozialabgabensatz für den Arbeitnehmer: ca. 14,9 % statt regulär ca. 21 %. Voller Rentenanspruch bleibt bestehen.',
-      inputs: { earnings: 1200, taxYear: '2026' },
-      resultSummary: 'ca. 1.020,94 € Nettoverdienst bei reduzierten Beiträgen',
+      description: `Beitragspflichtige Einnahme Arbeitnehmer: 2.000 ÷ 1.397 × (1.200 − 603) = ${findSec(MIDI_EX, 'reducedBase')?.formattedValue}. Effektiver Sozialabgabensatz für den Arbeitnehmer (kinderlos, ab 23 Jahren): ${findSec(MIDI_EX, 'effectiveRate')?.formattedValue} statt regulär gut 21 %. Voller Rentenanspruch bleibt bestehen.`,
+      inputs: { earnings: 1200, taxYear: '2026', children: '0' },
+      resultSummary: `${MIDI_EX.primary.formattedValue} Nettoverdienst bei reduzierten Beiträgen`,
     },
     content: {
       intro: 'Der Übergangsbereich (Midijob) verhindert, dass Arbeitnehmer beim Überschreiten der Minijob-Grenze abrupt mit den vollen 20 % Sozialabgaben belastet werden.',
@@ -1184,6 +1211,30 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         unit: '€',
       },
       {
+        id: 'taxClass',
+        label: 'Steuerklasse',
+        type: 'select',
+        defaultValue: '1',
+        options: [
+          { value: '1', label: 'Steuerklasse I' },
+          { value: '2', label: 'Steuerklasse II (Alleinerziehend)' },
+          { value: '3', label: 'Steuerklasse III' },
+          { value: '4', label: 'Steuerklasse IV' },
+          { value: '5', label: 'Steuerklasse V' },
+          { value: '6', label: 'Steuerklasse VI' },
+        ],
+      },
+      {
+        id: 'churchTax',
+        label: 'Kirchensteuer',
+        type: 'select',
+        defaultValue: 'no',
+        options: [
+          { value: 'no', label: 'Nein' },
+          { value: 'yes', label: 'Ja (9 %)' },
+        ],
+      },
+      {
         id: 'taxYear',
         label: 'Jahr',
         type: 'select',
@@ -1195,13 +1246,13 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     calculate: calculateBonusNetto,
-    formula: 'Steuer(Bonus) = Jahressteuer(Gehalt + Bonus) - Jahressteuer(Gehalt)',
-    formulaExplanation: 'Einmalzahlungen werden als sonstige Bezüge versteuert. Die Steuerdifferenz auf das gesamte Jahresgehalt mit und ohne Bonus bestimmt den genauen Abzug.',
+    formula: 'Netto(Bonus) = Jahresnetto(Gehalt + Bonus) − Jahresnetto(Gehalt)',
+    formulaExplanation: 'Einmalzahlungen werden als sonstige Bezüge abgerechnet: Lohnsteuer, Soli und Kirchensteuer ergeben sich aus der Jahressteuer mit und ohne Bonus, Sozialabgaben fallen bis zu den Beitragsbemessungsgrenzen an. Der Rechner nutzt dafür dieselbe Berechnung wie der Brutto-Netto-Rechner (kinderlos ab 23, gesetzlich versichert mit durchschnittlichem Zusatzbeitrag).',
     workedExample: {
       title: 'Beispiel: 4.000 € Bonus bei 48.000 € regulärem Jahresgehalt',
-      description: 'Auf den Bonus greift wegen der Progression der persönliche Grenzsteuersatz (ca. 34 %) sowie ggf. Sozialabgaben. Netto-Auszahlung: ca. 2.180 €.',
-      inputs: { regularGrossYear: 48000, bonus: 4000, taxYear: '2026' },
-      resultSummary: 'ca. 2.180,00 € Netto-Auszahlung vom 4.000 € Bonus',
+      description: `Steuerklasse 1, kinderlos, ohne Kirchensteuer (2026): Auf den Bonus entfallen ${findSec(BONUS_EX, 'taxOnBonus')?.formattedValue} Steuern und ${findSec(BONUS_EX, 'svOnBonus')?.formattedValue} Sozialabgaben. Netto-Auszahlung: ${BONUS_EX.primary.formattedValue}.`,
+      inputs: { regularGrossYear: 48000, bonus: 4000, taxClass: '1', churchTax: 'no', taxYear: '2026' },
+      resultSummary: `${BONUS_EX.primary.formattedValue} Netto-Auszahlung vom 4.000 € Bonus`,
     },
     content: {
       intro: 'Freude über die Sonderzahlung, Enttäuschung auf dem Gehaltszettel: Warum werden Boni und Weihnachtsgeld gefühlt so stark besteuert? Dieser Rechner schafft Klarheit.',

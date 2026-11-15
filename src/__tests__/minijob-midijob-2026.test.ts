@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { getCalculatorBySlug } from '@/data/calculators';
 import { TAX_CONFIG_2025, TAX_CONFIG_2026 } from '@/data/regulated/tax';
 import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
-import { calculateMidijob, calculateMinijob } from '@/lib/calculators/steuernGehalt';
+import { calculateBruttoNetto, calculateMidijob, calculateMinijob } from '@/lib/calculators/steuernGehalt';
 
 /**
  * Regression tests for the 2026 Minijob/Midijob values. Expected numbers are derived
@@ -71,12 +71,20 @@ describe('minijob-rechner and midijob-rechner share the 2026 values', () => {
   });
 
   it('midijob-rechner uses the § 20 Abs. 2a employee base (1.200 € → 854,69 €)', () => {
-    const res = calculateMidijob({ earnings: 1200, taxYear: '2026' });
+    // 1 Kind: kein Kinderlosenzuschlag, kein Kinderabschlag (der Rechner rechnet sonst kinderlos ab 23)
+    const res = calculateMidijob({ earnings: 1200, taxYear: '2026', children: '1' });
     const reducedBase = Number(res.secondary?.find((s) => s.id === 'reducedBase')?.value);
     const anSocial = Number(res.secondary?.find((s) => s.id === 'anSocial')?.value);
     expect(reducedBase).toBeCloseTo(beArbeitnehmer(1200), 6);
     expect(reducedBase).toBeCloseTo(854.69, 2);
     expect(anSocial).toBeCloseTo(beArbeitnehmer(1200) * AN_RATE, 6);
+  });
+
+  it('midijob-rechner adds the Kinderlosenzuschlag and matches the Brutto-Netto-Rechner', () => {
+    const midi = calculateMidijob({ earnings: 1200, taxYear: '2026' });
+    const bn = calculateBruttoNetto({ grossSalary: 1200, period: 'month', taxYear: '2026', taxClass: '1', children: '0', age: 30 });
+    expect(Number(midi.primary.value)).toBeCloseTo(Number(bn.primary.value), 6);
+    expect(Number(midi.secondary?.find((s) => s.id === 'anSocial')?.value)).toBeGreaterThan(beArbeitnehmer(1200) * AN_RATE);
   });
 
   it('midijob-rechner 2025 uses G = 556 € (1.200 € → 2.000 / 1.444 × 644)', () => {

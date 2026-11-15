@@ -661,7 +661,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       { question: 'Welche Kantenlänge hat ein Würfel mit 1.000 Litern (1 m³) Volumen?', answer: 'Die Kubikwurzel aus 1 ist 1 Meter (bzw. dritte Wurzel aus 1.000 Litern = 10 Dezimeter = 100 cm).' },
       { question: 'Wie berechnet man Kubikwurzeln auf Taschenrechnern ohne Spezialtaste?', answer: 'Nutzen Sie die Potenzfunktion: Die dritte Wurzel aus x entspricht x hoch (1/3) bzw. x^(0,333333).' },
     ],
-    relatedSlugs: ['quadratwurzel-rechner', 'n-te-wurzel-rechner', 'zehnerpotenzen-rechner', 'zehnerpotenzen-rechner'],
+    relatedSlugs: ['quadratwurzel-rechner', 'n-te-wurzel-rechner', 'zehnerpotenzen-rechner'],
   },
   {
     id: 'n-te-wurzel-rechner',
@@ -747,7 +747,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       title: 'Beispiel: 2.500.000',
       description: '2.500.000 = 2,5 × 10⁶ (2,5 Mega).',
       inputs: { numberVal: 2500000 },
-      resultSummary: '2,5 × 10⁶',
+      resultSummary: '2,5 × 10^6',
     },
     content: {
       intro: 'Zehnerpotenzen drücken sehr große (Astronomische) oder sehr kleine (Mikrokosmos) Zahlen in kompakter wissenschaftlicher Schreibweise (Scientific Notation) aus.',
@@ -917,8 +917,8 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
     shortName: 'Teiler berechnen',
     category: 'mathematik',
     subcategory: 'Zahlen & Algebra',
-    metaTitle: 'Teiler-Rechner: alle Teiler & Vielfache einer Zahl',
-    metaDescription: 'Ermitteln Sie alle Teiler einer ganzen Zahl, die Anzahl der Teiler und die ersten Vielfachen. Für Schule & Mathematik.',
+    metaTitle: 'Teiler-Rechner: alle Teiler einer Zahl & Primzahltest',
+    metaDescription: 'Ermitteln Sie alle Teiler einer ganzen Zahl, die Anzahl der Teiler und ob die Zahl eine Primzahl ist. Für Schule & Mathematik.',
     h1: 'Teiler & Vielfache Rechner',
     shortDescription: 'Berechnet die vollständige Teilermenge einer Zahl und prüft, ob es sich um eine Primzahl handelt.',
     searchKeywords: ['teiler rechner', 'alle teiler einer zahl finden', 'teilermenge berechnen', 'vielfache einer zahl'],
@@ -961,7 +961,7 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       resultSummary: '12 Teiler gefunden',
     },
     content: {
-      intro: 'Dieser Rechner ermittelt alle echten Teiler einer Zahl, prüft auf Primzahleigenschaften und listet die ersten Vielfachen auf.',
+      intro: 'Dieser Rechner ermittelt alle Teiler einer Zahl von 1 bis 100.000 (einschließlich 1 und der Zahl selbst), zählt sie und prüft, ob die Zahl eine Primzahl ist.',
       details: 'Zahlen, deren echte Teiler summiert genau die Zahl selbst ergeben, heißen vollkommene Zahlen (z. B. 6 = 1 + 2 + 3 oder 28 = 1 + 2 + 4 + 7 + 14). Besitzt eine Zahl außer der 1 und sich selbst keine Teiler, ist sie eine Primzahl.',
     },
     faqs: [

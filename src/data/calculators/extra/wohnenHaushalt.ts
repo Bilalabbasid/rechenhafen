@@ -542,7 +542,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     inputs: [
       { id: 'warmRent', label: 'Monatliche Warmmiete (Bruttomiete inkl. Nebenkosten)', type: 'number', defaultValue: 950, min: 0, step: 25, unit: '€' },
       { id: 'defectPct', label: 'Minderungssatz laut Urteilen / Minderungstabelle', type: 'number', defaultValue: 20, min: 0, max: 100, step: 1, unit: '%' },
-      { id: 'defectDays', label: 'Dauer des Mangels im Monat (Tage)', type: 'number', defaultValue: 30, min: 0, max: 31, step: 1, unit: 'Tage', helpText: 'Abrechnungskonvention: Im deutschen Mietrecht wird der Abrechnungsmonat einheitlich mit 30 Tagen berechnet (§ 536 BGB / BGH).' },
+      { id: 'defectDays', label: 'Dauer des Mangels im Monat (Tage)', type: 'number', defaultValue: 30, min: 0, max: 31, step: 1, unit: 'Tage', helpText: 'Vereinfachung des Rechners: Ein Monat wird mit 30 Tagen angesetzt. 30 Tage entsprechen der vollen Minderung für den Monat.' },
     ],
     calculate: (inputs) => {
       const warmStr = String(inputs.warmRent ?? inputs.monthlyRent ?? '').trim();
@@ -601,8 +601,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
           ? `Bei ${formatCurrency(warm)} Warmmiete und ${formatPercent(pct, 0)} Minderung für ${days} Tage beträgt die Mietminderung ${formatCurrency(0)}. Die Miete bleibt bei ${formatCurrency(warm)}.`
           : `Bei ${formatCurrency(warm)} Warmmiete und ${formatPercent(pct, 0)} Minderung für ${days} Tage beträgt die Mietminderung ${formatCurrency(actualReduction)}. Die geminderte Monatsmiete beträgt ${formatCurrency(reducedRent)}.`,
         qualifications: [
-          'Berechnungsgrundlage ist nach ständiger BGH-Rechtsprechung (BGH VIII ZR 225/03) die Bruttowarmmiete.',
-          'Monats-/Tageskonvention: Der Kalendermonat wird juristisch einheitlich mit 30 Tagen berechnet (§ 536 BGB / BGH VIII ZR 296/09).',
+          'Berechnungsgrundlage ist nach der Rechtsprechung des BGH (Urteil vom 6. April 2005, XII ZR 225/03) die Bruttomiete einschließlich Nebenkosten.',
+          'Tageskonvention: Der Rechner setzt einen Monat vereinfachend mit 30 Tagen an.',
         ],
         basisSummary: [
           { label: 'Warmmiete', value: formatCurrency(warm) },
@@ -612,7 +612,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       };
     },
     formula: 'Mietminderung = Warmmiete × (Minderungssatz / 100) × (Tage des Mangels / 30)',
-    formulaExplanation: 'Nach ständiger BGH-Rechtsprechung (BGH VIII ZR 225/03) ist die Bruttowarmmiete die Bemessungsgrundlage für die Mietminderung nach § 536 BGB.',
+    formulaExplanation: 'Nach der Rechtsprechung des BGH (Urteil vom 6. April 2005, XII ZR 225/03) ist die Bruttomiete einschließlich Nebenkosten die Bemessungsgrundlage für die Mietminderung nach § 536 BGB.',
     workedExample: {
       title: 'Beispiel: 950 € Warmmiete mit 20 % Minderung für 30 Tage',
       inputValues: [{ label: 'Warmmiete', value: '950 €' }, { label: 'Minderungssatz', value: '20 %' }, { label: 'Tage', value: '30 Tage' }],
@@ -621,11 +621,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Bei erheblichen Mängeln der Mietsache (z. B. Heizungsausfall im Winter, Schimmelbefall, Baulärm) haben Mieter nach § 536 BGB ein gesetzliches Recht zur Mietminderung.',
-      details: 'Die Minderung errechnet sich taggenau aus der Warmmiete (Bruttomiete inklusive Vorauszahlungen): Minderung = (Warmmiete / 30 Tage) · Minderungsquote · Ausfalltage.',
+      details: 'Der Rechner ermittelt die Minderung tageweise aus der Warmmiete (Bruttomiete inklusive Vorauszahlungen) und setzt den Monat vereinfachend mit 30 Tagen an: Minderung = (Warmmiete / 30 Tage) · Minderungsquote · Ausfalltage.',
     },
     faqs: [
-      { question: 'Wird die Minderung von der Kaltmiete oder Warmmiete berechnet?', answer: 'Nach ständiger Rechtsprechung des Bundesgerichtshofs (BGH, Az. XII ZR 225/03) ist die Bruttomiete (Warmmiete inklusive Nebenkostenvorauszahlungen) die zwingende Bemessungsgrundlage.' },
-      { question: 'Darf man die Miete ohne Mängelanzeige sofort kürzen?', answer: 'Nein, nach § 536c BGB muss der Mangel dem Vermieter unverzüglich schriftlich angezeigt und eine angemessene Frist zur Beseitigung gesetzt werden; erst ab Zugang der Anzeige darf gemindert werden.' },
+      { question: 'Wird die Minderung von der Kaltmiete oder Warmmiete berechnet?', answer: 'Von der Bruttomiete, also der Warmmiete einschließlich der Nebenkostenvorauszahlungen oder -pauschale. So hat es der Bundesgerichtshof mit Urteil vom 6. April 2005 (XII ZR 225/03) entschieden.' },
+      { question: 'Darf man die Miete ohne Mängelanzeige sofort kürzen?', answer: 'Die Minderung tritt nach § 536 BGB kraft Gesetzes ein, sobald ein erheblicher Mangel die Tauglichkeit der Wohnung beeinträchtigt. Sie müssen den Mangel dem Vermieter aber nach § 536c BGB unverzüglich anzeigen. Eine bestimmte Form oder eine Fristsetzung verlangt das Gesetz dafür nicht; eine schriftliche Anzeige mit Datum ist als Nachweis trotzdem sinnvoll. Unterbleibt die Anzeige und kann der Vermieter deshalb nicht abhelfen, verlieren Sie insoweit das Minderungsrecht.' },
     ],
     relatedSlugs: ['untermiete-rechner', 'mietbelastungsquote-rechner', 'mietkaution-zinsen-rechner', 'mietrendite-brutto-netto-rechner', 'abstandszahlung-rechner'],
   },
@@ -808,7 +808,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Bei einer Indexmiete (§ 557b BGB) ist die Entwicklung der Kaltmiete an den Verbraucherpreisindex (VPI) des Statistischen Bundesamtes gekoppelt.',
-      details: 'Formel: Neue Miete = Alte Miete · (Neuer VPI / Alter VPI). Steigt der Index um 5,2 %, darf der Vermieter die Kaltmiete mit einer schriftlichen Erklärung und einmonatiger Ankündigungsfrist um exakt 5,2 % anheben.',
+      details: 'Formel: Neue Miete = Alte Miete · (Neuer VPI / Alter VPI). Steigt der Index um 5,2 %, darf der Vermieter die Kaltmiete um exakt 5,2 % anheben. Er muss die Anpassung in Textform erklären; die neue Miete ist nach § 557b Abs. 3 BGB ab Beginn des übernächsten Monats nach Zugang der Erklärung zu zahlen.',
     },
     faqs: [
       { question: 'Kann die Miete bei einer Indexmiete auch sinken?', answer: 'Ja, sollte der Verbraucherpreisindex in einer Deflationsphase fallen, hat der Mieter nach dem Gesetz einen Rechtsanspruch auf Absenkung der Kaltmiete.' },
@@ -1055,7 +1055,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Gewinne aus dem Verkauf privater Immobilien sind nach § 23 EStG steuerpflichtig, wenn zwischen Anschaffung und Veräußerung weniger als 10 Jahre liegen (Spekulationsfrist).',
-      details: 'Verkaufsgewinn = Verkaufspreis - Anschaffungskosten - Notar/Makler - Renovierungskosten der ersten 3 Jahre. Der Gewinn wird mit dem individuellen persönlichen Einkommensteuersatz versteuert.',
+      details: 'Verkaufsgewinn = Verkaufspreis - Verkaufskosten - (Anschaffungskosten inkl. Notar, Grundbuch, Makler und Grunderwerbsteuer - in Anspruch genommene AfA). Renovierungskosten erhöhen die Anschaffungskosten nur, wenn sie als anschaffungsnahe Herstellungskosten gelten: Instandsetzungen innerhalb von drei Jahren nach dem Kauf, die ohne Umsatzsteuer 15 % der Gebäude-Anschaffungskosten übersteigen. Der Gewinn wird mit dem persönlichen Einkommensteuersatz versteuert.',
     },
     faqs: [
       { question: 'Wann entfällt die 10-Jahres-Frist bei Eigennutzung?', answer: 'Wurde die Immobilie im Jahr des Verkaufs und den beiden vorangegangenen Kalenderjahren durchgehend selbst bewohnt, ist der Verkaufsgewinn auch vor Ablauf von 10 Jahren steuerfrei.' },
@@ -1130,7 +1130,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       result: '12.495,00 € Käuferanteil',
     },
     content: {
-      intro: 'Seit dem Gesetz über die Verteilung der Maklerkosten beim Verkauf von Wohnungen und Einfamilienhäusern (§ 656c BGB) gilt das gesetzliche Halbteilungskonsens.',
+      intro: 'Seit dem Gesetz über die Verteilung der Maklerkosten beim Verkauf von Wohnungen und Einfamilienhäusern (§ 656c BGB) gilt beim Kauf von Wohnungen und Einfamilienhäusern durch Verbraucher der gesetzliche Halbteilungsgrundsatz.',
       details: 'Wird der Makler von beiden Parteien beauftragt, zahlen Käufer und Verkäufer exakt denselben Provisionsanteil. In der Praxis beträgt die Courtage meist je 3,57 Prozent inklusive 19 % Mehrwertsteuer (Gesamtprovision: 7,14 %).',
     },
     faqs: [
@@ -1248,7 +1248,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     shortName: 'Notarkosten-Rechner',
     category: 'wohnen-immobilien',
     subcategory: 'Immobilienkauf & Finanzierung',
-    metaTitle: 'Notarkosten Rechner Immobilienkauf – Notar-',
+    metaTitle: 'Notarkosten-Rechner: Notar & Grundbuch beim Immobilienkauf',
     metaDescription: 'Berechnen Sie die anfallenden Notarkosten und Grundbuchamtsgebühren nach GNotKG (ca. 1,5 % bis 2,0 % des Kaufpreises) inklusive Grundschuldbestellung.',
     h1: 'Notar- und Grundbuchkosten Rechner – Kaufvertrag & Grundschuld',
     shortDescription: 'Kalkuliert die gesetzlichen Gebühren für Notarbeurkundung und Grundbucheintragung.',
@@ -1314,7 +1314,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       details: 'Für Kaufvertragsentwurf, Beurkundung, Grundbucheintragung (Auflassungsvormerkung und Eigentumsumschreibung) sowie die Eintragung einer Grundschuld fallen in der Summe rund 1,5 bis 2,0 Prozent des Kaufpreises an.',
     },
     faqs: [
-      { question: 'Sind Notargebühren verhandelbar?', answer: 'Nein, Notare sind nach § 17 BNotO gesetzlich verpflichtet, exakt die Gebühren nach dem GNotKG abzurechnen; Rabatte oder Gebührenübernahmen sind strafbar.' },
+      { question: 'Sind Notargebühren verhandelbar?', answer: 'Nein, Notare sind nach § 17 BNotO verpflichtet, die gesetzlich vorgeschriebenen Gebühren nach dem GNotKG zu erheben. Rabatte oder Gebührenübernahmen sind berufsrechtlich unzulässig.' },
       { question: 'Wer zahlt üblicherweise die Notarkosten beim Immobilienkauf?', answer: 'Nach den Gepflogenheiten im Kaufvertrag trägt der Käufer alle Notar- und Grundbuchkosten des Kaufs und der Grundschuld; der Verkäufer trägt nur Kosten für die Löschung alter, eigener Belastungen.' },
     ],
     relatedSlugs: ['grunderwerbsteuer-rechner', 'maklerprovision-rechner', 'kaufnebenkosten-rechner'],
@@ -1584,7 +1584,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     searchKeywords: ['hausgeld rechner', 'wohngeld eigentumswohnung rechner', 'hausgeld pro qm durchschnitt', 'umlagefaehiges hausgeld'],
     inputs: [
       { id: 'livingArea', label: 'Wohnungsgröße in m²', type: 'number', defaultValue: 80, min: 0, max: 400, step: 5, unit: 'm²', helpText: 'Wohnfläche der Eigentumswohnung in m².' },
-      { id: 'avgHausgeldPerSqm', label: 'Durchschnittliches Hausgeld pro m² (üblich 3,50 € - 5,50 €)', type: 'number', defaultValue: 4.20, min: 0, max: 15, step: 0.1, unit: '€/m²', helpText: 'Gesamthausgeld je m² Wohnfläche laut Wirtschaftsplan.' },
+      { id: 'avgHausgeldPerSqm', label: 'Hausgeld pro m² Wohnfläche laut Wirtschaftsplan', type: 'number', defaultValue: 4.20, min: 0, max: 15, step: 0.1, unit: '€/m²', helpText: 'Gesamthausgeld je m² Wohnfläche laut Wirtschaftsplan.' },
       { id: 'apportionablePct', label: 'Auf Mieter umlagefähiger Anteil (Heizung, Müll etc.)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 5, unit: '%', helpText: 'Auf Mieter umlagefähiger Anteil in Prozent (0 % bei reinen Eigentümerkosten oder Leerstand).' },
     ],
     calculate: (inputs) => {
@@ -1641,7 +1641,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Welche Teile des Hausgelds kann der Eigentümer auf Mieter umlegen?', answer: 'Nur die Kosten nach der Betriebskostenverordnung (§ 2 BetrKV); Verwaltergebühren, Kontoführungsgebühren und die Instandhaltungsrücklage verbleiben immer beim Eigentümer.' },
-      { question: 'Wie hoch ist das durchschnittliche Hausgeld pro Quadratmeter?', answer: 'In Deutschland liegt das Hausgeld meist zwischen 3,00 € und 4,50 € pro Quadratmeter Wohnfläche im Monat, abhängig von Gebäudealter, Aufzug und Heizsystem.' },
+      { question: 'Wie hoch ist das durchschnittliche Hausgeld pro Quadratmeter?', answer: 'Einen amtlichen Durchschnittswert gibt es nicht. Die Höhe hängt stark von Gebäudealter, Heizsystem, Aufzug, Hausmeister, Verwaltervergütung und der beschlossenen Zuführung zur Erhaltungsrücklage ab. Maßgeblich ist allein der Wirtschaftsplan Ihrer Eigentümergemeinschaft: Teilen Sie das dort ausgewiesene monatliche Hausgeld durch Ihre Wohnfläche, erhalten Sie den Satz pro m² für diesen Rechner.' },
     ],
     relatedSlugs: ['instandhaltungsruecklage-rechner', 'mietrendite-brutto-netto-rechner', 'grundsteuer-reform-rechner'],
   },
@@ -1730,11 +1730,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Absetzung für Abnutzung (AfA nach § 7 Abs. 4 EStG) mindert das steuerpflichtige Einkommen von Vermietern durch die steuerliche Abschreibung des Gebäudewerts.',
-      details: 'Seit 2023 fertiggestellte Wohngebäude werden mit linear 3,0 % jährlich abgeschrieben. Für ältere Bestandsbauten (Fertigstellung nach 1924) gilt der Steuersatz von 2,0 % über 50 Jahre. Wichtig: Der Grundstücksanteil (Bodenwert) darf nicht abgeschrieben werden.',
+      details: 'Seit 2023 fertiggestellte Wohngebäude werden mit linear 3,0 % jährlich abgeschrieben. Für ältere Bestandsbauten (Fertigstellung 1925 bis 2022) gilt ein AfA-Satz von 2,0 % über 50 Jahre. Wichtig: Der Grundstücksanteil (Bodenwert) darf nicht abgeschrieben werden.',
     },
     faqs: [
       { question: 'Wie ermittelt man den Gebäudeanteil für die AfA?', answer: 'Über die offizielle Arbeitshilfe des Bundesfinanzministeriums zur Kaufpreisaufteilung auf Gebäude und Grund und Boden anhand von Bodenrichtwerten und Gebäudeherstellungskosten.' },
-      { question: 'Gibt es für energieeffiziente Neubauten eine Sonder-AfA?', answer: 'Ja, für Neubauten mit Effizienzhaus-Standard 40 mit Qualitätssiegel Nachhaltiges Gebäude (QNG) existiert eine degressive AfA bzw. Sonder-AfA nach § 7b EStG.' },
+      { question: 'Gibt es für energieeffiziente Neubauten eine Sonder-AfA?', answer: 'Es gibt zwei getrennte Regelungen. Die degressive AfA nach § 7 Abs. 5a EStG erlaubt für neue Wohngebäude mit Baubeginn zwischen dem 1. Oktober 2023 und dem 30. September 2029 jährlich 5 % vom Restwert statt linear 3 %. Daneben gibt es die Sonderabschreibung für neue Mietwohnungen nach § 7b EStG, die unter anderem einen Effizienzhaus-40-Standard mit Qualitätssiegel Nachhaltiges Gebäude (QNG) und Baukostenobergrenzen voraussetzt.' },
     ],
     relatedSlugs: ['spekulationssteuer-immobilien-rechner', 'mietrendite-brutto-netto-rechner', 'kaufnebenkosten-rechner'],
   },
@@ -1948,7 +1948,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     metaDescription: 'Ermitteln Sie den fairen und rechtssicheren Zeitwert für gebrauchte Küchen und Einrichtungsgegenstände nach linearer AfA und Kölner Tabelle.',
     h1: 'Abstandszahlung Rechner – Zeitwert für Küche & Möbel ermitteln',
     shortDescription: 'Berechnet den realistischen Zeitwert für Möbel und Küchen bei Wohnungsübernahme.',
-    searchKeywords: ['abstandszahlung rechner', 'zeitwert einbaukueche berechnen', 'koelner tabelle moebel zeitwert', 'paragraph 4a woblauwg abstand'],
+    searchKeywords: ['abstandszahlung rechner', 'zeitwert einbaukueche berechnen', 'koelner tabelle moebel zeitwert', 'paragraph 4a wovermrg abstand'],
     inputs: [
       { id: 'originalPrice', label: 'Neupreis der Einbauküche / Möbel (Rechnung)', type: 'number', defaultValue: 6000, min: 0, step: 100, unit: '€', helpText: 'Ursprünglicher Anschaffungspreis laut Beleg in Euro.' },
       { id: 'ageYears', label: 'Alter in Jahren', type: 'number', defaultValue: 4, min: 0, max: 40, step: 0.5, unit: 'Jahre', helpText: 'Alter in Jahren (0 Jahre bei sofort übernommener Neuausstattung).' },
@@ -1975,7 +1975,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         };
       }
 
-      // Nach gängiger Rechtsprechung: Im ersten Jahr Wertverlust ca. 24 %, danach lineare Abschreibung des Restwerts
+      // Modellannahme des Rechners: Im ersten Jahr Wertverlust 24 %, danach lineare Abschreibung des Restwerts
       let zeitwert = 0;
       if (age === 0) {
         zeitwert = orig;
@@ -2006,8 +2006,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         ],
       };
     },
-    formula: 'Zeitwert = Neupreis abzüglich altersüblicher Wertminderung nach Rechtsprechung',
-    formulaExplanation: 'Nach § 4a WoVermittG ist eine Vereinbarung über ein Entgelt für Einrichtungsgegenstände unwirksam, soweit das Entgelt in einem auffälligen Missverhältnis zum Wert steht (über 50 % über Zeitwert ist strafbar).',
+    formula: 'Zeitwert = Neupreis − 24 % im ersten Jahr, danach lineare Abschreibung des Restwerts über die übrige Nutzungsdauer (Modellannahme des Rechners)',
+    formulaExplanation: 'Nach § 4a Abs. 2 WoVermRG ist die Preisabrede über Einrichtungsgegenstände unwirksam, soweit der Preis in einem auffälligen Missverhältnis zum Wert der Einrichtung steht. Einen festen Prozentsatz nennt das Gesetz nicht.',
     workedExample: {
       title: 'Beispiel: 6.000 € Küche nach 4 Jahren bei 15 Jahren Nutzungsdauer',
       inputValues: [{ label: 'Neupreis', value: '6.000 €' }, { label: 'Alter', value: '4 Jahre' }, { label: 'Nutzungsdauer', value: '15 Jahre' }],
@@ -2016,10 +2016,10 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Wertermittler kalkuliert den angemessenen Zeitwert von Möbeln oder Einbauküchen, die vom Vormieter an den Nachmieter übergeben werden.',
-      details: 'Nach § 4a Wohnungsvermittlungsgesetz (WoVermG) sind Vereinbarungen unwirksam, wenn das Entgelt in einem auffälligen Missverhältnis zum Wert der Einrichtung steht (mehr als 50 % über dem tatsächlichen Zeitwert).',
+      details: 'Nach § 4a Abs. 2 des Gesetzes zur Regelung der Wohnungsvermittlung (WoVermRG) ist die Preisvereinbarung unwirksam, soweit das Entgelt in einem auffälligen Missverhältnis zum Wert der Einrichtung steht. Eine Zahlung allein dafür, dass der Vormieter die Wohnung freimacht, ist nach § 4a Abs. 1 WoVermRG unwirksam; erlaubt ist nur die Erstattung nachgewiesener Umzugskosten.',
     },
     faqs: [
-      { question: 'Wie berechnet man den Zeitwert einer Einbauküche fair?', answer: 'Nach der linearen Abschreibung: Anschaffungspreis abzüglich ca. 24 % Wertverlust im ersten Jahr und danach jährlich ca. 8 % über eine Gesamtnutzungsdauer von 10 Jahren.' },
+      { question: 'Wie berechnet man den Zeitwert einer Einbauküche fair?', answer: 'Der Rechner zieht im ersten Jahr 24 % vom Neupreis ab und schreibt die verbleibenden 76 % dann gleichmäßig über die restliche Nutzungsdauer ab. Bei der voreingestellten Gesamtnutzungsdauer von 15 Jahren sind das rund 5,4 % des Neupreises pro weiterem Jahr (76 % / 14 Jahre). Eine 6.000-€-Küche ist danach nach 4 Jahren noch etwa 3.582,86 € wert.' },
       { question: 'Darf der Vormieter den Mietvertrag an eine Abstandsübernahme koppeln?', answer: 'Nein, nur der Vermieter entscheidet über den Mietvertragsabschluss; Koppelungsgeschäfte durch Vormieter sind rechtlich unzulässig.' },
     ],
     relatedSlugs: ['mietkaution-zinsen-rechner', 'warmmiete-rechner', 'mietbelastungsquote-rechner'],
@@ -2368,6 +2368,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'totalWarmRent', label: 'Gesamte Warmmiete der Wohnung', type: 'number', defaultValue: 1200, min: 0, step: 25, unit: '€', helpText: 'Vollständige Warmmiete der Wohnung in Euro.' },
       { id: 'totalApartmentArea', label: 'Gesamtwohnfläche der Wohnung in m²', type: 'number', defaultValue: 80, min: 1, step: 5, unit: 'm²', helpText: 'Gesamtwohnfläche der gesamten Wohnung laut Mietvertrag.' },
       { id: 'subletRoomArea', label: 'Größe des untervermieteten Zimmers in m²', type: 'number', defaultValue: 20, min: 0, step: 1, unit: 'm²', helpText: 'Exklusiv vom Untermieter genutzte Zimmerfläche in m².' },
+      { id: 'commonArea', label: 'Gemeinsam genutzte Fläche (Küche, Bad, Flur) in m²', type: 'number', defaultValue: 20, min: 0, step: 1, unit: 'm²', helpText: 'Fläche, die alle Bewohner gemeinsam nutzen. Leer gelassen setzt der Rechner 25 % der Gesamtwohnfläche an.' },
+      { id: 'occupants', label: 'Anzahl der Bewohner, die sich die Gemeinschaftsfläche teilen', type: 'number', defaultValue: 2, min: 2, max: 10, step: 1, unit: 'Personen', helpText: 'Hauptmieter und Untermieter zusammen (bei zwei Personen wird die Gemeinschaftsfläche hälftig geteilt).' },
       { id: 'furnishingSurcharge', label: 'Monatlicher Möblierungs- & WLAN-Zuschlag', type: 'number', defaultValue: 40, min: 0, step: 5, unit: '€', helpText: 'Monatlicher Möblierungs- & Pauschalzuschlag in Euro (0 € bei unmöblierter Vermietung).' },
     ],
     calculate: (inputs) => {
@@ -2375,6 +2377,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const totalAreaRaw = inputs.totalApartmentArea;
       const roomAreaRaw = inputs.subletRoomArea;
       const surchargeRaw = inputs.furnishingSurcharge;
+      const commonRaw = inputs.commonArea;
+      const occupantsRaw = inputs.occupants;
 
       const rentStr = rentRaw !== undefined && rentRaw !== null ? String(rentRaw).trim() : '';
       const totalAreaStr = totalAreaRaw !== undefined && totalAreaRaw !== null ? String(totalAreaRaw).trim() : '';
@@ -2385,18 +2389,29 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       const totalArea = totalAreaStr !== '' ? parseFloat(totalAreaStr.replace(',', '.')) : 80;
       const roomArea = roomAreaStr !== '' ? parseFloat(roomAreaStr.replace(',', '.')) : 20;
       const surcharge = surchargeStr !== '' ? parseFloat(surchargeStr.replace(',', '.')) : 40;
+      const commonStr = commonRaw !== undefined && commonRaw !== null ? String(commonRaw).trim() : '';
+      const occupantsStr = occupantsRaw !== undefined && occupantsRaw !== null ? String(occupantsRaw).trim() : '';
+      const commonArea = commonStr !== '' ? parseFloat(commonStr.replace(',', '.')) : totalArea * 0.25;
+      const occupants = occupantsStr !== '' ? parseInt(occupantsStr, 10) : 2;
 
-      if (isNaN(totalRent) || isNaN(totalArea) || isNaN(roomArea) || isNaN(surcharge) || totalRent < 0 || totalArea <= 0 || roomArea < 0 || surcharge < 0) {
+      if (isNaN(totalRent) || isNaN(totalArea) || isNaN(roomArea) || isNaN(surcharge) || isNaN(commonArea) || isNaN(occupants) || totalRent < 0 || totalArea <= 0 || roomArea < 0 || surcharge < 0 || commonArea < 0 || occupants < 2) {
         return {
           primary: { id: 'totalSubRent', label: 'Empfohlene Warm-Untermiete', value: 0, formattedValue: '–' },
           secondary: [],
-          error: 'Bitte geben Sie gültige Werte ein (Gesamtwohnfläche muss größer als 0 sein).',
+          error: 'Bitte geben Sie gültige Werte ein (Gesamtwohnfläche größer als 0, mindestens 2 Bewohner).',
+        };
+      }
+      if (roomArea + commonArea > totalArea) {
+        return {
+          primary: { id: 'totalSubRent', label: 'Empfohlene Warm-Untermiete', value: 0, formattedValue: '–' },
+          secondary: [],
+          error: 'Zimmerfläche und Gemeinschaftsfläche zusammen dürfen nicht größer als die Gesamtwohnfläche sein.',
         };
       }
 
-      // Modell: Untermieter nutzt Zimmer exklusiv + halben Anteil an Restfläche (Küche, Bad, Flur)
-      const commonArea = Math.max(0, totalArea - (roomArea * 2));
-      const subRatio = Math.min(1, (roomArea + (commonArea / 2)) / totalArea);
+      // Modell: Untermieter zahlt für sein Zimmer und seinen Kopfanteil an der Gemeinschaftsfläche (Küche, Bad, Flur).
+      const commonShareArea = commonArea / occupants;
+      const subRatio = Math.min(1, (roomArea + commonShareArea) / totalArea);
       const baseSubRent = totalRent * subRatio;
       const totalSubRent = baseSubRent + surcharge;
       return {
@@ -2404,6 +2419,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         secondary: [
           { id: 'baseSubRent', label: 'Flächenanteil an Warmmiete', value: baseSubRent, formattedValue: formatCurrency(baseSubRent) },
           { id: 'subRatio', label: 'Anteil an Gesamtwohnfläche', value: subRatio * 100, formattedValue: formatPercent(subRatio * 100, 1) },
+          { id: 'usedArea', label: 'Zugerechnete Fläche (Zimmer + Anteil Gemeinschaftsfläche)', value: roomArea + commonShareArea, formattedValue: `${formatNumber(roomArea + commonShareArea, 1)} m²` },
           { id: 'surcharge', label: 'Möblierungs- & Pauschalzuschlag', value: surcharge, formattedValue: formatCurrency(surcharge) },
         ],
         summaryText: `Für das ${roomArea} m² große Zimmer ergibt sich inklusive Gemeinschaftsnutzung und Zuschlägen eine angemessene Untermiete von ${formatCurrency(totalSubRent)} monatlich.`,
@@ -2411,22 +2427,23 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         basisSummary: [
           { label: 'Gesamtwohnfläche', value: `${totalArea} m²` },
           { label: 'Zimmerfläche', value: `${roomArea} m²` },
+          { label: 'Gemeinschaftsfläche', value: `${formatNumber(commonArea, 1)} m² (geteilt durch ${occupants})` },
           { label: 'Gesamtmiete der Wohnung', value: formatCurrency(totalRent) },
           { label: 'Zuschläge', value: formatCurrency(surcharge) },
         ],
       };
     },
-    formula: 'Untermiete = Warmmiete × Nutzungsflächenanteil + Zuschläge',
+    formula: 'Untermiete = Warmmiete × (Zimmerfläche + Gemeinschaftsfläche / Bewohner) / Gesamtwohnfläche + Zuschläge',
     formulaExplanation: 'Bei berechtigtem Interesse hat der Mieter nach § 553 BGB einen Anspruch auf Erlaubnis zur Untervermietung. Der Vermieter kann einen angemessenen Untermietzuschlag verlangen.',
     workedExample: {
       title: 'Beispiel: 20 m² Zimmer in 80 m² Wohnung bei 1.200 € Warmmiete',
-      inputValues: [{ label: 'Gesamtmiete', value: '1.200 €' }, { label: 'Gesamtfläche', value: '80 m²' }, { label: 'Zimmergröße', value: '20 m²' }],
-      steps: ['Reine Zimmerfläche: 25 % der Wohnung', 'Inkl. Küche/Bad anteilig: ca. 37,5 %', 'Anteil: 1.200 € × 0,375 = 450 € + 40 € Zuschlag = 490 €'],
+      inputValues: [{ label: 'Gesamtmiete', value: '1.200 €' }, { label: 'Gesamtfläche', value: '80 m²' }, { label: 'Zimmergröße', value: '20 m²' }, { label: 'Gemeinschaftsfläche', value: '20 m², 2 Bewohner' }],
+      steps: ['Reine Zimmerfläche: 20 m² = 25 % der Wohnung', 'Plus halbe Gemeinschaftsfläche: 20 m² + 10 m² = 30 m² = 37,5 %', 'Anteil: 1.200 € × 0,375 = 450 € + 40 € Zuschlag = 490 €'],
       result: '490,00 € monatliche Untermiete',
     },
     content: {
       intro: 'Dieser Rechner kalkuliert den fairen Mietanteil und die Nebenkostenumlage bei der Untervermietung einzelner Zimmer an Mitbewohner oder Zwischenmieter.',
-      details: 'Kostenanteil = Warmmiete · (Zimmerfläche + anteilige Gemeinschaftsfläche) / Gesamtwohnfläche. Für möblierte Zimmer kann ein angemessener Möblierungszuschlag erhoben werden.',
+      details: 'Kostenanteil = Warmmiete · (Zimmerfläche + Gemeinschaftsfläche / Anzahl Bewohner) / Gesamtwohnfläche. Die übrigen Zimmer des Hauptmieters zahlt der Hauptmieter allein. Für möblierte Zimmer kann ein angemessener Möblierungszuschlag erhoben werden.',
     },
     faqs: [
       { question: 'Benötigt man für die Untervermietung die Erlaubnis des Vermieters?', answer: 'Ja, nach § 553 BGB muss die Erlaubnis eingeholt werden. Bei berechtigtem Interesse (z. B. finanzielle Entlastung, Auslandsaufenthalt) hat der Mieter jedoch einen Rechtsanspruch auf Genehmigung.' },
@@ -2504,7 +2521,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       details: 'Erbbauzins = Grundstückswert · Zinssatz (üblich 3 bis 5 Prozent p.a.). Typische Vertragslaufzeiten betragen 75 bis 99 Jahre. Der Zinssatz ist in der Regel über Wertsicherungsklauseln an den Verbraucherpreisindex gekoppelt.',
     },
     faqs: [
-      { question: 'Was geschieht bei Ablauf des Erbbaurechtsvertrags (Heimfall)?', answer: 'Das Eigentum am Gebäude geht auf den Grundstückseigentümer über; dieser muss dem Erbbaurechtsnehmer nach § 27 ErbbauRG eine angemessene Entschädigung (meist mind. 2/3 des Gebäudewerts) zahlen.' },
+      { question: 'Was geschieht, wenn das Erbbaurecht durch Zeitablauf endet?', answer: 'Das Bauwerk fällt an den Grundstückseigentümer, der dafür nach § 27 Abs. 1 ErbbauRG eine Entschädigung zahlen muss. Höhe und Zahlungsweise können im Vertrag geregelt oder die Entschädigung ganz ausgeschlossen werden. Nur wenn das Erbbaurecht der Wohnversorgung minderbemittelter Bevölkerungskreise dient, sind mindestens zwei Drittel des gemeinen Werts des Bauwerks zu zahlen (§ 27 Abs. 2). Davon zu unterscheiden ist der Heimfall: die vorzeitige Rückübertragung des Erbbaurechts, etwa bei Zahlungsverzug, wenn der Vertrag das vorsieht.' },
       { question: 'Warum sind Erbbaurecht-Immobilien im Kaufpreis günstiger?', answer: 'Weil Sie das teure Grundstück nicht kaufen, sondern nur pachten; dadurch sinkt der anfängliche Kaufpreis erheblich, dafür fallen jedoch dauerhafte monatliche Zinsen an.' },
     ],
     relatedSlugs: ['grundsteuer-reform-rechner', 'mietbudget-rechner', 'kaufnebenkosten-rechner'],

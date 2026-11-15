@@ -1,3 +1,4 @@
+import { parseNumberList } from './parseNumberList';
 import { CalculationResult } from '@/types/calculator';
 import { formatNumber, formatPercent } from '@/lib/formatters';
 
@@ -371,12 +372,7 @@ export function calculateRuleOfThree(inputs: Record<string, any>): CalculationRe
 
 export function calculateAverage(inputs: Record<string, any>): CalculationResult {
   const rawInput = inputs.numbers !== undefined ? String(inputs.numbers) : '10; 20; 30; 40; 50';
-  const numbers = rawInput
-    .split(/[;, \n]+/)
-    .map((s) => s.trim().replace(',', '.'))
-    .filter((s) => s.length > 0)
-    .map(Number)
-    .filter((n) => Number.isFinite(n));
+  const numbers = parseNumberList(rawInput);
 
   if (numbers.length === 0) {
     return {

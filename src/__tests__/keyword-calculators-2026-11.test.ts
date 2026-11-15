@@ -207,7 +207,7 @@ describe('Brutto-Netto-Rechner: Stundenlohn, Werkstudent, Übergangsbereich, Min
 
   it('Übergangsbereich: same employee contributions as the Midijob-Rechner, no jump at 2.000 €', () => {
     const r = bn({ grossSalary: 1500, period: 'month', children: '1' });
-    const midi = run('midijob-rechner', { earnings: 1500, taxYear: '2026' });
+    const midi = run('midijob-rechner', { earnings: 1500, taxYear: '2026', children: '1' });
     const midiSocial = Number(midi.secondary!.find((s) => /Sozialabgaben/.test(s.label))!.value);
     expect(val(r, 'socialTotal')).toBeCloseTo(midiSocial, 2);
     const a = Number(bn({ grossSalary: 2000, period: 'month' }).primary.value);

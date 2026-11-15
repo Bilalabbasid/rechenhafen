@@ -675,7 +675,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "2,21 bar Reifendruck"
     },
     content: {
-      intro: 'Dieser Druckrechner konvertiert Drücke zwischen Pascal (Pa), Bar (bar), technischer Atmosphäre (at), Millimeter Quecksilbersäule (mmHg/Torr) und PSI (Pound-force per square inch).',
+      intro: 'Dieser Druckrechner konvertiert Drücke zwischen Pascal (Pa), Hektopascal (hPa), Megapascal (MPa), Bar (bar), Millimeter Quecksilbersäule (mmHg/Torr) und PSI (Pound-force per square inch).',
       details: '1 bar = 100.000 Pascal = 100 kPa = 1.000 hPa (Standardmaß in der Meteorologie). 1 physikalische Standardatmosphäre (1 atm) = 1.013,25 hPa = 760 mmHg. 1 bar ≈ 14,5038 PSI.',
     },
     faqs: [
@@ -892,7 +892,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "18,93 Liter"
     },
     content: {
-      intro: 'Dieser Raummaß-Konverter rechnet Kubikmeter, Liter, Milliliter sowie amerikanische Gallonen (US gal), Pints und Flüssigunzen (fl oz) um.',
+      intro: 'Dieser Raummaß-Konverter rechnet Kubikmeter, Liter, Milliliter sowie amerikanische und britische Gallonen (US gal, UK gal) und US-Flüssigunzen (fl oz) um.',
       details: '1 Kubikmeter (m³) = 1.000 Kubikdezimeter (dm³) = 1.000 Liter. 1 US-Flüssiggallone (Liquid Gallon) = 3,78541 Liter; 1 britische Imperial Gallon = 4,54609 Liter.',
     },
     faqs: [
@@ -1002,7 +1002,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "25.000 m²"
     },
     content: {
-      intro: 'Dieser Flächenumrechner transformiert Flächenmaße zwischen Quadratmillimetern, Quadratzentimetern, Quadratmetern, Ar, Hektar, Quadratkilometern und angloamerikanischen Acres.',
+      intro: 'Dieser Flächenumrechner transformiert Flächenmaße zwischen Quadratmetern, Ar, Hektar, Quadratkilometern sowie angloamerikanischen Acres und Quadratfuß.',
       details: 'Umrechnungsfaktor bei metrischen Flächen ist stets 100: 1 km² = 100 Hektar (ha); 1 ha = 100 Ar (a); 1 a = 100 Quadratmeter (m²). 1 Acre entspricht ca. 4.046,86 m² (ca. 0,405 Hektar).',
     },
     faqs: [
@@ -1113,11 +1113,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "2,32 kWh (entspricht der Dauerleistung einer 100W-Lampe für fast 24h)"
     },
     content: {
-      intro: 'Dieser Energierechner konvertiert Energie, Arbeit und Wärmemengen zwischen Joule (J), Kilowattstunden (kWh), Kilokalorien (kcal), Wattsekunden und British Thermal Units (BTU).',
-      details: '1 Kilowattstunde (kWh) = 3.600.000 Joule = 3,6 Megajoule (MJ). 1 Kilokalorie (kcal) = exakt 4.186,8 Joule (internationale Kalorie). 1 BTU ≈ 1.055 Joule.',
+      intro: 'Dieser Energierechner konvertiert Energie, Arbeit und Wärmemengen zwischen Joule (J), Kilojoule (kJ), Megajoule (MJ), Kilowattstunden (kWh), Kilokalorien (kcal) und British Thermal Units (BTU).',
+      details: '1 Kilowattstunde (kWh) = 3.600.000 Joule = 3,6 Megajoule (MJ). 1 Kilokalorie (kcal) = 4.184 Joule (thermochemische Kalorie, mit der dieser Rechner arbeitet). 1 BTU ≈ 1.055 Joule.',
     },
     faqs: [
-      { question: 'Wie viel Kilowattstunden Energie stecken in 1.000 Kilokalorien Nahrung?', answer: '1.000 kcal entsprechen exakt 1,163 Kilowattstunden chemischer Energie.' },
+      { question: 'Wie viel Kilowattstunden Energie stecken in 1.000 Kilokalorien Nahrung?', answer: '1.000 kcal entsprechen 4.184.000 Joule, geteilt durch 3.600.000 sind das rund 1,162 Kilowattstunden chemischer Energie.' },
       { question: 'Was ist ein Elektronenvolt (eV)?', answer: 'Eine winzige Energieeinheit der Atom- und Teilchenphysik: 1 eV ≈ 1,602 · 10⁻¹⁹ Joule (die kinetische Energie eines Elektrons beim Durchlaufen von 1 Volt Spannung).' },
     ],
     relatedSlugs: ['radioaktivitaet-strahlendosis-rechner', 'elektrische-ladung-kapazitaet-rechner', 'beleuchtungsstaerke-lux-lumen-rechner', 'leistung-umrechner', 'stromkostenrechner', 'kalorien-rezept-rechner'],
@@ -1210,7 +1210,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "110,32 kW"
     },
     content: {
-      intro: 'Dieser Leistungskonverter rechnet mechanische und elektrische Leistung zwischen Watt (W), Kilowatt (kW), Megawatt (MW) und Pferdestärken (PS / hp) um.',
+      intro: 'Dieser Leistungskonverter rechnet mechanische und elektrische Leistung zwischen Watt (W), Kilowatt (kW) und Pferdestärken (PS / hp) um.',
       details: 'In Deutschland gilt nach DIN 66036: 1 metrische PS = exakt 735,49875 Watt ≈ 0,7355 kW. Umgekehrt entspricht 1 kW exakt 1,35962 PS. Die angloamerikanische Mechanical Horsepower (hp) ist mit ca. 745,7 Watt minimal größer.',
     },
     faqs: [
@@ -1426,7 +1426,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         summaryText: 'Ein Download von ' + sizeGb + ' GB bei ' + speedMbits + ' Mbit/s Leitung (effektiv ca. ' + formatMeasure(effectiveMbs, 1) + ' MB/s) dauert rund ' + durationText + '.',
       };
     },
-    formula: "Downloadzeit (s) = (Dateigröße in MB) / (Bandbreite in Mbit/s / 8 × Overheadfaktor)",
+    formula: "Downloadzeit (s) = Dateigröße in MB / (Bandbreite in Mbit/s / 8) × (1 + Overhead in % / 100)",
     formulaExplanation: "Internet-Provider werben mit Megabit (Mbit/s). Downloads zeigen Browser und Launcher jedoch in Megabyte (MB/s) an. Da 1 Byte aus 8 Bits besteht, muss die Provider-Zahl immer durch 8 geteilt werden.",
     workedExample: {
           "title": "Beispiel: 50 GB Spiel mit 100 Mbit/s Leitung herunterladen",
@@ -1441,7 +1441,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                 }
           ],
           "steps": [
-                "MB/s = 100 / 8 = 12,5 MB/s (mit 10 % Verlust: 11,36 MB/s)",
+                "MB/s = 100 / 8 = 12,5 MB/s (mit 10 % Overhead-Zuschlag: 12,5 / 1,1 = 11,36 MB/s)",
                 "Zeit = 50.000 / 11,36 = 4.401 Sekunden ≈ 73 Minuten"
           ],
           "result": "ca. 1 Stunde und 13 Minuten"
@@ -1451,7 +1451,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       details: 'Da 1 Byte aus 8 Bit besteht, muss die nominelle Leitungsbandbreite durch 8 geteilt werden: Ein Internetanschluss mit 250 Mbit/s lädt Daten maximal mit theoretisch 31,25 Megabyte pro Sekunde (MB/s) herunter.',
     },
     faqs: [
-      { question: 'Wie lange dauert der Download eines 50-GB-Spiels bei einer 100-Mbit/s-Leitung?', answer: '100 Mbit/s liefern netto ca. 12,5 MB/s. 50.000 MB geteilt durch 12,5 MB/s = 4.000 Sekunden, also etwa 1 Stunde und 7 Minuten.' },
+      { question: 'Wie lange dauert der Download eines 50-GB-Spiels bei einer 100-Mbit/s-Leitung?', answer: '100 Mbit/s entsprechen theoretisch 12,5 MB/s; damit wären 50.000 MB nach 4.000 Sekunden (rund 67 Minuten) geladen. Der Rechner schlägt standardmäßig 10 % Overhead auf die Downloadzeit auf (effektiv 12,5 / 1,1 = 11,36 MB/s). So ergeben sich rund 4.400 Sekunden, also etwa 1 Stunde und 13 Minuten.' },
       { question: 'Warum erreichen Speedtests selten die gebuchte maximale Bandbreite?', answer: 'Durch Netzwerk-Overhead (TCP/IP-Header verbrauchen ca. 5–10 % der Bandbreite), WLAN-Störungen oder Auslastung der Server des Anbieters.' },
     ],
     relatedSlugs: ['daten-speicher-umrechner', 'zeit-umrechner', 'stromkostenrechner'],
@@ -1544,7 +1544,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "88,5 ft-lb"
     },
     content: {
-      intro: 'Dieser Drehmomentkonverter rechnet Drehmomente zwischen Newtonmetern (Nm), Kilonewtonmetern (kNm) und imperialen Foot-Pounds (ft-lb) um.',
+      intro: 'Dieser Drehmomentkonverter rechnet Drehmomente zwischen Newtonmetern (Nm), Kilopondmetern (kpm) sowie imperialen Foot-Pounds (ft-lb) und Inch-Pounds (in-lb) um.',
       details: '1 Newtonmeter (Nm) ist das Drehmoment, das eine Kraft von 1 Newton bei einem Hebelarm von 1 Meter erzeugt. 1 Foot-Pound (ft-lb) entspricht ca. 1,3558 Nm; 1 Nm entspricht ca. 0,7376 ft-lb.',
     },
     faqs: [
@@ -2287,7 +2287,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "7,85 g/cm³"
     },
     content: {
-      intro: 'Dieser Dichterechner konvertiert Stoffdichten zwischen kg/m³, g/cm³, g/ml, kg/l sowie imperialen pounds per cubic foot (lb/ft³).',
+      intro: 'Dieser Dichterechner konvertiert Stoffdichten zwischen kg/m³, g/cm³ (= kg/l) sowie imperialen pounds per cubic foot (lb/ft³) und pounds per cubic inch (lb/in³).',
       details: '1 g/cm³ = 1.000 kg/m³ = 1 kg/Liter. Reines flüssiges Wasser besitzt bei 4 °C (Dichteanomalie) seine höchste Dichte von exakt 1.000 kg/m³ (1 g/cm³). Metalle wie Gold erreichen 19,3 g/cm³, Blei 11,3 g/cm³.',
     },
     faqs: [
@@ -2608,15 +2608,15 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "radioaktivitaet-strahlendosis-rechner",
     slug: "radioaktivitaet-strahlendosis-rechner",
-    name: "Radioaktivitäts- & Strahlendosis-Rechner (Bq, Ci, Sievert & Gray)",
-    shortName: "Strahlendosis-Rechner",
+    name: "Strahlendosis-Umrechner (Sievert, Millisievert, Mikrosievert & rem)",
+    shortName: "Strahlendosis-Umrechner",
     category: "einheiten",
     subcategory: "Physik & Mechanik",
-    metaTitle: 'Strahlendosis Rechner – Sievert, Becquerel, Gray',
-    metaDescription: 'Rechnen Sie ionisierende Strahlung um: Aktivität (Becquerel Bq, Curie Ci), Energiedosis (Gray Gy, Rad) und Äquivalentdosis (Sievert Sv, rem).',
-    h1: 'Strahlendosis Rechner – Becquerel, Sievert & Gray umrechnen',
-    shortDescription: 'Konvertiert Aktivität (Bq/Ci) und Äquivalentdosis (Sv/mSv/rem).',
-    searchKeywords: ["radioaktivitaet umrechner becquerel curie","sievert in millisievert mikrosievert umrechnen","gray in sievert strahlendosis rechner","natuerliche strahlenbelastung deutschland msv"],
+    metaTitle: 'Strahlendosis umrechnen – Sv, mSv, µSv & rem',
+    metaDescription: 'Rechnen Sie Äquivalentdosen um zwischen Sievert (Sv), Millisievert (mSv), Mikrosievert (µSv) und rem, mit Tabelle für Dosisleistungen in µSv/h pro Jahr.',
+    h1: 'Strahlendosis umrechnen – Sievert, mSv, µSv & rem',
+    shortDescription: 'Konvertiert Äquivalentdosen zwischen Sv, mSv, µSv und rem.',
+    searchKeywords: ["sievert in millisievert mikrosievert umrechnen","mikrosievert pro stunde in millisievert pro jahr","rem in sievert umrechnen","natuerliche strahlenbelastung deutschland msv"],
     inputs: [
           {
                 "id": "inputValue",
@@ -2703,12 +2703,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "7.000 µSv"
     },
     content: {
-      intro: 'Dieser Strahlenschutzrechner konvertiert Aktivität in Becquerel (Bq) und biologische Strahlendosen zwischen Sievert (Sv), Millisievert (mSv) und Gray (Gy).',
+      intro: 'Dieser Strahlenschutzrechner rechnet Äquivalentdosen zwischen Sievert (Sv), Millisievert (mSv), Mikrosievert (µSv) und der älteren Einheit rem um und ordnet den Wert ein.',
       details: '1 Becquerel entspricht einem Atomzerfall pro Sekunde. Das Sievert bewertet die biologische Schädigungswirkung auf menschliches Gewebe: Die durchschnittliche natürliche Strahlenbelastung in Deutschland beträgt ca. 2,1 mSv pro Person und Jahr.',
     },
     faqs: [
-      { question: 'Wie viel Strahlung verursacht ein Langstreckenflug nach New York?', answer: 'Durch die Höhenstrahlung in 10 bis 12 km Höhe beträgt die Dosis eines Hin- und Rückflugs Frankfurt–New York ca. 0,05 bis 0,10 Millisievert (entspricht etwa einer Röntgenaufnahme der Lunge).' },
-      { question: 'Welcher gesetzliche Dosisgrenzwert gilt für beruflich strahlenexponierte Personen?', answer: 'Nach der Strahlenschutzverordnung (StrlSchV) maximal 20 Millisievert pro Kalenderjahr.' },
+      { question: 'Wie viel Strahlung verursacht ein Langstreckenflug nach New York?', answer: 'Durch die Höhenstrahlung in 10 bis 12 km Höhe beträgt die Dosis eines Hin- und Rückflugs Frankfurt–New York nach Angaben des Bundesamts für Strahlenschutz etwa 0,12 Millisievert (rund 120 µSv). Je nach Sonnenaktivität und Flughöhe schwankt der Wert.' },
+      { question: 'Welcher gesetzliche Dosisgrenzwert gilt für beruflich strahlenexponierte Personen?', answer: 'Nach § 78 Strahlenschutzgesetz (StrlSchG) maximal 20 Millisievert effektive Dosis pro Kalenderjahr.' },
     ],
     relatedSlugs: ['energie-arbeit-umrechner', 'zeit-umrechner', 'gewicht-masse-umrechner'],
   },
@@ -2809,7 +2809,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "1.200 mPa·s (1.200 cP)"
     },
     content: {
-      intro: 'Dieser Strömungsrechner transformiert die dynamische Viskosität (Pascal-Sekunden Pa·s, Centipoise cP) und kinematische Viskosität (m²/s, Centistokes cSt) von Fluiden und Schmierölen.',
+      intro: 'Dieser Strömungsrechner transformiert die dynamische Viskosität von Fluiden und Schmierölen zwischen Pascalsekunden (Pa·s), Millipascalsekunden (mPa·s), Centipoise (cP) und Poise (P).',
       details: 'Kinematische Viskosität nu = Dynamische Viskosität eta / Dichte rho. Wasser bei 20 °C besitzt eine dynamische Viskosität von ca. 1,0 mPa·s (1 cP); Motoröl 10W-40 liegt bei ca. 100 bis 200 mPa·s.',
     },
     faqs: [
@@ -2870,11 +2870,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
       
       // Pariser Stich: 1 EU-Größe = 2/3 cm = 6.67 mm
-      // Fußlänge in cm ≈ (EU - 2) * (2/3)
+      // Fußlänge in cm = (EU - 1,5) * (2/3), umgekehrt EU = 1,5 * Fußlänge + 1,5
       const footLengthCm = ((eu - 1.5) * 2) / 3;
       
-      // UK Größe: (EU - 33) * 0.75 ca.
-      // Formel: UK = 3 * Leistenlänge in Zoll - 25
+      // UK Größe (Näherung): (EU - 31,5) * 0,75
+      // Hintergrund: UK = 3 * Leistenlänge in Zoll - 25 (wird hier nicht verwendet)
       const uk = (eu - 31.5) * 0.75;
       
       // US Men ≈ UK + 0.5 bis 1.0 (meist UK + 0.5)
@@ -2916,8 +2916,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "US 8.5 / UK 8.0 (27,0 cm Fußlänge)"
     },
     content: {
-      intro: 'Dieser Größenumrechner gleicht internationale Konfektions- und Schuhgrößen zwischen EU (Paris-Stich), US, UK und Fußlänge in Zentimetern (Mondopoint) ab.',
-      details: 'Die europäische Schuhgröße basiert auf dem Pariser Stich (1 Stich = 2/3 cm ≈ 6,67 mm): EU-Größe = (Fußlänge in cm + 1,5 cm Abrollzugabe) · 1,5. Eine Fußlänge von 27 cm entspricht EU-Größe 42.',
+      intro: 'Dieser Größenumrechner gleicht Schuhgrößen zwischen EU (Paris-Stich), US, UK und Fußlänge in Zentimetern (Mondopoint) ab.',
+      details: 'Die europäische Schuhgröße basiert auf dem Pariser Stich (1 Stich = 2/3 cm ≈ 6,67 mm): Der Rechner verwendet die Näherung EU-Größe = 1,5 × Fußlänge in cm + 1,5. Eine Fußlänge von 27 cm entspricht damit EU-Größe 42 (1,5 × 27 + 1,5 = 42).',
     },
     faqs: [
       { question: 'Warum fallen Schuhgrößen verschiedener Hersteller so unterschiedlich aus?', answer: 'Weil Hersteller unterschiedliche Leistenformen verwenden und US/UK-Größen oft mit gerundeten Umrechnungsfaktoren in EU-Größen übersetzen.' },
@@ -3025,7 +3025,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         secondary: [
           { id: 'sheetWeight', label: 'Gewicht pro Einzelblatt', value: singleSheetWeightG, formattedValue: formatMeasure(singleSheetWeightG, 2) + ' g' },
           { id: 'totalWeight', label: 'Gesamtgewicht (' + sheets + ' Blätter)', value: totalWeightG, formattedValue: formatMeasure(totalWeightG, 1) + ' g (' + formatMeasure(totalWeightG / 1000, 3) + ' kg)' },
-          { id: 'letterCheck', label: 'Porto-Richtwert Deutsche Post', value: 0, formattedValue: (totalWeightG + 5) <= 20 ? 'Standardbrief bis 20g' : (totalWeightG + 5) <= 50 ? 'Kompaktbrief bis 50g' : 'Großbrief bis 500g' },
+          { id: 'letterCheck', label: 'Porto-Richtwert Deutsche Post', value: 0, formattedValue: (totalWeightG + 5) <= 20 ? 'Standardbrief bis 20g' : (totalWeightG + 5) <= 50 ? 'Kompaktbrief bis 50g' : (totalWeightG + 5) <= 500 ? 'Großbrief bis 500g' : 'über 500 g: Maxibrief oder Päckchen' },
         ],
         summaryText: String(fmt || 'A4').toUpperCase() + ' misst genau ' + wMm + ' × ' + hMm + ' mm. ' + sheets + ' Blatt (' + gM2 + ' g/m²) wiegen ca. ' + formatMeasure(totalWeightG, 1) + ' Gramm.',
       };
@@ -3061,7 +3061,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Wie viel wiegt ein DIN-A4-Blatt Normalpapier (80 g/m²)?', answer: 'Aus 1 m² (DIN A0) entstehen durch viermaliges Halbieren genau 16 DIN-A4-Blätter. Ein Blatt wiegt: 80 g / 16 = exakt 5,0 Gramm.' },
-      { question: 'Welches Format passt in einen Standard-Briefumschlag DIN lang?', answer: 'Ein zweimal horizontal gefaltetes DIN-A4-Blatt (105 × 210 mm) passt exakt in einen DIN-lang-Umschlag (110 × 220 mm).' },
+      { question: 'Welches Format passt in einen Standard-Briefumschlag DIN lang?', answer: 'Ein zweimal quer gefaltetes DIN-A4-Blatt (99 × 210 mm) passt in einen DIN-lang-Umschlag (110 × 220 mm).' },
     ],
     relatedSlugs: ['gewicht-masse-umrechner', 'flaeche-umrechner', 'laengen-umrechner'],
   },

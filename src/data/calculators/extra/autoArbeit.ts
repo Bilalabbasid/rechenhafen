@@ -3,6 +3,18 @@ import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { computeEStSingle, computeUebergangsbereich } from '@/lib/calculators/steuernGehalt';
 import { calculateDienstwagen } from '@/lib/calculators/auto';
+import { LEGAL_VALUES_2026 } from '@/legal/de';
+import { GERMAN_DATA_2026 } from '@/data/regulated/2026';
+
+// Beitragsbemessungsgrenzen 2026 (Sozialversicherungs-Rechengrößenverordnung 2026)
+const BBG_RV_MONAT_2026 = LEGAL_VALUES_2026.bbgRentenversicherungMonat.value;
+const BBG_KV_MONAT_2026 = LEGAL_VALUES_2026.bbgKrankenversicherungMonat.value;
+// Höchstkrankengeld: 70 % des kalendertäglichen Regelentgelts, höchstens bis zur BBG KV (§ 47 Abs. 1 und 6 SGB V)
+const KRANKENGELD_MAX_TAG_2026 = (BBG_KV_MONAT_2026 / 30) * 0.7;
+// Steuerfreie Pauschalen § 3 Nr. 26 / 26a EStG ab 2026 (Steueränderungsgesetz 2025)
+const UEBUNGSLEITER_PAUSCHALE = GERMAN_DATA_2026.uebungsleiterpauschale_jahr.value;
+const EHRENAMT_PAUSCHALE = GERMAN_DATA_2026.ehrenamtspauschale_jahr.value;
+const fmtEuro0 = (v: number) => `${formatNumber(v, 0)} €`;
 
 // ---------------------------------------------------------------------------
 // LKW-Maut Deutschland: Mautteilsätze in Euro je km nach Anlage 1 BFStrMG
@@ -2015,7 +2027,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const regularNet = gross * 0.62;
       const reducedGross = gross * (1 - reduction);
       const reducedNet = reducedGross * 0.62;
-      const netDifference = Math.max(0, regularNet - reducedNet);
+      // Soll- und Ist-Entgelt werden nur bis zur Beitragsbemessungsgrenze der Arbeitslosenversicherung berücksichtigt (§ 106 SGB III)
+      const sollCapped = Math.min(gross, BBG_RV_MONAT_2026);
+      const istCapped = Math.min(reducedGross, BBG_RV_MONAT_2026);
+      const netDifference = Math.max(0, (sollCapped - istCapped) * 0.62);
       const kug = netDifference * rate;
       const totalIncome = reducedNet + kug;
 
@@ -2245,8 +2260,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const rule2 = dailyNet * 0.90;
       const rawDailyKrankengeld = Math.min(rule1, rule2);
 
-      // Gesetzliches Höchstkrankengeld 2026 (ca. 120,75 € / Tag)
-      const cappedDailyKrankengeld = Math.min(rawDailyKrankengeld, 120.75);
+      // Höchstkrankengeld 2026 aus der Beitragsbemessungsgrenze der Krankenversicherung
+      const cappedDailyKrankengeld = Math.min(rawDailyKrankengeld, KRANKENGELD_MAX_TAG_2026);
 
       // Vom Krankengeld gehen Arbeitnehmeranteile zu RV (9,3%), ALV (1,3%) und PV (ca. 2,2% bzw. 2,8%) ab:
       const pvRate = hasKids ? 0.022 : 0.028;
@@ -2401,7 +2416,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       result: '2.280,00 € Brutto (ca. 1.482 € Netto)',
     },
     content: {
-      intro: 'Während der Elternzeit haben Arbeitnehmer nach § 15 BEEG einen Rechtsanspruch auf Teilzeitarbeit im Umfang von 24 bis maximal 32 Wochenstunden.',
+      intro: 'Während der Elternzeit haben Arbeitnehmer nach § 15 BEEG einen Rechtsanspruch auf Teilzeitarbeit im Umfang von 15 bis 32 Wochenstunden im Monatsdurchschnitt.',
       details: 'Dieser Rechner ermittelt den Teilzeitverdienst während der Elternzeit und kalkuliert eventuelle Anrechnungen auf das Basiselterngeld bzw. ElterngeldPlus.',
     },
     faqs: [
@@ -2550,7 +2565,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     metaTitle: 'Zuschläge Rechner § 3b EStG – Steuerfreie Sonntags-',
     metaDescription: 'Berechnen Sie steuer- und beitragsfreie Zuschläge für Nachtarbeit (25 % / 40 %), Sonntagsarbeit (50 %) und Feiertagsarbeit (125 % / 150 %) nach § 3b EStG.',
     h1: 'Zuschläge Rechner – Steuerfreie Nacht- & Sonntagszuschläge berechnen',
-    shortDescription: 'Ermittelt die steuer- und sozialversicherungsfreien Zuschläge nach § 3b EStG.',
+    shortDescription: 'Ermittelt die steuerfreien Zuschläge nach § 3b EStG und den beitragsfreien Teil in der Sozialversicherung.',
     searchKeywords: ['zuschlaege rechner paragraph 3b estg', 'nachtzuschlag steuerfrei berechnen', 'sonntagszuschlag 50 prozent rechner', 'feiertagszuschlag 125 prozent netto'],
     inputs: [
       { id: 'hourlyWage', label: 'Grundstundenlohn in Euro (maximal 50 €/Std. steuerlich begünstigt)', type: 'number', defaultValue: 18.50, min: 0, max: 80, step: 0.5, unit: '€/Std.' },
@@ -2563,8 +2578,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { value: 'night_standard', label: 'Nachtarbeit 20:00 - 06:00 Uhr (25 % steuerfrei)' },
           { value: 'night_core', label: 'Nachtarbeit 00:00 - 04:00 Uhr bei Beginn vor 00:00 (40 % steuerfrei)' },
           { value: 'sunday', label: 'Sonntagsarbeit (50 % steuerfrei)' },
-          { value: 'holiday_standard', label: 'Feiertagsarbeit & 31.12. ab 14 Uhr (125 % steuerfrei)' },
-          { value: 'holiday_special', label: 'Besondere Feiertage: 1. Mai, 25./26. Dez, 1. Jan (150 % steuerfrei)' },
+          { value: 'holiday_standard', label: 'Gesetzliche Feiertage (auch 1. Januar) und 31.12. ab 14 Uhr (125 % steuerfrei)' },
+          { value: 'holiday_special', label: '24.12. ab 14 Uhr, 25./26. Dezember und 1. Mai (150 % steuerfrei)' },
         ],
       },
       { id: 'workedHours', label: 'Geleistete begünstigte Stunden', type: 'number', defaultValue: 8, min: 0, max: 100, step: 0.5, unit: 'Stunden' },
@@ -2581,22 +2596,28 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       if (type === 'holiday_standard') pct = 1.25;
       if (type === 'holiday_special') pct = 1.50;
 
-      // Steuerlich anerkannter Höchstgrundlohn: 50 €/Std.
-      // Für Beitragsfreiheit in der Sozialversicherung: max. 25 €/Std.
+      // Steuerlich anerkannter Höchstgrundlohn: 50 €/Std. (§ 3b Abs. 2 EStG)
+      // Beitragsfrei in der Sozialversicherung nur bis 25 €/Std. Grundlohn (§ 1 Abs. 1 Satz 1 Nr. 1 SvEV)
       const taxBaseWage = Math.min(wage, 50);
       const bonusPerHour = taxBaseWage * pct;
       const totalBonusTaxFree = bonusPerHour * hours;
+      const svFreeBonus = Math.min(wage, 25) * pct * hours;
+      const svLiableBonus = Math.max(0, totalBonusTaxFree - svFreeBonus);
       const basePayGross = wage * hours;
       const totalPay = basePayGross + totalBonusTaxFree;
 
       return {
-        primary: { id: 'totalBonusTaxFree', label: 'Steuerfreier Zuschlag (Brutto = Netto)', value: totalBonusTaxFree, formattedValue: formatCurrency(totalBonusTaxFree), highlight: true },
+        primary: { id: 'totalBonusTaxFree', label: svLiableBonus > 0 ? 'Steuerfreier Zuschlag' : 'Steuer- und beitragsfreier Zuschlag (Brutto = Netto)', value: totalBonusTaxFree, formattedValue: formatCurrency(totalBonusTaxFree), highlight: true },
         secondary: [
           { id: 'bonusPerHour', label: 'Zuschlag pro Stunde', value: bonusPerHour, formattedValue: `${formatCurrency(bonusPerHour)}/Std.` },
+          { id: 'svFreeBonus', label: 'Davon frei von Sozialversicherungsbeiträgen', value: svFreeBonus, formattedValue: formatCurrency(svFreeBonus) },
+          { id: 'svLiableBonus', label: 'Davon sozialversicherungspflichtig (Grundlohn über 25 €/Std.)', value: svLiableBonus, formattedValue: formatCurrency(svLiableBonus) },
           { id: 'basePayGross', label: 'Regulärer Grundlohn (steuerpflichtig)', value: basePayGross, formattedValue: formatCurrency(basePayGross) },
           { id: 'totalPay', label: 'Gesamtauszahlung Grundlohn + Zuschlag', value: totalPay, formattedValue: formatCurrency(totalPay) },
         ],
-        summaryText: `Für ${hours} Stunden erhalten Sie einen steuerfreien Zuschlag von ${formatCurrency(totalBonusTaxFree)} (${formatCurrency(bonusPerHour)}/Std.). Dieser Betrag geht ohne Abzüge direkt aufs Konto!`,
+        summaryText: svLiableBonus > 0
+          ? `Für ${hours} Stunden erhalten Sie einen steuerfreien Zuschlag von ${formatCurrency(totalBonusTaxFree)} (${formatCurrency(bonusPerHour)}/Std.). Weil Ihr Grundlohn über 25 €/Std. liegt, sind davon nur ${formatCurrency(svFreeBonus)} beitragsfrei; auf ${formatCurrency(svLiableBonus)} fallen Sozialversicherungsbeiträge an.`
+          : `Für ${hours} Stunden erhalten Sie einen steuer- und beitragsfreien Zuschlag von ${formatCurrency(totalBonusTaxFree)} (${formatCurrency(bonusPerHour)}/Std.). Dieser Betrag kommt ohne Abzüge bei Ihnen an.`,
       };
     },
     formula: 'Zuschlag = Grundstundenlohn (max. 50 €) × Begünstigter Prozentsatz × Stunden',
@@ -2608,11 +2629,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       result: '74,00 € steuerfreies Extra',
     },
     content: {
-      intro: 'Zuschläge für Nacht-, Sonntags- und Feiertagsarbeit sind nach § 3b EStG unter Einhaltung gesetzlicher Höchstgrenzen von der Lohnsteuer und den Sozialabgaben befreit.',
-      details: 'Steuerfreie Höchstsätze bezogen auf den Grundlohn (max. 50 €/Std.): Nachtarbeit 25 % (zwischen 0:00 und 4:00 Uhr 40 %), Sonntagsarbeit 50 %, Feiertagsarbeit 125 % (an besonderen Feiertagen wie 1. Mai oder Weihnachten 150 %).',
+      intro: 'Zuschläge für Nacht-, Sonntags- und Feiertagsarbeit sind nach § 3b EStG bis zu gesetzlichen Höchstsätzen lohnsteuerfrei. Beitragsfrei in der Sozialversicherung sind sie nur, soweit der Grundlohn 25 € pro Stunde nicht übersteigt (§ 1 SvEV).',
+      details: 'Steuerfreie Höchstsätze bezogen auf den Grundlohn (max. 50 €/Std.): Nachtarbeit von 20 bis 6 Uhr 25 % (zwischen 0 und 4 Uhr 40 %, wenn die Arbeit vor 0 Uhr begonnen wurde), Sonntagsarbeit 50 %, Arbeit an gesetzlichen Feiertagen und am 31. Dezember ab 14 Uhr 125 %, am 24. Dezember ab 14 Uhr, am 25. und 26. Dezember sowie am 1. Mai 150 %.',
     },
     faqs: [
-      { question: 'Ab welcher Uhrzeit gilt Arbeit als Nachtarbeit?', answer: 'Arbeitszeitrechtlich (§ 2 ArbZG) und steuerlich (§ 3b EStG) gilt die Zeit von 23:00 bis 06:00 Uhr (in Bäckereien ab 22:00 Uhr) als Nachtzeit.' },
+      { question: 'Ab welcher Uhrzeit gilt Arbeit als Nachtarbeit?', answer: 'Für die Steuerfreiheit nach § 3b Abs. 2 EStG gilt die Zeit von 20 bis 6 Uhr als Nachtarbeit. Das Arbeitszeitgesetz definiert Nachtzeit enger: von 23 bis 6 Uhr, in Bäckereien und Konditoreien von 22 bis 5 Uhr (§ 2 Abs. 3 ArbZG).' },
       { question: 'Können Sonntags- und Nachtzuschläge gleichzeitig gezahlt werden?', answer: 'Ja, fallen Sonntags- und Nachtarbeit zusammen, dürfen beide steuerfreien Zuschläge nebeneinander gewährt werden (z. B. 50 % Sonntag + 25 % Nacht = 75 % steuerfrei).' },
     ],
     relatedSlugs: ['stundenlohnrechner', 'ueberstunden-auszahlung-rechner', 'teilzeit-gehaltsrechner'],
@@ -2905,8 +2926,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const rate = inputs.hasChildren === 'yes' ? 0.67 : 0.60;
       const age = inputs.ageYears !== undefined && inputs.ageYears !== '' ? Math.max(18, parseInt(inputs.ageYears, 10) || 0) : 35;
 
+      // Bemessungsentgelt höchstens bis zur Beitragsbemessungsgrenze der Arbeitslosenversicherung
       // Pauschaliertes Nettoentgelt nach § 153 SGB III
-      const dailyGross = gross / 30;
+      const dailyGross = Math.min(gross, BBG_RV_MONAT_2026) / 30;
       const dailyPauschalNet = dailyGross * (inputs.taxClass === '3' ? 0.70 : 0.62);
       const dailyAlg = dailyPauschalNet * rate;
       const monthlyAlg = dailyAlg * 30;
@@ -3340,10 +3362,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'arbeit-gehalt',
     subcategory: 'Familie & Freizeit',
     metaTitle: 'Ehrenamtspauschale & Übungsleiterpauschale Rechner 2026',
-    metaDescription: 'Berechnen Sie die steuerfreien Freibeträge für Ehrenamt (840 €/Jahr) und Übungsleiter/Trainer (3.000 €/Jahr) nach § 3 Nr. 26 und 26a EStG.',
+    metaDescription: `Berechnen Sie die steuerfreien Freibeträge 2026 für Ehrenamt (${fmtEuro0(EHRENAMT_PAUSCHALE)}/Jahr) und Übungsleiter/Trainer (${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)}/Jahr) nach § 3 Nr. 26 und 26a EStG.`,
     h1: 'Ehrenamtspauschale Rechner – Steuerfreie Vergütung im Verein',
     shortDescription: 'Ermittelt die steuer- und sozialversicherungsfreien Vergütungen für gemeinnützige Tätigkeiten.',
-    searchKeywords: ['ehrenamtspauschale rechner 840 euro', 'uebungsleiterpauschale 3000 euro steuerfrei', 'paragraph 3 nummer 26 estg freibetrag', 'ehrenamt aufwandsentschaedigung rechner'],
+    searchKeywords: ['ehrenamtspauschale rechner 960 euro', 'uebungsleiterpauschale 3300 euro steuerfrei', 'paragraph 3 nummer 26 estg freibetrag', 'ehrenamt aufwandsentschaedigung rechner'],
     inputs: [
       {
         id: 'activityType',
@@ -3351,20 +3373,20 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'trainer',
         options: [
-          { value: 'trainer', label: 'Übungsleiter, Trainer, Ausbilder, Erzieher (§ 3 Nr. 26 EStG: bis 3.000 €/Jahr)' },
-          { value: 'volunteer', label: 'Ehrenamtliche Vereinstätigkeit / Vorstand / Helfer (§ 3 Nr. 26a EStG: bis 840 €/Jahr)' },
-          { value: 'combined', label: 'Kombination aus beiden Tätigkeiten (zwei getrennte Ämter: bis 3.840 €/Jahr)' },
+          { value: 'trainer', label: `Übungsleiter, Trainer, Ausbilder, Erzieher (§ 3 Nr. 26 EStG: bis ${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)}/Jahr)` },
+          { value: 'volunteer', label: `Ehrenamtliche Vereinstätigkeit / Vorstand / Helfer (§ 3 Nr. 26a EStG: bis ${fmtEuro0(EHRENAMT_PAUSCHALE)}/Jahr)` },
+          { value: 'combined', label: `Kombination aus beiden Tätigkeiten (zwei getrennte Ämter: bis ${fmtEuro0(UEBUNGSLEITER_PAUSCHALE + EHRENAMT_PAUSCHALE)}/Jahr)` },
         ],
       },
-      { id: 'yearlyPayout', label: 'Vereinbarte jährliche Aufwandsentschädigung', type: 'number', defaultValue: 3200, min: 0, step: 100, unit: '€/Jahr' },
+      { id: 'yearlyPayout', label: 'Vereinbarte jährliche Aufwandsentschädigung', type: 'number', defaultValue: 3500, min: 0, step: 100, unit: '€/Jahr' },
     ],
     calculate: (inputs) => {
       const type = inputs.activityType || 'trainer';
-      const payout = inputs.yearlyPayout !== undefined && inputs.yearlyPayout !== '' ? Math.max(0, parseFloat(inputs.yearlyPayout) || 0) : 3200;
+      const payout = inputs.yearlyPayout !== undefined && inputs.yearlyPayout !== '' ? Math.max(0, parseFloat(inputs.yearlyPayout) || 0) : 3500;
 
-      let allowance = 3000;
-      if (type === 'volunteer') allowance = 840;
-      if (type === 'combined') allowance = 3840;
+      let allowance = UEBUNGSLEITER_PAUSCHALE;
+      if (type === 'volunteer') allowance = EHRENAMT_PAUSCHALE;
+      if (type === 'combined') allowance = UEBUNGSLEITER_PAUSCHALE + EHRENAMT_PAUSCHALE;
 
       const taxFreePart = Math.min(payout, allowance);
       const taxablePart = Math.max(0, payout - allowance);
@@ -3380,19 +3402,19 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       };
     },
     formula: 'Steuerfrei = min(Aufwandsentschädigung, Freibetrag nach § 3 Nr. 26/26a EStG)',
-    formulaExplanation: 'Übungsleiter erhalten bis zu 3.000 Euro, sonstige Ehrenamtliche bis zu 840 Euro jährlich steuer- und beitragsfrei, sofern die Tätigkeit im ideellen Bereich oder Zweckbetrieb einer gemeinnützigen Organisation ausgeübt wird.',
+    formulaExplanation: `Übungsleiter erhalten seit 2026 bis zu ${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)}, sonstige Ehrenamtliche bis zu ${fmtEuro0(EHRENAMT_PAUSCHALE)} jährlich steuer- und beitragsfrei, sofern die Tätigkeit im ideellen Bereich oder Zweckbetrieb einer gemeinnützigen Organisation ausgeübt wird.`,
     workedExample: {
-      title: 'Beispiel: Fußballtrainer erhält 3.200 € Aufwandsentschädigung im Jahr',
-      inputValues: [{ label: 'Tätigkeit', value: 'Übungsleiter (3.000 €)' }, { label: 'Vergütung', value: '3.200 €' }],
-      steps: ['3.000 € bleiben 100 % steuer- und beitragsfrei', '200 € Überhang unterliegt der Besteuerung (z. B. als Minijob)'],
-      result: '3.000,00 € steuerfrei',
+      title: 'Beispiel: Fußballtrainer erhält 3.500 € Aufwandsentschädigung im Jahr',
+      inputValues: [{ label: 'Tätigkeit', value: `Übungsleiter (${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)})` }, { label: 'Vergütung', value: '3.500 €' }],
+      steps: [`${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)} bleiben 100 % steuer- und beitragsfrei`, `${fmtEuro0(3500 - UEBUNGSLEITER_PAUSCHALE)} Überhang unterliegen der Besteuerung (z. B. als Minijob)`],
+      result: `${formatCurrency(UEBUNGSLEITER_PAUSCHALE)} steuerfrei`,
     },
     content: {
       intro: 'Dieser Rechner kalkuliert steuerfreie Aufwandsentschädigungen für ehrenamtliche Tätigkeiten (Ehrenamtspauschale und Übungsleiterpauschale nach dem Einkommensteuergesetz).',
-      details: 'Nach § 3 Nr. 26 EStG können Übungsleiter, Trainer und Ausbilder bis zu 3.000 Euro pro Kalenderjahr steuer- und sozialversicherungsfrei erhalten. Die allgemeine Ehrenamtspauschale nach § 3 Nr. 26a EStG beträgt bis zu 840 Euro jährlich.',
+      details: `Nach § 3 Nr. 26 EStG können Übungsleiter, Trainer und Ausbilder seit 2026 bis zu ${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)} pro Kalenderjahr steuer- und sozialversicherungsfrei erhalten (bis 2025: 3.000 €). Die allgemeine Ehrenamtspauschale nach § 3 Nr. 26a EStG beträgt bis zu ${fmtEuro0(EHRENAMT_PAUSCHALE)} jährlich (bis 2025: 840 €).`,
     },
     faqs: [
-      { question: 'Können Übungsleiterpauschale und Ehrenamtspauschale kombiniert werden?', answer: 'Ja, aber nur für unterschiedliche Tätigkeiten: Wer im selben Verein als Vorstand (Ehrenamt: bis 840 €) und als Jugendtrainer (Übungsleiter: bis 3.000 €) arbeitet, kann beide Freibeträge nebeneinander ausschöpfen.' },
+      { question: 'Können Übungsleiterpauschale und Ehrenamtspauschale kombiniert werden?', answer: `Ja, aber nur für unterschiedliche Tätigkeiten: Wer im selben Verein als Vorstand (Ehrenamt: bis ${fmtEuro0(EHRENAMT_PAUSCHALE)}) und als Jugendtrainer (Übungsleiter: bis ${fmtEuro0(UEBUNGSLEITER_PAUSCHALE)}) arbeitet, kann beide Freibeträge nebeneinander ausschöpfen.` },
       { question: 'Müssen Einnahmen unterhalb des Freibetrags in der Steuererklärung angegeben werden?', answer: 'Ja, sie gehören in die Anlage N oder S, werden dort jedoch über die Steuerbefreiung nach § 3 Nr. 26/26a EStG steuerlich wieder neutralisiert.' },
     ],
     relatedSlugs: ['minijob-rechner', 'teilzeit-gehaltsrechner', 'dienstjubilaeum-steuerfrei-rechner'],
@@ -3401,7 +3423,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       year: 2026,
       source: 'Einkommensteuergesetz (§ 3 Nr. 26, Nr. 26a EStG)',
       sourceUrl: 'https://www.gesetze-im-internet.de/estg/__3.html',
-      lastVerified: '2026-01-15',
+      lastVerified: '2026-11-15',
     }
   },
 ];

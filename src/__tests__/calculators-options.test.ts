@@ -155,14 +155,14 @@ describe('Calculators Meaningful Options Test Suite', () => {
 
     it('calculates commuter allowance with car (uncapped) vs public transport (4.500 € cap)', () => {
       // 80 km single trip, 220 workdays
-      // Per day: 20 * 0.30 + 60 * 0.38 = 6.00 + 22.80 = 28.80 €
-      // Total year: 28.80 * 220 = 6.336 €
+      // Since 2026: 0,38 € from the first km (StÄndG 2025). Per day: 80 * 0.38 = 30.40 €
+      // Total year: 30.40 * 220 = 6.688 €
       const carRes = calculateCommuterAllowance({
         distanceKm: 80,
         workdays: 220,
         transportMode: 'car',
       });
-      expect(carRes.primary.value).toBe(6336);
+      expect(carRes.primary.value).toBe(6688);
 
       // Public transport capped at 4.500 €
       const publicRes = calculateCommuterAllowance({
@@ -176,10 +176,10 @@ describe('Calculators Meaningful Options Test Suite', () => {
       const homeOfficeRes = calculateCommuterAllowance({
         distanceKm: 80,
         workdays: 220,
-        homeOfficeDays: 20, // 200 days * 28.80 = 5.760 €
+        homeOfficeDays: 20, // 200 days * 30.40 = 6.080 €
         transportMode: 'car',
       });
-      expect(homeOfficeRes.primary.value).toBe(5760);
+      expect(homeOfficeRes.primary.value).toBe(6080);
     });
   });
 

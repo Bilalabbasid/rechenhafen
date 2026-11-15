@@ -20,6 +20,38 @@ function buildBridgeLoanQuickReference(): string {
   ].join('\n\n');
 }
 
+/**
+ * Effektiver Jahreszins nach § 16 PAngV und ihrer Anlage für gleich hohe Monatsraten:
+ * Der Barwert aller Raten, abgezinst mit (1 + i)^(Monat / 12), entspricht der Auszahlung. i per Bisektion, in Prozent.
+ */
+function effectiveAnnualRate(payout: number, monthlyRate: number, months: number): number {
+  if (payout <= 0 || monthlyRate <= 0 || months <= 0) return 0;
+  const presentValue = (i: number) => {
+    const q = Math.pow(1 + i, -1 / 12);
+    let factor = 1;
+    let sum = 0;
+    for (let k = 1; k <= months; k++) {
+      factor *= q;
+      sum += monthlyRate * factor;
+    }
+    return sum;
+  };
+  let lo = -0.5;
+  let hi = 10;
+  for (let iter = 0; iter < 200; iter++) {
+    const mid = (lo + hi) / 2;
+    if (presentValue(mid) > payout) lo = mid;
+    else hi = mid;
+  }
+  return ((lo + hi) / 2) * 100;
+}
+// Beispiel aus dem Effektivzins-Rechner: 20.000 € zu 5 % über 48 Monate ohne Disagio (gleiche Funktion wie das Ergebnis).
+const EFFEKTIVZINS_EXAMPLE = (() => {
+  const r = 0.05 / 12;
+  const rate = 20000 * (r / (1 - Math.pow(1 + r, -48)));
+  return formatPercent(effectiveAnnualRate(20000, rate, 48), 2);
+})();
+
 export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
   // ==================== FINANZEN (18) ====================
   {
@@ -83,8 +115,8 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         summaryText: `Bei ${formatCurrency(deposit)} zu ${formatPercent(rate)} p.a. über ${months} Monate beträgt Ihr Zinsertrag ${formatCurrency(interest)}.`,
       };
     },
-    formula: 'Zinsertrag = Anlagebetrag × (Zinssatz / 100) × (Tage / 360)',
-    formulaExplanation: 'Deutsche Zinsmethode (30/360). Bei unterjähriger Zinsgutschrift greift der Zinseszins.',
+    formula: 'Endguthaben = Anlagebetrag × (1 + Zinssatz / Gutschriften pro Jahr)^(Gutschriften pro Jahr × Monate / 12)',
+    formulaExplanation: 'Der Rechner verzinst je Gutschriftperiode (monatlich, vierteljährlich oder jährlich) und rechnet gutgeschriebene Zinsen in der nächsten Periode mit (Zinseszins). Der Zinssatz gilt als konstant; eine taggenaue Abrechnung wie bei der Bank wird nicht nachgebildet.',
     workedExample: {
       title: 'Beispiel: 10.000 € zu 3,5 % p.a. für 12 Monate (quartalsweise)',
       description: 'Zinsertrag ca. 354,62 € inklusive Zinseszins.',
@@ -93,7 +125,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Tagesgeld bietet tägliche Verfügbarkeit bei voller Einlagensicherung bis 100.000 € je Kunde und Bank nach EU-Recht.',
-      details: 'Zinsertrag = Anlagebetrag · (Zinssatz / 100) · (Tage / 360) nach deutscher Zinsmethode. Bei vierteljährlicher oder monatlicher Zinsgutschrift entsteht ein spürbarer Zinseszinseffekt. Zinserträge unterliegen bei Überschreiten des Sparer-Pauschbetrags der Abgeltungsteuer. Berechnen Sie Ihren Netto-Zinsertrag mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und verwalten Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
+      details: 'Gutgeschriebene Zinsen werden ab der nächsten Periode mitverzinst. Bei vierteljährlicher oder monatlicher Zinsgutschrift entsteht deshalb ein kleiner Zinseszinseffekt. Zinserträge unterliegen bei Überschreiten des Sparer-Pauschbetrags der Abgeltungsteuer. Berechnen Sie Ihren Netto-Zinsertrag mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/) und verwalten Sie Ihren Freibetrag mit dem [Freistellungsauftrag-Rechner](/rechner/freistellungsauftrag-rechner/).',
     },
     faqs: [
       { question: 'Wie sicher ist Tagesgeld bei Banken in der EU?', answer: 'Über die gesetzliche Einlagensicherung (EdB in Deutschland) sind Einlagen bis 100.000 € pro Person und Kreditinstitut gesetzlich garantiert abgesichert.' },
@@ -182,7 +214,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       details: 'Da das Kapital während der Laufzeit unkündbar gebunden ist, belohnen Banken Festgeld typischerweise mit planbaren Zinsen, die unabhängig von EZB-Zinssenkungen konstant bleiben. Bei Zinsauszahlung zieht die Bank bei Überschreiten des Freibetrags die 25 %ige Kapitalertragsteuer zuzüglich Soli ab. Ermitteln Sie Ihren Reingewinn mit unserem [Kapitalertragsteuer-Rechner](/rechner/kapitalertragsteuer-rechner/).',
     },
     faqs: [
-      { question: 'Kann man ein Festgeldkonto vor Ablauf der Laufzeit vorzeitig kündigen?', answer: 'Grundsätzlich nein. Nur in extremen Härtefällen (§ 314 BGB) stimmen Banken einer vorzeitigen Auflösung zu, meist unter vollständigem Verlust aller aufgelaufenen Zinsen.' },
+      { question: 'Kann man ein Festgeldkonto vor Ablauf der Laufzeit vorzeitig kündigen?', answer: 'In der Regel nicht: Das Geld ist für die vereinbarte Laufzeit fest angelegt. Ob und zu welchen Bedingungen eine vorzeitige Auflösung möglich ist, regeln allein die Vertragsbedingungen Ihrer Bank. Legen Sie deshalb nur Geld fest an, das Sie während der Laufzeit sicher nicht brauchen.' },
       { question: 'Was ist die Festgeld-Treppen-Strategie?', answer: 'Man teilt das Sparvermögen auf mehrere Festgelder mit gestaffelten Laufzeiten (1, 2, 3 Jahre) auf; so wird jedes Jahr ein Teilbetrag fällig und liquide wiederanlegbar.' },
     ],
     relatedSlugs: ['kapitalertragsteuer-rechner', 'freistellungsauftrag-rechner', 'tagesgeld-rechner', 'zinseszinsrechner', 'spardauer-rechner'],
@@ -1802,13 +1834,13 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         primary: { id: 'interest', label: 'Anfallende Dispozinsen', value: interest, formattedValue: formatCurrency(interest), highlight: true },
         secondary: [
           { id: 'perDay', label: 'Zinskosten pro Tag', value: days > 0 ? interest / days : 0, formattedValue: formatCurrency(days > 0 ? interest / days : 0) },
-          { id: 'perYear', label: 'Zinskosten bei 1 Jahr Überziehung', value: (amount * rate) / 100, formattedValue: formatCurrency((amount * rate) / 100) },
+          { id: 'perYear', label: 'Zinskosten bei 1 Jahr Überziehung (365 Tage)', value: (amount * rate * 365) / 36000, formattedValue: formatCurrency((amount * rate * 365) / 36000) },
         ],
         summaryText: `Für ${formatCurrency(amount)} über ${days} Tage bei ${formatPercent(rate)} Dispozins zahlen Sie ${formatCurrency(interest)} Zinsen.`,
       };
     },
     formula: 'Dispozinsen = (Überziehungsbetrag × Zinssatz × Tage) / (100 × 360)',
-    formulaExplanation: 'Deutsche Zinsmethode (30/360). Banken berechnen Dispozinsen taggenau.',
+    formulaExplanation: 'Der Rechner zählt die tatsächlichen Überziehungstage und teilt durch 360 Zinstage (Eurozinsmethode act/360). Ein volles Kalenderjahr kostet damit etwas mehr als der Jahreszinssatz. Welche Zinsmethode Ihre Bank verwendet, steht in ihrem Preis- und Leistungsverzeichnis; bei act/365 fallen die Zinsen geringfügig niedriger aus.',
     workedExample: {
       title: 'Beispiel: 1.500 € Dispo bei 11,5 % Zinsen für 45 Tage',
       description: 'Zinskosten: 21,56 €.',
@@ -1816,8 +1848,8 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       resultSummary: '21,56 € Dispozinsen',
     },
     content: {
-      intro: 'Der Dispositionskredit (Dispo) auf dem Girokonto ist flexibel, gehört mit durchschnittlich 10 bis 14 Prozent Effektivzins jedoch zu den teuersten Kreditformen in Deutschland.',
-      details: 'Dispozinsen werden taggenau auf den beanspruchten Überziehungsbetrag berechnet: Zinsen = Überziehungsbetrag · (Dispozinssatz / 100) · (Tage / 360).',
+      intro: 'Der Dispositionskredit (Dispo) auf dem Girokonto ist flexibel, aber meist deutlich teurer als ein Ratenkredit. Dieser Rechner zeigt, was eine Überziehung mit dem Zinssatz Ihrer Bank kostet.',
+      details: 'Dispozinsen fallen nur auf den tatsächlich beanspruchten Betrag und nur für die Tage im Minus an. Der Rechner nutzt: Zinsen = Überziehungsbetrag · (Dispozinssatz / 100) · (Tage / 360).',
     },
     faqs: [
       { question: 'Was ist der Unterschied zwischen Dispo- und Überziehungszins?', answer: 'Der Dispozinssatz gilt innerhalb des vereinbarten Rahmens (z. B. bis 3 Monatsgehälter). Wird dieser Rahmen noch weiter überzogen (geduldete Überziehung), verlangen Banken oft zusätzliche Strafzinsen.' },
@@ -2771,23 +2803,27 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       const netPayout = loan * (1 - disagio / 100);
       const r = (nom / 100) / 12;
       const monthlyRate = r > 0 ? loan * (r / (1 - Math.pow(1 + r, -m))) : loan / m;
-      const approxEff = nom + (disagio / (m / 12));
+      const eff = effectiveAnnualRate(netPayout, monthlyRate, m);
+      const totalPaid = monthlyRate * m;
+      const totalCost = totalPaid - netPayout;
       return {
-        primary: { id: 'eff', label: 'Effektiver Jahreszins (ca.)', value: approxEff, formattedValue: formatPercent(approxEff, 2), highlight: true },
+        primary: { id: 'eff', label: 'Effektiver Jahreszins', value: eff, formattedValue: formatPercent(eff, 2), highlight: true },
         secondary: [
           { id: 'rate', label: 'Monatliche Rate', value: monthlyRate, formattedValue: formatCurrency(monthlyRate) },
           { id: 'payout', label: 'Tatsächliche Netto-Auszahlung', value: netPayout, formattedValue: formatCurrency(netPayout) },
+          { id: 'totalPaid', label: 'Summe aller Raten', value: totalPaid, formattedValue: formatCurrency(totalPaid) },
+          { id: 'totalCost', label: 'Kreditkosten (Zinsen und Disagio)', value: totalCost, formattedValue: formatCurrency(totalCost) },
         ],
-        summaryText: `Bei einem Sollzins von ${formatPercent(nom)} und ${formatPercent(disagio)} Disagio beträgt der effektive Jahreszins ca. ${formatPercent(approxEff, 2)}.`,
+        summaryText: `Bei einem Sollzins von ${formatPercent(nom)} und ${formatPercent(disagio)} Disagio beträgt der effektive Jahreszins ${formatPercent(eff, 2)}. Sie erhalten ${formatCurrency(netPayout)} und zahlen ${m} Raten von je ${formatCurrency(monthlyRate)}.`,
       };
     },
-    formula: 'Effektivzins nach PAngV',
-    formulaExplanation: 'Berücksichtigt Auszahlungskurs, Zinsverrechnung und Nebenkosten.',
+    formula: 'Auszahlung = Σ Rate ÷ (1 + Effektivzins)^(Monat ÷ 12)',
+    formulaExplanation: 'Berechnung nach § 16 PAngV und ihrer Anlage für ein Annuitätendarlehen: Die Monatsrate ergibt sich aus Nennbetrag, Sollzins und Laufzeit. Der effektive Jahreszins ist der Zinssatz, bei dem der Barwert aller Raten genau der Auszahlung (Nennbetrag abzüglich Disagio) entspricht. Weitere Kosten wie Vermittlungsgebühren erfasst der Rechner nicht.',
     workedExample: {
       title: 'Beispiel: 20.000 € zu 5,0 % über 48 Monate ohne Disagio',
-      description: 'Effektivzins: ca. 5,12 % p.a.',
+      description: `Effektivzins: ${EFFEKTIVZINS_EXAMPLE} p.a. Auch ohne Gebühren liegt er über dem Sollzins, weil die Zinsen monatlich verrechnet werden.`,
       inputs: { loanAmount: 20000, nominalRate: 5.0, disagioPct: 0, months: 48 },
-      resultSummary: 'ca. 5,12 % Effektivzins',
+      resultSummary: `${EFFEKTIVZINS_EXAMPLE} Effektivzins`,
     },
     content: {
       intro: 'Der effektive Jahreszins nach der Preisangabenverordnung (PAngV) fasst Sollzins, Auszahlungskurs, Zinsverrechnungstermine und Bearbeitungskosten in einer einheitlichen Vergleichskennzahl zusammen.',

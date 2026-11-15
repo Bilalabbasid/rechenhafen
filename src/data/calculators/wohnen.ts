@@ -195,7 +195,7 @@ export const WOHNEN_CALCULATORS: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Welcher Unterschied besteht zwischen Wohnfläche und Nutzfläche?', answer: 'Wohnfläche umfasst alle beheizten, bewohnbaren Räume; Nutzfläche schließt Keller, Dachböden, Garagen und gewerbliche Flächen ein.' },
-      { question: 'Wie beeinflusst das Baujahr den Quadratmeterpreis?', answer: 'Neubauten nach aktuellen Effizienzhaus-Standards (KfW 40) erzielen meist 20 bis 40 Prozent höhere Quadratmeterpreise als unrenovierte Bestandsbauten mit hohem Energiebedarf.' },
+      { question: 'Wie beeinflusst das Baujahr den Quadratmeterpreis?', answer: 'Neubauten und sanierte Gebäude mit niedrigem Energiebedarf erzielen in der Regel höhere Quadratmeterpreise als unsanierte Bestandsbauten. Wie groß der Abstand ist, hängt stark von Lage und Marktlage ab. Vergleichen Sie Quadratmeterpreise deshalb nur zwischen Objekten mit ähnlichem Baujahr und Zustand; den Energiebedarf entnehmen Sie dem Energieausweis.' },
     ],
     relatedSlugs: ['immobilienrendite-rechner', 'kaufnebenkosten-rechner', 'mietbelastungsquote-rechner'],
   },

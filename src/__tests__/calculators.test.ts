@@ -145,11 +145,11 @@ describe('RechenHafen Calculation Engines', () => {
       expect(res.primary.value).toBeCloseTo(12.60, 2);
     });
 
-    it('applies German 2026 commuter allowance tiers', () => {
-      // 25 km: First 20 km @ 0.30, next 5 km @ 0.38 = 6.00 + 1.90 = 7.90 per day
-      // 220 workdays = 1738.00 €
+    it('applies the German 2026 commuter allowance (0,38 € from the first km)', () => {
+      // 25 km @ 0.38 = 9.50 per day (§ 9 Abs. 1 Satz 3 Nr. 4 EStG i. d. F. StÄndG 2025)
+      // 220 workdays = 2090.00 €
       const res = calculateCommuterAllowance({ distanceKm: 25, workdays: 220 });
-      expect(res.primary.value).toBeCloseTo(1738.0, 1);
+      expect(res.primary.value).toBeCloseTo(2090.0, 1);
     });
   });
 

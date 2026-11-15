@@ -77,10 +77,10 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     shortName: 'Standardabweichung',
     category: 'statistik-wissenschaft',
     subcategory: 'Deskriptive Statistik',
-    metaTitle: 'Standardabweichung Rechner – Grundgesamtheit (Population σ)',
-    metaDescription: 'Berechnen Sie Varianz σ² und Standardabweichung σ für die Grundgesamtheit mit Schritt-für-Schritt-Rechenweg und Datenreihe.',
-    h1: 'Standardabweichung Rechner – Populationsstreuung berechnen',
-    shortDescription: 'Berechnet Varianz und Standardabweichung einer vollständigen Population (N) mit detailliertem Rechenweg und Mittelwert.',
+    metaTitle: 'Standardabweichung Rechner – Stichprobe s & Varianz',
+    metaDescription: 'Berechnen Sie Mittelwert, Varianz s² und Standardabweichung s einer Stichprobe (Teilung durch n − 1). Zum Vergleich zeigt der Rechner auch σ der Grundgesamtheit.',
+    h1: 'Standardabweichung Rechner – Stichprobe s und Varianz',
+    shortDescription: 'Berechnet Mittelwert, Stichprobenvarianz s² und Stichproben-Standardabweichung s und gibt zusätzlich die Standardabweichung σ der Grundgesamtheit aus.',
     searchKeywords: ['standardabweichung rechner', 'varianz berechnen online', 'stichproben standardabweichung', 'streuung statistik formel'],
     inputs: [
       { id: 'values', label: 'Zahlenreihe eingeben', type: 'text', defaultValue: '12; 15; 18; 11; 19; 14; 16', placeholder: '12; 15; 18; 11; 19; 14; 16', helpText: 'Zahlen getrennt durch Semikolon eingeben' },
@@ -90,12 +90,12 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Die Stichproben-Standardabweichung nutzt die Bessel-Korrektur (Teilung durch n - 1), um eine unverzerrte Schätzung der Populationsstreuung zu gewährleisten.',
     workedExample: {
       title: 'Beispiel: 7 Werte (11, 12, 14, 15, 16, 18, 19)',
-      description: 'Mittelwert: 15,0. Stichproben-Standardabweichung: s = 3,00. Varianz: s² = 9,00.',
+      description: 'Mittelwert: 15. Summe der Abweichungsquadrate: 52. Stichprobenvarianz: s² = 52 / 6 = 8,6667. Stichproben-Standardabweichung: s = 2,9439 (σ der Grundgesamtheit: 2,7255).',
       inputs: { values: '12; 15; 18; 11; 19; 14; 16' },
-      resultSummary: 's = 3,0000',
+      resultSummary: 's = 2,9439',
     },
     content: {
-      intro: 'Die Standardabweichung (Sigma s) misst die typische Streubreite einzelner Messwerte um ihren gemeinsamen arithmetischen Mittelwert.',
+      intro: 'Die Standardabweichung (s) misst die typische Streubreite einzelner Messwerte um ihren gemeinsamen arithmetischen Mittelwert.',
       details: 'Formel für die empirische Standardabweichung der Stichprobe (Bessel-Korrektur mit n-1): s = Wurzel[ (1 / (n-1)) · Summe(x_i - Mittelwert)² ]. Je kleiner die Standardabweichung, desto homogener und präziser liegen die Daten beieinander.',
     },
     faqs: [
@@ -136,8 +136,8 @@ export const STATISTIK_CALCULATORS: CalculatorDefinition[] = [
     formula: 'U = R × I | P = U × I',
     formulaExplanation: 'Elektrische Spannung ist das Produkt aus Widerstand und Stromstärke. Die elektrische Leistung in Watt ergibt sich aus Spannung mal Strom.',
     workedExample: {
-      title: 'Beispiel: 230 Volt Steckdose bei 23 Ohm Widerstand',
-      description: 'I = 230 V / 23 Ω = 10,00 A. Leistung P = 230 V × 10 A = 2.300 Watt (2,3 kW).',
+      title: 'Beispiel: 10 Ampere durch einen Widerstand von 23 Ohm',
+      description: 'Gesucht ist die Spannung: U = R × I = 23 Ω × 10 A = 230 V. Leistung P = 230 V × 10 A = 2.300 Watt (2,3 kW).',
       inputs: { target: 'voltage', voltage: 230, current: 10, resistance: 23 },
       resultSummary: '230 V | 2.300 W',
     },

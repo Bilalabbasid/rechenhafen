@@ -3996,7 +3996,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     category: "statistik-wissenschaft",
     subcategory: "Wahrscheinlichkeitsrechnung",
     metaTitle: 'Würfel & Münze Wahrscheinlichkeitsrechner – Würfe',
-    metaDescription: 'Berechnen Sie Trefferchancen für Mehrfach-Würfe mit 6-seitigen Würfeln und Münzwürfe (mindestens eine 6, Pasch, Augensumme).',
+    metaDescription: 'Berechnen Sie die Chance auf mindestens eine 6 bei 1 bis 10 sechsseitigen Würfeln, die Gegenwahrscheinlichkeit und den Vergleich mit n-mal Kopf beim Münzwurf.',
     h1: 'Würfel & Münzwurf Wahrscheinlichkeitsrechner',
     shortDescription: 'Ermittelt Chancen und Gegenwahrscheinlichkeiten für mehrfache Würfel- und Münzwürfe.',
     searchKeywords: ["würfel wahrscheinlichkeit rechner","münzwurf wahrscheinlichkeit","mindestens eine sechs rechner","pasch chance berechnen","laplace wahrscheinlichkeit"],
@@ -4009,15 +4009,6 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                 "step": 1,
                 "min": 1,
                 "max": 10
-          },
-          {
-                "id": "targetRoll",
-                "label": "Mindestens einmal Augenzahl 6 gewünscht",
-                "type": "number",
-                "defaultValue": 1,
-                "step": 1,
-                "min": 1,
-                "max": 6
           }
     ],
     calculate: (inputs: Record<string, any>) => {
@@ -4045,13 +4036,12 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           "title": "Beispiel: 3 Würfel, mindestens eine 6",
           "description": "P(keine 6) = (5/6)³ = 125 / 216 = 57,87 %. P(mindestens eine 6) = 1 - 0,5787 = 42,13 %.",
           "inputs": {
-                "diceCount": 3,
-                "targetRoll": 1
+                "diceCount": 3
           },
           "resultSummary": "42,13 %"
     },
     content: {
-      intro: 'Dieser Stochastik-Rechner ermittelt Eintrittswahrscheinlichkeiten, Augensummen und Trefferfolgen bei fairen Münzen und mehrfachen Würfelwürfen.',
+      intro: 'Dieser Stochastik-Rechner ermittelt für 1 bis 10 faire Würfel die Chance auf mindestens eine 6, auf lauter Sechsen und auf keine einzige 6, dazu zum Vergleich die Wahrscheinlichkeit, mit einer Münze n-mal hintereinander Kopf zu werfen.',
       details: 'Klassische Laplace-Wahrscheinlichkeit: P(E) = Günstige Ergebnisse / Mögliche Ergebnisse. Bei zwei 6-seitigen Würfeln gibt es 6² = 36 mögliche Würfelpaare; die Augensumme 7 ist mit 6 günstigen Paaren (Wahrscheinlichkeit 6/36 = 16,67 %) am wahrscheinlichsten.',
     },
     faqs: [

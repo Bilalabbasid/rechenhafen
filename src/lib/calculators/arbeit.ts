@@ -117,7 +117,9 @@ export function calculateSalaryIncrease(inputs: Record<string, any>): Calculatio
   const increasePercent = inputs.increasePercent !== undefined && inputs.increasePercent !== '' && !isNaN(parseFloat(inputs.increasePercent))
     ? parseFloat(inputs.increasePercent)
     : 5.0;
-  const monthsPerYear = parseInt(inputs.monthsPerYear || '12', 10);
+  // Dezimalwerte wie 13,5 Gehälter (z. B. Chemie-Tarif) zulassen; ungültige Eingaben fallen auf 12 zurück
+  const rawMonths = parseFloat(String(inputs.monthsPerYear ?? '12').replace(',', '.'));
+  const monthsPerYear = Number.isFinite(rawMonths) && rawMonths > 0 ? rawMonths : 12;
 
   if (currentSalary < 0) {
     return {
@@ -141,7 +143,7 @@ export function calculateSalaryIncrease(inputs: Record<string, any>): Calculatio
     },
     secondary: [
       { id: 'monthlyPlus', label: 'Monatliches Plus (brutto)', value: monthlyPlus, formattedValue: `+${formatCurrency(monthlyPlus)}` },
-      { id: 'yearlyPlus', label: `Jährliches Plus (${monthsPerYear} Gehälter)`, value: yearlyPlus, formattedValue: `+${formatCurrency(yearlyPlus)}` },
+      { id: 'yearlyPlus', label: `Jährliches Plus (${formatNumber(monthsPerYear, 1)} Gehälter)`, value: yearlyPlus, formattedValue: `+${formatCurrency(yearlyPlus)}` },
       { id: 'newYearly', label: 'Neues Jahresgehalt', value: newYearlySalary, formattedValue: formatCurrency(newYearlySalary) },
     ],
     summaryText: `Eine Gehaltserhöhung um ${formatPercent(increasePercent, 1)} steigert Ihr Monatsgehalt von ${formatCurrency(currentSalary)} auf ${formatCurrency(newMonthlySalary)} (+${formatCurrency(monthlyPlus)}/Monat, +${formatCurrency(yearlyPlus)}/Jahr).`,

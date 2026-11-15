@@ -1,3 +1,4 @@
+import { parseNumberList } from './parseNumberList';
 import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 
@@ -103,12 +104,7 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
 
   // Simple arithmetic average (default)
   const gradesInput = inputs.grades !== undefined ? String(inputs.grades) : '2; 1; 3; 2; 1.5; 2.7';
-  const grades = gradesInput
-    .split(/[;, \n]+/)
-    .map((s) => s.trim().replace(',', '.'))
-    .filter((s) => s.length > 0)
-    .map(Number)
-    .filter((n) => Number.isFinite(n) && n >= 0.7 && n <= 6.0);
+  const grades = parseNumberList(gradesInput).filter((n) => n >= 0.7 && n <= 6.0);
 
   if (grades.length === 0) {
     return {
@@ -156,12 +152,7 @@ export function calculateGradeAverage(inputs: Record<string, any>): CalculationR
 
 export function calculateStandardDeviation(inputs: Record<string, any>): CalculationResult {
   const rawInput = inputs.values !== undefined ? String(inputs.values) : '12; 15; 18; 11; 19; 14; 16';
-  const vals = rawInput
-    .split(/[;, \n]+/)
-    .map((s) => s.trim().replace(',', '.'))
-    .filter((s) => s.length > 0)
-    .map(Number)
-    .filter((n) => Number.isFinite(n));
+  const vals = parseNumberList(rawInput);
 
   if (vals.length < 2) {
     return {
