@@ -8,7 +8,7 @@ import styles from '@/styles/layout.module.css';
 
 export const metadata: Metadata = {
   title: 'Alle Rechner – Gesamtverzeichnis',
-  description: 'Übersicht über alle 421 kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.',
+  description: `Übersicht über alle ${ALL_CALCULATORS.length} kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.`,
   alternates: {
     canonical: 'https://rechenhafen.de/rechner/',
   },
@@ -32,7 +32,7 @@ export default function AllCalculatorsPage() {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: 'Alle Rechner – Gesamtverzeichnis',
-    description: 'Übersicht über alle 421 kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.',
+    description: `Übersicht über alle ${ALL_CALCULATORS.length} kostenlosen Online-Rechner auf RechenHafen. Filtern Sie nach Themen wie Steuern, Finanzen, Alltag, Gesundheit, Auto und Mathematik.`,
     url: 'https://rechenhafen.de/rechner/',
     inLanguage: 'de-DE',
     mainEntity: {

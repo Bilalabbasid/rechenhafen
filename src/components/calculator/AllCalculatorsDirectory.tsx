@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, X, Filter } from 'lucide-react';
 import CalculatorCard from '@/components/common/CalculatorCard';
-import { searchCalculators } from '@/lib/search/searchEngine';
+import { searchItems, normalizeGermanText, type SearchableItem } from '@/lib/search/searchCore';
+import { loadSearchIndex } from '@/lib/search/clientIndex';
 import cardsStyles from '@/styles/cards.module.css';
 
 interface CategoryMeta {
@@ -31,6 +32,18 @@ export default function AllCalculatorsDirectory({ calculators, categories }: Pro
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLetter, setSelectedLetter] = useState<string>('all');
+  // Search index is fetched on first search, not bundled with the page.
+  const [index, setIndex] = useState<SearchableItem[] | null>(null);
+
+  useEffect(() => {
+    if (searchQuery.trim() && !index) {
+      loadSearchIndex()
+        .then(setIndex)
+        .catch(() => {
+          /* network error: the simple name filter below stays in use */
+        });
+    }
+  }, [searchQuery, index]);
 
   // Available initial letters
   const availableLetters = useMemo(() => {
@@ -62,17 +75,21 @@ export default function AllCalculatorsDirectory({ calculators, categories }: Pro
     }
 
     // Filter by Search Query
-    if (searchQuery.trim()) {
-      const searchMatches = searchCalculators(searchQuery, { limit: 500, minScore: 20 });
+    if (searchQuery.trim() && index) {
+      const searchMatches = searchItems(index, searchQuery, { limit: 500, minScore: 20 });
       const scoreMap = new Map(searchMatches.map((m) => [m.slug, m.score]));
 
       result = result
         .filter((c) => scoreMap.has(c.slug))
         .sort((a, b) => (scoreMap.get(b.slug) || 0) - (scoreMap.get(a.slug) || 0));
+    } else if (searchQuery.trim()) {
+      // Until the index has loaded: plain name match
+      const q = normalizeGermanText(searchQuery);
+      result = result.filter((c) => normalizeGermanText(`${c.name} ${c.shortName || ''}`).includes(q));
     }
 
     return result;
-  }, [calculators, selectedCategory, selectedLetter, searchQuery]);
+  }, [calculators, selectedCategory, selectedLetter, searchQuery, index]);
 
   return (
     <div>

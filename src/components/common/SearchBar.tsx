@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, X, Calculator, ArrowRight, CornerDownLeft } from 'lucide-react';
-import { searchCalculators, SearchResultItem } from '@/lib/search/searchEngine';
+import { searchItems, type SearchResultItem, type SearchableItem } from '@/lib/search/searchCore';
+import { loadSearchIndex } from '@/lib/search/clientIndex';
 import styles from '@/styles/search.module.css';
 
 interface Props {
@@ -35,6 +36,8 @@ export default function SearchBar({
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  // Search index is fetched on first use (focus or typing), not bundled with every page.
+  const [index, setIndex] = useState<SearchableItem[] | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsListRef = useRef<HTMLUListElement>(null);
@@ -56,6 +59,16 @@ export default function SearchBar({
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, [query, results.length]);
 
+  const ensureIndex = useCallback(() => {
+    if (!index) {
+      loadSearchIndex()
+        .then(setIndex)
+        .catch(() => {
+          /* network error: the next focus or keystroke retries */
+        });
+    }
+  }, [index]);
+
   // Search execution using deterministic local search engine
   useEffect(() => {
     if (!query.trim()) {
@@ -64,12 +77,16 @@ export default function SearchBar({
       setSelectedIndex(-1);
       return;
     }
+    if (!index) {
+      ensureIndex();
+      return;
+    }
 
-    const matches = searchCalculators(query, { limit: 8, minScore: 20 });
+    const matches = searchItems(index, query, { limit: 8, minScore: 20 });
     setResults(matches);
     setIsOpen(true);
     setSelectedIndex(-1);
-  }, [query]);
+  }, [query, index, ensureIndex]);
 
   // Click outside listener to dismiss suggestions
   useEffect(() => {
@@ -189,7 +206,8 @@ export default function SearchBar({
           onChange={(e) => setQuery(e.target.value.slice(0, 100))}
           onInput={(e) => setQuery((e.target as HTMLInputElement).value.slice(0, 100))}
           onFocus={() => {
-            if (query.trim() && (results.length > 0 || query.trim().length > 1)) setIsOpen(true);
+            ensureIndex();
+            if (index && query.trim() && (results.length > 0 || query.trim().length > 1)) setIsOpen(true);
           }}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
@@ -299,7 +317,7 @@ export default function SearchBar({
                   padding: '6px 14px',
                 }}
               >
-                Zum Rechner-Verzeichnis (alle 421 Rechner) →
+                Zum Rechner-Verzeichnis (alle Rechner) →
               </Link>
             </div>
             <div className={styles.suggestionsTitle}>Beliebte Rechner:</div>

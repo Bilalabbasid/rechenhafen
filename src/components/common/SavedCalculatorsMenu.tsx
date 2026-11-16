@@ -10,21 +10,19 @@ import {
   clearRecentCalculators,
   RecentCalculatorItem,
 } from '@/lib/storage/favorites';
+import { loadSearchIndex } from '@/lib/search/clientIndex';
 import styles from '@/styles/layout.module.css';
 
-let searchIndexPromise: Promise<Record<string, string>> | undefined;
-
+// Names come from the small /search-index.json, fetched only when the menu is opened.
+// Never import '@/data/calculators' here: this menu is in the header of every page.
 function getCalculatorNamesMap(): Promise<Record<string, string>> {
-  if (!searchIndexPromise) {
-    searchIndexPromise = import('@/data/searchIndex').then(({ SEARCH_INDEX }) => {
-      const map: Record<string, string> = {};
-      for (const item of SEARCH_INDEX) {
-        map[item.slug] = item.name;
-      }
-      return map;
-    });
-  }
-  return searchIndexPromise;
+  return loadSearchIndex().then((items) => {
+    const map: Record<string, string> = {};
+    for (const item of items) {
+      map[item.slug] = item.name;
+    }
+    return map;
+  });
 }
 
 export default function SavedCalculatorsMenu() {
@@ -41,7 +39,6 @@ export default function SavedCalculatorsMenu() {
 
   useEffect(() => {
     refreshData();
-    getCalculatorNamesMap().then(setNameMap).catch(() => {});
 
     const handleFavChange = () => refreshData();
     const handleRecentChange = () => refreshData();
@@ -54,6 +51,13 @@ export default function SavedCalculatorsMenu() {
       window.removeEventListener('rechenhafen_recent_changed', handleRecentChange);
     };
   }, []);
+
+  // Calculator names are only needed once the menu is open
+  useEffect(() => {
+    if (isOpen && Object.keys(nameMap).length === 0) {
+      getCalculatorNamesMap().then(setNameMap).catch(() => {});
+    }
+  }, [isOpen, nameMap]);
 
   // Click outside to close
   useEffect(() => {
