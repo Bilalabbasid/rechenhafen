@@ -241,13 +241,14 @@ describe('Audit Improvements: 8 Scoped Calculators', () => {
   describe('7. Autobahn-Mautrechner (/rechner/autobahn-maut-rechner-vignette/)', () => {
     const calc = EXTRA_AUTO_ARBEIT.find((c) => c.slug === 'autobahn-maut-rechner-vignette');
 
-    it('calculates 10-day Austria vignette (12.80 €) + Brenner round-trip (24.00 €) = 36.80 €', () => {
+    // Streckenmaut A13 Brenner 2026: 12,50 € je Einzelfahrt (2025: 12,00 €)
+    it('calculates 10-day Austria vignette (12.80 €) + Brenner round-trip (25.00 €) = 37.80 €', () => {
       expect(calc).toBeDefined();
       const output = calc!.calculate({
         countryRoute: 'at_brenner',
       });
 
-      expect(output.primary.value).toBe(36.80);
+      expect(output.primary.value).toBeCloseTo(37.80, 10);
     });
 
     it('calculates Austria 10-day vignette alone (12.80 €)', () => {

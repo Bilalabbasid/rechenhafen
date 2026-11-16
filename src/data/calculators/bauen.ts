@@ -177,8 +177,19 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     calculate: (inputs) => {
+      // Leere Maßfelder nicht stillschweigend durch Ersatzwerte (4 × 3 m) füllen.
+      const missing = (['lengthM', 'widthM', 'depthCm'] as const).filter(
+        (k) => inputs[k] === undefined || inputs[k] === null || String(inputs[k]).trim() === '',
+      );
+      if (missing.length > 0) {
+        return {
+          primary: { id: 'volume', label: 'Benötigtes Betonvolumen', value: 0, formattedValue: '–', highlight: true },
+          error: 'Bitte geben Sie Länge, Breite und Dicke ein.',
+        };
+      }
       const base = calculateConcreteVolume(inputs);
       if (base.error) return base;
+      const sacksText = (n: number) => `${formatNumber(n, 0)} ${n === 1 ? 'Sack' : 'Säcke'}`;
 
       const reservePct = Math.max(0, parseFloat(String(inputs.reservePercent ?? '0')) || 0);
       const netM3 = Number(base.primary.value);
@@ -214,13 +225,13 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
         return {
           primary,
           secondary: [
-            { id: 'cementSacks', label: 'Zement (25-kg-Säcke)', value: sacks, formattedValue: `${sacks} Säcke (${formatNumber(cementKg, 0)} kg)`, highlight: true },
+            { id: 'cementSacks', label: 'Zement (25-kg-Säcke)', value: sacks, formattedValue: `${sacksText(sacks)} (${formatNumber(cementKg, 0)} kg)`, highlight: true },
             { id: 'gravelKg', label: 'Betonkies 0/16 mm', value: gravelKg, formattedValue: `${formatNumber(gravelKg, 0)} kg (${formatNumber(gravelKg / 1000, 2)} t)` },
             { id: 'waterL', label: 'Anmachwasser ca.', value: waterL, formattedValue: `${formatNumber(waterL, 0)} Liter` },
             { id: 'shovelRatio', label: 'Faustregel in Schaufeln', value: mix.shovels, formattedValue: `1 Schaufel Zement auf ${mix.shovels} Schaufeln Kies` },
           ],
           details: [netItem, ...(area ? [area] : [])],
-          summaryText: `Für ${formatNumber(m3, 2)} m³ ${mix.label} brauchen Sie ${sacks} Säcke Zement, rund ${formatNumber(gravelKg / 1000, 2)} t Betonkies und etwa ${formatNumber(waterL, 0)} Liter Wasser.`,
+          summaryText: `Für ${formatNumber(m3, 2)} m³ ${mix.label} brauchen Sie ${sacksText(sacks)} Zement, rund ${formatNumber(gravelKg / 1000, 2)} t Betonkies und etwa ${formatNumber(waterL, 0)} Liter Wasser.`,
           warning: transportHint,
         };
       }
@@ -243,12 +254,12 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
       return {
         primary,
         secondary: [
-          { id: 'bags', label: `Fertigbeton-Säcke à ${formatNumber(bagWeightKg, 0)} kg`, value: bags, formattedValue: `${bags} Säcke`, highlight: true },
+          { id: 'bags', label: `Fertigbeton-Säcke à ${formatNumber(bagWeightKg, 0)} kg`, value: bags, formattedValue: sacksText(bags), highlight: true },
           { id: 'weight', label: 'Trockenbeton gesamt', value: dryKg, formattedValue: `ca. ${formatNumber(dryKg, 0)} kg (${formatNumber(dryKg / 1000, 2)} t)` },
           netItem,
           ...(area ? [area] : []),
         ],
-        summaryText: `Für ${formatNumber(m3, 2)} m³ Beton brauchen Sie etwa ${bags} Säcke Fertigbeton à ${formatNumber(bagWeightKg, 0)} kg.`,
+        summaryText: `Für ${formatNumber(m3, 2)} m³ Beton brauchen Sie etwa ${sacksText(bags)} Fertigbeton à ${formatNumber(bagWeightKg, 0)} kg.`,
         warning: transportHint,
       };
     },

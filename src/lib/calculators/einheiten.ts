@@ -407,7 +407,9 @@ export function calculateTimeConversion(inputs: Record<string, any>): Calculatio
 // 5. TEMPERATUR-UMRECHNER
 // =========================================================================
 export function calculateTemperatureConversion(inputs: Record<string, any>): CalculationResult {
-  const val = parseUnitNumber(inputs.value !== undefined && inputs.value !== '' && inputs.value !== null ? inputs.value : 25);
+  // Leeres Feld: Hinweis statt stillschweigend 25 °C umzurechnen.
+  const isEmptyValue = inputs.value === undefined || inputs.value === null || String(inputs.value).trim() === '';
+  const val = isEmptyValue ? null : parseUnitNumber(inputs.value);
   const from = inputs.fromUnit || 'C'; // 'C', 'F', 'K'
   const to = inputs.toUnit || 'F';
 
@@ -446,7 +448,13 @@ export function calculateTemperatureConversion(inputs: Record<string, any>): Cal
 
   const toLabel = to === 'K' ? 'Kelvin (K)' : `Grad ${to === 'C' ? 'Celsius' : 'Fahrenheit'} (°${to})`;
   const toFormatted = to === 'K' ? `${formatNumber(result, 2)} K` : `${formatNumber(result, 2)} °${to}`;
-  const fromFormatted = from === 'K' ? `${formatNumber(val, 1)} K` : `${formatNumber(val, 1)} °${from}`;
+  const fromFormatted = from === 'K' ? `${formatNumber(val, 2)} K` : `${formatNumber(val, 2)} °${from}`;
+  // Genau am Gefrier- bzw. Siedepunkt (bei 1 atm) liegen zwei Phasen nebeneinander vor.
+  const waterState = Math.abs(celsius) < 1e-6
+    ? 'Am Gefrierpunkt (Eis und Wasser)'
+    : Math.abs(celsius - 100) < 1e-6
+      ? 'Am Siedepunkt (Wasser und Dampf)'
+      : celsius < 0 ? 'Gefroren (Eis)' : celsius > 100 ? 'Gasförmig (Dampf)' : 'Flüssig';
 
   return {
     primary: {
@@ -460,9 +468,9 @@ export function calculateTemperatureConversion(inputs: Record<string, any>): Cal
       { id: 'celsius', label: 'In Grad Celsius', value: celsius, formattedValue: `${formatNumber(celsius, 2)} °C` },
       { id: 'fahrenheit', label: 'In Grad Fahrenheit', value: fahrenheit, formattedValue: `${formatNumber(fahrenheit, 2)} °F` },
       { id: 'kelvin', label: 'In Kelvin (SI-Basiseinheit)', value: kelvin, formattedValue: `${formatNumber(kelvin, 2)} K` },
-      { id: 'waterState', label: 'Aggregatzustand von Wasser bei 1 atm', value: celsius <= 0 ? 'Gefroren (Eis)' : celsius >= 100 ? 'Gasförmig (Dampf)' : 'Flüssig', formattedValue: celsius <= 0 ? 'Gefroren (Eis)' : celsius >= 100 ? 'Gasförmig (Dampf)' : 'Flüssig' },
+      { id: 'waterState', label: 'Aggregatzustand von Wasser bei 1 atm', value: waterState, formattedValue: waterState },
     ],
-    summaryText: `${fromFormatted} entsprechen ${toFormatted} (${formatNumber(celsius, 1)} °C / ${formatNumber(fahrenheit, 1)} °F / ${formatNumber(kelvin, 2)} K).`,
+    summaryText: `${fromFormatted} entsprechen ${toFormatted} (${formatNumber(celsius, 2)} °C / ${formatNumber(fahrenheit, 2)} °F / ${formatNumber(kelvin, 2)} K).`,
   };
 }
 

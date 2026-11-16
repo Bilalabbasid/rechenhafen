@@ -53,6 +53,12 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
       error: 'Der Zinssatz darf nicht negativ sein.',
     };
   }
+  if (rawRate > 100) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Bitte prüfen Sie den Zinssatz. Werte über 100 % sind nicht plausibel.',
+    };
+  }
   const rateAnnual = rawRate / 100;
 
   if (inputs.years === undefined || inputs.years === null || String(inputs.years).trim() === '') {
@@ -66,6 +72,12 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
     return {
       primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
       error: 'Die Laufzeit muss mindestens 1 volles Jahr betragen.',
+    };
+  }
+  if (rawYears > 100) {
+    return {
+      primary: { id: 'endAmount', label: 'Endkapital', value: 0, formattedValue: '-' },
+      error: 'Bitte wählen Sie eine Laufzeit von höchstens 100 Jahren.',
     };
   }
   const years = rawYears;
@@ -151,7 +163,7 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
   }
 
   const freqLabel = compoundFreq === 12 ? 'monatlicher' : compoundFreq === 4 ? 'vierteljährlicher' : compoundFreq === 2 ? 'halbjährlicher' : 'jährlicher';
-  const timingLabel = depositTiming === 'start' ? 'vorschüssig (Monatsanfang)' : 'nachschüssig (Monatsende)';
+  const timingLabel = depositTiming === 'start' ? 'zum Monatsanfang' : 'zum Monatsende';
 
   return {
     primary: {
@@ -170,7 +182,7 @@ export function calculateCompoundInterest(inputs: Record<string, any>): Calculat
       ],
       rows: rows.slice(-15),
     },
-    summaryText: `Nach ${years} Jahren wächst Ihr Startkapital von ${formatCurrency(initial)} mit ${timingLabel} Sparrate von anfangs ${formatCurrency(initialMonthly)} bei ${formatPercent(rateAnnual * 100)} Zinsen und ${freqLabel} Zinsgutschrift auf ein Endvermögen von ${formatCurrency(balance)} an. Davon sind ${formatCurrency(totalInterest)} reiner Zinsgewinn.`,
+    summaryText: `Nach ${years} ${years === 1 ? 'Jahr' : 'Jahren'} wächst Ihr Startkapital von ${formatCurrency(initial)} mit einer Sparrate von anfangs ${formatCurrency(initialMonthly)} (Einzahlung ${timingLabel}) bei ${formatPercent(rateAnnual * 100)} Zinsen und ${freqLabel} Zinsgutschrift auf ein Endvermögen von ${formatCurrency(balance)} an. Davon sind ${formatCurrency(totalInterest)} reiner Zinsgewinn.`,
   };
 }
 
@@ -396,11 +408,12 @@ function parseNum(v: any): number {
   return parseFloat(String(v).trim().replace(',', '.'));
 }
 
-function formatMonthsDe(months: number): string {
+/** dative = true für „nach 4 Jahren und 11 Monaten“. */
+function formatMonthsDe(months: number, dative = false): string {
   const y = Math.floor(months / 12);
   const m = months % 12;
-  const yText = `${y} ${y === 1 ? 'Jahr' : 'Jahre'}`;
-  const mText = `${m} ${m === 1 ? 'Monat' : 'Monate'}`;
+  const yText = `${y} ${y === 1 ? 'Jahr' : dative ? 'Jahren' : 'Jahre'}`;
+  const mText = `${m} ${m === 1 ? 'Monat' : dative ? 'Monaten' : 'Monate'}`;
   if (y > 0 && m > 0) return `${yText} und ${mText}`;
   if (y > 0) return yText;
   return mText;
@@ -620,7 +633,7 @@ export function calculateSparplan(inputs: Record<string, any>): CalculationResul
     primary: { id: 'duration', label: primaryLabel, value: months, formattedValue: `${formatMonthsDe(months)} (${months} Monate)`, highlight: true },
     secondary,
     breakdown: { columns: SAVINGS_COLUMNS, rows: sim.rows },
-    summaryText: `Mit ${formatCurrency(monthly)} im Monat (${timingText}) und ${formatPercent(ratePct)} Zinsen erreichen Sie ${formatCurrency(target)} nach ${formatMonthsDe(months)}. Dann liegen ${formatCurrency(sim.balance)} auf dem Konto, davon ${formatCurrency(interest)} Zinsen.`,
+    summaryText: `Mit ${formatCurrency(monthly)} im Monat (${timingText}) und ${formatPercent(ratePct)} Zinsen erreichen Sie ${formatCurrency(target)} nach ${formatMonthsDe(months, true)}. Dann liegen ${formatCurrency(sim.balance)} auf dem Konto, davon ${formatCurrency(interest)} Zinsen.`,
     directAnswer: `Spardauer: ${formatMonthsDe(months)} (${months} Monate).`,
     calculationSteps: [
       `Monatszins: ${formatPercent(ratePct)} ÷ 12 = ${formatNumber(r * 100, 4)} %`,

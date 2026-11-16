@@ -470,7 +470,7 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
 
   // --- BESCHÄFTIGUNGSART: Minijob, Übergangsbereich (Midijob), Werkstudent ---
   const isMinijob = monthlyGross > 0 && monthlyGross <= config.minijobGrenze;
-  const isUebergang = !isMinijob && monthlyGross <= config.midijobObergrenze;
+  const isUebergang = monthlyGross > config.minijobGrenze && monthlyGross <= config.midijobObergrenze;
   const ub = isUebergang ? computeUebergangsbereich(monthlyGross, config) : null;
   const rvRate = config.beitragssatzRentenversicherung;
   const avRate = config.beitragssatzArbeitslosenversicherung;
@@ -618,8 +618,15 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
 
   // Arbeitgeberkosten
   const agSvTotal = agRv + agAv + agKv + agPv;
-  const umlageRate = config.umlageU1 + config.umlageU2 + config.umlageU3Insolvenzgeld + config.berufsgenossenschaftDurchschnitt;
-  const agUmlagen = monthlyGross * umlageRate;
+  // Umlagen U1/U2 (§ 7 Abs. 2 AAG) und Insolvenzgeldumlage (§ 358 Abs. 2 SGB III) bemessen sich nach dem Entgelt, nach dem
+  // die Rentenversicherungsbeiträge bemessen werden: höchstens bis zur BBG der RV, im Übergangsbereich die reduzierte
+  // beitragspflichtige Einnahme (BE gesamt), im Minijob der tatsächliche Verdienst (ohne die 175-€-Mindestbemessung)
+  // mit den Umlagesätzen der Minijob-Zentrale. Die Unfallversicherung (BG) bleibt als Durchschnittssatz auf dem Brutto.
+  const umlageBase = isMinijob ? monthlyGross : ub ? ub.beGesamt : rvGross;
+  const u1Rate = isMinijob ? config.minijobUmlageU1 : config.umlageU1;
+  const u2Rate = isMinijob ? config.minijobUmlageU2 : config.umlageU2;
+  const u3Rate = isMinijob ? config.minijobInsolvenzgeldumlage : config.umlageU3Insolvenzgeld;
+  const agUmlagen = umlageBase * (u1Rate + u2Rate + u3Rate) + monthlyGross * config.berufsgenossenschaftDurchschnitt;
   const agPauschsteuer = isMinijob ? monthlyGross * config.minijobPauschsteuer : 0;
   const monthlyEmployerTotal = monthlyGross + agSvTotal + agUmlagen + agPauschsteuer;
 
@@ -697,7 +704,7 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
       label: 'Sozialabgaben gesamt (AN)',
       value: monthlySocialAN,
       formattedValue: formatCurrency(monthlySocialAN),
-      helpText: `${formatPercent(socialQuota)} Ihres Bruttos gehen an KV, PV, RV und AV.`,
+      helpText: `${formatPercent(socialQuota)} Ihres Bruttos gehen an ${noKvPv ? 'die Rentenversicherung' : 'KV, PV, RV und AV'}.`,
     },
     { id: 'krankenversicherung', label: 'Krankenversicherung (AN)', value: anKv, formattedValue: formatCurrency(anKv), helpText: kvHelp },
     { id: 'kvZusatzbeitrag', label: `davon Zusatzbeitrag (AN, ${pct(kvZusatz / 200)})`, value: anKvZusatz, formattedValue: formatCurrency(anKvZusatz) },
@@ -721,7 +728,7 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
 
   if (showEmployerShare) {
     secondary.push(
-      { id: 'agKrankenversicherung', label: 'Krankenversicherung (AG)', value: agKv, formattedValue: formatCurrency(agKv), helpText: isPrivateKv ? (pkvZuschuss > 0 ? 'Steuerfreier Arbeitgeberzuschuss zur privaten Kranken- und Pflegeversicherung.' : 'Ohne PKV-Beitrag kein Arbeitgeberzuschuss berechnet.') : 'Gleicher Anteil wie beim Arbeitnehmer, inkl. halbem Zusatzbeitrag.' },
+      { id: 'agKrankenversicherung', label: 'Krankenversicherung (AG)', value: agKv, formattedValue: formatCurrency(agKv), helpText: isPrivateKv ? (pkvZuschuss > 0 ? 'Steuerfreier Arbeitgeberzuschuss zur privaten Kranken- und Pflegeversicherung.' : 'Ohne PKV-Beitrag kein Arbeitgeberzuschuss berechnet.') : isMinijob ? 'Pauschalbeitrag von 13 % des Minijob-Verdienstes (§ 249b SGB V).' : isWerkstudent ? 'Werkstudent: kein Arbeitgeberbeitrag zur Krankenversicherung.' : ub ? 'Im Übergangsbereich zahlt der Arbeitgeber mehr als die Hälfte: Gesamtbeitrag auf die reduzierte Bemessungsgrundlage abzüglich Ihres Anteils.' : 'Gleicher Anteil wie beim Arbeitnehmer, inkl. halbem Zusatzbeitrag.' },
       { id: 'agPflegeversicherung', label: 'Pflegeversicherung (AG)', value: agPv, formattedValue: formatCurrency(agPv), helpText: 'Ohne Kinderlosenzuschlag – den zahlt allein der Arbeitnehmer.' },
       { id: 'agRentenversicherung', label: 'Rentenversicherung (AG)', value: agRv, formattedValue: formatCurrency(agRv) },
       { id: 'agArbeitslosenversicherung', label: 'Arbeitslosenversicherung (AG)', value: agAv, formattedValue: formatCurrency(agAv) },
@@ -731,7 +738,7 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
         label: 'Umlagen U1, U2, Insolvenzgeld & Unfallversicherung (AG)',
         value: agUmlagen,
         formattedValue: formatCurrency(agUmlagen),
-        helpText: `Richtwerte: U1 ${pct(config.umlageU1)}, U2 ${pct(config.umlageU2)}, Insolvenzgeldumlage ${pct(config.umlageU3Insolvenzgeld)}, Berufsgenossenschaft Ø ${pct(config.berufsgenossenschaftDurchschnitt)}. Ihre Kasse und BG können abweichen.`,
+        helpText: `${isMinijob ? 'Sätze der Minijob-Zentrale' : 'Richtwerte'}: U1 ${pct(u1Rate)}, U2 ${pct(u2Rate)}, Insolvenzgeldumlage ${pct(u3Rate)}, berechnet auf ${formatCurrency(umlageBase)}${!isMinijob && !ub && monthlyGross > config.bbgRentenversicherungMonat ? ' (Beitragsbemessungsgrenze der Rentenversicherung)' : ub ? ' (reduzierte Bemessungsgrundlage im Übergangsbereich)' : ''}; Berufsgenossenschaft Ø ${pct(config.berufsgenossenschaftDurchschnitt)} auf das volle Brutto. ${isMinijob ? 'Der BG-Beitrag kann' : 'Ihre Kasse und BG können'} abweichen.`,
       },
       { id: 'svGesamt', label: 'Sozialversicherung gesamt (AN + AG)', value: monthlySocialAN + agSvTotal, formattedValue: formatCurrency(monthlySocialAN + agSvTotal) },
     );
@@ -1244,12 +1251,16 @@ export function calculateAbfindung(inputs: Record<string, any>): CalculationResu
   const taxYear = inputs.taxYear || '2026';
   const config = getTaxConfig(taxYear);
 
-  const regularIncome = inputs.regularIncome !== undefined && inputs.regularIncome !== '' && !isNaN(Number(inputs.regularIncome))
-    ? Math.max(0, Number(inputs.regularIncome))
-    : 45000;
-  const abfindung = inputs.abfindung !== undefined && inputs.abfindung !== '' && !isNaN(Number(inputs.abfindung))
-    ? Math.max(0, Number(inputs.abfindung))
-    : 30000;
+  const parsedIncome = readNumberInput(inputs.regularIncome);
+  const parsedAbfindung = readNumberInput(inputs.abfindung);
+  if (parsedIncome === null || !Number.isFinite(parsedIncome) || parsedAbfindung === null || !Number.isFinite(parsedAbfindung)) {
+    return {
+      primary: { id: 'netAbfindung', label: 'Netto-Abfindung (nach Fünftelregelung)', value: 0, formattedValue: '-' },
+      error: 'Bitte geben Sie Ihr reguläres Jahreseinkommen (zvE, 0 € ist möglich) und die Höhe der Abfindung ein.',
+    };
+  }
+  const regularIncome = Math.max(0, parsedIncome);
+  const abfindung = Math.max(0, parsedAbfindung);
 
   // 1. Reguläre Steuer ohne Abfindung
   const estWithout = computeEStSingle(regularIncome, config);
@@ -1368,13 +1379,16 @@ export function calculateRenteBruttoNetto(inputs: Record<string, any>): Calculat
   const taxableAnnualPension = annualGross * taxableRate;
 
   // 1. Sozialabgabenabzug (direkter Einbehalt durch die Deutsche Rentenversicherung)
-  const monthlyKvdr = Math.round(grossPension * kvdrRate * 100) / 100;
-  const monthlyPvdr = Math.round(grossPension * pvdrRate * 100) / 100;
+  // Beiträge höchstens bis zur Beitragsbemessungsgrenze der Kranken- und Pflegeversicherung (§ 223 Abs. 3 SGB V)
+  const kvPvBase = Math.min(grossPension, config.bbgKrankenversicherungMonat);
+  const monthlyKvdr = Math.round(kvPvBase * kvdrRate * 100) / 100;
+  const monthlyPvdr = Math.round(kvPvBase * pvdrRate * 100) / 100;
   const monthlySocialDeductions = monthlyKvdr + monthlyPvdr;
   const payoutAfterSocial = Math.round(Math.max(0, grossPension - monthlySocialDeductions) * 100) / 100;
 
-  // 2. Einkommensteuer auf steuerpflichtigen Rentenanteil (nach Abzug von Vorsorgeaufwendungen § 10 EStG und Werbungskostenpauschbetrag 102 € nach § 9a EStG)
-  const taxableBase = Math.max(0, taxableAnnualPension - (monthlySocialDeductions * 12) - 102);
+  // 2. Einkommensteuer auf steuerpflichtigen Rentenanteil (nach Abzug von Vorsorgeaufwendungen § 10 EStG,
+  //    Werbungskosten-Pauschbetrag 102 € nach § 9a Satz 1 Nr. 3 EStG und Sonderausgaben-Pauschbetrag 36 € nach § 10c EStG)
+  const taxableBase = Math.max(0, taxableAnnualPension - (monthlySocialDeductions * 12) - 102 - 36);
   const annualESt = computeEStSingle(taxableBase, config);
   const monthlyESt = Math.round((annualESt / 12) * 100) / 100;
 
@@ -1478,7 +1492,7 @@ export function calculateGewerbesteuer(inputs: Record<string, any>): Calculation
     legalFormLabel = 'Kapitalgesellschaft (GmbH, UG haftungsbeschränkt, AG)';
   } else if (legalForm === 'sonstige') {
     freibetrag = 5000;
-    legalFormLabel = 'Verein / sonstige juristische Person (§ 11 Abs. 1 Nr. 2 GewStG)';
+    legalFormLabel = 'Verein / sonstige juristische Person (§ 11 Abs. 1 Satz 3 Nr. 2 GewStG)';
   }
 
   // 3. Gekürzter Gewerbeertrag (mindestens 0)
@@ -1564,7 +1578,7 @@ export function calculateGewerbesteuer(inputs: Record<string, any>): Calculation
   let summaryText = `Für ${legalFormLabel} mit einem Gewerbeertrag von ${formatCurrency(ertrag)} (abgerundet: ${formatCurrency(roundedErtrag)}) beträgt die Gewerbesteuer beim Hebesatz von ${formatNumber(hebesatz, 1)} % voraussichtlich ${formatCurrency(gewerbesteuer)}.`;
   if (freibetrag > 0 && roundedErtrag <= freibetrag) {
     summaryText += ` Durch den Freibetrag von ${formatCurrency(freibetrag)} fällt keine Gewerbesteuer an (Steuermessbetrag: 0,00 €).`;
-  } else if (isPersonenUnternehmen) {
+  } else if (freibetrag > 0) {
     summaryText += ` Nach Abzug des Freibetrags von ${formatCurrency(freibetrag)} verbleiben ${formatCurrency(taxableErtrag)} als Bemessungsgrundlage (Steuermessbetrag: ${formatCurrency(steuermessbetrag)}).`;
   } else {
     summaryText += ` Für Kapitalgesellschaften gewährt das GewStG keinen Freibetrag; der volle abgerundete Gewerbeertrag (${formatCurrency(roundedErtrag)}) wird mit 3,5 % besteuert (Steuermessbetrag: ${formatCurrency(steuermessbetrag)}).`;

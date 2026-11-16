@@ -353,12 +353,12 @@ function isOn(v: any): boolean {
   return v === true || v === 'true' || v === 1 || v === '1';
 }
 
-/** "6 Jahre und 7 Monate" – deutsche Laufzeitangabe aus Monaten. */
-export function formatMonthsGerman(months: number): string {
+/** "6 Jahre und 7 Monate" – deutsche Laufzeitangabe aus Monaten; dative = true für „nach 6 Jahren und 7 Monaten“. */
+export function formatMonthsGerman(months: number, dative = false): string {
   const y = Math.floor(months / 12);
   const m = months % 12;
-  const yText = `${y} ${y === 1 ? 'Jahr' : 'Jahre'}`;
-  const mText = `${m} ${m === 1 ? 'Monat' : 'Monate'}`;
+  const yText = `${y} ${y === 1 ? 'Jahr' : dative ? 'Jahren' : 'Jahre'}`;
+  const mText = `${m} ${m === 1 ? 'Monat' : dative ? 'Monaten' : 'Monate'}`;
   if (y > 0 && m > 0) return `${yText} und ${mText}`;
   if (y > 0) return yText;
   return mText;
@@ -615,7 +615,7 @@ export function calculateRatenkredit(inputs: Record<string, any>): CalculationRe
   } else {
     primaryValue = sim.months;
     primaryFormatted = `${formatMonthsGerman(sim.months)} (${sim.months} Monate)`;
-    summary = `Mit ${formatCurrency(payment)} im Monat ist ${loanText} bei ${formatPercent(interestPct)} (${rateTypeLabel}) nach ${formatMonthsGerman(sim.months)} getilgt.${balloonText} Bis dahin zahlen Sie ${formatCurrency(sim.totalInterest)} Zinsen.`;
+    summary = `Mit ${formatCurrency(payment)} im Monat ist ein Kredit von ${loanText} bei ${formatPercent(interestPct)} (${rateTypeLabel}) nach ${formatMonthsGerman(sim.months, true)} getilgt.${balloonText} Bis dahin zahlen Sie ${formatCurrency(sim.totalInterest)} Zinsen.`;
     directAnswer = `Laufzeit: ${formatMonthsGerman(sim.months)} (${sim.months} Raten), Gesamtzinsen: ${formatCurrency(sim.totalInterest)}.`;
   }
 
@@ -761,10 +761,11 @@ export function calculateTilgungsplan(inputs: Record<string, any>): CalculationR
   const payoffMonths = rest <= 0.005 ? month : null;
   if (payoffMonths !== null && payoffMonths < n) restAtFixedEnd = 0;
 
+  const yearsDat = `${years} ${years === 1 ? 'Jahr' : 'Jahren'}`;
   const secondary: Array<{ id: string; label: string; value: number; formattedValue: string }> = [
-    { id: 'remainingDebt', label: `Restschuld nach ${years} Jahren Zinsbindung`, value: restAtFixedEnd, formattedValue: formatCurrency(restAtFixedEnd) },
-    { id: 'repaid', label: `Getilgt in ${years} Jahren`, value: repaidFixed, formattedValue: formatCurrency(repaidFixed) },
-    { id: 'interest', label: `Zinsen in ${years} Jahren`, value: interestFixed, formattedValue: formatCurrency(interestFixed) },
+    { id: 'remainingDebt', label: `Restschuld nach ${yearsDat} Zinsbindung`, value: restAtFixedEnd, formattedValue: formatCurrency(restAtFixedEnd) },
+    { id: 'repaid', label: `Getilgt in ${yearsDat}`, value: repaidFixed, formattedValue: formatCurrency(repaidFixed) },
+    { id: 'interest', label: `Zinsen in ${yearsDat}`, value: interestFixed, formattedValue: formatCurrency(interestFixed) },
     {
       id: 'initialRepaymentPct',
       label: mode === 'volltilger' ? 'Nötige anfängliche Tilgung' : 'Anfängliche Tilgung',
@@ -810,8 +811,8 @@ export function calculateTilgungsplan(inputs: Record<string, any>): CalculationR
     ? `${formatCurrency(loan)} (Kaufpreis ${formatCurrency(price)} + ${formatCurrency(sideCosts)} Nebenkosten − ${formatCurrency(equity)} Eigenkapital)`
     : formatCurrency(loan);
   const summary = mode === 'volltilger'
-    ? `Damit ${loanText} bei ${formatPercent(interestPct)} Sollzins nach ${years} Jahren vollständig getilgt ist, brauchen Sie ${formatCurrency(payment)} im Monat. Das entspricht einer anfänglichen Tilgung von ${formatPercent(initialRepaymentPct, 2)}. Die Zinsen betragen insgesamt ${formatCurrency(interestFixed)}.`
-    : `Bei ${loanText}, ${formatPercent(interestPct)} Sollzins und ${formatPercent(initialRepaymentPct, 2)} anfänglicher Tilgung zahlen Sie ${formatCurrency(payment)} im Monat. Nach ${years} Jahren Zinsbindung bleibt eine Restschuld von ${formatCurrency(restAtFixedEnd)}${payoffMonths !== null ? `; bei gleichem Zins wären Sie nach ${formatMonthsGerman(payoffMonths)} schuldenfrei` : ''}.`;
+    ? `Damit ein Darlehen von ${loanText} bei ${formatPercent(interestPct)} Sollzins nach ${yearsDat} vollständig getilgt ist, brauchen Sie ${formatCurrency(payment)} im Monat. Das entspricht einer anfänglichen Tilgung von ${formatPercent(initialRepaymentPct, 2)}. Die Zinsen betragen insgesamt ${formatCurrency(interestFixed)}.`
+    : `Bei ${loanText}, ${formatPercent(interestPct)} Sollzins und ${formatPercent(initialRepaymentPct, 2)} anfänglicher Tilgung zahlen Sie ${formatCurrency(payment)} im Monat. Nach ${yearsDat} Zinsbindung bleibt eine Restschuld von ${formatCurrency(restAtFixedEnd)}${payoffMonths !== null ? `; bei gleichem Zins wären Sie nach ${formatMonthsGerman(payoffMonths, true)} schuldenfrei` : ''}.`;
 
   const steps: string[] = mode === 'volltilger'
     ? [
@@ -837,7 +838,7 @@ export function calculateTilgungsplan(inputs: Record<string, any>): CalculationR
       rows,
     },
     summaryText: summary,
-    directAnswer: `Monatsrate: ${formatCurrency(payment)}, Restschuld nach ${years} Jahren: ${formatCurrency(restAtFixedEnd)}.`,
+    directAnswer: `Monatsrate: ${formatCurrency(payment)}, Restschuld nach ${yearsDat}: ${formatCurrency(restAtFixedEnd)}.`,
     calculationSteps: steps,
     ...(warnings.length > 0 ? { warning: warnings.join(' ') } : {}),
   };

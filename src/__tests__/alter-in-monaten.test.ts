@@ -36,7 +36,8 @@ describe('Alter-in-Monaten-Rechner (alter-in-monaten)', () => {
     });
 
     expect(res.primary.value).toBe(1);
-    expect(res.primary.formattedValue).toBe('1 Monate, 27 Tage');
+    expect(res.primary.formattedValue).toBe('1 Monat, 27 Tage');
+    expect(res.summaryText).toContain('1 voller Lebensmonat und 27 Tage');
 
     const running = res.secondary?.find((s) => s.id === 'runningMonth');
     const rest = res.secondary?.find((s) => s.id === 'restDays');
@@ -53,7 +54,7 @@ describe('Alter-in-Monaten-Rechner (alter-in-monaten)', () => {
     });
 
     expect(res.primary.value).toBe(1);
-    expect(res.primary.formattedValue).toBe('1 Monate, 0 Tage');
+    expect(res.primary.formattedValue).toBe('1 Monat, 0 Tage');
     const running = res.secondary?.find((s) => s.id === 'runningMonth');
     expect(running?.value).toBe(2);
   });
@@ -65,7 +66,19 @@ describe('Alter-in-Monaten-Rechner (alter-in-monaten)', () => {
     });
 
     expect(res.primary.value).toBe(1);
-    expect(res.primary.formattedValue).toBe('1 Monate, 0 Tage');
+    expect(res.primary.formattedValue).toBe('1 Monat, 0 Tage');
+    const weeks = res.secondary?.find((s) => s.id === 'totalWeeks');
+    expect(weeks?.formattedValue).toBe('4 Wochen, 1 Tag');
+  });
+
+  it('asks for a birth date instead of silently using a default date', () => {
+    const res = calc.calculate({ birthDate: '', targetDate: '2026-03-15' });
+    expect(res.error).toBe('Bitte geben Sie ein Geburtsdatum ein.');
+  });
+
+  it('rejects impossible calendar days such as 30 February', () => {
+    const res = calc.calculate({ birthDate: '2026-02-30', targetDate: '2026-03-15' });
+    expect(res.error).toBeDefined();
   });
 
   it('rejects target date earlier than birth date with clean error', () => {

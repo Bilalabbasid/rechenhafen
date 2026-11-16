@@ -1,11 +1,12 @@
 import { PageContentMap } from './types';
 import { CalculationResult } from '@/types/calculator';
-import { EXTRA_AUTO_ARBEIT } from '../extra/autoArbeit';
+import { EXTRA_AUTO_ARBEIT, LKW_WEIGHT_CLASS_LABELS } from '../extra/autoArbeit';
+import { AUTO_CALCULATORS } from '../auto';
 import { calculateCommuterAllowance, calculateEVCharging, calculateTravelTime } from '@/lib/calculators/auto';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 import { calculateCarCO2 } from '@/lib/calculators/co2';
-import { CO2_PRICE_2026_CORRIDOR } from '@/data/emissions';
+import { CO2_PRICE_2026_CORRIDOR, EMISSION_FACTORS } from '@/data/emissions';
 
 // ---------------------------------------------------------------------------
 // Alle Zahlen in Tabellen und Antworten stammen aus der calculate-Funktion des
@@ -346,6 +347,147 @@ const CO2_CT_PER_L = (factor: number, price: number) => (factor * price) / 10; /
 const CO2_B7_T = num(CO2_B7, 'co2Total');
 const CO2_COST_MIN = CO2_B7_T * CO2_PRICE_2026_CORRIDOR.min * CO2_MWST;
 const CO2_COST_MAX = CO2_B7_T * CO2_PRICE_2026_CORRIDOR.max * CO2_MWST;
+
+// ---------------------------------------------------------------------------
+// Batch 4 (Auto & Energie): Rechner aus AUTO_CALCULATORS
+// ---------------------------------------------------------------------------
+function runAuto(slug: string, inputs: Record<string, any>): CalculationResult {
+  const calc = AUTO_CALCULATORS.find((c) => c.slug === slug);
+  if (!calc || !calc.calculate) throw new Error(`page-content/auto: calculator ${slug} not found`);
+  return calc.calculate(inputs) as CalculationResult;
+}
+
+// Kfz-Steuer (Erstzulassung ab 2021, § 9 Abs. 1 Nr. 2 Buchst. c KraftStG)
+type KsEngine = 'petrol' | 'diesel';
+const kfz = (engineType: KsEngine, cc: number, co2g: number) =>
+  run('kfz-steuer-rechner', { firstRegistration: 'from_2021', engineType, displacementCc: cc, co2EmissionsGkm: co2g, evRegistrationYear: 2023, grossWeightKg: 2100 });
+const KS_CARS: { label: string; type: KsEngine; cc: number }[] = [
+  { label: 'Benziner 999 cm³', type: 'petrol', cc: 999 },
+  { label: 'Benziner 1.498 cm³', type: 'petrol', cc: 1498 },
+  { label: 'Diesel 1.968 cm³', type: 'diesel', cc: 1968 },
+];
+const KS_TABLE = table(
+  ['CO₂ laut Feld V.7', ...KS_CARS.map((c) => c.label)],
+  [100, 120, 140, 160, 180, 200].map((g) => [`${g} g/km`, ...KS_CARS.map((c) => txt(kfz(c.type, c.cc, g), 'totalTax'))]),
+);
+const KS_STEP_LOW = num(kfz('petrol', 1498, 120), 'totalTax') - num(kfz('petrol', 1498, 100), 'totalTax');
+const KS_STEP_HIGH = num(kfz('petrol', 1498, 200), 'totalTax') - num(kfz('petrol', 1498, 180), 'totalTax');
+const KS_BIG_TAX = num(kfz('diesel', 2993, 230), 'totalTax');
+// § 11 Abs. 2 KraftStG: Halbjahreszahlung ab mehr als 500 € Jahressteuer mit 3 % Aufschlag, Vierteljahr ab mehr als 1.000 € mit 6 %
+const KS_HALF = (KS_BIG_TAX / 2) * 1.03;
+const kfzEv = (kg: number) => run('kfz-steuer-rechner', { firstRegistration: 'from_2021', engineType: 'electric', evRegistrationYear: 2015, grossWeightKg: kg, displacementCc: 0, co2EmissionsGkm: 0 });
+const KS_EV_LIST = [1600, 2000, 2400, 2800, 3200].map((kg) => `${formatNumber(kg, 0)} kg: ${txt(kfzEv(kg), 'tax')}`).join(', ');
+
+// LKW-Maut (Anlage 1 BFStrMG)
+type LmWeight = keyof typeof LKW_WEIGHT_CLASS_LABELS;
+const lkw = (weightClass: LmWeight, co2Class: string, euroClass = 'euro6', km = 100) =>
+  run('lkw-maut-deutschland-rechner', { distanceKm: km, weightClass, euroClass, co2Class });
+const LM_WEIGHTS = Object.keys(LKW_WEIGHT_CLASS_LABELS) as LmWeight[];
+const LM_TABLE = table(
+  ['Gewichtsklasse (EURO VI)', 'CO₂-Klasse 1', 'CO₂-Klasse 2', 'CO₂-Klasse 3', 'CO₂-Klasse 4'],
+  LM_WEIGHTS.map((w) => [LKW_WEIGHT_CLASS_LABELS[w], ...['1', '2', '3', '4'].map((c) => txt(lkw(w, c), 'ratePerKm'))]),
+);
+const LM_KM = 100000;
+const LM_C1 = num(lkw('over18t_5plusaxles', '1', 'euro6', LM_KM), 'totalMaut');
+const LM_C4 = num(lkw('over18t_5plusaxles', '4', 'euro6', LM_KM), 'totalMaut');
+const LM_E5 = num(lkw('over18t_5plusaxles', '1', 'euro5', LM_KM), 'totalMaut');
+
+// Vignette Österreich: 1- und 10-Tages-Preis aus dem Rechner; 2-Monats- und Jahresvignette 2026
+// (106,80 € bzw. 32,00 €, ASFINAG-Tarif laut oesterreich.gv.at, geprüft 2026-11-16) sind nicht im Rechner hinterlegt.
+const am = (route: string) => num(run('autobahn-maut-rechner-vignette', { countryRoute: route }), 'cost');
+const AM_1 = am('at_1day');
+const AM_10 = am('at_10days');
+const AM_BRENNER = am('at_brenner');
+const AM_A22 = am('it_brenner_gardasee');
+const AM_2M = 32;
+const AM_YEAR = 106.8;
+const AM_YEAR_FROM = Math.floor(AM_YEAR / AM_10) + 1;
+const AM_TABLE = table(
+  ['Reisemuster', 'Günstigste Variante', 'Kosten'],
+  [
+    ['Durchfahrt an einem einzigen Tag', '1-Tages-Vignette', eur(AM_1)],
+    ['Hin- und Rückfahrt innerhalb von 10 Tagen', '10-Tages-Vignette', eur(AM_10)],
+    ['Hinfahrt und Rückfahrt mehr als 10 Tage auseinander', '2 × 1-Tages-Vignette', `${eur(2 * AM_1)} (statt ${eur(2 * AM_10)})`],
+    ['3 Reisen innerhalb von 2 Monaten', '2-Monats-Vignette', `${eur(AM_2M)} (statt ${eur(3 * AM_10)})`],
+    [`${AM_YEAR_FROM} oder mehr 10-Tages-Zeiträume im Vignettenjahr`, 'Jahresvignette', `${eur(AM_YEAR)} (statt ${eur(AM_YEAR_FROM * AM_10)})`],
+  ],
+);
+
+// Dienstwagen
+const dw = (blp: number, type: string, km = 20) =>
+  run('dienstwagen-1-prozent-rechner', { grossListPrice: blp, distanceWorkKm: km, carDriveType: type, taxRate: 38, compareLogbook: false, yearlyActualCarCosts: 10500, totalYearlyKm: 25000, privateSharePct: 20, workDays: 220 });
+const DW_TABLE = table(
+  ['Bruttolistenpreis', 'Verbrenner', 'Plug-in-Hybrid', 'Elektroauto'],
+  [30000, 45000, 60000, 80000, 100000, 110000].map((p) => [eur0(p), ...['combustion', 'hybrid', 'electric'].map((t) => txt(dw(p, t), 'totalBenefit'))]),
+);
+const DW_EV_AT = num(dw(100000, 'electric'), 'totalBenefit');
+const DW_EV_OVER = num(dw(100100, 'electric'), 'totalBenefit');
+const DW_COMMUTE = num(dw(48000, 'combustion'), 'commuteBenefit');
+// Einzelbewertung laut BMF-Schreiben vom 3.3.2022: 0,002 % des Listenpreises je Entfernungskilometer und Fahrt
+const DW_SINGLE = (days: number) => 48000 * 0.00002 * 20 * days;
+const DW_SINGLE_8 = DW_SINGLE(8);
+const DW_EQUAL_DAYS = Math.round((DW_COMMUTE * 12) / DW_SINGLE(1));
+
+// Dienstfahrrad
+const df = (price: number, salary: number) =>
+  run('dienstfahrrad-jobrad-rechner', { bikePriceGross: price, grossSalary: salary, leaseTerm: '36', employerSubsidy: 0, serviceCost: 10, taxClass: '1' });
+const DF_SALARIES = [2800, 3800, 6000, 9000];
+const DF_TABLE = table(
+  ['UVP des Rads', ...DF_SALARIES.map((s) => `${eur0(s)} brutto`)],
+  [1500, 3000, 4500, 6000].map((p) => [eur0(p), ...DF_SALARIES.map((s) => txt(df(p, s), 'actualNetDeduction'))]),
+);
+const DF_RATE_3000 = num(df(3000, 3800), 'grossDeduction');
+const DF_BEN = (p: number) => txt(df(p, 3800), 'benefit');
+
+// Spritkosten
+const sk = (inp: Record<string, any>) =>
+  runAuto('spritkostenrechner', { distance: 100, tripType: 'single', consumption: 6.8, pricePerLiter: 1.78, tripsCount: 1, passengers: 1, includeExtraCosts: false, ...inp });
+const SK_PRICES = [1.6, 1.75, 1.9];
+const SK_TABLE = table(
+  ['Verbrauch', ...SK_PRICES.map((p) => `${n2(p)} €/l`)],
+  [5, 6, 7, 8, 10].map((c) => [`${c} l/100 km`, ...SK_PRICES.map((p) => txt(sk({ consumption: c, pricePerLiter: p }), 'cost'))]),
+);
+const SK_YEAR_KM = 15000;
+const SK_YEAR_LITERS = num(sk({ distance: SK_YEAR_KM }), 'totalLiters');
+const SK_10CT = num(sk({ distance: SK_YEAR_KM, pricePerLiter: 1.88 }), 'cost') - num(sk({ distance: SK_YEAR_KM }), 'cost');
+const SK_1L = num(sk({ distance: SK_YEAR_KM }), 'cost') - num(sk({ distance: SK_YEAR_KM, consumption: 5.8 }), 'cost');
+
+// Kraftstoffverbrauch
+const kv = (inp: Record<string, any>) => runAuto('kraftstoffverbrauch-rechner', { mode: 'tanken', distanceKm: 620, litersFueled: 42.5, inputValue: 6.5, inputUnit: 'l100km', ...inp });
+const KV_FILLS = [
+  { label: 'Stadtverkehr', km: 380, l: 31.5 },
+  { label: 'Autobahn', km: 720, l: 41.0 },
+  { label: 'Gemischt', km: 540, l: 36.2 },
+];
+const KV_SINGLE = KV_FILLS.map((f) => num(kv({ distanceKm: f.km, litersFueled: f.l }), 'cons'));
+const KV_SUM_KM = KV_FILLS.reduce((s, f) => s + f.km, 0);
+const KV_SUM_L = KV_FILLS.reduce((s, f) => s + f.l, 0);
+const KV_TOTAL = num(kv({ distanceKm: KV_SUM_KM, litersFueled: KV_SUM_L }), 'cons');
+const KV_NAIVE = KV_SINGLE.reduce((s, v) => s + v, 0) / KV_SINGLE.length;
+const KV_FILL_TABLE = table(
+  ['Tankfüllung', 'Gefahren', 'Nachgetankt', 'Verbrauch'],
+  KV_FILLS.map((f, i) => [f.label, `${formatNumber(f.km, 0)} km`, `${n1(f.l)} l`, `${n2(KV_SINGLE[i])} l/100 km`]),
+);
+const KV_KML_LIST = [10, 12, 15, 18, 20].map((k) => `${k} km/l = ${txt(kv({ mode: 'umrechnen', inputValue: k, inputUnit: 'kml' }), 'l100km')}`).join(', ');
+
+// CO₂ beim Pendeln (UBA TREMOD, je Personenkilometer)
+const cp = (mode: string, km: number) =>
+  runAuto('co2-pendeln-rechner', { oneWayDistanceKm: km, commutingDays: 180, transportMode: mode, enableScenarioB: false, comparisonMode: 'train_local', comparisonDistanceKm: km, comparisonDays: 180 });
+const CP_MODES: [string, string][] = [
+  ['car_average', 'Pkw (Durchschnitt)'],
+  ['bus_local', 'Linienbus Nahverkehr'],
+  ['train_local', 'Eisenbahn Nahverkehr'],
+  ['tram_metro', 'Straßen-, Stadt- und U-Bahn'],
+  ['pedelec', 'Pedelec'],
+];
+const CP_KMS = [5, 15, 30];
+const CP_TABLE = table(
+  ['Verkehrsmittel', ...CP_KMS.map((k) => `${k} km einfach`)],
+  CP_MODES.map(([m, label]) => [label, ...CP_KMS.map((k) => `${formatNumber(num(cp(m, k), 'emissionsKg'), 0)} kg`)]),
+);
+const CP_OCC = EMISSION_FACTORS.verkehr_pkw_besetzungsgrad.value;
+const CP_PKW = EMISSION_FACTORS.verkehr_pkw_durchschnitt.value;
+const CP_20 = num(cp('car_average', 20), 'emissionsKg');
 
 export const AUTO_PAGE_CONTENT: PageContentMap = {
   'bremsweg-rechner': {
@@ -712,6 +854,118 @@ export const AUTO_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Warum weicht das Ergebnis vom CO₂-Wert im Fahrzeugschein ab?',
         answer: 'Der Wert in der Zulassungsbescheinigung (Feld V.7) stammt aus dem genormten WLTP-Prüfzyklus. Der Rechner nutzt dagegen Ihren tatsächlichen Verbrauch. Wer viel Kurzstrecke, Autobahn mit hohem Tempo oder im Winter fährt, liegt oft über dem Prüfwert. Für die Kfz-Steuer zählt allein der WLTP-Wert, für Ihre persönliche Klimabilanz ist der echte Verbrauch aussagekräftiger.',
+      },
+    ],
+  },
+
+  'kfz-steuer-rechner': {
+    sections: [
+      {
+        title: 'Kfz-Steuer 2026 für typische Pkw nach CO₂-Wert',
+        content: `Jahressteuer für Pkw mit Erstzulassung ab 2021, berechnet mit dem Rechner (Hubraumbetrag plus CO₂-Staffel, auf volle Euro abgerundet):\n\n${KS_TABLE}\n\nDer Diesel zahlt beim Hubraum 9,50 € statt 2,00 € je angefangene 100 cm³, die CO₂-Komponente ist für beide Antriebe gleich. Weil die Staffel progressiv ist, kosten 20 g/km mehr im unteren Bereich ${eur(KS_STEP_LOW)} (von 100 auf 120 g/km), im oberen Bereich dagegen ${eur(KS_STEP_HIGH)} (von 180 auf 200 g/km). Ein Fahrzeug mit niedrigerem WLTP-Wert spart also umso mehr, je höher es in der Staffel liegt.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Kann ich die Kfz-Steuer in Raten zahlen?',
+        answer: `Nur bei höheren Beträgen und mit Aufschlag (§ 11 Abs. 2 KraftStG): Liegt die Jahressteuer über 500 €, ist halbjährliche Zahlung möglich, jede Rate steigt dann um 3 %. Über 1.000 € geht auch vierteljährlich mit 6 % Aufschlag. Beispiel: Ein Diesel mit 2.993 cm³ und 230 g/km kostet ${eur(KS_BIG_TAX)} im Jahr; halbjährlich gezahlt sind es zweimal ${eur(KS_HALF)}, zusammen ${eur(2 * KS_HALF)}. Darunter wird die Steuer für ein Jahr im Voraus fällig.`,
+      },
+      {
+        question: 'Was zahlt ein Elektroauto, wenn die Steuerbefreiung abgelaufen ist?',
+        answer: `Dann gilt die Gewichtssteuer nach § 9 Abs. 1 Nr. 3 KraftStG, ermäßigt um 50 % (§ 9 Abs. 2). Für ein E-Auto mit Erstzulassung 2015, dessen zehnjährige Befreiung 2025 endete, ergibt der Rechner je nach zulässigem Gesamtgewicht: ${KS_EV_LIST} im Jahr. Die Befreiung endet am Jahrestag der Erstzulassung; im Jahr des Ablaufs wird die Steuer nur ab diesem Tag fällig.`,
+      },
+    ],
+  },
+
+  'lkw-maut-deutschland-rechner': {
+    sections: [
+      {
+        title: 'Mautsatz je Kilometer nach Gewicht und CO₂-Klasse',
+        content: `Mautsätze für EURO-VI-Fahrzeuge, zusammengesetzt aus den vier Teilsätzen der Anlage 1 BFStrMG:\n\n${LM_TABLE}\n\nNur der CO₂-Teilsatz hängt an der CO₂-Emissionsklasse; Infrastruktur, Luftverschmutzung und Lärm bleiben gleich. Die Klassen 2 und 3 senken den Satz deshalb nur leicht, Klasse 4 halbiert bei EURO VI ungefähr den CO₂-Anteil. Emissionsfreie Lkw (Klasse 5) sind nach § 1 Abs. 2 Nr. 7 BFStrMG bis 30. Juni 2031 von der Maut befreit.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Maut zahlt ein Sattelzug bei 100.000 km im Jahr?',
+        answer: `Bei ${formatNumber(LM_KM, 0)} mautpflichtigen Kilometern zahlt ein Sattelzug über 18 t mit 5 Achsen, EURO VI und CO₂-Klasse 1 ${eur(LM_C1)}. In CO₂-Klasse 4 sind es ${eur(LM_C4)}, also ${eur(LM_C1 - LM_C4)} weniger. Ein EURO-V-Fahrzeug der CO₂-Klasse 1 kommt auf ${eur(LM_E5)}, weil Luftverschmutzungs- und CO₂-Teilsatz höher sind.`,
+      },
+    ],
+  },
+
+  'autobahn-maut-rechner-vignette': {
+    sections: [
+      {
+        title: 'Welche Vignette passt zu Ihrer Reise?',
+        content: `Vergleich mit den ASFINAG-Tarifen 2026 für Pkw bis 3,5 t:\n\n${AM_TABLE}\n\nDie 10-Tages-Vignette deckt zehn aufeinanderfolgende Kalendertage ab. Liegen Hin- und Rückfahrt weiter auseinander, sind zwei 1-Tages-Vignetten günstiger als zwei 10-Tages-Vignetten. Digitale Vignetten sind an das Kennzeichen gebunden; prüfen Sie es vor dem Kauf genau. Streckenmaut wie am Brenner oder an den Tauern kommt immer zusätzlich dazu.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was kostet die Maut von Deutschland zum Gardasee über den Brenner?',
+        answer: `Mit den Werten des Rechners: 10-Tages-Vignette plus Brenner-Streckenmaut hin und zurück ${eur(AM_BRENNER)}, dazu die italienische A22 vom Brenner bis Affi am Gardasee hin und zurück mit einem Richtwert von ${eur(AM_A22)}. Zusammen sind das rund ${eur(AM_BRENNER + AM_A22)}. Dauert der Urlaub länger als zehn Tage, gilt die Vignette auf der Rückfahrt nicht mehr; dann brauchen Sie eine zweite Vignette.`,
+      },
+    ],
+  },
+
+  'dienstwagen-1-prozent-rechner': {
+    sections: [
+      {
+        title: 'Monatlicher geldwerter Vorteil nach Listenpreis und Antrieb',
+        content: `Berechnet für 20 km einfache Entfernung, Privatnutzung plus Arbeitsweg:\n\n${DW_TABLE}\n\nBeim Elektroauto entscheidet die Grenze von 100.000 € Bruttolistenpreis: Bei genau ${eur0(100000)} sind es ${eur(DW_EV_AT)} im Monat, bei ${eur0(100100)} schon ${eur(DW_EV_OVER)}, weil dann 0,5 % statt 0,25 % gelten. Für E-Autos, die vor dem 1. Juli 2025 angeschafft wurden, lag die Grenze niedriger; das Anschaffungsdatum prüft der Rechner nicht.\n\n**Nur wenige Bürotage?** Statt 0,03 % je Entfernungskilometer und Monat kann der Arbeitsweg nach dem BMF-Schreiben vom 3. März 2022 einzeln bewertet werden: 0,002 % des Listenpreises je Entfernungskilometer und tatsächlicher Fahrt. Bei 48.000 € und 20 km sind das bei 8 Bürotagen im Monat ${eur(DW_SINGLE_8)} statt ${eur(DW_COMMUTE)}. Ab ${DW_EQUAL_DAYS} Fahrten im Jahr ergibt die Einzelbewertung denselben Betrag wie die Monatspauschale. Voraussetzung: Jede Fahrt wird mit Datum festgehalten, und der Arbeitgeber legt die Methode für das ganze Kalenderjahr fest. Der Rechner selbst bildet die Einzelbewertung nicht ab.`,
+      },
+    ],
+  },
+
+  'dienstfahrrad-jobrad-rechner': {
+    sections: [
+      {
+        title: 'Geschätzte Netto-Belastung nach Radpreis und Gehalt',
+        content: `Monatliche Netto-Belastung laut Rechner (Steuerklasse 1, 10 € Service im Monat, kein Arbeitgeberzuschuss):\n\n${DF_TABLE}\n\nDie Leasingrate setzt der Rechner pauschal mit 2,9 % der UVP an; mit Service ergibt sich bei 3.000 € ein Bruttoabzug von ${eur(DF_RATE_3000)}. Wie stark die Gehaltsumwandlung entlastet, hängt vom Gehalt ab: Oberhalb der Beitragsbemessungsgrenzen sinkt die Ersparnis bei den Sozialabgaben. Bei 3.000 € UVP zahlen Sie mit ${eur0(6000)} brutto ${txt(df(3000, 6000), 'actualNetDeduction')}, mit ${eur0(9000)} brutto ${txt(df(3000, 9000), 'actualNetDeduction')}. Für Ihre Entscheidung zählt die Rate aus dem Angebot Ihres Arbeitgebers.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie hoch ist der geldwerte Vorteil bei einem E-Bike für rund 5.000 €?',
+        answer: `Angesetzt wird 1 % des auf volle 100 € abgerundeten Viertels der UVP. Bei 4.999 € UVP sind das ${DF_BEN(4999)} im Monat, bei 5.000 € ebenfalls ${DF_BEN(5000)}. Erst ab 5.200 € UVP erreicht das Viertel 1.300 €, der Vorteil steigt dann auf ${DF_BEN(5200)}; bei 5.600 € sind es ${DF_BEN(5600)}. Versteuert wird dieser kleine Betrag mit Ihrem persönlichen Steuersatz.`,
+      },
+    ],
+  },
+
+  spritkostenrechner: {
+    sections: [
+      {
+        title: 'Spritkosten für 100 km nach Verbrauch und Literpreis',
+        content: `Kosten einer 100-km-Fahrt laut Rechner, ohne Maut und Verschleiß:\n\n${SK_TABLE}\n\nSo nutzen Sie die Tabelle: Suchen Sie Ihren Verbrauch und den aktuellen Literpreis heraus. Der Tabellenwert geteilt durch 100 sind Ihre Spritkosten je Kilometer, für 350 km nehmen Sie ihn mal 3,5. Zwischen 5 und 10 l/100 km liegt bei gleichem Preis genau der Faktor 2.\n\n**Was 10 Cent mehr pro Liter im Jahr ausmachen:** Bei ${formatNumber(SK_YEAR_KM, 0)} km im Jahr und 6,8 l/100 km tanken Sie ${formatNumber(SK_YEAR_LITERS, 0)} Liter. Jeder Cent mehr je Liter kostet damit ${eur(SK_10CT / 10)} im Jahr, 10 Cent machen ${eur(SK_10CT)} aus. Ein Liter weniger Verbrauch auf 100 km spart bei 1,78 €/l dagegen ${eur(SK_1L)} im Jahr.`,
+      },
+    ],
+  },
+
+  'kraftstoffverbrauch-rechner': {
+    sections: [
+      {
+        title: 'Mehrere Tankfüllungen richtig zusammenfassen',
+        content: `Ein Durchschnitt über mehrere Tankfüllungen wird genauer, wenn Sie Liter und Kilometer erst addieren und dann teilen. Beispiel mit drei Füllungen:\n\n${KV_FILL_TABLE}\n\nZusammen: ${n1(KV_SUM_L)} l auf ${formatNumber(KV_SUM_KM, 0)} km ergeben ${n2(KV_TOTAL)} l/100 km. Der einfache Mittelwert der drei Einzelwerte läge bei ${n2(KV_NAIVE)} l/100 km, weil die kurze Stadtfüllung dann genauso viel zählt wie die lange Autobahnfüllung. Haben Sie zwischendurch nicht vollgetankt, addieren Sie diese Liter zur nächsten vollen Füllung und zählen die Kilometer weiter.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie rechne ich km/l in l/100 km um?',
+        answer: `Teilen Sie 100 durch den km/l-Wert. Der Rechner liefert im Modus „Verbrauch umrechnen“: ${KV_KML_LIST}. Je höher der km/l-Wert, desto sparsamer das Auto; bei l/100 km ist es umgekehrt.`,
+      },
+    ],
+  },
+
+  'co2-pendeln-rechner': {
+    sections: [
+      {
+        title: 'Jahresemissionen nach Entfernung und Verkehrsmittel',
+        content: `Rechnerische CO₂e-Emissionen pro Person bei 180 Pendeltagen, hin und zurück, mit den UBA-Werten des Rechners:\n\n${CP_TABLE}\n\nDie Emissionen wachsen linear mit der Strecke und mit den Pendeltagen: doppelte Entfernung, doppelte Menge. Fahrrad und Fußweg setzt der Rechner mit 0 kg an. Fahren Sie einen Teil der Strecke mit dem Auto und den Rest mit der Bahn, rechnen Sie beide Teilstrecken getrennt und addieren die Ergebnisse.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Ich fahre allein im Auto. Stimmt der Pkw-Wert dann?',
+        answer: `Nur bedingt. Die ${CP_PKW} g CO₂e je Personenkilometer verteilen die Emissionen eines Autos auf durchschnittlich ${n1(CP_OCC)} Personen. Wer allein fährt, verursacht rechnerisch rund ${formatNumber(CP_PKW * CP_OCC, 0)} g je Kilometer. Für 20 km einfache Strecke an 180 Tagen wären das statt ${formatNumber(CP_20, 0)} kg rund ${formatNumber(CP_20 * CP_OCC, 0)} kg im Jahr. Genauer wird es mit dem tatsächlichen Verbrauch Ihres Autos im [CO₂-Autorechner](/rechner/co2-auto-rechner/).`,
       },
     ],
   },

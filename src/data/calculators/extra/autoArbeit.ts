@@ -251,19 +251,29 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           };
         }
 
-        // Berechnung für das Steuerjahr 2026: Befreiung gilt für 10 Jahre, längstens bis 31.12.2035 (§ 3d Abs. 1 KraftStG)
-        const exemptEndYear = Math.min(2035, rawEvYear + 10);
+        // Berechnung für das Steuerjahr 2026: Befreiung gilt 10 Jahre ab dem TAG der Erstzulassung,
+        // längstens bis 31.12.2035 (§ 3d Abs. 1 KraftStG). Da nur das Jahr bekannt ist, endet die
+        // Befreiung im Lauf des Jahres (Erstzulassungsjahr + 10), am Jahrestag der Erstzulassung.
+        const anniversaryYear = rawEvYear + 10;
+        const cappedAt2035 = anniversaryYear > 2035;
+        const exemptEndYear = Math.min(2035, anniversaryYear);
         const calculationYear = 2026;
-        const isExempt = calculationYear <= exemptEndYear;
+        const isExempt = calculationYear < exemptEndYear || cappedAt2035;
+        const endsDuringCalcYear = !cappedAt2035 && exemptEndYear === calculationYear;
+        const exemptUntilText = cappedAt2035
+          ? 'Bis 31.12.2035 (Höchstgrenze nach § 3d Abs. 1 KraftStG)'
+          : `Bis zum Jahrestag der Erstzulassung im Jahr ${exemptEndYear} (§ 3d Abs. 1 KraftStG)`;
 
         if (isExempt) {
           return {
             primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: 0, formattedValue: '0,00 € (Steuerbefreit)', highlight: true },
             secondary: [
-              { id: 'exemptUntil', label: 'Dauer der Steuerbefreiung', value: 0, formattedValue: `Bis 31.12.${exemptEndYear} (§ 3d Abs. 1 KraftStG)` },
-              { id: 'status', label: 'Befreiungsstatus', value: 0, formattedValue: '10 Jahre ab Erstzulassung steuerbefreit' },
+              { id: 'exemptUntil', label: 'Dauer der Steuerbefreiung', value: 0, formattedValue: exemptUntilText },
+              { id: 'status', label: 'Befreiungsstatus', value: 0, formattedValue: cappedAt2035 ? 'Steuerbefreit bis zur Höchstgrenze 31.12.2035' : '10 Jahre ab dem Tag der Erstzulassung steuerbefreit' },
             ],
-            summaryText: `Für Ihr Elektrofahrzeug (Erstzulassung ${rawEvYear}) gilt nach § 3d Abs. 1 KraftStG eine 10-jährige Steuerbefreiung bis zum 31.12.${exemptEndYear}. Im Steuerjahr ${calculationYear} fällt keine Kraftfahrzeugsteuer an.`,
+            summaryText: cappedAt2035
+              ? `Für Ihr Elektrofahrzeug (Erstzulassung ${rawEvYear}) gilt nach § 3d Abs. 1 KraftStG die Steuerbefreiung längstens bis zum 31.12.2035. Im Steuerjahr ${calculationYear} fällt keine Kraftfahrzeugsteuer an.`
+              : `Für Ihr Elektrofahrzeug (Erstzulassung ${rawEvYear}) gilt nach § 3d Abs. 1 KraftStG eine Steuerbefreiung für zehn Jahre ab dem Tag der Erstzulassung, also bis zum Jahrestag im Jahr ${exemptEndYear}. Im Steuerjahr ${calculationYear} fällt keine Kraftfahrzeugsteuer an.`,
           };
         }
 
@@ -307,12 +317,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         return {
           primary: { id: 'tax', label: 'Jährliche KFZ-Steuer', value: payableTax, formattedValue: formatCurrency(payableTax), highlight: true },
           secondary: [
-            { id: 'status', label: 'Befreiungsstatus', value: 0, formattedValue: `Steuerbefreiung endete am 31.12.${exemptEndYear}` },
+            { id: 'status', label: 'Befreiungsstatus', value: 0, formattedValue: endsDuringCalcYear ? `Steuerbefreiung endet ${exemptEndYear} am Jahrestag der Erstzulassung` : `Steuerbefreiung endete ${exemptEndYear} am Jahrestag der Erstzulassung` },
             { id: 'fullWeightTax', label: 'Volle gewichtsbasierte Steuer (§ 9 Abs. 1 Nr. 3)', value: fullWeightTax, formattedValue: formatCurrency(fullWeightTax) },
             { id: 'reduction', label: '50 % Elektro-Ermäßigung (§ 9 Abs. 2)', value: discountedTax, formattedValue: `-${formatCurrency(fullWeightTax - discountedTax)}` },
             { id: 'monthlyEff', label: 'Monatliche Belastung', value: payableTax / 12, formattedValue: formatCurrency(payableTax / 12) },
           ],
-          summaryText: `Die 10-jährige Steuerbefreiung endete am 31.12.${exemptEndYear}. Nach § 9 Abs. 2 KraftStG wird die Steuer nach dem Fahrzeuggewicht (${weight} kg) ermittelt und um 50 % ermäßigt. Die Steuer beträgt nach gesetzlicher Abrundung (§ 11 Abs. 5 KraftStG) ${formatCurrency(payableTax)} pro Jahr.`,
+          summaryText: `${endsDuringCalcYear ? `Die 10-jährige Steuerbefreiung endet ${exemptEndYear} am Jahrestag der Erstzulassung; für ${calculationYear} fällt die Steuer deshalb nur anteilig ab diesem Tag an. Der folgende Betrag ist die volle Jahressteuer.` : `Die 10-jährige Steuerbefreiung endete ${exemptEndYear} am Jahrestag der Erstzulassung.`} Nach § 9 Abs. 2 KraftStG wird die Steuer nach dem Fahrzeuggewicht (${formatNumber(weight, 0)} kg) ermittelt und um 50 % ermäßigt. Die Steuer beträgt nach gesetzlicher Abrundung (§ 11 Abs. 5 KraftStG) ${formatCurrency(payableTax)} pro Jahr.`,
         };
       }
 
@@ -352,7 +362,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       // CO2-Zuschlag je nach Zulassungszeitraum
       let co2Tax = 0;
       if (regPeriod === 'from_2021') {
-        // § 9 Abs. 1 Nr. 2 Buchst. b KraftStG: Progressive CO2-Staffel ab 2021
+        // § 9 Abs. 1 Nr. 2 Buchst. c KraftStG: Progressive CO2-Staffel ab 2021
         const excess = Math.max(0, co2 - 95);
         if (excess > 0) {
           if (excess <= 20) co2Tax += excess * 2.00;
@@ -386,10 +396,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { id: 'co2Tax', label: 'CO2-Aufschlag', value: co2Tax, formattedValue: formatCurrency(co2Tax) },
           { id: 'monthlyEff', label: 'Monatliche Belastung', value: totalTax / 12, formattedValue: formatCurrency(totalTax / 12) },
         ],
-        summaryText: `Für Ihr Fahrzeug (${cc} cm³, ${co2} g/km CO2) beträgt die jährliche KFZ-Steuer nach gesetzlicher Abrundung (§ 11 Abs. 5 KraftStG) ${formatCurrency(totalTax)} (${formatCurrency(baseTax)} Hubraum + ${formatCurrency(co2Tax)} CO2-Zuschlag).`,
+        summaryText: `Für Ihr Fahrzeug (${formatNumber(cc, 0)} cm³, ${co2} g/km CO2) beträgt die jährliche KFZ-Steuer nach gesetzlicher Abrundung (§ 11 Abs. 5 KraftStG) ${formatCurrency(totalTax)} (${formatCurrency(baseTax)} Hubraum + ${formatCurrency(co2Tax)} CO2-Zuschlag).`,
       };
     },
-    formula: 'KFZ-Steuer = Math.floor(Hubraumbetrag + CO2-Zuschlag)',
+    formula: 'KFZ-Steuer = Hubraumbetrag + CO₂-Zuschlag, auf volle Euro abgerundet',
     formulaExplanation: 'Rechtsgrundlage ist § 9 KraftStG i. V. m. der zwingenden Abrundungsvorschrift nach § 11 Abs. 5 KraftStG.',
     workedExample: {
       title: 'Beispiel: 1.998 cm³ Benziner mit 135 g/km CO2 (ab 2021)',
@@ -405,7 +415,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     faqs: [
       { question: 'Wo finde ich Hubraum und CO₂-Ausstoß im Fahrzeugschein (Zulassungsbescheinigung Teil I)?', answer: 'Der Hubraum in Kubikzentimetern (cm³) ist in Feld P.1 vermerkt. Der für die Steuer maßgebliche CO₂-Ausstoß in g/km (nach dem realistischeren WLTP-Messverfahren) ist in Feld V.7 eingetragen. Die Antriebsart (z. B. Benzin, Diesel, Elektro) steht in Feld 14.' },
       { question: 'Warum ist die KFZ-Steuer für Diesel so viel höher als für Benziner?', answer: 'Diesel-Pkw werden mit 9,50 € pro angefangene 100 cm³ besteuert (Benziner: 2,00 €). Der Gesetzgeber gleicht damit die niedrigere Energiesteuer auf Dieselkraftstoff an den Tankstellen steuerlich aus.' },
-      { question: 'Wie funktioniert die progressive CO₂-Staffel ab Erstzulassung 2021?', answer: 'Emissionen bis 95 g/km sind zuschlagfrei. Darüber greift ein Stufentarif nach § 9 Abs. 1 Nr. 2 Buchst. b KraftStG: 96–115 g/km kosten 2,00 € je Gramm; 116–135 g/km kosten 2,20 €; 136–155 g/km kosten 2,50 €; 156–175 g/km kosten 2,90 €; 176–195 g/km kosten 3,40 €; ab 196 g/km fallen 4,00 € je Gramm an.' },
+      { question: 'Wie funktioniert die progressive CO₂-Staffel ab Erstzulassung 2021?', answer: 'Emissionen bis 95 g/km sind zuschlagfrei. Darüber greift ein Stufentarif nach § 9 Abs. 1 Nr. 2 Buchst. c KraftStG: 96–115 g/km kosten 2,00 € je Gramm; 116–135 g/km kosten 2,20 €; 136–155 g/km kosten 2,50 €; 156–175 g/km kosten 2,90 €; 176–195 g/km kosten 3,40 €; ab 196 g/km fallen 4,00 € je Gramm an.' },
       { question: 'Wie lange sind Elektroautos von der KFZ-Steuer befreit?', answer: 'Nach § 3d Abs. 1 KraftStG sind reine Elektrofahrzeuge bei einer Erstzulassung zwischen dem 18.05.2011 und 31.12.2030 für zehn Jahre ab dem Tag der erstmaligen Zulassung steuerbefreit (längstens bis 31.12.2035). Nach Ablauf dieser Frist wird die Steuer nach dem zulässigen Gesamtgewicht berechnet und nach § 9 Abs. 2 KraftStG um 50 % ermäßigt.' },
       { question: 'Wie wird die KFZ-Steuer gesetzlich gerundet?', answer: 'Nach § 11 Abs. 5 KraftStG ist die zu entrichtende Jahressteuer zwingend auf volle Euro nach unten abzurunden (z. B. werden 108,50 € gesetzlich auf 108,00 € abgerundet).' },
       { question: 'Wie werden Plug-in-Hybride (PHEV) bei der KFZ-Steuer behandelt?', answer: 'Plug-in-Hybride gelten steuerlich nicht als reine Elektroautos. Sie werden wie herkömmliche Verbrenner nach Hubraum (Benzin oder Diesel) plus CO₂-Ausstoß besteuert, profitieren aber durch den Elektromotor meist von einem geringeren offiziellen CO₂-Wert.' },
@@ -1318,8 +1328,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       ]},
     ],
     calculate: (inputs) => {
-      const price = parseFloat(inputs.bikePriceGross) || 3500;
-      const salary = parseFloat(inputs.grossSalary) || 3800;
+      const rawPrice = parseFloat(inputs.bikePriceGross);
+      const rawSalary = parseFloat(inputs.grossSalary);
+      // Leere oder ungültige Eingaben fallen auf die Beispielwerte zurück, negative Werte ebenso
+      const price = rawPrice > 0 ? rawPrice : 3500;
+      const salary = rawSalary > 0 ? rawSalary : 3800;
       const subsidy = inputs.employerSubsidy !== undefined && inputs.employerSubsidy !== null && String(inputs.employerSubsidy).trim() !== ''
         ? Math.max(0, parseFloat(inputs.employerSubsidy) || 0)
         : 0;
@@ -1333,7 +1346,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       // Monatlicher Brutto-Umwandlungsbetrag vom Gehalt
       const grossDeduction = Math.max(0, leasingRate + service - subsidy);
 
-      // Amtliche Reihenfolge laut BMF LStH 2025 Anhang 24 IV Nr. 4 & § 6 Abs. 1 Nr. 4 Satz 6 EStG:
+      // Amtliche Reihenfolge laut BMF LStH 2025 Anhang 24 IV Nr. 4 & § 8 Abs. 2 Satz 10 EStG:
       // "1 % eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung ..."
       // 1. UVP vierteln (25 %)
       // 2. Dieses Viertel auf volle 100 Euro nach unten abrunden
@@ -1350,11 +1363,11 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       }
 
       // Sozialversicherungsentlastung (AN-Anteil ca. 20,5 %):
-      // BBG KV/PV 2026: 5.512,50 €; BBG RV/AV 2026: 8.050 €
+      // BBG 2026 aus src/legal/de/2026.ts: KV/PV 5.812,50 €, RV/AV 8.450 € im Monat
       let svRate = 0.205;
-      if (salary > 8050) {
+      if (salary > BBG_RV_MONAT_2026) {
         svRate = 0.0;
-      } else if (salary > 5512.5) {
+      } else if (salary > BBG_KV_MONAT_2026) {
         svRate = 0.106;
       }
 
@@ -1399,8 +1412,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { id: 'privateRef', label: 'Referenzkosten privater Kauf inkl. Service', value: privatePurchaseEquivalent, formattedValue: formatCurrency(privatePurchaseEquivalent) },
         ],
         qualifications: [
-          'Amtliche Berechnungsmethode (Rechtsstand 2026): 1 % eines auf volle 100 Euro abgerundeten Viertels der Brutto-UVP (§ 6 Abs. 1 Nr. 4 Satz 6 EStG i. V. m. BMF LStH 2025 Anhang 24 IV Nr. 4).',
-          'Gilt für Fahrräder und Pedelecs (Tretunterstützung bis 25 km/h). Schnelle S-Pedelecs (bis 45 km/h) gelten als Kraftfahrzeuge und werden nach der 0,5-%-Kfz-Regelung besteuert.',
+          'Amtliche Berechnungsmethode (Rechtsstand 2026): 1 % eines auf volle 100 Euro abgerundeten Viertels der Brutto-UVP (§ 8 Abs. 2 Satz 10 EStG i. V. m. BMF LStH 2025 Anhang 24 IV Nr. 4).',
+          'Gilt für Fahrräder und Pedelecs (Tretunterstützung bis 25 km/h). Schnelle S-Pedelecs (bis 45 km/h) gelten als Kraftfahrzeuge; für sie gilt nicht die Fahrradregel, sondern die Dienstwagenbesteuerung nach § 6 Abs. 1 Nr. 4 EStG.',
           'Unverbindliche Orientierungsrechnung: Die tatsächliche Gehaltsabrechnung hängt von individuellen Steuermerkmalen, Kirchensteuer, Krankenversicherung und betrieblichen Vereinbarungen ab. Keine Steuerberatung.',
           'Unabhängigkeitshinweis: RechenHafen ist unabhängig und steht in keinem geschäftlichen Verhältnis zur JobRad GmbH oder anderen Anbietern.',
         ],
@@ -1417,47 +1430,47 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       };
     },
     formula: 'Geldwerter Vorteil = 1 % × floor(UVP ÷ 4, 100); Netto-Belastung ≈ Bruttoabzug − Steuer-/SV-Ersparnis + (Geldwerter Vorteil × Grenzsteuersatz)',
-    formulaExplanation: 'Nach amtlicher BMF-Richtlinie (§ 6 Abs. 1 Nr. 4 Satz 6 EStG / LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: 1. Die unverbindliche Preisempfehlung (UVP brutto inkl. MwSt.) wird geviertelt (25 %). 2. Dieses Viertel wird auf volle 100 Euro nach unten abgerundet. 3. Davon wird 1 % monatlich als geldwerter Vorteil dem steuerpflichtigen Bruttogehalt hinzugerechnet. Beispiel: 3.500 € UVP ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil. Schnelle S-Pedelecs (bis 45 km/h) gelten kraftfahrzeugrechtlich als Kraftfahrzeuge und unterliegen gesonderten steuerlichen Vorschriften (0,5-%-Regelung). Dieser Rechner dient der Orientierung und ersetzt keine Steuerberatung.',
+    formulaExplanation: 'Nach amtlicher BMF-Richtlinie (§ 8 Abs. 2 Satz 10 EStG / LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: 1. Die unverbindliche Preisempfehlung (UVP brutto inkl. MwSt.) wird geviertelt (25 %). 2. Dieses Viertel wird auf volle 100 Euro nach unten abgerundet. 3. Davon wird 1 % monatlich als geldwerter Vorteil dem steuerpflichtigen Bruttogehalt hinzugerechnet. Beispiel: 3.500 € UVP ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil. Schnelle S-Pedelecs (bis 45 km/h) gelten kraftfahrzeugrechtlich als Kraftfahrzeuge; für sie gilt die Dienstwagenbesteuerung, nicht die Fahrradregel. Dieser Rechner dient der Orientierung und ersetzt keine Steuerberatung.',
     workedExample: {
       title: 'Beispiel: 3.500 € E-Bike über 36 Monate bei 3.800 € Bruttogehalt (Steuerklasse 1)',
-      description: 'Amtliche Vorteilsberechnung: 3.500 € ÷ 4 = 875 €, abgerundet auf volle 100 € = 800 €, davon 1 % = 8,00 € monatlicher geldwerter Vorteil. Leasingrate brutto: ca. 101,50 €/Monat zzgl. 10,00 € Versicherung. Nach Abzug von Lohnsteuer und Sozialabgaben sowie Hinzurechnung der Steuer auf den geldwerten Vorteil (8,00 € × Grenzsteuersatz) beträgt die tatsächliche monatliche Netto-Belastung rund 68,00 €. Nach 36 Monaten und Übernahme für ca. 630 € (18 %) beträgt die Gesamtersparnis gegenüber dem privaten Direktkauf rund 420 €.',
+      description: 'Amtliche Vorteilsberechnung: 3.500 € ÷ 4 = 875 €, abgerundet auf volle 100 € = 800 €, davon 1 % = 8,00 € monatlicher geldwerter Vorteil. Leasingrate brutto: ca. 101,50 €/Monat zzgl. 10,00 € Versicherung. Der Bruttoabzug von 111,50 € senkt Steuer und Sozialabgaben (Modell: 33 % Grenzsteuersatz plus 20,5 % Sozialabgaben = 59,65 €); dazu kommt die Steuer auf den geldwerten Vorteil (8,00 € × 33 % = 2,64 €). Die geschätzte monatliche Netto-Belastung beträgt damit 54,49 €. 36 Netto-Raten (1.961,55 €) plus Übernahme für ca. 630 € (18 % als Modellannahme) ergeben 2.591,55 €; gegenüber Kauf plus 36 Monate Service für 3.860 € sind das rechnerisch 1.268,45 € weniger.',
       inputs: { bikePriceGross: 3500, grossSalary: 3800, employerSubsidy: 0, serviceCost: 10, taxClass: '1' },
-      resultSummary: 'ca. 68,00 € monatlich netto (ca. 420 € Gesamtersparnis)',
+      resultSummary: 'ca. 54,49 € monatlich netto (rechnerisch 1.268,45 € weniger als beim Privatkauf)',
     },
     content: {
-      intro: 'Mit unserem kostenlosen Dienstrad-Rechner ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Kauf beim Dienstfahrrad-Leasing per Gehaltsumwandlung. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung funktioniert. RechenHafen ist ein unabhängiges Informationsportal und steht in keiner geschäftlichen oder gesellschaftsrechtlichen Verbindung zur JobRad GmbH oder anderen Leasinganbietern.',
+      intro: 'Mit unserem kostenlosen Dienstrad-Rechner ermitteln Sie Ihre tatsächliche monatliche Netto-Belastung und die Gesamtersparnis gegenüber dem privaten Kauf beim Dienstfahrrad-Leasing per Gehaltsumwandlung. Dieser Rechner wird häufig auch als JobRad-Rechner gesucht. RechenHafen steht in keiner Verbindung zu JobRad. Erfahren Sie transparent, wie die gesetzliche 0,25-%-Regelung nach § 8 Abs. 2 Satz 10 EStG und amtlicher BMF-Verwaltungsanweisung funktioniert. RechenHafen ist ein unabhängiges Informationsportal und steht in keiner geschäftlichen oder gesellschaftsrechtlichen Verbindung zur JobRad GmbH oder anderen Leasinganbietern.',
       sections: [
         {
           title: 'So funktioniert das Dienstrad-Leasing per Gehaltsumwandlung',
-          content: 'Beim Dienstrad-Leasing least der Arbeitgeber das Fahrrad oder E-Bike bei einer Leasinggesellschaft (wie JobRad, Deutsche Dienstrad, Bikeleasing oder BusinessBike) und überlässt es Ihnen auch zur uneingeschränkten privaten Nutzung.\n\nDie monatliche Leasingrate wird direkt von Ihrem Bruttogehalt einbehalten (**Gehaltsumwandlung**). Dadurch sinkt Ihr steuer- und sozialversicherungspflichtiges Bruttoeinkommen, sodass Sie spürbar weniger Lohnsteuer und Sozialabgaben abführen.\n\nAls Ausgleich müssen Sie lediglich die private Nutzung als sogenannten **geldwerten Vorteil** pauschal versteuern. Seit 2020 gilt hierfür die gesetzlich verankerte, äußerst günstige **0,25-%-Regel**.',
+          content: 'Beim Dienstrad-Leasing least der Arbeitgeber das Fahrrad oder E-Bike bei einer Leasinggesellschaft (wie JobRad, Deutsche Dienstrad, Bikeleasing oder BusinessBike) und überlässt es Ihnen auch zur uneingeschränkten privaten Nutzung.\n\nDie monatliche Leasingrate wird direkt von Ihrem Bruttogehalt einbehalten (**Gehaltsumwandlung**). Dadurch sinkt Ihr steuer- und sozialversicherungspflichtiges Bruttoeinkommen, sodass Sie spürbar weniger Lohnsteuer und Sozialabgaben abführen.\n\nAls Ausgleich müssen Sie lediglich die private Nutzung als sogenannten **geldwerten Vorteil** pauschal versteuern. Seit 2020 gilt hierfür die **0,25-%-Regel**.',
         },
         {
-          title: 'Die 0,25-%-Regelung nach § 6 Abs. 1 Nr. 4 EStG',
-          content: 'Für betriebliche Fahrräder und Pedelecs (bis 25 km/h) bestimmt die amtliche Steuerrichtlinie des Bundesfinanzministeriums (LStH 2025 Anhang 24 IV Nr. 4) den monatlichen geldwerten Vorteil als 1 % eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung:\n- **Schritt 1 (Vierteln)**: Die Brutto-UVP inklusive fest verbautem Zubehör wird zuerst durch 4 geteilt (25 %).\n- **Schritt 2 (Abrunden)**: Das ermittelte Viertel wird auf volle 100 Euro nach unten abgerundet.\n- **Schritt 3 (1-%-Monatsansatz)**: Von diesem abgerundeten Viertel wird 1 Prozent monatlich dem steuerpflichtigen Bruttoentgelt hinzugerechnet.\n\n**Beispiel nach amtlicher Rechenfolge**:\nBei einem E-Bike für 3.500 Euro UVP beträgt das Viertel 875 Euro. Abgerundet auf volle 100 Euro ergeben sich 800 Euro. 1 Prozent davon entspricht **8,00 Euro monatlichem geldwerten Vorteil** (effektiv 0,25 % des gerundeten Viertels). Dies kostet Sie je nach Steuerklasse netto meist nur 2,50 bis 4 Euro im Monat.\n\n**Wichtige Abgrenzungen**:\n- **S-Pedelecs (bis 45 km/h)**: Gelten verkehrsrechtlich als Kraftfahrzeuge (Kleinkraftrad). Für sie greift nicht die Fahrradregelung, sondern die Kfz-Dienstwagenbesteuerung (0,5-%-Regelung für Elektro-Kfz zzgl. 0,03 % pro Entfernungskilometer für Wege zwischen Wohnung und erster Tätigkeitsstätte).\n- **Individuelle Arbeitsverträge**: Tarifverträge, Betriebsvereinbarungen und individuelle Leasingüberlassungsverträge können abweichende Regelungen für Raten, Versicherungen und Arbeitgeberzuschüsse vorsehen.',
+          title: 'Die 0,25-%-Regelung für Diensträder',
+          content: 'Für betriebliche Fahrräder und Pedelecs (bis 25 km/h) bestimmen die gleich lautenden Erlasse der obersten Finanzbehörden der Länder vom 9. Januar 2020 auf Grundlage von § 8 Abs. 2 Satz 10 EStG den monatlichen geldwerten Vorteil als 1 % eines auf volle 100 Euro abgerundeten Viertels der unverbindlichen Preisempfehlung:\n- **Schritt 1 (Vierteln)**: Die Brutto-UVP inklusive fest verbautem Zubehör wird zuerst durch 4 geteilt (25 %).\n- **Schritt 2 (Abrunden)**: Das ermittelte Viertel wird auf volle 100 Euro nach unten abgerundet.\n- **Schritt 3 (1-%-Monatsansatz)**: Von diesem abgerundeten Viertel wird 1 Prozent monatlich dem steuerpflichtigen Bruttoentgelt hinzugerechnet.\n\n**Beispiel nach amtlicher Rechenfolge**:\nBei einem E-Bike für 3.500 Euro UVP beträgt das Viertel 875 Euro. Abgerundet auf volle 100 Euro ergeben sich 800 Euro. 1 Prozent davon entspricht **8,00 Euro monatlichem geldwerten Vorteil** (effektiv 0,25 % der UVP). Bei 33 % Grenzsteuersatz kostet dieser Vorteil 2,64 € Steuer im Monat.\n\n**Wichtige Abgrenzungen**:\n- **S-Pedelecs (bis 45 km/h)**: Gelten verkehrsrechtlich als Kraftfahrzeuge (Kleinkraftrad). Für sie greift nicht die Fahrradregelung, sondern die Kfz-Dienstwagenbesteuerung nach § 6 Abs. 1 Nr. 4 EStG mit Listenpreis und Zuschlag für Wege zwischen Wohnung und erster Tätigkeitsstätte.\n- **Individuelle Arbeitsverträge**: Tarifverträge, Betriebsvereinbarungen und individuelle Leasingüberlassungsverträge können abweichende Regelungen für Raten, Versicherungen und Arbeitgeberzuschüsse vorsehen.',
         },
         {
           title: 'Leasing versus Direktkauf: Wann lohnt sich das Dienstrad?',
-          content: 'Das Dienstrad-Leasing lohnt sich besonders durch drei Effekte:\n- **Steuer- und SV-Vorteil**: Die monatliche Netto-Belastung liegt meist 25 bis 40 Prozent unter der regulären Brutto-Rate.\n- **Integrierte Versicherung**: Diebstahl, Vandalismus und Verschleiß sind in den Leasingpaketen meist günstig mitversichert.\n- **Günstige Übernahme**: Am Ende der 36 Monate können Sie das Rad meist für ca. 15 bis 18 Prozent des Ursprungspreises privat übernehmen.\n\nPrüfen Sie Ihre Gehaltsbasis mit unserem [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) oder vergleichen Sie die Mobilitätskosten mit dem [Pendlerpauschale Rechner](/rechner/pendlerpauschale-rechner/) und dem [Spritkostenrechner](/rechner/spritkostenrechner/).',
+          content: 'Ob sich das Dienstrad-Leasing lohnt, hängt von drei Punkten ab:\n- **Steuer- und SV-Vorteil**: Im Standardbeispiel (3.800 € brutto, Steuerklasse 1) sinkt der Abzug von 111,50 € brutto auf geschätzt 54,49 € netto im Monat.\n- **Versicherung**: Viele Leasingpakete enthalten eine Versicherung; was sie abdeckt, steht in Ihrem Überlassungsvertrag.\n- **Übernahme**: Der Rechner nimmt einen Übernahmepreis von 18 % der UVP an. Das tatsächliche Angebot macht die Leasinggesellschaft am Vertragsende.\n\nPrüfen Sie Ihre Gehaltsbasis mit unserem [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) oder vergleichen Sie die Mobilitätskosten mit dem [Pendlerpauschale Rechner](/rechner/pendlerpauschale-rechner/) und dem [Spritkostenrechner](/rechner/spritkostenrechner/).',
         },
         {
           title: 'Einfluss von Gehalt, Steuerklasse und Arbeitgeberzuschuss',
-          content: 'Die tatsächliche Netto-Ersparnis hängt von mehreren persönlichen Faktoren ab:\n- **Grenzsteuersatz**: Je höher Ihr Bruttoeinkommen, desto größer ist die Steuerersparnis bei der Gehaltsumwandlung.\n- **Arbeitgeberzuschuss**: Beteiligt sich der Arbeitgeber freiwillig mit einem monatlichen Zuschuss (z. B. 20 bis 50 Euro), sinkt Ihr Eigenanteil drastisch.\n- **Vollständige Kostenübernahme**: Übernimmt der Arbeitgeber das Dienstrad zusätzlich zum regulären Gehalt als Extra, ist die Gestellung für Arbeitnehmer nach § 3 Nr. 37 EStG sogar komplett steuer- und sozialabgabenfrei.',
+          content: 'Die tatsächliche Netto-Ersparnis hängt von mehreren persönlichen Faktoren ab:\n- **Grenzsteuersatz**: Je höher Ihr Bruttoeinkommen, desto größer ist die Steuerersparnis bei der Gehaltsumwandlung.\n- **Arbeitgeberzuschuss**: Beteiligt sich der Arbeitgeber freiwillig mit einem monatlichen Zuschuss, sinkt Ihr Bruttoabzug um genau diesen Betrag.\n- **Vollständige Kostenübernahme**: Übernimmt der Arbeitgeber das Dienstrad zusätzlich zum regulären Gehalt als Extra, ist die Gestellung für Arbeitnehmer nach § 3 Nr. 37 EStG sogar komplett steuer- und sozialabgabenfrei.',
         },
         {
           title: 'Unabhängiger Rechner für JobRad, Bikeleasing, BusinessBike und weitere Anbieter',
-          content: 'Dieser Rechner arbeitet vollständig anbieterunabhängig auf Basis des deutschen Steuerrechts (§ 6 Abs. 1 Nr. 4 Satz 6 EStG i. V. m. amtlichen BMF-Erlassen). Das Berechnungsprinzip der Gehaltsumwandlung gilt einheitlich für alle deutschen Leasinggesellschaften – darunter JobRad GmbH, Deutsche Dienstrad, Bikeleasing-Service, BusinessBike, Lease a Bike und KazenMaier. RechenHafen steht in keinem geschäftlichen oder gesellschaftsrechtlichen Verhältnis zu diesen Marken.',
+          content: 'Dieser Rechner arbeitet vollständig anbieterunabhängig auf Basis des deutschen Steuerrechts (§ 8 Abs. 2 Satz 10 EStG i. V. m. amtlichen BMF-Erlassen). Das Berechnungsprinzip der Gehaltsumwandlung gilt einheitlich für alle deutschen Leasinggesellschaften – darunter JobRad GmbH, Deutsche Dienstrad, Bikeleasing-Service, BusinessBike, Lease a Bike und KazenMaier. RechenHafen steht in keinem geschäftlichen oder gesellschaftsrechtlichen Verhältnis zu diesen Marken.',
         },
       ],
-      details: 'Gesetzliche Grundlagen: § 6 Abs. 1 Nr. 4 Satz 6 EStG sowie BMF LStH 2025 Anhang 24 IV Nr. 4 zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Versicherungskennzeichen) gelten abweichende Regeln wie für Kraftfahrzeuge (0,5-%-Regelung). Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/dienstwagen-1-prozent-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/). Unverbindliche Modellrechnung – keine Steuerberatung.',
+      details: 'Gesetzliche Grundlagen: § 8 Abs. 2 Satz 10 EStG sowie BMF LStH 2025 Anhang 24 IV Nr. 4 zur ertragsteuerlichen Behandlung der Überlassung von (Elektro-)Fahrrädern. Für S-Pedelecs (über 25 km/h mit Versicherungskennzeichen) gelten die Regeln für Kraftfahrzeuge. Vergleichen Sie auch Alternativen mit dem [Firmenwagen Rechner (1-%-Regel)](/rechner/dienstwagen-1-prozent-rechner/) und dem [Einkommensteuerrechner](/rechner/einkommensteuerrechner/). Unverbindliche Modellrechnung – keine Steuerberatung.',
     },
     faqs: [
-      { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 6 Abs. 1 Nr. 4 Satz 6 EStG und amtlicher BMF-Verwaltungsanweisung (LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: Die Brutto-UVP wird geviertelt (25 %), dieses Viertel wird auf volle 100 Euro nach unten abgerundet und davon wird monatlich 1 Prozent als geldwerter Vorteil angesetzt. Bei 3.500 € UVP: 3.500 € ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil.' },
-      { question: 'Gilt die 0,25-%-Regelung auch für schnelle S-Pedelecs (bis 45 km/h)?', answer: 'Nein. S-Pedelecs mit Motorunterstützung bis 45 km/h gelten verkehrsrechtlich als Kraftfahrzeuge (Kleinkraftrad). Für sie gilt die Kfz-Dienstwagenregelung (0,5-%-Regelung für Elektrofahrzeuge) zuzüglich der Versteuerung der einfachen Wegstrecke zwischen Wohnung und Arbeitsstätte (0,03 % des halbierten Bruttolistenpreises je Entfernungskilometer).' },
+      { question: 'Wie funktioniert die 0,25-%-Regelung beim Dienstfahrrad?', answer: 'Nach § 8 Abs. 2 Satz 10 EStG und amtlicher BMF-Verwaltungsanweisung (LStH 2025 Anhang 24 IV Nr. 4) lautet die gesetzliche Reihenfolge: Die Brutto-UVP wird geviertelt (25 %), dieses Viertel wird auf volle 100 Euro nach unten abgerundet und davon wird monatlich 1 Prozent als geldwerter Vorteil angesetzt. Bei 3.500 € UVP: 3.500 € ÷ 4 = 875 € → abgerundet 800 € → 1 % = 8,00 € monatlicher geldwerter Vorteil.' },
+      { question: 'Gilt die 0,25-%-Regelung auch für schnelle S-Pedelecs (bis 45 km/h)?', answer: 'Nein. S-Pedelecs mit Motorunterstützung bis 45 km/h gelten verkehrsrechtlich als Kraftfahrzeuge (Kleinkraftrad). Für sie gilt die Kfz-Dienstwagenregelung nach § 6 Abs. 1 Nr. 4 EStG mit dem Bruttolistenpreis als Grundlage, zuzüglich eines Zuschlags für die Wege zwischen Wohnung und erster Tätigkeitsstätte. Welcher Prozentsatz anzusetzen ist, klärt die Lohnbuchhaltung; dieser Rechner bildet S-Pedelecs nicht ab.' },
       { question: 'Welche Auswirkung hat ein Arbeitgeberzuschuss?', answer: 'Wenn Ihr Arbeitgeber die Leasingrate oder die Inspektionskosten ganz oder teilweise bezuschusst, sinkt Ihr Bruttoabzug entsprechend. Manche Arbeitgeber übernehmen die Kosten vollständig – in diesem Fall ist das Dienstfahrrad für Sie sogar komplett steuer- und beitragsfrei (§ 3 Nr. 37 EStG).' },
-      { question: 'Dienstrad-Leasing vs. Privatkauf: Was ist günstiger?', answer: 'Aufgrund der Ersparnis bei Lohnsteuer und Sozialabgaben sowie des günstigen Übernahmepreises nach 36 Monaten (typischerweise ca. 17 bis 18 Prozent des UVP) ist das Dienstrad-Leasing in den allermeisten Fällen 20 bis 35 Prozent günstiger als der private Barkauf mit Ratenkredit.' },
-      { question: 'Wer kann ein Dienstfahrrad über die Gehaltsumwandlung nutzen?', answer: 'Jeder festangestellte Arbeitnehmer, dessen Arbeitgeber einen Rahmenvertrag mit einem Leasinganbieter geschlossen hat. Auch Beamte in Bund und den meisten Bundesländern sowie Selbstständige können Dienstrad-Leasingmodelle steuerlich nutzen.' },
+      { question: 'Dienstrad-Leasing vs. Privatkauf: Was ist günstiger?', answer: 'Das hängt von Ihrem Grenzsteuersatz, den Sozialabgaben und dem Übernahmepreis ab. Im Standardbeispiel (3.500 € E-Bike, 3.800 € brutto, Steuerklasse 1, 10 € Service im Monat) kostet das Leasing inklusive Übernahme rechnerisch 2.591,55 € statt 3.860 € für Kauf plus Service. Bei einem Gehalt über der Beitragsbemessungsgrenze oder ohne Lohnsteuer schrumpft der Vorteil; prüfen Sie Ihre eigenen Werte im Rechner.' },
+      { question: 'Wer kann ein Dienstfahrrad über die Gehaltsumwandlung nutzen?', answer: 'Arbeitnehmer, deren Arbeitgeber Dienstrad-Leasing anbietet, meist über einen Rahmenvertrag mit einem Leasinganbieter. Ob Beamte teilnehmen können, regelt der jeweilige Dienstherr; für Selbstständige gilt nicht die Gehaltsumwandlung, sondern die Gewinnermittlung ihres Betriebs.' },
       { question: 'Warum wird dieser Rechner auch als JobRad-Rechner bezeichnet?', answer: 'JobRad ist eine geschützte Marke der JobRad GmbH und einer der bekanntesten Pioniere des Dienstrad-Leasings in Deutschland. Der Rechner berechnet herstellerunabhängig die gesetzliche Gehaltsumwandlung, die gleichermaßen für JobRad, Deutsche Dienstrad, Bikeleasing, BusinessBike, Lease a Bike und weitere Anbieter gilt. RechenHafen steht in keiner geschäftlichen Verbindung zu JobRad.' },
-      { question: 'Was geschieht am Ende der 36 Monate Leasinglaufzeit?', answer: 'Am Ende des Leasingvertrags bietet die Leasinggesellschaft das Fahrrad in der Regel zur privaten Übernahme für rund 17 bis 18 Prozent des ursprünglichen UVP an. Alternativ kann das Rad zurückgegeben und ein neues Dienstfahrrad geleast werden.' },
+      { question: 'Was geschieht am Ende der 36 Monate Leasinglaufzeit?', answer: 'Am Ende des Leasingvertrags bietet die Leasinggesellschaft das Fahrrad häufig zur privaten Übernahme an; der Rechner setzt dafür 18 % der UVP an, das tatsächliche Angebot kann abweichen. Alternativ kann das Rad zurückgegeben und ein neues Dienstfahrrad geleast werden.' },
     ],
     legalFootnotes: [
       {
@@ -1468,9 +1481,9 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         reviewedDate: '2026-10-09',
       },
       {
-        citation: '§ 6 Abs. 1 Nr. 4 Satz 6 EStG',
-        text: 'Bewertung der privaten Nutzung betrieblicher Kraftfahrzeuge und Fahrräder bei Gehaltsumwandlung.',
-        url: 'https://www.gesetze-im-internet.de/estg/__6.html',
+        citation: '§ 8 Abs. 2 Satz 10 EStG',
+        text: 'Ermächtigung der Länder, Durchschnittswerte für Sachbezüge festzusetzen. Darauf beruhen die gleich lautenden Ländererlasse vom 9. Januar 2020 zur Überlassung von (Elektro-)Fahrrädern an Arbeitnehmer (ab 2020: 1 % eines auf volle 100 Euro abgerundeten Viertels der UVP).',
+        url: 'https://www.gesetze-im-internet.de/estg/__8.html',
         effectiveDate: '01.01.2026',
         reviewedDate: '2026-10-09',
       },
@@ -1479,14 +1492,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'BMF LStH 2025 Anhang 24 IV Nr. 4 & § 6 Abs. 1 Nr. 4 Satz 6 EStG',
+      source: 'BMF LStH 2025 Anhang 24 IV Nr. 4 & § 8 Abs. 2 Satz 10 EStG',
       sourceUrl: 'https://amtliche-handbuecher.bundesfinanzministerium.de/lsth/2025/B-Anhaenge/Anhang-24/IV/IV-4/inhalt.html',
       lastVerified: '2026-10-09',
     },
     trustMeta: {
       lastReviewed: '2026-10-09',
       sourceName: 'Bundesfinanzministerium (BMF LStH Anhang 24)',
-      legalBasis: '1 % eines auf volle 100 Euro abgerundeten Viertels der UVP (§ 6 Abs. 1 Nr. 4 Satz 6 EStG)',
+      legalBasis: '1 % eines auf volle 100 Euro abgerundeten Viertels der UVP (§ 8 Abs. 2 Satz 10 EStG)',
     },
   },
 
@@ -1650,10 +1663,10 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         options: [
           { value: 'at_1day', label: 'Österreich: 1-Tages-Vignette (9,60 € – ASFINAG Tarif 2026)' },
           { value: 'at_10days', label: 'Österreich: 10-Tages-Vignette (12,80 € – ASFINAG Tarif 2026)' },
-          { value: 'at_brenner', label: 'Österreich: 10-Tages-Vignette + Brennermaut A13 hin & zurück (36,80 €)' },
-          { value: 'at_tauern', label: 'Österreich: 10-Tages-Vignette + Tauernautobahn A10 hin & zurück (41,80 €)' },
-          { value: 'ch_year', label: 'Schweiz: Nationalstrassen-Jahresvignette (40,00 CHF gesetzlicher Tarif ≈ ca. 42,00 €)' },
-          { value: 'it_brenner_gardasee', label: 'Italien: Streckenmaut Brenner (A22) bis Gardasee Süd hin & zurück (ca. 33,60 €)' },
+          { value: 'at_brenner', label: 'Österreich: 10-Tages-Vignette + Brennermaut A13 hin & zurück (37,80 €)' },
+          { value: 'at_tauern', label: 'Österreich: 10-Tages-Vignette + Tauernautobahn A10 hin & zurück (42,80 €)' },
+          { value: 'ch_year', label: 'Schweiz: Nationalstrassen-Jahresvignette (40,00 CHF, pauschal mit 42,00 € angesetzt)' },
+          { value: 'it_brenner_gardasee', label: 'Italien: Streckenmaut Brenner (A22) bis Gardasee Süd hin & zurück (Richtwert ca. 33,60 €)' },
         ],
       },
     ],
@@ -1681,17 +1694,17 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
         validity = '10 Kalendertage (inkl. Lochungstag/Gültigkeitsbeginn)';
         operator = 'ASFINAG (Österreich)';
       } else if (route === 'at_brenner') {
-        // ASFINAG 2026: 10-Tages-Vignette 12,80 € + 2x Brenner-Einzelfahrt à 12,00 € = 24,00 €
+        // ASFINAG 2026: 10-Tages-Vignette 12,80 € + 2x Brenner-Einzelfahrt à 12,50 € = 25,00 € (2025: 12,00 €)
         vignettePart = 12.80;
-        routeTollPart = 24.00;
+        routeTollPart = 25.00;
         cost = vignettePart + routeTollPart;
         label = 'Österreich: 10-Tages-Vignette + Brennermaut (A13) Hin- & Rückfahrt';
         validity = 'Vignette: 10 Tage; Streckenmaut: 2 Einzelfahrten (1 Jahr gültig)';
         operator = 'ASFINAG (Österreich)';
       } else if (route === 'at_tauern') {
-        // ASFINAG 2026: 10-Tages-Vignette 12,80 € + 2x Tauern/Katschberg Einzelfahrt à 14,50 € = 29,00 €
+        // ASFINAG 2026: 10-Tages-Vignette 12,80 € + 2x Tauern/Katschberg Einzelfahrt à 15,00 € = 30,00 € (2025: 14,50 €)
         vignettePart = 12.80;
-        routeTollPart = 29.00;
+        routeTollPart = 30.00;
         cost = vignettePart + routeTollPart;
         label = 'Österreich: 10-Tages-Vignette + Tauernautobahn (A10) Hin- & Rückfahrt';
         validity = 'Vignette: 10 Tage; Streckenmaut: 2 Einzelfahrten Tauern/Katschberg';
@@ -1770,41 +1783,41 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       inputValues: [{ label: 'Auswahl', value: '10-Tages-Vignette + Brenner Hin- & Rückfahrt' }],
       steps: [
         'ASFINAG 10-Tages-Vignette (Tarif 2026) = 12,80 €',
-        'ASFINAG Brenner Streckenmaut A13 (2 × 12,00 €) = 24,00 €',
-        'Gesamtkosten = 12,80 € + 24,00 € = 36,80 €',
+        'ASFINAG Brenner Streckenmaut A13 (2 × 12,50 €) = 25,00 €',
+        'Gesamtkosten = 12,80 € + 25,00 € = 37,80 €',
       ],
-      result: '36,80 € Gesamtkosten',
+      result: '37,80 € Gesamtkosten',
     },
     content: {
       intro: 'Dieser Rechner ermittelt die offiziellen Vignetten- und Streckenmaut-Tarife für ausgewählte Korridore durch Österreich, die Schweiz und über den Brennerpass nach Norditalien (PKW bis 3,5 t zGG). Er ist kein europaweiter Freiform-Routenplaner.',
       sections: [
         {
           title: 'Offizielle Vignettenpreise Österreich 2026 (ASFINAG)',
-          content: 'Für mehrspurige Kraftfahrzeuge bis 3,5 t höchstzulässigem Gesamtgewicht (hzG) gelten bei der ASFINAG folgende Tarife:\n\n- **1-Tages-Vignette:** 9,60 € (ausschließlich digital als E-Vignette erhältlich; gilt an einem Kalendertag)\n- **10-Tages-Vignette:** 12,80 € (digital oder als Klebevignette; gilt für 10 aufeinanderfolgende Kalendertage)\n- **2-Monats-Vignette:** 32,00 €\n- **Jahresvignette:** 107,00 €\n\n*Quelle: Offizielle Tariftabelle der ASFINAG (gültig für 2026).*',
+          content: 'Für mehrspurige Kraftfahrzeuge bis 3,5 t höchstzulässigem Gesamtgewicht (hzG) gelten bei der ASFINAG folgende Tarife:\n\n- **1-Tages-Vignette:** 9,60 € (ausschließlich digital als E-Vignette erhältlich; gilt an einem Kalendertag)\n- **10-Tages-Vignette:** 12,80 € (digital oder als Klebevignette; gilt für 10 aufeinanderfolgende Kalendertage)\n- **2-Monats-Vignette:** 32,00 €\n- **Jahresvignette:** 106,80 € (gültig vom 1. Dezember 2025 bis 31. Januar 2027)\n\nOnline gekaufte digitale Jahres- und 2-Monats-Vignetten gelten für Verbraucher wegen des Rücktrittsrechts erst ab dem 18. Tag nach dem Kauf. 1-Tages- und 10-Tages-Vignetten können sofort gelten.\n\n*Quelle: ASFINAG-Tarife 2026, veröffentlicht auf oesterreich.gv.at (Stand der Prüfung: November 2026).*',
         },
         {
           title: 'Streckenmaut (Sondermaut) in Österreich',
-          content: 'Bestimmte baulich aufwendige Alpenquerungen kosten in Österreich extra und sind **nicht** durch die Vignette abgedeckt:\n\n- **A13 Brennerautobahn:** 12,00 € Einzelfahrt (Hin- und Rückfahrt: 24,00 €)\n- **A10 Tauernautobahn (Tauern- & Katschbergtunnel):** 14,50 € Einzelfahrt (Hin- und Rückfahrt: 29,00 €)\n- **S16 Arlberg-Straßentunnel:** 12,50 € Einzelfahrt\n\nAuf Streckenmautabschnitten besteht keine Vignettenpflicht; fahren Sie jedoch über mautpflichtige Autobahnzubringer (z. B. A12 Inntalautobahn), benötigen Sie zusätzlich eine Vignette.',
+          content: 'Bestimmte baulich aufwendige Alpenquerungen kosten in Österreich extra und sind **nicht** durch die Vignette abgedeckt:\n\n- **A13 Brennerautobahn:** 12,50 € Einzelfahrt 2026 (Hin- und Rückfahrt: 25,00 €; 2025 waren es 12,00 €)\n- **A10 Tauernautobahn (Tauern- & Katschbergtunnel):** 15,00 € Einzelfahrt 2026 (Hin- und Rückfahrt: 30,00 €)\n- **S16 Arlberg-Straßentunnel:** eigene Streckenmaut; den aktuellen Tarif nennt die ASFINAG (im Rechner nicht enthalten)\n\nAuf Streckenmautabschnitten besteht keine Vignettenpflicht; fahren Sie jedoch über mautpflichtige Autobahnzubringer (z. B. A12 Inntalautobahn), benötigen Sie zusätzlich eine Vignette.',
         },
         {
           title: 'Schweiz: Nationalstrassen-Vignette (40 CHF)',
-          content: 'In der Schweiz gibt es für PKW bis 3,5 t keine Tages- oder Zehn-Tages-Vignetten, sondern ausschließlich die gesetzliche Jahresvignette für **40,00 CHF** (erhältlich als digitale E-Vignette oder Klebevignette über das Bundesamt für Zoll und Grenzsicherheit BAZG). Bei aktuellem Wechselkurs entspricht dies circa 42,00 € (Tageskurs vorbehalten).',
+          content: 'In der Schweiz gibt es für PKW bis 3,5 t keine Tages- oder Zehn-Tages-Vignetten, sondern ausschließlich die gesetzliche Jahresvignette für **40,00 CHF** (erhältlich als digitale E-Vignette oder Klebevignette über das Bundesamt für Zoll und Grenzsicherheit BAZG). Der Euro-Betrag hängt vom Wechselkurs ab; der Rechner setzt pauschal 42,00 € an.',
         },
         {
           title: 'Italien: Entfernungsabhängige Streckenmaut',
-          content: 'In Italien wird auf den meisten Autobahnen keine Vignette verlangt, sondern an den Mautstationen streckenabhängig pro gefahrenem Kilometer abgerechnet. Auf der Brennerautobahn A22 (Brennero bis Rovereto Sud / Affi am Gardasee) beträgt die Maut für einen Standard-PKW (Klasse A) rund 16,80 € einfache Fahrt bzw. circa 33,60 € für Hin- und Rückfahrt.',
+          content: 'In Italien wird auf den meisten Autobahnen keine Vignette verlangt, sondern an den Mautstationen streckenabhängig pro gefahrenem Kilometer abgerechnet. Auf der Brennerautobahn A22 (Brennero bis Rovereto Sud / Affi am Gardasee) setzt der Rechner für einen Standard-PKW (Klasse A) einen Richtwert von rund 16,80 € je einfache Fahrt bzw. 33,60 € für Hin- und Rückfahrt an. Den genauen Betrag für Ihre Ein- und Ausfahrt nennt der Tarifrechner der Autostrada del Brennero.',
         },
         {
           title: 'Nicht unterstützte Länder (Frankreich, Spanien, Gesamtitalien)',
           content: 'Für beliebige Mautstrecken in Frankreich (APRR, SANEF, VINCI Autoroutes), Spanien (Autopistas) oder dem restlichen italienischen Autobahnnetz (Autostrade per l’Italia) nutzen Sie bitte direkt die offiziellen Routen- und Tarifrechner der jeweiligen Betreibergesellschaften oder des ADAC.',
         },
       ],
-      details: 'Der Rechner bietet verifizierte Betreiberpreise für die gängigsten Transit- und Urlaubsstrecken im Alpenraum (Österreich, Schweiz, Brennerroute). Er ist kein europaweiter Routenplaner für beliebige Einzelfahrten in Frankreich oder Spanien. Er deckt Personenkraftwagen und leichte Wohnmobile bis 3,5 t ab. Für LKW über 3,5 t gilt in Österreich die streckenbezogene GO-Box und in Deutschland die [LKW-Maut](/rechner/lkw-maut-deutschland-rechner/).',
+      details: 'Der Rechner enthält die Tarife 2026 für Vignette und Streckenmaut in Österreich sowie die Schweizer Jahresvignette (40 CHF, pauschal in Euro umgerechnet); für die italienische A22 nutzt er einen Richtwert. Er ist kein europaweiter Routenplaner für beliebige Einzelfahrten in Frankreich oder Spanien. Er deckt Personenkraftwagen und leichte Wohnmobile bis 3,5 t ab. Für LKW über 3,5 t gilt in Österreich die streckenbezogene GO-Box und in Deutschland die [LKW-Maut](/rechner/lkw-maut-deutschland-rechner/).',
     },
     faqs: [
       {
         question: 'Gilt die österreichische 10-Tages-Vignette auch für die Brennerautobahn?',
-        answer: 'Nein. Die Brennerautobahn (A13 ab Innsbruck-Süd bis zur italienischen Grenze) ist ein Streckenmautabschnitt der ASFINAG. Hier fällt pro Einzelfahrt eine separate Sondermaut von 12,00 € an (24,00 € für Hin- und Rückfahrt), unabhängig vom Besitz einer Autobahnvignette.',
+        answer: 'Nein. Die Brennerautobahn (A13 ab Innsbruck-Süd bis zur italienischen Grenze) ist ein Streckenmautabschnitt der ASFINAG. Hier fällt 2026 pro Einzelfahrt eine separate Sondermaut von 12,50 € an (25,00 € für Hin- und Rückfahrt), unabhängig vom Besitz einer Autobahnvignette.',
       },
       {
         question: 'Gibt es für die Schweiz auch Kurzzeit-Vignetten für Urlauber?',
@@ -1812,14 +1825,14 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       },
       {
         question: 'Was ist bei der digitalen E-Vignette der ASFINAG für Konsumenten zu beachten?',
-        answer: 'Beim Online-Kauf der E-Vignette durch private Konsumenten galt früher eine 18-tägige Wartefrist wegen des EU-Rücktrittsrechts. Die 1-Tages- und 10-Tages-Vignetten sind bei der ASFINAG inzwischen jedoch sofort ab Kauf gültig.',
+        answer: 'Kaufen Verbraucher eine digitale Jahres- oder 2-Monats-Vignette online im ASFINAG-Mautshop oder in der App, gilt sie wegen des Rücktrittsrechts im Fernabsatz frühestens ab dem 18. Tag nach dem Kauf. 1-Tages- und 10-Tages-Vignetten können online mit sofortigem Gültigkeitsbeginn gekauft werden; an einer Verkaufsstelle gekaufte Vignetten gelten auf Wunsch sofort.',
       },
     ],
     timeSensitiveMeta: {
       year: 2026,
       source: 'ASFINAG Mautordnung & Tarife 2026 / BAZG Schweiz',
       sourceUrl: 'https://www.asfinag.at/maut-vignette/vignette/',
-      lastVerified: '2026-10-15',
+      lastVerified: '2026-11-16',
     },
     relatedSlugs: ['fahrtkostenrechner', 'spritkostenrechner', 'kraftstoffverbrauch-rechner', 'auto-gesamtkosten-rechner', 'lkw-maut-deutschland-rechner'],
   },
@@ -2508,7 +2521,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
       const monthlySacrifice = net - continuousNetSalary;
 
       return {
-        primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: continuousNetSalary, formattedValue: formatCurrency(continuousNetSalary), highlight: true },
+        primary: { id: 'continuousNetSalary', label: 'Fortlaufendes monatliches Nettogehalt', value: continuousNetSalary, formattedValue: formatCurrency(continuousNetSalary), highlight: true, helpText: 'Vereinfachung: Der Rechner kürzt das Netto im gleichen Verhältnis wie die Arbeitszeit. Tatsächlich wird das Brutto gekürzt; weil Lohnsteuer progressiv ist, bleibt netto meist etwas mehr.' },
         secondary: [
           { id: 'monthlySacrifice', label: 'Monatlicher Gehaltsverzicht in der Ansparphase', value: monthlySacrifice, formattedValue: formatCurrency(monthlySacrifice) },
           { id: 'salaryRatio', label: 'Monatliche Auszahlungsquote', value: salaryRatio * 100, formattedValue: formatPercent(salaryRatio * 100, 1) },
@@ -2545,12 +2558,12 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           content: 'Der Fortbestand des Sozialversicherungsschutzes ist **nicht** automatisch garantiert, sondern hängt streng von der vertraglichen Ausgestaltung ab:\n- **Geschützt über Wertguthaben nach § 7b SGB IV**: Wenn Sie mit Ihrem Arbeitgeber ein schriftliches Wertguthaben oder Blockmodell vereinbaren und monatlich Arbeitsentgelt über der Minijob-Grenze ausgezahlt wird, bleiben Kranken-, Pflege-, Renten- und Arbeitslosenversicherung während der gesamten Freistellung lückenlos bestehen.\n- **Gefahr bei unbezahltem Sonderurlaub (§ 7 Abs. 3 SGB IV)**: Bei einer unbezahlten Freistellung ohne Gehaltsfortzahlung besteht die gesetzliche Pflichtversicherung nach § 7 Abs. 3 Satz 1 SGB IV nur für **längstens einen Monat** fort. Ab dem zweiten Monat müssen Sie sich selbst freiwillig in der gesetzlichen Kranken- und Pflegeversicherung versichern und den vollen Beitrag aus eigener Tasche tragen!\n\n*Wichtiger Hinweis zur Orientierung*: Stimmen Sie Ihr Sabbatical-Modell vorab verbindlich mit Ihrer Personalabteilung und Ihrer Krankenkasse bzw. der Deutschen Rentenversicherung (DRV) ab.',
         },
       ],
-      details: 'Rechtliche Grundlagen: § 7 Abs. 1a und § 7b SGB IV (Wertguthabenvereinbarung) sowie § 7 Abs. 3 SGB IV (Fortbestand der Beschäftigung bei Freistellung). Tarifverträge (z. B. TVöD, TV-L) enthalten oft spezifische Sabbatical-Regelungen mit Laufzeiten von 2 bis 7 Jahren.',
+      details: 'Rechtliche Grundlagen: § 7 Abs. 1a und § 7b SGB IV (Wertguthabenvereinbarung) sowie § 7 Abs. 3 SGB IV (Fortbestand der Beschäftigung bei Freistellung). Ob Ihr Arbeitgeber ein Sabbatical anbietet und zu welchen Bedingungen, regeln Arbeitsvertrag, Betriebsvereinbarung oder Tarifvertrag; im Beamtenrecht gibt es eigene Freistellungsmodelle.',
     },
     faqs: [
       { question: 'Was genau berechnet der Sabbatical-Rechner?', answer: 'Der Rechner ermittelt die monatliche Auszahlungsquote und das geglättete Nettogehalt: Sie arbeiten in der Ansparphase in Vollzeit, erhalten aber nur den vereinbarten Teilbetrag ausgezahlt. Das angesparte Guthaben finanziert anschließend die monatlichen Bezüge während Ihrer Freistellung.' },
       { question: 'Bleibt man während des Sabbaticals automatisch kranken- und sozialversichert?', answer: 'Das hängt vom gewählten Modell ab: Nur bei einem ordnungsgemäß vereinbarten Blockmodell oder Wertguthaben nach § 7b SGB IV bleibt das sozialversicherungspflichtige Arbeitsverhältnis formal bestehen, sodass Kranken-, Renten- und Pflegeversicherung lückenlos weiterlaufen. Bei unbezahltem Urlaub endet die Pflichtversicherung nach einem Monat (§ 7 Abs. 3 SGB IV) und Sie müssen sich selbst freiwillig weiterversichern.' },
-      { question: 'Gibt es einen gesetzlichen Anspruch auf ein Sabbatical in Deutschland?', answer: 'In der Privatwirtschaft gibt es keinen generellen gesetzlichen Anspruch auf ein Sabbatical. Ein Rechtsanspruch kann sich jedoch aus Tarifverträgen, Betriebsvereinbarungen oder dem Recht auf Brückenteilzeit (§ 9a TzBfG) ergeben. Klären Sie Freistellung und Rückkehrkonditionen stets rechtzeitig mit Ihrem Arbeitgeber.' },
+      { question: 'Gibt es einen gesetzlichen Anspruch auf ein Sabbatical in Deutschland?', answer: 'In der Privatwirtschaft gibt es keinen generellen gesetzlichen Anspruch auf ein Sabbatical. Ein Anspruch kann sich aus Tarifvertrag oder Betriebsvereinbarung ergeben. Die Brückenteilzeit (§ 9a TzBfG) gibt in Betrieben mit mehr als 45 Beschäftigten nur einen Anspruch darauf, die Arbeitszeit für ein bis fünf Jahre zu verringern, nicht auf eine vollständige Freistellung. Klären Sie Freistellung und Rückkehr rechtzeitig mit Ihrem Arbeitgeber.' },
       { question: 'Was ist der Unterschied zwischen Wertguthaben und unbezahltem Sonderurlaub?', answer: 'Beim Wertguthaben (§ 7b SGB IV) wird Gehalt vorab angespart und während der Auszeit fortlaufend ausgezahlt; der Sozialversicherungsschutz bleibt voll erhalten. Bei unbezahltem Urlaub entfällt das Gehalt komplett und nach einem Monat erlischt der gesetzliche Pflichtversicherungsschutz.' },
     ],
     relatedSlugs: ['urlaubstage-rechner', 'teilzeit-gehaltsrechner', 'arbeitstage-rechner', 'grosselternzeit-rechner'],
@@ -2990,7 +3003,7 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     category: 'arbeit-gehalt',
     subcategory: 'Gehalt & Netto',
     metaTitle: 'Bürgergeld Rechner 2026: Anspruch, Regelsatz & Wohnkosten berechnen',
-    metaDescription: 'Berechnen Sie Ihren geschätzten Bürgergeld-Anspruch 2026 nach SGB II: Gesetzliche Regelbedarfe (563 € für Alleinstehende, Kinder nach Altersstufen), Miete, Heizung und Mehrbedarfe.',
+    metaDescription: 'Bürgergeld bzw. seit 1. Juli 2026 Grundsicherungsgeld nach SGB II schätzen: Regelbedarfe (563 € für Alleinstehende, Kinder nach Altersstufen), Miete, Heizung, Mehrbedarfe und Freibeträge.',
     h1: 'Bürgergeld-Rechner 2026 – Gesetzlichen Anspruch nach SGB II ermitteln',
     shortDescription: 'Kalkuliert den monatlichen Gesamtbedarf nach SGB II aus gesetzlichem Regelsatz, Miete, Heizung, Mehrbedarfen und anrechenbarem Einkommen.',
     searchKeywords: ['buergergeld rechner 2026', 'buergergeld anspruch berechnen', 'regelsatz buergergeld alleinerziehend', 'kosten der unterkunft kdu buergergeld', 'sgb ii anspruch berechnen', 'schonvermoegen buergergeld', 'buergergeld miete heizung'],
@@ -3201,8 +3214,8 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
           { id: 'heatingShare', label: 'Heizkosten (separat erfasst)', value: heating, formattedValue: formatCurrency(heating) },
           { id: 'totalDemand', label: 'Gesamtbedarf des Haushalts', value: totalDemand, formattedValue: formatCurrency(totalDemand) },
           { id: 'earningsAllowance', label: 'Gesetzlicher Erwerbstätigenfreibetrag (§ 11b SGB II)', value: totalEarningsAllowance, formattedValue: formatCurrency(totalEarningsAllowance) },
-          { id: 'deductedEarnedIncome', label: 'Anrechenbares Erwerbseinkommen', value: anrechenbaresErwerb, formattedValue: `-${formatCurrency(anrechenbaresErwerb)}` },
-          { id: 'otherIncomeDeducted', label: 'Sonstige anzurechnende Einkünfte (Kindergeld etc.)', value: otherIncome || 0, formattedValue: `-${formatCurrency(otherIncome || 0)}` },
+          { id: 'deductedEarnedIncome', label: 'Anrechenbares Erwerbseinkommen', value: anrechenbaresErwerb, formattedValue: `${anrechenbaresErwerb > 0 ? '−' : ''}${formatCurrency(anrechenbaresErwerb)}` },
+          { id: 'otherIncomeDeducted', label: 'Sonstige anzurechnende Einkünfte (Kindergeld etc.)', value: otherIncome || 0, formattedValue: `${(otherIncome || 0) > 0 ? '−' : ''}${formatCurrency(otherIncome || 0)}` },
         ],
         summaryText: `Ihr rechnerischer Gesamtbedarf liegt bei ${formatCurrency(totalDemand)} (bestehend aus ${formatCurrency(totalRegel)} Regelbedarf${singleParentNeed > 0 ? `, ${formatCurrency(singleParentNeed)} Mehrbedarf für Alleinerziehende` : ''} und ${formatCurrency(totalHousing)} Kosten der Unterkunft). Nach Abzug des anzurechnenden Einkommens von ${formatCurrency(totalDeductedIncome)} (Erwerbseinkommen nach § 11b SGB II: ${formatCurrency(anrechenbaresErwerb)}${(otherIncome || 0) > 0 ? `, sonstige Einnahmen: ${formatCurrency(otherIncome || 0)}` : ''}) ergibt sich ein geschätzter monatlicher Leistungsbetrag von ${formatCurrency(finalBenefit)}.`,
       };
@@ -3211,35 +3224,36 @@ export const EXTRA_AUTO_ARBEIT: CalculatorDefinition[] = [
     formulaExplanation: 'Gesetzliche Regelbedarfe nach § 20, § 23 SGB II zzgl. anerkannter Kosten für Unterkunft und Heizung (§ 22 SGB II) abzüglich anrechenbarem Nettoeinkommen (§ 11b SGB II).',
     workedExample: {
       title: 'Beispiel: Alleinstehend mit 1 Kind (4 Jahre) und 450 € Kaltmiete + 100 € Heizung',
-      description: 'Berechnung für eine alleinerziehende Person mit einem Kind (4 Jahre), 450 € Kaltmiete und 100 € Heizkosten: Regelbedarf Erwachsene (563 €) + Regelbedarf Kind 0–5 Jahre (357 €) + Mehrbedarf für Alleinerziehende (36 % = 202,68 €) + Wohnkosten (550 €) ergibt einen geschätzten Anspruch von 1.672,68 € monatlich.',
-      inputValues: [{ label: 'Typ', value: 'Alleinstehend' }, { label: 'Kind', value: '1 Kind (0–5 Jahre)' }, { label: 'Alleinerziehend', value: 'Ja' }, { label: 'Wohnkosten', value: '550 €' }],
-      steps: ['Regelsatz Erwachsene = 563,00 €', 'Regelsatz Kind (0–5 Jahre) = 357,00 €', 'Mehrbedarf Alleinerziehend (36 %) = 202,68 €', 'Kosten für Miete & Heizung = 550,00 €', 'Geschätzter Leistungsbetrag = 1.672,68 €'],
-      result: '1.672,68 € geschätzter Monatsbetrag',
+      description: 'Berechnung für eine alleinerziehende Person mit einem Kind (4 Jahre), 450 € Kaltmiete und 100 € Heizkosten: Regelbedarf Erwachsene (563 €) + Regelbedarf Kind 0–5 Jahre (357 €) + Mehrbedarf für Alleinerziehende (36 % = 202,68 €) + Wohnkosten (550 €) ergibt einen Gesamtbedarf von 1.672,68 €. Das Kindergeld von 259 € ist Einkommen des Kindes und wird abgezogen, unter „Sonstige anzurechnende Einkünfte“ eingetragen. Es bleiben 1.413,68 € im Monat.',
+      inputs: { householdType: 'single', isSingleParent: true, children0to5: 1, coldRent: 450, heatingCosts: 100, otherIncome: 259 },
+      inputValues: [{ label: 'Typ', value: 'Alleinerziehend' }, { label: 'Kind', value: '1 Kind (0–5 Jahre)' }, { label: 'Wohnkosten', value: '550 €' }, { label: 'Kindergeld', value: '259 €' }],
+      steps: ['Regelsatz Erwachsene = 563,00 €', 'Regelsatz Kind (0–5 Jahre) = 357,00 €', 'Mehrbedarf Alleinerziehend (36 %) = 202,68 €', 'Kosten für Miete & Heizung = 550,00 €', 'Gesamtbedarf = 1.672,68 €', 'Abzüglich Kindergeld 259,00 € = 1.413,68 €'],
+      result: '1.413,68 € geschätzter Monatsbetrag',
     },
     content: {
-      intro: 'Das Bürgergeld (Grundsicherung für Arbeitsuchende nach dem Zweiten Buch Sozialgesetzbuch – SGB II) sichert das soziokulturelle Existenzminimum für erwerbsfähige Hilfebedürftige und deren Bedarfsgemeinschaft.',
-      details: 'Der monatliche Bürgergeld-Gesamtbedarf setzt sich aus den gesetzlichen Regelbedarfen (563 € für Alleinstehende, 506 € je volljährigem Partner in einer Bedarfsgemeinschaft, gestaffelte Sätze für Kinder nach § 23 SGB II) und den anerkannten Kosten der Unterkunft und Heizung (KdU nach § 22 SGB II) zusammen. Im ersten Bezugsjahr (Karenzzeit) gilt eine Angemessenheitsvermutung für die Kaltmiete; Heizkosten müssen jedoch auch während der Karenzzeit angemessen sein. Nach Ablauf der Karenzzeit gelten die örtlichen Angemessenheitsrichtlinien der jeweiligen Kommune. Erwerbseinkommen wird nicht voll abgezogen: Nach § 11b SGB II mindern Grundabsetzbetrag (100 €) und prozentuale Erwerbstätigenfreibeträge den anzurechnenden Betrag.',
+      intro: 'Das Bürgergeld (Grundsicherung für Arbeitsuchende nach dem Zweiten Buch Sozialgesetzbuch – SGB II) sichert das Existenzminimum für erwerbsfähige Leistungsberechtigte und ihre Bedarfsgemeinschaft. Seit dem 1. Juli 2026 heißt die Leistung Grundsicherungsgeld (§ 19 SGB II, Reform „Neue Grundsicherung“). Die Regelbedarfe 2026 sind gleich geblieben; geändert haben sich vor allem Vermögensschutz und Karenzzeit.',
+      details: 'Der monatliche Gesamtbedarf setzt sich aus den gesetzlichen Regelbedarfen (563 € für Alleinstehende, 506 € je volljährigem Partner in einer Bedarfsgemeinschaft, gestaffelte Sätze für Kinder nach § 23 SGB II) und den anerkannten Kosten der Unterkunft und Heizung (§ 22 SGB II) zusammen. Im ersten Bezugsjahr (Karenzzeit) wird die tatsächliche Miete anerkannt, seit 1. Juli 2026 aber höchstens bis zum Eineinhalbfachen der örtlich angemessenen Kosten; Heizkosten müssen auch in der Karenzzeit angemessen sein. Danach gelten die Angemessenheitsgrenzen der Kommune. Erwerbseinkommen wird nicht voll angerechnet: Nach § 11b SGB II bleiben 100 € Grundabsetzbetrag und prozentuale Erwerbstätigenfreibeträge frei.',
     },
     faqs: [
       { question: 'Wie hoch sind die Bürgergeld-Regelsätze 2026 nach Altersstufen?', answer: 'Für Alleinstehende und Alleinerziehende gilt die Regelbedarfsstufe 1 mit 563 € monatlich. Volljährige Partner erhalten je 506 € (Stufe 2). Für Kinder und Jugendliche gelten gesetzlich gestaffelte Sätze: 357 € für Kinder von 0 bis 5 Jahren (Stufe 6), 390 € für Kinder von 6 bis 13 Jahren (Stufe 5) und 471 € für Jugendliche von 14 bis 17 Jahren (Stufe 4).' },
       { question: 'Welcher Mehrbedarf steht Alleinerziehenden zu?', answer: 'Nach § 21 Abs. 3 SGB II erhalten Alleinerziehende einen Mehrbedarf von 36 % des Erwachsenen-Regelbedarfs (202,68 €), wenn sie mit einem Kind unter 7 Jahren oder mit zwei bzw. drei Kindern unter 16 Jahren zusammenleben. In anderen Konstellationen beträgt der Zuschlag 12 % je Kind (maximal 60 %).' },
-      { question: 'Werden die gesamten Miet- und Heizkosten uneingeschränkt übernommen?', answer: 'Nein. Im ersten Bezugsjahr (Karenzzeit nach § 22 Abs. 1 SGB II) werden die tatsächlichen Kaltmietkosten in der Regel anerkannt, sofern sie nicht offensichtlich unangemessen sind. Heizkosten müssen jedoch stets angemessen sein. Nach dem ersten Jahr übernimmt das Jobcenter nur noch die nach dem örtlichen Mietspiegel bzw. den kommunalen Richtlinien als angemessen definierten Kosten.' },
-      { question: 'Welches Schonvermögen ist beim Bürgergeld geschützt?', answer: 'In der einjährigen Karenzzeit gilt nach § 12 SGB II ein Schonvermögen von 40.000 € für die erste Person und 15.000 € für jedes weitere Mitglied der Bedarfsgemeinschaft. Nach Ablauf der Karenzzeit gilt ein einheitlicher Freibetrag von 15.000 € pro Person.' },
-      { question: 'Welche Freibeträge gelten bei eigenem Erwerbseinkommen (§ 11b SGB II)?', answer: 'Die ersten 100 € Bruttoeinkommen aus Erwerbstätigkeit sind als Grundabsetzbetrag anrechnungsfrei. Im Bereich von 100 € bis 520 € bleiben 20 % anrechnungsfrei, von 520 € bis 1.000 € bleiben 30 % frei (bei Kindern im Haushalt bis 1.200 € bzw. 1.500 €).' },
+      { question: 'Werden die gesamten Miet- und Heizkosten uneingeschränkt übernommen?', answer: 'Nein. Im ersten Bezugsjahr (Karenzzeit nach § 22 Abs. 1 SGB II) erkennt das Jobcenter die tatsächliche Miete an. Seit dem 1. Juli 2026 gilt dabei eine Obergrenze: Was mehr als das Eineinhalbfache der örtlich angemessenen Unterkunftskosten beträgt, wird auch in der Karenzzeit nicht übernommen. Heizkosten müssen stets angemessen sein. Nach der Karenzzeit zahlt das Jobcenter nur die nach den kommunalen Richtlinien angemessenen Kosten; zu hohe Kosten werden in der Regel höchstens sechs Monate weiter übernommen, wenn eine Senkung nicht möglich oder nicht zumutbar ist.' },
+      { question: 'Welches Schonvermögen ist beim Bürgergeld bzw. Grundsicherungsgeld geschützt?', answer: 'Seit dem 1. Juli 2026 gibt es keine Karenzzeit mehr für Erspartes. Der Freibetrag hängt vom Alter jeder Person in der Bedarfsgemeinschaft ab (§ 12 Abs. 2 SGB II): 5.000 € bis zur Vollendung des 30. Lebensjahres, 10.000 € ab dem 31., 12.500 € ab dem 41. und 20.000 € ab dem 51. Lebensjahr. Nicht ausgeschöpfte Freibeträge können auf andere Mitglieder der Bedarfsgemeinschaft übertragen werden. Ein selbst genutztes Haus oder eine selbst genutzte Eigentumswohnung bleibt in der Karenzzeit geschützt. Für laufende Bewilligungen gelten Übergangsregeln; ab wann das neue Recht für Sie gilt, teilt das Jobcenter mit.' },
+      { question: 'Welche Freibeträge gelten bei eigenem Erwerbseinkommen (§ 11b SGB II)?', answer: 'Die ersten 100 € aus Erwerbstätigkeit bleiben als Grundabsetzbetrag anrechnungsfrei. Vom Bruttolohn über 100 € bis 520 € bleiben 20 % frei, über 520 € bis 1.000 € 30 % und über 1.000 € bis 1.200 € noch 10 %. Wer mit einem minderjährigen Kind in der Bedarfsgemeinschaft lebt oder ein minderjähriges Kind hat, für den gilt die 10-%-Stufe bis 1.500 €. Bei 1.000 € brutto sind das zusammen 328 € Freibetrag.' },
     ],
     relatedSlugs: ['arbeitslosengeld-1-rechner', 'warmmiete-rechner', 'teilzeit-gehaltsrechner', 'brutto-netto-rechner', 'midijob-rechner'],
     isTimeSensitive: true,
     timeSensitiveMeta: {
       year: 2026,
-      source: 'Zweites Buch Sozialgesetzbuch (SGB II) & BMAS Bekanntmachung',
+      source: 'Zweites Buch Sozialgesetzbuch (SGB II) in der Fassung ab 1. Juli 2026 (Grundsicherungsgeld) & BMAS Bekanntmachung',
       sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/',
-      lastVerified: '2026-10-01',
+      lastVerified: '2026-11-16',
     },
     trustMeta: {
-      legalBasis: 'Zweites Buch Sozialgesetzbuch (§ 20, § 21, § 22, § 23, § 11b SGB II)',
+      legalBasis: 'Zweites Buch Sozialgesetzbuch (§ 11b, § 12, § 19, § 20, § 21, § 22, § 23 SGB II)',
       sourceName: 'Bundesministerium für Arbeit und Soziales (BMAS)',
       sourceUrl: 'https://www.gesetze-im-internet.de/sgb_2/__20.html',
-      lastReviewed: '2026-10-01',
+      lastReviewed: '2026-11-16',
       limitations: [
         'Orientierungsberechnung: Die verbindliche Feststellung obliegt ausschließlich dem zuständigen Jobcenter.',
         'Örtliche Mietobergrenzen (Angemessenheitsrichtlinien der jeweiligen kreisfreien Stadt oder des Landkreises) sind nicht integriert.',

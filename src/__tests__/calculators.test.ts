@@ -236,7 +236,8 @@ describe('RechenHafen Calculation Engines', () => {
         concreteReserve: 5,
         openingsArea: 0,
       });
-      expect(res?.primary.value).toBe(101);
+      // Delfing DP 24 = 50 × 20 cm → 10 Steine/m²: 12 m² × 10 = 120, +5 % = 126
+      expect(res?.primary.value).toBe(126);
       const concreteSec = res?.secondary?.find((s) => s.id === 'concreteM3');
       expect(concreteSec?.value).toBeCloseTo(1.638, 3);
     });

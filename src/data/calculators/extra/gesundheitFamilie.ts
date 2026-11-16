@@ -475,8 +475,8 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       const whrLimit = isMale ? 0.9 : 0.85;
       const whrHigh = whr >= whrLimit;
       const whrRisk = whrHigh
-        ? `Ab WHO-Grenzwert ${formatNumber(whrLimit, 2)}: erhöhtes Risiko für Stoffwechsel- und Herz-Kreislauf-Erkrankungen`
-        : `Unter dem WHO-Grenzwert ${formatNumber(whrLimit, 2)}: kein erhöhtes Risiko durch die Fettverteilung`;
+        ? `Ab WHO-Grenzwert ${formatNumber(whrLimit, 2, 2)}: erhöhtes Risiko für Stoffwechsel- und Herz-Kreislauf-Erkrankungen`
+        : `Unter dem WHO-Grenzwert ${formatNumber(whrLimit, 2, 2)}: kein erhöhtes Risiko durch die Fettverteilung`;
       const shape = whrHigh ? 'Apfeltyp – Fett sitzt eher am Bauch' : 'Birnentyp bzw. ausgeglichen – Fett sitzt eher an Hüfte und Beinen';
 
       // Taillenumfang nach WHO (2008)
@@ -531,7 +531,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         secondary,
         calculationSteps,
         ...(warning ? { warning } : {}),
-        summaryText: `Ihr Taille-Hüft-Verhältnis liegt bei ${formatNumber(whr, 2)} (${whrHigh ? 'ab' : 'unter'} dem WHO-Grenzwert von ${formatNumber(whrLimit, 2)}).${whtr !== undefined ? ` Ihr Taille-zu-Größe-Verhältnis beträgt ${formatNumber(whtr, 2)}; die Taille sollte unter ${formatNumber((height as number) * 0.5, 0)} cm liegen.` : ''}`,
+        summaryText: `Ihr Taille-Hüft-Verhältnis liegt bei ${formatNumber(whr, 2)} (${whrHigh ? 'ab' : 'unter'} dem WHO-Grenzwert von ${formatNumber(whrLimit, 2, 2)}).${whtr !== undefined ? ` Ihr Taille-zu-Größe-Verhältnis beträgt ${formatNumber(whtr, 2)}; die Taille sollte unter ${formatNumber((height as number) * 0.5, 0)} cm liegen.` : ''}`,
       };
     },
     formula: 'WHR = Taillenumfang / Hüftumfang · WHtR = Taillenumfang / Körpergröße',
@@ -1669,11 +1669,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         },
         {
           title: 'Prozent vom Maximalpuls oder Karvonen?',
-          content: 'Die einfache Methode multipliziert den Maximalpuls mit dem Prozentsatz der Zone. Die Karvonen-Methode rechnet mit der Herzfrequenzreserve, also Maximalpuls minus Ruhepuls. So fließt Ihr Trainingszustand ein: Bei niedrigem Ruhepuls liegen die Zonen enger zusammen und höher. Bei 184 bpm Maximalpuls und 62 bpm Ruhepuls liegt Zone 2 nach Karvonen bei 135–147 bpm, nach der einfachen Methode bei 110–129 bpm. Achten Sie beim Vergleich mit Ihrer Sportuhr darauf, welche Methode sie nutzt.',
-        },
-        {
-          title: 'Die fünf Trainingszonen',
-          content: '- Zone 1 (50–60 %): Regeneration, lockeres Bewegen\n- Zone 2 (60–70 %): Grundlagenausdauer, längere ruhige Einheiten\n- Zone 3 (70–80 %): aerobes Tempo, zügige Dauerläufe\n- Zone 4 (80–90 %): Schwellenbereich, Intervalle und Tempoläufe\n- Zone 5 (90–100 %): Maximalbereich, sehr kurze Belastungen\n\nViele Trainingspläne setzen den Großteil der Einheiten in Zone 1 und 2. Wie viel Energie Sie dabei verbrauchen, zeigt der [Kalorienbedarf-Rechner](/rechner/kalorienbedarf-rechner/).',
+          content: 'Die einfache Methode multipliziert den Maximalpuls mit dem Prozentsatz der Zone. Die Karvonen-Methode rechnet mit der Herzfrequenzreserve, also Maximalpuls minus Ruhepuls. So fließt Ihr Trainingszustand ein: Gegenüber der einfachen Methode liegen die Zonen höher und enger zusammen, und zwar umso mehr, je höher Ihr Ruhepuls ist. Ein niedriger Ruhepuls vergrößert die Reserve und damit die Breite jeder Zone. Bei 184 bpm Maximalpuls und 62 bpm Ruhepuls liegt Zone 2 nach Karvonen bei 135–147 bpm, nach der einfachen Methode bei 110–129 bpm. Achten Sie beim Vergleich mit Ihrer Sportuhr darauf, welche Methode sie nutzt.',
         },
         {
           title: 'Sicherheit beim pulsgesteuerten Training',
@@ -1693,7 +1689,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
       {
         question: 'In welchem Pulsbereich verbrennt man am meisten Fett?',
-        answer: 'Anteilig nutzt der Körper in Zone 1 und 2 (etwa 60–70 % der HFmax) besonders viel Fett als Energiequelle. Insgesamt verbrauchen Sie bei höherer Intensität aber mehr Kalorien pro Minute. Für das Abnehmen zählt vor allem die gesamte Energiebilanz.',
+        answer: 'Anteilig nutzt der Körper bei niedriger bis mittlerer Intensität, also etwa in Zone 1 und 2 (50–70 % der HFmax), besonders viel Fett als Energiequelle. Insgesamt verbrauchen Sie bei höherer Intensität aber mehr Kalorien pro Minute. Für das Abnehmen zählt vor allem die gesamte Energiebilanz.',
       },
       {
         question: 'Ist die Formel 220 minus Alter noch aktuell?',
@@ -2091,12 +2087,12 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
             { id: 'maxKiz', label: 'Gesetzlicher Höchstbetrag', value: maxTotalKiz, formattedValue: formatCurrency(maxTotalKiz) },
             { id: 'extraBenefits', label: 'Hinweis zu Mindesteinkommen', value: 'Bürgergeld-Vorrang', formattedValue: 'Vorrangiger Bürgergeld-Anspruch' },
           ],
-          summaryText: `Bei einem monatlichen Bruttoeinkommen von ${formatCurrency(gross)} wird das gesetzliche Mindesteinkommen von 900 € (§ 6a BKGG) nicht erreicht. In diesem Fall besteht kein Anspruch auf Kinderzuschlag, sondern vorrangig Anspruch auf Bürgergeld (SGB II) zur Sicherung des Lebensunterhalts.`,
+          summaryText: `Bei einem monatlichen Bruttoeinkommen von ${formatCurrency(gross)} erreichen Elternpaare das Mindesteinkommen von 900 € (§ 6a Abs. 1 Nr. 2 BKGG) nicht; dann besteht kein Anspruch auf Kinderzuschlag, in Betracht kommt Bürgergeld (SGB II). Für Alleinerziehende liegt die Grenze bei 600 €. Dieser Rechner geht von einem Elternpaar aus – liegen Sie als Alleinerziehende ab 600 €, lassen Sie den Anspruch bei der Familienkasse prüfen.`,
           basisSummary: [
             { label: 'Kinder im Haushalt', value: `${kids}` },
             { label: 'Bruttoeinkommen Eltern', value: formatCurrency(gross) },
             { label: 'Monatliche Warmmiete', value: formatCurrency(rent) },
-            { label: 'Mindesteinkommensgrenze', value: '900,00 € (nicht erreicht)' },
+            { label: 'Mindesteinkommensgrenze', value: '900,00 € für Elternpaare (nicht erreicht); Alleinerziehende 600,00 €' },
           ],
         };
       }
@@ -2126,7 +2122,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       };
     },
     formula: 'KiZ ≈ Kinder × 297 € − 45 % × (Bruttoeinkommen − (1.600 € + Warmmiete)), mindestens 0 €',
-    formulaExplanation: 'Der Kinderzuschlag unterstützt erwerbstätige Eltern, deren Einkommen zwar für den eigenen Lebensunterhalt reicht, aber nicht für den der gesamten Familie (§ 6a BKGG). Erwerbseinkommen oberhalb des elterlichen Bedarfs mindert ihn zu 45 % (§ 6a Abs. 6 BKGG). Der Rechner bildet den Elternbedarf vereinfacht als 1.600 € plus Warmmiete ab und rechnet mit dem Bruttoeinkommen; die Familienkasse nutzt das bereinigte Einkommen und den genauen Bedarf.',
+    formulaExplanation: 'Der Kinderzuschlag unterstützt erwerbstätige Eltern, deren Einkommen zwar für den eigenen Lebensunterhalt reicht, aber nicht für den der gesamten Familie (§ 6a BKGG). Erwerbseinkommen oberhalb des elterlichen Bedarfs mindert ihn zu 45 % (§ 6a Abs. 6 Satz 3 BKGG). Der Rechner ist eine Grobschätzung mit diesen Vereinfachungen: Er rechnet mit dem Bruttoeinkommen statt mit dem bereinigten Nettoeinkommen nach Abzug der Freibeträge. Er setzt den Elternbedarf pauschal mit 1.600 € plus der vollen Warmmiete an; die Familienkasse rechnet mit den Regelbedarfen der Eltern und nur mit deren Anteil an den Wohnkosten, der sich nach der Kinderzahl richtet (§ 6a Abs. 5 Satz 4 BKGG). Und er behandelt alles Einkommen als Erwerbseinkommen; andere Einnahmen wie Arbeitslosengeld mindern den Zuschlag voll (§ 6a Abs. 6 Satz 1 BKGG). Er geht außerdem von einem Elternpaar ohne eigenes Einkommen der Kinder aus. Das Ergebnis kann deshalb spürbar vom Bescheid abweichen, nach oben wie nach unten.',
     workedExample: {
       title: 'Beispiel: 2 Kinder bei 2.800 € Familieneinkommen und 780 € Warmmiete',
       inputValues: [{ label: 'Kinder', value: '2' }, { label: 'Einkommen', value: '2.800 €' }, { label: 'Warmmiete', value: '780 €' }],
@@ -2134,7 +2130,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       result: 'ca. 405,00 € monatlicher Kinderzuschlag',
     },
     content: {
-      intro: 'Der Kinderzuschlag (KiZ nach § 6a BKGG) unterstützt Familien mit geringem Erwerbseinkommen, damit diese keinen Bürgergeld-Anspruch geltend machen müssen.',
+      intro: 'Der Kinderzuschlag (KiZ nach § 6a BKGG) unterstützt Familien mit geringem Erwerbseinkommen, damit diese kein Grundsicherungsgeld (bis Juni 2026: Bürgergeld) beantragen müssen.',
       details: 'Voraussetzung: Die Eltern verfügen über ein Mindesteinkommen (900 € für Paare, 600 € für Alleinerziehende), das jedoch nicht für die gesamte Familie ausreicht. Der KiZ beträgt seit 2025 und auch 2026 bis zu 297 € monatlich je Kind.',
     },
     faqs: [
@@ -2763,7 +2759,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
     ],
     content: {
-      intro: 'Mit diesem Zyklusrechner sehen Sie, wann Ihr Eisprung voraussichtlich stattfindet und an welchen Tagen Sie fruchtbar sind. Geben Sie den ersten Tag Ihrer letzten Periode und Ihre Zykluslänge ein. Der Rechner zeigt dann einen Kalender für die nächsten drei Zyklen. Schwankt Ihr Zyklus, tragen Sie den kürzesten und längsten Zyklus ein. Ohne Datum erhalten Sie die Werte als Zyklustage.',
+      intro: 'Mit diesem Zyklusrechner sehen Sie, wann Ihr Eisprung voraussichtlich stattfindet und an welchen Tagen Sie fruchtbar sind. Geben Sie den ersten Tag Ihrer letzten Periode und Ihre Zykluslänge ein. Der Rechner zeigt dann einen Kalender für die nächsten drei Zyklen. Schwankt Ihr Zyklus, tragen Sie den kürzesten und längsten Zyklus ein. Ohne Datum erhalten Sie die Werte als Zyklustage. Wichtig: Der Rechner ist keine Verhütungsmethode. Er schätzt den Eisprung nur aus dem Kalender und kann eine Schwangerschaft nicht sicher ausschließen.',
       sections: [
         {
           title: 'So rechnet der Zyklusrechner',
@@ -2799,7 +2795,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
       {
         question: 'Wie viele Tage im Monat ist man fruchtbar?',
-        answer: 'Rund 6 Tage pro Zyklus. Spermien überleben im Körper bis zu 5 Tage, die Eizelle ist nach dem Eisprung nur etwa 12 bis 24 Stunden befruchtungsfähig. Am wahrscheinlichsten ist eine Schwangerschaft bei Geschlechtsverkehr in den 2 bis 3 Tagen vor dem Eisprung.',
+        answer: 'Biologisch rund 6 Tage pro Zyklus: die 5 Tage vor dem Eisprung und der Eisprungtag. Spermien überleben im Körper bis zu 5 Tage, die Eizelle ist nach dem Eisprung nur etwa 12 bis 24 Stunden befruchtungsfähig. Der Rechner zählt den Tag nach dem Eisprung als Puffer mit und zeigt deshalb 7 Tage an. Am wahrscheinlichsten ist eine Schwangerschaft bei Geschlechtsverkehr in den 2 bis 3 Tagen vor dem Eisprung.',
       },
       {
         question: 'Kann ich mit dem Zyklusrechner verhüten?',
@@ -3091,9 +3087,9 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         type: 'select',
         defaultValue: 'smart_mix',
         options: [
-          { value: 'used_thrifty', label: 'Sparsam – überwiegend gebraucht (ca. 750 €)' },
-          { value: 'smart_mix', label: 'Mix – Sicherheitsartikel neu, Rest gebraucht (ca. 1.650 €)' },
-          { value: 'premium_new', label: 'Alles neu / Markenprodukte (ca. 3.200 €)' },
+          { value: 'used_thrifty', label: 'Sparsam – überwiegend gebraucht (Beispielbudget 750 €)' },
+          { value: 'smart_mix', label: 'Mix – Sicherheitsartikel neu, Rest gebraucht (Beispielbudget 1.650 €)' },
+          { value: 'premium_new', label: 'Alles neu / Markenprodukte (Beispielbudget 3.200 €)' },
         ],
       },
       { id: 'hasPresentsBudget', label: 'Geschenke von Familie und Freunden', type: 'number', defaultValue: 500, min: 0, max: 5000, step: 50, unit: '€' },
@@ -3112,7 +3108,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
       { id: 'diapersPerDayYear1', label: 'Windeln pro Tag im 1. Lebensjahr', type: 'number', defaultValue: 7, min: 0, max: 15, step: 1, unit: 'Stück/Tag', helpText: 'Neugeborene brauchen 7 bis 10, ab etwa 6 Monaten 5 bis 6 Windeln täglich.', dependsOn: { field: 'includeDiapers', value: true } },
       { id: 'diapersPerDayYear2to3', label: 'Windeln pro Tag ab dem 2. Lebensjahr', type: 'number', defaultValue: 5, min: 0, max: 15, step: 1, unit: 'Stück/Tag', helpText: 'Nur bei einem Zeitraum über 12 Monate relevant. Üblich sind 4 bis 5 Windeln.', dependsOn: { field: 'includeDiapers', value: true } },
-      { id: 'costPerDiaper', label: 'Preis pro Windel', type: 'number', defaultValue: 0.24, min: 0, max: 2, step: 0.01, unit: '€', helpText: 'Eigenmarken ca. 0,15–0,20 €, Markenwindeln ca. 0,25–0,35 €.', dependsOn: { field: 'includeDiapers', value: true } },
+      { id: 'costPerDiaper', label: 'Preis pro Windel', type: 'number', defaultValue: 0.24, min: 0, max: 2, step: 0.01, unit: '€', helpText: 'Beispielpreise: Eigenmarken etwa 0,15–0,20 €, Markenwindeln etwa 0,25–0,35 € – je nach Größe, Packung und Angebot. Am besten den Stückpreis Ihrer Windeln vom Preisschild übernehmen.', dependsOn: { field: 'includeDiapers', value: true } },
     ],
     calculate: (inputs) => {
       const isEmpty = (v: any) => v === undefined || v === null || String(v).trim() === '';
@@ -3136,7 +3132,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
 
       const secondary: any[] = [
         { id: 'equipmentOwnCost', label: 'Eigenanteil Erstausstattung', value: ownCost, formattedValue: formatCurrency(ownCost) },
-        { id: 'totalGrossCost', label: `Gesamtwert der Erstausstattung (${typeLabel})`, value: totalGrossCost, formattedValue: formatCurrency(totalGrossCost) },
+        { id: 'totalGrossCost', label: `Beispielbudget Erstausstattung (${typeLabel})`, value: totalGrossCost, formattedValue: formatCurrency(totalGrossCost) },
         { id: 'gifts', label: 'Übernommen von Familie / Geschenke', value: Math.min(gifts, totalGrossCost), formattedValue: formatCurrency(Math.min(gifts, totalGrossCost)) },
       ];
       const calculationSteps = [`Erstausstattung: ${formatCurrency(totalGrossCost)} − ${formatCurrency(gifts)} Geschenke = ${formatCurrency(ownCost)}`];
@@ -3148,7 +3144,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
           primary: { id: 'ownCost', label: 'Eigene Ausgaben für die Erstausstattung', value: ownCost, formattedValue: formatCurrency(ownCost), highlight: true },
           secondary: secondary.slice(1),
           calculationSteps,
-          summaryText: `Für die Baby-Erstausstattung (${typeLabel}) fallen ca. ${formatCurrency(totalGrossCost)} an. Nach Abzug von ${formatCurrency(Math.min(gifts, totalGrossCost))} Geschenken verbleiben für Sie ${formatCurrency(ownCost)}.`,
+          summaryText: `Für die Baby-Erstausstattung (${typeLabel}) setzt der Rechner ein Beispielbudget von ${formatCurrency(totalGrossCost)} an. Nach Abzug von ${formatCurrency(Math.min(gifts, totalGrossCost))} Geschenken verbleiben für Sie ${formatCurrency(ownCost)}.`,
         };
       }
 
@@ -3184,7 +3180,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
         { id: 'diaperMonthly', label: 'Windelkosten pro Monat (Durchschnitt)', value: diaperMonthly, formattedValue: formatCurrency(diaperMonthly) },
         {
           id: 'clothSaving',
-          label: 'Stoffwindeln zum Vergleich (Set ca. 450 €, ohne Waschkosten)',
+          label: 'Stoffwindeln zum Vergleich (Beispiel: Set 450 €, ohne Waschkosten)',
           value: Math.max(0, clothDiff),
           formattedValue: clothDiff > 0 ? `bis zu ${formatCurrency(clothDiff)} günstiger` : 'Im gewählten Zeitraum kein Kostenvorteil',
         },
@@ -3204,7 +3200,7 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       };
     },
     formula: 'Budget = (Erstausstattung − Geschenke) + Windeln · Windelkosten = (Windeln/Tag 1. Jahr × 365 + Windeln/Tag ab 2. Jahr × 365 je weiteres Jahr) × Preis pro Windel',
-    formulaExplanation: 'Der Rechner nimmt einen typischen Gesamtwert für die Erstausstattung (750 €, 1.650 € oder 3.200 €) und zieht Geschenke ab. Für die Windeln multipliziert er den Tagesbedarf mit 365 Tagen pro Lebensjahr und dem Stückpreis. Die größten Einzelposten der Ausstattung sind Kinderwagen (300 bis 1.200 €), Babyschale (150 bis 350 €) sowie Bett und Wickelkommode (250 bis 800 €).',
+    formulaExplanation: 'Der Rechner nimmt ein festes Beispielbudget für die Erstausstattung (750 €, 1.650 € oder 3.200 €) und zieht Geschenke ab. Diese Beträge sind Annahmen des Rechners, keine erhobenen Durchschnittspreise. Für die Windeln multipliziert er den Tagesbedarf mit 365 Tagen pro Lebensjahr und dem Stückpreis, den Sie selbst eintragen.',
     workedExample: {
       title: 'Beispiel 1: Mix aus neu und gebraucht, 500 € Geschenke, Windeln im ersten Jahr',
       inputValues: [{ label: 'Standard', value: 'Mix (1.650 €)' }, { label: 'Geschenke', value: '500 €' }, { label: 'Windeln', value: '7 pro Tag à 0,24 €' }],
@@ -3249,27 +3245,23 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       sections: [
         {
           title: 'Was die Erstausstattung kostet',
-          content: 'Die drei Standards beruhen auf typischen Preisen. Sparsam mit überwiegend gebrauchten Sachen sind es rund 750 €. Ein Mix aus neuen Sicherheitsartikeln und gebrauchten Möbeln und Kleidern kostet rund 1.650 €. Wer alles neu kauft, kommt auf rund 3.200 €. Die größten Posten sind Kinderwagen (300 bis 1.200 €), Babyschale (150 bis 350 €) sowie Bett und Wickelkommode (250 bis 800 €). Babyschale und Matratze sollten Sie neu kaufen, bei Kleidung und Möbeln lohnt sich Second-Hand.',
-        },
-        {
-          title: 'Windeln: Bedarf und Kosten',
-          content: 'Neugeborene brauchen 7 bis 10 Windeln am Tag, ab etwa 6 Monaten sind es meist 5 bis 6, im zweiten und dritten Jahr 4 bis 5. Bei 7 Windeln täglich sind das 2.555 Stück im ersten Jahr. Mit 0,24 € pro Stück kostet das rund 613 € oder 51 € im Monat. Bis zum Trockenwerden mit etwa drei Jahren kommen rund 6.200 Windeln zusammen. Eigenmarken aus der Drogerie kosten oft 0,15 bis 0,20 € pro Windel und senken die Summe deutlich.',
+          content: 'Die drei Standards sind Beispielbudgets dieses Rechners, keine amtlich erhobenen Durchschnittswerte: 750 € für überwiegend gebrauchte Sachen, 1.650 € für einen Mix aus neuen Sicherheitsartikeln und gebrauchten Möbeln und Kleidern, 3.200 € für eine komplett neue Ausstattung. Ihre tatsächlichen Kosten hängen von Marken, Angeboten und Leihgaben ab. Die größten Einzelposten sind in der Regel Kinderwagen, Babyschale sowie Bett und Wickelkommode – vergleichen Sie dort die aktuellen Preise besonders genau. Babyschale und Matratze sollten Sie neu kaufen, bei Kleidung und Möbeln lohnt sich Second-Hand.',
         },
         {
           title: 'Stoffwindeln oder Einwegwindeln?',
-          content: 'Ein Stoffwindel-Set kostet einmalig rund 450 €. Der Rechner vergleicht diesen Betrag mit Ihren Einwegwindel-Kosten. Wasser, Strom und Waschmittel sind dabei nicht enthalten. Über drei Jahre lassen sich so mehrere Hundert Euro sparen, besonders wenn das Set für Geschwister weitergenutzt wird. Im ersten Jahr allein ist der Vorteil oft klein.',
+          content: 'Für ein Stoffwindel-Set setzt der Rechner einen Beispielbetrag von einmalig 450 € an. Diesen Betrag vergleicht er mit Ihren Einwegwindel-Kosten. Wasser, Strom und Waschmittel sind dabei nicht enthalten. Über drei Jahre lassen sich so mehrere Hundert Euro sparen, besonders wenn das Set für Geschwister weitergenutzt wird. Im ersten Jahr allein ist der Vorteil oft klein.',
         },
         {
           title: 'Zuschüsse und Unterstützung',
           content: 'Schwangere in einer finanziellen Notlage können über eine Schwangerschaftsberatungsstelle Hilfe der Bundesstiftung Mutter und Kind beantragen. Wer Bürgergeld bezieht, erhält vom Jobcenter auf Antrag Leistungen für die Erstausstattung bei Schwangerschaft und Geburt (§ 24 Abs. 3 SGB II). Einige Kommunen geben Windelsäcke oder Zuschüsse für die Entsorgung aus. Ob Ihnen Kinderzuschlag zusteht, prüft der [Kinderzuschlag-Rechner](/rechner/kinderzuschlag-kiz-rechner/). Für die Zeit danach hilft der [Kita-Gebühren-Rechner](/rechner/kita-gebuehren-rechner/).',
         },
       ],
-      details: 'Erstausstattung: Sparsam ca. 750 €, Mix ca. 1.650 €, alles neu ca. 3.200 € (Richtwerte). Windeln: 1. Lebensjahr Windeln/Tag × 365, jedes weitere Jahr Windeln/Tag × 365. Stoffwindel-Vergleich mit einem Set für ca. 450 € ohne Waschkosten.',
+      details: 'Erstausstattung: Beispielbudgets sparsam 750 €, Mix 1.650 €, alles neu 3.200 € (Annahmen des Rechners). Windeln: 1. Lebensjahr Windeln/Tag × 365, jedes weitere Jahr Windeln/Tag × 365. Stoffwindel-Vergleich mit einem Set für ca. 450 € ohne Waschkosten.',
     },
     faqs: [
       {
         question: 'Was kostet eine Baby-Erstausstattung?',
-        answer: 'Je nach Anspruch zwischen etwa 750 € und 3.200 €. Mit einem Mix aus neuen Sicherheitsartikeln und gebrauchten Sachen liegen viele Familien bei rund 1.650 €. Geschenke und Leihgaben senken den Eigenanteil oft deutlich.',
+        answer: 'Eine amtliche Durchschnittszahl gibt es dafür nicht. Der Rechner arbeitet mit drei Beispielbudgets: 750 € für überwiegend Gebrauchtes, 1.650 € für einen Mix aus neuen Sicherheitsartikeln und gebrauchten Sachen und 3.200 € für eine komplett neue Ausstattung. Geschenke und Leihgaben senken den Eigenanteil.',
       },
       {
         question: 'Wie viele Windeln braucht ein Baby am Tag?',
@@ -3277,11 +3269,11 @@ export const EXTRA_GESUNDHEIT_FAMILIE: CalculatorDefinition[] = [
       },
       {
         question: 'Wie viel kosten Windeln im ersten Jahr?',
-        answer: 'Bei 7 Windeln täglich brauchen Sie 2.555 Windeln im ersten Jahr. Zu 0,24 € pro Stück sind das rund 613 €, also etwa 51 € im Monat. Mit Eigenmarken für 0,18 € sinkt der Betrag auf rund 460 €.',
+        answer: 'Bei 7 Windeln täglich brauchen Sie 2.555 Windeln im ersten Jahr. Bei einem Beispielpreis von 0,24 € pro Stück sind das rund 613 €, also etwa 51 € im Monat. Bei 0,18 € pro Stück wären es rund 460 €.',
       },
       {
         question: 'Lohnen sich Stoffwindeln finanziell?',
-        answer: 'Über die ganze Wickelzeit meist ja. Einwegwindeln kosten bis zum Trockenwerden oft 1.200 bis 1.800 €, ein Stoffwindel-Set rund 450 € plus Waschkosten. Im ersten Jahr allein ist der Unterschied kleiner.',
+        answer: 'Über die ganze Wickelzeit oft ja, aber es hängt von Ihren Preisen ab. Im Beispiel mit 6.205 Einwegwindeln zu 0,20 € in drei Jahren kommen 1.241 € zusammen, der Rechner setzt für ein Stoffwindel-Set 450 € plus Waschkosten an. Im ersten Jahr allein ist der Unterschied kleiner.',
       },
       {
         question: 'Was gehört unbedingt zur Erstausstattung?',

@@ -557,6 +557,8 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
   const startFormatted = formatDateGerman(diff.rawStart);
   const endFormatted = formatDateGerman(diff.rawEnd);
   const daysFormatted = formatNumber(diff.totalDays, 0);
+  const daysUnit = unit(diff.totalDays, 'Tag', 'Tage');
+  const oneDay = diff.totalDays === 1;
 
   // Calendar-correct months/years: count from the earlier date; with Starttag-Zählung one day is added at the end.
   const laterForSpan = includeStartDay
@@ -572,22 +574,22 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
       : `Start- und Enddatum sind identisch (${startFormatted}). Ohne Starttag liegt die Zeitspanne bei 0 Tagen.`;
   } else if (mode === 'since') {
     if (diff.isReversed) {
-      directionSentence = `Das gewählte Datum ${startFormatted} liegt in der Zukunft: Bis dorthin sind es noch ${daysFormatted} Tage.`;
+      directionSentence = `Das gewählte Datum ${startFormatted} liegt in der Zukunft: Bis dorthin ${oneDay ? 'ist' : 'sind'} es noch ${daysUnit}.`;
     } else {
-      directionSentence = `Seit dem ${startFormatted} sind ${daysFormatted} Tage vergangen.`;
+      directionSentence = `Seit dem ${startFormatted} ${oneDay ? 'ist' : 'sind'} ${daysUnit} vergangen.`;
     }
   } else if (mode === 'until') {
     if (diff.isReversed) {
-      directionSentence = `Das Zieldatum ${endFormatted} liegt bereits in der Vergangenheit: Seitdem sind ${daysFormatted} Tage vergangen.`;
+      directionSentence = `Das Zieldatum ${endFormatted} liegt bereits in der Vergangenheit: Seitdem ${oneDay ? 'ist' : 'sind'} ${daysUnit} vergangen.`;
     } else {
-      directionSentence = `Bis zum ${endFormatted} sind es noch ${daysFormatted} Tage.`;
+      directionSentence = `Bis zum ${endFormatted} ${oneDay ? 'ist' : 'sind'} es noch ${daysUnit}.`;
     }
   } else {
     // between
     if (diff.isReversed) {
-      directionSentence = `Hinweis: Das Startdatum (${startFormatted}) liegt nach dem Enddatum (${endFormatted}). Der Rechner hat die Differenz vom früheren zum späteren Datum ermittelt (${daysFormatted} Tage).`;
+      directionSentence = `Hinweis: Das Startdatum (${startFormatted}) liegt nach dem Enddatum (${endFormatted}). Der Rechner hat die Differenz vom früheren zum späteren Datum ermittelt (${daysUnit}).`;
     } else {
-      directionSentence = `Vom ${startFormatted} bis zum ${endFormatted} sind es ${daysFormatted} Tage.`;
+      directionSentence = `Vom ${startFormatted} bis zum ${endFormatted} ${oneDay ? 'ist' : 'sind'} es ${daysUnit}.`;
     }
   }
 
@@ -652,7 +654,7 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
     });
     countdownStep = cd.reached
       ? `Countdown: Der ${endFormatted}, ${timeLabel}, ist bereits erreicht.`
-      : `Countdown ab jetzt bis ${endFormatted}, ${timeLabel}: ${cd.days} Tage, ${cd.hours} Std. und ${cd.minutes} Min. (Sommer-/Winterzeit berücksichtigt).`;
+      : `Countdown ab jetzt bis ${endFormatted}, ${timeLabel}: ${unit(cd.days, 'Tag', 'Tage')}, ${cd.hours} Std. und ${cd.minutes} Min. (Sommer-/Winterzeit berücksichtigt).`;
   }
 
   secondary.push({
@@ -664,8 +666,8 @@ export function calculateTagerechner(inputs: Record<string, any>): CalculationRe
 
   const spanAnchor = addMonthsClamped(diff.earlier, span.totalMonths);
   const calculationSteps = [
-    `Kalendertage: ${formatDateGerman(diff.earlier)} bis ${formatDateGerman(diff.later)} = ${formatNumber(diff.totalDays - (includeStartDay ? 1 : 0), 0)} Tage${includeStartDay ? ' + 1 Tag (Starttag mitgezählt) = ' + daysFormatted + ' Tage' : ''}.`,
-    `Wochen: ${daysFormatted} ÷ 7 = ${formatNumber(diff.totalWeeks, 0)} Wochen, Rest ${diff.remDays} ${diff.remDays === 1 ? 'Tag' : 'Tage'}.`,
+    `Kalendertage: ${formatDateGerman(diff.earlier)} bis ${formatDateGerman(diff.later)} = ${unit(diff.totalDays - (includeStartDay ? 1 : 0), 'Tag', 'Tage')}${includeStartDay ? ' + 1 Tag (Starttag mitgezählt) = ' + daysUnit : ''}.`,
+    `Wochen: ${daysFormatted} ÷ 7 = ${unit(diff.totalWeeks, 'Woche', 'Wochen')}, Rest ${unit(diff.remDays, 'Tag', 'Tage')}.`,
     `Monate: ${formatDateGerman(diff.earlier)} + ${unit(span.totalMonths, 'Monat', 'Monate')} = ${formatDateGerman(spanAnchor)}; danach noch ${unit(span.days, 'Tag', 'Tage')}.`,
   ];
   if (countdownStep) calculationSteps.push(countdownStep);
@@ -749,9 +751,10 @@ export function calculateTageBisGeburtstag(inputs: Record<string, any>): Calcula
   const legalNum = next.num + 1;
   const legalParts = dayNumberToDate(legalNum);
 
+  const ageNextText = unit(ageNext, 'Jahr', 'Jahre');
   const summaryText = isToday
-    ? `Heute ist Ihr Geburtstag: Sie werden ${ageNext} Jahre alt. Geboren wurden Sie an einem ${birthWeekday}.${leapNote}`
-    : `Bis zu Ihrem nächsten Geburtstag am ${nextWeekday}, ${nextFormatted}, sind es noch ${unit(daysUntil, 'Tag', 'Tage')} (${unit(weeks, 'Woche', 'Wochen')} und ${unit(remDays, 'Tag', 'Tage')}). Dann werden Sie ${ageNext} Jahre alt.${leapNote}`;
+    ? `Heute ist Ihr Geburtstag: Sie werden ${ageNextText} alt. Geboren wurden Sie an einem ${birthWeekday}.${leapNote}`
+    : `Bis zu Ihrem nächsten Geburtstag am ${nextWeekday}, ${nextFormatted}, ${daysUntil === 1 ? 'ist' : 'sind'} es noch ${unit(daysUntil, 'Tag', 'Tage')} (${unit(weeks, 'Woche', 'Wochen')} und ${unit(remDays, 'Tag', 'Tage')}). Dann werden Sie ${ageNextText} alt.${leapNote}`;
 
   return {
     primary: {
@@ -764,7 +767,7 @@ export function calculateTageBisGeburtstag(inputs: Record<string, any>): Calcula
     },
     secondary: [
       { id: 'nextDate', label: isToday ? 'Geburtstag' : 'Nächster Geburtstag', value: nextFormatted, formattedValue: `${nextWeekday}, ${nextFormatted}` },
-      { id: 'ageNext', label: isToday ? 'Neues Alter' : 'Alter am nächsten Geburtstag', value: ageNext, formattedValue: `${ageNext} Jahre` },
+      { id: 'ageNext', label: isToday ? 'Neues Alter' : 'Alter am nächsten Geburtstag', value: ageNext, formattedValue: ageNextText },
       { id: 'weeks', label: 'In Wochen und Tagen', value: weeks, formattedValue: `${unit(weeks, 'Woche', 'Wochen')} und ${unit(remDays, 'Tag', 'Tage')}` },
       { id: 'birthWeekday', label: 'Wochentag Ihrer Geburt', value: birthWeekday, formattedValue: `${birthWeekday}, ${formatDateGerman(birth)}` },
       { id: 'currentAge', label: 'Aktuelles Alter', value: currentAge, formattedValue: `${currentAge} ${currentAge === 1 ? 'Jahr' : 'Jahre'}` },
@@ -787,8 +790,8 @@ export function calculateTageBisGeburtstag(inputs: Record<string, any>): Calcula
     ],
     calculationSteps: [
       `Heute: ${formatDateGerman(today)}. Geburtstag in diesem Zyklus: ${nextFormatted}${next.shifted ? ' (29.02. → 28.02.)' : ''}.`,
-      `Tage: ${nextFormatted} − ${formatDateGerman(today)} = ${formatNumber(daysUntil, 0)} Tage = ${weeks} Wochen und ${remDays} Tage.`,
-      `Alter: ${next.parts.year} − ${birth.year} = ${ageNext} Jahre am nächsten Geburtstag.`,
+      `Tage: ${nextFormatted} − ${formatDateGerman(today)} = ${unit(daysUntil, 'Tag', 'Tage')} = ${unit(weeks, 'Woche', 'Wochen')} und ${unit(remDays, 'Tag', 'Tage')}.`,
+      `Alter: ${next.parts.year} − ${birth.year} = ${ageNextText} am nächsten Geburtstag.`,
     ],
     summaryText,
   };
@@ -840,13 +843,19 @@ export function calculateTageBisWeihnachten(inputs: Record<string, any>): Calcul
   const weekday = getGermanWeekday(targetParts.year, targetParts.month, targetParts.day);
   const targetDateFormatted = `${targetDay < 10 ? '0' + targetDay : targetDay}.12.${targetYear}`;
 
+  const daysText = unit(daysRemaining, 'Tag', 'Tage');
+  const saturdaysText = unit(saturdaysRemaining, 'Samstag', 'Samstage');
+  // "Bis Heiligabend" bzw. "Bis zum 1. Weihnachtstag" (nicht "Bis zu 1. Weihnachtstag")
+  const untilPhrase = targetType === 'weihnachten' ? 'Bis zum 1. Weihnachtstag (25. Dezember)' : 'Bis Heiligabend (24. Dezember)';
+
   let summaryText = '';
   if (isTodayChristmas) {
     summaryText = `Heute ist ${targetType === 'weihnachten' ? 'der 1. Weihnachtstag' : 'Heiligabend'}! Das Fest ist da – wir wünschen besinnliche und frohe Feiertage!`;
   } else if (isChristmasPassed) {
-    summaryText = `${targetLabel} ${heute.year} ist bereits vorüber. Der Countdown schaltet automatisch auf das nächste Fest am ${weekday}, den ${targetDateFormatted} um. Es verbleiben ${formatNumber(daysRemaining, 0)} Tage (${formatNumber(saturdaysRemaining, 0)} Samstage).`;
+    summaryText = `${targetLabel} ${heute.year} ist bereits vorüber. Der Countdown schaltet automatisch auf das nächste Fest am ${weekday}, den ${targetDateFormatted} um. Es ${daysRemaining === 1 ? 'verbleibt' : 'verbleiben'} ${daysText} (${saturdaysText}).`;
   } else {
-    summaryText = `Bis zu ${targetLabel} am ${weekday}, den ${targetDateFormatted}, sind es genau ${formatNumber(daysRemaining, 0)} Tage. Das entspricht ${formatNumber(totalWeeks, 0)} vollen Wochen und ${remDays} Tagen (${formatNumber(saturdaysRemaining, 0)} verbleibende Samstage).`;
+    const weeksDative = `${unit(totalWeeks, 'vollen Woche', 'vollen Wochen')} und ${unit(remDays, 'Tag', 'Tagen')}`;
+    summaryText = `${untilPhrase} am ${weekday}, den ${targetDateFormatted}, ${daysRemaining === 1 ? 'ist' : 'sind'} es genau ${daysText}. Das entspricht ${weeksDative} (${saturdaysRemaining === 1 ? '1 verbleibender Samstag' : `${formatNumber(saturdaysRemaining, 0)} verbleibende Samstage`}).`;
   }
 
   return {

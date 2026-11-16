@@ -2198,7 +2198,7 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
           'Für eine verlässliche Materialbedarfsberechnung einer Schalungssteinmauer benötigen Sie fünf zentrale Eingangsdaten:',
           '1. Länge und Höhe der Mauer zur Ermittlung der Brutto-Ansichtsfläche.',
           '2. Flächen von Öffnungen (z. B. Durchbrüche, Treppenausschnitte oder Tore), die nicht mit Steinen aufgemauert werden.',
-          '3. Das ausgewählte Steinformat bzw. den Herstellerbedarf an Steinen pro Quadratmeter (Standard: 8 Steine je m² bei 50 × 25 cm Format).',
+          '3. Das ausgewählte Steinformat bzw. den Herstellerbedarf an Steinen pro Quadratmeter (8 Steine je m² bei 50 × 25 cm, 10 Steine je m² bei 50 × 20 cm).',
           '4. Die herstellerspezifische Füllbetonmenge des konkreten Produkts (in l/m² oder l/Stein laut Datenblatt).',
           '5. Einen separat gewählten Zuschlag für die Betonbestellung (z. B. 3 bis 8 Prozent für Rüttelverluste und Unebenheiten).',
         ],
@@ -2251,10 +2251,10 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
         id: 'steinmenge-berechnen',
         title: 'Wie berechne ich gleichzeitig die Steinmenge?',
         paragraphs: [
-          'Handelsübliche Schalungssteine messen in Deutschland und Mitteleuropa nahezu einheitlich 50 cm in der Länge und 25 cm in der Höhe. Ein Stein deckt 0,5 m × 0,25 m = 0,125 m² Fläche ab. Daraus folgt die feste Grundregel von exakt 8 Steinen je Quadratmeter Wandfläche.',
-          'Für eine 12 m² große Wand ergibt sich:\n12 m² × 8 = 96 Steine ohne Reserve.',
-          'Mit einem marktüblichen Steinzuschlag von 5 % für Bruch und Passstücke:\n96 × 1,05 = 100,8 → kaufmännisch aufgerundet 101 Steine.',
-          'Die zusätzliche Steinreserve von 5 Steinen erhöht nicht das geometrische Füllvolumen der fertigen Wand. Die Stückzahl ist eine Bedarfsabschätzung für den Materialeinkauf. Ecken, Pfeiler, Endsteine, der Halbsteinverband und Lagenabfolgen müssen im Verlegeplan berücksichtigt werden. Nutzen Sie dafür unseren [Schalungssteine-Rechner](/rechner/schalungssteine-rechner/).',
+          'Schalungssteine sind fast immer 50 cm lang, die Höhe unterscheidet sich aber je nach Hersteller: Delfing DP-Steine sind 20 cm hoch (0,5 m × 0,20 m = 0,10 m², also 10 Steine je Quadratmeter), Beyhl-Steine rund 25 cm (49,7 × 24,7 cm, 8 Steine je Quadratmeter). Die Stückzahl je m² steht im Datenblatt des gewählten Steins.',
+          'Für eine 12 m² große Wand mit Delfing DP 24 (10 Steine/m²) ergibt sich:\n12 m² × 10 = 120 Steine ohne Reserve. Mit 25 cm hohen Steinen (8 Steine/m²) wären es 96 Steine.',
+          'Mit einem marktüblichen Steinzuschlag von 5 % für Bruch und Passstücke:\n120 × 1,05 = 126 Steine.',
+          'Die zusätzliche Steinreserve von 6 Steinen erhöht nicht das geometrische Füllvolumen der fertigen Wand. Die Stückzahl ist eine Bedarfsabschätzung für den Materialeinkauf. Ecken, Pfeiler, Endsteine, der Halbsteinverband und Lagenabfolgen müssen im Verlegeplan berücksichtigt werden. Nutzen Sie dafür unseren [Schalungssteine-Rechner](/rechner/schalungssteine-rechner/).',
         ],
       },
       {
@@ -2286,12 +2286,12 @@ export const RATGEBER_ARTICLES: RatgeberArticle[] = [
       formula: 'Füllbeton (m³) = Netto-Wandfläche × Füllmenge (l/m²) ÷ 1.000 × (1 + Betonzuschlag/100)',
       steps: [
         { label: 'Schritt 1: Netto-Wandfläche berechnen', calculation: '8,0 m × 1,5 m = 12,0 m² Wandfläche' },
-        { label: 'Schritt 2: Grundbedarf Schalungssteine', calculation: '12,0 m² × 8 Steine/m² = 96 Steine Netto' },
-        { label: 'Schritt 3: Steine inklusive 5 % Steinreserve', calculation: '96 × 1,05 = 100,8 → 101 Schalungssteine' },
+        { label: 'Schritt 2: Grundbedarf Schalungssteine', calculation: '12,0 m² × 10 Steine/m² (50 × 20 cm) = 120 Steine Netto' },
+        { label: 'Schritt 3: Steine inklusive 5 % Steinreserve', calculation: '120 × 1,05 = 126 Schalungssteine' },
         { label: 'Schritt 4: Netto-Füllbetonvolumen', calculation: '12,0 m² × 130 l/m² = 1.560 Liter = 1,56 m³' },
         { label: 'Schritt 5: Betonbestellmenge mit 5 % Bestellzuschlag', calculation: '1,56 m³ × 1,05 = 1,638 m³ ≈ 1,64 m³ Füllbeton' },
       ],
-      resultSummary: '96 Schalungssteine Netto (101 Stück inkl. Reserve) und 1,56 m³ Netto-Füllbeton (Bestellmenge ca. 1,64 m³ bei 5 % Zuschlag).',
+      resultSummary: '120 Schalungssteine Netto (126 Stück inkl. Reserve) und 1,56 m³ Netto-Füllbeton (Bestellmenge ca. 1,64 m³ bei 5 % Zuschlag).',
     },
     commonMistakes: [
       {

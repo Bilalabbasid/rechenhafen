@@ -213,6 +213,29 @@ const MF_SUM = MF_K1 + MF_K2;
 const MF_P1 = (MF_K1 * MF_MASSE) / MF_SUM;
 const MF_P2 = (MF_K2 * MF_MASSE) / MF_SUM;
 
+// ---------------------------------------------------------------------------
+// Zyklusrechner (Modus „Nur Zyklustage“, damit die Werte nicht vom heutigen Datum abhängen)
+// ---------------------------------------------------------------------------
+const zy = (cycleLengthDays: number, lutealPhaseDays = 14) => run('zykluslaenge-eisprung-rechner', { mode: 'days', cycleType: 'regular', cycleLengthDays, lutealPhaseDays });
+const ZY_TABLE = [24, 26, 28, 30, 32, 35]
+  .map((c) => {
+    const r = zy(c);
+    return `| ${c} Tage | ${txt(r, 'ovulationDay')} | ${txt(r, 'fertileWindow')} | ${txt(r, 'nextPeriod')} |`;
+  })
+  .join('\n');
+const ZY_L12 = zy(28, 12);
+const ZY_L14 = zy(28, 14);
+
+// ---------------------------------------------------------------------------
+// Baby-Erstausstattung: Windelkosten (Beispielpreise, keine Marktdaten)
+// ---------------------------------------------------------------------------
+const ea = (equipmentStandard: string, hasPresentsBudget: number, diaperMonths: string, costPerDiaper: number) =>
+  run('erstausstattung-baby-rechner', { equipmentStandard, hasPresentsBudget, includeDiapers: true, diaperMonths, diapersPerDayYear1: 7, diapersPerDayYear2to3: 5, costPerDiaper });
+const EA_TABLE = [0.15, 0.2, 0.25, 0.3]
+  .map((p) => `| ${formatCurrency(p)} | ${['12', '24', '36'].map((m) => txt(ea('smart_mix', 0, m, p), 'diaperCost')).join(' | ')} |`)
+  .join('\n');
+const EA_DIAPERS_36 = num(ea('smart_mix', 0, '36', 0.2), 'totalDiapers');
+
 export const FAMILIE_PAGE_CONTENT: PageContentMap = {
   'kinderzuschlag-kiz-rechner': {
     sections: [
@@ -363,7 +386,7 @@ export const FAMILIE_PAGE_CONTENT: PageContentMap = {
       },
       {
         question: 'Werden Kita-Gebühren bei Kinderzuschlag oder Wohngeld erlassen?',
-        answer: 'Ja. Nach § 90 Abs. 4 SGB VIII wird kein Kostenbeitrag erhoben, wenn die Eltern Bürgergeld, Kinderzuschlag oder Wohngeld erhalten. Die Befreiung gilt nicht automatisch: Legen Sie den Bescheid beim Jugendamt oder Kita-Träger vor.',
+        answer: 'Ja. Nach § 90 Abs. 4 SGB VIII wird kein Kostenbeitrag erhoben, wenn die Eltern Grundsicherungsgeld (bis Juni 2026 Bürgergeld), Kinderzuschlag oder Wohngeld erhalten. Die Befreiung gilt nicht automatisch: Legen Sie den Bescheid beim Jugendamt oder Kita-Träger vor.',
       },
     ],
   },
@@ -427,8 +450,8 @@ export const FAMILIE_PAGE_CONTENT: PageContentMap = {
     ],
     faqs: [
       {
-        question: 'Wie wirkt sich Unterhaltsvorschuss auf Bürgergeld und Kinderzuschlag aus?',
-        answer: `Beim Bürgergeld wird er voll als Einkommen des Kindes angerechnet, beim Kinderzuschlag zu 45 %. Für ein Kind von 12 bis 17 Jahren mit ${eur(UV_12_PAY)} Vorschuss sinkt der Kinderzuschlag also um ${eur(UV_12_PAY * 0.45)}.`,
+        question: 'Wie wirkt sich Unterhaltsvorschuss auf Grundsicherungsgeld (früher Bürgergeld) und Kinderzuschlag aus?',
+        answer: `Beim Grundsicherungsgeld (bis Juni 2026 Bürgergeld) wird er voll als Einkommen des Kindes angerechnet, beim Kinderzuschlag zu 45 %. Für ein Kind von 12 bis 17 Jahren mit ${eur(UV_12_PAY)} Vorschuss sinkt der Kinderzuschlag also um ${eur(UV_12_PAY * 0.45)}.`,
       },
       {
         question: 'Wird Unterhaltsvorschuss zeitlich begrenzt gezahlt?',
@@ -502,6 +525,31 @@ export const FAMILIE_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Wird bei nur einem Kind höher eingestuft?',
         answer: 'Das ist möglich, aber keine Automatik. Die Tabelle geht von zwei Unterhaltsberechtigten aus; bei nur einem Kind kann das Gericht eine oder mehrere Gruppen höher gehen, bei drei und mehr Berechtigten tiefer (Anm. A.I). Dieser Rechner stuft nicht automatisch um.',
+      },
+    ],
+  },
+
+  'zykluslaenge-eisprung-rechner': {
+    faqs: [
+      {
+        question: 'Was ändert eine kürzere Lutealphase an der Berechnung?',
+        answer: `Der Eisprung rückt nach hinten. Bei einem 28-Tage-Zyklus und 14 Tagen Lutealphase rechnet der Rechner mit dem ${txt(ZY_L14, 'ovulationDay')}, bei 12 Tagen Lutealphase mit dem ${txt(ZY_L12, 'ovulationDay')}. Das fruchtbare Fenster verschiebt sich entsprechend von ${txt(ZY_L14, 'fertileWindow')} auf ${txt(ZY_L12, 'fertileWindow')}. Ihre eigene Lutealphase erkennen Sie, wenn Sie über mehrere Zyklen die Basaltemperatur messen und die Tage vom Temperaturanstieg bis zur nächsten Periode zählen.`,
+      },
+    ],
+  },
+
+  'erstausstattung-baby-rechner': {
+    // Ersetzt den früheren Abschnitt „Windeln: Bedarf und Kosten“ der Definition (Tabelle aus der Engine).
+    sections: [
+      {
+        title: 'Windeln: Bedarf und Kosten nach Stückpreis',
+        content: `Neugeborene brauchen 7 bis 10 Windeln am Tag, ab etwa 6 Monaten sind es meist 5 bis 6, im zweiten und dritten Jahr 4 bis 5. Mit 7 Windeln täglich im ersten und 5 ab dem zweiten Jahr ergibt der Rechner diese Kosten. Die Stückpreise sind Beispielwerte, keine aktuellen Marktpreise:
+
+| Preis pro Windel | 12 Monate | 24 Monate | 36 Monate |
+|---|---|---|---|
+${EA_TABLE}
+
+Bis zum dritten Geburtstag kommen in diesem Modell ${formatNumber(EA_DIAPERS_36, 0)} Windeln zusammen. Jeder Cent beim Stückpreis macht deshalb über drei Jahre ${formatCurrency(EA_DIAPERS_36 * 0.01)} aus. Steht kein Stückpreis am Regal, teilen Sie den Packungspreis durch die Anzahl der Windeln. Achten Sie beim Vergleich auf die Windelgröße, denn größere Windeln kosten pro Stück meist mehr.`,
       },
     ],
   },

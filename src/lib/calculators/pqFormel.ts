@@ -19,6 +19,20 @@ function signed(x: number): string {
   return x < 0 ? `− ${fmt(-x)}` : `+ ${fmt(x)}`;
 }
 
+/** Signed x-term without a redundant 1: "+ x" / "− x" / "+ 3x". */
+function signedX(x: number): string {
+  if (x === 1) return '+ x';
+  if (x === -1) return '− x';
+  return `${signed(x)}x`;
+}
+
+/** Leading x²-term without a redundant 1: "x²" / "−x²" / "3x²". */
+function leadX2(a: number): string {
+  if (a === 1) return 'x²';
+  if (a === -1) return '−x²';
+  return `${fmt(a)}x²`;
+}
+
 /**
  * pq-Formel: x² + px + q = 0  →  x₁,₂ = −p/2 ± √((p/2)² − q)
  * Mode 'abc' normalises ax² + bx + c = 0 by dividing through a.
@@ -45,15 +59,15 @@ export function calculatePqFormel(inputs: Record<string, any>): CalculationResul
     a = ra;
     p = rb / ra;
     q = rc / ra;
-    equation = `${fmt(ra)}x² ${signed(rb)}x ${signed(rc)} = 0`;
-    steps.push(`Normalform herstellen: durch a = ${fmt(ra)} teilen → x² ${signed(p)}x ${signed(q)} = 0`);
+    equation = `${leadX2(ra)} ${signedX(rb)} ${signed(rc)} = 0`;
+    steps.push(`Normalform herstellen: durch a = ${fmt(ra)} teilen → x² ${signedX(p)} ${signed(q)} = 0`);
   } else {
     const rp = readNumber(inputs.p);
     const rq = readNumber(inputs.q);
     if (rp === null || rq === null) return fail('Bitte geben Sie p und q ein (0 ist erlaubt).');
     p = rp;
     q = rq;
-    equation = `x² ${signed(p)}x ${signed(q)} = 0`;
+    equation = `x² ${signedX(p)} ${signed(q)} = 0`;
   }
 
   const half = -p / 2;

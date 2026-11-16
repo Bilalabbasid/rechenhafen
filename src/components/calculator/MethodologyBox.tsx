@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, AlertCircle, Scale, Leaf, Calculator, ExternalLink, BookOpen } from 'lucide-react';
 import { TrustMetadata, LegalFootnote } from '@/types/calculator';
+import { EMISSION_FACTORS } from '@/data/emissions';
 
 interface Props {
   category: string;
@@ -171,7 +172,7 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
         }}>
           <Leaf size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
-            <strong>Emissions- & Energiedaten:</strong> Berechnungen zu CO₂-Einsparungen und Energieverbräuchen orientieren sich an den offiziellen Kennzahlen des Umweltbundesamtes (UBA, z. B. bundesweiter Strommix ca. 380 g CO₂/kWh).
+            <strong>Emissions- & Energiedaten:</strong> Berechnungen zu CO₂-Einsparungen und Energieverbräuchen orientieren sich an den offiziellen Kennzahlen des Umweltbundesamtes (UBA, z. B. deutscher Strommix im Datenjahr {EMISSION_FACTORS.strom_mix_de_generation_2025.referenceYear}: {EMISSION_FACTORS.strom_mix_de_generation_2025.value} g CO₂/kWh bei der Erzeugung).
           </div>
         </div>
       )}

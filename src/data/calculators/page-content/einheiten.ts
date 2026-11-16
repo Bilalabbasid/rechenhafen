@@ -1,7 +1,7 @@
 import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 import { EXTRA_EINHEITEN_KOCHEN } from '../extra/einheitenKochen';
-import { calculateLengthConversion } from '@/lib/calculators/einheiten';
+import { calculateLengthConversion, calculateTemperatureConversion } from '@/lib/calculators/einheiten';
 import { PageContentMap } from './types';
 
 // ---------------------------------------------------------------------------
@@ -563,6 +563,40 @@ const len180In = Number(laenge(180, 'cm', 'in').primary.value);
 const len180Ft = Math.floor(len180In / 12);
 const len180Rest = len180In - len180Ft * 12;
 
+// ---------------------------------------------------------------------------
+// Temperatur
+// ---------------------------------------------------------------------------
+const temp = (value: number, fromUnit: string, toUnit: string) => {
+  const r = calculateTemperatureConversion({ value, fromUnit, toUnit });
+  if (r.error) throw new Error(`page-content/einheiten: Temperatur ${value} ${fromUnit} → ${r.error}`);
+  return Number(r.primary.value);
+};
+const OFEN_F = [300, 325, 350, 375, 400, 425, 450, 475];
+const ofenTable = table(
+  ['Rezeptangabe', 'genau umgerechnet', 'am Ofen einstellen (auf 5 °C gerundet)'],
+  OFEN_F.map((fahrenheit) => {
+    const c = temp(fahrenheit, 'F', 'C');
+    return [`${fahrenheit} °F`, `${n(c, 1)} °C`, `${n(Math.round(c / 5) * 5, 0)} °C`];
+  })
+);
+const t20F = temp(20, 'C', 'F');
+const t22F = temp(22, 'C', 'F');
+const t2F = temp(2, 'C', 'F');
+
+// ---------------------------------------------------------------------------
+// Binär / Hex / Dezimal
+// ---------------------------------------------------------------------------
+const zahlensystem = engine('binaer-hex-dezimal-umrechner');
+const dezimalNach = (value: number) => zahlensystem({ mode: 'convert', inputBase: '10', numberValue: String(value) });
+const neg13 = dezimalNach(-13);
+const zk13 = dezimalNach(256 - 13);
+const zk1 = dezimalNach(256 - 1);
+const zk128 = dezimalNach(256 - 128);
+const bitRows = [8, 16, 32].map((bits) => {
+  const max = dezimalNach(2 ** bits - 1);
+  return [`${bits} Bit`, `0 bis ${shown(max, 'decimal')}`, shown(max, 'hex'), `−${n(2 ** (bits - 1), 0)} bis ${n(2 ** (bits - 1) - 1, 0)}`];
+});
+
 export const EINHEITEN_PAGE_CONTENT: PageContentMap = {
   'volumen-umrechner': {
     sections: [
@@ -1121,6 +1155,30 @@ export const EINHEITEN_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Ist eine Meile in den USA und in Großbritannien gleich lang?',
         answer: 'Ja, beide verwenden seit 1959 die internationale Meile mit genau 1.609,344 m. In den USA gab es daneben für die Landvermessung noch die „Survey Mile“, die um rund 3 mm länger war. Sie wurde Ende 2022 offiziell abgeschafft, für Alltag und Navigation hatte der Unterschied ohnehin keine Bedeutung.',
+      },
+    ],
+  },
+
+  'temperatur-umrechner': {
+    sections: [
+      {
+        title: 'Backofen-Temperaturen aus amerikanischen Rezepten',
+        content: `US-Rezepte geben die Ofentemperatur fast immer in Fahrenheit an, meist in Schritten von 25 °F. Deutsche Backöfen lassen sich dagegen oft nur in 5- oder 10-Grad-Schritten einstellen. Die mittlere Spalte ist mit dem Rechner umgerechnet, die rechte auf 5 °C gerundet:\n\n${ofenTable}\n\nAmerikanische Rezepte beziehen sich in der Regel auf Ober-/Unterhitze. Ob und wie weit Sie bei Umluft herunterregeln, steht in der Anleitung Ihres Backofens. Beim Grillen und Frittieren lohnt sich ein Thermometer, denn dort entscheiden wenige Grad über das Ergebnis.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie rechne ich einen Temperaturunterschied von Celsius in Fahrenheit um?',
+        answer: `Bei Differenzen fällt die 32 weg, es zählt nur der Faktor 1,8. Steigt die Raumtemperatur von 20 °C (${n(t20F, 1)} °F) auf 22 °C (${n(t22F, 1)} °F), ist das ein Plus von ${n(t22F - t20F, 1)} °F. Wer die 2 Grad Unterschied wie eine Temperatur umrechnet, erhält fälschlich ${n(t2F, 1)} °F. Ein Unterschied von 1 K ist dagegen genau so groß wie 1 °C.`,
+      },
+    ],
+  },
+
+  'binaer-hex-dezimal-umrechner': {
+    sections: [
+      {
+        title: 'Negative Zahlen: Minuszeichen oder Zweierkomplement?',
+        content: `Der Rechner stellt negative Zahlen mit Minuszeichen dar, so wie man sie von Hand schreibt: −13 ist ${shown(neg13, 'hex')} hexadezimal und ${shown(neg13, 'binary')} binär. Computer speichern ganze Zahlen dagegen meist im Zweierkomplement mit fester Bitbreite. Bei 8 Bit rechnet man dafür 256 − 13 = 243 und wandelt diese Zahl um:\n\n- −13 → 243 → ${shown(zk13, 'binary')} (Hex ${shown(zk13, 'hex')})\n- −1 → 255 → ${shown(zk1, 'binary')} (Hex ${shown(zk1, 'hex')})\n- −128 → 128 → ${shown(zk128, 'binary')} (Hex ${shown(zk128, 'hex')})\n\nAm höchsten Bit erkennen Sie das Vorzeichen: Ist es 1, ist die Zahl negativ. Bei 16 oder 32 Bit nehmen Sie statt 256 die Zahl 65.536 bzw. 4.294.967.296. Wenn ein Programm F3 als −13 anzeigt, ist das also kein Rechenfehler, sondern eine andere Darstellung.\n\nWelche Zahlen in eine Bitbreite passen, zeigt die Übersicht. Ohne Vorzeichen reicht der Bereich von 0 bis 2^n − 1, mit Vorzeichen von −2^(n−1) bis 2^(n−1) − 1:\n\n${table(['Bitbreite', 'ohne Vorzeichen', 'Höchstwert in Hex', 'mit Vorzeichen (Zweierkomplement)'], bitRows)}`,
       },
     ],
   },

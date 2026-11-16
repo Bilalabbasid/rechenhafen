@@ -1,5 +1,5 @@
 import { CalculationResult } from '@/types/calculator';
-import { calculatePricePerSquareMeter } from '@/lib/calculators/wohnen';
+import { calculatePricePerSquareMeter, calculateRentBudget, calculateMieterhoehung } from '@/lib/calculators/wohnen';
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/formatters';
 import { EXTRA_WOHNEN_HAUSHALT } from '../extra/wohnenHaushalt';
 import { PageContentMap, PageContentOverlay } from './types';
@@ -767,6 +767,103 @@ function warmmiete(): PageContentOverlay {
   };
 }
 
+// ---------------------------------------------------------------------------
+// mietbudget-rechner
+// ---------------------------------------------------------------------------
+function mietbudget(): PageContentOverlay {
+  const budget = (net: number, quote: number) => Number(calculateRentBudget({ netIncome: net, targetPercent: String(quote) }).primary.value);
+  const quotes = [25, 30, 35, 40];
+  const rows = [1500, 2000, 2500, 3000, 3500, 4000, 5000]
+    .map((net) => `| ${eur(net)} | ${quotes.map((q) => eur(budget(net, q))).join(' | ')} |`)
+    .join('\n');
+  const rent = 1000;
+  // Nötiges Einkommen: Budget(Einkommen) = Miete, also Einkommen = Miete ÷ Quote; Gegenprobe mit dem Rechner.
+  const need30 = rent / 0.3;
+  const need35 = rent / 0.35;
+  const check30 = budget(need30, 30);
+  return {
+    sections: [
+      {
+        title: 'Mietbudget nach Einkommen und Mietquote',
+        content:
+          'Höchstens tragbare Warmmiete im Monat, abhängig vom Haushaltsnetto:\n\n' +
+          `| Haushaltsnetto | 25 % | 30 % | 35 % | 40 % |\n| --- | --- | --- | --- | --- |\n${rows}\n\n` +
+          'Paare und Familien rechnen mit dem gemeinsamen Netto, einschließlich Kindergeld und regelmäßiger Unterhaltszahlungen. Haben Sie hohe andere Fixkosten, etwa eine Kreditrate oder ein Auto, orientieren Sie sich eher an der 25-%-Spalte. Bei unregelmäßigem Einkommen wie Provisionen oder Selbstständigkeit setzen Sie das Netto eines schwachen Monats an, nicht den Durchschnitt.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel muss ich verdienen, um 1.000 € Warmmiete zu bezahlen?',
+        answer: `Nach der 30-%-Regel ${eur(need30)} netto im Monat, denn ${eur(need30)} × 30 % = ${eur(check30)}. Mit 35 % Mietquote reichen ${eur(need35)}. Vermieter, die das Dreifache der Warmmiete als Einkommen erwarten, wollen ${eur(rent * 3)} sehen; bei einem Paar zählt in der Regel das Einkommen beider Hauptmieter.`,
+      },
+    ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// vorfaelligkeitsentschaedigung-baufinanzierung-rechner
+// ---------------------------------------------------------------------------
+function vorfaelligkeit(): PageContentOverlay {
+  const slug = 'vorfaelligkeitsentschaedigung-baufinanzierung-rechner';
+  const est = (diff: number, years: number) =>
+    Number(run(slug, { loanType: 'baufinanzierung', remainingDebt: 200000, contractRate: 2 + diff, reinvestmentRate: 2, remainingYears: years }).primary.value);
+  const diffs = [0.5, 1, 1.5, 2, 2.5];
+  const years = [2, 4, 6, 8];
+  const rows = diffs
+    .map((d) => `| ${formatNumber(d, 1)} ${d === 1 ? 'Prozentpunkt' : 'Prozentpunkte'} | ${years.map((y) => eur(est(d, y))).join(' | ')} |`)
+    .join('\n');
+  const smallDiff = est(0.5, 4);
+  const bigDiff = est(2, 4);
+  return {
+    sections: [
+      {
+        title: 'Größenordnung nach Zinsdifferenz und Restlaufzeit',
+        content:
+          'Geschätzte Entschädigung für 200.000 € Restschuld nach der Näherung dieses Rechners. Zinsdifferenz = Vertragszins minus Wiederanlagerendite:\n\n' +
+          `| Zinsdifferenz | 2 Jahre | 4 Jahre | 6 Jahre | 8 Jahre |\n| --- | --- | --- | --- | --- |\n${rows}\n\n` +
+          `Zwei Größen treiben die Forderung: wie viel teurer Ihr Vertrag als das heutige Zinsniveau ist und wie lange die Zinsbindung noch läuft. Bei 4 Jahren Rest kostet ein halber Prozentpunkt Differenz geschätzt ${eur(smallDiff)}, zwei Prozentpunkte dagegen ${eur(bigDiff)}. Ist Ihr Vertragszins niedriger als die aktuelle Pfandbriefrendite, entsteht meist gar kein Zinsschaden. Die Tabelle ersetzt nicht die Abrechnung der Bank, zeigt aber, ob deren Betrag grob plausibel ist.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Darf ich eine Baufinanzierung vor Ende der Zinsbindung überhaupt kündigen?',
+        answer: 'Nur mit einem berechtigten Interesse. Nach § 490 Abs. 2 BGB können Sie ein Darlehen mit festem Sollzins, das durch eine Grundschuld gesichert ist, mit der Frist des § 488 Abs. 3 Satz 2 BGB (drei Monate) kündigen, wenn seit der vollständigen Auszahlung sechs Monate vergangen sind und Sie die Immobilie anderweitig verwerten wollen, typischerweise beim Verkauf. Dann schulden Sie die Vorfälligkeitsentschädigung. Wollen Sie nur umschulden, weil die Zinsen gefallen sind, muss die Bank nicht zustimmen; möglich ist dann nur ein Aufhebungsvertrag zu ihren Bedingungen.',
+      },
+    ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// mieterhoehung-rechner
+// ---------------------------------------------------------------------------
+function mieterhoehung(): PageContentOverlay {
+  const cap = (base: number, rate: string) =>
+    Number(
+      calculateMieterhoehung({ increaseType: 'vergleichsmiete', currentRent: base, entryMode: 'amount', proposedRent: base, rentThreeYearsAgo: base, comparableRent: 0, kappungsgrenze: rate }).primary.value,
+    );
+  const rows = [500, 700, 900, 1100, 1300]
+    .map((b) => `| ${eur(b)} | ${eur(cap(b, '20'))} | ${eur(cap(b, '15'))} | ${eur(cap(b, '20') - cap(b, '15'))} |`)
+    .join('\n');
+  return {
+    sections: [
+      {
+        title: 'Höchste Miete nach der Kappungsgrenze',
+        content:
+          'Obergrenze nach drei Jahren, wenn in dieser Zeit keine andere Erhöhung nach § 558 BGB erfolgt ist. Die ortsübliche Vergleichsmiete kann die Grenze weiter senken:\n\n' +
+          `| Kaltmiete vor 3 Jahren | Grenze bei 20 % | Grenze bei 15 % | Unterschied pro Monat |\n| --- | --- | --- | --- |\n${rows}\n\n` +
+          `Hat der Vermieter innerhalb der drei Jahre schon einmal erhöht, zählt diese Erhöhung mit. Beispiel: Die Miete stieg vor 18 Monaten von ${eur(700)} auf ${eur(770)}. Bei 15 % Kappungsgrenze sind insgesamt höchstens ${eur(cap(700, '15'))} erlaubt, also nur noch ${eur(cap(700, '15') - 770)} mehr, auch wenn der Mietspiegel deutlich mehr hergäbe. ` +
+          'Tragen Sie deshalb im Rechner die Miete ein, die genau drei Jahre vor dem geplanten Erhöhungstermin galt.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Gilt die Mietpreisbremse auch für Mieterhöhungen im laufenden Vertrag?',
+        answer: 'Nein. Die Mietpreisbremse (§ 556d BGB) begrenzt nur die Miete zu Beginn eines neuen Mietvertrags: In Gebieten, die eine Landesverordnung als angespannten Wohnungsmarkt ausweist, darf sie die ortsübliche Vergleichsmiete höchstens um 10 % übersteigen; Ausnahmen gelten etwa für Neubauten und nach umfassender Modernisierung. Solche Verordnungen müssen spätestens mit Ablauf des 31. Dezember 2029 außer Kraft treten. Im laufenden Mietverhältnis gelten dagegen Kappungsgrenze und Vergleichsmiete nach § 558 BGB, wie sie dieser Rechner prüft.',
+      },
+    ],
+  };
+}
+
 export const WOHNEN_PAGE_CONTENT: PageContentMap = {
   'quadratmeterpreis-rechner': quadratmeterpreis(),
   'mietrendite-brutto-netto-rechner': mietrendite(),
@@ -785,4 +882,7 @@ export const WOHNEN_PAGE_CONTENT: PageContentMap = {
   'mietkaution-zinsen-rechner': mietkaution(),
   'modernisierungsumlage-rechner': modernisierungsumlage(),
   'warmmiete-rechner': warmmiete(),
+  'mietbudget-rechner': mietbudget(),
+  'vorfaelligkeitsentschaedigung-baufinanzierung-rechner': vorfaelligkeit(),
+  'mieterhoehung-rechner': mieterhoehung(),
 };

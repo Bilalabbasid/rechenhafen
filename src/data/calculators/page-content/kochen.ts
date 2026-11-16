@@ -478,6 +478,79 @@ const BOOZE_60 = booze(250, 13, 'simmer60', 4);
 const BOOZE_RUM = booze(40, 40, 'flambee', 4);
 const BEER_BOTTLE_G = num(run('cocktail-alkoholgehalt-rechner', { spiritMl: 330, spiritVolPct: 5, liqueurMl: 0, liqueurVolPct: 20, fillerMl: 0, iceMeltMl: 0 }), 'pureAlcohol');
 
+// ---------------------------------------------------------------------------
+// Zucker-Ersatz
+// ---------------------------------------------------------------------------
+const sugarSub = (sugarGrams: number, substitute: string) => run('zucker-ersatz-rechner', { direction: 'sugar_to_sub', sugarGrams, substitute });
+const SUGAR_SUBS: Array<[string, string]> = [
+  ['erythrit', 'Erythrit'],
+  ['xylit', 'Xylit'],
+  ['honey', 'Honig'],
+  ['agave', 'Agavendicksaft'],
+  ['stevia', 'Stevia-Streusüße „1:1“'],
+];
+const SUGAR_TABLE = table(
+  ['Ersatz für 100 g Zucker', 'Menge', 'Weniger kcal als Zucker', 'Teigflüssigkeit reduzieren'],
+  SUGAR_SUBS.map(([k, name]) => {
+    const r = sugarSub(100, k);
+    const liquid = num(r, 'liquidTip');
+    return [name, txt(r, 'subGrams'), `ca. ${n(num(r, 'savedCalories'), 0)} kcal`, liquid > 0 ? `ca. ${n(liquid, 0)} ml` : '–'];
+  }),
+);
+const SUGAR_HONEY_200 = sugarSub(200, 'honey');
+
+// ---------------------------------------------------------------------------
+// Reis
+// ---------------------------------------------------------------------------
+const rice = (riceGrams: number, riceType: string) => run('wasser-reis-verhaeltnis-rechner', { riceGrams, riceType });
+const RICE_MAIN_G = 115;
+const riceMl = (g: number, type: string) => `${n(num(rice(g, type), 'waterMl'), 0)} ml`;
+const RICE_TABLE = table(
+  ['Personen', 'Trockenreis', 'Wasser Basmati', 'Wasser Jasmin', 'Wasser Vollkorn', 'Gekocht (Basmati)'],
+  [1, 2, 3, 4, 6, 8].map((p) => {
+    const g = p * RICE_MAIN_G;
+    return [`${p}`, g0(g), riceMl(g, 'basmati'), riceMl(g, 'jasmine'), riceMl(g, 'wholegrain'), txt(rice(g, 'basmati'), 'cookedYield').replace(' (Richtwert)', '')];
+  }),
+);
+const RICE_TYPES: Array<[string, string]> = [
+  ['basmati', 'Basmati'],
+  ['jasmine', 'Jasmin'],
+  ['wholegrain', 'Vollkorn'],
+  ['sushi', 'Sushi'],
+  ['risotto', 'Risotto'],
+];
+const RICE_YIELD_100 = RICE_TYPES.map(([k, name]) => `${name} ${g0(num(rice(100, k), 'cookedYield'))}`).join(', ');
+
+// ---------------------------------------------------------------------------
+// Nudeln
+// ---------------------------------------------------------------------------
+const pasta = (inputs: Record<string, any>) => run('nudeln-rohmaerk-gewicht-rechner', inputs);
+const PASTA_250_ALDENTE = pasta({ mode: 'cooked_to_dry', cookedGrams: 250, factorPreset: 'aldente' });
+const PASTA_250_SOFT = pasta({ mode: 'cooked_to_dry', cookedGrams: 250, factorPreset: 'soft' });
+const PASTA_250_FRESH = pasta({ mode: 'cooked_to_dry', cookedGrams: 250, factorPreset: 'fresh' });
+const PASTA_PARTY = pasta({ mode: 'portion_plan', factorPreset: 'aldente', personsCount: 20, mealType: 'mainDish' });
+const PASTA_PARTY_SIDE = pasta({ mode: 'portion_plan', factorPreset: 'aldente', personsCount: 20, mealType: 'sideDish' });
+
+// ---------------------------------------------------------------------------
+// Esslöffel / Teelöffel
+// ---------------------------------------------------------------------------
+const spoon = (ingredient: string, spoonType: string, spoonsCount = 1) => run('essloeffel-teeloeffel-gramm-rechner', { mode: 'spoons', ingredient, spoonType, spoonsCount });
+const SPOON_INGREDIENTS: Array<[string, string]> = [
+  ['sugar', 'Zucker'],
+  ['flour', 'Weizenmehl'],
+  ['salt', 'Salz'],
+  ['butter', 'Butter (weich)'],
+  ['honey', 'Honig'],
+  ['cocoa', 'Kakaopulver'],
+];
+const per100 = (ingredient: string, spoonType: string) => n(100 / num(spoon(ingredient, spoonType), 'perSpoon'), 1);
+const SPOON_TABLE = table(
+  ['100 g …', 'gestrichene EL', 'gehäufte EL', 'gestrichene TL'],
+  SPOON_INGREDIENTS.map(([k, name]) => [name, per100(k, 'elLevel'), per100(k, 'elHeaped'), per100(k, 'tlLevel')]),
+);
+const SPOON_BUTTER_EL = num(spoon('butter', 'elLevel'), 'perSpoon');
+const SPOON_BUTTER_ELH = num(spoon('butter', 'elHeaped'), 'perSpoon');
+
 export const KOCHEN_PAGE_CONTENT: PageContentMap = {
   'eiweiss-eigelb-ersatz-rechner': {
     sections: [
@@ -979,6 +1052,66 @@ export const KOCHEN_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Verdunstet Alkohol im Backofen schneller als im Topf?',
         answer: 'Nicht grundsätzlich. Die USDA-Daten nennen für Gebäck, das 25 Minuten gebacken wird, ohne dass der Alkohol eingerührt ist, rund 45 % verbleibenden Alkohol. Im Inneren eines Kuchens wird es zudem nicht heißer als etwa 100 °C. Ist der Alkohol gut eingerührt, gelten ähnliche Werte wie beim Köcheln.',
+      },
+    ],
+  },
+
+  'zucker-ersatz-rechner': {
+    sections: [
+      {
+        title: 'Alle Alternativen im Vergleich: Was ersetzt 100 g Zucker?',
+        content: `Ergebnisse dieses Rechners für 100 g Haushaltszucker. Die Mengen gleichen nur die Süße aus:\n\n${SUGAR_TABLE}\n\nSo wählen Sie aus: Erythrit braucht die größte Menge und bringt keine Kalorien, verhält sich im Teig aber anders als Zucker. Xylit lässt sich 1:1 tauschen, hat aber Kalorien und ist für Hunde giftig. Honig und Agavendicksaft sind flüssig und süßen stärker. Sie sparen deshalb Menge und einen Teil der Kalorien, deutlich weniger als Erythrit, und der Teig braucht weniger Flüssigkeit. Bei Stevia-Streusüße „1:1“ handelt es sich um Mischprodukte. Ob die Menge und der Kaloriengehalt stimmen, steht auf der jeweiligen Packung.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Honig nehme ich statt 200 g Zucker, und wie viel weniger Milch?',
+        answer: `Der Rechner setzt dafür ${txt(SUGAR_HONEY_200, 'subGrams')} Honig an. Als Faustregel reduzieren Sie die Flüssigkeit im Teig, etwa Milch oder Wasser, um ca. ${n(num(SUGAR_HONEY_200, 'liquidTip'), 0)} ml. Senken Sie außerdem die Backtemperatur leicht oder decken Sie den Kuchen gegen Ende ab, weil Honig schneller bräunt als Zucker.`,
+      },
+    ],
+  },
+
+  'wasser-reis-verhaeltnis-rechner': {
+    sections: [
+      {
+        title: 'Reis und Wasser für 1 bis 8 Personen',
+        content: `Gerechnet mit ${RICE_MAIN_G} g Trockenreis pro Person als Hauptgericht, der Portionsgröße dieses Rechners:\n\n${RICE_TABLE}\n\nAls Beilage reichen etwa 65 g pro Person. Dann halbieren Sie die Mengen grob. Bei großen Mengen nehmen Sie einen breiten Topf, damit die Reisschicht nicht zu hoch wird und oben wie unten gleichmäßig gart. Der Rechner skaliert das Verhältnis von Reis zu Wasser linear, bei doppelter Reismenge also auch doppelt so viel Wasser.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel gekochter Reis wird aus 100 g Trockenreis?',
+        answer: `Nach den Richtwerten dieses Rechners: ${RICE_YIELD_100}. Der Reis wird höchstens so schwer wie Reis und Wasser zusammen, weil er nur die Flüssigkeit im Topf aufnehmen kann. Etwas Dampf entweicht immer, bei langer Garzeit wie bei Vollkornreis mehr. Wiegen Sie den fertigen Reis, wenn Sie Kalorien zählen, und rechnen Sie mit den Nährwerten für ungekochten Reis zurück.`,
+      },
+    ],
+  },
+
+  'nudeln-rohmaerk-gewicht-rechner': {
+    sections: [
+      {
+        title: 'Gekochte Nudeln abwiegen und Nährwerte richtig zählen',
+        content: `Die Nährwerte auf der Nudelpackung beziehen sich in der Regel auf die ungekochte Ware. Wer gekochte Nudeln auf dem Teller wiegt, muss deshalb zurückrechnen:\n\n1. **Gekochte Menge wiegen:** zum Beispiel 250 g auf dem Teller.\n2. **Durch den Quellfaktor teilen:** Al dente (2,3) ergibt das ${txt(PASTA_250_ALDENTE, 'rawPasta')}, weich gekocht (2,5) ${txt(PASTA_250_SOFT, 'rawPasta')}.\n3. **Packungswerte anwenden:** Die Nährwerte pro 100 g auf der Packung gelten für dieses Trockengewicht.\n\nBei frischer Pasta aus dem Kühlregal sind es für 250 g gekocht ${txt(PASTA_250_FRESH, 'rawPasta')}. Der häufigste Fehler ist, die gekochte Menge direkt mit den Packungswerten zu rechnen. Dann zählen Sie mehr als doppelt so viele Kalorien, wie Sie gegessen haben.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viele Nudeln brauche ich für 20 Personen?',
+        answer: `Als Hauptgericht rechnet der Rechner mit ${txt(PASTA_PARTY, 'rawPasta')}, das ergibt ${txt(PASTA_PARTY, 'cookedPasta')}. Als Beilage oder am Buffet mit mehreren Gerichten genügen ${txt(PASTA_PARTY_SIDE, 'rawPasta')}. Für die Hauptgericht-Menge bräuchten Sie ${txt(PASTA_PARTY, 'waterReq')}. Das passt in keinen Haushaltstopf: Kochen Sie in mehreren Durchgängen oder in zwei Töpfen gleichzeitig.`,
+      },
+    ],
+  },
+
+  'essloeffel-teeloeffel-gramm-rechner': {
+    sections: [
+      {
+        title: 'Wie viele Löffel ergeben 100 g?',
+        content: `Die Umkehrung der Löffeltabelle, berechnet mit den Löffelgewichten dieses Rechners:\n\n${SPOON_TABLE}\n\nNützlich ist das, wenn ein Rezept Gramm angibt, Sie aber keine Waage zur Hand haben. Runden Sie auf halbe Löffel und nehmen Sie bei Salz, Backpulver und Kakao lieber etwas weniger. Diese Zutaten bestimmen den Geschmack stark, ein Löffel zu viel lässt sich kaum ausgleichen. Bei Mehl und Zucker in Teigen fallen kleine Abweichungen weniger auf.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viele Esslöffel sind 50 g Butter?',
+        answer: `Mit weicher Butter rechnet der Rechner mit ${g0(SPOON_BUTTER_EL)} pro gestrichenem und ${g0(SPOON_BUTTER_ELH)} pro gehäuftem Esslöffel. 50 g sind also etwa ${n(50 / SPOON_BUTTER_EL, 1)} gestrichene oder ${n(50 / SPOON_BUTTER_ELH, 1)} gehäufte Esslöffel. Bei kalter Butter aus dem Kühlschrank ist das Abmessen mit dem Löffel ungenau. Schneiden Sie dann lieber ab: Ein Fünftel eines 250-g-Stücks sind 50 g.`,
       },
     ],
   },

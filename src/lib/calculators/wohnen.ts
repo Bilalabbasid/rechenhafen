@@ -27,7 +27,7 @@ export function calculateRentBurden(inputs: Record<string, any>): CalculationRes
   const ratio = (warmRent / netIncome) * 100;
   const remaining = netIncome - warmRent;
 
-  let assessment = 'Optimal (unter 30 %)';
+  let assessment = 'Optimal (bis 30 %)';
   if (ratio > 40) {
     assessment = 'Kritisch hoch (über 40 % des Einkommens)';
   } else if (ratio > 30) {
@@ -298,9 +298,10 @@ export function calculatePricePerSquareMeter(inputs: Record<string, any>): Calcu
 }
 
 export function calculateRentBudget(inputs: Record<string, any>): CalculationResult {
+  // Leeres Feld = keine Eingabe, kein stiller Ersatzwert.
   const rawIncome = inputs.netIncome !== undefined && inputs.netIncome !== null && String(inputs.netIncome).trim() !== ''
-    ? parseFloat(inputs.netIncome)
-    : 3000;
+    ? parseFloat(String(inputs.netIncome).replace(',', '.'))
+    : NaN;
   if (isNaN(rawIncome) || rawIncome <= 0) {
     return {
       primary: { id: 'maxRent', label: 'Maximal empfohlene Warmmiete', value: 0, formattedValue: '0,00 €' },
@@ -519,16 +520,16 @@ export function calculateMieterhoehung(inputs: Record<string, any>): Calculation
       const demandDate = new Date(demandDateParts.year, demandDateParts.month - 1, demandDateParts.day);
       const lastIncDate = new Date(lastIncreaseParts.year, lastIncreaseParts.month - 1, lastIncreaseParts.day);
 
-      // 1. Wartefrist: frühestens 1 Jahr nach letzter Erhöhung geltend machen (§ 558 Abs. 1 Satz 1 BGB)
+      // 1. Wartefrist: frühestens 1 Jahr nach letzter Erhöhung geltend machen (§ 558 Abs. 1 Satz 2 BGB)
       const earliestDemandDate = new Date(lastIncreaseParts.year + 1, lastIncreaseParts.month - 1, lastIncreaseParts.day);
       const waitingPeriodPassed = demandDate.getTime() >= earliestDemandDate.getTime();
       if (!waitingPeriodPassed) {
         timingWarnings.push(
-          `Wartefrist verletzt (§ 558 Abs. 1 Satz 1 BGB): Das Erhöhungsverlangen ging am ${formatDateDe(demandDate)} zu, frühestens zulässig wäre der ${formatDateDe(earliestDemandDate)} (12 Monate nach letzter Erhöhung).`
+          `Wartefrist verletzt (§ 558 Abs. 1 Satz 2 BGB): Das Erhöhungsverlangen ging am ${formatDateDe(demandDate)} zu, frühestens zulässig wäre der ${formatDateDe(earliestDemandDate)} (12 Monate nach letzter Erhöhung).`
         );
       }
 
-      // 2. 15-Monate-Frist bei Wirksamwerden (§ 558 Abs. 1 Satz 2 BGB):
+      // 2. 15-Monate-Frist bei Wirksamwerden (§ 558 Abs. 1 Satz 1 BGB):
       let req15Year = lastIncreaseParts.year;
       let req15Month = lastIncreaseParts.month + 15;
       if (req15Month > 12) {
@@ -540,7 +541,7 @@ export function calculateMieterhoehung(inputs: Record<string, any>): Calculation
 
       if (!fifteenMonthsPassed) {
         timingWarnings.push(
-          `15-Monate-Sperrfrist beachten (§ 558 Abs. 1 Satz 2 BGB): Bei Zahlung zum ${formatDateDe(earliestPayDate)} wäre die Miete noch nicht seit 15 Monaten unverändert. Die Miete darf frühestens ab dem ${formatDateDe(earliest15Date)} steigen.`
+          `15-Monate-Sperrfrist beachten (§ 558 Abs. 1 Satz 1 BGB): Bei Zahlung zum ${formatDateDe(earliestPayDate)} wäre die Miete noch nicht seit 15 Monaten unverändert. Die Miete darf frühestens ab dem ${formatDateDe(earliest15Date)} steigen.`
         );
       }
     }

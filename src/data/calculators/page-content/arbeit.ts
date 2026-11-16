@@ -1,7 +1,10 @@
 import { PageContentMap } from './types';
 import { CalculationResult } from '@/types/calculator';
 import { EXTRA_AUTO_ARBEIT } from '../extra/autoArbeit';
-import { calculateBruttoNetto, calculateMinijob } from '@/lib/calculators/steuernGehalt';
+import {
+  calculateBruttoNetto, calculateMinijob, calculateEinkommensteuer, calculateAbfindung, calculateGewerbesteuer, calculateRenteBruttoNetto,
+} from '@/lib/calculators/steuernGehalt';
+import { calculateSplittingvorteil, calculateMinijobStunden } from '@/lib/calculators/steuerRecht';
 import { calculateHourlyWage, calculateSalaryIncrease, calculatePartTimeSalary } from '@/lib/calculators/arbeit';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { MINIJOB_PERIODS, WEEKS_PER_MONTH } from '@/data/regulated/minijob';
@@ -261,6 +264,114 @@ const MJ_XMAS_MONTHLY = 560;
 const MJ_XMAS_BONUS = 500;
 const MJ_XMAS_TOTAL = MJ_XMAS_MONTHLY * 12 + MJ_XMAS_BONUS;
 const MJ_RV_RATE = LEGAL_VALUES_2026.beitragssatzRentenversicherung.value;
+
+// ---------------------------------------------------------------------------
+// Brutto-Netto-Rechner: Netto bei 3.000 € nach Steuerklasse
+// ---------------------------------------------------------------------------
+const bnNet = (gross: number, taxClass: string) => Number(calculateBruttoNetto({ ...BN_BASE, taxClass, grossSalary: gross, period: 'month' }).primary.value);
+const BN_3000 = { i: bnNet(3000, '1'), iii: bnNet(3000, '3'), v: bnNet(3000, '5') };
+
+// ---------------------------------------------------------------------------
+// Einkommensteuerrechner: Tariftabelle 2026, Vergleich mit 2025
+// ---------------------------------------------------------------------------
+const est = (zve: number, year = '2026', tariff = 'single') => calculateEinkommensteuer({ mode: 'zve', taxableIncome: zve, taxYear: year, tariffType: tariff, churchTaxRate: '0' });
+const EST_TABLE = [20000, 30000, 40000, 50000, 60000, 80000, 100000]
+  .map((z) => {
+    const g = est(z);
+    return `| ${eur0(z)} | ${txt(g, 'einkommensteuer')} | ${txt(g, 'avgTaxRate')} | ${txt(g, 'marginalRate')} | ${txt(g, 'solz')} | ${txt(est(z, '2026', 'splitting'), 'einkommensteuer')} |`;
+  })
+  .join('\n');
+const estDiff = (z: number) => num(est(z, '2025'), 'einkommensteuer') - num(est(z), 'einkommensteuer');
+
+// ---------------------------------------------------------------------------
+// Ehegattensplitting: Vorteil nach Aufteilung des gemeinsamen Einkommens
+// ---------------------------------------------------------------------------
+const spv = (a: number, b: number) => calculateSplittingvorteil({ incomeA: a, incomeB: b, taxYear: '2026' });
+const SP_SHARES = [1, 0.75, 0.6, 0.5];
+const SP_TABLE = [60000, 80000, 100000, 120000]
+  .map((t) => `| ${eur0(t)} | ${SP_SHARES.map((s) => txt(spv(t * s, t * (1 - s)), 'vorteil')).join(' | ')} |`)
+  .join('\n');
+const SP_100_ALONE = txt(spv(100000, 0), 'vorteil');
+const SP_100_6040 = txt(spv(60000, 40000), 'vorteil');
+const SP_HIGH_BOTH = spv(225000, 75000);
+
+// ---------------------------------------------------------------------------
+// Abfindung: gleiche Abfindung, unterschiedliches übriges Einkommen
+// ---------------------------------------------------------------------------
+const AB_AMOUNT = 40000;
+const abf = (reg: number) => calculateAbfindung({ regularIncome: reg, abfindung: AB_AMOUNT, taxYear: '2026' });
+const AB_ROWS = [0, 15000, 30000, 45000, 70000].map((reg) => ({ reg, r: abf(reg) }));
+const AB_TABLE = AB_ROWS.map((x) => `| ${eur0(x.reg)} | ${txt(x.r, 'taxFuenftel')} | ${txt(x.r, 'taxRegular')} | ${txt(x.r, 'taxSavings')} | ${txt(x.r, 'netAbfindung')} |`).join('\n');
+const AB_LOW = AB_ROWS[1].r;
+const AB_MID = AB_ROWS[3].r;
+const AB_HIGH = AB_ROWS[4].r;
+
+// ---------------------------------------------------------------------------
+// Gewerbesteuer: Hebesatz und Anrechnung nach § 35 EStG
+// ---------------------------------------------------------------------------
+const GW_ERTRAG = 80000;
+const gws = (form: string, hebesatz: number) => calculateGewerbesteuer({ legalForm: form, gewerbeertrag: GW_ERTRAG, hebesatz, taxYear: '2026' });
+const GW_TABLE = [200, 300, 400, 450, 490]
+  .map((h) => {
+    const e = gws('einzelunternehmen', h);
+    const gst = num(e, 'gewerbesteuer');
+    const credit = num(e, 'estCreditPotential');
+    return `| ${h} % | ${eur(gst)} | ${eur(credit)} | ${eur(gst - credit)} | ${txt(gws('kapitalgesellschaft', h), 'gewerbesteuer')} |`;
+  })
+  .join('\n');
+const GW_MESS = num(gws('einzelunternehmen', 400), 'steuermessbetrag');
+const GW_ZERLEGUNG = GW_MESS * 0.6 * 4 + GW_MESS * 0.4 * 3;
+
+// ---------------------------------------------------------------------------
+// Renten-Brutto-Netto: Tabelle und Schwelle für Einkommensteuer
+// ---------------------------------------------------------------------------
+const RN_BASE = { retirementYear: '2026', additionalHealthRate: 2.9, careInsuranceOption: '1_child' };
+const rente = (gross: number, year = '2026') => calculateRenteBruttoNetto({ ...RN_BASE, grossPension: gross, retirementYear: year });
+const RN_TABLE = [1000, 1300, 1500, 1800, 2200, 2600, 3000]
+  .map((p) => {
+    const r = rente(p);
+    return `| ${eur0(p)} | ${eur(num(r, 'kvdr') + num(r, 'pvdr'))} | ${txt(r, 'payoutAfterSocial')} | ${txt(r, 'est')} | ${txt(r, 'netPension')} |`;
+  })
+  .join('\n');
+function firstTaxedPension(year: string): number {
+  for (let p = 500; p <= 4000; p += 5) if (num(rente(p, year), 'est') > 0) return p;
+  return NaN;
+}
+const RN_TAX_FROM_2026 = firstTaxedPension('2026');
+
+// ---------------------------------------------------------------------------
+// Minijob-Stunden: Stunden nach Stundenlohn 2026 und 2027
+// ---------------------------------------------------------------------------
+const mjs = (year: number, wage: number) => calculateMinijobStunden({ year: String(year), wageType: 'custom', hourlyWage: wage });
+const mjsCell = (year: number, wage: number) => {
+  const r = mjs(year, wage);
+  return r.error ? 'unter Mindestlohn | –' : `${txt(r, 'maxHoursMonth')} | ${txt(r, 'maxHoursWeek')}`;
+};
+const MJS_WAGES = [MINDESTLOHN_2026, MINDESTLOHN_2027, 15, 16, 18, 20];
+const MJS_TABLE = MJS_WAGES.map((w) => `| ${eur(w)} | ${mjsCell(2026, w)} | ${mjsCell(2027, w)} |`).join('\n');
+const MJS_YEAR_HOURS = txt(calculateMinijobStunden({ year: '2026', wageType: 'mindestlohn' }), 'maxHoursYear');
+
+// ---------------------------------------------------------------------------
+// Bürgergeld: Erwerbstätigenfreibetrag nach § 11b SGB II
+// ---------------------------------------------------------------------------
+const BG_BASE = { householdType: 'single', coldRent: 450, heatingCosts: 100 };
+const bgAllowance = (gross: number, withChild: boolean) =>
+  num(run('buergergeld-anspruch-rechner', { ...BG_BASE, grossEarnedIncome: gross, netEarnedIncome: gross, children6to13: withChild ? 1 : 0 }), 'earningsAllowance');
+const BG_TABLE = [100, 300, 520, MINIJOB_GRENZE_2026, 800, 1000, 1200, 1500]
+  .map((g) => `| ${eur(g)} | ${eur(bgAllowance(g, false))} | ${eur(bgAllowance(g, true))} | ${formatPercent((bgAllowance(g, false) / g) * 100, 1)} |`)
+  .join('\n');
+const BG_MINI = run('buergergeld-anspruch-rechner', { ...BG_BASE, grossEarnedIncome: MINIJOB_GRENZE_2026, netEarnedIncome: MINIJOB_GRENZE_2026 });
+const BG_NONE = run('buergergeld-anspruch-rechner', { ...BG_BASE });
+
+// ---------------------------------------------------------------------------
+// Sabbatical: proportional gekürztes Netto gegenüber Netto aus gekürztem Brutto
+// ---------------------------------------------------------------------------
+const SAB_ROWS = [3500, 4500, 6000].flatMap((g) => [0.75, 0.5].map((q) => {
+  const full = netMonthly(g);
+  return { g, q, prop: full * q, real: netMonthly(g * q) };
+}));
+const SAB_TABLE = SAB_ROWS.map((x) => `| ${eur0(x.g)} | ${formatPercent(x.q * 100, 0)} | ${eur(x.prop)} | ${eur(x.real)} | ${eur(x.real - x.prop)} |`).join('\n');
+const SAB_EX = SAB_ROWS.find((x) => x.g === 4500 && x.q === 0.5)!;
 
 export const ARBEIT_PAGE_CONTENT: PageContentMap = {
   'jahresgehalt-in-monatsgehalt-rechner': {
@@ -748,6 +859,157 @@ export const ARBEIT_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Habe ich im Minijob Anspruch auf Urlaub und Lohnfortzahlung bei Krankheit?',
         answer: 'Ja. Minijobber sind Arbeitnehmer mit denselben Rechten wie Vollzeitkräfte: bezahlter Urlaub nach dem Bundesurlaubsgesetz (anteilig nach Arbeitstagen pro Woche), Entgeltfortzahlung bis zu sechs Wochen bei Krankheit, Bezahlung an Feiertagen und mindestens der gesetzliche Mindestlohn. Die Umlage U1, die der Rechner beim Arbeitgeber einrechnet, erstattet ihm einen Teil der Lohnfortzahlung.',
+      },
+    ],
+  },
+
+  'brutto-netto-rechner': {
+    // Die Seite hat bereits 4 Abschnitte (Obergrenze laut merge-steuern-auto.test.ts); deshalb nur eine FAQ
+    // anstelle der entfernten, doppelten FAQ „Welche Abzüge fallen vom Bruttogehalt an?“.
+    faqs: [
+      {
+        question: 'Wie viel netto sind 3.000 € brutto 2026?',
+        answer: `In Steuerklasse I (und IV) ohne Kinder und ohne Kirchensteuer bleiben ${eur(BN_3000.i)} im Monat, in Steuerklasse III ${eur(BN_3000.iii)}, in Steuerklasse V nur ${eur(BN_3000.v)}. Die Sozialabgaben sind in allen Klassen gleich, der Unterschied liegt allein in der Lohnsteuer. Bei III/V legt erst der Steuerbescheid die Jahressteuer des Paares fest; die Steuererklärung ist dann Pflicht (§ 46 Abs. 2 Nr. 3a EStG) und kann zu einer Nachzahlung führen. Grundlage: 30 Jahre, kinderlos, gesetzlich versichert mit 2,9 % Zusatzbeitrag.`,
+      },
+    ],
+  },
+
+  einkommensteuerrechner: {
+    sections: [
+      {
+        title: 'Einkommensteuer-Tabelle 2026 (Auszug)',
+        content:
+          `Werte dieses Rechners ohne Kirchensteuer. Die letzte Spalte gilt für Ehepaare, deren gemeinsames zu versteuerndes Einkommen den Betrag der ersten Spalte erreicht.\n\n| zvE im Jahr | Einkommensteuer Grundtarif | Durchschnittssatz | Grenzsteuersatz | Soli | Einkommensteuer Splittingtarif |\n| --- | --- | --- | --- | --- | --- |\n${EST_TABLE}\n\n` +
+          'So lesen Sie die Tabelle: Der Durchschnittssatz ist der Anteil der Steuer am gesamten zvE, der Grenzsteuersatz die Belastung des nächsten Euros. Bei 50.000 € zvE gehen von 1.000 € mehr also gut ein Drittel an das Finanzamt, obwohl die Steuer insgesamt nur rund ein Fünftel des Einkommens ausmacht. Soli fällt in der Tabelle erst an, wenn die Einkommensteuer über 20.350 € liegt.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel weniger Einkommensteuer zahle ich 2026 als 2025?',
+        answer: `Bei gleichem zu versteuerndem Einkommen etwas weniger, weil der Grundfreibetrag von 12.096 € auf 12.348 € und die übrigen Tarifgrenzen angehoben wurden. Im Grundtarif sind es bei 30.000 € zvE ${eur(estDiff(30000))}, bei 60.000 € ${eur(estDiff(60000))} und bei 100.000 € ${eur(estDiff(100000))} weniger im Jahr. Die Entlastung gilt für dasselbe zvE; steigt Ihr Einkommen 2026, kann die Steuer trotzdem höher ausfallen als 2025.`,
+      },
+    ],
+  },
+
+  'ehegattensplitting-rechner': {
+    sections: [
+      {
+        title: 'Splittingvorteil 2026 nach Aufteilung des Einkommens',
+        content:
+          `Splittingvorteil im Jahr (Einkommensteuer und Soli) mit diesem Rechner. Spalten: Anteil des höher verdienenden Partners am gemeinsamen zu versteuernden Einkommen.\n\n| Gemeinsames zvE | 100 : 0 | 75 : 25 | 60 : 40 | 50 : 50 |\n| --- | --- | --- | --- | --- |\n${SP_TABLE}\n\n` +
+          'Der Vorteil hängt fast nur vom Abstand der beiden Einkommen ab. Schon bei 60 zu 40 bleibt wenig übrig, bei gleich hohen Einkommen nichts. Für Paare, die überlegen zu heiraten, ist die erste Spalte der Höchstwert bei einem Alleinverdiener.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Lohnt sich das Splitting, wenn beide Partner gut verdienen?',
+        answer: `Kaum. Bei 100.000 € gemeinsamem zvE spart ein Alleinverdiener ${SP_100_ALONE} im Jahr, bei einer Verteilung von 60.000 € zu 40.000 € sind es nur ${SP_100_6040}. Liegen beide Einkommen im Bereich des Spitzensteuersatzes von 42 %, etwa 225.000 € und 75.000 €, beträgt der Vorteil ${txt(SP_HIGH_BOTH, 'vorteil')}, weil jeder zusätzliche Euro bei beiden ohnehin mit demselben Satz besteuert wird.`,
+      },
+    ],
+  },
+
+  abfindungsrechner: {
+    sections: [
+      {
+        title: `Gleiche Abfindung, anderes Jahreseinkommen: ${eur0(AB_AMOUNT)} im Vergleich`,
+        content:
+          `| Übriges zvE im Auszahlungsjahr | Steuer mit Fünftelregelung | Steuer ohne Fünftelregelung | Ersparnis | Netto-Abfindung |\n| --- | --- | --- | --- | --- |\n${AB_TABLE}\n\n` +
+          `Je weniger Sie im Jahr der Auszahlung sonst verdienen, desto stärker wirkt die Fünftelregelung. Bei ${eur0(AB_ROWS[1].reg)} übrigem zvE bleiben ${txt(AB_LOW, 'netAbfindung')} netto, bei ${eur0(AB_ROWS[3].reg)} nur ${txt(AB_MID, 'netAbfindung')}. ` +
+          (num(AB_HIGH, 'taxSavings') === 0
+            ? `Bei ${eur0(AB_ROWS[4].reg)} bringt die Regel nichts mehr, weil Einkommen und Abfindung schon vollständig im Bereich des Spitzensteuersatzes liegen. `
+            : '') +
+          'Deshalb kann es sich lohnen, die Auszahlung in das Jahr nach dem Austritt zu legen, wenn dort ein Teil des Gehalts fehlt. Beachten Sie aber, dass Arbeitslosengeld zwar steuerfrei ist, über den Progressionsvorbehalt (§ 32b EStG) jedoch den Steuersatz auf die Abfindung erhöht. Das rechnet dieser Rechner nicht ein.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Darf die Abfindung in Raten über zwei Jahre ausgezahlt werden?',
+        answer: 'Für die Fünftelregelung ist das riskant. Sie setzt eine Zusammenballung von Einkünften voraus, die Abfindung muss also grundsätzlich in einem Kalenderjahr zufließen. Verteilen Sie den Betrag auf zwei Jahre, wird jede Rate in der Regel normal besteuert. Wann die Abfindung fließt, legen Sie im Aufhebungsvertrag oder Vergleich fest; steuerlich zählt der Tag der Gutschrift.',
+      },
+    ],
+  },
+
+  'gewerbesteuer-rechner': {
+    sections: [
+      {
+        title: `Hebesatz und Anrechnung auf die Einkommensteuer bei ${eur0(GW_ERTRAG)} Gewerbeertrag`,
+        content:
+          `| Hebesatz | Gewerbesteuer Einzelunternehmen | Anrechnung § 35 EStG höchstens | Verbleibende Belastung | Gewerbesteuer GmbH |\n| --- | --- | --- | --- | --- |\n${GW_TABLE}\n\n` +
+          'Für Einzelunternehmer und Gesellschafter einer Personengesellschaft gleicht die Anrechnung bis zu einem Hebesatz von 400 % die Gewerbesteuer rechnerisch ganz aus, sofern genug Einkommensteuer auf die gewerblichen Einkünfte entfällt. Liegt der Hebesatz darüber, bleibt die Differenz als echte Mehrbelastung. Eine GmbH kann nichts anrechnen; für sie kommt die Gewerbesteuer zur Körperschaftsteuer hinzu und fällt ohne Freibetrag an.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Welcher Hebesatz gilt bei Betriebsstätten in mehreren Gemeinden?',
+        answer: `Dann wird der Steuermessbetrag zerlegt, in der Regel nach dem Verhältnis der Arbeitslöhne in den Betriebsstätten (§§ 28, 29 GewStG). Jede Gemeinde wendet ihren Hebesatz auf ihren Anteil an. Beispiel mit ${eur0(GW_ERTRAG)} Gewerbeertrag eines Einzelunternehmens: Messbetrag ${eur(GW_MESS)}, davon 60 % in einer Gemeinde mit 400 % und 40 % in einer mit 300 %. Zusammen ergeben sich ${eur(GW_ZERLEGUNG)} Gewerbesteuer statt ${eur(GW_MESS * 4)} bei 400 % für alles.`,
+      },
+    ],
+  },
+
+  'renten-brutto-netto-rechner': {
+    sections: [
+      {
+        title: 'Netto-Rente 2026: Tabelle für den Rentenbeginn 2026',
+        content:
+          `Ergebnisse dieses Rechners für Alleinstehende mit einem Kind (Pflegeversicherung 3,6 %), 2,9 % Zusatzbeitrag und ohne weitere Einkünfte.\n\n| Bruttorente | Kranken- und Pflegeversicherung | Auszahlung | Einkommensteuer im Monat | Netto nach Steuer |\n| --- | --- | --- | --- | --- |\n${RN_TABLE}\n\n` +
+          'Die Spalte „Auszahlung“ ist der Betrag, den die Rentenversicherung überweist. Die Einkommensteuer wird nicht abgezogen, sondern nach der Steuererklärung per Bescheid nachgefordert; legen Sie diesen Betrag deshalb monatlich zurück. Betriebsrenten, Mieteinnahmen oder eine Witwenrente erhöhen die Steuer, ebenso spätere Rentenerhöhungen, die voll steuerpflichtig sind.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Ab welcher Rente zahle ich 2026 Einkommensteuer?',
+        answer: `Bei Rentenbeginn 2026 und ohne weitere Einkünfte rechnet der Rechner ab rund ${eur0(RN_TAX_FROM_2026)} Bruttorente im Monat mit Einkommensteuer (alleinstehend, ein Kind, 2,9 % Zusatzbeitrag). Bei früherem Rentenbeginn ist der steuerfreie Teil größer. Er gilt aber als fester Eurobetrag, und jede spätere Rentenerhöhung ist voll steuerpflichtig, deshalb rechnet der Rechner für frühere Jahrgänge nur näherungsweise. Verheiratete mit Zusammenveranlagung haben einen doppelten Grundfreibetrag, das bildet dieser Rechner nicht ab.`,
+      },
+    ],
+  },
+
+  'minijob-stunden-rechner': {
+    sections: [
+      {
+        title: 'Höchststunden nach Stundenlohn: 2026 und ab 2027',
+        content:
+          `| Stundenlohn | 2026 pro Monat | 2026 pro Woche | 2027 pro Monat | 2027 pro Woche |\n| --- | --- | --- | --- | --- |\n${MJS_TABLE}\n\n` +
+          `Ab 2027 steigt die Grenze auf ${eur0(MINIJOB_PERIODS.find((p) => p.year === 2027)!.grenze)}. Wer mehr als den Mindestlohn verdient und keine Lohnerhöhung bekommt, darf 2027 also etwas mehr Stunden arbeiten als 2026. Wer nur den Mindestlohn erhält, bekommt automatisch mehr Geld, darf aber praktisch gleich viele Stunden arbeiten.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Darf ich in einem Monat mehr Stunden arbeiten und im nächsten weniger?',
+        answer: `Ja, in Grenzen. Maßgeblich ist der durchschnittliche Verdienst über zwölf Monate; zum Mindestlohn 2026 sind das höchstens ${MJS_YEAR_HOURS} im Jahr. Ein Monat mit mehr Stunden ist erlaubt, wenn Sie das in anderen Monaten ausgleichen und der für zwölf Monate geschätzte Verdienst die Jahresgrenze nicht übersteigt. Extreme Verteilungen, etwa drei Monate Vollzeit und den Rest des Jahres kaum Arbeit, akzeptiert die Minijob-Zentrale nicht als Minijob.`,
+      },
+    ],
+  },
+
+  'buergergeld-anspruch-rechner': {
+    sections: [
+      {
+        title: 'Was vom Lohn anrechnungsfrei bleibt (§ 11b SGB II)',
+        content:
+          `Freibetrag aus Grundabsetzbetrag und Erwerbstätigenfreibetrag, berechnet mit diesem Rechner.\n\n| Bruttolohn im Monat | Freibetrag ohne Kind | Freibetrag mit minderjährigem Kind | Anteil frei (ohne Kind) |\n| --- | --- | --- | --- |\n${BG_TABLE}\n\n` +
+          'Angerechnet wird das Nettoeinkommen abzüglich dieses Freibetrags. Die ersten 100 € behalten Sie ganz, danach sinkt der Anteil, der Ihnen bleibt. Über 1.200 € (mit Kind über 1.500 €) wird jeder weitere Euro voll angerechnet, bis der Anspruch endet. Prüfen Sie dann Wohngeld und Kinderzuschlag: Beseitigen sie die Hilfebedürftigkeit, gehen sie dem Bürgergeld vor (§ 12a SGB II).',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel bringt ein Minijob neben dem Bürgergeld?',
+        answer: `Bei einem Minijob mit ${eur(MINIJOB_GRENZE_2026)} im Monat (von der Rentenversicherung befreit, also netto gleich brutto) bleiben ${txt(BG_MINI, 'earningsAllowance')} anrechnungsfrei. Für eine alleinstehende Person mit 450 € Kaltmiete und 100 € Heizkosten sinkt die Leistung von ${BG_NONE.primary.formattedValue} auf ${BG_MINI.primary.formattedValue}. Zusammen mit dem Lohn haben Sie damit ${eur(Number(BG_MINI.primary.value) + MINIJOB_GRENZE_2026)} statt ${BG_NONE.primary.formattedValue} im Monat.`,
+      },
+    ],
+  },
+
+  'sabbatical-rechner': {
+    sections: [
+      {
+        title: 'Warum das tatsächliche Netto meist höher ist als die Quote',
+        content:
+          `Der Rechner kürzt Ihr Netto im Verhältnis der Arbeitsmonate. Im Blockmodell wird aber das Brutto gekürzt, und darauf fällt weniger Lohnsteuer an. Vergleich mit dem Brutto-Netto-Rechner (Steuerklasse I, kinderlos, 2026):\n\n| Vollzeit-Brutto | Auszahlungsquote | Netto anteilig gekürzt | Netto aus gekürztem Brutto | Unterschied |\n| --- | --- | --- | --- | --- |\n${SAB_TABLE}\n\n` +
+          `Bei ${eur0(SAB_EX.g)} Brutto und 12 + 12 Monaten zeigt der Rechner ${eur(SAB_EX.prop)}, tatsächlich bleiben rund ${eur(SAB_EX.real)} im Monat. Nutzen Sie das Ergebnis oben deshalb als vorsichtige Untergrenze und rechnen Sie das gekürzte Brutto im [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) nach.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was passiert mit dem angesparten Guthaben, wenn ich vor der Auszeit kündige?',
+        answer: 'Dann liegt ein sogenannter Störfall vor: Das Wertguthaben wird nicht für die Freistellung genutzt und ausgezahlt. Die Auszahlung ist steuerpflichtig, und auf die Summe der Entgelte, die ohne die Vereinbarung beitragspflichtig gewesen wären, fallen Sozialversicherungsbeiträge an (§ 23b Abs. 2 SGB IV). Unter bestimmten Voraussetzungen können Sie das Guthaben stattdessen zu einem neuen Arbeitgeber oder zur Deutschen Rentenversicherung Bund mitnehmen (§ 7f SGB IV).',
       },
     ],
   },

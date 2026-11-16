@@ -11,6 +11,7 @@ import { calculateOhmsLaw, calculateStandardDeviation } from '@/lib/calculators/
 import { MATHEMATIK_CALCULATORS } from '../mathematik';
 import { EXTRA_DATUM_MATH } from '../extra/datumMath';
 import { EXTRA_BUSINESS_STATISTIK } from '../extra/businessStatistik';
+import { SCHULMATHE_CALCULATORS } from '../schulmathe';
 
 // ---------------------------------------------------------------------------
 // Helpers: every number below is produced by the calculators' own engines at module load.
@@ -280,6 +281,67 @@ const ledWeiss470 = calculateOhmsLaw({ target: 'current', voltage: 12 - 3, resis
 const sicherung = calculateOhmsLaw({ target: 'resistance', voltage: 230, current: 16 });
 const halbeSpannung = calculateOhmsLaw({ target: 'current', voltage: 115, resistance: 46 });
 const volleSpannung = calculateOhmsLaw({ target: 'current', voltage: 230, resistance: 46 });
+
+// ==================== Prozentrechner ====================
+const prozent = engineOf(MATHEMATIK_CALCULATORS, 'prozentrechner');
+const pVon = (p: number, g: number) => prozent({ calculationMode: 'partOf', percent: p, base: g }).primary.value as number;
+const PROZENT_BRUECHE: Array<[number, string, string]> = [
+  [1, '1 %', '1/100'], [5, '5 %', '1/20'], [10, '10 %', '1/10'], [12.5, '12,5 %', '1/8'], [20, '20 %', '1/5'],
+  [25, '25 %', '1/4'], [100 / 3, '33⅓ %', '1/3'], [50, '50 %', '1/2'], [75, '75 %', '3/4'],
+];
+const prozentRows = PROZENT_BRUECHE.map(([p, label, bruch]) => [label, bruch, `${f(pVon(p, 240))} €`]);
+const p175 = pVon(17.5, 240);
+const p175Teile = [pVon(10, 240), pVon(5, 240), pVon(2.5, 240)];
+const rabatt1 = prozent({ calculationMode: 'decrease', percent: 20, base: 100 }).primary.value as number;
+const rabatt2 = prozent({ calculationMode: 'decrease', percent: 10, base: rabatt1 }).primary.value as number;
+const rabattGesamt = prozent({ calculationMode: 'shareOf', part: 100 - rabatt2, base: 100 }).primary.value as number;
+
+// ==================== Dreieck ====================
+const dreieck = engineOf(MATHEMATIK_CALCULATORS, 'dreieckrechner');
+const gleichseitig = (a: number) => dreieck({ given: 'threeSides', sideA: a, sideB: a, sideC: a, unit: 'cm' });
+const dreieckRows = [1, 2, 5, 10, 20].map((a) => {
+  const r = gleichseitig(a);
+  return [`${f(a, 0)} cm`, `${f(num(r, 'ha'))} cm`, `${f(r.primary.value as number)} cm²`, `${f(num(r, 'inradius'))} cm`, `${f(num(r, 'circumradius'))} cm`];
+});
+const gs6 = gleichseitig(6);
+const gsVerhaeltnis = num(gleichseitig(10), 'circumradius') / num(gleichseitig(10), 'inradius');
+
+// ==================== Quadratwurzel ====================
+const wurzel = engineOf(MATHEMATIK_CALCULATORS, 'quadratwurzel-rechner');
+const sqrtOf = (x: number) => wurzel({ value: x, degree: 2 });
+const wurzelRows = Array.from({ length: 20 }, (_, i) => i + 1).map((x) => {
+  const r = sqrtOf(x);
+  const simplified = sec(r, 'simplified')?.formattedValue;
+  const exact = Number.isInteger(r.primary.value as number);
+  return [String(x), exact ? f(r.primary.value as number, 0) : `≈ ${f(r.primary.value as number, 4)}`, simplified ? `√${x} = ${simplified}` : exact ? 'Quadratzahl' : '–'];
+});
+const w9 = sqrtOf(9).primary.value as number;
+const w16 = sqrtOf(16).primary.value as number;
+const w25 = sqrtOf(25).primary.value as number;
+const w2mal8 = sqrtOf(2 * 8).primary.value as number;
+
+// ==================== pq-Formel ====================
+const pqEngine = engineOf(SCHULMATHE_CALCULATORS, 'pq-formel-rechner');
+const pqRun = (p: number, q: number) => pqEngine({ mode: 'pq', p, q });
+const pqText = (r: CalculationResult) => minus(String(r.primary.formattedValue).replace(/\s{2,}/g, ', '));
+const pqQ0 = pqRun(4, 0);
+const pqP0 = pqRun(0, -9);
+const pqP0neg = pqRun(0, 9);
+const pqRichtig = pqRun(-6, 5);
+const pqFalsch = pqRun(6, 5);
+const pqScheitel = pqRun(-2, -8);
+
+// ==================== Dezimalzahl in Bruch ====================
+const dezBruch = engineOf(EXTRA_DATUM_MATH, 'dezimal-in-bruch-rechner');
+const alsBruch = (d: string) => dezBruch({ direction: 'dec2frac', decimalVal: d });
+const DEZ_WERTE = ['0,1', '0,125', '0,2', '0,25', '0,375', '0,4', '0,5', '0,625', '0,75', '0,8', '0,875', '0,(3)', '0,(6)', '0,1(6)', '0,8(3)', '0,(1)'];
+const dezRows = DEZ_WERTE.map((d) => {
+  const r = alsBruch(d);
+  return [d, String(r.primary.formattedValue), String(sec(r, 'pct')?.formattedValue ?? '')];
+});
+const dez35 = alsBruch('0,35');
+const dez125 = alsBruch('0,125');
+const dez0375 = alsBruch('0,0375');
 
 export const MATHE_PAGE_CONTENT: PageContentMap = {
   'kgv-rechner': {
@@ -759,6 +821,81 @@ export const MATHE_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Gilt das Ohmsche Gesetz für jedes Bauteil?',
         answer: 'Nein. Es gilt nur, solange der Widerstand konstant ist, also für Metalldrähte und Widerstände bei gleichbleibender Temperatur. LEDs und Dioden leiten erst ab ihrer Durchlassspannung und haben keinen festen Widerstand. Glühlampen ändern ihren Widerstand mit der Temperatur stark.',
+      },
+    ],
+  },
+
+  prozentrechner: {
+    sections: [
+      {
+        title: 'Prozentsätze als Bruch: Kopfrechnen am Beispiel 240 €',
+        content: `Viele gängige Prozentsätze sind einfache Brüche. Statt mit Kommazahlen zu multiplizieren, teilen Sie dann nur durch eine kleine Zahl. Die Beträge in der Tabelle hat der Modus „Prozentwert“ für einen Grundwert von 240 € berechnet:\n\n${table(['Prozentsatz', 'als Bruch', 'von 240 €'], prozentRows)}\n\nBesonders praktisch sind 12,5 % = 1/8 und 33⅓ % = 1/3: 12,5 % von 240 € sind 240 / 8 = ${f(pVon(12.5, 240))} €. Krumme Sätze setzen Sie aus diesen Bausteinen zusammen. 17,5 % sind 10 % + 5 % + 2,5 %, also ${f(p175Teile[0])} € + ${f(p175Teile[1])} € + ${f(p175Teile[2])} € = ${f(p175)} €.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Ergeben 20 % und danach 10 % Rabatt zusammen 30 % Rabatt?',
+        answer: `Nein, nur ${f(rabattGesamt)} %. Der zweite Rabatt bezieht sich auf den bereits reduzierten Preis: Aus 100 € werden nach 20 % Rabatt ${f(rabatt1)} €, davon gehen noch einmal 10 % ab, es bleiben ${f(rabatt2)} €. Im Rechner nehmen Sie dafür zweimal den Modus „Wert um p % verringern“ und setzen das erste Ergebnis als neuen Grundwert ein. Die Reihenfolge der Rabatte spielt dabei keine Rolle.`,
+      },
+    ],
+  },
+
+  dreieckrechner: {
+    sections: [
+      {
+        title: 'Gleichseitige Dreiecke: Werte für typische Seitenlängen',
+        content: `Bei einem gleichseitigen Dreieck sind alle drei Seiten gleich lang und alle Winkel 60°. Höhe und Fläche hängen dann nur noch von der Seitenlänge a ab: h = a · √3 / 2 ≈ 0,866 · a und A = √3 / 4 · a² ≈ 0,433 · a². Die Werte unten stammen aus dem Modus „Drei Seiten“ mit a = b = c:\n\n${table(['Seite a', 'Höhe', 'Fläche', 'Inkreisradius', 'Umkreisradius'], dreieckRows)}\n\nZwei Dinge fallen auf: Verdoppelt sich die Seite, vervierfacht sich die Fläche. Und der Umkreisradius ist genau ${f(gsVerhaeltnis, 0)}-mal so groß wie der Inkreisradius, weil beide Kreise ihren Mittelpunkt im Schwerpunkt haben und dieser die Höhe im Verhältnis 2 : 1 teilt.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie berechnet man die Fläche eines gleichseitigen Dreiecks?',
+        answer: `Mit A = √3 / 4 · a². Bei einer Seitenlänge von 6 cm ergibt das ${f(gs6.primary.value as number)} cm², die Höhe beträgt ${f(num(gs6, 'ha'))} cm. Im Rechner wählen Sie „Drei Seiten“ und tragen dreimal 6 ein, dann sehen Sie zusätzlich Umfang (${f(num(gs6, 'perimeter'), 0)} cm) und die Radien.`,
+      },
+    ],
+  },
+
+  'quadratwurzel-rechner': {
+    sections: [
+      {
+        title: 'Wurzeltabelle: Quadratwurzeln von 1 bis 20',
+        content: `Die Werte sind mit dem Rechner (n = 2) ermittelt und auf vier Nachkommastellen gerundet. In der dritten Spalte steht die vereinfachte Form, wenn sich ein Quadratfaktor herausziehen lässt:\n\n${table(['Zahl', 'Quadratwurzel', 'Vereinfacht'], wurzelRows)}\n\nZahlen wie 2, 3, 5, 6 oder 7 enthalten keinen Quadratfaktor, ihre Wurzel lässt sich nicht weiter vereinfachen. Mit √2 ≈ 1,4142, √3 ≈ 1,7321 und √5 ≈ 2,2361 im Kopf lassen sich viele andere Wurzeln schnell abschätzen, etwa √12 = 2 · √3.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Darf man Wurzeln addieren, zum Beispiel √9 + √16 = √25?',
+        answer: `Nein, das ist einer der häufigsten Fehler. √9 + √16 = ${f(w9, 0)} + ${f(w16, 0)} = ${f(w9 + w16, 0)}, aber √25 = ${f(w25, 0)}. Für Summen gibt es keine Wurzelregel. Beim Multiplizieren und Dividieren dürfen Sie Wurzeln dagegen zusammenfassen: √2 · √8 = √16 = ${f(w2mal8, 0)}, und √50 / √2 = √25 = ${f(w25, 0)}.`,
+      },
+    ],
+  },
+
+  'pq-formel-rechner': {
+    sections: [
+      {
+        title: 'Sonderfälle und der häufigste Vorzeichenfehler',
+        content: `Fehlt in der Gleichung ein Glied, geht es ohne pq-Formel schneller. Der Rechner liefert trotzdem dieselben Lösungen:\n\n- **q = 0**, etwa x² + 4x = 0: x ausklammern, x · (x + 4) = 0. Ein Produkt ist null, wenn ein Faktor null ist. Rechner: ${pqText(pqQ0)}.\n- **p = 0**, etwa x² − 9 = 0: nach x² umstellen, x² = 9, also x = ±3. Rechner: ${pqText(pqP0)}.\n- **p = 0 und q > 0**, etwa x² + 9 = 0: x² = −9 hat keine reelle Lösung. Rechner: ${pqText(pqP0neg)}.\n\nDer häufigste Fehler ist das Vorzeichen vor p/2. Bei x² − 6x + 5 = 0 ist p = −6, also −p/2 = +3, und die Lösungen sind ${pqText(pqRichtig)}. Wer das Minus vergisst und mit p = 6 rechnet, bekommt ${pqText(pqFalsch)}. Die Probe mit Vieta deckt den Fehler sofort auf: Die Summe der Lösungen muss −p = 6 ergeben.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie bestimme ich den Scheitelpunkt der Parabel aus p und q?',
+        answer: `Der Scheitelpunkt der Normalparabel y = x² + px + q liegt bei S(−p/2 | q − (p/2)²). Die x-Koordinate ist also genau die Mitte zwischen den beiden Nullstellen. Für x² − 2x − 8 liefert der Rechner ${minus(String(sec(pqScheitel, 'vertex')?.formattedValue))}: Die Nullstellen 4 und −2 liegen symmetrisch um x = 1.`,
+      },
+    ],
+  },
+
+  'dezimal-in-bruch-rechner': {
+    sections: [
+      {
+        title: 'Häufige Dezimalzahlen als Bruch',
+        content: `Diese Werte begegnen Ihnen beim Backen, Messen und in Prozentangaben besonders oft. Alle Brüche sind mit dem Rechner ermittelt und vollständig gekürzt:\n\n${table(['Dezimalzahl', 'Bruch', 'Prozent'], dezRows)}\n\nAuffällig sind die Achtel: 0,125, 0,375, 0,625 und 0,875 haben drei Nachkommastellen, weil 8 = 2 · 2 · 2 ist. Bei den Dritteln und Sechsteln entsteht immer eine Periode. 0,(1) ist genau ein Neuntel, entsprechend ist 0,(2) = 2/9 und so weiter.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie wandelt man einen Prozentsatz in einen Bruch um?',
+        answer: `Teilen Sie den Prozentsatz durch 100 und wandeln Sie die Dezimalzahl um. 35 % = 0,35 = ${String(dez35.primary.formattedValue)}, 12,5 % = 0,125 = ${String(dez125.primary.formattedValue)}, und 3,75 % = 0,0375 = ${String(dez0375.primary.formattedValue)}. Im Rechner geben Sie dafür die Dezimalzahl ein, also 0,35 statt 35 %.`,
       },
     ],
   },

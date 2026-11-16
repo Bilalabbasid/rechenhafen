@@ -331,7 +331,9 @@ describe('SEO & 301 Redirects Verification', () => {
     expect(jobrad).toBeDefined();
     expect(jobrad?.isTimeSensitive).toBe(true);
     expect(jobrad?.timeSensitiveMeta?.year).toBe(2026);
-    expect(jobrad?.timeSensitiveMeta?.source).toContain('§ 6 Abs. 1 Nr. 4 Satz 6 EStG');
+    // Arbeitnehmer-Diensträder: § 8 Abs. 2 Satz 10 EStG i. V. m. gleich lautenden Ländererlassen vom 9.1.2020
+    // (§ 6 Abs. 1 Nr. 4 Satz 6 EStG betrifft nur die Entnahme im Betriebsvermögen)
+    expect(jobrad?.timeSensitiveMeta?.source).toContain('§ 8 Abs. 2 Satz 10 EStG');
 
     const res = jobrad?.calculate({
       bikePriceGross: 3500,

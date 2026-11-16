@@ -4,7 +4,7 @@ import { EXTRA_FINANZEN_KREDIT } from '../extra/finanzenKredit';
 import { EXTRA_BUSINESS_STATISTIK } from '../extra/businessStatistik';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/formatters';
-import { calculateVat } from '@/lib/calculators/business';
+import { calculateVat, calculateMargin } from '@/lib/calculators/business';
 import { calculateDiscount } from '@/lib/calculators/moreCalculators';
 import { calculateCompoundInterest } from '@/lib/calculators/finanzen';
 
@@ -345,6 +345,29 @@ const ZZ_LATE_DYN = zz({ initialAmount: 0, monthlyContribution: 150, annualRate:
 const ZZ_ONCE = [2, 3, 5].map((rate) => ({ rate, r: zz({ initialAmount: 10000, monthlyContribution: 0, annualRate: rate, years: 10, compoundFrequency: '1' }) }));
 const ZZ_END = zz({ initialAmount: 10000, monthlyContribution: 150, annualRate: 5, years: 15 });
 const ZZ_START = zz({ initialAmount: 10000, monthlyContribution: 150, annualRate: 5, years: 15, depositTiming: 'start' });
+
+// ---------- Marge ----------
+// Rabatt auf den Verkaufspreis: neue Marge und nötige Mehrmenge für denselben Rohertrag
+const MARGE_EK = 60;
+const MARGE_VK = 100;
+const margeAt = (vk: number) => calculateMargin({ mode: 'fromPrices', purchasePrice: MARGE_EK, sellingPrice: vk });
+const MARGE_BASE_PROFIT = sec(margeAt(MARGE_VK), 'grossProfit');
+const MARGE_ROWS = [0, 5, 10, 15, 20].map((d) => {
+  const r = margeAt(MARGE_VK * (1 - d / 100));
+  const profit = sec(r, 'grossProfit');
+  return [d === 0 ? 'ohne Rabatt' : pct(d, 0), eur(MARGE_VK * (1 - d / 100)), eur(profit), pct(prim(r), 2), `+${num((MARGE_BASE_PROFIT / profit - 1) * 100, 0)} %`];
+});
+
+// ---------- Rentabilität ----------
+// Gleiches Unternehmen, Gewinn vor Zinsen 104.000 €, 400.000 € Eigen- und 600.000 € Fremdkapital, steigender Kreditzins
+const rentCalc = calc('umsatzrentabilitaet-rechner');
+const RENT_EBIT = 104000;
+const RENT_FK = 600000;
+const RENT_ROWS = [2, 4, 6, 8, 10.4, 12].map((rate) => {
+  const interest = RENT_FK * (rate / 100);
+  const r = rentCalc({ profit: RENT_EBIT - interest, revenue: 1000000, equity: 400000, debt: RENT_FK, interestExpense: interest });
+  return [pct(rate, 1), eur0(RENT_EBIT - interest), pct(sec(r, 'roe'), 1), pct(sec(r, 'roa'), 1)];
+});
 
 export const FINANZEN_BUSINESS_PAGE_CONTENT: PageContentMap = {
   'thesaurierend-vs-ausschuettend-rechner': {
@@ -937,6 +960,33 @@ export const FINANZEN_BUSINESS_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Was ist der Unterschied zwischen vorschüssiger und nachschüssiger Einzahlung?',
         answer: `Vorschüssig wird die Rate am Monatsanfang eingezahlt und verzinst sich im selben Monat schon mit, nachschüssig erst am Monatsende. Mit den Standardwerten (10.000 € Start, 150 € monatlich, 5 %, 15 Jahre) ergibt das ${eur(prim(ZZ_START))} statt ${eur(prim(ZZ_END))}, also ${eur(prim(ZZ_START) - prim(ZZ_END))} mehr. Sparpläne mit Ausführung zu Monatsbeginn entsprechen der vorschüssigen Variante.`,
+      },
+    ],
+  },
+
+  'marge-rechner': {
+    sections: [
+      {
+        title: 'Was ein Rabatt von der Marge übrig lässt',
+        content: [
+          `Ein Artikel kostet ${eur(MARGE_EK)} im Einkauf und ${eur(MARGE_VK)} im Verkauf (netto). Jeder Rabatt geht voll vom Rohgewinn ab, der Einkaufspreis bleibt gleich:`,
+          table(['Rabatt', 'Verkaufspreis', 'Rohgewinn', 'Marge', 'Nötige Mehrmenge'], MARGE_ROWS),
+          `Die letzte Spalte zeigt, wie viel mehr Stück Sie verkaufen müssen, um denselben Rohgewinn in Euro zu erreichen wie ohne Rabatt. Bei ${pct(prim(margeAt(MARGE_VK)), 0)} Ausgangsmarge verlangt ein Nachlass von 10 % bereits ${num((MARGE_BASE_PROFIT / sec(margeAt(MARGE_VK * 0.9), 'grossProfit') - 1) * 100, 0)} % mehr Absatz, einer von 20 % ${num((MARGE_BASE_PROFIT / sec(margeAt(MARGE_VK * 0.8), 'grossProfit') - 1) * 100, 0)} % mehr. ` +
+            'Je niedriger die Ausgangsmarge, desto teurer wird jeder Rabattpunkt. Prüfen Sie Aktionspreise deshalb mit dem Modus „Marge aus Einkaufs- und Verkaufspreis“, bevor Sie sie ankündigen.',
+        ].join('\n\n'),
+      },
+    ],
+  },
+
+  'umsatzrentabilitaet-rechner': {
+    sections: [
+      {
+        title: 'Wann der Hebel kippt: gleiches Unternehmen, steigende Kreditzinsen',
+        content: [
+          `Ein Unternehmen erwirtschaftet ${eur0(RENT_EBIT)} vor Zinsen bei 1 Mio. € Umsatz, 400.000 € Eigenkapital und ${eur0(RENT_FK)} Fremdkapital. Nur der Zins auf das Fremdkapital ändert sich:`,
+          table(['Kreditzins', 'Gewinn nach Zinsen', 'Eigenkapitalrendite', 'Gesamtkapitalrendite'], RENT_ROWS),
+          'Die Gesamtkapitalrendite bleibt in jeder Zeile gleich, weil die Zinsen wieder hinzugerechnet werden. Die Eigenkapitalrendite fällt dagegen mit jedem Zinsschritt. Bei 10,4 % Kreditzins entspricht sie genau der Gesamtkapitalrendite, darüber liegt sie unter ihr: Ab diesem Punkt drückt jeder geliehene Euro die Rendite der Eigentümer. Für eine Finanzierungsentscheidung vergleichen Sie also den Zins des neuen Kredits mit der Gesamtkapitalrendite, nicht mit der Umsatzrendite.',
+        ].join('\n\n'),
       },
     ],
   },

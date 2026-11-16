@@ -11,6 +11,7 @@ import {
   computeUebergangsbereich,
 } from '@/lib/calculators/steuernGehalt';
 import { calculateSpecialRepayment } from '@/lib/calculators/kredit';
+import { calculatePfaendung, PFAENDUNGSFREIGRENZEN } from '@/lib/calculators/steuerRecht';
 import { calculateInflation, calculateReturn } from '@/lib/calculators/finanzen';
 import { getTaxConfig } from '@/data/regulated/tax';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
@@ -182,6 +183,52 @@ const LOSS_ROWS = [10, 20, 30, 50].map((loss) => ({
   need: sec(calculateReturn({ initialInvestment: 100 - loss, finalValue: 100, years: 1 }), 'totalReturn'),
 }));
 const HALF_YEAR_CAGR = prim(calculateReturn({ initialInvestment: 10000, finalValue: 11000, years: 0.5 }));
+
+// ---------- Sparrechner ----------
+const sparCalc = inline('sparrechner');
+// Die Seite hat bereits vier eigene Abschnitte (redaktionelle Obergrenze), deshalb nur eine FAQ.
+const sparRate = (target: number, years: number) =>
+  prim(sparCalc({ mode: 'sparrate', targetAmount: target, initialAmount: 0, annualRate: 3, years, depositTiming: 'end', netIncome: 0 }));
+const SPAR_TARGET_TEXT = [10000, 25000, 100000]
+  .map((t) => `${eur0(t)} in 10 Jahren ${eur(sparRate(t, 10))}, in 20 Jahren ${eur(sparRate(t, 20))}`)
+  .join('; ');
+
+// ---------- Kapitalertragsteuer ----------
+const kapCalc = inline('kapitalertragsteuer-rechner');
+const kap = (gain: number, status: string, church = 'none') => kapCalc({ capitalIncome: gain, maritalStatus: status, usedAllowance: 0, churchState: church });
+const KAP_ROWS = [1500, 3000, 5000, 10000, 25000].map((g) => {
+  const s = kap(g, 'single');
+  const m = kap(g, 'married');
+  return [eur0(g), eur(prim(s)), eur(sec(s, 'net')), eur(prim(m)), eur(sec(m, 'net'))];
+});
+const KAP_ETF_GAIN = 4000;
+const KAP_ETF_TAXABLE = KAP_ETF_GAIN * 0.7; // Aktienfonds: 30 % Teilfreistellung (§ 20 Abs. 1 InvStG)
+const KAP_ETF_WITH = prim(kap(KAP_ETF_TAXABLE, 'single'));
+const KAP_ETF_WITHOUT = prim(kap(KAP_ETF_GAIN, 'single'));
+
+// ---------- Maximaler Kredit ----------
+const maxKreditCalc = inline('maximaler-kredit-rechner');
+const maxKredit = (rate: number, years: number, interestRate = 4.5) =>
+  prim(maxKreditCalc({ netIncome: rate, fixedExpenses: 0, existingLoans: 0, safetyBuffer: 0, interestRate, termYears: years, equity: 0 }));
+const MAX_RATES = [300, 500, 800, 1200];
+const MAX_YEARS = [3, 5, 8, 10];
+const MAX_ROWS = MAX_RATES.map((r) => [eur0(r), ...MAX_YEARS.map((y) => eur0(maxKredit(r, y)))]);
+const MAX_1000_45 = maxKredit(1000, 5, 4.5);
+const MAX_1000_55 = maxKredit(1000, 5, 5.5);
+const MAX_1000_45_8 = maxKredit(1000, 8, 4.5);
+const MAX_1000_55_8 = maxKredit(1000, 8, 5.5);
+
+// ---------- Pfändung ----------
+const PF = PFAENDUNGSFREIGRENZEN['2026'];
+const pfaend = (net: number, dependents: number) => prim(calculatePfaendung({ netIncome: net, dependents, period: '2026' }));
+const PF_NETS = [1600, 1800, 2000, 2200, 2500, 3000, 3500, 4000, 5000];
+const PF_DEPS = [0, 1, 2, 3];
+const PF_ROWS = PF_NETS.map((n) => [eur0(n), ...PF_DEPS.map((d) => eur(pfaend(n, d)))]);
+// § 850a Nr. 4 ZPO: Weihnachtsvergütung unpfändbar bis zur Hälfte des auf volle 10 € aufgerundeten monatlichen Freibetrags
+const PF_XMAS_FREE = (Math.ceil(PF.grundbetrag / 10) * 10) / 2;
+const PF_OVERTIME_EXAMPLE = 400;
+// tilgungsrechner und ratenkreditrechner: kein Overlay, beide Seiten sind bei der redaktionellen Obergrenze
+// (4 Abschnitte, 6 FAQs, geprüft in merge-kredit-sparen.test.ts).
 
 export const GELD_PAGE_CONTENT: PageContentMap = {
   'midijob-rechner': {
@@ -627,4 +674,71 @@ export const GELD_PAGE_CONTENT: PageContentMap = {
       },
     ],
   },
+
+  sparrechner: {
+    faqs: [
+      {
+        question: 'Wie viel muss ich im Monat für 10.000 €, 25.000 € oder 100.000 € sparen?',
+        answer: `Ohne Startkapital, bei 3 % Zins und Einzahlung zum Monatsende: ${SPAR_TARGET_TEXT}. Doppelte Spardauer halbiert die Rate nicht nur, sie drückt sie noch etwas tiefer, weil die Zinsen länger mitarbeiten. Vorhandenes Erspartes tragen Sie im Modus „Sparrate“ als Startkapital ein.`,
+      },
+    ],
+  },
+
+  'kapitalertragsteuer-rechner': {
+    sections: [
+      {
+        title: 'Steuer und Netto-Ertrag bei typischen Beträgen',
+        content: [
+          'Ohne Kirchensteuer, voller Sparer-Pauschbetrag noch verfügbar:',
+          table(['Kapitalertrag', 'Steuer (Single)', 'Netto (Single)', 'Steuer (Ehepaar)', 'Netto (Ehepaar)'], KAP_ROWS),
+          `Bis ${eur0(LEGAL_VALUES_2026.sparerPauschbetragSingle.value)} (Ehepaare ${eur0(LEGAL_VALUES_2026.sparerPauschbetragMarried.value)}) fällt nichts an, jeder Euro darüber kostet 26,375 Cent. Der Unterschied zwischen Single und Ehepaar beträgt deshalb höchstens ${eur(prim(kap(25000, 'single')) - prim(kap(25000, 'married')))} im Jahr, egal wie hoch die Erträge sind.`,
+        ].join('\n\n'),
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie rechne ich die Teilfreistellung eines Aktien-ETFs ein?',
+        answer: `Ziehen Sie vor der Eingabe 30 % vom Fondsertrag ab. Bei ${eur0(KAP_ETF_GAIN)} Gewinn aus einem Aktien-ETF tragen Sie ${eur0(KAP_ETF_TAXABLE)} ein. Als Single ohne Kirchensteuer ergibt das ${eur(KAP_ETF_WITH)} Steuer statt ${eur(KAP_ETF_WITHOUT)} ohne Teilfreistellung. Bei Mischfonds sind es 15 %, bei Zinsen, Tagesgeld und Einzelaktien gibt es keine Teilfreistellung.`,
+      },
+    ],
+  },
+
+  'maximaler-kredit-rechner': {
+    sections: [
+      {
+        title: 'Kreditrahmen je Monatsrate und Laufzeit',
+        content: [
+          'Wie viel Kredit eine feste Monatsrate bei 4,5 % Sollzins trägt (gerundet):',
+          table(['Monatsrate', ...MAX_YEARS.map((y) => `${y} Jahre`)], MAX_ROWS),
+          'Die Laufzeit hebt den Rahmen stark an, aber nicht im gleichen Verhältnis: Bei längerer Laufzeit fließt ein größerer Teil jeder Rate in Zinsen. Ratenkredite laufen meist nur wenige Jahre; die langen Laufzeiten betreffen vor allem Baufinanzierungen, für die Banken zusätzlich Eigenkapital und den Wert der Immobilie prüfen.',
+        ].join('\n\n'),
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie stark senkt ein höherer Zins den Kreditrahmen?',
+        answer: `Bei 1.000 € Monatsrate und 5 Jahren Laufzeit trägt die Rate bei 4,5 % rund ${eur0(MAX_1000_45)} Kredit, bei 5,5 % noch ${eur0(MAX_1000_55)}. Ein Prozentpunkt mehr kostet hier also rund ${eur0(MAX_1000_45 - MAX_1000_55)} Kreditrahmen. Bei 8 Jahren Laufzeit ist der Abstand größer: ${eur0(MAX_1000_45_8)} gegenüber ${eur0(MAX_1000_55_8)}.`,
+      },
+    ],
+  },
+
+  pfaendungsrechner: {
+    sections: [
+      {
+        title: 'Pfändbare Beträge ab 1. Juli 2026 im Überblick',
+        content: [
+          'Pfändbarer Betrag pro Monat nach § 850c ZPO, abhängig vom Nettolohn und der Zahl der Personen, denen Sie Unterhalt leisten:',
+          table(['Nettolohn', ...PF_DEPS.map((d) => (d === 0 ? 'keine Unterhaltspflicht' : d === 1 ? '1 Person' : `${d} Personen`))], PF_ROWS),
+          `Ablesen: Der Nettolohn wird auf volle 10 € abgerundet, die amtliche Tabelle arbeitet in denselben Stufen. Mit jeder unterhaltsberechtigten Person steigt nicht nur der Freibetrag, auch der pfändbare Anteil am Mehrbetrag sinkt. Was über ${eur(PF.vollPfaendbarAb)} liegt, geht vollständig an den Gläubiger. Für Werte zwischen den Zeilen nutzen Sie den Rechner oben.`,
+        ].join('\n\n'),
+      },
+    ],
+    faqs: [
+      {
+        question: 'Sind Weihnachtsgeld und Überstundenvergütung pfändbar?',
+        answer: `Nur teilweise. Nach § 850a ZPO ist die Vergütung für Mehrarbeitsstunden zur Hälfte unpfändbar: Von ${eur0(PF_OVERTIME_EXAMPLE)} Überstundenvergütung zählen nur ${eur0(PF_OVERTIME_EXAMPLE / 2)} zum pfändbaren Einkommen. Weihnachtsgeld bleibt bis zur Hälfte des auf volle 10 € aufgerundeten Grundfreibetrags frei, ab 1. Juli 2026 also bis ${eur(PF_XMAS_FREE)}. Diese unpfändbaren Teile gehören nicht in das Nettoeinkommen, das Sie oben eintragen.`,
+      },
+    ],
+  },
+
 };

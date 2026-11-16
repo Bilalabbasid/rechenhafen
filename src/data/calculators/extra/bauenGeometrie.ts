@@ -1391,13 +1391,15 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       },
       {
         id: "stoneFormat",
-        label: "Steinformat & Grundbedarf (Standardannahme)",
+        label: "Steinformat (für eigene Herstellerwerte)",
         type: "select",
         defaultValue: "8",
         options: [
-          { value: "8", label: "Standardformat 50 × 25 cm (Rastermaß: 8 Steine je m² Wandfläche)" },
+          { value: "8", label: "50 × 25 cm (8 Steine je m² Wandfläche, 25 cm Schichthöhe)" },
+          { value: "10", label: "50 × 20 cm (10 Steine je m² Wandfläche, 20 cm Schichthöhe)" },
         ],
-        helpText: "Standard-Rastermaß 50 cm Länge × 25 cm Schichthöhe",
+        helpText: "Bei den Herstellerwerten ist das Format des jeweiligen Steins bereits hinterlegt.",
+        dependsOn: { field: "fillMode", value: ["customM2", "customStone"] },
       },
       {
         id: "fillMode",
@@ -1405,10 +1407,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         type: "select",
         defaultValue: "preset_delfing24",
         options: [
-          { value: "preset_delfing24", label: "Delfing DP 24 cm (Herstellerwert: ca. 130 l/m²)" },
-          { value: "preset_delfing175", label: "Delfing DP 17,5 cm (Herstellerwert: ca. 80 l/m²)" },
-          { value: "preset_beyhl24", label: "Beyhl 24 cm (Herstellerwert: ca. 18 l/Stein ≈ 144 l/m² bei 8 Stk./m²)" },
-          { value: "preset_beyhl175", label: "Beyhl 17,5 cm (Herstellerwert: ca. 12 l/Stein ≈ 96 l/m² bei 8 Stk./m²)" },
+          { value: "preset_delfing24", label: "Delfing DP 24, 50 × 20 cm (Herstellerwert: 130 l/m², 10 Steine/m²)" },
+          { value: "preset_delfing175", label: "Delfing DP 17,5, 50 × 20 cm (Herstellerwert: 80 l/m², 10 Steine/m²)" },
+          { value: "preset_beyhl24", label: "Beyhl 24 cm, 50 × 25 cm (Herstellerwert: 18 l/Stein ≈ 144 l/m², 8 Steine/m²)" },
+          { value: "preset_beyhl175", label: "Beyhl 17,5 cm, 50 × 25 cm (Herstellerwert: 12 l/Stein ≈ 96 l/m², 8 Steine/m²)" },
           { value: "customM2", label: "Eigener Herstellerwert in Liter je m² Wandfläche" },
           { value: "customStone", label: "Eigener Herstellerwert in Liter je Stein" },
         ],
@@ -1637,14 +1639,26 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         };
       }
 
-      // Standardmaß: 50 cm lang, 25 cm hoch -> 8 Steine pro m²
-      const stonesPerM2 = 8;
-      const baseStones = Math.ceil(wallArea * stonesPerM2);
-      const stonesWithReserve = Math.ceil(wallArea * stonesPerM2 * stoneReserveFactor);
+      // Steinformat: Die Herstellerwerte gehören zu einem bestimmten Steinformat.
+      // Delfing DP 24 (130 l/m²) und DP 17,5 (80 l/m²) sind 50 × 20 cm groß → 10 Steine/m², 20 cm Schichthöhe
+      // (Delfing-Produktkatalog DP-Schalungsstein). Beyhl 24/17,5 (18 bzw. 12 l/Stein) sind 49,7 × 24,7 cm → 8 Steine/m².
+      // Eigene Herstellerwerte: Format aus dem Feld „Steinformat“ (Standard 50 × 25 cm).
+      const fillMode = inputs.fillMode;
+      const isDelfingPreset = fillMode === 'preset_delfing24' || fillMode === 'preset_delfing175';
+      const isBeyhlPreset = fillMode === 'preset_beyhl24' || fillMode === 'preset_beyhl175';
+      const stonesPerM2 = isDelfingPreset ? 10 : isBeyhlPreset ? 8 : String(inputs.stoneFormat) === '10' ? 10 : 8;
+      const courseHeightM = stonesPerM2 === 10 ? 0.2 : 0.25;
+      const courseHeightCm = Math.round(courseHeightM * 100);
+      const formatLabel = stonesPerM2 === 10 ? '50 × 20 cm' : '50 × 25 cm';
+
+      const baseStones = Math.ceil(wallArea * stonesPerM2 - 1e-9);
+      const stonesWithReserve = Math.ceil(wallArea * stonesPerM2 * stoneReserveFactor - 1e-9);
       const reserveStonesCount = Math.max(0, stonesWithReserve - baseStones);
 
-      // Lagen / Schichten berechnen (25 cm Schichthöhe)
-      const courses = Math.max(1, Math.ceil(h / 0.25));
+      // Lagen / Schichten (Schichthöhe je nach Steinformat 20 oder 25 cm)
+      const rawCourses = h / courseHeightM;
+      const courses = Math.max(1, Math.ceil(rawCourses - 1e-9));
+      const coursesRoundedUp = Math.abs(rawCourses - Math.round(rawCourses)) > 1e-9;
 
       // Trennung in Normalsteine und Eck- / Endsteine
       const cornerBlocks = cornersCount * courses;
@@ -1654,7 +1668,6 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
 
       // Füllmenge in Liter je m² ermitteln
       let litersPerM2 = 130; // Standardbeispiel: Delfing DP 24
-      const fillMode = inputs.fillMode;
       const customVal = parseFloat(inputs.customFillValue) || 130;
 
       if (fillMode === 'preset_delfing24') {
@@ -1725,14 +1738,16 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             label: 'Davon Eck- / Endsteine',
             value: cornerEndBlocks,
             formattedValue: `${cornerEndBlocks} Stück (${cornerBlocks} Ecksteine + ${endBlocks} Endsteine)`,
-            helpText: `${cornersCount} Ecken und ${openEndsCount} Wandenden über ${courses} Steinlagen`,
+            helpText: `${cornersCount} ${cornersCount === 1 ? 'Ecke' : 'Ecken'} und ${openEndsCount} ${openEndsCount === 1 ? 'Wandende' : 'Wandenden'} über ${courses} ${courses === 1 ? 'Steinlage' : 'Steinlagen'}`,
           },
           {
             id: 'courses',
             label: 'Steinlagen / Schichten',
             value: courses,
-            formattedValue: `${courses} Lagen (bei 25 cm Steinhöhe)`,
-            helpText: `${formatNumber(h, 2)} m Mauerhöhe ÷ 0,25 m Schichthöhe`,
+            formattedValue: `${courses} ${courses === 1 ? 'Lage' : 'Lagen'} (bei ${courseHeightCm} cm Steinhöhe)`,
+            helpText: coursesRoundedUp
+              ? `${formatNumber(h, 2)} m Mauerhöhe ÷ ${formatNumber(courseHeightM, 2)} m Schichthöhe = ${formatNumber(rawCourses, 2)}, aufgerundet: Die oberste Lage wird gekürzt oder die Mauer etwas höher.`
+              : `${formatNumber(h, 2)} m Mauerhöhe ÷ ${formatNumber(courseHeightM, 2)} m Schichthöhe`,
           },
           {
             id: 'stoneReserveAmount',
@@ -1760,16 +1775,16 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             formattedValue: wallTypeDescription,
           },
         ],
-        directAnswer: `Für Ihre Mauer (${wallTypeDescription}, Höhe ${formatNumber(h, 2)} m = ${formatNumber(wallArea, 2)} m² Nettofläche in ${courses} Lagen) benötigen Sie ${baseStones} Schalungssteine Netto (${standardBlocks} Normalsteine und ${cornerEndBlocks} Eck-/Endsteine; insgesamt ${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Reserve) sowie ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton (Netto: ${formatNumber(concreteBaseM3, 2)} m³).`,
+        directAnswer: `Für Ihre Mauer (${wallTypeDescription}, Höhe ${formatNumber(h, 2)} m = ${formatNumber(wallArea, 2)} m² Nettofläche in ${courses} ${courses === 1 ? 'Lage' : 'Lagen'}) benötigen Sie ${baseStones} Schalungssteine Netto (${standardBlocks} Normalsteine und ${cornerEndBlocks} Eck-/Endsteine; insgesamt ${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Reserve) sowie ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton (Netto: ${formatNumber(concreteBaseM3, 2)} m³).`,
         qualifications: [
           'Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.',
           'Herstellerangaben beachten: Hohlraumvolumen variieren je nach Hersteller und Wandstärke (z. B. Delfing DP 24 ca. 130 l/m², Beyhl 24er ca. 144 l/m²).',
           'Fundament getrennt bemessen: Der Fundamentbeton für das Streifenfundament ist eine separate Position und nicht im Füllvolumen der Steine enthalten.',
         ],
         calculationSteps: [
-          `Wandabmessungen: ${wallTypeDescription}, Höhe: ${formatNumber(h, 2)} m (${courses} Lagen à 25 cm)`,
+          `Wandabmessungen: ${wallTypeDescription}, Höhe: ${formatNumber(h, 2)} m (${courses} ${courses === 1 ? 'Lage' : 'Lagen'} à ${courseHeightCm} cm)`,
           `Netto-Wandfläche = ${formatNumber(totalLength, 2)} m Gesamtlänge × ${formatNumber(h, 2)} m Höhe − ${formatNumber(openings, 2)} m² Öffnungen = ${formatNumber(wallArea, 2)} m²`,
-          `Grundbedarf Steine = ${formatNumber(wallArea, 2)} m² × 8 Steine/m² = ${baseStones} Schalungssteine (${standardBlocks} Normalsteine + ${cornerEndBlocks} Eck-/Endsteine)`,
+          `Grundbedarf Steine = ${formatNumber(wallArea, 2)} m² × ${stonesPerM2} Steine/m² (Format ${formatLabel}) = ${baseStones} Schalungssteine (${standardBlocks} Normalsteine + ${cornerEndBlocks} Eck-/Endsteine)`,
           `Steine inkl. ${stoneReservePercent} % Reserve = ${baseStones} + ${reserveStonesCount} = ${stonesWithReserve} Stück`,
           `Netto-Füllbeton = ${formatNumber(wallArea, 2)} m² × ${formatNumber(litersPerM2, 1)} l/m² ÷ 1.000 = ${formatNumber(concreteBaseM3, 2)} m³ (${formatNumber(concreteBaseM3 * 1000, 0)} Liter)`,
           `Finaler Betonbedarf inkl. ${concreteReservePercent} % Bestellzuschlag = ${formatNumber(concreteBaseM3, 2)} m³ × ${formatNumber(concreteReserveFactor, 2)} = ${formatNumber(concreteTotalM3, 2)} m³`,
@@ -1778,68 +1793,72 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { label: 'Mauer-Bauform', value: wallTypeDescription },
           { label: 'Mauerhöhe & Schichten', value: `${formatNumber(h, 2)} m (${courses} Steinlagen)` },
           { label: 'Netto-Wandfläche', value: `${formatNumber(wallArea, 2)} m²` },
-          { label: 'Steinformat', value: '50 × 25 cm (8 Steine/m² Standard-Raster)' },
+          { label: 'Steinformat', value: `${formatLabel} (${stonesPerM2} Steine/m²)` },
           { label: 'Hersteller-Füllmenge', value: `${formatNumber(litersPerM2, 1)} Liter je m²` },
           { label: 'Steinreserve', value: `${stoneReservePercent} % (+${reserveStonesCount} Steine)` },
           { label: 'Betonbestellzuschlag', value: `${concreteReservePercent} %` },
         ],
-        summaryText: `Materialabschätzung: Für ${formatNumber(wallArea, 2)} m² Netto-Wandfläche (${courses} Lagen) benötigen Sie ${baseStones} Schalungssteine Netto (${standardBlocks} Normalsteine, ${cornerEndBlocks} Eck-/Endsteine bzw. ${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Steinreserve). Das geometrische Füllvolumen beträgt ${formatNumber(concreteBaseM3, 2)} m³ (bei ${litersPerM2} l/m² Herstellerangabe). Mit ${concreteReservePercent} % Betonbestellzuschlag ergibt sich eine Bestellmenge von ca. ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.`,
+        summaryText: `Materialabschätzung: Für ${formatNumber(wallArea, 2)} m² Netto-Wandfläche (${courses} ${courses === 1 ? 'Lage' : 'Lagen'}) benötigen Sie ${baseStones} Schalungssteine Netto (${standardBlocks} Normalsteine, ${cornerEndBlocks} Eck-/Endsteine bzw. ${stonesWithReserve} Stück inkl. ${stoneReservePercent} % Steinreserve). Das geometrische Füllvolumen beträgt ${formatNumber(concreteBaseM3, 2)} m³ (bei ${litersPerM2} l/m² Herstellerangabe). Mit ${concreteReservePercent} % Betonbestellzuschlag ergibt sich eine Bestellmenge von ca. ${formatNumber(concreteTotalM3, 2)} m³ Füllbeton. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.`,
       };
     },
-    formula: "Steine = Netto-Wandfläche × 8 Stk./m² × (1 + Steinreserve/100); Füllbeton = Netto-Wandfläche × Hersteller-Füllmenge (l/m²) × (1 + Betonzuschlag/100) ÷ 1.000",
-    formulaExplanation: "Schalungssteine im Standardformat (50 × 25 cm) decken 0,125 m² Ansichtsfläche je Stein ab (exakt 8 Steine je m² Nettofläche). Die Anzahl der Steinlagen ergibt sich aus Mauerhöhe geteilt durch das Schichthöhenmaß (25 cm). Je nach Wandtyp (gerade Wand, L-Form, U-Form, Rechteck) werden Normalsteine und Eck-/Endsteine separat aufgeschlüsselt. Das Füllvolumen richtet sich nach den herstellerspezifischen Hohlraumwerten (z. B. 130 l/m² bei Delfing DP 24). Steinreserve (Verschnitt) und Betonbestellzuschlag werden als getrennte Reserven ausgewiesen. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.",
+    formula: "Steine = Netto-Wandfläche × Steine je m² (8 bei 50 × 25 cm, 10 bei 50 × 20 cm) × (1 + Steinreserve/100); Füllbeton = Netto-Wandfläche × Hersteller-Füllmenge (l/m²) × (1 + Betonzuschlag/100) ÷ 1.000",
+    formulaExplanation: "Ein Schalungsstein im Format 50 × 25 cm deckt 0,125 m² Ansichtsfläche ab, das sind 8 Steine je m². Steine mit 20 cm Höhe (50 × 20 cm, z. B. Delfing DP) decken 0,1 m² ab, das sind 10 Steine je m². Bei den Herstellerwerten ist das passende Format hinterlegt, bei eigenen Werten wählen Sie es aus. Die Anzahl der Steinlagen ergibt sich aus Mauerhöhe geteilt durch die Schichthöhe (25 bzw. 20 cm). Je nach Wandtyp (gerade Wand, L-Form, U-Form, Rechteck) werden Normalsteine und Eck-/Endsteine separat aufgeschlüsselt. Das Füllvolumen richtet sich nach den herstellerspezifischen Hohlraumwerten (z. B. 130 l/m² bei Delfing DP 24). Steinreserve (Verschnitt) und Betonbestellzuschlag werden als getrennte Reserven ausgewiesen. Sicherheitshinweis: Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben.",
     workedExample: {
-      title: "Beispiel: 8 m × 1,5 m Mauer mit 24er Schalungssteinen (Herstellerangabe 130 l/m²)",
-      description: "Für eine Mauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit 24er Schalungssteinen (130 l/m² Herstellerangabe, z. B. Delfing DP 24) und 5 % Steinreserve werden rechnerisch 96 Steine Netto bzw. 101 Schalungssteine inkl. Reserve benötigt. Das Netto-Betonvolumen beträgt 1,56 m³ (bei 5 % Bestellzuschlag ca. 1,64 m³).",
+      title: "Beispiel: 8 m × 1,5 m Mauer mit Delfing DP 24 (50 × 20 cm, 130 l/m²)",
+      description: "Für eine Mauer von 8 m Länge und 1,5 m Höhe (12 m² Ansichtsfläche) mit Delfing DP 24 (Format 50 × 20 cm, 10 Steine je m², Herstellerangabe 130 l/m²) und 5 % Steinreserve werden rechnerisch 120 Steine Netto bzw. 126 Schalungssteine inkl. Reserve benötigt. Das Netto-Betonvolumen beträgt 1,56 m³ (bei 5 % Bestellzuschlag ca. 1,64 m³).",
       inputValues: [
         { label: "Wandmaß", value: "8 m × 1,5 m (12 m² Ansichtsfläche)" },
-        { label: "Hersteller-Füllmenge", value: "130 l/m² (z. B. Delfing DP 24)" },
+        { label: "Stein", value: "Delfing DP 24, 50 × 20 cm (10 Steine/m², 130 l/m²)" },
         { label: "Steinreserve", value: "5 %" },
         { label: "Betonzuschlag", value: "0 % (optional 5 %)" }
       ],
       steps: [
         "Netto-Wandfläche: 8 m × 1,5 m = 12 m²",
-        "Grundbedarf Steine: 12 m² × 8 Stk./m² = 96 Schalungssteine (50 × 25 cm)",
-        "Steine inkl. 5 % Reserve: 96 × 1,05 = 100,8 → aufgerundet 101 Steine",
+        "Grundbedarf Steine: 12 m² × 10 Stk./m² = 120 Schalungssteine (50 × 20 cm)",
+        "Steine inkl. 5 % Reserve: 120 × 1,05 = 126 Steine",
+        "Lagen: 1,5 m ÷ 0,20 m = 7,5 → 8 Lagen, die oberste wird gekürzt",
         "Netto-Füllbeton: 12 m² × 130 l/m² = 1.560 Liter = 1,56 m³",
         "Betonbestellmenge (bei optional 5 % Zuschlag): 1,56 m³ × 1,05 = 1,638 m³ ≈ 1,64 m³"
       ],
-      result: "96 Steine Netto (101 Steine inkl. Reserve) und 1,56 m³ Füllbeton (1,638 m³ bzw. ca. 1,64 m³ mit 5 % Bestellzuschlag)."
+      result: "120 Steine Netto (126 Steine inkl. Reserve) und 1,56 m³ Füllbeton (1,638 m³ bzw. ca. 1,64 m³ mit 5 % Bestellzuschlag).",
+      inputs: { wallType: "straight", wallLength: 8, wallHeight: 1.5, fillMode: "preset_delfing24", stoneReserve: 5, concreteReserve: 0 },
     },
     workedExamples: [
       {
-        title: "Beispiel 1: 12 m² Mauer mit 24er Steinen (Delfing DP 24, 130 l/m²)",
-        description: "Für eine 8 m lange und 1,5 m hohe Wand (12 m² Ansichtsfläche) mit 24er Steinen, 5 % Steinreserve und 0 % Betonzuschlag ergeben sich 96 Steine Netto, 101 Steine inkl. Reserve und 1,56 m³ Füllbeton (bei 5 % Betonzuschlag: 1,638 m³).",
+        title: "Beispiel 1: 12 m² Mauer mit 24er Steinen im Format 50 × 25 cm (Beyhl 24, 18 l/Stein)",
+        description: "Für eine 8 m lange und 1,5 m hohe Wand (12 m² Ansichtsfläche) mit 24er Steinen im Format 50 × 25 cm, 5 % Steinreserve und 0 % Betonzuschlag ergeben sich 96 Steine Netto, 101 Steine inkl. Reserve und 1,73 m³ Füllbeton. Mit 25 cm hohen Steinen sind es genau 6 Lagen.",
         inputValues: [
           { label: "Mauermaß", value: "8 m × 1,5 m (12 m²)" },
           { label: "Steinformat", value: "50 × 25 cm (8 Stk./m²)" },
-          { label: "Füllmenge", value: "130 l/m²" },
+          { label: "Füllmenge", value: "18 l/Stein = 144 l/m²" },
           { label: "Steinreserve", value: "5 %" },
         ],
         steps: [
           "Netto-Wandfläche berechnen: 8 m × 1,5 m = 12 m²",
           "Steine Netto: 12 m² × 8 Stk./m² = 96 Schalungssteine",
           "Steine inkl. 5 % Reserve: 96 × 1,05 = 100,8 → aufgerundet 101 Steine",
-          "Füllbeton Netto: 12 m² × 130 l/m² = 1.560 Liter = 1,56 m³",
+          "Füllbeton Netto: 12 m² × 144 l/m² = 1.728 Liter ≈ 1,73 m³",
         ],
-        resultSummary: "101 Schalungssteine (inkl. 5 % Reserve), 1,56 m³ Füllbeton",
+        resultSummary: "101 Schalungssteine (inkl. 5 % Reserve), 1,73 m³ Füllbeton",
+        inputs: { wallType: "straight", wallLength: 8, wallHeight: 1.5, fillMode: "preset_beyhl24", stoneReserve: 5, concreteReserve: 0 },
       },
       {
-        title: "Beispiel 2: Kleine Gartenmauer (6 m × 0,75 m mit 17,5er Steinen, 80 l/m²)",
-        description: "Für eine Gartenmauer von 6 m Länge und 0,75 m Höhe (4,5 m² Fläche) mit 17,5er Steinen (80 l/m² Füllmenge) und 5 % Steinreserve werden 36 Steine Netto (38 Steine inkl. Reserve) und 0,36 m³ Füllbeton benötigt.",
+        title: "Beispiel 2: Kleine Gartenmauer (6 m × 0,75 m mit 17,5er Steinen, 12 l/Stein)",
+        description: "Für eine Gartenmauer von 6 m Länge und 0,75 m Höhe (4,5 m² Fläche) mit 17,5er Steinen im Format 50 × 25 cm (z. B. Beyhl 17,5 mit 12 l je Stein) und 5 % Steinreserve werden 36 Steine Netto (38 Steine inkl. Reserve) und 0,43 m³ Füllbeton benötigt.",
         inputValues: [
           { label: "Mauermaß", value: "6 m × 0,75 m (4,5 m²)" },
           { label: "Steinformat", value: "50 × 25 cm (8 Stk./m²)" },
-          { label: "Füllmenge", value: "80 l/m² (17,5 cm Wandstärke)" },
+          { label: "Füllmenge", value: "12 l/Stein = 96 l/m² (17,5 cm Wandstärke)" },
           { label: "Steinreserve", value: "5 %" },
         ],
         steps: [
           "Netto-Wandfläche: 6 m × 0,75 m = 4,5 m²",
           "Steine Netto: 4,5 m² × 8 Stk./m² = 36 Schalungssteine",
           "Steine inkl. 5 % Reserve: 36 × 1,05 = 37,8 → aufgerundet 38 Steine",
-          "Füllbeton Netto: 4,5 m² × 80 l/m² = 360 Liter = 0,36 m³",
+          "Füllbeton Netto: 4,5 m² × 96 l/m² = 432 Liter ≈ 0,43 m³",
         ],
-        resultSummary: "38 Schalungssteine (inkl. 5 % Reserve), 0,36 m³ Füllbeton",
+        resultSummary: "38 Schalungssteine (inkl. 5 % Reserve), 0,43 m³ Füllbeton",
+        inputs: { wallType: "straight", wallLength: 6, wallHeight: 0.75, fillMode: "preset_beyhl175", stoneReserve: 5, concreteReserve: 0 },
       },
     ],
     content: {
@@ -1847,21 +1866,21 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       sections: [
         {
           title: 'Schalungssteine berechnen – Wandformen, Lagen und Steinbedarf',
-          content: 'Die Bedarfsrechnung für Schalungssteine basiert auf der Netto-Ansichtsfläche und der gewählten Wandform Ihrer Mauer:\n- **Standardformat**: Handelsübliche Schalungssteine messen meist 50 cm Länge und 25 cm Höhe (Ansichtsfläche: 0,125 m² je Stein).\n- **Steine pro Quadratmeter**: Daraus ergibt sich die feste Grundregel von **exakt 8 Schalungssteinen je 1 m² Wandfläche**.\n- **Steinlagen & Verband**: Die Anzahl der Steinlagen ergibt sich aus Mauerhöhe geteilt durch 25 cm Schichthöhe. Je nach Grundriss (gerade Mauer, L-Form, U-Form oder geschlossener Pool) teilen sich die Steine in Normalsteine und Eck- bzw. Endsteine für die Lagenabfolge auf.\n- **Steinreserve getrennt planen**: Planen Sie mindestens 5 Prozent Reserve für Passstücke, Eckschnitte und unvermeidbaren Bruch ein. Diese Reservesteine erhöhen nicht das geometrische Füllvolumen der fertigen Wand.',
+          content: 'Die Bedarfsrechnung für Schalungssteine basiert auf der Netto-Ansichtsfläche und der gewählten Wandform Ihrer Mauer:\n- **Steinformat**: Viele Schalungssteine messen rund 50 × 25 cm (Ansichtsfläche 0,125 m², z. B. Beyhl mit 49,7 × 24,7 cm). Es gibt aber auch 20 cm hohe Steine im Format 50 × 20 cm (0,1 m²), etwa die Delfing-DP-Steine mit 130 bzw. 80 l/m².\n- **Steine pro Quadratmeter**: Bei 50 × 25 cm sind es **8 Steine je m²**, bei 50 × 20 cm **10 Steine je m²**. Wer mit dem falschen Format rechnet, bestellt 20 % zu wenig oder zu viel.\n- **Steinlagen & Verband**: Die Anzahl der Steinlagen ergibt sich aus Mauerhöhe geteilt durch die Schichthöhe (25 bzw. 20 cm). Je nach Grundriss (gerade Mauer, L-Form, U-Form oder geschlossener Pool) teilen sich die Steine in Normalsteine und Eck- bzw. Endsteine für die Lagenabfolge auf.\n- **Steinreserve getrennt planen**: Planen Sie mindestens 5 Prozent Reserve für Passstücke, Eckschnitte und unvermeidbaren Bruch ein. Diese Reservesteine erhöhen nicht das geometrische Füllvolumen der fertigen Wand.',
         },
         {
           title: 'Füllbetonbedarf nach Herstellerdatenblatt bestimmen',
-          content: 'Die Wandstärke allein reicht für die Betonberechnung nicht aus, da Steggeometrie und Hohlraumanteil je nach Hersteller und Serie variieren:\n- **Delfing DP 17,5 cm**: ca. 80 Liter Beton je m² Wandfläche\n- **Delfing DP 24 cm**: ca. 130 Liter Beton je m² Wandfläche\n- **Beyhl 17,5 cm**: ca. 12 Liter je Stein (entspricht ca. 96 l/m² bei 8 Steinen/m²)\n- **Beyhl 24 cm**: ca. 18 Liter je Stein (entspricht ca. 144 l/m² bei 8 Steinen/m²)\n\nPrüfen Sie stets das technische Datenblatt Ihres konkreten Steins. Für die Betonbestellung empfiehlt sich ein separat kalkulierter Zuschlag von 3 bis 8 Prozent. Größere Mengen berechnen Sie direkt im [Betonrechner](/rechner/betonrechner/).',
+          content: 'Die Wandstärke allein reicht für die Betonberechnung nicht aus, da Steggeometrie und Hohlraumanteil je nach Hersteller und Serie variieren:\n- **Delfing DP 17,5 (50 × 20 cm)**: 80 Liter Beton je m² Wandfläche\n- **Delfing DP 24 (50 × 20 cm)**: 130 Liter Beton je m² Wandfläche\n- **Beyhl 17,5 cm (50 × 25 cm)**: 12 Liter je Stein (entspricht 96 l/m² bei 8 Steinen/m²)\n- **Beyhl 24 cm (50 × 25 cm)**: 18 Liter je Stein (entspricht 144 l/m² bei 8 Steinen/m²)\n\nDie Werte stammen aus den Produktangaben der Hersteller. Prüfen Sie stets das technische Datenblatt Ihres konkreten Steins, auch innerhalb einer Marke gibt es verschiedene Formate. Für die Betonbestellung kalkulieren Sie einen eigenen Zuschlag für Einbauverluste und Restmengen. Größere Mengen berechnen Sie direkt im [Betonrechner](/rechner/betonrechner/).',
         },
         {
           title: 'Wichtiger Sicherheitshinweis zu Statik und Bewehrung',
           content: 'Der Rechner ermittelt Materialmengen. Er ersetzt keine Statik, Bewehrungsplanung oder Herstellervorgaben:\n- **Bewehrungsstahl**: Durchmesser, Anzahl, Lage und Verankerung der Bewehrungseisen hängen von Erddruck, Windlast, Mauerhöhe und Belastung ab und müssen statisch bemessen werden.\n- **Fundament**: Fundamentbeton ist eine getrennte Position und darf nicht aus der Schalungsstein-Füllmenge abgeleitet werden.\n- **Herstellerrichtlinien**: Beachten Sie die Verarbeitungsrichtlinien des Herstellers bezüglich maximaler Füllhöhe je Betoniertag und Frischbetonkonsistenz.',
         },
       ],
-      details: 'Da Standard-Schalungssteine 50 cm lang und 25 cm hoch sind, werden genau 8 Steine je Quadratmeter Nettofläche benötigt. Füllbeton und Fundamentbeton müssen getrennt berechnet werden. Weiterführende Werkzeuge: [Betonrechner mit Mischungsverhältnis](/rechner/betonrechner/) und [Fundament-Rechner](/rechner/fundament-rechner/).',
+      details: 'Schalungssteine im Format 50 × 25 cm ergeben 8 Steine je Quadratmeter Nettofläche, 20 cm hohe Steine (50 × 20 cm) 10 Steine je Quadratmeter. Füllbeton und Fundamentbeton müssen getrennt berechnet werden. Weiterführende Werkzeuge: [Betonrechner mit Mischungsverhältnis](/rechner/betonrechner/) und [Fundament-Rechner](/rechner/fundament-rechner/).',
     },
     faqs: [
-      { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Handelsübliche Standard-Schalungssteine haben die Maße 50 cm Länge und 25 cm Höhe (Fläche 0,125 m²). Für einen Quadratmeter Wandfläche werden exakt 8 Steine benötigt. Rechnen Sie zusätzlich eine Steinreserve von ca. 5 % für Zuschnitt und Bruch ein.' },
+      { question: 'Wie viele Schalungssteine braucht man pro Quadratmeter (m²)?', answer: 'Das hängt von der Steinhöhe ab. Steine im Format 50 × 25 cm (Fläche 0,125 m²) brauchen 8 Stück je m² Wandfläche, Steine im Format 50 × 20 cm (0,1 m²) 10 Stück je m². Für 12 m² Wand sind das 96 bzw. 120 Steine. Rechnen Sie zusätzlich eine Steinreserve von ca. 5 % für Zuschnitt und Bruch ein.' },
       { question: 'Wie viel Beton brauche ich für 24er Schalungssteine?', answer: 'Das hängt vom konkreten Produkt ab. Bei Delfing DP-Schalungssteinen (24 cm) sind es beispielsweise ca. 130 l/m², bei Beyhl-Schalungssteinen ca. 18 l pro Stein (entspricht ca. 144 l/m²). Für eine 12-m²-Mauer entspricht dies rund 1,56 bis 1,73 m³ Füllbeton vor Bestellzuschlag.' },
       { question: 'Gehört das Fundament zum Füllbeton?', answer: 'Nein. Das Fundament und der Füllbeton der Hohlkammern sind getrennte Positionen. Berechnen Sie das Streifen- oder Plattenfundament nach den geplanten Abmessungen und addieren Sie es erst bei der Gesamtbestellung.' },
       { question: 'Kann man den Bewehrungsstahl pauschal berechnen?', answer: 'Nein. Eine Materialberechnung ersetzt keinen statischen Nachweis. Durchmesser, Stababstände und Anschlussbewehrung hängen von Lastannahmen, Erddruck und Hangneigung ab und müssen fachgerecht geplant werden.' },
@@ -3117,11 +3136,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
               id: 'bigbags',
               label: 'Liefermenge in Big Bags (Richtwert à 1.000 kg)',
               value: bigBags,
-              formattedValue: bigBags + ' Big Bag(s)',
+              formattedValue: formatNumber(bigBags, 0) + (bigBags === 1 ? ' Big Bag' : ' Big Bags'),
               helpText: 'Auf ganze Gebinde aufgerundet. Prüfen Sie das tatsächliche Füllgewicht Ihres Händlers (z. B. 1.000 kg, 500 kg oder 1 m³).',
             },
           ],
-          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${formatNumber(d, 1)} cm Einbauhöhe ergibt sich ein geometrisches Volumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Bestellzuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${bigBags} Big Bag(s) à 1 t Richtwert).`,
+          summaryText: `Für ${formatNumber(a, 0)} m² Fläche bei ${formatNumber(d, 1)} cm Einbauhöhe ergibt sich ein geometrisches Volumen von ${formatNumber(baseVolumeM3, 2)} m³${compPercent > 0 ? ` plus ${formatNumber(allowanceM3, 2)} m³ Bestellzuschlag (${compPercent} %)` : ''}. Bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ entspricht dies ${formatNumber(totalTonnes, 2)} Tonnen Material (${formatNumber(bigBags, 0)} ${bigBags === 1 ? 'Big Bag' : 'Big Bags'} à 1 t Richtwert).`,
           qualifications: [
             mat === 'crushed_0_32'
               ? 'Hinweis: Der Richtwert für Schotter 0/32 (1,80 t/m³) bezieht sich bereits auf den verdichteten Einbauzustand im Unterbau.'
@@ -3175,10 +3194,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
               id: 'bigbags',
               label: 'Lieferung in Big Bags (à 1.000 kg Richtwert)',
               value: bigBags,
-              formattedValue: bigBags + ' Big Bag(s)',
+              formattedValue: formatNumber(bigBags, 0) + (bigBags === 1 ? ' Big Bag' : ' Big Bags'),
             },
           ],
-          summaryText: `${formatNumber(vol, 2)} m³ Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ wiegen rechnerisch ca. ${formatNumber(totalTonnes, 2)} Tonnen (ca. ${bigBags} Big Bag(s) à 1 t Richtwert).`,
+          summaryText: `${formatNumber(vol, 2)} m³ Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ wiegen rechnerisch ca. ${formatNumber(totalTonnes, 2)} Tonnen (ca. ${formatNumber(bigBags, 0)} ${bigBags === 1 ? 'Big Bag' : 'Big Bags'} à 1 t Richtwert).`,
         };
       }
 
@@ -3213,7 +3232,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             id: 'tonnesInput',
             label: 'Ausgangsgewicht',
             value: tonnes,
-            formattedValue: formatNumber(tonnes, 2) + ' Tonnen',
+            formattedValue: formatNumber(tonnes, 2) + (tonnes === 1 ? ' Tonne' : ' Tonnen'),
           },
           {
             id: 'densityUsed',
@@ -3225,10 +3244,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
             id: 'bigbags',
             label: 'Lieferung in Big Bags (à 1.000 kg Richtwert)',
             value: bigBags,
-            formattedValue: bigBags + ' Big Bag(s)',
+            formattedValue: formatNumber(bigBags, 0) + (bigBags === 1 ? ' Big Bag' : ' Big Bags'),
           },
         ],
-        summaryText: `${formatNumber(tonnes, 2)} Tonnen Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ ergeben ein Schüttvolumen von ca. ${formatNumber(vol, 2)} m³ (ca. ${bigBags} Big Bag(s) à 1 t Richtwert).`,
+        summaryText: `${formatNumber(tonnes, 2)} ${tonnes === 1 ? 'Tonne' : 'Tonnen'} Schüttgut bei einer Schüttdichte von ${formatNumber(density, 2)} t/m³ ${tonnes === 1 ? 'ergibt' : 'ergeben'} ein Schüttvolumen von ca. ${formatNumber(vol, 2)} m³ (ca. ${formatNumber(bigBags, 0)} ${bigBags === 1 ? 'Big Bag' : 'Big Bags'} à 1 t Richtwert).`,
       };
     },
     formula: "Gewicht (t) = Volumen (m³) × Schüttdichte (t/m³); Volumen (m³) = Fläche (m²) × Schütthöhe (m)",
@@ -3322,7 +3341,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         },
         {
           title: 'Muss Splitt verdichtet werden?',
-          content: 'Einheitliche Körnungen ohne Feinanteile wie Splitt 2/5 werden im Pflasterbett lose abgezogen und verdichten sich beim Einrütteln des Pflasters kaum (nur 0 bis maximal 5 %). Gestufte Schottertragschichten (z. B. Frostschutz 0/32 mit Sand- und Staubanteil) verdichten sich hingegen stark (10 bis 20 %). Verwenden Sie für reinen Splitt daher keinen pauschalen 15-%-Aufschlag.',
+          content: 'Einheitliche Körnungen ohne Feinanteile wie Splitt 2/5 lassen sich weniger stark zusammendrücken als gestufte Gemische mit Sand- und Staubanteil wie Frostschutz 0/32. Ganz ohne Setzung geht es aber auch beim Splittbett nicht: Beim Abrütteln des Pflasters sackt es etwas ein, deshalb wird die Bettung meist etwas höher abgezogen als die geplante Enddicke. Geben Sie im Rechner die lose Schichtdicke ein, die Sie tatsächlich abziehen, statt pauschal 15 % aufzuschlagen. Für Schottertragschichten fragen Sie beim Händler nach der Einbaudichte im verdichteten Zustand und rechnen mit diesem Wert.',
         },
         {
           title: 'Warum wiegt ein Big Bag nicht immer genau eine Tonne?',
@@ -4876,7 +4895,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     metaTitle: 'Quader & Würfel berechnen – Volumen und Oberfläche',
     metaDescription: 'Volumen, Oberfläche und Raumdiagonale von Quader und Würfel berechnen: V = a · b · c bzw. V = a³ – mit Formeln, Rechenweg und Umrechnung in Liter.',
     h1: 'Quader und Würfel berechnen – Volumen, Oberfläche und Raumdiagonale',
-    shortDescription: 'Berechnet Volumen (auch in Litern), Oberfläche, Raumdiagonale und Kantenlänge von Quader und Würfel.',
+    shortDescription: 'Berechnet Volumen (auch in Litern), Oberfläche, Raumdiagonale und die Summe aller Kanten von Quader und Würfel.',
     searchKeywords: [
       'quader berechnen',
       'volumen quader',
@@ -4924,13 +4943,20 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const dims = isCube ? `Kantenlänge ${formatNumber(a, 2)} cm` : `${formatNumber(a, 2)} × ${formatNumber(b, 2)} × ${formatNumber(c, 2)} cm`;
 
       return {
-        primary: { id: 'volume', label: `Volumen ${name} (V)`, value: v, formattedValue: formatNumber(v, 2) + ' cm³ (' + formatNumber(v / 1000, 3) + ' Liter)', highlight: true },
+        primary: {
+          id: 'volume',
+          label: `Volumen ${name} (V)`,
+          value: v,
+          // Sehr kleine Körper (z. B. 0,1 cm Kante) nicht als "0 cm³ (0 Liter)" anzeigen.
+          formattedValue: `${formatNumber(v, v < 1 ? 4 : 2)} cm³ (${v / 1000 < 0.001 ? 'unter 0,001' : formatNumber(v / 1000, 3)} Liter)`,
+          highlight: true,
+        },
         secondary: [
           { id: 'surface', label: 'Oberfläche (O)', value: o, formattedValue: formatNumber(o, 2) + ' cm²' },
           { id: 'spaceDiag', label: 'Raumdiagonale (d)', value: d, formattedValue: formatNumber(d, 2) + ' cm' },
           { id: 'edges', label: 'Summe aller Kanten', value: k, formattedValue: formatNumber(k, 2) + ' cm' },
         ],
-        summaryText: `Der ${name} (${dims}) hat ein Volumen von ${formatNumber(v, 2)} cm³, eine Oberfläche von ${formatNumber(o, 2)} cm² und eine Raumdiagonale von ${formatNumber(d, 2)} cm.`,
+        summaryText: `Der ${name} (${dims}) hat ein Volumen von ${formatNumber(v, v < 1 ? 4 : 2)} cm³, eine Oberfläche von ${formatNumber(o, 2)} cm² und eine Raumdiagonale von ${formatNumber(d, 2)} cm.`,
       };
     },
     formula: "Quader: V = a · b · c, O = 2 · (ab + bc + ac)   |   Würfel: V = a³, O = 6 · a²   |   d = √(a² + b² + c²)",
@@ -4958,7 +4984,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       },
     ],
     content: {
-      intro: 'Mit diesem Rechner berechnen Sie Volumen, Oberfläche, Raumdiagonale und Kantenlänge eines Quaders oder Würfels. Typische Anwendungen sind Kartons und Pakete, Aquarien, Hochbeete, Räume und Container. Das Volumen wird zusätzlich in Liter umgerechnet.',
+      intro: 'Mit diesem Rechner berechnen Sie Volumen, Oberfläche, Raumdiagonale und die Summe aller Kanten eines Quaders oder Würfels. Typische Anwendungen sind Kartons und Pakete, Aquarien, Hochbeete, Räume und Container. Das Volumen wird zusätzlich in Liter umgerechnet.',
       sections: [
         {
           title: 'Formeln für Quader und Würfel',
@@ -4972,7 +4998,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         {
           title: 'Volumen in Liter umrechnen',
           content:
-            '1 Liter entspricht 1.000 cm³ oder 1 dm³, und 1 m³ sind 1.000 Liter. Ein Aquarium mit 80 × 35 × 40 cm hat also 112.000 cm³ = 112 Liter Volumen. Achten Sie darauf, alle Kanten in derselben Einheit einzugeben.',
+            '1 Liter entspricht 1.000 cm³ oder 1 dm³, und 1 m³ sind 1.000 Liter. Ein Aquarium mit 80 × 35 × 40 cm hat also 112.000 cm³ = 112 Liter Volumen. Der Rechner erwartet alle Kanten in Zentimetern; Maße in Metern rechnen Sie vorher um (1,2 m = 120 cm).',
         },
       ],
     },

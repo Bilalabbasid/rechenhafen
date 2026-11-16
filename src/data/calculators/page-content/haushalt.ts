@@ -1,6 +1,8 @@
 import { PageContentMap } from './types';
 import { CalculationResult } from '@/types/calculator';
 import { EXTRA_WOHNEN_HAUSHALT } from '../extra/wohnenHaushalt';
+import { HAUSHALT_CALCULATORS } from '../haushalt';
+import { CO2_PRICE_2026_CORRIDOR, EMISSION_FACTORS } from '@/data/emissions';
 import { calculateElectricityCost, calculateLedSavings } from '@/lib/calculators/haushalt';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
 
@@ -359,6 +361,95 @@ const GV_KWH_PER_M3 = num(gv(100, 10.8, 0.95), 'reference100Kwh') / 100;
 const GV_PLAN_KWH = 12000;
 const GV_PLAN_M3 = GV_PLAN_KWH / GV_KWH_PER_M3;
 const GV_HS_HI = 1.11; // Verhältnis Brennwert/Heizwert bei Erdgas, physikalischer Richtwert
+
+// ---------------------------------------------------------------------------
+// Batch 4 (Auto & Energie): CO₂-Preis, Heizöl, CO₂-Strom, Wasser, CO₂-Aufteilung, Gaskosten
+// ---------------------------------------------------------------------------
+function runHaus(slug: string, inputs: Record<string, any>): CalculationResult {
+  const calc = HAUSHALT_CALCULATORS.find((c) => c.slug === slug);
+  if (!calc || !calc.calculate) throw new Error(`page-content/haushalt: calculator ${slug} not found`);
+  return calc.calculate(inputs) as CalculationResult;
+}
+const fmt1 = (v: number) => formatNumber(v, 1, 1);
+const fmt2 = (v: number) => formatNumber(v, 2, 2);
+
+// CO₂-Preis 2026: Korridor nach § 10 Abs. 2 BEHG, kein Festpreis
+const CORRIDOR_KEYS: [string, number][] = [
+  ['2026_corridor_55', CO2_PRICE_2026_CORRIDOR.min],
+  ['2026_corridor_60', CO2_PRICE_2026_CORRIDOR.midpoint],
+  ['2026_corridor_65', CO2_PRICE_2026_CORRIDOR.max],
+];
+const cpr = (fuel: string, amount: number, priceYear: string) =>
+  runHaus('co2-preis-rechner', { calculationMode: 'by_fuel', fuel, amount, priceYear, customPricePerTonne: 60, includeVat: true, emissionsAmount: 2000, emissionsUnit: 'kg', pricePerTonne: 60, priceTaxStatus: 'user_basis' });
+const cprCost = (fuel: string, amount: number, key: string) => num(cpr(fuel, amount, key), 'carbonCostTotal');
+const CPR_FUELS: [string, number, string][] = [
+  ['gas', 10000, '10.000 kWh Erdgas'],
+  ['heizoel', 1000, '1.000 l Heizöl EL'],
+  ['benzin', 1000, '1.000 l Benzin'],
+  ['diesel', 1000, '1.000 l Diesel'],
+  ['lpg', 1000, '1.000 kg Flüssiggas'],
+];
+const CPR_TABLE = table(
+  ['Verbrauch', ...CORRIDOR_KEYS.map(([, p]) => `${eur0(p)}/t`)],
+  CPR_FUELS.map(([f, a, label]) => [label, ...CORRIDOR_KEYS.map(([k]) => eur(cprCost(f, a, k)))]),
+);
+const CPR_GAS_15 = CORRIDOR_KEYS.map(([k]) => cprCost('gas', 15000, k));
+
+// Heizöl
+const oel = (area: number, std: string) => run('oelheizung-verbrauch-rechner', { livingArea: area, insulationStandard: std, oilPricePerLiter: 1.05 });
+const OEL_STDS: [string, string][] = [['modern', 'gut gedämmt'], ['standard', 'teilsaniert'], ['unrenovated', 'unsaniert']];
+const OEL_TABLE = table(
+  ['Wohnfläche', ...OEL_STDS.map(([s, l]) => `${l} (${formatNumber(num(oel(100, s), 'litersPerSqm'), 0)} l/m²)`)],
+  [80, 120, 160, 200].map((a) => [`${a} m²`, ...OEL_STDS.map(([s]) => { const r = oel(a, s); return `${formatNumber(num(r, 'totalLiters'), 0)} l / ${txt(r, 'totalCost')}`; })]),
+);
+const OEL_DEF_L = num(oel(140, 'standard'), 'totalLiters');
+const OEL_CT_L = (key: string) => (cprCost('heizoel', 1000, key) / 1000) * 100;
+const OEL_YEAR = (key: string) => cprCost('heizoel', OEL_DEF_L, key);
+const OEL_GAP_80_200 = num(oel(200, 'unrenovated'), 'totalLiters') / num(oel(200, 'modern'), 'totalLiters');
+
+// CO₂ aus Strom: UBA-Faktoren laut Mitteilung vom 23.03.2026 (2023 = 379 g, 2024 = 353 g vorläufig, 2025 = 344 g geschätzt)
+const cst = (kwh: number, g: number) => num(runHaus('co2-strom-rechner', { consumptionKwh: kwh, period: 'year', tariffType: 'custom', customFactorGrams: g, compareConsumptionKwh: '' }), 'totalKg');
+const CST_2025 = EMISSION_FACTORS.strom_mix_de_generation_2025.value;
+const CST_YEARS: [string, number][] = [['2023', 379], ['2024 (vorläufig)', 353], ['2025 (geschätzt)', CST_2025]];
+const CST_TABLE = table(
+  ['Datenjahr', 'Faktor', '1.500 kWh', '2.500 kWh', '4.000 kWh'],
+  CST_YEARS.map(([y, g]) => [y, `${g} g/kWh`, ...[1500, 2500, 4000].map((k) => `${formatNumber(cst(k, g), 0)} kg`)]),
+);
+const CST_DROP_2500 = cst(2500, 379) - cst(2500, CST_2025);
+const CST_TARIFF_G = 150;
+
+// Wasser
+const was = (persons: number, liters: number) => run('wasserverbrauch-haushalt-rechner', { persons, dailyLitersPerPerson: liters, freshWaterPrice: 2.1, wasteWaterPrice: 2.7, fixedFeeYear: 0 });
+const WAS_L = [100, 126, 150];
+const WAS_TABLE = table(
+  ['Personen', ...WAS_L.map((l) => `${l} l pro Kopf und Tag`)],
+  [1, 2, 3, 4, 5].map((p) => [String(p), ...WAS_L.map((l) => { const r = was(p, l); return `${fmt1(num(r, 'totalYearlyM3'))} m³ / ${txt(r, 'totalYearlyCost')}`; })]),
+);
+const WAS_EXTRA_PERSON = num(was(4, 126), 'totalYearlyCost') - num(was(3, 126), 'totalYearlyCost');
+const WAS_PER_LITER_CT = (num(was(1, 100), 'totalYearlyCost') / num(was(1, 100), 'totalYearlyM3') / 1000) * 100;
+
+// CO₂-Kostenaufteilung (CO2KostAufG); Kosten nur als Annahme mit dem Korridor-Mittelwert
+const cab = (kg: number, area: number, cost: number) =>
+  run('co2-abgabe-vermieter-mieter-rechner', { co2CostTotal: cost, co2EmissionsKg: kg, livingArea: area, billingMonths: 12, statutoryExemption: 'none' });
+const cabCost = (kg: number) =>
+  num(runHaus('co2-preis-rechner', { calculationMode: 'by_emissions', emissionsAmount: kg, emissionsUnit: 'kg', pricePerTonne: CO2_PRICE_2026_CORRIDOR.midpoint, priceTaxStatus: 'add_vat', fuel: 'gas', amount: 15000, priceYear: '2026_corridor_60', customPricePerTonne: 60, includeVat: true }), 'carbonCostTotal');
+const CAB_AREA = 75;
+const CAB_TABLE = table(
+  ['CO₂ im Jahr', 'kg CO₂/m²', 'Stufe', 'CO₂-Kosten (Annahme)', 'Vermieter', 'Mieter'],
+  [900, 1500, 2100, 2700, 3300, 3900].map((kg) => {
+    const cost = cabCost(kg);
+    const r = cab(kg, CAB_AREA, cost);
+    return [`${formatNumber(kg, 0)} kg`, fmt1(kg / CAB_AREA), String(num(r, 'stepClassification')), eur(cost), `${txt(r, 'landlordShare')} (${txt(r, 'landlordPct')})`, txt(r, 'tenantShare')];
+  }),
+);
+const CAB_ROUND = cab(2696, 100, 200);
+
+// Gaskosten
+const gko = (kwh: number, ct: number) =>
+  num(runHaus('gaskostenrechner', { inputType: 'kwh', annualKwh: kwh, priceUnit: 'eur', pricePerKwh: ct / 100, basePricePeriod: 'yearly', basePrice: 120, meterOld: 12400, meterNew: 13800, calorificValue: 10.3, stateFactor: 0.95 }), 'totalAnnualCost');
+const GKO_1CT = gko(14000, 11) - gko(14000, 10);
+const GKO_CT = (key: string) => (cprCost('gas', 1000, key) / 1000) * 100;
+const GKO_YEAR = (key: string) => cprCost('gas', 14000, key);
 
 export const HAUSHALT_PAGE_CONTENT: PageContentMap = {
   stromkostenrechner: {
@@ -734,6 +825,96 @@ export const HAUSHALT_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Warum weicht meine eigene Umrechnung von den kWh auf der Gasrechnung ab?',
         answer: 'Meist aus einem von drei Gründen: Der Versorger hat einen Zählerstand geschätzt statt abgelesen, der Abrechnungszeitraum beginnt oder endet an einem anderen Tag als Ihre Ablesung, oder der Brennwert hat sich während des Zeitraums geändert und wird anteilig gewichtet. Prüfen Sie die Ablesedaten auf der Rechnung und rechnen Sie mit genau diesen Zählerständen und Faktoren nach.',
+      },
+    ],
+  },
+
+  'co2-preis-rechner': {
+    sections: [
+      {
+        title: 'CO₂-Kosten 2026 je Brennstoff im gesetzlichen Preiskorridor',
+        content:
+          `Für 2026 gibt es keinen Festpreis mehr, sondern einen Korridor von ${eur0(CO2_PRICE_2026_CORRIDOR.min)} bis ${eur0(CO2_PRICE_2026_CORRIDOR.max)} je Tonne (§ 10 Abs. 2 BEHG). Rechnerischer CO₂-Kostenanteil mit den EBeV-Standardfaktoren des Rechners, inklusive 19 % Umsatzsteuer:\n\n${CPR_TABLE}\n\n` +
+          `Lesen Sie die Tabelle wie einen Dreisatz: Für 2.000 l Heizöl verdoppeln Sie die Zeile, für 15.000 kWh Gas nehmen Sie sie mal 1,5. Welcher Preis innerhalb des Korridors bei Ihnen ankommt, hängt davon ab, zu welchem Preis Ihr Lieferant die Zertifikate kauft und ob er ihn voll weitergibt.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Warum bietet der Rechner für 2026 drei verschiedene CO₂-Preise an?',
+        answer: `Weil das BEHG für 2026 nur Unter- und Obergrenze festlegt: ${eur0(CO2_PRICE_2026_CORRIDOR.min)} und ${eur0(CO2_PRICE_2026_CORRIDOR.max)} je Tonne. Der Mittelwert von ${eur0(CO2_PRICE_2026_CORRIDOR.midpoint)} ist der Zertifikatepreis, den § 4 Abs. 1 Nr. 2 CO2KostAufG für 2026 als maßgeblich bestimmt; in Ihrer Brennstoffrechnung können andere Beträge stehen. Für 15.000 kWh Gas liegen zwischen Unter- und Obergrenze ${eur(CPR_GAS_15[2] - CPR_GAS_15[0])} im Jahr (${eur(CPR_GAS_15[0])} gegenüber ${eur(CPR_GAS_15[2])}).`,
+      },
+    ],
+  },
+
+  'oelheizung-verbrauch-rechner': {
+    sections: [
+      {
+        title: 'Heizölbedarf nach Wohnfläche und Gebäudezustand',
+        content: `Modellschätzung des Rechners mit 1,05 € je Liter als Beispielpreis (Liter pro Jahr / Kosten pro Jahr):\n\n${OEL_TABLE}\n\nDer unsanierte Altbau braucht im Modell ${formatNumber(OEL_GAP_80_200, 2)}-mal so viel Öl wie das gut gedämmte Haus gleicher Größe. Vergleichen Sie die Tabelle mit Ihrem echten Verbrauch aus der Tankbilanz: Liegt er klar über der Zeile Ihres Gebäudezustands, lohnt ein Blick auf Heizkurve, Warmwasserbereitung und Kesselwartung.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel CO₂-Preis steckt 2026 in einem Liter Heizöl?',
+        answer: `Mit dem EBeV-Standardwert für Heizöl EL und dem Preiskorridor 2026 sind es rechnerisch ${fmt1(OEL_CT_L('2026_corridor_55'))} bis ${fmt1(OEL_CT_L('2026_corridor_65'))} Cent je Liter inklusive 19 % Umsatzsteuer. Für die ${formatNumber(OEL_DEF_L, 0)} Liter des Standardbeispiels ergibt das ${eur(OEL_YEAR('2026_corridor_55'))} bis ${eur(OEL_YEAR('2026_corridor_65'))} im Jahr. Dieser Anteil ist im Literpreis des Händlers bereits enthalten; in einer vermieteten Wohnung wird er nach dem CO2KostAufG zwischen Vermieter und Mieter aufgeteilt.`,
+      },
+    ],
+  },
+
+  'co2-strom-rechner': {
+    sections: [
+      {
+        title: 'Derselbe Verbrauch mit den UBA-Faktoren 2023 bis 2025',
+        content: `Das Umweltbundesamt hat am 23. März 2026 folgende Werte für den deutschen Strommix veröffentlicht. Gerechnet mit dem Rechner:\n\n${CST_TABLE}\n\nFür 2.500 kWh sinkt der rechnerische Ausstoß allein durch den veränderten Strommix um ${formatNumber(CST_DROP_2500, 0)} kg, ohne dass im Haushalt eine Kilowattstunde gespart wurde. Wenn Sie Ihren Verbrauch über mehrere Jahre vergleichen, rechnen Sie deshalb beide Jahre mit demselben Faktor; sonst vermischen Sie Ihre eigene Einsparung mit der Veränderung im Kraftwerkspark.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wo finde ich den CO₂-Wert meines eigenen Stromtarifs?',
+        answer: `Stromlieferanten müssen nach § 42 Abs. 1 Nr. 2 EnWG Angaben zu den CO₂-Emissionen ihres Strommixes machen; Sie finden sie in der Stromkennzeichnung auf der Rechnung oder auf der Website des Anbieters. Diesen Wert können Sie als eigenen Faktor eintragen. Mit angenommenen ${CST_TARIFF_G} g/kWh ergeben 2.500 kWh ${formatNumber(cst(2500, CST_TARIFF_G), 0)} kg statt ${formatNumber(cst(2500, CST_2025), 0)} kg mit dem UBA-Durchschnitt. Beachten Sie: Die Stromkennzeichnung ist eine bilanzielle Zuordnung, der physikalische Strom aus der Steckdose bleibt derselbe Mix.`,
+      },
+    ],
+  },
+
+  'wasserverbrauch-haushalt-rechner': {
+    sections: [
+      {
+        title: 'Wasserverbrauch und Kosten nach Haushaltsgröße',
+        content: `Jahresverbrauch und Kosten laut Rechner mit den Beispieltarifen 2,10 € (Trinkwasser) und 2,70 € (Schmutzwasser) je m³, ohne Grundpreis:\n\n${WAS_TABLE}\n\nDie mittlere Spalte entspricht dem bundesweiten Durchschnitt von rund 126 Litern. Ein Liter Leitungswasser kostet mit diesen Tarifen inklusive Abwasser ${fmt2(WAS_PER_LITER_CT)} Cent. Tragen Sie die Preise aus Ihrem Gebührenbescheid ein, sie unterscheiden sich von Gemeinde zu Gemeinde stark.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel teurer wird die Wasserrechnung durch eine weitere Person?',
+        answer: `Bei 126 Litern pro Tag und den Beispieltarifen des Rechners steigen die Jahreskosten von drei auf vier Personen um ${eur(WAS_EXTRA_PERSON)}, also um ${eur(WAS_EXTRA_PERSON / 12)} im Monat. Ein fester Grundpreis ändert sich dadurch meist nicht. Zieht jemand neu ein, passen Sie am besten gleich den Abschlag an, damit die Jahresabrechnung keine Nachzahlung bringt.`,
+      },
+    ],
+  },
+
+  'co2-abgabe-vermieter-mieter-rechner': {
+    sections: [
+      {
+        title: 'Von der CO₂-Menge zur Aufteilung: Beispiele für eine 75-m²-Wohnung',
+        content: `Die CO₂-Kosten setzt die Tabelle mit dem Mittelwert des Preiskorridors 2026 an (${eur0(CO2_PRICE_2026_CORRIDOR.midpoint)} je Tonne plus 19 % Umsatzsteuer). In Ihrer Abrechnung gelten die Beträge der Brennstoffrechnung.\n\n${CAB_TABLE}\n\nJe schlechter der energetische Zustand, desto höher die CO₂-Menge pro Quadratmeter und desto größer der Anteil des Vermieters. Zwischen den Stufen liegen jeweils 5 kg CO₂/m²; bei 75 m² entspricht eine Stufe also 375 kg CO₂ im Jahr.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wird der CO₂-Wert pro Quadratmeter vor der Einstufung gerundet?',
+        answer: `Ja. Nach § 5 Abs. 1 Satz 3 CO2KostAufG wird der spezifische Ausstoß auf die erste Nachkommastelle gerundet. Beispiel: 2.696 kg CO₂ auf 100 m² ergeben 26,96 kg/m², gerundet 27,0 kg/m². Damit liegt die Wohnung in Stufe ${formatNumber(num(CAB_ROUND, 'stepClassification'), 0)} mit ${txt(CAB_ROUND, 'landlordPct')} Vermieteranteil und nicht in der Stufe darunter. Prüfen Sie bei Werten knapp unter einer Grenze, ob in der Abrechnung richtig gerundet wurde.`,
+      },
+    ],
+  },
+
+  gaskostenrechner: {
+    faqs: [
+      {
+        question: 'Wie viel CO₂-Preis steckt 2026 in einer Kilowattstunde Gas?',
+        answer: `Mit dem EBeV-Standardwert von ${formatNumber(EMISSION_FACTORS.brennstoff_erdgas_ebev.value, 4)} kg CO₂ je kWh und dem Preiskorridor 2026 von ${eur0(CO2_PRICE_2026_CORRIDOR.min)} bis ${eur0(CO2_PRICE_2026_CORRIDOR.max)} je Tonne (§ 10 Abs. 2 BEHG) sind es rechnerisch ${fmt2(GKO_CT('2026_corridor_55'))} bis ${fmt2(GKO_CT('2026_corridor_65'))} Cent je kWh inklusive 19 % Umsatzsteuer. Für 14.000 kWh im Jahr ergibt das ${eur(GKO_YEAR('2026_corridor_55'))} bis ${eur(GKO_YEAR('2026_corridor_65'))}. Gibt Ihr Versorger den CO₂-Preis weiter, ist er im Arbeitspreis bereits enthalten und kommt nicht zusätzlich hinzu.`,
+      },
+      {
+        question: 'Was bringt ein Cent weniger Arbeitspreis im Jahr?',
+        answer: `Bei 14.000 kWh verändert jeder Cent je kWh die Jahreskosten um ${eur(GKO_1CT)}, das sind ${eur(GKO_1CT / 12)} im Monat. Vergleichen Sie Tarife deshalb immer mit Arbeits- und Grundpreis zusammen: Ein Tarif mit 1 Cent niedrigerem Arbeitspreis darf bei diesem Verbrauch bis zu ${eur(GKO_1CT)} mehr Grundpreis im Jahr kosten und ist trotzdem nicht teurer.`,
       },
     ],
   },

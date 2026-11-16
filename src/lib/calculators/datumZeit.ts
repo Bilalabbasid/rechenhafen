@@ -200,17 +200,21 @@ export function calculateDateDifference(inputs: Record<string, any>): Calculatio
   let primaryLabel = 'Tage';
   let primaryFormatted = `${formatNumber(totalDays, 0)} Tage`;
 
+  const weeksText = `${formatNumber(totalWeeks, 0)} ${totalWeeks === 1 ? 'Woche' : 'Wochen'}`;
+  const remDaysText = `${remDays} ${remDays === 1 ? 'Tag' : 'Tage'}`;
+  primaryFormatted = `${formatNumber(totalDays, 0)} ${totalDays === 1 ? 'Tag' : 'Tage'}`;
+
   if (outputUnit === 'detailed') {
     primaryLabel = 'Detaillierte Zeitspanne';
-    primaryFormatted = `${years} Jahre, ${months} Monate, ${days} Tage`;
+    primaryFormatted = ymd(years, months, days);
   } else if (outputUnit === 'weeks') {
     primaryLabel = 'Wochen';
     primaryVal = totalWeeks;
-    primaryFormatted = `${formatNumber(totalWeeks, 0)} Wochen (${remDays} Resttage)`;
+    primaryFormatted = `${weeksText} (${remDays} ${remDays === 1 ? 'Resttag' : 'Resttage'})`;
   } else if (outputUnit === 'months') {
     primaryLabel = 'Monate';
     primaryVal = totalMonths;
-    primaryFormatted = `ca. ${formatNumber(totalMonths, 0)} Monate`;
+    primaryFormatted = `ca. ${formatNumber(totalMonths, 0)} ${totalMonths === 1 ? 'Monat' : 'Monate'}`;
   } else if (outputUnit === 'years') {
     const decYears = totalDays / 365.25;
     primaryLabel = 'Jahre';
@@ -227,12 +231,12 @@ export function calculateDateDifference(inputs: Record<string, any>): Calculatio
       highlight: true,
     },
     secondary: [
-      { id: 'totalDays', label: 'Tage gesamt', value: totalDays, formattedValue: `${formatNumber(totalDays, 0)} Tage` },
+      { id: 'totalDays', label: 'Tage gesamt', value: totalDays, formattedValue: `${formatNumber(totalDays, 0)} ${totalDays === 1 ? 'Tag' : 'Tage'}` },
       { id: 'detailed', label: 'Kalendarische Spanne', value: totalDays, formattedValue: `${years} J, ${months} M, ${days} T` },
-      { id: 'weeks', label: 'Wochen & Tage', value: totalWeeks, formattedValue: `${totalWeeks} Wochen und ${remDays} Tage` },
+      { id: 'weeks', label: 'Wochen & Tage', value: totalWeeks, formattedValue: `${weeksText} und ${remDaysText}` },
       { id: 'hours', label: 'Stunden gesamt', value: totalHours, formattedValue: `${formatNumber(totalHours, 0)} Std.` },
     ],
-    summaryText: `Zwischen dem ${startFormatted} und dem ${endFormatted} liegen ${formatNumber(totalDays, 0)} Tage (${years} Jahre, ${months} Monate und ${days} Tage).${includeEndDay ? ' (inklusive Endtag)' : ''}`,
+    summaryText: `Zwischen dem ${startFormatted} und dem ${endFormatted} ${totalDays === 1 ? 'liegt 1 Tag' : `liegen ${formatNumber(totalDays, 0)} Tage`} (${ymd(years, months, days, true)}).${includeEndDay ? ' (inklusive Endtag)' : ''}`,
   };
 }
 
@@ -798,17 +802,21 @@ export function calculateBirthdayWeekday(inputs: Record<string, any>): Calculati
 }
 
 export function calculateISOWeek(inputs: Record<string, any>): CalculationResult {
-  const d = inputs.date ? new Date(inputs.date) : new Date();
-  if (isNaN(d.getTime())) {
+  // Kalenderdaten als reine Jahr/Monat/Tag-Werte rechnen (UTC-basiert): `new Date('2026-09-19')` wäre
+  // UTC-Mitternacht und läge in Browsern mit negativem UTC-Versatz lokal noch am Vortag.
+  const hasDate = inputs.date !== undefined && inputs.date !== null && String(inputs.date).trim() !== '';
+  const parts = hasDate ? parseDateParts(inputs.date) : getBerlinTodayParts();
+  if (!parts) {
     return {
       primary: { id: 'kw', label: 'Kalenderwoche', value: 0, formattedValue: '-' },
       error: 'Ungültiges Datum.',
     };
   }
 
-  const kw = getISOWeek(d);
-  const year = d.getFullYear();
-  const quarter = Math.floor(d.getMonth() / 3) + 1;
+  const kw = getISOWeekFromParts(parts.year, parts.month, parts.day);
+  const year = parts.year;
+  const quarter = Math.floor((parts.month - 1) / 3) + 1;
+  const dayOfYear = getDayOfYear(parts.year, parts.month, parts.day);
 
   return {
     primary: {
@@ -820,30 +828,16 @@ export function calculateISOWeek(inputs: Record<string, any>): CalculationResult
     },
     secondary: [
       { id: 'quarter', label: 'Quartal', value: quarter, formattedValue: `Q${quarter}` },
-      { id: 'dayOfYear', label: 'Tag des Jahres', value: getDayOfYear(d), formattedValue: `Tag ${getDayOfYear(d)} von ${isLeapYear(year) ? 366 : 365}` },
+      { id: 'dayOfYear', label: 'Tag des Jahres', value: dayOfYear, formattedValue: `Tag ${dayOfYear} von ${isLeapYear(year) ? 366 : 365}` },
     ],
-    summaryText: `Der ${formatDateDe(d)} liegt in der Kalenderwoche ${kw} (Quartal Q${quarter}).`,
+    summaryText: `Der ${formatDateGerman(parts)} liegt in der Kalenderwoche ${kw} (Quartal Q${quarter}).`,
   };
 }
 
 // Helpers
-function getISOWeek(date: Date): number {
-  const target = new Date(date.valueOf());
-  const dayNr = (date.getDay() + 6) % 7;
-  target.setDate(target.getDate() - dayNr + 3);
-  const firstThursday = target.valueOf();
-  target.setMonth(0, 1);
-  if (target.getDay() !== 4) {
-    target.setMonth(0, 1 + ((4 - target.getDay() + 7) % 7));
-  }
-  return 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
-}
-
-function getDayOfYear(date: Date): number {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date.getTime() - start.getTime();
-  const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
+/** Tag des Jahres (1. Januar = 1), zeitzonenunabhängig über fortlaufende UTC-Tagesnummern. */
+function getDayOfYear(year: number, month: number, day: number): number {
+  return dateToDayNumber(year, month, day) - dateToDayNumber(year, 1, 1) + 1;
 }
 
 function isLeapYear(year: number): boolean {

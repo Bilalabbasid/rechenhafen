@@ -245,7 +245,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     category: 'datum-zeit',
     subcategory: 'Alter & Geburtstag',
     metaTitle: 'Alter in Monaten Rechner – Lebensmonate exakt berechnen',
-    metaDescription: 'Wie viele Monate alt ist Ihr Kind oder ein Vertrag? Berechnen Sie vollendete Lebensmonate, Resttage und den laufenden Lebensmonat kalendergenau nach BGB.',
+    metaDescription: 'Wie viele Monate alt ist Ihr Kind oder ein Vertrag? Berechnen Sie vollendete Lebensmonate, Resttage und den laufenden Lebensmonat kalendergenau.',
     h1: 'Alter in Monaten & Lebensmonate berechnen',
     shortDescription: 'Ermittelt die vollendeten Lebensmonate, verbleibende Resttage und den laufenden Lebensmonat zwischen Geburtsdatum und Stichtag kalendergenau.',
     searchKeywords: [
@@ -261,21 +261,27 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       { id: 'targetDate', label: 'Stichtag', type: 'date', defaultValue: '2026-03-15' },
     ],
     calculate: (inputs) => {
-      const bStr = String(inputs.birthDate || '2024-03-15');
-      const tStr = String(inputs.targetDate || '2026-03-15');
+      const isEmpty = (v: unknown) => v === undefined || v === null || String(v).trim() === '';
+      if (isEmpty(inputs.birthDate)) {
+        return {
+          primary: { id: 'completedMonths', label: 'Vollendete Lebensmonate', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie ein Geburtsdatum ein.',
+        };
+      }
+      // Ohne Stichtag wird bis heute (deutsche Zeit) gerechnet.
+      const birth = parseDateParts(inputs.birthDate);
+      const target = parseDateParts(isEmpty(inputs.targetDate) ? getBerlinTodayString() : inputs.targetDate);
 
-      const bParts = bStr.split('-').map(Number);
-      const tParts = tStr.split('-').map(Number);
-
-      if (bParts.length !== 3 || tParts.length !== 3 || bParts.some(isNaN) || tParts.some(isNaN)) {
+      if (!birth || !target) {
         return {
           primary: { id: 'completedMonths', label: 'Vollendete Lebensmonate', value: 0, formattedValue: '-' },
           error: 'Bitte geben Sie ein gültiges Geburtsdatum und einen Stichtag ein.',
         };
       }
 
-      const [bY, bM, bD] = bParts;
-      const [tY, tM, tD] = tParts;
+      const [bY, bM, bD] = [birth.year, birth.month, birth.day];
+      const [tY, tM, tD] = [target.year, target.month, target.day];
+      const n = (count: number, singular: string, plural: string) => `${formatNumber(count, 0)} ${count === 1 ? singular : plural}`;
 
       const birthUtc = Date.UTC(bY, bM - 1, bD);
       const targetUtc = Date.UTC(tY, tM - 1, tD);
@@ -335,7 +341,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
           id: 'completedMonths',
           label: 'Vollendete Lebensmonate',
           value: completedMonths,
-          formattedValue: `${completedMonths} Monate, ${restDays} Tage`,
+          formattedValue: `${n(completedMonths, 'Monat', 'Monate')}, ${n(restDays, 'Tag', 'Tage')}`,
           highlight: true,
         },
         secondary: [
@@ -349,22 +355,22 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
             id: 'restDays',
             label: 'Verbleibende Resttage',
             value: restDays,
-            formattedValue: `${restDays} ${restDays === 1 ? 'Tag' : 'Tage'}`,
+            formattedValue: n(restDays, 'Tag', 'Tage'),
           },
           {
             id: 'totalWeeks',
             label: 'Alter in Wochen',
             value: totalWeeks,
-            formattedValue: `${totalWeeks} Wochen, ${restWeekDays} Tage`,
+            formattedValue: `${n(totalWeeks, 'Woche', 'Wochen')}, ${n(restWeekDays, 'Tag', 'Tage')}`,
           },
           {
             id: 'totalDays',
             label: 'Gesamte Lebenstage',
             value: totalDays,
-            formattedValue: `${formatNumber(totalDays, 0)} Tage`,
+            formattedValue: n(totalDays, 'Tag', 'Tage'),
           },
         ],
-        summaryText: `Vom ${bFormatted} bis zum ${tFormatted} sind ${completedMonths} volle Lebensmonate und ${restDays} Tage vergangen. Die Person befindet sich im ${runningMonth}. Lebensmonat.`,
+        summaryText: `Vom ${bFormatted} bis zum ${tFormatted} sind ${n(completedMonths, 'voller Lebensmonat', 'volle Lebensmonate')} und ${n(restDays, 'Tag', 'Tage')} vergangen. Die Person befindet sich im ${runningMonth}. Lebensmonat.`,
       };
     },
     formula: 'Vollendete Monate = Anzahl voller Monatssprünge (anniversary days); Laufender Lebensmonat = Vollendete Monate + 1',
@@ -396,19 +402,19 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       },
     ],
     content: {
-      intro: 'Dieser Rechner ermittelt das kalendarische Alter in vollendeten Monaten, Resttagen und dem aktuell laufenden Lebensmonat – unverzichtbar für Elternzeit, U-Untersuchungen, Beikost und Entwicklungsstufen.',
+      intro: 'Dieser Rechner ermittelt das kalendarische Alter in vollendeten Monaten, Resttagen und dem aktuell laufenden Lebensmonat. Gebraucht wird das zum Beispiel bei Elterngeld und Elternzeit, Altersangaben auf Babynahrung oder Kinderspielzeug und beim Vergleich mit Entwicklungstabellen. Lassen Sie den Stichtag leer, rechnet er bis heute.',
       sections: [
         {
           title: 'Vollendete Lebensmonate vs. laufender Lebensmonat: Der Unterschied',
-          content: 'Im Alltag kommt es häufig zu Missverständnissen:\n\n- **Vollendete Lebensmonate:** Beschreibt das bereits abgeschlossene Alter. Ein Baby, das am 15. Januar geboren wurde, vollendet am 15. März seinen 2. Lebensmonat (Alter: genau 2 Monate).\n- **Laufender Lebensmonat:** Beschreibt den Zählmonat, in dem sich das Kind gerade befindet. Bereits ab dem Tag nach der Geburt (16. Januar) befindet sich das Neugeborene im 1. Lebensmonat. Ab dem 15. März beginnt somit der **3. Lebensmonat**.\n\nAusführliche Beispiele, Vergleichstabellen und rechtliche Hintergründe finden Sie in unserem Ratgeber [Lebensmonate berechnen: Vollendete Monate und laufender Lebensmonat](/ratgeber/lebensmonate-berechnen/).',
+          content: 'Im Alltag kommt es häufig zu Missverständnissen:\n\n- **Vollendete Lebensmonate:** Beschreibt das bereits abgeschlossene Alter. Ein Baby, das am 15. Januar geboren wurde, vollendet am 15. März seinen 2. Lebensmonat (Alter: genau 2 Monate).\n- **Laufender Lebensmonat:** Beschreibt den Zählmonat, in dem sich das Kind gerade befindet. Vom Tag der Geburt (15. Januar) an läuft der 1. Lebensmonat, ab dem 15. Februar der 2. Ab dem 15. März beginnt somit der **3. Lebensmonat**.\n\nAusführliche Beispiele, Vergleichstabellen und rechtliche Hintergründe finden Sie in unserem Ratgeber [Lebensmonate berechnen: Vollendete Monate und laufender Lebensmonat](/ratgeber/lebensmonate-berechnen/).',
         },
         {
           title: 'Warum 4 Wochen kein Kalendermonat sind',
-          content: 'Vier Wochen haben exakt 28 Tage (4 × 7 Tage). Ein durchschnittlicher Kalendermonat hat jedoch **30,44 Tage** (365 Tage ÷ 12 Monate). Ein Kind mit 12 Wochen ist somit noch nicht 3 Monate alt, sondern erst rund 2 Monate und 3 Wochen (84 Tage vs. ca. 91–92 Tage bei 3 Kalendermonaten). Berechnen Sie Lebensmonate deshalb nie durch Division der Tage durch 30 oder 28.',
+          content: 'Vier Wochen haben exakt 28 Tage (4 × 7 Tage). Ein durchschnittlicher Kalendermonat hat jedoch **30,44 Tage** (365,25 Tage ÷ 12 Monate). Ein Kind mit 12 Wochen ist somit noch nicht 3 Monate alt: 12 Wochen sind 84 Tage, drei Kalendermonate je nach Lage 89 bis 92 Tage. Wer am 1. Januar 2026 geboren ist, ist nach 84 Tagen (am 26. März) erst 2 Monate und 25 Tage alt. Berechnen Sie Lebensmonate deshalb nie durch Division der Tage durch 30 oder 28.',
         },
         {
           title: 'Monatsende-Konvention bei Geburt am 29., 30. oder 31.',
-          content: 'Wurde eine Person an einem Tag geboren, der im Folgemonat nicht existiert (z. B. 31. Januar), greift die bürgerlich-rechtliche Monatsende-Regel (§ 188 Abs. 3 BGB analog): Der Lebensmonat vollendet sich mit Ablauf des letzten Kalendertages dieses Monats (also am 28. Februar, im Schaltjahr am 29. Februar).',
+          content: 'Wurde eine Person an einem Tag geboren, der im Folgemonat nicht existiert (z. B. 31. Januar), nimmt der Rechner den letzten Kalendertag dieses Monats als Monatstag: Am 28. Februar (im Schaltjahr am 29. Februar) zeigt er 1 vollendeten Monat. Das entspricht dem Gedanken von § 188 Abs. 3 BGB, nach dem eine Monatsfrist am letzten Tag des kürzeren Monats endet. Im nächsten Monat zählt wieder der ursprüngliche Tag: Der 2. Monat ist am 31. März vollendet. Für Elterngeld oder andere Fristen mit Behördenbezug ist die Berechnung der zuständigen Stelle maßgeblich, weil dort die Tag-genaue Abgrenzung entscheidet.',
         },
       ],
       details: 'Dieser Rechner führt eine reine kalendarische Frist- und Datumsarithmetik durch. Er ersetzt keine individuelle medizinische Terminplanung (z. B. für kinderärztliche Früherkennungsuntersuchungen U1 bis U9) oder behördliche Fristbescheide bei Elterngeld und Elternzeit.',
@@ -1015,7 +1021,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       },
       {
         question: 'Ist Heiligabend (24. Dezember) ein gesetzlicher Feiertag?',
-        answer: 'Nein, Heiligabend ist in Deutschland kein gesetzlicher Feiertag. Viele Tarifverträge und Arbeitgeber regeln jedoch, dass ab 12:00 oder 14:00 Uhr arbeitsfrei ist oder nur ein halber Urlaubstag genommen werden muss.',
+        answer: 'Nein, Heiligabend ist in Deutschland kein gesetzlicher Feiertag. Ob ab mittags frei ist oder nur ein halber Urlaubstag genommen werden muss, regeln einzelne Tarifverträge, Betriebsvereinbarungen oder Arbeitsverträge; einen allgemeinen gesetzlichen Anspruch darauf gibt es nicht.',
       },
       {
         question: 'Warum stellt der Countdown nach dem 25. Dezember automatisch auf das Folgejahr um?',

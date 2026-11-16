@@ -3,6 +3,8 @@
  * Jede Angabe enthält Quelle, Gültigkeit und Prüfdatum.
  */
 
+import { EMISSION_FACTORS } from '@/data/emissions';
+
 export interface RegulatedValue<T = number> {
   key: string;
   value: T;
@@ -128,14 +130,15 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
   },
   co2_faktor_strommix: {
     key: 'co2_faktor_strommix',
-    value: 0.380,
+    // Einzige Quelle: Emissionsregister (UBA, Datenjahr 2025: 344 g CO₂/kWh), hier in kg/kWh umgerechnet.
+    value: EMISSION_FACTORS.strom_mix_de_generation_2025.value / 1000,
     unit: 'kg/kWh',
-    description: 'CO2-Emissionsfaktor für den deutschen Strommix (Durchschnitt)',
+    description: 'CO2-Emissionsfaktor für den deutschen Strommix (UBA, Datenjahr 2025, direkte Emissionen der Erzeugung)',
     year: 2026,
     effectiveFrom: '2026-01-01',
     source: 'Umweltbundesamt (UBA)',
-    sourceUrl: 'https://www.umweltbundesamt.de/themen/klima-energie/energie/stromerzeugung/strom-waermebereitstellung-in-zahlen',
-    lastVerified: '2026-01-10',
+    sourceUrl: EMISSION_FACTORS.strom_mix_de_generation_2025.sourceUrl,
+    lastVerified: EMISSION_FACTORS.strom_mix_de_generation_2025.verificationDate,
   },
   buergergeld_regelsatz: {
     key: 'buergergeld_regelsatz',

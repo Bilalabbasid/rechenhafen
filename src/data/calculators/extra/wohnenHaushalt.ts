@@ -409,12 +409,16 @@ function calculateMortgagePrepaymentEstimate(inputs: Record<string, any>): Calcu
   const reinvestStr = reinvestRaw !== undefined && reinvestRaw !== null ? String(reinvestRaw).trim() : '';
   const yearsStr = yearsRaw !== undefined && yearsRaw !== null ? String(yearsRaw).trim() : '';
 
-  const debt = debtStr !== '' ? parseFloat(debtStr.replace(',', '.')) : 180000;
-  const contract = contractStr !== '' ? parseFloat(contractStr.replace(',', '.')) : 4.2;
-  const reinvest = reinvestStr !== '' ? parseFloat(reinvestStr.replace(',', '.')) : 2.4;
-  const years = yearsStr !== '' ? parseFloat(yearsStr.replace(',', '.')) : 4;
+  // Fehlender Parameter (undefined) = Standardwert; ein geleertes Feld ist ein Eingabefehler.
+  const read = (raw: unknown, s: string, fallback: number) => (raw === undefined || raw === null ? fallback : s === '' ? NaN : parseFloat(s.replace(',', '.')));
+  const debt = read(debtRaw, debtStr, 180000);
+  const contract = read(contractRaw, contractStr, 4.2);
+  const reinvest = read(reinvestRaw, reinvestStr, 2.4);
+  const yearsInput = read(yearsRaw, yearsStr, 4);
+  // Die geschützte Zinserwartung endet spätestens mit dem Kündigungsrecht nach § 489 Abs. 1 Nr. 2 BGB (10 Jahre).
+  const years = Math.min(yearsInput, 10);
 
-  if (isNaN(debt) || isNaN(contract) || isNaN(reinvest) || isNaN(years) || debt < 0 || contract < 0 || reinvest < 0 || years < 0) {
+  if (isNaN(debt) || isNaN(contract) || isNaN(reinvest) || isNaN(yearsInput) || debt < 0 || contract < 0 || reinvest < 0 || yearsInput < 0) {
     return {
       primary: { id: 'compensation', label: 'Geschätzte Vorfälligkeitsentschädigung', value: 0, formattedValue: '–' },
       secondary: [],
@@ -435,8 +439,11 @@ function calculateMortgagePrepaymentEstimate(inputs: Record<string, any>): Calcu
       { id: 'totalPayoff', label: 'Ablösebetrag (Restschuld + Entschädigung)', value: debt + compensation, formattedValue: formatCurrency(debt + compensation) },
     ],
     summaryText: `Bei einer Zinsdifferenz von ${formatPercent(interestDiff, 2)} und ${formatNumber(years, 1)} Jahren Restzinsbindung verlangt die Bank voraussichtlich ca. ${formatCurrency(compensation)} Entschädigung.`,
+    ...(yearsInput > 10 ? { warning: 'Gerechnet wurde mit 10 Jahren: Nach § 489 Abs. 1 Nr. 2 BGB können Sie ein Festzinsdarlehen zehn Jahre nach der vollständigen Auszahlung mit sechs Monaten Frist kündigen. Ein Zinsschaden für die Zeit danach wird deshalb nicht ersetzt.' } : {}),
     directAnswer: compensation === 0
-      ? 'Liegt der Wiederanlagezins auf oder über Ihrem Vertragszins, entsteht der Bank kein Zinsschaden. Es fällt voraussichtlich keine Vorfälligkeitsentschädigung an.'
+      ? debt === 0 || years === 0
+        ? 'Ohne Restschuld oder ohne restliche Zinsbindung entsteht der Bank kein Zinsschaden. Es fällt keine Vorfälligkeitsentschädigung an.'
+        : 'Liegt der Wiederanlagezins nicht deutlich unter Ihrem Vertragszins, entsteht der Bank nach dieser Schätzung kein Zinsschaden. Es fällt voraussichtlich keine Vorfälligkeitsentschädigung an.'
       : `Bei ${formatCurrency(debt)} Restschuld, ${formatPercent(interestDiff, 2)} Zinsdifferenz und ${formatNumber(years, 1)} Jahren Restzinsbindung beträgt die geschätzte Entschädigung ca. ${formatCurrency(compensation)} (${formatPercent(pctOfDebt, 2)} der Restschuld).`,
     qualifications: [
       'Schätzung: Banken rechnen mit der Renditekurve von Pfandbriefen und dem genauen Tilgungsplan. Die tatsächliche Forderung kann abweichen.',
@@ -508,7 +515,7 @@ function calculateConsumerLoanPrepayment(inputs: Record<string, any>): Calculati
     qualifications: [
       'Gesetzliche Obergrenze für Allgemein-Verbraucherdarlehen mit gebundenem Sollzins (§ 502 Abs. 1 und 3 BGB). Die Bank darf weniger verlangen, aber nicht mehr.',
       'Die Sollzinsen bis zum Vertragsende werden mit gleichbleibender Monatsrate (Annuität) aus Restschuld, Sollzins und Restlaufzeit berechnet.',
-      'Keine Entschädigung bei variablem Zins, bei Rückzahlung aus einer vertraglich verlangten Restschuldversicherung oder bei unzureichenden Vertragsangaben zu Laufzeit, Kündigungsrecht oder Berechnung (§ 502 Abs. 2 BGB).',
+      'Keine Entschädigung bei variablem Zins, bei Rückzahlung aus einer vertraglich verlangten Restschuldversicherung oder bei unzureichenden Vertragsangaben zu Laufzeit, Kündigungsrecht oder Berechnung (§ 502 Abs. 1 und 2 BGB).',
     ],
     calculationSteps: [
       `Restlaufzeit ${formatNumber(months, 0)} Monate → Höchstsatz ${formatPercent(capPct, 1)}`,
@@ -1915,7 +1922,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         },
         {
           title: 'Wann entfällt die Vorfälligkeitsentschädigung?',
-          content: 'Beim Ratenkredit entfällt sie, wenn der Sollzins variabel ist, wenn eine vom Vertrag verlangte Restschuldversicherung die Rückzahlung übernimmt oder wenn der Vertrag Laufzeit, Kündigungsrecht oder Berechnung der Entschädigung unzureichend angibt (§ 502 Abs. 2 BGB).\n\nBei der Baufinanzierung können Sie nach 10 Jahren ab Auszahlung mit sechs Monaten Frist ohne Entschädigung kündigen (§ 489 BGB). Vereinbarte Sondertilgungen senken die Entschädigung. Wie sich eine Sondertilgung auf Laufzeit und Zinsen auswirkt, zeigt der [Sondertilgungsrechner](/rechner/sondertilgungsrechner/). Ihren Tilgungsplan berechnen Sie mit dem [Tilgungsrechner](/rechner/tilgungsrechner/), Raten für einen neuen Kredit mit dem [Ratenkreditrechner](/rechner/ratenkreditrechner/).',
+          content: 'Beim Ratenkredit entfällt sie, wenn der Sollzins variabel ist, wenn eine vom Vertrag verlangte Restschuldversicherung die Rückzahlung übernimmt oder wenn der Vertrag Laufzeit, Kündigungsrecht oder Berechnung der Entschädigung unzureichend angibt (§ 502 Abs. 1 und 2 BGB).\n\nBei der Baufinanzierung können Sie nach 10 Jahren ab vollständiger Auszahlung mit sechs Monaten Frist ohne Entschädigung kündigen (§ 489 Abs. 1 Nr. 2 BGB). Vereinbarte Sondertilgungen senken die Entschädigung. Wie sich eine Sondertilgung auf Laufzeit und Zinsen auswirkt, zeigt der [Sondertilgungsrechner](/rechner/sondertilgungsrechner/). Ihren Tilgungsplan berechnen Sie mit dem [Tilgungsrechner](/rechner/tilgungsrechner/), Raten für einen neuen Kredit mit dem [Ratenkreditrechner](/rechner/ratenkreditrechner/).',
         },
       ],
       details: 'Ratenkredit: Entschädigung = min(1 % bzw. 0,5 % × Restschuld; Sollzinsen bis Vertragsende). Baufinanzierung: Entschädigung ≈ Restschuld × (Vertragszins − Wiederanlagezins − 0,15 %) × Restjahre × 0,9.',
@@ -1923,7 +1930,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     faqs: [
       { question: 'Wie hoch ist die Vorfälligkeitsentschädigung bei einem Ratenkredit?', answer: 'Höchstens 1 % des vorzeitig zurückgezahlten Betrags, bei höchstens 12 Monaten Restlaufzeit höchstens 0,5 %. Zusätzlich darf sie die Sollzinsen bis zum Vertragsende nicht übersteigen. Bei 12.000 € und 24 Monaten Restlaufzeit sind das maximal 120 €.' },
       { question: 'Wie berechnet die Bank die Vorfälligkeitsentschädigung bei einer Baufinanzierung?', answer: 'Nach der vom BGH anerkannten Aktiv-Passiv-Methode. Die Bank vergleicht Ihre Vertragszinsen mit der Rendite sicherer Pfandbriefe für die Restlaufzeit, zieht ersparte Kosten ab und zinst den Schaden ab. Bei 180.000 € Restschuld, 1,8 Prozentpunkten Zinsdifferenz und 4 Jahren Rest ergibt die Schätzung rund 10.700 €.' },
-      { question: 'Wann muss ich keine Vorfälligkeitsentschädigung zahlen?', answer: 'Bei variablem Sollzins, bei Rückzahlung durch eine vom Kreditvertrag verlangte Restschuldversicherung und bei unzureichenden Vertragsangaben zur Laufzeit, zum Kündigungsrecht oder zur Berechnung (§ 502 Abs. 2 BGB). Bei Baufinanzierungen entfällt sie außerdem nach Ablauf von 10 Jahren ab Auszahlung (§ 489 BGB).' },
+      { question: 'Wann muss ich keine Vorfälligkeitsentschädigung zahlen?', answer: 'Bei variablem Sollzins, bei Rückzahlung durch eine vom Kreditvertrag verlangte Restschuldversicherung und bei unzureichenden Vertragsangaben zur Laufzeit, zum Kündigungsrecht oder zur Berechnung (§ 502 Abs. 1 und 2 BGB). Bei Baufinanzierungen entfällt sie außerdem, wenn Sie nach Ablauf von 10 Jahren ab vollständiger Auszahlung mit sechs Monaten Frist kündigen (§ 489 Abs. 1 Nr. 2 BGB).' },
       { question: 'Lohnt es sich, einen Ratenkredit vorzeitig zurückzuzahlen?', answer: 'Meist ja, weil die Entschädigung gedeckelt ist und Sie die restlichen Zinsen sparen. Bei 12.000 € Restschuld, 24 Monaten Restlaufzeit und 6,5 % Sollzins sparen Sie 829,32 € Zinsen und zahlen höchstens 120 € Entschädigung. Netto bleiben 709,32 €.' },
       { question: 'Kann ich die Vorfälligkeitsentschädigung beim Hausverkauf vermeiden?', answer: 'Ja, wenn der Käufer das Darlehen zu den alten Konditionen übernimmt und die Bank zustimmt. Möglich ist auch ein Pfandtausch: Das Darlehen wird auf eine neue Immobilie übertragen. Beides müssen Sie mit Ihrer Bank verhandeln.' },
     ],
@@ -2656,7 +2663,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'hoursPerDay', label: 'Nutzungsdauer pro Tag in Stunden', type: 'number', defaultValue: 4, min: 0, max: 24, step: 0.5, unit: 'Std./Tag', dependsOn: { field: 'device', value: 'custom' } },
       { id: 'usageDays', label: 'Nutzungstage im Zeitraum', type: 'number', defaultValue: 365, min: 1, max: 366, step: 1, unit: 'Tage', helpText: 'z. B. 365 für ein Jahr, 30 für einen Monat oder 60 für einen Heizlüfter im Winter.', dependsOn: { field: 'device', value: 'custom' } },
       // Fernseher
-      { id: 'tvWatts', label: 'Leistung des Fernsehers im Betrieb in Watt', type: 'number', defaultValue: 120, min: 0, max: 1000, step: 5, unit: 'W', helpText: 'Vorschlag: 120 W. Typisch sind 50 bis 200 W je nach Größe und Technik (LED, QLED, OLED).', dependsOn: { field: 'device', value: 'tv' } },
+      { id: 'tvWatts', label: 'Leistung des Fernsehers im Betrieb in Watt', type: 'number', defaultValue: 120, min: 0, max: 1000, step: 5, unit: 'W', helpText: 'Vorschlag: 120 W. Das EU-Energielabel nennt den Verbrauch in kWh je 1.000 Stunden (SDR); diese Zahl entspricht der mittleren Leistung in Watt.', dependsOn: { field: 'device', value: 'tv' } },
       { id: 'tvHoursPerDay', label: 'Fernsehzeit pro Tag in Stunden', type: 'number', defaultValue: 4, min: 0, max: 24, step: 0.5, unit: 'Std./Tag', dependsOn: { field: 'device', value: 'tv' } },
       { id: 'tvStandbyWatts', label: 'Standby-Leistung des Fernsehers in Watt', type: 'number', defaultValue: 1, min: 0, max: 50, step: 0.5, unit: 'W', helpText: 'Neuere Geräte liegen meist unter 1 W, ältere oder Geräte mit Schnellstart deutlich darüber.', dependsOn: { field: 'device', value: 'tv' } },
       // Kühl- und Gefriergeräte
@@ -2669,11 +2676,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         max: 2000,
         step: 5,
         unit: 'kWh/Jahr',
-        helpText: 'Die Angabe „kWh/annum“ auf dem Energielabel. Ältere Geräte ohne Label: oft 250 bis 350 kWh.',
+        helpText: 'Die Angabe „kWh/annum“ auf dem Energielabel. Ältere Geräte ohne Label: Verbrauch mit einem Strommessgerät über 7 Tage messen und mit 52 malnehmen.',
         dependsOn: { field: 'device', value: ['fridge', 'fridgeCompare'] },
         conditionalLabels: [{ condition: { field: 'device', value: 'fridgeCompare' }, label: 'Jahresverbrauch des Altgeräts in kWh' }],
       },
-      { id: 'fridgeNewKwhYear', label: 'Jahresverbrauch des Neugeräts in kWh', type: 'number', defaultValue: 115, min: 0, max: 2000, step: 5, unit: 'kWh/Jahr', helpText: 'Sparsame Neugeräte liegen oft bei 90 bis 130 kWh pro Jahr.', dependsOn: { field: 'device', value: 'fridgeCompare' } },
+      { id: 'fridgeNewKwhYear', label: 'Jahresverbrauch des Neugeräts in kWh', type: 'number', defaultValue: 115, min: 0, max: 2000, step: 5, unit: 'kWh/Jahr', helpText: 'Wert „kWh/annum“ vom EU-Energielabel des Geräts, das Sie kaufen möchten.', dependsOn: { field: 'device', value: 'fridgeCompare' } },
       { id: 'fridgeNewPrice', label: 'Kaufpreis des Neugeräts', type: 'number', defaultValue: 650, min: 0, step: 25, unit: '€', helpText: '0 eintragen, wenn Sie nur die Stromersparnis sehen möchten.', dependsOn: { field: 'device', value: 'fridgeCompare' } },
       // Klimaanlage
       { id: 'acSplitWatts', label: 'Mittlere Leistungsaufnahme beim Kühlen in Watt', type: 'number', defaultValue: 600, min: 0, max: 5000, step: 50, unit: 'W', helpText: 'Vorschlag: 600 W (≈ 0,6 kWh pro Stunde) für ein Inverter-Split-Gerät.', dependsOn: { field: 'device', value: 'acSplit' } },
@@ -2681,7 +2688,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       { id: 'acHoursPerDay', label: 'Kühlstunden pro Tag', type: 'number', defaultValue: 6, min: 0, max: 24, step: 1, unit: 'Std./Tag', dependsOn: { field: 'device', value: ['acSplit', 'acMobile'] } },
       { id: 'acDays', label: 'Kühltage pro Jahr', type: 'number', defaultValue: 35, min: 0, max: 366, step: 5, unit: 'Tage', helpText: 'Anzahl der Tage, an denen die Klimaanlage läuft (z. B. heiße Sommertage).', dependsOn: { field: 'device', value: ['acSplit', 'acMobile'] } },
       // Standby
-      { id: 'standbyWatts', label: 'Standby-Leistung in Watt (alle Geräte zusammen)', type: 'number', defaultValue: 35, min: 0, max: 2000, step: 1, unit: 'W', helpText: 'Ein typischer Haushalt kommt auf 20 bis 50 W Standby. Ein Strommessgerät zeigt den genauen Wert.', dependsOn: { field: 'device', value: 'standby' } },
+      { id: 'standbyWatts', label: 'Standby-Leistung in Watt (alle Geräte zusammen)', type: 'number', defaultValue: 35, min: 0, max: 2000, step: 1, unit: 'W', helpText: 'Vorschlag: 35 W als Beispielwert. Ein Strommessgerät an der Steckdosenleiste zeigt den genauen Wert.', dependsOn: { field: 'device', value: 'standby' } },
       { id: 'standbyHoursPerDay', label: 'Stunden ohne Nutzung (im Standby) pro Tag', type: 'number', defaultValue: 20, min: 0, max: 24, step: 1, unit: 'Std./Tag', dependsOn: { field: 'device', value: 'standby' } },
       // Für alle Geräte
       { id: 'electricityPrice', label: 'Strompreis (Arbeitspreis) in Cent pro kWh', type: 'number', defaultValue: 36, min: 0, max: 200, step: 0.5, unit: 'ct/kWh', helpText: 'Vorbelegt mit 36 ct/kWh als Beispielwert. Tragen Sie den Arbeitspreis aus Ihrem Stromvertrag ein.' },
@@ -2742,11 +2749,11 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         },
         {
           title: 'Kühlschrank und Gefrierschrank: Wert vom EU-Energielabel nutzen',
-          content: 'Kühl- und Gefriergeräte laufen rund um die Uhr, schalten den Kompressor aber immer wieder ab. Watt mal 24 Stunden würde den Verbrauch deshalb stark überschätzen. Tragen Sie stattdessen den Jahresverbrauch in kWh vom EU-Energielabel ein. Ältere Geräte verbrauchen oft 250 bis 350 kWh im Jahr, sparsame Neugeräte 90 bis 130 kWh.\n\nMit der Option „Kühlschrank: Altgerät gegen Neugerät vergleichen“ sehen Sie die jährliche Ersparnis. Der Rechner zeigt außerdem, nach wie vielen Jahren sich der Kaufpreis über die gesparten Stromkosten bezahlt macht.',
+          content: 'Kühl- und Gefriergeräte laufen rund um die Uhr, schalten den Kompressor aber immer wieder ab. Watt mal 24 Stunden würde den Verbrauch deshalb stark überschätzen. Tragen Sie stattdessen den Jahresverbrauch in kWh vom EU-Energielabel ein. Fehlt das Label beim Altgerät, messen Sie eine Woche lang mit einem Strommessgerät und rechnen den Wert auf 52 Wochen hoch.\n\nMit der Option „Kühlschrank: Altgerät gegen Neugerät vergleichen“ sehen Sie die jährliche Ersparnis. Der Rechner zeigt außerdem, nach wie vielen Jahren sich der Kaufpreis über die gesparten Stromkosten bezahlt macht.',
         },
         {
           title: 'Standby und Klimaanlage: Kosten, die man leicht übersieht',
-          content: 'Viele Geräte ziehen auch ausgeschaltet Strom: Router, Spielekonsolen mit Schnellstart, Receiver, Kaffeevollautomaten. Ein typischer Haushalt kommt auf 20 bis 50 W Standby. Die Kosten ergeben sich aus Standby-Leistung × Stunden ohne Nutzung × 365 Tage. Eine abschaltbare Steckdosenleiste beendet diesen Verbrauch.\n\nBei Klimaanlagen entscheidet der Gerätetyp. Split-Geräte kühlen deutlich effizienter als mobile Monoblock-Geräte, die warme Luft über einen Schlauch durch das Fenster leiten. Der Rechner schlägt 600 W für Split-Geräte und 1.200 W für mobile Geräte vor. Steht die Leistung im Datenblatt, tragen Sie diesen Wert ein.',
+          content: 'Viele Geräte ziehen auch ausgeschaltet Strom: Router, Spielekonsolen mit Schnellstart, Receiver, Kaffeevollautomaten. Der Rechner schlägt 35 W als Beispielwert vor. Die Kosten ergeben sich aus Standby-Leistung × Stunden ohne Nutzung × 365 Tage. Eine abschaltbare Steckdosenleiste beendet diesen Verbrauch.\n\nBei Klimaanlagen entscheidet der Gerätetyp. Split-Geräte kühlen deutlich effizienter als mobile Monoblock-Geräte, die warme Luft über einen Schlauch durch das Fenster leiten. Der Rechner schlägt 600 W für Split-Geräte und 1.200 W für mobile Geräte vor. Steht die Leistung im Datenblatt, tragen Sie diesen Wert ein.',
         },
         {
           title: 'Welcher Rechner passt zu Ihrer Frage?',
@@ -2756,7 +2763,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       details: 'Kosten = Leistung in Watt ÷ 1.000 × Betriebsstunden × Strompreis je kWh. Ein Gerät mit 1.000 W kostet bei 36 ct/kWh pro Betriebsstunde 36 Cent. Der Grundpreis Ihres Stromtarifs ist nicht enthalten, weil er unabhängig vom einzelnen Gerät anfällt.',
     },
     faqs: [
-      { question: 'Wie viel Strom verbraucht ein Fernseher im Jahr?', answer: 'Ein Fernseher mit 120 Watt verbraucht bei 4 Stunden täglich 175,2 kWh im Jahr. Mit 1 Watt Standby in der übrigen Zeit sind es 182,5 kWh. Bei 36 ct/kWh kostet das 65,70 € pro Jahr. Große Geräte ab 65 Zoll und HDR-Inhalte liegen oft deutlich darüber.' },
+      { question: 'Wie viel Strom verbraucht ein Fernseher im Jahr?', answer: 'Ein Fernseher mit 120 Watt verbraucht bei 4 Stunden täglich 175,2 kWh im Jahr. Mit 1 Watt Standby in der übrigen Zeit sind es 182,5 kWh. Bei 36 ct/kWh kostet das 65,70 € pro Jahr. Den Wert Ihres Modells liefert das EU-Energielabel: Die Angabe in kWh je 1.000 Stunden entspricht der mittleren Leistung in Watt, getrennt für SDR und HDR.' },
       { question: 'Was kostet ein Kühlschrank im Jahr an Strom?', answer: 'Multiplizieren Sie den Jahresverbrauch vom EU-Energielabel mit Ihrem Strompreis. Ein Gerät mit 220 kWh pro Jahr kostet bei 36 ct/kWh 79,20 € im Jahr. Ein sparsames Neugerät mit 115 kWh kommt auf 41,40 €.' },
       { question: 'Lohnt sich ein neuer Kühlschrank wegen der Stromkosten?', answer: 'Das hängt vom Verbrauch des Altgeräts ab. Ersetzt ein Neugerät mit 115 kWh ein Altgerät mit 320 kWh, sparen Sie bei 36 ct/kWh 73,80 € im Jahr. Ein Kaufpreis von 650 € ist dann nach etwa 8,8 Jahren über die Stromersparnis eingespart.' },
       { question: 'Wie hoch sind die Standby-Kosten im Jahr?', answer: 'Rechnen Sie Standby-Leistung × Stunden ohne Nutzung × 365 Tage. Ein Haushalt mit 35 Watt Standby an 20 Stunden täglich verbraucht 255,5 kWh im Jahr. Bei 36 ct/kWh kostet das 91,98 €.' },
@@ -3197,8 +3204,8 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     timeSensitiveMeta: {
       year: 2026,
       source: 'BDEW / Bundesverband Wärmepumpe (BWP)',
-      sourceUrl: 'https://www.waermepumpe.de/normen-technik/jahresarbeitszahl/',
-      lastVerified: '2026-01-20',
+      sourceUrl: 'https://www.waermepumpe.de/werkzeuge/jaz-rechner/',
+      lastVerified: '2026-11-16',
     },
   },
 
@@ -3794,7 +3801,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         max: 1000,
         step: 5,
         unit: 'Liter/Tag',
-        helpText: 'Bundesweiter Richtwert: ca. 125 bis 128 Liter pro Kopf und Tag (Quelle: BDEW 2024 / Destatis)',
+        helpText: 'Bundesdurchschnitt: rund 126 Liter je Einwohner und Tag (Destatis, Erhebung 2022, Haushalte und Kleingewerbe)',
       },
       {
         id: 'freshWaterPrice',
@@ -3993,16 +4000,16 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       result: '657,00 € jährliche Wasserkosten (rechnerischer Monatsdurchschnitt: 54,75 €)',
     },
     content: {
-      intro: 'Der Rechner schätzt Ihren Verbrauch aus Haushaltsgröße und täglichem Pro-Kopf-Verbrauch. Die tatsächlichen Gebühren hängen von Ihrem örtlichen Versorger ab. Kosten für die Erwärmung des Wassers sind nicht enthalten. Nach Daten der BDEW-Wasserstatistik (2024) sowie des Statistischen Bundesamtes (Destatis 2022) verbraucht eine Person in Deutschland durchschnittlich ca. 125 bis 128 Liter Trinkwasser pro Tag.',
+      intro: 'Der Rechner schätzt Ihren Verbrauch aus Haushaltsgröße und täglichem Pro-Kopf-Verbrauch. Die tatsächlichen Gebühren hängen von Ihrem örtlichen Versorger ab. Kosten für die Erwärmung des Wassers sind nicht enthalten. Nach der Erhebung des Statistischen Bundesamtes für 2022 lag die Wasserabgabe an Haushalte und Kleingewerbe bei rund 126 Litern je Einwohner und Tag.',
       details: 'Ein Kubikmeter (m³) entspricht genau 1.000 Litern Wasser. Die Jahresrechnung der Stadtwerke oder des Wasserverbands setzt sich aus zwei Teilen zusammen: dem Frischwasserbezug (Trinkwasser) und der Schmutzwassergebühr (Kanalisation). Beide Gebührenarten werden pro bezogenem Kubikmeter berechnet. Feste Zählergrundpreise und Zählermieten fallen unabhängig vom Verbrauch an. Nicht in diesem Rechner enthalten sind gesplittete Niederschlagswassergebühren für versiegelte Dach- und Hofflächen sowie die Energie für die Warmwasserbereitung.',
       sections: [
         {
           title: 'Liter versus Kubikmeter (m³): Wie wird gerechnet?',
-          content: 'Im Alltag erfassen wir Wasser oft in Litern (z. B. 40 bis 60 Liter für einen Duschvorgang oder 5 Liter für einen Spülgang). Der Wasserzähler im Keller misst das Volumen jedoch in vollen Kubikmetern (m³). Die Umrechnung ist denkbar einfach: 1.000 Liter entsprechen genau 1 m³ Wasser. Verbraucht ein 3-Personen-Haushalt 125 Liter pro Kopf und Tag, sind das 375 Liter täglich bzw. 136.875 Liter im Jahr – das entspricht 136,88 m³ auf der Abrechnung.',
+          content: 'Im Alltag denken wir in Litern, etwa beim Duschen oder bei der Toilettenspülung. Der Wasserzähler im Keller misst das Volumen jedoch in vollen Kubikmetern (m³). Die Umrechnung ist denkbar einfach: 1.000 Liter entsprechen genau 1 m³ Wasser. Verbraucht ein 3-Personen-Haushalt 125 Liter pro Kopf und Tag, sind das 375 Liter täglich bzw. 136.875 Liter im Jahr – das entspricht 136,88 m³ auf der Abrechnung.',
         },
         {
           title: 'Geschätzter Modellverbrauch versus gemessener Zählerstand',
-          content: 'Dieser Rechner liefert eine Orientierung anhand von Durchschnittswerten. Ihr realer Verbrauch kann deutlich abweichen: Sparsame Duschköpfe, moderne Spartasten am WC und effiziente Waschmaschinen senken den Bedarf auf 90 bis 100 Liter pro Tag. Ausgedehnte Wannenbäder, häufiges Gießen im Garten oder Poolbefüllungen im Sommer können den Verbrauch auf über 160 Liter pro Kopf steigern. Für eine exakte Abrechnung sind stets die abgelesenen Zählerstände auf Ihrer Wasseruhr maßgeblich.',
+          content: 'Dieser Rechner liefert eine Orientierung anhand von Durchschnittswerten. Ihr realer Verbrauch kann deutlich abweichen: Sparsame Duschköpfe, Spartasten am WC und effiziente Waschmaschinen senken den Bedarf, Wannenbäder, Gartenbewässerung oder eine Poolfüllung erhöhen ihn. Teilen Sie den Jahresverbrauch laut Abrechnung durch Personen und 365 Tage, dann kennen Sie Ihren eigenen Literwert für das Eingabefeld. Für eine exakte Abrechnung sind stets die abgelesenen Zählerstände auf Ihrer Wasseruhr maßgeblich.',
         },
         {
           title: 'Welche Gebühren sind enthalten – und welche nicht?',
@@ -4010,18 +4017,18 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
         },
         {
           title: 'Wo finden Sie Ihre individuellen Tarife?',
-          content: 'Die genauen Preise für Frisch- und Abwasser finden Sie auf der Jahresabrechnung Ihres regionalen Wasserversorgers bzw. im Abwassergebührenbescheid Ihrer Stadt oder Gemeinde. Typischerweise bewegen sich die Preise in Deutschland zwischen 1,50 € und 3,00 € je m³ für Trinkwasser und zwischen 1,80 € und 4,50 € je m³ für Schmutzwasser. Bei den meisten Versorgern fallen zudem 30 bis 120 € feste Zählergebühr pro Jahr an.',
+          content: 'Die genauen Preise für Frisch- und Abwasser finden Sie auf der Jahresabrechnung Ihres regionalen Wasserversorgers bzw. im Abwassergebührenbescheid Ihrer Stadt oder Gemeinde. Die Preise unterscheiden sich von Ort zu Ort erheblich; die Voreinstellungen des Rechners (2,10 € und 2,70 € je m³) sind nur Beispielwerte. Prüfen Sie außerdem, ob Ihr Versorger einen festen Grund- oder Zählerpreis berechnet.',
         },
       ],
     },
     faqs: [
       {
         question: 'Wie hoch ist der durchschnittliche Wasserverbrauch pro Person in Deutschland?',
-        answer: 'Nach Erhebungen des Bundesverbandes der Energie- und Wasserwirtschaft (BDEW 2024) sowie des Statistischen Bundesamtes (Destatis 2022) liegt der tägliche Trinkwasserverbrauch bei rund 125 bis 128 Litern pro Person. Auf ein volles Jahr gerechnet entspricht das ca. 45 bis 47 Kubikmetern (m³) pro Kopf.',
+        answer: 'Nach der Erhebung des Statistischen Bundesamtes für 2022 wurden an Haushalte und Kleingewerbe rund 126 Liter je Einwohner und Tag abgegeben. Auf ein volles Jahr gerechnet sind das rund 46 Kubikmeter (m³) pro Kopf. Zwischen den Bundesländern gibt es deutliche Unterschiede.',
       },
       {
         question: 'Warum ist die Abwassergebühr oft teurer als das Trinkwasser?',
-        answer: 'Der Betrieb, die Instandhaltung und die Modernisierung von Kanalnetzen, Regenrückhaltebecken und Kläranlagen mit mehrstufigen Reinigungsverfahren sind extrem kapitalintensiv. Die Kommunen müssen diese Kosten über die Schmutzwassergebühr kostendeckend auf die verbrauchten Kubikmeter umlegen.',
+        answer: 'Der Betrieb, die Instandhaltung und die Modernisierung von Kanalnetzen, Regenrückhaltebecken und Kläranlagen mit mehrstufigen Reinigungsverfahren sind kapitalintensiv. Die Kommunen müssen diese Kosten über die Schmutzwassergebühr kostendeckend auf die verbrauchten Kubikmeter umlegen.',
       },
       {
         question: 'Sind Warmwasserkosten im Wasserverbrauch-Rechner enthalten?',
@@ -4029,7 +4036,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
       },
       {
         question: 'Wie kann man die Wasserkosten im Haushalt am wirksamsten senken?',
-        answer: 'Die größten Einsparpotenziale bieten Sparduschköpfe (reduzieren den Durchfluss von ca. 14–16 l/min auf 6–8 l/min), Spartasten an der Toilettenspülung (spart bis zu 5 Liter pro Spülgang) sowie die vollständige Beladung von Wasch- und Spülmaschinen mit dem Eco-Programm.',
+        answer: 'Ansatzpunkte sind ein Sparduschkopf, die Spartaste an der Toilettenspülung sowie voll beladene Wasch- und Spülmaschinen im Eco-Programm. Wie viel ein Duschkopf spart, prüfen Sie selbst: Füllen Sie einen Eimer 10 Sekunden lang und rechnen Sie den Wert auf Liter pro Minute hoch.',
       },
     ],
     relatedSlugs: ['warmwasserkosten-rechner', 'waschmaschine-kosten-rechner', 'spuelmaschine-kosten-rechner', 'stromkosten-geraete-rechner'],
@@ -4176,7 +4183,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Wie wirkt sich die CO₂-Abgabe auf den Heizölpreis aus?', answer: 'Auf Heizöl fällt nach dem BEHG eine CO₂-Abgabe an, die im Literpreis des Brennstoffhändlers bereits enthalten ist.' },
-      { question: 'Wann dürfen alte Ölheizungen nach dem GEG noch betrieben werden?', answer: 'Bestehende Ölheizungen dürfen weiter betrieben und repariert werden; Standard-Heizkessel (keine Brennwert- oder Niedertemperaturtechnik) müssen jedoch nach 30 Jahren Betrieb stillgelegt werden (§ 72 GEG).' },
+      { question: 'Muss eine alte Ölheizung nach 30 Jahren ausgetauscht werden?', answer: 'Nach dem früheren § 72 GEG mussten Standard-Heizkessel nach 30 Jahren stillgelegt werden. Das Gebäudeenergiegesetz heißt seit Juli 2026 Gebäudemodernisierungsgesetz (GModG), und § 72 ist dort als „weggefallen“ geführt. Eine Stilllegungspflicht allein wegen des Kesselalters steht damit nicht mehr im Gesetz. Unabhängig davon prüft der Schornsteinfeger weiterhin die Abgaswerte.' },
     ],
     relatedSlugs: ['heizkostenvergleich-rechner', 'gaskostenrechner', 'gasverbrauch-kwh-m3-rechner', 'waermepumpe-stromkosten-rechner'],
     trustMeta: {
@@ -4569,7 +4576,7 @@ export const EXTRA_WOHNEN_HAUSHALT: CalculatorDefinition[] = [
     category: 'haushalt-energie',
     subcategory: 'Heizung & Gas',
     metaTitle: 'Energieeffizienzklasse Haus: Rechner A+ bis H nach GEG',
-    metaDescription: 'Ermitteln Sie die Energieeffizienzklasse Ihres Hauses (A+ bis H) anhand des Endenergiebedarfs in kWh/(m²·a) nach Gebäudeenergiegesetz (GEG).',
+    metaDescription: 'Ermitteln Sie die Energieeffizienzklasse Ihres Hauses (A+ bis H) aus dem Endenergiekennwert in kWh/(m²·a) nach Anlage 10 GModG (vormals GEG).',
     h1: 'Energieeffizienzklasse Rechner – Haus-Energieklasse nach GEG ermitteln',
     shortDescription: 'Ordnet den Endenergieverbrauch der offiziellen Energieeffizienzklasse von A+ bis H zu.',
     searchKeywords: ['energieeffizienzklasse rechner haus', 'kwh pro qm energieausweis klasse', 'effizienzklasse a plus bis h', 'gebaeudeenergiegesetz effizienzklassen'],

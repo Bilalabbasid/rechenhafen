@@ -7,6 +7,33 @@ import {
 } from '@/lib/calculators/gesundheit';
 import { formatNumber } from '@/lib/formatters';
 
+// ---------------------------------------------------------------------------
+// Referenztabellen für BMI und Kalorienbedarf, beim Laden mit den eigenen Engines berechnet
+// ---------------------------------------------------------------------------
+const secText = (r: ReturnType<typeof calculateBMI>, id: string) => String(r.secondary?.find((s) => s.id === id)?.formattedValue ?? '');
+const secValue = (r: ReturnType<typeof calculateBMI>, id: string) => Number(r.secondary?.find((s) => s.id === id)?.value ?? NaN);
+const BMI_HEIGHT_TABLE = [150, 155, 160, 165, 170, 175, 180, 185, 190, 195]
+  .map((h) => {
+    const r = calculateBMI({ unitSystem: 'metric', weight: 70, height: h, age: 40, bodyFrame: 'medium' });
+    return `| ${h} cm | ${secText(r, 'normalRange')} | ab ${formatNumber(30 * (h / 100) ** 2, 1)} kg | ${secText(r, 'creffIdealWeight').replace('ca. ', '')} |`;
+  })
+  .join('\n');
+const BMI_LOSS_EX = calculateBMI({ unitSystem: 'metric', weight: 92, height: 178, age: 45, bodyFrame: 'medium' });
+const BMI_LOSS_KG = secValue(BMI_LOSS_EX, 'distanceToRange');
+const kcalOf = (r: ReturnType<typeof calculateCalorieNeeds>, id: string) => `${formatNumber(secValue(r, id), 0)} kcal`;
+const calRef = (gender: string, age: number, weight: number, height: number, pal: string) =>
+  calculateCalorieNeeds({ formula: 'mifflin', gender, age, weight, height, activityLevel: pal, sportKcalPerDay: 0, goal: 'maintain' });
+const CAL_REF_TABLE = ([
+  ['Frau', 'female', 25, 65, 165],
+  ['Frau', 'female', 45, 65, 165],
+  ['Frau', 'female', 65, 65, 165],
+  ['Mann', 'male', 25, 80, 180],
+  ['Mann', 'male', 45, 80, 180],
+  ['Mann', 'male', 65, 80, 180],
+] as Array<[string, string, number, number, number]>)
+  .map(([label, g, a, w, h]) => `| ${label}, ${a} J., ${w} kg, ${h} cm | ${kcalOf(calRef(g, a, w, h, '1.4'), 'bmr')} | ${['1.4', '1.6', '1.8'].map((p) => kcalOf(calRef(g, a, w, h, p), 'tdee')).join(' | ')} |`)
+  .join('\n');
+
 export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'bmi-rechner',
@@ -149,7 +176,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
         },
         {
           title: 'Normalgewicht, Idealgewicht nach Creff und Broca',
-          content: 'Der Normalgewichtsbereich ist die Gewichtsspanne, in der Ihr BMI zwischen 18,5 und 24,9 liegt. Bei 1,70 m sind das 53,5 bis 72,0 kg. Die Creff-Formel liefert dagegen einen einzelnen Richtwert: [(Größe in cm − 100) + Alter / 10] × 0,9. Bei schmalem Körperbau wird das Ergebnis zusätzlich mit 0,9 multipliziert, bei kräftigem mit 1,1. Die ältere Broca-Formel (Größe in cm − 100) zeigen wir nur zum Vergleich. Sie überschätzt das Normalgewicht bei großen Menschen. Keiner dieser Werte ist ein Zielgewicht, das Sie erreichen müssen.',
+          content: `Der Normalgewichtsbereich ist die Gewichtsspanne, in der Ihr BMI zwischen 18,5 und 24,9 liegt. Bei 1,70 m sind das 53,5 bis 72,0 kg. Die Creff-Formel liefert dagegen einen einzelnen Richtwert: [(Größe in cm − 100) + Alter / 10] × 0,9. Bei schmalem Körperbau wird das Ergebnis zusätzlich mit 0,9 multipliziert, bei kräftigem mit 1,1. Die ältere Broca-Formel (Größe in cm − 100) zeigen wir nur zum Vergleich. Sie überschätzt das Normalgewicht bei großen Menschen. Keiner dieser Werte ist ein Zielgewicht, das Sie erreichen müssen.\n\nDiese Werte liefert der Rechner für Erwachsene (Creff-Spalte: 40 Jahre, normaler Körperbau):\n\n| Größe | Normalgewicht (BMI 18,5–24,9) | Adipositas (BMI 30) | Idealgewicht nach Creff |\n|---|---|---|---|\n${BMI_HEIGHT_TABLE}\n\nLiegt Ihr Gewicht zwischen Obergrenze und Adipositas-Wert, zählt das nach WHO als Übergewicht. Bei kleinen Größen liegt der Creff-Wert etwa in der Mitte der Normalspanne, bei großen Menschen im oberen Bereich. Wie weit Sie von der Obergrenze entfernt sind, zeigt das Ergebnis unter „Abstand zum Normalgewicht“: Bei 92 kg und 1,78 m sind es ${formatNumber(BMI_LOSS_KG, 1)} kg.`,
         },
         {
           title: 'BMI ab 65 Jahren',
@@ -369,7 +396,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
         },
         {
           title: 'Schritt 2: PAL-Wert und Leistungsumsatz',
-          content: 'Der PAL-Wert (Physical Activity Level) gibt an, wie viel Energie Sie im Alltag im Verhältnis zum Grundumsatz verbrauchen. Die Deutsche Gesellschaft für Ernährung (DGE) nennt diese Richtwerte:\n\n- 1,2: ausschließlich sitzend oder liegend\n- 1,4–1,5: Bürotätigkeit, wenig Bewegung in der Freizeit\n- 1,6–1,7: sitzend mit zeitweisem Gehen oder Stehen\n- 1,8–1,9: überwiegend gehend oder stehend\n- 2,0–2,4: körperlich schwere Arbeit\n\nFür Sport an 4 bis 5 Tagen pro Woche (30–60 Minuten) rechnet die DGE etwa 0,3 PAL-Einheiten dazu. Der Leistungsumsatz ist der Teil des Gesamtumsatzes, der über den Grundumsatz hinausgeht.',
+          content: `Der PAL-Wert (Physical Activity Level) gibt an, wie viel Energie Sie im Alltag im Verhältnis zum Grundumsatz verbrauchen. Die Deutsche Gesellschaft für Ernährung (DGE) nennt diese Richtwerte:\n\n- 1,2: ausschließlich sitzend oder liegend\n- 1,4–1,5: Bürotätigkeit, wenig Bewegung in der Freizeit\n- 1,6–1,7: sitzend mit zeitweisem Gehen oder Stehen\n- 1,8–1,9: überwiegend gehend oder stehend\n- 2,0–2,4: körperlich schwere Arbeit\n\nFür Sport an 4 bis 5 Tagen pro Woche (30–60 Minuten) rechnet die DGE etwa 0,3 PAL-Einheiten dazu. Der Leistungsumsatz ist der Teil des Gesamtumsatzes, der über den Grundumsatz hinausgeht.\n\nSo wirken PAL-Wert und Alter in diesem Rechner (Mifflin-St Jeor, ohne Sportkalorien):\n\n| Person | Grundumsatz | PAL 1,4 | PAL 1,6 | PAL 1,8 |\n|---|---|---|---|---|\n${CAL_REF_TABLE}\n\nDer Schritt von PAL 1,4 auf 1,8 macht bei derselben Person mehr aus als ein Altersunterschied von 40 Jahren, denn die Formel zieht pro Lebensjahr nur 5 kcal vom Grundumsatz ab. Wer seinen PAL-Wert zu hoch ansetzt, überschätzt den Bedarf deshalb schnell. Im Zweifel wählen Sie die niedrigere Stufe und prüfen nach drei Wochen an der Waage nach.`,
         },
         {
           title: 'Schritt 3: Kalorienziel zum Abnehmen oder Zunehmen',
@@ -397,7 +424,7 @@ export const GESUNDHEIT_CALCULATORS: CalculatorDefinition[] = [
       },
       {
         question: 'Mifflin-St Jeor oder Harris-Benedict – welche Formel ist genauer?',
-        answer: 'Studien zeigen für die Mifflin-St-Jeor-Formel bei Erwachsenen mit Normal- und Übergewicht meist die geringere Abweichung vom gemessenen Grundumsatz. Die Harris-Benedict-Formel liefert oft 50 bis 100 kcal mehr. Bei sehr muskulösen Menschen unterschätzen beide Formeln den Bedarf eher.',
+        answer: 'In der Übersichtsarbeit von Frankenfield et al. (2005) lag die Mifflin-St-Jeor-Formel bei Erwachsenen mit Normal- und Übergewicht am häufigsten nahe am gemessenen Grundumsatz. Die Harris-Benedict-Formel liefert meist etwas mehr, in den beiden Beispielen auf dieser Seite rund 60 bzw. 70 kcal. Bei sehr muskulösen Menschen unterschätzen beide Formeln den Bedarf eher.',
       },
       {
         question: 'Wie viele Kalorien sollte ich zum Abnehmen essen?',

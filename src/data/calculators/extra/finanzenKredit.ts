@@ -1016,11 +1016,11 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         },
         {
           title: 'Wann kann die Günstigerprüfung nach § 32d Abs. 6 EStG relevant sein?',
-          content: 'Die Abgeltungsteuer von 25 % soll Kapitaleinkünfte pauschal abgelten. Wenn Ihr **persönlicher Einkommensteuersatz** (Grenzsteuersatz) jedoch **unter 25 %** liegt, dürfen Sie in der Steuererklärung die sogenannte **Günstigerprüfung** beantragen:\n- Das Finanzamt prüft automatisch, ob die Versteuerung Ihrer Kapitalerträge mit Ihrem individuellen Steuersatz günstiger ist als der 25 %-Abgeltungsteuertarif.\n- Ist dies der Fall, wird die Differenz erstattet.\n- Typische Fälle sind Studierende, Rentner, Auszubildende oder Personen mit geringem oder unregelmäßigem Erwerbseinkommen (zu versteuerndes Einkommen unter ca. 20.000 € für Alleinstehende). Berechnen Sie Ihre individuelle Steuerprogression mit unserem [Einkommensteuerrechner mit Soli und Kirchensteuer](/rechner/einkommensteuerrechner/).',
+          content: 'Die Abgeltungsteuer von 25 % soll Kapitaleinkünfte pauschal abgelten. Wenn Ihr **persönlicher Einkommensteuersatz** (Grenzsteuersatz) jedoch **unter 25 %** liegt, dürfen Sie in der Steuererklärung die sogenannte **Günstigerprüfung** beantragen:\n- Auf diesen Antrag (Anlage KAP) prüft das Finanzamt, ob die Versteuerung Ihrer Kapitalerträge mit Ihrem individuellen Steuersatz günstiger ist als der 25 %-Abgeltungsteuertarif.\n- Ist dies der Fall, wird die Differenz erstattet.\n- Typische Fälle sind Studierende, Rentner, Auszubildende oder Personen mit geringem oder unregelmäßigem Erwerbseinkommen (zu versteuerndes Einkommen unter ca. 20.000 € für Alleinstehende). Berechnen Sie Ihre individuelle Steuerprogression mit unserem [Einkommensteuerrechner mit Soli und Kirchensteuer](/rechner/einkommensteuerrechner/).',
         },
         {
           title: 'Was dieser Rechner nicht berücksichtigen kann (Besonderheiten & Grenzen)',
-          content: 'Dieser Online-Rechner ermittelt den regulären Quellensteuerabzug nach deutschem Steuerrecht. Folgende Sondersachverhalte können im Einzelfall abweichende Ergebnisse bedingen:\n- **Fonds-Teilfreistellung (§ 20 InvStG):** Bei Aktienfonds mit mindestens 51 % Aktienquote sind 30 % aller Erträge und Gewinne steuerfrei (bei Mischfonds mit mind. 25 % Aktienquote: 15 %). Unser Rechner ermittelt den Steuerabzug auf den steuerpflichtigen Ertrag nach Berücksichtigung dieser Teilfreistellung.\n- **Verlustverrechnungstöpfe (§ 20 Abs. 6 EStG):** Realisierte Verluste werden von Banken in getrennten Töpfen (Aktienverluste vs. sonstige Verluste) mit Gewinnen verrechnet, bevor Steuer anfällt.\n- **Ausländische Quellensteuer (§ 32d Abs. 5 EStG):** Bereits im Ausland einbehaltene Steuern (z. B. auf US-Dividenden nach Doppelbesteuerungsabkommen) können auf die deutsche Abgeltungsteuer angerechnet werden.\n- **Nichtveranlagungs-Bescheinigung (NV-Bescheinigung):** Liegt Ihr Gesamteinkommen unter dem Grundfreibetrag, können Sie beim Finanzamt eine NV-Bescheinigung beantragen; die Bank zahlt dann auch Erträge oberhalb von 1.000 € ohne Steuerabzug aus.',
+          content: 'Dieser Online-Rechner ermittelt den regulären Quellensteuerabzug nach deutschem Steuerrecht. Folgende Sondersachverhalte können im Einzelfall abweichende Ergebnisse bedingen:\n- **Fonds-Teilfreistellung (§ 20 InvStG):** Bei Aktienfonds mit mindestens 51 % Aktienquote sind 30 % aller Erträge und Gewinne steuerfrei (bei Mischfonds mit mind. 25 % Aktienquote: 15 %). Der Rechner zieht die Teilfreistellung nicht selbst ab: Tragen Sie bei Fondserträgen den Betrag nach Teilfreistellung ein, bei einem Aktien-ETF also 70 % des Ertrags.\n- **Verlustverrechnungstöpfe (§ 20 Abs. 6 EStG):** Realisierte Verluste werden von Banken in getrennten Töpfen (Aktienverluste vs. sonstige Verluste) mit Gewinnen verrechnet, bevor Steuer anfällt.\n- **Ausländische Quellensteuer (§ 32d Abs. 5 EStG):** Bereits im Ausland einbehaltene Steuern (z. B. auf US-Dividenden nach Doppelbesteuerungsabkommen) können auf die deutsche Abgeltungsteuer angerechnet werden.\n- **Nichtveranlagungs-Bescheinigung (NV-Bescheinigung):** Liegt Ihr Gesamteinkommen unter dem Grundfreibetrag, können Sie beim Finanzamt eine NV-Bescheinigung beantragen; die Bank zahlt dann auch Erträge oberhalb von 1.000 € ohne Steuerabzug aus.',
         },
       ],
     },
@@ -1934,7 +1934,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         max: 25,
         step: 0.1,
         unit: '%',
-        helpText: 'Gebundener Sollzinssatz (aktuell meist ca. 4,0 bis 7,5 % je nach Bonität und Darlehensart).',
+        helpText: 'Gebundener Sollzins aus Ihrem Angebot. 4,5 % ist ein Beispielwert; der Zins hängt von Bonität, Laufzeit und Darlehensart ab.',
       },
       {
         id: 'termYears',
@@ -1991,6 +1991,18 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           error: 'Die Kreditlaufzeit muss mindestens 1 Jahr betragen.',
         };
       }
+      if (rawYears > 40) {
+        return {
+          primary: { id: 'loan', label: 'Maximaler Kreditbetrag', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Bitte wählen Sie eine Kreditlaufzeit von höchstens 40 Jahren.',
+        };
+      }
+      if (!Number.isFinite(z) || z < 0 || z > 30) {
+        return {
+          primary: { id: 'loan', label: 'Maximaler Kreditbetrag', value: 0, formattedValue: '0,00 €', highlight: true },
+          error: 'Bitte geben Sie einen Sollzins zwischen 0 und 30 % ein.',
+        };
+      }
       const years = rawYears;
       const equity = parseFloat(inputs.equity) || 0;
 
@@ -2015,7 +2027,8 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       const totalRepayment = availableRate * m;
       const totalInterest = Math.max(0, totalRepayment - roundedLoan);
       const totalBudget = roundedLoan + equity;
-      const loadRatio = net > 0 ? (availableRate / net) * 100 : 0;
+      // Belastungsquote aller Kreditraten: neue Rate plus bestehende Raten
+      const loadRatio = net > 0 ? ((availableRate + loans) / net) * 100 : 0;
 
       const secondaryItems: ResultItem[] = [
         {
@@ -2062,7 +2075,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
         },
         {
           id: 'loadRatio',
-          label: 'Kreditraten-Belastungsquote am Nettoeinkommen',
+          label: 'Belastungsquote aller Kreditraten am Nettoeinkommen',
           value: loadRatio,
           formattedValue: formatPercent(loadRatio, 1),
           helpText: loadRatio <= 35 ? 'Solider Bereich (unter 35 % des Nettoeinkommens)' : 'Erhöhte Belastungsquote (über 35 %)',
@@ -2085,15 +2098,15 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           helpText: 'Finanzmathematisch ermittelter Darlehensrahmen bei Ihrer verfügbaren Rate (unverbindliche Orientierung).',
         },
         secondary: secondaryItems,
-        directAnswer: `Auf Basis Ihres verfügbaren Haushaltsüberschusses von ${formatCurrency(availableRate)} monatlich können Sie sich bei ${formatPercent(z)} Sollzins über ${years} Jahre einen Kredit von ca. ${formatCurrency(roundedLoan)} leisten (Gesamtrückzahlung: ${formatCurrency(totalRepayment)}).`,
+        directAnswer: `Auf Basis Ihres verfügbaren Haushaltsüberschusses von ${formatCurrency(availableRate)} monatlich können Sie sich bei ${formatPercent(z)} Sollzins über ${years} ${years === 1 ? 'Jahr' : 'Jahre'} einen Kredit von ca. ${formatCurrency(roundedLoan)} leisten (Gesamtrückzahlung: ${formatCurrency(totalRepayment)}).`,
         qualifications: [
           'Unverbindliche Orientierungshilfe: Das Ergebnis ist eine finanzmathematische Modellrechnung und stellt keine Kreditzusage oder verbindliche Finanzierungsbewilligung dar.',
-          'Banken führen vor jeder Bewilligung eine bankeigene Haushaltsrechnung mit gesetzlichen Lebenshaltungs-Mindestpauschalen sowie eine Schufa-Bonitätsprüfung durch.',
-          'Verbraucherschutz-Empfehlung: Die monatliche Kreditrate sollte idealerweise 30 % bis höchstens 35 % des regelmäßigen Haushaltsnettoeinkommens nicht überschreiten.',
+          'Banken führen vor jeder Bewilligung eine eigene Haushaltsrechnung mit bankinternen Pauschalen für die Lebenshaltung sowie eine Bonitätsprüfung (z. B. SCHUFA) durch.',
+          'Faustregel: Alle Kreditraten zusammen sollten nicht mehr als rund 35 % des regelmäßigen Haushaltsnettoeinkommens binden.',
         ],
         notes: [
           'Unverbindliche Orientierungshilfe: Das Ergebnis ist eine finanzmathematische Modellrechnung und stellt keine Kreditzusage oder verbindliche Finanzierungsbewilligung dar.',
-          'Banken führen vor jeder Bewilligung eine bankeigene Haushaltsrechnung mit gesetzlichen Lebenshaltungs-Mindestpauschalen sowie eine Schufa-Bonitätsprüfung durch.',
+          'Banken führen vor jeder Bewilligung eine eigene Haushaltsrechnung mit bankinternen Pauschalen für die Lebenshaltung sowie eine Bonitätsprüfung (z. B. SCHUFA) durch.',
         ],
         calculationSteps: [
           `Haushaltsrechnung: ${formatCurrency(net)} Netto − ${formatCurrency(fixed)} Fixkosten − ${formatCurrency(loans)} bestehende Kredite − ${formatCurrency(buffer)} Puffer = ${formatCurrency(availableRate)} verfügbare Rate/Monat`,
@@ -2107,28 +2120,28 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           { label: 'Monatlicher Sicherheitspuffer', value: formatCurrency(buffer) },
           { label: 'Verfügbare monatliche Kreditrate', value: formatCurrency(availableRate) },
           { label: 'Angenommener Sollzins', value: formatPercent(z) },
-          { label: 'Kreditlaufzeit', value: `${years} Jahre (${m} Monate)` },
+          { label: 'Kreditlaufzeit', value: `${years} ${years === 1 ? 'Jahr' : 'Jahre'} (${m} Monate)` },
           { label: 'Vorhandenes Eigenkapital', value: formatCurrency(equity) },
         ],
-        summaryText: `Aus einem Nettoeinkommen von ${formatCurrency(net)} verbleibt nach Abzug von ${formatCurrency(fixed)} Fixkosten, ${formatCurrency(loans)} bestehenden Raten und ${formatCurrency(buffer)} Sicherheitspuffer eine tragbare Monatsrate von ${formatCurrency(availableRate)}. Bei ${formatPercent(z)} Zinsen über ${years} Jahre ergibt sich ein maximaler Kreditbetrag von ca. ${formatCurrency(roundedLoan)}. Gesamtrückzahlung: ${formatCurrency(totalRepayment)} (Zinskosten: ca. ${formatCurrency(totalInterest)}). Hinweis: Dies ist eine unverbindliche Orientierung und keine Finanzierungszusage.`,
+        summaryText: `Aus einem Nettoeinkommen von ${formatCurrency(net)} verbleibt nach Abzug von ${formatCurrency(fixed)} Fixkosten, ${formatCurrency(loans)} bestehenden Raten und ${formatCurrency(buffer)} Sicherheitspuffer eine tragbare Monatsrate von ${formatCurrency(availableRate)}. Bei ${formatPercent(z)} Zinsen über ${years} ${years === 1 ? 'Jahr' : 'Jahre'} ergibt sich ein maximaler Kreditbetrag von ca. ${formatCurrency(roundedLoan)}. Gesamtrückzahlung: ${formatCurrency(totalRepayment)} (Zinskosten: ca. ${formatCurrency(totalInterest)}). Hinweis: Dies ist eine unverbindliche Orientierung und keine Finanzierungszusage.`,
       };
     },
     formula: 'Maximaler Kredit = Verfügbare Monatsrate × ((1 − (1 + r)^−n) ÷ r)',
     formulaExplanation: 'Rentenbarwertformel: Berechnet den maximalen Darlehensbetrag aus der monatlich tragbaren Rate (Haushaltsüberschuss abzüglich Ausgaben und Puffer), dem monatlichen Zinsfaktor r = (Sollzins / 100) / 12 und der Gesamtlaufzeit n = Jahre × 12.',
     workedExample: {
-      title: 'Beispiel: 3.500 € Nettoeinkommen, 2.000 € Ausgaben und 4,5 % Zinsen über 5 Jahre',
-      description: 'Bei 3.500 € Netto, 1.800 € Fixkosten, 200 € Altkrediten und 300 € Puffer verbleiben 1.200 € freier Überschuss. Bei 500 € gewählter Rate und 4,5 % Zins über 60 Monate ergibt sich eine maximale Darlehenssumme von ca. 26.860 €.',
-      inputs: { monthlyBudget: 500, interestRate: 4.5, termYears: 5 },
-      resultSummary: 'ca. 26.860 € Darlehenssumme',
+      title: 'Beispiel: 3.500 € Nettoeinkommen, 4,5 % Sollzins, 5 Jahre Laufzeit',
+      description: 'Von 3.500 € Netto gehen 1.800 € Fixkosten, 200 € bestehende Kreditrate und 300 € Puffer ab. Für die neue Rate bleiben 1.200 €. Über 60 Monate bei 4,5 % Sollzins trägt diese Rate rund 64.367 € Kredit; zurückgezahlt werden 72.000 €, davon 7.633 € Zinsen. Alle Kreditraten zusammen (1.400 €) binden dann 40 % des Nettoeinkommens, mehr als die 35-%-Faustregel. Mit 475 € Puffer sinkt die neue Rate auf 1.025 €, die Quote auf 35 % und der Kreditrahmen auf rund 54.981 €.',
+      inputs: { netIncome: 3500, fixedExpenses: 1800, existingLoans: 200, safetyBuffer: 300, interestRate: 4.5, termYears: 5, equity: 0 },
+      resultSummary: 'ca. 64.367 € Kreditrahmen bei 1.200 € Monatsrate',
     },
     content: {
       intro: '„Wie viel Kredit bekomme ich?“ Diese zentrale Frage steht vor jedem Ratenkredit und vor jeder Baufinanzierung. Mit unserem kostenlosen Maximaler Kredit Rechner ermitteln Sie auf Basis Ihrer realen Einnahmen, regelmäßigen Fixkosten, bestehender Kredite und eines soliden Sicherheitspuffers, welchen Darlehensbetrag Sie monatlich verlässlich tragen können.',
-      details: 'Wichtiger Hinweis: Das Ergebnis ist eine finanzmathematische Schätzung und neutrale Orientierungshilfe zur Ermittlung Ihres finanziellen Spielraums – es handelt sich ausdrücklich nicht um eine verbindliche Kreditzusage oder Bonitätsentscheidung einer Bank. Kreditinstitute führen vor einer Bewilligung stets eine individuelle Haushaltsrechnung (Einnahmen abzüglich gesetzlicher Lebenshaltungskostenpauschalen, Warmmiete, Unterhalt und bestehender Raten) sowie eine Bonitätsprüfung (z. B. via SCHUFA) durch. Als Faustregel gilt: Die monatliche Kreditrate sollte keinesfalls mehr als 35 bis 40 % des regelmäßigen Haushaltsnettoeinkommens betragen.',
+      details: 'Wichtiger Hinweis: Das Ergebnis ist eine finanzmathematische Schätzung und neutrale Orientierungshilfe zur Ermittlung Ihres finanziellen Spielraums – es handelt sich ausdrücklich nicht um eine verbindliche Kreditzusage oder Bonitätsentscheidung einer Bank. Kreditinstitute führen vor einer Bewilligung stets eine individuelle Haushaltsrechnung (Einnahmen abzüglich bankinterner Pauschalen für die Lebenshaltung, Warmmiete, Unterhalt und bestehender Raten) sowie eine Bonitätsprüfung (z. B. via SCHUFA) durch. Als verbreitete Faustregel gilt: Alle Kreditraten zusammen sollten nicht mehr als rund 35 % des regelmäßigen Haushaltsnettoeinkommens betragen.',
     },
     faqs: [
-      { question: 'Wie berechnet eine Bank, wie viel Kredit ich maximal bekomme?', answer: 'Banken erstellen eine Haushaltsrechnung: Vom monatlichen Nettoeinkommen werden Pauschalen für Lebenshaltung (ca. 800–1.200 € für die erste Person, ca. 350–450 € je weitere Person) sowie Fixkosten (Miete, Versicherungen, bestehende Kredite) abgezogen. Der verbleibende Überschuss bildet die maximal zulässige monatliche Kreditrate.' },
+      { question: 'Wie berechnet eine Bank, wie viel Kredit ich maximal bekomme?', answer: 'Banken erstellen eine Haushaltsrechnung: Vom monatlichen Nettoeinkommen werden Pauschalen für die Lebenshaltung je Person sowie Fixkosten (Miete, Versicherungen, bestehende Kredite) abgezogen. Die Höhe der Pauschalen legt jede Bank selbst fest und nennt sie meist nicht. Der verbleibende Überschuss bildet die maximal zulässige monatliche Kreditrate.' },
       { question: 'Warum ist diese Berechnung keine Kreditzusage?', answer: 'Der Rechner ermittelt den theoretischen Kreditrahmen anhand Ihrer Angaben rein mathematisch. Eine tatsächliche Darlehensvergabe hängt zusätzlich von Ihrer Bonität (SCHUFA-Score), der Dauer der Beschäftigung (z. B. unbefristeter Arbeitsvertrag außerhalb der Probezeit) und internen Risikorichtlinien der jeweiligen Bank ab.' },
-      { question: 'Welcher Anteil des Nettoeinkommens sollte maximal in Kreditraten fließen?', answer: 'Verbraucherschützer und Banken empfehlen, dass alle monatlichen Kreditverpflichtungen zusammen maximal 30 bis höchstens 35–40 Prozent des monatlichen Haushaltsnettoeinkommens ausmachen sollten, um finanzielle Puffer für unvorhergesehene Ausgaben zu wahren.' },
+      { question: 'Welcher Anteil des Nettoeinkommens sollte maximal in Kreditraten fließen?', answer: 'Eine gesetzliche Grenze gibt es nicht. Verbreitet ist die Faustregel, dass alle monatlichen Kreditraten zusammen nicht mehr als rund 35 Prozent des Haushaltsnettoeinkommens ausmachen sollten, damit ein Puffer für unvorhergesehene Ausgaben bleibt. Der Rechner zeigt diesen Anteil als Belastungsquote, einschließlich Ihrer bestehenden Raten.' },
       { question: 'Wie beeinflussen Zins und Laufzeit die leistbare Kredithöhe?', answer: 'Eine längere Laufzeit verteilt die Tilgung auf mehr Monate, wodurch bei gleicher Monatsrate ein höherer Kreditbetrag leistbar wird – allerdings steigen dadurch auch die absoluten Zinskosten. Ein höherer Zinssatz wiederum reduziert den tilgbaren Kreditbetrag, da ein größerer Teil der Rate für die Zinsen aufgezehrt wird.' },
       { question: 'Wie viel Kredit bekomme ich bei 2.500 Euro oder 3.000 Euro Netto?', answer: 'Bei 2.500 € Netto und ca. 1.800 € Lebenshaltungskosten verbleiben rund 400 bis 500 € leistbare Monatsrate (entspricht bei 5 % Zinsen über 5 Jahre ca. 21.000 bis 26.500 € Kredit). Bei 3.000 € Netto sind bei 700 € Rate rund 37.000 € Kredit finanzierbar.' },
     ],
@@ -2141,7 +2154,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
       lastVerified: '2026-01-15',
     },
     trustMeta: {
-      methodology: 'Rentenbarwert-Kalkulation auf Basis monatlich dekursiver Zinsverrechnung gemäß PAngV.',
+      methodology: 'Rentenbarwert-Kalkulation mit monatlicher Zinsverrechnung (Monatszins = Sollzins ÷ 12) und Raten am Monatsende.',
       assumptions: [
         'Konstanter Sollzinssatz über die gesamte Kreditlaufzeit',
         'Gleichbleibende Monatsrate ohne Sondertilgungen oder Ratenpausen',
@@ -2340,7 +2353,7 @@ export const EXTRA_FINANZEN_KREDIT: CalculatorDefinition[] = [
           { id: 'interest', label: 'Gesamte Zinskosten', value: (rate * m) - loan, formattedValue: formatCurrency((rate * m) - loan) },
           { id: 'notarySaved', label: 'Ersparnis Notar/Grundbuch', value: 650, formattedValue: 'ca. 650 € (keine Grundschuld)' },
         ],
-        summaryText: `Für ${formatCurrency(loan)} Modernisierung zahlen Sie monatlich ${formatCurrency(rate)} über ${y} Jahre.`,
+        summaryText: `Für ${formatCurrency(loan)} Modernisierung zahlen Sie monatlich ${formatCurrency(rate)} über ${y} ${y === 1 ? 'Jahr' : 'Jahre'}.`,
       };
     },
     formula: 'Monatsrate = Kreditsumme × (r / (1 - (1 + r)^-n))',

@@ -11,7 +11,7 @@ function rosRating(ros: number, profit: number): string {
   if (profit === 0) return 'Ausgeglichen (Break-Even, kein Gewinn)';
   if (ros < 0) return 'Verlustzone (negatives Ergebnis)';
   if (ros < 2) return 'Geringe Marge (anfällig bei Kostensteigerungen)';
-  if (ros < 5) return 'Durchschnittlicher Mittelstandsbereich';
+  if (ros < 5) return 'Mittlerer Bereich (mit der Branche vergleichen)';
   if (ros < 10) return 'Gute Ertragskraft';
   return 'Sehr hohe Ertragskraft';
 }
@@ -1067,7 +1067,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
         },
         {
           title: 'Welche Werte sind gut?',
-          content: 'Gute Werte hängen stark von der Branche ab. Der Lebensmittelhandel arbeitet oft mit 1,5 bis 3 % Umsatzrendite und gleicht das über hohe Mengen aus. Software- und Pharmaunternehmen erreichen teils 20 % und mehr. Eine Eigenkapitalrendite von 10 bis 18 % gilt im Mittelstand als solide. Liegt sie dauerhaft unter dem Zins sicherer Anlagen, lohnt sich das unternehmerische Risiko kaum.\n\nVergleichen Sie Kennzahlen am besten mit Vorjahren und Unternehmen derselben Branche. Für die Preis- und Kostenkalkulation nutzen Sie den [Deckungsbeitrag-Rechner](/rechner/deckungsbeitrag-rechner/), für die Zahlungsfähigkeit den [Liquiditätsgrad-Rechner](/rechner/liquiditaetsgrad-rechner/) und für den Mittelzufluss den [Cashflow-Rechner](/rechner/cashflow-rechner/).',
+          content: 'Gute Werte hängen stark von der Branche ab. Handelsunternehmen mit hohem Umsatz und geringem Kapitaleinsatz kommen oft mit einer niedrigen Umsatzrendite aus, weil sich das Kapital häufig umschlägt. Unternehmen mit hohen Entwicklungs- oder Anlagekosten brauchen dagegen eine höhere Umsatzrendite. Feste Richtwerte für „gut“ gibt es deshalb nicht. Für die Eigenkapitalrendite gilt eine einfache Untergrenze: Liegt sie dauerhaft unter dem Zins sicherer Anlagen, lohnt sich das unternehmerische Risiko kaum.\n\nVergleichen Sie Kennzahlen am besten mit Vorjahren und Unternehmen derselben Branche. Für die Preis- und Kostenkalkulation nutzen Sie den [Deckungsbeitrag-Rechner](/rechner/deckungsbeitrag-rechner/), für die Zahlungsfähigkeit den [Liquiditätsgrad-Rechner](/rechner/liquiditaetsgrad-rechner/) und für den Mittelzufluss den [Cashflow-Rechner](/rechner/cashflow-rechner/).',
         },
       ],
       details: 'Umsatzrentabilität = Gewinn ÷ Umsatz × 100. Eigenkapitalrentabilität = Gewinn ÷ Eigenkapital × 100. Gesamtkapitalrentabilität = (Gewinn + Fremdkapitalzinsen) ÷ Gesamtkapital × 100.',
@@ -1077,7 +1077,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       { question: 'Wie berechnet man die Eigenkapitalrentabilität?', answer: 'Teilen Sie den Jahresüberschuss durch das Eigenkapital und multiplizieren Sie mit 100. Bei 40.000 € Gewinn und 250.000 € Eigenkapital ergibt das 16 %. Das ist die Verzinsung des Kapitals, das die Eigentümer eingesetzt haben.' },
       { question: 'Warum werden bei der Gesamtkapitalrentabilität die Zinsen addiert?', answer: 'Die Zinsen sind der Ertrag, den das Fremdkapital für die Kreditgeber erwirtschaftet. Erst mit ihnen zeigt die Kennzahl, was das gesamte Kapital verdient hat – unabhängig von der Finanzierung. Bei 60.000 € Gewinn, 20.000 € Zinsen und 1.000.000 € Gesamtkapital sind das 8 %.' },
       { question: 'Was ist der Leverage-Effekt?', answer: 'Der Hebeleffekt des Fremdkapitals auf die Eigenkapitalrendite. Liegt die Gesamtkapitalrendite über dem Fremdkapitalzins, steigert zusätzliches Fremdkapital die Eigenkapitalrendite. Liegt sie darunter, sinkt die Eigenkapitalrendite mit jedem weiteren Kredit.' },
-      { question: 'Welche Umsatzrendite ist gut?', answer: 'Das hängt von der Branche ab. Im Lebensmittelhandel sind 1,5 bis 3 % üblich, im Mittelstand gelten 2 bis 5 % als durchschnittlich. Software- und Pharmaunternehmen erreichen teils über 20 %.' },
+      { question: 'Welche Umsatzrendite ist gut?', answer: 'Das hängt von der Branche ab, ein allgemeingültiger Richtwert existiert nicht. Aussagekräftig ist der Vergleich mit den eigenen Vorjahren und mit Unternehmen derselben Branche. Eine niedrige Umsatzrendite kann trotzdem eine gute Gesamtkapitalrendite ergeben, wenn sich das Kapital oft umschlägt: 3 % Umsatzrendite bei dreifachem Kapitalumschlag entsprechen grob 9 % auf das eingesetzte Kapital.' },
     ],
     relatedSlugs: ['deckungsbeitrag-rechner', 'liquiditaetsgrad-rechner', 'cashflow-rechner', 'abschreibung-linear-degressiv-rechner'],
   },

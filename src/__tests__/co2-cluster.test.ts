@@ -360,25 +360,29 @@ describe('CO2 Calculator Cluster Comprehensive Regression & Legal Verification S
     it('verifies all 10 statutory steps at annual thresholds according to CO2KostAufG Anlage', () => {
       const testCases = [
         { specific: 0, expectedStep: 1, landlordPct: 0, tenantPct: 100 },
-        { specific: 11.99, expectedStep: 1, landlordPct: 0, tenantPct: 100 },
+        { specific: 11.94, expectedStep: 1, landlordPct: 0, tenantPct: 100 },
         { specific: 12.00, expectedStep: 2, landlordPct: 10, tenantPct: 90 },
-        { specific: 16.99, expectedStep: 2, landlordPct: 10, tenantPct: 90 },
+        { specific: 16.94, expectedStep: 2, landlordPct: 10, tenantPct: 90 },
         { specific: 17.00, expectedStep: 3, landlordPct: 20, tenantPct: 80 },
-        { specific: 21.99, expectedStep: 3, landlordPct: 20, tenantPct: 80 },
+        { specific: 21.94, expectedStep: 3, landlordPct: 20, tenantPct: 80 },
         { specific: 22.00, expectedStep: 4, landlordPct: 30, tenantPct: 70 },
-        { specific: 26.99, expectedStep: 4, landlordPct: 30, tenantPct: 70 },
+        { specific: 26.94, expectedStep: 4, landlordPct: 30, tenantPct: 70 },
         { specific: 27.00, expectedStep: 5, landlordPct: 40, tenantPct: 60 },
-        { specific: 31.99, expectedStep: 5, landlordPct: 40, tenantPct: 60 },
+        { specific: 31.94, expectedStep: 5, landlordPct: 40, tenantPct: 60 },
         { specific: 32.00, expectedStep: 6, landlordPct: 50, tenantPct: 50 },
-        { specific: 36.99, expectedStep: 6, landlordPct: 50, tenantPct: 50 },
+        { specific: 36.94, expectedStep: 6, landlordPct: 50, tenantPct: 50 },
         { specific: 37.00, expectedStep: 7, landlordPct: 60, tenantPct: 40 },
-        { specific: 41.99, expectedStep: 7, landlordPct: 60, tenantPct: 40 },
+        { specific: 41.94, expectedStep: 7, landlordPct: 60, tenantPct: 40 },
         { specific: 42.00, expectedStep: 8, landlordPct: 70, tenantPct: 30 },
-        { specific: 46.99, expectedStep: 8, landlordPct: 70, tenantPct: 30 },
+        { specific: 46.94, expectedStep: 8, landlordPct: 70, tenantPct: 30 },
         { specific: 47.00, expectedStep: 9, landlordPct: 80, tenantPct: 20 },
-        { specific: 51.99, expectedStep: 9, landlordPct: 80, tenantPct: 20 },
+        { specific: 51.94, expectedStep: 9, landlordPct: 80, tenantPct: 20 },
         { specific: 52.00, expectedStep: 10, landlordPct: 95, tenantPct: 5 },
         { specific: 75.00, expectedStep: 10, landlordPct: 95, tenantPct: 5 },
+        // § 5 Abs. 1 Satz 3 CO2KostAufG: Rundung auf eine Nachkommastelle vor der Einstufung
+        { specific: 11.95, expectedStep: 2, landlordPct: 10, tenantPct: 90 },
+        { specific: 26.96, expectedStep: 5, landlordPct: 40, tenantPct: 60 },
+        { specific: 51.95, expectedStep: 10, landlordPct: 95, tenantPct: 5 },
       ];
 
       for (const tc of testCases) {

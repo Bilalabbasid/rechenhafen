@@ -337,7 +337,7 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
     });
 
     // 7. Schalungssteine
-    it('fixture: Schalungssteine matches acceptance fixture for 96 base stones, 101 reserve stones, 1.56 m³ and 1.638 m³ concrete', () => {
+    it('fixture: Schalungssteine (Delfing DP 24, 50 × 20 cm) matches acceptance fixture for 120 base stones, 126 reserve stones, 1.56 m³ and 1.638 m³ concrete', () => {
       const calc = getCalculatorDefinitionBySlug('schalungssteine-rechner');
       expect(calc).toBeDefined();
 
@@ -351,11 +351,12 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
       };
       const res0 = calc!.calculate(defaults);
 
-      // 1. Stones: 12 * 8 = 96 base, ceil(96 * 1.05) = 101 reserve
-      expect(res0.primary.value).toBe(101);
-      expect(res0.primary.formattedValue).toBe('101 Stück');
+      // 1. Stones: DP 24 is 50 × 20 cm (Delfing catalogue: 10 Stück/m²) → 12 * 10 = 120 base, 120 * 1.05 = 126 reserve
+      //    (previously 12 * 8 = 96 / 101, which assumed 25-cm-high stones)
+      expect(res0.primary.value).toBe(126);
+      expect(res0.primary.formattedValue).toBe('126 Stück');
       const baseStones = res0.secondary?.find((s) => s.id === 'baseStones');
-      expect(baseStones?.value).toBe(96);
+      expect(baseStones?.value).toBe(120);
 
       // 2. Concrete 0 % reserve: 12 * 0.130 = 1.56 m³
       const concreteSec0 = res0.secondary?.find((s) => s.id === 'concreteM3');
@@ -368,8 +369,8 @@ describe('Calculator Quality, Content, and SEO QA Verification', () => {
       expect(concreteSec5?.value).toBeCloseTo(1.638, 3);
       expect(concreteSec5?.formattedValue).toContain('1,64 m³');
 
-      // 4. Stated values in workedExample match exactly
-      expect(calc!.workedExample.result).toContain('101 Steine');
+      // 4. Stated values in workedExample match exactly (Delfing DP 24 = 50 × 20 cm, 10 Steine/m²: 120 → 126 Steine)
+      expect(calc!.workedExample.result).toContain('126 Steine');
       expect(calc!.workedExample.result).toContain('1,56 m³');
       expect(calc!.workedExample.result).toContain('1,638 m³');
       expect(calc!.workedExample.description).toContain('1,56 m³');

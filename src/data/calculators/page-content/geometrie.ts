@@ -2,6 +2,7 @@ import { CalculationResult, CalculatorDefinition } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 import { calculateCylinder, calculateRectangle } from '@/lib/calculators/geometrie';
 import { EXTRA_BAUEN_GEOMETRIE } from '../extra/bauenGeometrie';
+import { GEOMETRIE_CALCULATORS } from '../geometrie';
 import { PageContentMap } from './types';
 
 // ---------------------------------------------------------------------------
@@ -306,6 +307,46 @@ const zielHoehe = 300000 / (Math.PI * 30 * 30);
 const zielProbe = num(zylinder({ radius: 30, height: zielHoehe }), 'volume') / 1000;
 const poolWand = zylinder({ radius: 183, height: 91 });
 
+// ==================== Kreis ====================
+const kreis = engineOf(GEOMETRIE_CALCULATORS, 'kreisrechner');
+const kreisD = (d: number) => kreis({ givenType: 'diameter', givenValue: d, unit: 'cm' });
+const KREIS_DURCHMESSER = [20, 26, 28, 30, 32, 40];
+const kreis26Flaeche = num(kreisD(26), 'area');
+const kreisTabelle = table(
+  ['Durchmesser', 'Fläche', 'Umfang (Rand)', 'Fläche im Vergleich zu 26 cm'],
+  KREIS_DURCHMESSER.map((d) => {
+    const r = kreisD(d);
+    return [`${d} cm`, `${f(num(r, 'area'), 0)} cm²`, `${f(num(r, 'circumference'), 1)} cm`, `${fx((num(r, 'area') / kreis26Flaeche) * 100, 0)} %`];
+  })
+);
+const kreisPlus32 = (num(kreisD(32), 'area') / kreis26Flaeche - 1) * 100;
+const kreis40 = num(kreisD(40), 'area');
+const kreis28 = num(kreisD(28), 'area');
+const kreis40zu28 = kreis40 / kreis28;
+const kreisZwei28 = 2 * kreis28;
+
+// ==================== Quader ====================
+const quader = engineOf(EXTRA_BAUEN_GEOMETRIE, 'quader-volumen-rechner');
+const quaderLiter = (a: number, b: number, c: number) => num(quader({ body: 'quader', lengthA: a, widthB: b, heightC: c }), 'volume') / 1000;
+const QUADER_BEISPIELE: Array<[string, number, number, number]> = [
+  ['Aquarium', 60, 30, 30],
+  ['Aquarium', 100, 40, 50],
+  ['Hochbeet', 200, 100, 80],
+  ['Sandkasten (Füllhöhe 30 cm)', 150, 150, 30],
+  ['Kühlbox (Innenmaß)', 50, 30, 30],
+];
+const quaderTabelle = table(
+  ['Gegenstand (Beispielmaße)', 'Innenmaß in cm', 'Volumen', 'in Litern'],
+  QUADER_BEISPIELE.map(([label, a, b, c]) => {
+    const liter = quaderLiter(a, b, c);
+    return [label, `${a} × ${b} × ${c}`, `${f(liter * 1000, 0)} cm³`, `${f(liter, 0)} l`];
+  })
+);
+const aquariumVoll = quaderLiter(100, 40, 50);
+const aquariumWasser = quaderLiter(100, 40, 45);
+const quaderRaum = quader({ body: 'quader', lengthA: 400, widthB: 350, heightC: 250 });
+const raumM3 = num(quaderRaum, 'volume') / 1_000_000;
+
 export const GEOMETRIE_PAGE_CONTENT: PageContentMap = {
   'hohlzylinder-rohr-rechner': {
     sections: [
@@ -572,6 +613,36 @@ export const GEOMETRIE_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Wie viel Folie oder Vlies brauche ich für Wand und Boden eines runden Pools?',
         answer: `Die Wand entspricht der Mantelfläche, der Boden der Grundfläche. Ein Pool mit 366 cm Durchmesser und 91 cm Wandhöhe hat ${f(num(poolWand, 'lateral') / 10000, 2)} m² Wand und ${f(num(poolWand, 'baseArea') / 10000, 2)} m² Boden. Für Überlappungen und den Rand oben kommt beim Zuschnitt etwas dazu.`,
+      },
+    ],
+  },
+
+  kreisrechner: {
+    sections: [
+      {
+        title: 'Pizza, Torte, Tischplatte: was ein paar Zentimeter Durchmesser ausmachen',
+        content: `Bei runden Dingen wird der Durchmesser angegeben, gegessen oder belegt wird aber die Fläche. Weil der Radius in A = π · r² im Quadrat steht, wächst die Fläche viel schneller als der Durchmesser. Die Tabelle ist mit dem Rechner im Modus „Durchmesser“ berechnet:\n\n${kreisTabelle}\n\nEine 32-cm-Pizza ist nur 6 cm breiter als eine 26-cm-Pizza, hat aber ${f(kreisPlus32, 0)} % mehr Fläche. Beim Preisvergleich lohnt es sich deshalb, den Preis durch die Fläche zu teilen statt durch den Durchmesser. Für eine Tortenform gilt dasselbe: Wer ein Rezept von 26 auf 20 cm verkleinert, braucht nur noch ${f((num(kreisD(20), 'area') / kreis26Flaeche) * 100, 0)} % der Zutaten, nicht ${f((20 / 26) * 100, 0)} %.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Sind zwei kleine Pizzen mehr als eine große?',
+        answer: `Nicht unbedingt. Eine Pizza mit 40 cm Durchmesser hat ${f(kreis40, 0)} cm² Fläche, eine mit 28 cm ${f(kreis28, 0)} cm². Zwei 28er kommen zusammen auf ${f(kreisZwei28, 0)} cm² und sind damit etwas kleiner als eine 40er, obwohl ihre Durchmesser zusammen 56 cm ergeben. Eine 40er entspricht ${f(kreis40zu28, 2)} Pizzen mit 28 cm.`,
+      },
+    ],
+  },
+
+  'quader-volumen-rechner': {
+    sections: [
+      {
+        title: 'Liter-Inhalt typischer Kästen und Becken',
+        content: `Geben Sie immer das Innenmaß in Zentimetern ein. Dann sind die Kubikzentimeter im Ergebnis gleich Milliliter, und 1.000 cm³ ergeben einen Liter. Die Maße in der Tabelle sind Beispiele:\n\n${quaderTabelle}\n\nBei Becken und Aquarien zählt außerdem die Füllhöhe, nicht die Glashöhe. Ein Aquarium mit 100 × 40 × 50 cm fasst randvoll ${f(aquariumVoll, 0)} Liter. Steht das Wasser 5 cm unter der Oberkante, sind es nur ${f(aquariumWasser, 0)} Liter, und Bodengrund, Steine und Technik verdrängen zusätzlich Wasser. Für Heizung, Pumpe und Futter- oder Medikamentendosierung rechnen Sie mit dem tatsächlichen Wasservolumen.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie rechne ich das Volumen eines Zimmers in Kubikmeter um?',
+        answer: `Geben Sie Länge, Breite und Raumhöhe in Zentimetern ein und teilen Sie das Ergebnis durch 1.000.000, denn 1 m³ sind 100 × 100 × 100 cm³. Ein Zimmer mit 4 × 3,5 m Grundfläche und 2,5 m Höhe hat ${f(num(quaderRaum, 'volume'), 0)} cm³, also ${f(raumM3, 0)} m³ oder ${f(raumM3 * 1000, 0)} Liter Luft. Diese Zahl brauchen Sie etwa für Luftentfeuchter, Heizlüfter oder die Luftwechselrate beim Lüften.`,
       },
     ],
   },

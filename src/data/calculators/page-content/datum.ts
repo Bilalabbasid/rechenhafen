@@ -265,6 +265,51 @@ const AT_NW = AT_ROWS.find((r) => r.name === 'Nordrhein-Westfalen')!;
 const AT_2412 = weekdayOf('2027-12-24');
 const AT_3112 = weekdayOf('2027-12-31');
 
+// ---------------------------------------------------------------------------
+// Tage bis Geburtstag: Wochentag in den nächsten Jahren (Stichtag jeweils 01.01.)
+// ---------------------------------------------------------------------------
+const gebNext = (birth: string, year: number) => run('tage-bis-geburtstag', { birthDate: birth, referenceDate: `${year}-01-01` });
+const GEB_YEARS = [2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033];
+const GEB_TABLE = GEB_YEARS.map((y) => `| ${y} | ${txt(gebNext('1992-08-14', y), 'nextDate')} | ${txt(gebNext('2000-02-29', y), 'nextDate')} |`).join('\n');
+const GEB_VORTAG = run('tage-bis-geburtstag', { birthDate: '1996-10-24', referenceDate: '2027-10-23' });
+const GEB_TAG = run('tage-bis-geburtstag', { birthDate: '1996-10-24', referenceDate: '2027-10-24' });
+const GEB_NACHTAG = run('tage-bis-geburtstag', { birthDate: '1996-10-24', referenceDate: '2027-10-25' });
+
+// ---------------------------------------------------------------------------
+// Alter in Monaten: Wochen und Monate nebeneinander (Geburt 01.01.2026)
+// ---------------------------------------------------------------------------
+const AIM_BIRTH = '2026-01-01';
+const aim = (birth: string, target: string) => run('alter-in-monaten', { birthDate: birth, targetDate: target });
+const AIM_WEEKS = [4, 8, 13, 17, 26, 39, 52];
+const AIM_TABLE = AIM_WEEKS.map((w) => {
+  const d = shift(AIM_BIRTH, w * 7);
+  const r = aim(AIM_BIRTH, d.iso);
+  return `| ${w} Wochen | ${d.de} | ${txt(r, 'completedMonths')} | ${txt(r, 'runningMonth')} |`;
+}).join('\n');
+const AIM_13_JAN = aim(AIM_BIRTH, shift(AIM_BIRTH, 91).iso);
+const AIM_13_JUL = aim('2026-07-01', shift('2026-07-01', 91).iso);
+const AIM_31_ANN = aim('2026-08-31', '2027-02-28');
+const AIM_31_VOR = aim('2026-08-31', '2027-02-27');
+const AIM_31_MAERZ = aim('2026-08-31', '2027-03-31');
+
+// ---------------------------------------------------------------------------
+// Tage bis Weihnachten: Wochentage und Adventssonntage
+// ---------------------------------------------------------------------------
+const XMAS_YEARS = [2026, 2027, 2028, 2029, 2030];
+const advent = (year: number) => {
+  const heiligabend = `${year}-12-24`;
+  const dn = dateToDayNumber(year, 12, 24);
+  const sundayOffset = new Date(dn * 86400000).getUTCDay(); // 0 = Sonntag
+  const vierter = shift(heiligabend, -sundayOffset);
+  const erster = shift(vierter.iso, -21);
+  return { year, heiligabend: weekdayOf(heiligabend), erster, vierter, isSunday: sundayOffset === 0 };
+};
+const XMAS = XMAS_YEARS.map(advent);
+const XMAS_TABLE = XMAS.map((a) => `| ${a.year} | ${a.heiligabend} | ${a.erster.de} | ${a.vierter.de} |`).join('\n');
+const XMAS_SUNDAY_YEARS = XMAS.filter((a) => a.isSunday).map((a) => a.year);
+const XMAS_2026 = XMAS[0];
+const XMAS_2026_DAYS = daysBetween(XMAS_2026.erster.iso, '2026-12-24');
+
 export const DATUM_PAGE_CONTENT: PageContentMap = {
   'lebenszeit-in-stunden': {
     sections: [
@@ -586,6 +631,51 @@ export const DATUM_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Sind Heiligabend und Silvester Arbeitstage?',
         answer: `Ja, der 24. und der 31. Dezember sind keine gesetzlichen Feiertage, der Rechner zählt sie als Arbeitstage. 2027 fallen beide auf einen ${AT_2412 === AT_3112 ? AT_2412 : `${AT_2412} bzw. ${AT_3112}`}. Ob Sie frei haben oder nur einen halben Tag arbeiten, regeln Tarifvertrag, Betriebsvereinbarung oder Arbeitsvertrag.`,
+      },
+    ],
+  },
+
+  'tage-bis-geburtstag': {
+    sections: [
+      {
+        title: 'Auf welchen Wochentag fällt der Geburtstag in den nächsten Jahren?',
+        content: `Die Tabelle zeigt den Geburtstag am 14. August und am 29. Februar für die kommenden Jahre, jeweils mit dem Rechner und dem Stichtag 1. Januar ermittelt:\n\n| Jahr | Geburtstag 14.08. | Geburtstag 29.02. (Anzeige) |\n|---|---|---|\n${GEB_TABLE}\n\nVon Jahr zu Jahr rückt der 14. August um einen Wochentag weiter, nach dem Schalttag 2028 und 2032 um zwei. Wer am 29. Februar geboren ist, sieht in Gemeinjahren den 28. Februar, nur 2028 und 2032 den echten Geburtstag. Wollen Sie wissen, wann Ihr Geburtstag wieder auf ein Wochenende fällt, lesen Sie die Spalte einfach von oben nach unten.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Zählt der Countdown den Geburtstag selbst mit?',
+        answer: `Nein, gezählt wird die Differenz von heute bis zum Geburtstag. Am Tag davor zeigt der Rechner „${txt(GEB_VORTAG, 'days')}“, am Geburtstag selbst „${txt(GEB_TAG, 'days')}“. Schon am nächsten Morgen beginnt der Countdown für das folgende Jahr, dann sind es wieder ${txt(GEB_NACHTAG, 'days')}.`,
+      },
+    ],
+  },
+
+  'alter-in-monaten': {
+    sections: [
+      {
+        title: 'Alter in Wochen und Monaten nebeneinander',
+        content: `In Babyratgebern, auf Beikost-Gläschen und bei Vorsorgeterminen wird das Alter mal in Wochen, mal in Monaten angegeben. Die Tabelle zeigt für ein Kind, das am 01.01.2026 geboren ist, beide Angaben nebeneinander:\n\n| Alter in Wochen | Datum | Vollendete Monate | Laufender Lebensmonat |\n|---|---|---|---|\n${AIM_TABLE}\n\nWochen und Monate decken sich nie genau, und das Ergebnis hängt von den Monatslängen ab. Nach 13 Wochen zeigt der Rechner bei Geburt am 01.01.2026 „${txt(AIM_13_JAN, 'completedMonths')}“, bei Geburt am 01.07.2026 dagegen „${txt(AIM_13_JUL, 'completedMonths')}“. 52 Wochen sind 364 Tage und damit immer etwas weniger als ein Jahr. Lesen Sie deshalb nach, ob eine Angabe in Wochen oder in Monaten gemeint ist.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wann ist ein am 31. August geborenes Kind 6 Monate alt?',
+        answer: `Am 28. Februar, weil der Februar keinen 31. hat. Für die Geburt am 31.08.2026 zeigt der Rechner am 28.02.2027 „${txt(AIM_31_ANN, 'completedMonths')}“, am Tag davor „${txt(AIM_31_VOR, 'completedMonths')}“. Im nächsten Monat gilt wieder der ursprüngliche Tag: Am 31.03.2027 sind es „${txt(AIM_31_MAERZ, 'completedMonths')}“.`,
+      },
+    ],
+  },
+
+  'tage-bis-weihnachten': {
+    sections: [
+      {
+        title: 'Heiligabend und Adventssonntage 2026 bis 2030',
+        content: `Der 4. Advent ist der letzte Sonntag vor dem 25. Dezember, der 1. Advent liegt genau drei Wochen davor. Fällt Heiligabend selbst auf einen Sonntag, ist er zugleich der 4. Advent${XMAS_SUNDAY_YEARS.length > 0 ? ` (in diesem Zeitraum ${XMAS_SUNDAY_YEARS.join(' und ')})` : ''}. Die Daten sind mit dem Datumsrechner ermittelt:\n\n| Jahr | Heiligabend | 1. Advent | 4. Advent |\n|---|---|---|---|\n${XMAS_TABLE}\n\nDer Countdown oben zählt Kalendertage, Wochenenden eingeschlossen. Wie viele Arbeitstage bis zum Fest bleiben, hängt außerdem von Ihrem Bundesland und Ihrem Urlaub ab. Den genauen Wert für Ihren Zeitraum liefert der [Arbeitstage-Rechner](/rechner/arbeitstage-rechner/).`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wann ist der 1. Advent 2026?',
+        answer: `Am ${XMAS_2026.erster.weekday}, ${XMAS_2026.erster.de}. Der 4. Advent ist der ${XMAS_2026.vierter.de}, Heiligabend fällt 2026 auf einen ${XMAS_2026.heiligabend}. Vom 1. Advent bis Heiligabend sind es ${XMAS_2026_DAYS} Tage, ein Adventskalender mit 24 Türchen beginnt dagegen immer am 1. Dezember.`,
       },
     ],
   },

@@ -3736,7 +3736,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           },
           {
             value: "stevia",
-            label: "Stevia Streusüße 1:1 (kalorienfrei)",
+            label: "Stevia-Streusüße „1:1“ (Mischprodukt, Rechner setzt 0 kcal an – Packung beachten)",
           },
         ],
         dependsOn: { field: "direction", value: "sugar_to_sub" },
@@ -3904,7 +3904,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             label: 'Flüssigkeitsanpassung',
             value: liquidReductionMl,
             formattedValue: liquidReductionMl > 0
-              ? `Richtwert: Teigflüssigkeit um ca. ${formatMeasure(Math.round(liquidReductionMl), 0)} ml je 100 g Zucker reduzieren (rezeptabhängig)`
+              ? `Richtwert: Teigflüssigkeit um ca. ${formatMeasure(Math.round(liquidReductionMl), 0)} ml insgesamt reduzieren (Faustregel 20 ml je 100 g ersetztem Zucker, rezeptabhängig)`
               : 'Der Rechner berechnet keine Anpassung der Teigflüssigkeit. Beachten Sie die Hinweise Ihres Rezepts.',
           },
         ],
@@ -3968,7 +3968,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       },
       {
         question: 'Karamellisiert Erythrit beim Backen wie normaler Zucker?',
-        answer: 'Nein, Erythrit karamellisiert nicht und schmilzt erst bei höheren Temperaturen. Zudem neigt es beim Abkühlen zum Auskristallisieren und kann einen leicht kühlen Geschmackseffekt auf der Zunge hervorrufen.',
+        answer: 'Nein. Erythrit bräunt und karamellisiert im Ofen nicht wie Haushaltszucker, Gebäck bleibt deshalb heller. Zudem neigt es beim Abkühlen zum Auskristallisieren und kann einen leicht kühlen Geschmackseffekt auf der Zunge hervorrufen.',
       },
     ],
     relatedSlugs: ['eiweiss-eigelb-ersatz-rechner', 'kalorien-rezept-rechner', 'cups-in-gramm-rechner', 'portionsrechner'],
@@ -4836,7 +4836,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       if (type === 'jasmine') {
         waterRatio = 1.3;
         cookMins = '12–14';
-        yieldFactor = 2.35;
+        // Höchstens Reis + Wasser (1 + 1,3 = 2,3) abzüglich etwas Dampf
+        yieldFactor = 2.25;
         methodNote = 'Quellmethode im geschlossenen Topf: Jasminreis benötigt weniger Wasser (1 : 1,3), damit die aromatischen Körner leicht klebrig, aber nicht matschig werden.';
       } else if (type === 'wholegrain') {
         waterRatio = 2.0;
@@ -4846,7 +4847,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       } else if (type === 'sushi') {
         waterRatio = 1.2;
         cookMins = '15 (+ 10 Min. Ruhen)';
-        yieldFactor = 2.30;
+        // Höchstens Reis + Wasser (1 + 1,2 = 2,2) abzüglich etwas Dampf
+        yieldFactor = 2.15;
         methodNote = 'Quellmethode im geschlossenen Topf: Sushi-Reis nach 15 Min. Garzeit vom Herd nehmen und 10 Min. bei geschlossenem Deckel nachdämpfen lassen. Erst danach mit gewürztem Sushi-Essig vermengen.';
       } else if (type === 'risotto') {
         waterRatio = 3.0;
@@ -4868,7 +4870,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       } else {
         const portionsAsSide = Math.round(riceG / 65);
         const portionsAsMain = Math.max(1, Math.round(riceG / 115));
-        portionsFormatted = `ca. ${portionsAsSide} Portion(en) (Beilage, Basis 65 g p.P.) / ca. ${portionsAsMain} Portion(en) (Hauptgericht, Basis 115 g p.P.)`;
+        const portionWord = (n: number) => (n === 1 ? 'Portion' : 'Portionen');
+        portionsFormatted = `ca. ${portionsAsSide} ${portionWord(portionsAsSide)} (Beilage, Basis 65 g p.P.) / ca. ${portionsAsMain} ${portionWord(portionsAsMain)} (Hauptgericht, Basis 115 g p.P.)`;
       }
       
       // Salt guidance: scale grams and teaspoons dynamically (assumption: 1 level teaspoon table salt ≈ 5 g)
@@ -4883,7 +4886,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         saltGuidance = `ca. ${formatMeasure(saltGrams, 0)} g (ca. ${formatMeasure(tspEquiv, 1)} gestr. TL; Annahme: ca. 5 g je gestr. TL, optional nach Geschmack)`;
       }
 
-      const liquidFormatted = waterMl + ' ml ' + liquidLabel;
+      const liquidFormatted = formatMeasure(waterMl, 0) + ' ml ' + liquidLabel;
+      const riceText = formatMeasure(riceG, 1);
 
       return {
         primary: {
@@ -4919,8 +4923,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             formattedValue: saltGuidance
           }
         ],
-        directAnswer: 'Für ' + riceG + ' g Reis benötigen Sie ' + liquidFormatted + ' bei einer Kochzeit von ca. ' + cookMins + ' Minuten.',
-        summaryText: 'Für ' + riceG + ' g Reis (' + (type === 'risotto' ? 'Risotto-Methode' : 'Quellmethode 1 : ' + waterRatio.toFixed(1).replace('.', ',')) + ') benötigen Sie ' + liquidFormatted + '. Nach dem Garen erhalten Sie ca. ' + formatMeasure(cookedWeightG, 0) + ' g fertigen Reis.',
+        directAnswer: 'Für ' + riceText + ' g Reis benötigen Sie ' + liquidFormatted + ' bei einer Kochzeit von ca. ' + cookMins + ' Minuten.',
+        summaryText: 'Für ' + riceText + ' g Reis (' + (type === 'risotto' ? 'Risotto-Methode' : 'Quellmethode 1 : ' + waterRatio.toFixed(1).replace('.', ',')) + ') benötigen Sie ' + liquidFormatted + '. Nach dem Garen erhalten Sie ca. ' + formatMeasure(cookedWeightG, 0) + ' g fertigen Reis.',
         qualifications: [
           methodNote,
           'Wasseraufnahme: Die Quellmethode basiert auf dem Gewichtsverhältnis (Gramm Reis zu Milliliter Wasser; 1 g Wasser = 1 ml). Beim Abmessen mit Tassen beachten, dass 1 Tasse Reis ca. 180–200 g wiegt, 1 Tasse Wasser jedoch ca. 240 ml.',
@@ -4957,7 +4961,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         },
         {
           title: "Reis waschen und salzen: Was ist sinnvoll?",
-          content: "Gründliches Abspülen des Reises vor dem Kochen unter kaltem fließendem Wasser schwemmt überschüssige Oberflächenstärke ab. Dadurch kleben Basmati- und Langkornreissorten nach dem Garen weniger zusammen. Zudem kann das Waschen eventuelle produktionsbedingte Staubreste und anorganisches Arsen reduzieren.\n\nSalz ist beim Reiskochen eine reine Geschmacksfrage und keine technische Notwendigkeit: 1 bis 2 Gramm Salz (ca. 1/2 gestrichener Teelöffel) pro 100 Gramm Trockenreis genügen vollkommen. Sushi-Reis wird traditionell erst nach dem Garen mit einer Mischung aus Reisessig, Zucker und Salz gewürzt."
+          content: "Gründliches Abspülen des Reises vor dem Kochen unter kaltem fließendem Wasser schwemmt überschüssige Oberflächenstärke ab. Dadurch kleben Basmati- und Langkornreissorten nach dem Garen weniger zusammen. Zudem kann das Waschen eventuelle produktionsbedingte Staubreste und anorganisches Arsen reduzieren.\n\nSalz ist beim Reiskochen eine reine Geschmacksfrage und keine technische Notwendigkeit: Der Rechner schlägt 1,5 Gramm Salz pro 100 Gramm Trockenreis vor, also knapp ein Drittel gestrichenen Teelöffel. Sushi-Reis wird traditionell erst nach dem Garen mit einer Mischung aus Reisessig, Zucker und Salz gewürzt."
         }
       ]
     },
@@ -5189,6 +5193,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       }
 
       const factorLabel = 'Faktor ' + factor.toFixed(1).replace('.', ',');
+      // Deutsche Zahlen (1.500 g, 12,5 g) und Singular/Plural in allen Texten
+      const gram = (v: number) => formatMeasure(v, 1);
+      const personText = (n: number) => `${n} ${n === 1 ? 'Person' : 'Personen'}`;
+      const portionText = (n: number) => `${n} ${n === 1 ? 'Portion' : 'Portionen'}`;
+      const factorStepLabel = isFresh
+        ? 'Quellfaktor frische Pasta'
+        : factorPreset === 'soft'
+          ? 'Quellfaktor weich gekocht'
+          : factorPreset === 'custom'
+            ? 'eigener Quellfaktor'
+            : 'Quellfaktor Hartweizen al dente';
       const rawTerm = isFresh ? 'ungekochte frische Pasta' : 'Trockennudeln';
       const rawTitle = isFresh ? 'Frische Pasta (ungekocht)' : 'Trockennudeln';
 
@@ -5240,7 +5255,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             };
           }
           rawPerPersonG = customG;
-          mealLabel = `Individuell (${customG} g p.P. ${rawTerm})`;
+          mealLabel = `Individuell (${gram(customG)} g p.P. ${rawTerm})`;
         }
 
         const totalRawG = Math.round(persons * rawPerPersonG);
@@ -5258,7 +5273,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'rawPasta',
             label: isFresh ? 'Benötigte frische Pasta (ungekocht)' : 'Benötigte Trockennudeln',
             value: totalRawG,
-            formattedValue: totalRawG + ' g' + (isFresh ? ' frische Pasta' : packages500g),
+            formattedValue: gram(totalRawG) + ' g' + (isFresh ? ' frische Pasta' : packages500g),
             highlight: true
           },
           secondary: [
@@ -5299,18 +5314,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                         ? `Benutzerdefinierter Quellfaktor (Faktor ${factor.toFixed(1).replace('.', ',')})`
                         : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
             },
-            { label: 'Anzahl Personen', value: `${persons} Personen` },
+            { label: 'Anzahl Personen', value: personText(persons) },
             { label: 'Mahlzeiten-Art & Hunger', value: mealLabel },
-            { label: 'Portionsannahme p.P.', value: `${rawPerPersonG} g ${rawTerm} p.P.` }
+            { label: 'Portionsannahme p.P.', value: `${gram(rawPerPersonG)} g ${rawTerm} p.P.` }
           ],
           calculationSteps: [
-            `Portionsannahme: ${persons} Personen × ${rawPerPersonG} g ${rawTerm} p.P. = ${totalRawG} g ${rawTerm} (Rohgewicht)`,
-            `Gekochte Ausbeute: ${totalRawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatMeasure(totalCookedG, 0)} g gekochte Pasta`,
-            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
+            `Portionsannahme: ${personText(persons)} × ${gram(rawPerPersonG)} g ${rawTerm} p.P. = ${gram(totalRawG)} g ${rawTerm} (Rohgewicht)`,
+            `Gekochte Ausbeute: ${gram(totalRawG)} g × ${factor.toFixed(1).replace('.', ',')} (${factorStepLabel}) = ca. ${formatMeasure(totalCookedG, 0)} g gekochte Pasta`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${gram(totalRawG)} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
             `Salzempfehlung (ca. 10 g je Liter): ${formatMeasure(waterLiters, 1)} l × 10 g = ${saltG} g Salz`
           ],
-          directAnswer: 'Für ' + persons + ' Personen (' + mealLabel + ') benötigen Sie ' + totalRawG + ' g ' + rawTerm + ', was bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g servierfertiger Pasta entspricht.',
-          summaryText: 'Für ' + persons + ' Personen benötigen Sie ' + totalRawG + ' g ' + rawTerm + ' (' + rawPerPersonG + ' g p.P.). Beim Kochen saugt die Pasta Wasser auf und ergibt bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g fertige Nudeln.',
+          directAnswer: 'Für ' + personText(persons) + ' (' + mealLabel + ') benötigen Sie ' + gram(totalRawG) + ' g ' + rawTerm + ', was bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g servierfertiger Pasta entspricht.',
+          summaryText: 'Für ' + personText(persons) + ' benötigen Sie ' + gram(totalRawG) + ' g ' + rawTerm + ' (' + gram(rawPerPersonG) + ' g p.P.). Beim Kochen saugt die Pasta Wasser auf und ergibt bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g fertige Nudeln.',
           qualifications: [
             'Empfohlene Topfgröße: Mindestens ' + recommendedPotLiters + ' Liter Topfvolumen, damit das Kochwasser nach dem Hineingeben der Pasta ausreichend Raum hat.',
             isFresh
@@ -5353,13 +5368,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'dryPasta',
               label: `Ausgangsgewicht (${rawTitle})`,
               value: rawG,
-              formattedValue: rawG + ' g ' + (isFresh ? 'frische Pasta' : 'Trockennudeln')
+              formattedValue: gram(rawG) + ' g ' + (isFresh ? 'frische Pasta' : 'Trockennudeln')
             },
             {
               id: 'estimatedPortions',
               label: 'Entspricht ca.',
               value: portions,
-              formattedValue: `ca. ${portions} Hauptgericht-Portionen (à ${portionRef} g ${isFresh ? 'frisch' : 'trocken'})`
+              formattedValue: `ca. ${portions} Hauptgericht-${portions === 1 ? 'Portion' : 'Portionen'} (à ${portionRef} g ${isFresh ? 'frisch' : 'trocken'})`
             },
             {
               id: 'waterReq',
@@ -5392,18 +5407,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                         ? `Benutzerdefinierter Quellfaktor (Faktor ${factor.toFixed(1).replace('.', ',')})`
                         : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
             },
-            { label: isFresh ? 'Ausgangsgewicht (frische Pasta)' : 'Ausgangsgewicht (Trockennudeln)', value: `${rawG} g ${rawTerm}` },
+            { label: isFresh ? 'Ausgangsgewicht (frische Pasta)' : 'Ausgangsgewicht (Trockennudeln)', value: `${gram(rawG)} g ${rawTerm}` },
             { label: 'Ergebnis (gekocht)', value: `ca. ${formatMeasure(totalCookedG, 0)} g gekocht` }
           ],
           calculationSteps: [
-            `Ausgangsgewicht: ${rawG} g ${rawTerm}`,
-            `Gekochte Ausbeute: ${rawG} g × ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${formatMeasure(totalCookedG, 0)} g gekochte Pasta`,
-            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${rawG} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
+            `Ausgangsgewicht: ${gram(rawG)} g ${rawTerm}`,
+            `Gekochte Ausbeute: ${gram(rawG)} g × ${factor.toFixed(1).replace('.', ',')} (${factorStepLabel}) = ca. ${formatMeasure(totalCookedG, 0)} g gekochte Pasta`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${gram(rawG)} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
             `Salzempfehlung: ${formatMeasure(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
-            `Portionen-Richtwert: ${rawG} g ÷ ${portionRef} g p.P. = ca. ${portions} Portionen`
+            `Portionen-Richtwert: ${gram(rawG)} g ÷ ${portionRef} g p.P. = ca. ${portionText(portions)}`
           ],
-          directAnswer: rawG + ' g ' + rawTerm + ' ergeben bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
-          summaryText: rawG + ' g ' + rawTerm + ' ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatMeasure(totalCookedG, 0) + ' g fertige Nudeln. Empfohlen werden ca. ' + formatMeasure(waterLiters, 1) + ' l Kochwasser und ' + saltG + ' g Salz.',
+          directAnswer: gram(rawG) + ' g ' + rawTerm + ' ergeben bei ' + factorLabel + ' ca. ' + formatMeasure(totalCookedG, 0) + ' g servierfertige gekochte Pasta.',
+          summaryText: gram(rawG) + ' g ' + rawTerm + ' ergeben nach dem Kochen mit ' + factorLabel + ' rund ' + formatMeasure(totalCookedG, 0) + ' g fertige Nudeln. Empfohlen werden ca. ' + formatMeasure(waterLiters, 1) + ' l Kochwasser und ' + saltG + ' g Salz.',
           qualifications: [
             'Wasseraufnahme variiert je nach Nudelform und Kochzeit: Al-dente-Biss ergibt ca. Faktor 2,2 bis 2,3; weicher gekochte Nudeln bis zu 2,5. Frische Pasta nimmt durch Eigenfeuchte nur ca. Faktor 1,5 auf.',
             'Herstellerhinweise auf der Verpackung haben Vorrang vor rechnerischen Richtwerten.'
@@ -5436,7 +5451,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
             id: 'rawPasta',
             label: isFresh ? 'Benötigte frische Pasta (ungekocht)' : 'Benötigte Trockennudeln',
             value: totalRawG,
-            formattedValue: totalRawG + ' g ' + (isFresh ? 'frisch (ungekocht)' : 'trocken'),
+            formattedValue: gram(totalRawG) + ' g ' + (isFresh ? 'frisch (ungekocht)' : 'trocken'),
             highlight: true
           },
           secondary: [
@@ -5450,7 +5465,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
               id: 'estimatedPortions',
               label: 'Entspricht ca.',
               value: portions,
-              formattedValue: `ca. ${portions} Hauptgericht-Portionen (à ${portionRef} g ${isFresh ? 'frisch' : 'trocken'})`
+              formattedValue: `ca. ${portions} Hauptgericht-${portions === 1 ? 'Portion' : 'Portionen'} (à ${portionRef} g ${isFresh ? 'frisch' : 'trocken'})`
             },
             {
               id: 'waterReq',
@@ -5484,17 +5499,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                         : 'Getrocknete Hartweizenpasta al dente (Faktor 2,3 – Standard)'))
             },
             { label: 'Gewünschte Fertigmenge (gekocht)', value: `${formatMeasure(cookedG, 0)} g gekocht` },
-            { label: isFresh ? 'Ergebnis Rohgewicht (frische Pasta)' : 'Ergebnis Rohgewicht (Trockennudeln)', value: `${totalRawG} g ${rawTerm}` }
+            { label: isFresh ? 'Ergebnis Rohgewicht (frische Pasta)' : 'Ergebnis Rohgewicht (Trockennudeln)', value: `${gram(totalRawG)} g ${rawTerm}` }
           ],
           calculationSteps: [
             `Gewünschte Fertigmenge: ${formatMeasure(cookedG, 0)} g gekochte Pasta`,
-            `Rückrechnung Rohgewicht: ${formatMeasure(cookedG, 0)} g ÷ ${factor.toFixed(1).replace('.', ',')} (${isFresh ? 'Quellfaktor frische Pasta' : 'Quellfaktor Hartweizen al dente'}) = ca. ${totalRawG} g ${rawTerm}`,
-            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${totalRawG} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
+            `Rückrechnung Rohgewicht: ${formatMeasure(cookedG, 0)} g ÷ ${factor.toFixed(1).replace('.', ',')} (${factorStepLabel}) = ca. ${gram(totalRawG)} g ${rawTerm}`,
+            `Kochwasser nach Faustformel (ca. 1 l je 100 g): ${gram(totalRawG)} g ÷ 100 × 1,0 l = ${formatMeasure(waterLiters, 1)} Liter Wasser`,
             `Salzempfehlung: ${formatMeasure(waterLiters, 1)} l × 10 g = ${saltG} g Salz`,
-            `Portionen-Richtwert: ${totalRawG} g ÷ ${portionRef} g p.P. = ca. ${portions} Portionen`
+            `Portionen-Richtwert: ${gram(totalRawG)} g ÷ ${portionRef} g p.P. = ca. ${portionText(portions)}`
           ],
-          directAnswer: 'Für ' + formatMeasure(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + totalRawG + ' g ' + rawTerm + ' ab (bei ' + factorLabel + ').',
-          summaryText: 'Um ca. ' + formatMeasure(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + totalRawG + ' g ' + rawTerm + ' ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
+          directAnswer: 'Für ' + formatMeasure(cookedG, 0) + ' g gekochte Pasta wiegen Sie ca. ' + gram(totalRawG) + ' g ' + rawTerm + ' ab (bei ' + factorLabel + ').',
+          summaryText: 'Um ca. ' + formatMeasure(cookedG, 0) + ' g servierfertige Nudeln zu erhalten, wiegen Sie vor dem Kochen ' + gram(totalRawG) + ' g ' + rawTerm + ' ab (Quellfaktor ' + factor.toFixed(1).replace('.', ',') + ').',
           qualifications: [
             `Rückrechnung: Rohgewicht = Gekochtes Gewicht ÷ Quellfaktor (${factor.toFixed(1).replace('.', ',')}).`,
             'Der Quellfaktor ist ein Richtwert; Garzeit und Teigbeschaffenheit beeinflussen die tatsächliche Ausbeute.'
@@ -5517,7 +5532,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         "Gekochte Ausbeute berechnen: 440 g × 2,3 = 1.012 g gekochte Pasta",
         "Kochwasser nach der 10-100-1000-Regel: 440 g ÷ 100 = 4,4 Liter Wasser",
         "Salzbedarf: 4,4 Liter × 10 g = 44 g Salz",
-        "Topfwahl: Bei 4,4 l Wasser mindestens einen 5- bis 6-Liter-Topf nutzen, damit das Wasser beim Kochen nicht überschäumt"
+        "Topfwahl: Bei 4,4 l Wasser mindestens einen 6-Liter-Topf nutzen (Wassermenge × 1,25, aufgerundet), damit das Wasser beim Kochen nicht überschäumt"
       ],
       result: "440 g Trockennudeln ergeben ca. 1.012 g gekochte Pasta (in 4,4 l Wasser mit 44 g Salz)"
     },
@@ -5541,7 +5556,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         },
         {
           title: "Die 10-100-1000-Faustregel für Nudelwasser",
-          content: "In der italienischen Küche gilt für das Kochen von getrockneten Nudeln die einfache Merkformel **10 - 100 - 1000**:\n\n- **10 Gramm Salz**\n- auf **100 Gramm Pasta**\n- in **1.000 Milliliter (1 Liter) Wasser**.\n\n*Wichtig:* Rechnen Sie für 440 g Pasta rechnerisch mit 4,4 Liter Wasser. Verwenden Sie dafür einen Topf mit mindestens 5 bis 6 Liter Fassungsvermögen, damit das siedende Nudelwasser nach der Pastazugabe nicht überkocht."
+          content: "In der italienischen Küche gilt für das Kochen von getrockneten Nudeln die einfache Merkformel **10 - 100 - 1000**:\n\n- **10 Gramm Salz**\n- auf **100 Gramm Pasta**\n- in **1.000 Milliliter (1 Liter) Wasser**.\n\n*Wichtig:* Rechnen Sie für 440 g Pasta rechnerisch mit 4,4 Liter Wasser. Verwenden Sie dafür einen Topf mit mindestens 6 Liter Fassungsvermögen, damit das siedende Nudelwasser nach der Pastazugabe nicht überkocht."
         }
       ]
     },
@@ -5560,13 +5575,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       },
       {
         question: "Gilt der Umrechnungsfaktor auch für Vollkorn- oder glutenfreie Nudeln?",
-        answer: "Vollkornnudeln aus Hartweizen quellen ähnlich mit Faktor 2,2 bis 2,4. Nudeln aus Hülsenfrüchten (Linsen, Kichererbsen) oder glutenfreie Maisteigwaren nehmen etwas weniger Wasser auf (Faktor ca. 2,0 bis 2,1)."
+        answer: "Die voreingestellten Faktoren gelten für Nudeln aus Hartweizengrieß. Für Vollkornnudeln, Nudeln aus Linsen oder Kichererbsen und glutenfreie Teigwaren gibt es keinen einheitlichen Wert. Wiegen Sie eine Portion einmal vor und nach dem Kochen ab, teilen Sie das gekochte durch das trockene Gewicht und tragen Sie das Ergebnis als eigenen Quellfaktor ein."
       }
     ],
     relatedSlugs: ['portionsrechner', 'wasser-reis-verhaeltnis-rechner', 'kalorien-rezept-rechner'],
     trustMeta: {
       lastReviewed: '2026-10-25',
-      sourceName: 'Küchenfachliche Richtwerte für Hartweizen- und Frischteigwaren & Barilla-Kochstandards',
+      sourceName: 'Küchenfachliche Richtwerte für Hartweizen- und Frischteigwaren',
       methodology: 'Quellfaktoren nach Stärkeverkleisterung und 10-100-1000-Wasserfaustregel',
     },
   },

@@ -429,6 +429,71 @@ const FASS_NO_GABLE = fassade(36, 5.5, 30, 'medium');
 const FASS_150 = (['smooth', 'medium', 'rough'] as const).map((s) => num(fassade(30, 5, 0, s), 'liters'));
 const FASS_PER_M2 = (['smooth', 'medium', 'rough'] as const).map((s) => num(fassade(10, 10, 0, s), 'liters') / 100);
 
+// ---------------------------------------------------------------------------
+// Betonrechner: Menge je 10 m² nach Plattendicke (ohne Reserve)
+// ---------------------------------------------------------------------------
+const beton = (depthCm: number, over: Record<string, any>) =>
+  run('betonrechner', { lengthM: 5, widthM: 2, depthCm, reservePercent: '0', ...over });
+const BETON_DICKEN = [8, 10, 12, 15, 20, 25];
+const BETON_TABLE = table(
+  ['Dicke', 'Beton für 10 m²', 'Fertigbeton 25 kg', 'Fertigbeton 40 kg', 'Zement 25 kg (C20/25, selbst gemischt)'],
+  BETON_DICKEN.map((d) => {
+    const m3 = Number(beton(d, { supplyMode: 'transport' }).primary.value);
+    const s25 = num(beton(d, { supplyMode: 'bags', bagWeightKg: 25 }), 'bags');
+    const s40 = num(beton(d, { supplyMode: 'bags', bagWeightKg: 40 }), 'bags');
+    const zement = num(beton(d, { supplyMode: 'mix', mixRatio: 'standard' }), 'cementSacks');
+    return [`${d} cm`, `${n2(m3)} m³`, `${n0(s25)} Säcke`, `${n0(s40)} Säcke`, `${n0(zement)} Säcke`];
+  }),
+);
+const BETON_1M3_FRESH = num(run('betonrechner', { lengthM: 1, widthM: 1, depthCm: 100, reservePercent: '0', supplyMode: 'transport' }), 'freshWeight');
+const BETON_1M3_DRY = num(run('betonrechner', { lengthM: 1, widthM: 1, depthCm: 100, reservePercent: '0', supplyMode: 'bags', bagWeightKg: 25 }), 'weight');
+const BETON_10_10 = beton(10, { supplyMode: 'bags', bagWeightKg: 25 });
+const BETON_10_10_RES = run('betonrechner', { lengthM: 5, widthM: 2, depthCm: 10, reservePercent: '10', supplyMode: 'bags', bagWeightKg: 25 });
+
+// ---------------------------------------------------------------------------
+// Kies & Splitt: Gewicht für 10 m² bei Beispiel-Schichtdicken
+// ---------------------------------------------------------------------------
+const kies = (over: Record<string, any>) => run('kies-splitt-rechner', { compaction: 0, ...over });
+const KIES_BEISPIELE: Array<[string, string, number]> = [
+  ['Splitt 2/5 (Pflasterbett)', 'grit_2_5', 4],
+  ['Kies 16/32 (Zierkies, Wegdecke)', 'gravel_16_32', 5],
+  ['Schotter 0/32 (Tragschicht)', 'crushed_0_32', 20],
+  ['Sand 0/2 (Fugen- oder Bettungssand)', 'sand_0_2', 3],
+  ['Rindenmulch (Beet)', 'bark', 7],
+];
+const KIES_TABLE = table(
+  ['Material', 'Schicht (Beispiel)', 'Volumen für 10 m²', 'Gewicht für 10 m²', 'Rechenwert Schüttdichte'],
+  KIES_BEISPIELE.map(([label, mat, depth]) => {
+    const r = kies({ calcMode: 'area_depth', area: 10, depth, materialType: mat });
+    return [label, `${depth} cm`, `${n2(num(r, 'totalVolume'))} m³`, `${n2(Number(r.primary.value))} t`, `${n2(num(r, 'densityUsed'))} t/m³`];
+  }),
+);
+const KIES_1T = kies({ calcMode: 'weight_to_volume', knownWeightTonnes: 1, materialType: 'grit_2_5' });
+const KIES_1T_M3 = Number(KIES_1T.primary.value);
+
+// ---------------------------------------------------------------------------
+// Schalungssteine: Bedarf je laufendem Meter Mauer
+// ---------------------------------------------------------------------------
+const schal = (over: Record<string, any>) =>
+  run('schalungssteine-rechner', { wallType: 'straight', wallLength: 1, stoneReserve: 0, concreteReserve: 0, openingsArea: 0, ...over });
+const SCHAL_HOEHEN = [0.5, 1, 1.5, 2];
+const SCHAL_TABLE = table(
+  ['Mauerhöhe', '50 × 25 cm (z. B. Beyhl 24): Steine', 'Füllbeton', '50 × 20 cm (Delfing DP 24): Steine', 'Füllbeton'],
+  SCHAL_HOEHEN.map((h) => {
+    const b = schal({ wallHeight: h, fillMode: 'preset_beyhl24' });
+    const d = schal({ wallHeight: h, fillMode: 'preset_delfing24' });
+    return [`${formatNumber(h, 2)} m`, n0(num(b, 'baseStones')), `${n0(num(b, 'concreteBaseM3') * 1000)} l`, n0(num(d, 'baseStones')), `${n0(num(d, 'concreteBaseM3') * 1000)} l`];
+  }),
+);
+const schalProStein = (fillMode: string) => {
+  const r = schal({ wallLength: 2, wallHeight: 1, fillMode });
+  return (num(r, 'concreteBaseM3') * 1000) / num(r, 'baseStones');
+};
+const SCHAL_L_BEYHL = schalProStein('preset_beyhl24');
+const SCHAL_L_DELFING = schalProStein('preset_delfing24');
+const SCHAL_L_BEYHL175 = schalProStein('preset_beyhl175');
+const SCHAL_L_DELFING175 = schalProStein('preset_delfing175');
+
 export const BAUEN_PAGE_CONTENT: PageContentMap = {
   'farbmengen-rechner': {
     sections: [
@@ -751,6 +816,51 @@ export const BAUEN_PAGE_CONTENT: PageContentMap = {
     faqs: [
       { question: 'Wie viel Fassadenfarbe brauche ich für 150 m²?', answer: `Bei zwei Anstrichen und 5 % Reserve sind es auf glattem Putz ${n0(FASS_150[0])} Liter, auf 2-mm-Scheibenputz ${n0(FASS_150[1])} Liter und auf grobem Reibeputz ${n0(FASS_150[2])} Liter.` },
       { question: 'Wie viele Liter Fassadenfarbe pro m² muss ich rechnen?', answer: `Für zwei Anstriche inklusive Reserve setzt der Rechner ${n2(FASS_PER_M2[0])} l/m² (glatt), ${n2(FASS_PER_M2[1])} l/m² (Scheibenputz) und ${n2(FASS_PER_M2[2])} l/m² (Reibeputz) an. Steht auf dem Gebinde ein anderer Verbrauch, gilt dieser.` },
+    ],
+  },
+
+  betonrechner: {
+    sections: [
+      {
+        title: 'Beton und Säcke für 10 m² nach Plattendicke',
+        content: `Für eine schnelle Einkaufsliste zeigt die Tabelle den Bedarf für 10 m² Fläche ohne Reserve, gerechnet mit den Richtwerten des Rechners (2.100 kg Trockenbeton bzw. 300 kg Zement je m³ C20/25):\n\n${BETON_TABLE}\n\nFür andere Flächen rechnen Sie anteilig: 25 m² brauchen das Zweieinhalbfache. Die Reserve für Verdichtung und Unebenheiten kommt noch dazu. Aus ${n0(num(BETON_10_10, 'bags'))} Säcken für eine 10 cm dicke Platte werden mit 10 % Reserve ${n0(num(BETON_10_10_RES, 'bags'))} Säcke.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel wiegt 1 m³ Beton?',
+        answer: `Frisch eingebauter Normalbeton wiegt rund ${formatNumber(BETON_1M3_FRESH / 1000, 1)} Tonnen je Kubikmeter, so rechnet der Rechner im Modus Transportbeton. Für einen Kubikmeter aus Fertigbeton-Säcken setzt er ${n0(BETON_1M3_DRY)} kg Trockenmischung an, weil das Anmachwasser erst auf der Baustelle dazukommt. Wer die Säcke selbst mit dem Anhänger abholt, sollte deshalb vorher die zulässige Zuladung prüfen und notfalls zweimal fahren.`,
+      },
+    ],
+  },
+
+  'kies-splitt-rechner': {
+    sections: [
+      {
+        title: 'Gewicht für 10 m² bei Beispiel-Schichtdicken',
+        content: `Die Tabelle zeigt, wie unterschiedlich schwer dieselbe Fläche je nach Material und Schichtdicke wird. Die Schichtdicken sind Beispiele, maßgeblich ist Ihre Planung; gerechnet ist ohne Bestellzuschlag:\n\n${KIES_TABLE}\n\nRindenmulch wird wegen seines geringen Gewichts meist nach Volumen angeboten, Splitt, Kies und Schotter häufig nach Tonnen. Die Schottertragschicht ist mit Abstand der schwerste Posten: Für 10 m² kommen mehrere Tonnen zusammen, solche Mengen lässt man sich besser anliefern.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Für wie viele Quadratmeter reicht eine Tonne Splitt?',
+        answer: `Eine Tonne Splitt 2/5 ergibt mit dem Rechenwert ${n2(num(KIES_1T, 'densityUsed'))} t/m³ rund ${n2(KIES_1T_M3)} m³. Bei 3 cm Schichtdicke reicht das für ${formatNumber(KIES_1T_M3 / 0.03, 1)} m², bei 4 cm für ${formatNumber(KIES_1T_M3 / 0.04, 1)} m² und bei 5 cm für ${formatNumber(KIES_1T_M3 / 0.05, 1)} m². Bei einer anderen Schüttdichte laut Lieferschein ändern sich die Werte entsprechend.`,
+      },
+    ],
+  },
+
+  'schalungssteine-rechner': {
+    sections: [
+      {
+        title: 'Steine und Füllbeton je laufendem Meter Mauer',
+        content: `Für eine Mauer mit 1 m Länge zeigt die Tabelle den Netto-Bedarf ohne Reserve, getrennt nach Steinformat:\n\n${SCHAL_TABLE}\n\nFür eine längere Mauer multiplizieren Sie mit der Länge in Metern. Die 20 cm hohen Steine brauchen bei gleicher Wandfläche ein Viertel mehr Steine, jeder einzelne fasst aber weniger Beton. Bei Höhen, die kein Vielfaches der Steinhöhe sind, wird die oberste Lage gekürzt; das kostet Verschnitt, den die Steinreserve im Rechner abdecken soll.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Beton passt in einen Schalungsstein?',
+        answer: `Das hängt vom Stein ab. Mit den Herstellerwerten des Rechners sind es bei Beyhl 24 rund ${n0(SCHAL_L_BEYHL)} Liter und bei Beyhl 17,5 rund ${n0(SCHAL_L_BEYHL175)} Liter je Stein. Bei den kleineren Delfing-DP-Steinen im Format 50 × 20 cm ergeben 130 l/m² bzw. 80 l/m² rund ${n0(SCHAL_L_DELFING)} bzw. ${n0(SCHAL_L_DELFING175)} Liter je Stein. Diese Werte helfen beim Abschätzen, wie viele Steine eine Mischerfüllung verfüllt.`,
+      },
     ],
   },
 };

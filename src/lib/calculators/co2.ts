@@ -588,7 +588,7 @@ export function calculateCarbonPrice(inputs: Record<string, any>): CalculationRe
       },
     ],
     directAnswer: `Für ${formatNumber(amount, 0)} ${unit} ${fuelName} beträgt der rechnerische CO₂-Kostenanteil bei ${formatCurrency(pricePerTonne)}/t CO₂ ca. ${formatCurrency(costGross)} ${includeVat ? 'brutto' : 'netto'} (Aufschlag: ${unitSurchargeText}).`,
-    summaryText: `Bei einem CO₂-Preis von ${formatCurrency(pricePerTonne)} je Tonne und einem Verbrauch von ${formatNumber(amount, 0)} ${unit} ${fuelName} beläuft sich der rechnerische CO₂-Kostenanteil auf ${formatCurrency(costGross)} ${includeVat ? 'inkl. 19 % MwSt.' : 'netto'}.`,
+    summaryText: `Bei einem CO₂-Preis von ${formatCurrency(pricePerTonne)} je Tonne und einem Verbrauch von ${formatNumber(amount, 0)} ${unit} ${fuelName} beläuft sich der rechnerische CO₂-Kostenanteil auf ${formatCurrency(costGross)} ${includeVat ? 'inkl. 19 % MwSt' : 'netto'}.`,
     basisSummary: [
       { label: 'Berechnungsmodus', value: 'Modus B: Brennstoffverbrauch & EBeV-Faktor' },
       { label: 'Brennstoff', value: fuelName },
@@ -947,6 +947,10 @@ export function calculateLandlordTenantCO2(inputs: Record<string, any>): Calcula
       error: 'Bitte geben Sie die CO₂-Emissionen des Abrechnungszeitraums in Kilogramm (kg) an.',
     };
   }
+
+  // § 5 Abs. 1 Satz 3 CO2KostAufG: Der spezifische Ausstoß ist auf die erste Nachkommastelle zu runden,
+  // bevor er in die Einstufungstabelle eingeordnet wird (26,96 → 27,0 → Stufe 5).
+  specificEmission = Math.round(specificEmission * 10) / 10;
 
   // 5. Grenzwerte nach § 5 Abs. 1 Satz 4 anteilig kürzen
   // Skalierungsfaktor: N / 12

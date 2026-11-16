@@ -210,6 +210,34 @@ const KF_ENERGY = kfMg('energy_drink');
 const KF_24H = num(kf('filter_coffee', 1, 24), 'remainingMg');
 const KF_EX = kf('energy_drink', 2, 8);
 
+// ---------------------------------------------------------------------------
+// Puls-Trainingszonen
+// ---------------------------------------------------------------------------
+const PZ = 'puls-trainingszonen-rechner';
+const pz = (age: number, zoneMethod: string, rest = 60) => run(PZ, { hfMaxMethod: 'tanaka', ageYears: age, zoneMethod, restingHeartRate: rest });
+const PZ_TABLE = [20, 30, 40, 50, 60, 70]
+  .map((a) => {
+    const pct = pz(a, 'hfmax');
+    return `| ${a} Jahre | ${txt(pct, 'hfMax')} | ${txt(pct, 'z2')} | ${txt(pz(a, 'karvonen', 60), 'z2')} | ${txt(pct, 'z4')} |`;
+  })
+  .join('\n');
+const PZ_R50 = pz(40, 'karvonen', 50);
+const PZ_R70 = pz(40, 'karvonen', 70);
+const pzWidth = (r: CalculationResult) => {
+  const [lo, hi] = txt(r, 'z2').replace(' bpm', '').split(' - ').map(Number);
+  return hi - lo;
+};
+
+// ---------------------------------------------------------------------------
+// WHR / WHtR
+// ---------------------------------------------------------------------------
+const WH = 'waist-to-hip-ratio-rechner';
+const wh = (gender: string, waistCm: number, hipCm: number, heightCm: number) => run(WH, { gender, waistCm, hipCm, includeHeight: true, heightCm, ageYears: 35 });
+const WH_HIP_LIMIT = 82 / 0.85;
+const WH_HIP_96 = wh('female', 82, 96, 168);
+const WH_HIP_97 = wh('female', 82, 97, 168);
+const whRiskWord = (r: CalculationResult) => (num(r, 'risk') === 1 ? 'ab dem Grenzwert' : 'darunter');
+
 export const GESUNDHEIT_PAGE_CONTENT: PageContentMap = {
   'schwimmen-kalorienverbrauch-rechner': {
     sections: [
@@ -572,6 +600,38 @@ export const GESUNDHEIT_PAGE_CONTENT: PageContentMap = {
         inputs: { drinkType: 'energy_drink', servingsCount: 2, hoursUntilBed: 8 },
         steps: [`Aufgenommen: 2 × 80 mg = ${txt(KF_EX, 'initialMg')}`, `Restmenge = 160 × 0,5^(8/5) ≈ ${n(num(KF_EX, 'remainingMg'), 0)} mg`],
         resultSummary: `${txt(KF_EX, 'remainingMg')} Restkoffein – ${txt(KF_EX, 'sleepImpact')}`,
+      },
+    ],
+  },
+
+  'puls-trainingszonen-rechner': {
+    sections: [
+      {
+        title: 'Die fünf Trainingszonen und Pulswerte nach Alter',
+        content: `- Zone 1 (50–60 %): Regeneration, lockeres Bewegen
+- Zone 2 (60–70 %): Grundlagenausdauer, längere ruhige Einheiten
+- Zone 3 (70–80 %): aerobes Tempo, zügige Dauerläufe
+- Zone 4 (80–90 %): Schwellenbereich, Intervalle und Tempoläufe
+- Zone 5 (90–100 %): Maximalbereich, sehr kurze Belastungen
+
+Viele Trainingspläne setzen den Großteil der Einheiten in Zone 1 und 2. Wie viel Energie Sie dabei verbrauchen, zeigt der [Kalorienbedarf-Rechner](/rechner/kalorienbedarf-rechner/).
+
+Diese Werte liefert der Rechner mit dem Maximalpuls nach Tanaka; die Karvonen-Spalte rechnet mit 60 bpm Ruhepuls:
+
+| Alter | HFmax | Zone 2 (% HFmax) | Zone 2 (Karvonen) | Zone 4 (% HFmax) |
+|---|---|---|---|---|
+${PZ_TABLE}
+
+Für dieselbe Person liegt die Karvonen-Zone deutlich höher. Prüfen Sie deshalb immer, auf welche Methode sich eine Pulsvorgabe bezieht. Auch der Ruhepuls selbst verschiebt die Karvonen-Zonen: Mit 40 Jahren liegt Zone 2 bei 50 bpm Ruhepuls bei ${txt(PZ_R50, 'z2')} (${pzWidth(PZ_R50)} Schläge breit), bei 70 bpm Ruhepuls bei ${txt(PZ_R70, 'z2')} (${pzWidth(PZ_R70)} Schläge breit). Sinkt Ihr Ruhepuls durch Training, lohnt es sich, die Zonen neu zu berechnen.`,
+      },
+    ],
+  },
+
+  'waist-to-hip-ratio-rechner': {
+    faqs: [
+      {
+        question: 'Welche Hüfte braucht man, damit die WHR unter dem Grenzwert bleibt?',
+        answer: `Teilen Sie die Taille durch den Grenzwert. Bei einer Frau mit 82 cm Taille muss die Hüfte mehr als ${n(WH_HIP_LIMIT, 1)} cm messen, damit die WHR unter 0,85 bleibt. Mit 96 cm Hüfte ergibt sich ${n(num(WH_HIP_96, 'whr'), 3)}, also ${whRiskWord(WH_HIP_96)}; mit 97 cm sind es ${n(num(WH_HIP_97, 'whr'), 3)} und damit ${whRiskWord(WH_HIP_97)}. Angezeigt werden beide Werte gerundet als ${txt(WH_HIP_96, 'whr')} – maßgeblich ist die Einstufung darunter. Ein einzelner Zentimeter beim Messen kann also entscheiden. Messen Sie deshalb zweimal an derselben Stelle.`,
       },
     ],
   },

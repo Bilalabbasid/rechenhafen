@@ -195,7 +195,7 @@ export function calculateMinijobStunden(inputs: Record<string, any>): Calculatio
     });
     check = fits
       ? ` ${formatNumber(plannedWeek, 2)} Stunden pro Woche ergeben ${formatCurrency(monthly)} im Monat und passen.`
-      : ` ${formatNumber(plannedWeek, 2)} Stunden pro Woche ergeben ${formatCurrency(monthly)} im Monat und liegen über der Grenze – dann wäre es ein Midijob.`;
+      : ` ${formatNumber(plannedWeek, 2)} Stunden pro Woche ergeben ${formatCurrency(monthly)} im Monat und liegen über der Grenze – ${monthly <= 2000 ? 'dann wäre es ein Midijob (Übergangsbereich bis 2.000 €)' : 'dann wäre es eine reguläre sozialversicherungspflichtige Beschäftigung (über 2.000 € endet auch der Übergangsbereich)'}.`;
   }
 
   return {

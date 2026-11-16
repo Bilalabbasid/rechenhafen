@@ -387,7 +387,7 @@ function calculateDecimalToFraction(inputs: Record<string, any>): CalculationRes
     steps.push(`Periode erkannt: ${decimalNormalized} (Vorperiode ${a} ${a === 1 ? 'Stelle' : 'Stellen'}, Periode ${b} ${b === 1 ? 'Stelle' : 'Stellen'}).`);
     steps.push(`Formel: (${all.toString()} − ${head.toString()}) / (${a > 0 ? `10^${a} × ` : ''}${'9'.repeat(b)}) = ${N.toString()}/${D.toString()}.`);
   } else if (preperiod) {
-    steps.push(`${preperiod.length} Nachkommastellen → Nenner 10^${preperiod.length} = ${D.toString()}: ${N.toString()}/${D.toString()}.`);
+    steps.push(`${preperiod.length} ${preperiod.length === 1 ? 'Nachkommastelle' : 'Nachkommastellen'} → Nenner 10^${preperiod.length} = ${D.toString()}: ${N.toString()}/${D.toString()}.`);
   } else {
     steps.push('Ganze Zahl ohne Nachkommastellen → Nenner 1.');
   }
@@ -500,7 +500,8 @@ export function calculateProzentVergleich(inputs: Record<string, any>): Calculat
       label: 'Änderungsfaktor',
       value: factor,
       formattedValue: `${fmt(factor)} ×`,
-      helpText: `Der neue Wert beträgt ${formatNumber((b / Math.abs(a)) * 100, 2)} % des alten.`,
+      // Faktor × 100 (nicht b / |a|): von −50 auf −25 ist der neue Wert 50 % des alten, nicht −50 %.
+      helpText: `Der neue Wert beträgt ${factor < 0 ? MINUS : ''}${formatNumber(Math.abs(factor) * 100, 2)} % des alten.`,
     });
   }
   secondary.push({
@@ -513,7 +514,7 @@ export function calculateProzentVergleich(inputs: Record<string, any>): Calculat
 
   const sentences: string[] = [];
   if (!changeDefined && a !== b) {
-    sentences.push(`Von ${aText} auf ${bText}: Eine prozentuale Veränderung lässt sich vom Ausgangswert 0 aus nicht berechnen, weil durch 0 geteilt würde. Die absolute ${absDiff > 0 ? 'Zunahme' : 'Abnahme'} beträgt ${formatSigned(absDiff)}${arePercentages ? ' Prozentpunkte' : ''}.`);
+    sentences.push(`Von ${aText} auf ${bText}: Eine prozentuale Veränderung lässt sich vom Ausgangswert 0 aus nicht berechnen, weil durch 0 geteilt würde. Die absolute ${absDiff > 0 ? 'Zunahme' : 'Abnahme'} beträgt ${formatSigned(absDiff)}${arePercentages ? (Math.abs(absDiff) === 1 ? ' Prozentpunkt' : ' Prozentpunkte') : ''}.`);
   } else if (a === b) {
     sentences.push(`Beide Werte sind gleich (${aText}): keine Veränderung, 0 % Unterschied.`);
   } else if (mode === 'change') {
@@ -543,7 +544,8 @@ export function calculateProzentVergleich(inputs: Record<string, any>): Calculat
       }
     : { ...symmetricItem, highlight: true, helpText: undefined };
 
-  const steps: string[] = [`Differenz: ${fmt(b)} − ${fmt(a)} = ${formatSigned(absDiff)}.`];
+  // Negative Subtrahenden in Klammern: "−25 − (−50)" statt "−25 − −50".
+  const steps: string[] = [`Differenz: ${fmt(b)} − ${a < 0 ? `(${fmt(a)})` : fmt(a)} = ${formatSigned(absDiff)}.`];
   if (changeDefined) {
     steps.push(`Veränderung: ${formatSigned(absDiff)} ÷ ${formatNumber(Math.abs(a), 4)} × 100 = ${changeText}.`);
   }

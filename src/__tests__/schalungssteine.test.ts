@@ -9,7 +9,10 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
       wallType: 'straight',
       wallLength: 8,
       wallHeight: 1.5,
-      fillMode: 'preset_delfing24',
+      // Geometrie-Tests mit Steinen 50 × 25 cm (8 Stück/m²) und eigenem Herstellerwert 130 l/m²
+      fillMode: 'customM2',
+      customFillValue: 130,
+      stoneFormat: '8',
       stoneReserve: 5,
       concreteReserve: 0,
     });
@@ -49,7 +52,10 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
       wallLength: 6,
       wallLengthB: 4,
       wallHeight: 1.0,
-      fillMode: 'preset_delfing24',
+      // Geometrie-Tests mit Steinen 50 × 25 cm (8 Stück/m²) und eigenem Herstellerwert 130 l/m²
+      fillMode: 'customM2',
+      customFillValue: 130,
+      stoneFormat: '8',
       stoneReserve: 5,
       concreteReserve: 0,
     });
@@ -85,7 +91,10 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
       wallHeight: 2.0,
       openingWidth: 1.0,
       openingHeight: 2.0,
-      fillMode: 'preset_delfing24',
+      // Geometrie-Tests mit Steinen 50 × 25 cm (8 Stück/m²) und eigenem Herstellerwert 130 l/m²
+      fillMode: 'customM2',
+      customFillValue: 130,
+      stoneFormat: '8',
       stoneReserve: 5,
       concreteReserve: 0,
     });
@@ -118,7 +127,10 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
       wallType: 'straight',
       wallLength: 8,
       wallHeight: 1.5,
-      fillMode: 'preset_delfing24',
+      // Geometrie-Tests mit Steinen 50 × 25 cm (8 Stück/m²) und eigenem Herstellerwert 130 l/m²
+      fillMode: 'customM2',
+      customFillValue: 130,
+      stoneFormat: '8',
       stoneReserve: 0,
       concreteReserve: 0,
     });
@@ -146,7 +158,10 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
       wallLength: 6,
       wallLengthB: 3,
       wallHeight: 1.5,
-      fillMode: 'preset_delfing24',
+      // Geometrie-Tests mit Steinen 50 × 25 cm (8 Stück/m²) und eigenem Herstellerwert 130 l/m²
+      fillMode: 'customM2',
+      customFillValue: 130,
+      stoneFormat: '8',
       stoneReserve: 5,
       concreteReserve: 0,
     });
@@ -165,6 +180,58 @@ describe('Schalungssteine Rechner (schalungssteine-rechner)', () => {
     // Standard blocks = 216 - 24 = 192
     const standard = result.secondary?.find((s) => s.id === 'standardBlocks');
     expect(standard?.value).toBe(192);
+  });
+
+  describe('Steinformat der Herstellerwerte', () => {
+    it('counts Delfing DP 24 (50 × 20 cm, 130 l/m²) with 10 stones per m² and 20 cm courses', () => {
+      // Delfing-Produktkatalog DP-Schalungsstein: DP-Grundelement 24, 50 × 20 cm, 10 Stück/m², 130 l/m²
+      const result = calc.calculate({
+        wallType: 'straight',
+        wallLength: 8,
+        wallHeight: 1.5,
+        fillMode: 'preset_delfing24',
+        stoneReserve: 5,
+        concreteReserve: 0,
+      });
+      expect(result.error).toBeUndefined();
+      expect(result.secondary?.find((s) => s.id === 'baseStones')?.value).toBe(120);
+      expect(result.primary.value).toBe(126);
+      // 1,5 m ÷ 0,20 m = 7,5 → 8 Lagen
+      expect(result.secondary?.find((s) => s.id === 'courses')?.value).toBe(8);
+      expect(result.secondary?.find((s) => s.id === 'concreteM3')?.value).toBe(1.56);
+      expect(calc.workedExample?.result).toContain('126 Steine');
+    });
+
+    it('counts Beyhl 24 (49,7 × 24,7 cm, 18 l/Stein) with 8 stones per m²', () => {
+      const result = calc.calculate({
+        wallType: 'straight',
+        wallLength: 8,
+        wallHeight: 1.5,
+        fillMode: 'preset_beyhl24',
+        stoneReserve: 5,
+        concreteReserve: 0,
+      });
+      expect(result.secondary?.find((s) => s.id === 'baseStones')?.value).toBe(96);
+      expect(result.primary.value).toBe(101);
+      expect(result.secondary?.find((s) => s.id === 'courses')?.value).toBe(6);
+      expect(result.secondary?.find((s) => s.id === 'concreteM3')?.value).toBeCloseTo(1.728, 3);
+    });
+
+    it('uses the selected stone format for custom values per stone', () => {
+      const result = calc.calculate({
+        wallType: 'straight',
+        wallLength: 5,
+        wallHeight: 1,
+        fillMode: 'customStone',
+        customFillValue: 13,
+        stoneFormat: '10',
+        stoneReserve: 0,
+        concreteReserve: 0,
+      });
+      expect(result.secondary?.find((s) => s.id === 'baseStones')?.value).toBe(50);
+      // 13 l/Stein × 10 Stück/m² × 5 m² = 650 l
+      expect(result.secondary?.find((s) => s.id === 'concreteM3')?.value).toBeCloseTo(0.65, 3);
+    });
   });
 
   describe('Geometry validation & opening error handling', () => {
