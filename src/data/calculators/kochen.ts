@@ -59,7 +59,7 @@ export const KOCHEN_CALCULATORS: CalculatorDefinition[] = [
   {
     id: 'backform-umrechner',
     slug: 'backform-umrechner',
-    name: 'Backform Umrechner (Springform rund & eckig)',
+    name: 'Backform Umrechner (runde Springformen)',
     shortName: 'Backform umrechnen',
     category: 'kochen-backen',
     subcategory: 'Backformen',
@@ -82,12 +82,12 @@ export const KOCHEN_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'Faktor: 0,59 × (ca. 40 % weniger Teig)',
     },
     content: {
-      intro: 'Dieser Backform-Umrechner skaliert Zutatenmengen quadratisch anhand des Durchmessers runder Springformen oder rechteckiger Backbleche.',
+      intro: 'Dieser Backform-Umrechner skaliert Zutatenmengen quadratisch anhand des Durchmessers runder Springformen. Für eckige Formen und Bleche rechnen Sie die Fläche über Länge × Breite (siehe unten).',
       details: 'Umrechnungsfaktor = Neue Grundfläche / Alte Grundfläche = (d_neu / d_alt)². Der Wechsel von einer 26-cm-Springform auf eine 28-cm-Form verlangt ca. 16 Prozent mehr Teig; der Wechsel von 26 cm auf 20 cm spart 41 Prozent Teig.',
     },
     faqs: [
       { question: 'Wie ändert sich die Backzeit bei einer kleineren oder größeren Backform?', answer: 'Wird der Teig in einer größeren Form flacher, verkürzt sich die Backzeit um ca. 15 bis 20 %; wird der Kuchen in einer kleineren Form dicker, verlängert sich die Backzeit bei evtl. leicht reduzierter Hitze.' },
-      { question: 'Welchem Springform-Durchmesser entspricht ein normales Backblech (ca. 40 × 30 cm)?', answer: 'Ein Backblech hat ca. 1.200 cm² Fläche; das entspricht exakt dem Teigvolumen von zwei 28-cm-Springformen (je ca. 615 cm²).' },
+      { question: 'Welchem Springform-Durchmesser entspricht ein normales Backblech (ca. 40 × 30 cm)?', answer: 'Ein Backblech von 40 × 30 cm hat 1.200 cm² Fläche; das entspricht ungefähr zwei 28-cm-Springformen (je ca. 616 cm², zusammen ca. 1.232 cm²). Ein Blechrezept reicht also knapp für zwei solche Formen.' },
     ],
     relatedSlugs: ['portionsrechner', 'gramm-in-ml-rechner', 'kreisrechner'],
   },

@@ -16,7 +16,7 @@ import {
   calculateTageBisWeihnachten,
 } from '@/lib/calculators/datumZeit';
 import { formatNumber, formatDateDe } from '@/lib/formatters';
-import { getBerlinTodayString, calculateTageBisGeburtstag } from '@/lib/calculators/dateMath';
+import { getBerlinTodayString, calculateTageBisGeburtstag, parseDateParts, dateToDayNumber } from '@/lib/calculators/dateMath';
 
 const FEDERAL_STATE_OPTIONS = [
   { value: 'bundesweit', label: 'Bundesweit (nur 9 einheitliche Feiertage)' },
@@ -60,7 +60,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     searchKeywords: ['altersrechner', 'alter berechnen', 'wie alt bin ich', 'geburtsdatum rechner', 'alter in jahren monaten tagen'],
     inputs: [
       { id: 'birthDate', label: 'Geburtsdatum', type: 'date', defaultValue: '1990-01-01' },
-      { id: 'targetDate', label: 'Stichtag (Vergleichsdatum)', type: 'date', defaultValue: '2026-01-01', helpText: 'Standardmäßig das heutige Datum' },
+      { id: 'targetDate', label: 'Stichtag (Vergleichsdatum)', type: 'date', defaultValue: '2026-01-01', helpText: 'Vorbelegt ist der 01.01.2026 – für Ihr heutiges Alter tragen Sie das heutige Datum ein' },
     ],
     calculate: calculateAge,
     formula: 'Alter = Stichtag - Geburtsdatum (unter Berücksichtigung von Schaltjahren und Monatslängen)',
@@ -76,7 +76,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       details: 'Im deutschen Recht (§ 187 Abs. 2 Satz 2 BGB) beginnt das Lebensjahr mit dem Beginn des Geburtstages. Wer am 29. Februar geboren wurde, vollendet in Gemeinjahren sein Lebensjahr gemäß § 188 BGB mit Ablauf des 28. Februars bzw. mit Beginn des 1. März.',
     },
     faqs: [
-      { question: 'Wann vollenden am 29. Februar Geborene in Nicht-Schaltjahren ihr Lebensjahr?', answer: 'Nach deutschem Zivilrecht (§ 188 Abs. 3 BGB) gilt das Lebensjahr mit Ablauf des 28. Februars (24:00 Uhr) als vollendet, sodass der Geburtstag am 1. März gefeiert wird.' },
+      { question: 'Wann vollenden am 29. Februar Geborene in Nicht-Schaltjahren ihr Lebensjahr?', answer: 'Nach deutschem Zivilrecht (§ 187 Abs. 2 Satz 2 und § 188 Abs. 2 BGB) ist das Lebensjahr mit Ablauf des 28. Februars (24:00 Uhr) vollendet. Rechtlich ist die Person also ab dem 1. März ein Jahr älter; der Rechner zählt den Geburtstag in Gemeinjahren deshalb ebenfalls am 1. März.' },
       { question: 'Wie berechnet man das Alter auf den Tag genau im Kopf?', answer: 'Man zieht zunächst das Geburtsjahr vom aktuellen Jahr ab. Liegt der Geburtstag im laufenden Jahr noch in der Zukunft, zieht man ein ganzes Jahr ab und berechnet die verbleibenden Monate und Resttage zum Vormonat.' },
     ],
     relatedSlugs: ['alter-in-tagen', 'geburtstagsrechner', 'tage-zwischen-zwei-daten', 'arbeitstage-rechner', 'altersunterschied', 'lebenszeit-in-stunden', 'alter-in-monaten'],
@@ -130,12 +130,32 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     searchKeywords: ['lebenszeit in stunden', 'wie viele stunden lebe ich', 'herzschläge im leben rechner'],
     inputs: [
       { id: 'birthDate', label: 'Geburtsdatum', type: 'date', defaultValue: '1990-01-01' },
+      { id: 'targetDate', label: 'Stichtag', type: 'date', defaultValue: getBerlinTodayString(), helpText: 'Standardmäßig heute; gezählt werden volle Kalendertage × 24 Stunden' },
     ],
     calculate: (inputs) => {
-      const b = new Date(inputs.birthDate || '1990-01-01');
-      const now = new Date();
-      const diffMs = now.getTime() - b.getTime();
-      const hours = Math.max(0, Math.floor(diffMs / 3600000));
+      const birthParts = parseDateParts(inputs.birthDate || '1990-01-01');
+      const hasTarget = inputs.targetDate !== undefined && inputs.targetDate !== null && String(inputs.targetDate).trim() !== '';
+      const targetParts = hasTarget ? parseDateParts(inputs.targetDate) : null;
+      if (!birthParts || (hasTarget && !targetParts)) {
+        return {
+          primary: { id: 'hours', label: 'Gelebte Stunden', value: 0, formattedValue: '-' },
+          error: 'Bitte geben Sie ein gültiges Geburtsdatum und einen gültigen Stichtag ein.',
+        };
+      }
+      let hours: number;
+      if (targetParts) {
+        const dayDiff = dateToDayNumber(targetParts.year, targetParts.month, targetParts.day) - dateToDayNumber(birthParts.year, birthParts.month, birthParts.day);
+        if (dayDiff < 0) {
+          return {
+            primary: { id: 'hours', label: 'Gelebte Stunden', value: 0, formattedValue: '-' },
+            error: 'Der Stichtag darf nicht vor dem Geburtsdatum liegen.',
+          };
+        }
+        hours = dayDiff * 24;
+      } else {
+        const diffMs = Date.now() - Date.UTC(birthParts.year, birthParts.month - 1, birthParts.day);
+        hours = Math.max(0, Math.floor(diffMs / 3600000));
+      }
       const days = Math.floor(hours / 24);
       const heartbeats = hours * 60 * 70; // ca. 70 Schläge pro Minute
       const breaths = hours * 60 * 14; // ca. 14 Atemzüge pro Minute
@@ -150,12 +170,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       };
     },
     formula: 'Stunden = Lebenstage × 24',
-    formulaExplanation: 'Umrechnung der vergangenen Lebenstage in Stunden.',
+    formulaExplanation: 'Die vollen Kalendertage zwischen Geburtsdatum und Stichtag (Schalttage eingeschlossen) werden mit 24 multipliziert. Herzschläge und Atemzüge sind grobe Schätzungen mit festen Durchschnittswerten.',
     workedExample: {
-      title: 'Beispiel: 30 Jahre gelebt',
-      description: 'Ca. 262.800 Stunden und über 1,1 Milliarden Herzschläge.',
-      inputs: { birthDate: '1990-01-01' },
-      resultSummary: 'ca. 262.800 Stunden',
+      title: 'Beispiel: 30 Jahre gelebt (01.01.1990 bis 01.01.2020)',
+      description: '10.957 Tage × 24 = 262.968 Stunden und über 1,1 Milliarden geschätzte Herzschläge.',
+      inputs: { birthDate: '1990-01-01', targetDate: '2020-01-01' },
+      resultSummary: '262.968 Stunden',
     },
     content: {
       intro: 'Die Umrechnung des Lebensalters in Stunden verdeutlicht die tatsächlich erlebte Zeitspanne und bietet eine greifbare Grundlage für biologische Vergleiche.',
@@ -191,12 +211,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       const weeks = Math.floor(days / 7);
       const remDays = days % 7;
       return {
-        primary: { id: 'weeks', label: 'Alter in Wochen', value: weeks, formattedValue: `${formatNumber(weeks, 0)} Wochen und ${remDays} Tage`, highlight: true },
+        primary: { id: 'weeks', label: 'Alter in Wochen', value: weeks, formattedValue: `${formatNumber(weeks, 0)} Wochen und ${remDays} ${remDays === 1 ? 'Tag' : 'Tage'}`, highlight: true },
         secondary: [
           { id: 'totalDays', label: 'Gesamte Tage', value: days, formattedValue: `${formatNumber(days, 0)} Tage` },
           { id: 'totalMonths', label: 'Ungefähre Monate', value: days / 30.4375, formattedValue: `ca. ${formatNumber(days / 30.4375, 1)} Monate` },
         ],
-        summaryText: `Das Alter beträgt genau ${weeks} volle Wochen und ${remDays} Tage (${days} Tage insgesamt).`,
+        summaryText: `Das Alter beträgt genau ${weeks} volle Wochen und ${remDays} ${remDays === 1 ? 'Tag' : 'Tage'} (${days} Tage insgesamt).`,
       };
     },
     formula: 'Wochen = Abrunden(Tage / 7)',
@@ -436,11 +456,11 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Der chronologische Altersabstand zweier Personen drückt die zeitliche Distanz zwischen ihren Geburtstagen in Jahren, Monaten und Tagen sowie als absolute Tagesdifferenz aus.',
-      details: 'Bei der Differenzbildung wird der zeitliche Abstand zwischen beiden Geburtszeitpunkten ermittelt. In Partnerschaften, Erbfolgen oder im Sport (Altersklassen) bildet dieser Wert die objektive Vergleichsbasis.',
+      details: 'Bei der Differenzbildung wird der zeitliche Abstand zwischen beiden Geburtszeitpunkten ermittelt. Für Paare, Geschwister oder Eltern und Kinder ergibt sich so ein exakter, kalendergenauer Vergleichswert.',
     },
     faqs: [
       { question: 'Verändert sich der Altersabstand in Tagen jemals?', answer: 'Nein, die Anzahl der Kalendertage zwischen zwei Geburtszeitpunkten bleibt das gesamte Leben über unveränderlich konstant.' },
-      { question: 'Wie wird der relative Altersunterschied mit zunehmendem Alter wahrgenommen?', answer: 'Psychologisch und prozentual schrumpft der Abstand: Ein Unterschied von 5 Jahren macht bei 15-Jährigen 33 % der Lebensspanne aus, bei 50-Jährigen nur noch 10 %.' },
+      { question: 'Wie wird der relative Altersunterschied mit zunehmendem Alter wahrgenommen?', answer: 'Prozentual schrumpft der Abstand: Ein Unterschied von 5 Jahren macht bei 15-Jährigen 33 % der Lebensspanne aus, bei 50-Jährigen nur noch 10 %.' },
     ],
     relatedSlugs: ['altersrechner', 'tage-zwischen-zwei-daten', 'geburtstagsrechner', 'alter-in-tagen', 'arbeitstage-rechner'],
   },
@@ -1038,7 +1058,6 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
         options: [
           { value: 'mo-fr', label: 'Montag bis Freitag (Reguläre 5-Tage-Woche)' },
           { value: 'mo-sa', label: 'Montag bis Samstag (6-Tage-Woche / Werktage)' },
-          { value: 'custom', label: 'Benutzerdefiniert' },
         ],
       },
       {
@@ -1082,17 +1101,17 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       },
       {
         title: 'Beispiel: Werktage im Februar 2026 (Montag bis Samstag)',
-        description: 'Der Februar 2026 hat 28 Tage und 4 Sonntage, Feiertage fallen nicht hinein. Es bleiben 24 Werktage – wichtig etwa für Fristen wie die Mietzahlung bis zum dritten Werktag.',
+        description: 'Der Februar 2026 hat 28 Tage und 4 Sonntage, Feiertage fallen nicht hinein. Es bleiben 24 Werktage – wichtig etwa für Fristen, die nach Werktagen bemessen sind, wie die Kündigung einer Wohnung bis zum dritten Werktag eines Monats (§ 573c BGB).',
         inputs: { startDate: '2026-02-01', endDate: '2026-02-28', workweek: 'mo-sa', excludeHolidays: true, hoursPerDay: 8 },
         resultSummary: '24 Werktage',
       },
     ],
     content: {
       intro: 'Die Ermittlung der tatsächlichen Arbeitstage bildet das Fundament für die Pendlerpauschale in der Einkommensteuererklärung sowie für Urlaubs- und Arbeitszeitplanungen.',
-      details: 'Ein typisches Kalenderjahr hat bei einer 5-Tage-Woche (Montag bis Freitag) zwischen 250 und 252 potenzielle Arbeitstage. Nach Abzug von Feiertagen und Urlaub verbleiben meist 200 bis 220 tatsächliche Arbeitstage.\n\n### Unterschied zwischen Arbeitstagen und Werktagen\n\nIm deutschen Arbeits- und Zivilrecht gilt eine zentrale Unterscheidung:\n- **Arbeitstage**: Tage, an denen im Rahmen des individuellen Arbeitsverhältnisses tatsächlich Dienst geleistet werden muss. Im modernen Büro- und Verwaltungsalltag ist dies typischerweise die 5-Tage-Woche von **Montag bis Freitag**.\n- **Werktage**: Gesetzlich definierte Tage nach § 3 Abs. 2 Bundesurlaubsgesetz (BUrlG) und dem Bürgerlichen Gesetzbuch (BGB). Hierzu zählen alle Tage von **Montag bis einschließlich Samstag** (6-Tage-Woche), sofern kein gesetzlicher Feiertag vorliegt. Relevanz besitzt dieser Begriff bei Kündigungsfristen, Mietzahlungen (§ 556b Abs. 1 BGB) und Ladenschlussgesetzen.\n\nFür Fristen auf 6-Tage-Basis wählen Sie oben die Option „Montag bis Samstag“. Für beliebige Zeitspannen zwischen zwei Daten steht Ihnen unser [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung.',
+      details: 'Ein Kalenderjahr hat 260 bis 262 Tage von Montag bis Freitag. Nach Abzug der gesetzlichen Feiertage bleiben je nach Bundesland und Jahr etwa 252 bis 256 Arbeitstage; davon geht noch der eigene Urlaub ab.\n\n### Unterschied zwischen Arbeitstagen und Werktagen\n\nIm deutschen Arbeits- und Zivilrecht gilt eine zentrale Unterscheidung:\n- **Arbeitstage**: Tage, an denen im Rahmen des individuellen Arbeitsverhältnisses tatsächlich Dienst geleistet werden muss. Im modernen Büro- und Verwaltungsalltag ist dies typischerweise die 5-Tage-Woche von **Montag bis Freitag**.\n- **Werktage**: Gesetzlich definierte Tage nach § 3 Abs. 2 Bundesurlaubsgesetz (BUrlG) und dem Bürgerlichen Gesetzbuch (BGB). Hierzu zählen alle Tage von **Montag bis einschließlich Samstag** (6-Tage-Woche), sofern kein gesetzlicher Feiertag vorliegt. Relevanz besitzt dieser Begriff etwa bei Kündigungsfristen im Mietrecht (§ 573c BGB). Ausnahme: Bei der Mietzahlung bis zum dritten Werktag (§ 556b Abs. 1 BGB) zählt der Samstag laut BGH nicht mit (Urteil vom 13.07.2010, VIII ZR 129/09).\n\nFür Fristen auf 6-Tage-Basis wählen Sie oben die Option „Montag bis Samstag“. Für beliebige Zeitspannen zwischen zwei Daten steht Ihnen unser [Tagerechner: Tage zwischen zwei Daten](/rechner/tage-zwischen-zwei-daten/) zur Verfügung.',
     },
     faqs: [
-      { question: 'Wie viele Arbeitstage erkennt das Finanzamt bei einer 5-Tage-Woche pauschal an?', answer: 'Die meisten Finanzämter akzeptieren ohne gesonderte Einzelnachweise 220 bis 230 Arbeitstage pro Jahr für die Entfernungspauschale.' },
+      { question: 'Wie viele Arbeitstage erkennt das Finanzamt bei einer 5-Tage-Woche pauschal an?', answer: 'Eine gesetzlich festgelegte Pauschale gibt es nicht. Für die Entfernungspauschale zählen die Tage, an denen Sie tatsächlich zur ersten Tätigkeitsstätte gefahren sind. Ermitteln Sie hier die Arbeitstage Ihres Bundeslandes und ziehen Sie Urlaubs-, Krankheits- und Homeoffice-Tage ab.' },
       { question: 'Müssen Feiertage am Wochenende abgezogen werden?', answer: 'Nein, Feiertage, die ohnehin auf einen Samstag oder Sonntag fallen, mindern die reguläre Arbeitszeit nicht zusätzlich.' },
       { question: 'Ist der Samstag ein Werktag?', answer: 'Ja. Nach § 3 Abs. 2 Bundesurlaubsgesetz und für Fristen im BGB zählt der Samstag als Werktag, Sonn- und Feiertage dagegen nicht. Wählen Sie oben „Montag bis Samstag“, um Werktage statt Arbeitstage zu zählen.' },
       { question: 'Zählen regionale Feiertage wie Fronleichnam als Werktage?', answer: 'Nein, nicht in den Bundesländern, in denen sie gesetzliche Feiertage sind – etwa Fronleichnam in Bayern oder NRW. Wählen Sie Ihr Bundesland, dann zieht der Rechner genau diese Feiertage ab.' },
@@ -1323,12 +1342,12 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: 'KW 38',
     },
     content: {
-      intro: 'Dieser Rechner führt Additionen und Subtraktionen von Kalenderwochen und Tagen zu einem vorgegebenen Ausgangsdatum durch.',
-      details: 'Wichtig für Bauzeitenpläne, Schwangerschaftswochen (SSW) und Lieferfristen im Handel, bei denen Fristen üblicherweise in vollen Arbeits- oder Kalenderwochen formuliert sind.',
+      intro: 'Dieser Rechner bestimmt für ein beliebiges Datum die Kalenderwoche nach ISO 8601 sowie das Quartal und den Tag des Jahres.',
+      details: 'Kalenderwochen werden in Deutschland vor allem für Liefertermine, Bauzeitenpläne, Schichtpläne und Urlaubsplanung verwendet („Lieferung in KW 12“). Jede KW beginnt am Montag und endet am Sonntag.',
     },
     faqs: [
-      { question: 'Wie addiert man 6 Wochen zu einem Datum im Kopf?', answer: '6 Wochen entsprechen genau 42 Kalendertagen. Addieren Sie einen vollen Monat (ca. 30 Tage) plus 12 weitere Tage.' },
-      { question: 'Fällt das Ergebnis nach Addition ganzer Wochen immer auf denselben Wochentag?', answer: 'Ja, da eine Woche genau 7 Tage hat, fällt das Zieldatum bei der Addition voller Wochen ausnahmslos auf denselben Wochentag wie das Ausgangsdatum.' },
+      { question: 'Kann der 1. Januar in der KW 52 oder 53 des Vorjahres liegen?', answer: 'Ja. Fällt der 1. Januar auf einen Freitag, Samstag oder Sonntag, gehört er noch zur letzten Woche des Vorjahres. Der 01.01.2027 (Freitag) liegt zum Beispiel in KW 53 des Jahres 2026.' },
+      { question: 'Zählen alle Länder die Kalenderwochen gleich?', answer: 'Nein. In den USA beginnt die Woche üblicherweise am Sonntag, und Woche 1 ist die Woche mit dem 1. Januar. Deshalb können US-Kalender um eine Woche von der deutschen ISO-Zählung abweichen.' },
     ],
     relatedSlugs: ['arbeitstage-rechner', 'tage-zwischen-zwei-daten', 'schaltjahr-rechner'],
   },

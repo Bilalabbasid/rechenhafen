@@ -1,8 +1,8 @@
 import { PageContentMap } from './types';
 import { CalculationResult } from '@/types/calculator';
 import { EXTRA_AUTO_ARBEIT } from '../extra/autoArbeit';
-import { calculateBruttoNetto } from '@/lib/calculators/steuernGehalt';
-import { calculateHourlyWage, calculateSalaryIncrease } from '@/lib/calculators/arbeit';
+import { calculateBruttoNetto, calculateMinijob } from '@/lib/calculators/steuernGehalt';
+import { calculateHourlyWage, calculateSalaryIncrease, calculatePartTimeSalary } from '@/lib/calculators/arbeit';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { MINIJOB_PERIODS, WEEKS_PER_MONTH } from '@/data/regulated/minijob';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
@@ -228,6 +228,39 @@ const EA_TRAINER_MONTH = num(ea('trainer', EA_TRAINER_MAX), 'monthlyTaxFree');
 const EA_TABLE = [1200, EA_TRAINER_MAX, EA_TRAINER_MAX + 600]
   .map((p) => `| ${eur(p)} | ${txt(ea('trainer', p), 'taxFreePart')} | ${txt(ea('trainer', p), 'taxablePart')} | ${txt(ea('volunteer', p), 'taxFreePart')} | ${txt(ea('volunteer', p), 'taxablePart')} |`)
   .join('\n');
+
+// ---------------------------------------------------------------------------
+// Teilzeit-Gehaltsrechner (Brutto per Teilzeitrechner, Netto per Brutto-Netto-Rechner, Steuerklasse 1)
+// ---------------------------------------------------------------------------
+const TZ_FULL = 4200;
+const TZ_HOURS = [40, 35, 32, 30, 25, 20];
+const tzGross = (hours: number) => num(calculatePartTimeSalary({ fullTimeSalary: TZ_FULL, fullTimeHours: 40, partTimeHours: hours }), 'partTimeSalary');
+const TZ_NET_FULL = netMonthly(TZ_FULL);
+const TZ_TABLE = TZ_HOURS.map((h) => {
+  const gross = tzGross(h);
+  const net = netMonthly(gross);
+  return `| ${h} Std. | ${eur(gross)} | ${eur(net)} | ${formatPercent((gross / TZ_FULL) * 100, 1)} | ${formatPercent((net / TZ_NET_FULL) * 100, 1)} |`;
+}).join('\n');
+const TZ_30_GROSS = tzGross(30);
+const TZ_30_NET = netMonthly(TZ_30_GROSS);
+const TZ_HOURLY = num(calculatePartTimeSalary({ fullTimeSalary: TZ_FULL, fullTimeHours: 40, partTimeHours: 30 }), 'hourlyWage');
+const TZ_4DAY = num(calculatePartTimeSalary({ fullTimeSalary: TZ_FULL, fullTimeHours: 40, partTimeHours: 32 }), 'partTimeSalary');
+
+// ---------------------------------------------------------------------------
+// Minijob-Rechner (calculateMinijob, Grenze und Werte 2026 aus der Steuerkonfiguration)
+// ---------------------------------------------------------------------------
+const mj = (earnings: number, rvOptOut: 'yes' | 'no') => calculateMinijob({ earnings, rvOptOut, taxYear: '2026' });
+const MJ_TABLE = [100, 175, 300, 450, MINIJOB_GRENZE_2026].map((e) => {
+  const without = mj(e, 'no');
+  return `| ${eur(e)} | ${eur(num(mj(e, 'yes'), 'netEarnings'))} | ${eur(num(without, 'rvContribution'))} | ${eur(num(without, 'netEarnings'))} | ${eur(num(without, 'agTotalCosts'))} |`;
+}).join('\n');
+const MJ_100_RV = num(mj(100, 'no'), 'rvContribution');
+const MJ_100_RV_NAIVE = 100 * LEGAL_VALUES_2026.minijobRvEigenanteil.value;
+const MJ_YEAR_LIMIT = MINIJOB_GRENZE_2026 * 12;
+const MJ_XMAS_MONTHLY = 560;
+const MJ_XMAS_BONUS = 500;
+const MJ_XMAS_TOTAL = MJ_XMAS_MONTHLY * 12 + MJ_XMAS_BONUS;
+const MJ_RV_RATE = LEGAL_VALUES_2026.beitragssatzRentenversicherung.value;
 
 export const ARBEIT_PAGE_CONTENT: PageContentMap = {
   'jahresgehalt-in-monatsgehalt-rechner': {
@@ -658,6 +691,63 @@ export const ARBEIT_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Muss der Verein die Pauschale gleichmäßig über das Jahr verteilen?',
         answer: `Nein. Der Verein kann den Freibetrag monatlich anteilig ansetzen, etwa ${eur(EA_TRAINER_MONTH)} für eine Übungsleitertätigkeit, oder zuerst voll ausschöpfen und erst danach den Überhang abrechnen. Endet die Tätigkeit im Laufe des Jahres, steht trotzdem der volle Jahresbetrag zur Verfügung.`,
+      },
+    ],
+  },
+
+  'teilzeit-gehaltsrechner': {
+    sections: [
+      {
+        title: 'Weniger Stunden, aber nicht im gleichen Maß weniger Netto',
+        content:
+          `Vollzeit 40 Stunden mit ${eur0(TZ_FULL)} brutto, Netto 2026 mit Steuerklasse 1, ohne Kinder, ohne Kirchensteuer, gesetzlich versichert:\n\n| Wochenstunden | Brutto | Netto | Brutto in % der Vollzeit | Netto in % der Vollzeit |\n| --- | --- | --- | --- | --- |\n${TZ_TABLE}\n\n` +
+          `Bei 30 Stunden bleiben 75 % des Bruttos, aber ${formatPercent((TZ_30_NET / TZ_NET_FULL) * 100, 1)} des Nettos, weil die Lohnsteuer progressiv sinkt. Die Sozialabgaben fallen dagegen fast genau anteilig. Mit Steuerklasse 3, 4 mit Faktor oder 5 sieht die Tabelle anders aus; rechnen Sie Ihr Netto deshalb mit dem [Brutto-Netto-Rechner](/rechner/brutto-netto-rechner/) nach.`,
+      },
+      {
+        title: 'Was bei Teilzeit außer dem Gehalt mitschrumpft',
+        content:
+          `- **Urlaub:** Arbeiten Sie an weniger Tagen pro Woche, sinkt die Zahl der Urlaubstage im selben Verhältnis. Die Urlaubswochen bleiben gleich. Kürzere Tage bei gleicher Tageszahl ändern den Urlaubsanspruch in Tagen nicht.\n` +
+          `- **Rente:** Entgeltpunkte richten sich nach dem Brutto. Aus ${eur0(TZ_30_GROSS)} statt ${eur0(TZ_FULL)} entstehen für diese Jahre 25 % weniger Rentenanspruch.\n` +
+          '- **Lohnersatzleistungen:** Krankengeld, Arbeitslosengeld und Elterngeld berechnen sich aus dem niedrigeren Teilzeitverdienst. Wer bald Elterngeld beziehen will, sollte den Zeitpunkt der Reduzierung deshalb mitbedenken.\n' +
+          `- **Sonderzahlungen:** Weihnachtsgeld, Urlaubsgeld oder Zulagen werden bei Teilzeit in der Regel anteilig gezahlt. Der Stundenlohn von ${eur(TZ_HOURLY)} bleibt dagegen gleich, das schreibt § 4 TzBfG vor.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viele Urlaubstage habe ich in Teilzeit mit einer 4-Tage-Woche?',
+        answer: 'Urlaubstage × Arbeitstage pro Woche in Teilzeit ÷ Arbeitstage in Vollzeit. Aus 30 Tagen bei fünf Arbeitstagen werden bei vier Arbeitstagen 30 × 4 ÷ 5 = 24 Urlaubstage. Die Zahl der freien Wochen ändert sich nicht: Sechs Wochen Urlaub sind in beiden Fällen sechs Wochen.',
+      },
+      {
+        question: 'Was verdiene ich in einer 4-Tage-Woche mit 32 Stunden?',
+        answer: `Wer die Arbeitszeit von 40 auf 32 Stunden senkt, bekommt 80 % des Bruttos, bei ${eur0(TZ_FULL)} also ${eur(TZ_4DAY)}. Davon zu unterscheiden ist die 4-Tage-Woche mit gleicher Stundenzahl, bei der 40 Stunden auf vier längere Tage verteilt werden: Dann bleibt das Gehalt gleich, aber das Arbeitszeitgesetz begrenzt die tägliche Arbeitszeit auf in der Regel 8, höchstens 10 Stunden.`,
+      },
+    ],
+  },
+
+  'minijob-rechner': {
+    sections: [
+      {
+        title: 'Auszahlung mit und ohne Befreiung von der Rentenversicherung (2026)',
+        content:
+          `| Monatsverdienst | Auszahlung mit Befreiung | RV-Eigenanteil ohne Befreiung | Auszahlung ohne Befreiung | Kosten Arbeitgeber |\n| --- | --- | --- | --- | --- |\n${MJ_TABLE}\n\n` +
+          `Unter 175 € gilt eine Sonderregel: Der Rentenbeitrag von ${formatPercent(MJ_RV_RATE * 100, 1)} wird mindestens aus 175 € berechnet (§ 163 Abs. 8 SGB VI). Der Arbeitgeber zahlt trotzdem nur 15 % des tatsächlichen Verdienstes, den Rest übernimmt der Minijobber. Bei 100 € Verdienst sind das ${eur(MJ_100_RV)} statt ${eur(MJ_100_RV_NAIVE)}. Ab 175 € bleibt es bei 3,6 %.`,
+      },
+      {
+        title: 'Mehrere Minijobs, Hauptjob und Weihnachtsgeld',
+        content:
+          `- **Neben einer Hauptbeschäftigung** bleibt der zuerst aufgenommene Minijob ein Minijob, ohne Steuer und Sozialabgaben für Sie außer dem RV-Eigenanteil. Jeder weitere Minijob wird mit dem Hauptjob zusammengerechnet und ist dann in der Kranken-, Pflege- und Rentenversicherung beitragspflichtig.\n` +
+          `- **Mehrere Minijobs ohne Hauptjob** werden addiert. Liegt die Summe über ${eur0(MINIJOB_GRENZE_2026)}, sind alle Jobs keine Minijobs mehr.\n` +
+          `- **Jahresbetrachtung:** Maßgeblich ist das voraussichtliche Jahresentgelt von höchstens ${eur0(MJ_YEAR_LIMIT)} (12 × ${eur0(MINIJOB_GRENZE_2026)}). Fest zugesagtes Weihnachtsgeld zählt mit. Bei ${eur0(MJ_XMAS_MONTHLY)} im Monat plus ${eur0(MJ_XMAS_BONUS)} Weihnachtsgeld kommen Sie auf ${eur0(MJ_XMAS_TOTAL)} im Jahr. Das passt ${MJ_XMAS_TOTAL <= MJ_YEAR_LIMIT ? 'noch' : 'nicht mehr'} unter die Grenze, obwohl der Monat mit dem Weihnachtsgeld allein deutlich über ${eur0(MINIJOB_GRENZE_2026)} liegt.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Rentenbeitrag zahle ich bei einem Minijob mit 100 € im Monat?',
+        answer: `Ohne Befreiung ${eur(MJ_100_RV)}, nicht nur 3,6 % von 100 €. Weil der Beitrag mindestens aus 175 € berechnet wird, zahlen Sie die Differenz zwischen ${formatPercent(MJ_RV_RATE * 100, 1)} von 175 € und den 15 % Ihres Arbeitgebers. Bei sehr kleinen Minijobs lohnt es sich deshalb besonders, die Befreiung zu prüfen, auch wenn dann die Rentenansprüche aus diesem Job wegfallen.`,
+      },
+      {
+        question: 'Habe ich im Minijob Anspruch auf Urlaub und Lohnfortzahlung bei Krankheit?',
+        answer: 'Ja. Minijobber sind Arbeitnehmer mit denselben Rechten wie Vollzeitkräfte: bezahlter Urlaub nach dem Bundesurlaubsgesetz (anteilig nach Arbeitstagen pro Woche), Entgeltfortzahlung bis zu sechs Wochen bei Krankheit, Bezahlung an Feiertagen und mindestens der gesetzliche Mindestlohn. Die Umlage U1, die der Rechner beim Arbeitgeber einrechnet, erstattet ihm einen Teil der Lohnfortzahlung.',
       },
     ],
   },

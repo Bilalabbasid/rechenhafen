@@ -712,6 +712,61 @@ function modernisierungsumlage(): PageContentOverlay {
   };
 }
 
+// ---------------------------------------------------------------------------
+// warmmiete-rechner
+// ---------------------------------------------------------------------------
+function warmmiete(): PageContentOverlay {
+  const warm = (cold: number, ops: number, heat: number, area: number) =>
+    run('warmmiete-rechner', { calculationMode: 'warm_from_components', coldRentInput: cold, operatingCosts: ops, heatingCosts: heat, otherOperatingCosts: 0, livingAreaMode1: area });
+  const flats: Array<[string, number, number, number, number]> = [
+    ['1-Zimmer, 38 m²', 520, 85, 60, 38],
+    ['3-Zimmer, 70 m² (Standardwerte)', 750, 150, 120, 70],
+    ['4-Zimmer, 95 m², Altbau', 980, 200, 190, 95],
+  ];
+  const rows = flats
+    .map(([label, cold, ops, heat, area]) => {
+      const r = warm(cold, ops, heat, area);
+      return `| ${label} | ${eur(Number(r.primary.value))} | ${formatNumber(sec(r, 'coldRentPerSqm'), 2, 2)} € | ${formatNumber(sec(r, 'warmRentPerSqm'), 2, 2)} € | ${pct(sec(r, 'utilPct'), 1)} |`;
+    })
+    .join('\n');
+  const before = warm(750, 150, 120, 70);
+  const heatYearPaid = 120 * 12;
+  const heatYearActual = 1680;
+  const backPay = heatYearActual - heatYearPaid;
+  const newHeat = heatYearActual / 12;
+  const after = warm(750, 150, newHeat, 70);
+  const lateYearEnd = 'Ende Dezember 2026';
+  return {
+    sections: [
+      {
+        title: 'Drei Beispielwohnungen: kalt, warm und der Nebenkostenanteil',
+        content:
+          `| Wohnung | Warmmiete | Kaltmiete je m² | Warmmiete je m² | Anteil Nebenkosten |\n| --- | --- | --- | --- | --- |\n${rows}\n\n` +
+          'Die Beträge sind Annahmen zur Veranschaulichung. Ein hoher Nebenkostenanteil bei einer schlecht gedämmten Altbauwohnung kann eine günstige Kaltmiete schnell aufzehren. Vergleichen Sie Wohnungen deshalb immer über die Warmmiete je Quadratmeter und fragen Sie bei der Besichtigung nach der letzten Betriebskostenabrechnung und dem Energieausweis.',
+      },
+      {
+        title: 'Nachzahlung absehen und die Vorauszahlung anpassen',
+        content:
+          `Angenommen, Sie zahlen ${eur(120)} Heizkostenvorauszahlung im Monat, also ${eur(heatYearPaid)} im Jahr, und die Abrechnung weist ${eur(heatYearActual)} tatsächliche Heizkosten aus:\n\n` +
+          `1. **Nachzahlung:** ${eur(heatYearActual)} − ${eur(heatYearPaid)} = ${eur(backPay)}\n` +
+          `2. **Angemessene neue Vorauszahlung:** ${eur(heatYearActual)} ÷ 12 = ${eur(newHeat)} im Monat\n` +
+          `3. **Neue Warmmiete:** Mit diesem Wert im Rechner steigt die Warmmiete von ${eur(Number(before.primary.value))} auf ${eur(Number(after.primary.value))}\n\n` +
+          'Nach einer Abrechnung dürfen beide Seiten die Vorauszahlungen in Textform auf eine angemessene Höhe anpassen (§ 560 Abs. 4 BGB). Als Mieter können Sie also auch selbst freiwillig mehr zahlen, um eine hohe Nachzahlung im nächsten Jahr zu vermeiden.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Bis wann muss die Nebenkostenabrechnung beim Mieter sein?',
+        answer: `Spätestens zwölf Monate nach Ende des Abrechnungszeitraums (§ 556 Abs. 3 BGB). Für das Kalenderjahr 2025 also bis ${lateYearEnd}. Kommt sie später, kann der Vermieter keine Nachzahlung mehr verlangen, es sei denn, er hat die Verspätung nicht zu vertreten. Ein Guthaben muss er trotzdem auszahlen. Einwände gegen eine Abrechnung müssen Sie innerhalb von zwölf Monaten nach Zugang erheben.`,
+      },
+      {
+        question: 'Ist eine Warmmiete als feste Pauschale ohne Heizkostenabrechnung erlaubt?',
+        answer: 'Bei Zentralheizung in der Regel nicht. Die Heizkostenverordnung schreibt vor, dass mindestens 50 % und höchstens 70 % der Heiz- und Warmwasserkosten nach Verbrauch verteilt werden, und geht abweichenden Vereinbarungen im Mietvertrag vor. Eine Ausnahme gilt unter anderem für Zweifamilienhäuser, in denen der Vermieter selbst eine Wohnung bewohnt. Kalte Betriebskosten dürfen dagegen als Pauschale vereinbart werden.',
+      },
+    ],
+  };
+}
+
 export const WOHNEN_PAGE_CONTENT: PageContentMap = {
   'quadratmeterpreis-rechner': quadratmeterpreis(),
   'mietrendite-brutto-netto-rechner': mietrendite(),
@@ -729,4 +784,5 @@ export const WOHNEN_PAGE_CONTENT: PageContentMap = {
   'maklerprovision-rechner': maklerprovision(),
   'mietkaution-zinsen-rechner': mietkaution(),
   'modernisierungsumlage-rechner': modernisierungsumlage(),
+  'warmmiete-rechner': warmmiete(),
 };

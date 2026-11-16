@@ -1069,7 +1069,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
         defaultValue: 'yes',
         options: [
           { value: 'yes', label: 'Ja, befreien lassen (Brutto = Netto, kein Eigenanteil)' },
-          { value: 'no', label: 'Nein, freiwillig einzahlen (3,6 % Eigenanteil für Rentenpunkte)' },
+          { value: 'no', label: 'Nein, rentenversicherungspflichtig bleiben (3,6 % Eigenanteil für Rentenpunkte)' },
         ],
       },
     ],
@@ -1084,7 +1084,7 @@ export const STEUERN_GEHALT_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Die Minijob-Grenze ist dynamisch an den gesetzlichen Mindestlohn gekoppelt und liegt 2026 bei 603 € monatlich (13,90 € Mindestlohn × 130 ÷ 3, aufgerundet; 2025: 556 €). Dieser Rechner zeigt Vor- und Nachteile der Rentenversicherungsbefreiung.',
-      details: 'Wer auf die Befreiung verzichtet und den geringen Eigenanteil von 3,6 % (ca. 20 €/Monat) zahlt, erwirbt vollwertige Rentenansprüche, Wartezeitmonate für die Altersrente und Anspruch auf Reha-Leistungen.',
+      details: 'Wer auf die Befreiung verzichtet und den geringen Eigenanteil von 3,6 % (bei 603 € rund 22 €/Monat) zahlt, erwirbt vollwertige Rentenansprüche, Wartezeitmonate für die Altersrente und Anspruch auf Reha-Leistungen.',
     },
     faqs: [
       { question: 'Lohnt sich die Befreiung von der Rentenversicherungspflicht im Minijob?', answer: 'Für Studierende oder Personen ohne sonstige Pflichtversicherung kann sich das Einzahlen lohnen, da mit geringem Eigenbeitrag Beitragsmonate für die Altersrente und der Anspruch auf Erwerbsminderungsrente gesichert werden.' },

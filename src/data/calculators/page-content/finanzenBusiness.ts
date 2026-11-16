@@ -4,6 +4,9 @@ import { EXTRA_FINANZEN_KREDIT } from '../extra/finanzenKredit';
 import { EXTRA_BUSINESS_STATISTIK } from '../extra/businessStatistik';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/formatters';
+import { calculateVat } from '@/lib/calculators/business';
+import { calculateDiscount } from '@/lib/calculators/moreCalculators';
+import { calculateCompoundInterest } from '@/lib/calculators/finanzen';
 
 // Alle Zahlen dieser Seiten kommen aus denselben calculate-Funktionen wie die Rechner selbst
 // bzw. aus den geprüften Rechtswerten in src/legal/de/2026.ts.
@@ -234,6 +237,114 @@ const CF_BASE = prim(cf(60000, 35000, 10000));
 const CF_LOSS = prim(cf(-20000, 35000, 0));
 const CF_RECEIVABLES_UP = 40000;
 const CF_NET_DEBT = 420000;
+
+// ---------- AfA linear / degressiv ----------
+const afaCalc = calc('abschreibung-linear-degressiv-rechner');
+const afaYear = (cost: number, life: number, method: string) => prim(afaCalc({ assetCost: cost, usefulLifeYears: life, afaMethod: method }));
+const afaRate = (life: number, method: string) => sec(afaCalc({ assetCost: 10000, usefulLifeYears: life, afaMethod: method }), 'rate');
+const AFA_COST = 50000;
+const AFA_LIFE = 10;
+const AFA_LINEAR = afaYear(AFA_COST, AFA_LIFE, 'linear');
+// Degressiver Plan: jedes Jahr Satz × Restbuchwert; Wechsel zu linear (Restbuchwert ÷ Restnutzungsdauer), sobald das mehr ergibt (§ 7 Abs. 3 EStG)
+const AFA_PLAN = (() => {
+  const rows: Array<{ year: number; used: number; switchedNow: boolean; book: number }> = [];
+  let book = AFA_COST;
+  let switched = false;
+  for (let year = 1; year <= AFA_LIFE; year++) {
+    const deg = afaYear(book, AFA_LIFE, 'degressive30');
+    const lin = afaYear(book, AFA_LIFE - year + 1, 'linear');
+    const switchedNow = !switched && lin > deg;
+    if (switchedNow) switched = true;
+    const used = switched ? lin : deg;
+    book -= used;
+    rows.push({ year, used, switchedNow, book: Math.abs(book) < 0.005 ? 0 : book });
+  }
+  return rows;
+})();
+const AFA_SWITCH = AFA_PLAN.find((r) => r.switchedNow)!;
+const AFA_ROWS = AFA_PLAN.map((r) => [
+  `${r.year}${r.switchedNow ? ' (Wechsel)' : ''}`,
+  eur(AFA_LINEAR),
+  eur(r.used),
+  eur(r.book),
+]);
+const AFA_DEG_3Y = AFA_PLAN.slice(0, 3).reduce((s, r) => s + r.used, 0);
+const AFA_CAR = 36000;
+const AFA_CAR_MONTHS = 4; // Anschaffung im September: September bis Dezember
+const AFA_CAR_LIN = (afaYear(AFA_CAR, 6, 'linear') * AFA_CAR_MONTHS) / 12;
+const AFA_CAR_DEG = (afaYear(AFA_CAR, 6, 'degressive30') * AFA_CAR_MONTHS) / 12;
+const AFA_CAR_DEG_Y2 = afaYear(AFA_CAR - AFA_CAR_DEG, 6, 'degressive30');
+
+// ---------- Rabatt ----------
+const disc = (price: number, rate: number) => calculateDiscount({ originalPrice: price, discountPercent: rate });
+const RAB_RATES = [10, 15, 20, 25, 30, 40, 50];
+const RAB_ROWS = RAB_RATES.map((rate) => {
+  const a = disc(79.99, rate);
+  const b = disc(249, rate);
+  return [`${rate} %`, eur(prim(a)), eur(sec(a, 'saved')), eur(prim(b)), eur(sec(b, 'saved'))];
+});
+const RAB_STEP1 = prim(disc(120, 20));
+const RAB_STEP2 = prim(disc(RAB_STEP1, 10));
+const RAB_SINGLE30 = prim(disc(120, 30));
+const RAB_COMBINED = (1 - RAB_STEP2 / 120) * 100;
+const RAB_SALE = 59.99;
+const RAB_ORIG = Math.round((RAB_SALE / (1 - 0.25)) * 100) / 100;
+const RAB_ORIG_CHECK = prim(disc(RAB_ORIG, 25));
+const RAB_FROM_OLD = 149;
+const RAB_FROM_NEW = 119;
+const RAB_FROM_RATE = ((RAB_FROM_OLD - RAB_FROM_NEW) / RAB_FROM_OLD) * 100;
+const RAB_FROM_CHECK = prim(disc(RAB_FROM_OLD, RAB_FROM_RATE));
+const RAB_VAT_GROSS = prim(calculateVat({ amount: 100, direction: 'netToGross', vatRate: '19' }));
+const RAB_VAT_A = prim(disc(RAB_VAT_GROSS, 20));
+const RAB_VAT_B = prim(calculateVat({ amount: prim(disc(100, 20)), direction: 'netToGross', vatRate: '19' }));
+
+// ---------- Mehrwertsteuer ----------
+const vatOut = (gross: number, rate: string) => calculateVat({ amount: gross, direction: 'grossToNet', vatRate: rate });
+const MWST_GROSS = [10, 50, 100, 250, 1000];
+const MWST_ROWS = MWST_GROSS.map((g) => {
+  const r19 = vatOut(g, '19');
+  const r7 = vatOut(g, '7');
+  return [eur(g), eur(prim(r19)), eur(sec(r19, 'vatAmount')), eur(prim(r7)), eur(sec(r7, 'vatAmount'))];
+});
+const MWST_FOOD = vatOut(46, '7');
+const MWST_DRINKS = vatOut(14, '19');
+const MWST_RESTAURANT_TAX = sec(MWST_FOOD, 'vatAmount') + sec(MWST_DRINKS, 'vatAmount');
+const MWST_ALL19 = sec(vatOut(60, '19'), 'vatAmount');
+const MWST_RECEIPT = sec(vatOut(119, '19'), 'vatAmount');
+const MWST_PERCENT = num(L.mwstNormalsatz.value * 100);
+const MWST_REDUCED = num(L.mwstErmaessigt.value * 100);
+
+// ---------- Churn-Rate ----------
+const churnCalc = calc('churn-rate-rechner');
+const churn = (start: number, lost: number) => churnCalc({ startCustomers: start, lostCustomers: lost, avgMrrPerCustomer: 49 });
+const CHURN_ROWS = [1, 2, 3, 5, 8].map((m) => {
+  const r = churn(1000, m * 10);
+  const annual = sec(r, 'annualChurn');
+  return [pct(m, 0), pct(annual, 1), `${num(sec(r, 'avgLifespan'), 1)} Monate`, num(1000 * (1 - annual / 100))];
+});
+const CHURN_BASE = churn(1000, 30);
+const CHURN_NAIVE = prim(CHURN_BASE) * 12;
+const CHURN_WRONG_DENOM = prim(churn(1200, 30));
+const CHURN_FROM_ANNUAL = (1 - Math.pow(1 - 0.2, 1 / 12)) * 100;
+const CHURN_FROM_ANNUAL_CHECK = sec(churn(1000, CHURN_FROM_ANNUAL * 10), 'annualChurn');
+
+// ---------- Zinseszins ----------
+const zz = (inputs: Record<string, any>) =>
+  calculateCompoundInterest({ compoundFrequency: '12', depositTiming: 'end', dynamicIncrease: 0, ...inputs });
+const ZZ_DATA = [10, 20, 30, 40].map((years) => {
+  const r = zz({ initialAmount: 0, monthlyContribution: 100, annualRate: 5, years });
+  return { years, r, interest: sec(r, 'totalInterest'), share: (sec(r, 'totalInterest') / prim(r)) * 100 };
+});
+const ZZ_ROWS = ZZ_DATA.map(({ years, r, interest, share }) => [`${years} Jahre`, eur0(sec(r, 'totalDeposits')), eur0(prim(r)), eur0(interest), pct(share, 0)]);
+const ZZ_FIRST = ZZ_DATA[0];
+const ZZ_CROSS = ZZ_DATA.find((d) => d.share > 50)!;
+const ZZ_EARLY = zz({ initialAmount: 0, monthlyContribution: 150, annualRate: 5, years: 35 });
+const ZZ_LATE = zz({ initialAmount: 0, monthlyContribution: 150, annualRate: 5, years: 25 });
+const ZZ_LATE_DOUBLE = zz({ initialAmount: 0, monthlyContribution: 300, annualRate: 5, years: 25 });
+const ZZ_LATE_DYN = zz({ initialAmount: 0, monthlyContribution: 150, annualRate: 5, years: 25, dynamicIncrease: 3 });
+const ZZ_ONCE = [2, 3, 5].map((rate) => ({ rate, r: zz({ initialAmount: 10000, monthlyContribution: 0, annualRate: rate, years: 10, compoundFrequency: '1' }) }));
+const ZZ_END = zz({ initialAmount: 10000, monthlyContribution: 150, annualRate: 5, years: 15 });
+const ZZ_START = zz({ initialAmount: 10000, monthlyContribution: 150, annualRate: 5, years: 15, depositTiming: 'start' });
 
 export const FINANZEN_BUSINESS_PAGE_CONTENT: PageContentMap = {
   'thesaurierend-vs-ausschuettend-rechner': {
@@ -668,6 +779,164 @@ export const FINANZEN_BUSINESS_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Woher bekomme ich die Werte für den Rechner?',
         answer: 'Jahresüberschuss und Abschreibungen stehen in der Gewinn- und Verlustrechnung, bei Einnahmenüberschussrechnern in der Anlage EÜR (Gewinn und AfA). Die Veränderung der langfristigen Rückstellungen ergibt sich aus dem Vergleich zweier Bilanzen. Kleine Betriebe ohne Bilanz tragen dort 0 € ein.',
+      },
+    ],
+  },
+
+  'abschreibung-linear-degressiv-rechner': {
+    sections: [
+      {
+        title: 'Abschreibungsplan: 50.000-€-Maschine, 10 Jahre Nutzungsdauer',
+        content:
+          `Linear stehen jedes Jahr ${eur(AFA_LINEAR)} als Betriebsausgabe an. Degressiv mit ${pct(afaRate(AFA_LIFE, 'degressive30'), 0)} wird jedes Jahr der Restbuchwert mit demselben Satz abgeschrieben, bis der lineare Betrag auf die Restnutzungsdauer größer ist:\n\n` +
+          table(['Jahr', 'Linear', 'Degressiv 30 % mit Wechsel', 'Restbuchwert degressiv'], AFA_ROWS) +
+          `\n\nIn den ersten drei Jahren setzen Sie degressiv ${eur0(AFA_DEG_3Y)} ab, linear nur ${eur0(AFA_LINEAR * 3)}. Ab Jahr ${AFA_SWITCH.year} lohnt der Wechsel: Der Restbuchwert wird dann gleichmäßig auf die verbleibenden ${AFA_LIFE - AFA_SWITCH.year + 1} Jahre verteilt. Insgesamt wird bei beiden Methoden genau der Kaufpreis abgeschrieben, die degressive AfA zieht den Steuervorteil nur nach vorn.`,
+      },
+      {
+        title: 'Anschaffung im laufenden Jahr: nur die Monate ab dem Kauf zählen',
+        content:
+          'Der Rechner zeigt die AfA eines vollen Jahres. Im Anschaffungsjahr kürzt § 7 Abs. 1 Satz 4 EStG den Betrag um ein Zwölftel für jeden vollen Monat vor dem Kaufmonat. Das gilt für beide Methoden.\n\n' +
+          `Beispiel: Pkw für ${eur0(AFA_CAR)} netto, Nutzungsdauer laut AfA-Tabelle 6 Jahre, angeschafft im September. Abgeschrieben werden 4 von 12 Monaten:\n\n` +
+          `- **Linear:** ${eur0(afaYear(AFA_CAR, 6, 'linear'))} × 4/12 = ${eur(AFA_CAR_LIN)} im ersten Jahr\n` +
+          `- **Degressiv:** Der dreifache lineare Satz wären 50 %, gedeckelt auf ${pct(afaRate(6, 'degressive30'), 0)}. ${eur0(afaYear(AFA_CAR, 6, 'degressive30'))} × 4/12 = ${eur(AFA_CAR_DEG)}; im zweiten Jahr dann ${pct(afaRate(6, 'degressive30'), 0)} von ${eur(AFA_CAR - AFA_CAR_DEG)} = ${eur(AFA_CAR_DEG_Y2)}\n\n` +
+          'Wer im Dezember kauft, bekommt also nur 1/12 der Jahres-AfA. Ein Kauf „noch schnell vor Silvester“ senkt den Gewinn deshalb weniger, als viele erwarten.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Welche degressive AfA gilt für Anschaffungen im Jahr 2026?',
+        answer: `Für bewegliche Wirtschaftsgüter, die nach dem 30. Juni 2025 und vor dem 1. Januar 2028 angeschafft werden, erlaubt § 7 Abs. 2 EStG höchstens das Dreifache des linearen Satzes und maximal 30 %. Bei 10 Jahren Nutzungsdauer sind das ${pct(afaRate(10, 'degressive30'), 0)}, bei 20 Jahren ${pct(afaRate(20, 'degressive30'), 0)}, bei 5 Jahren greift die Obergrenze von ${pct(afaRate(5, 'degressive30'), 0)}. Gebäude und immaterielle Wirtschaftsgüter wie Software sind ausgeschlossen. Die Variante mit 20 % betrifft nur Käufe zwischen April und Dezember 2024.`,
+      },
+      {
+        question: 'Darf ich von der degressiven zur linearen AfA wechseln und wieder zurück?',
+        answer: `Von degressiv zu linear ja, umgekehrt nicht (§ 7 Abs. 3 EStG). Nach dem Wechsel wird der Restbuchwert gleichmäßig auf die Restnutzungsdauer verteilt. Im Beispiel der Maschine sind das ab Jahr ${AFA_SWITCH.year} jeweils ${eur(AFA_SWITCH.used)} pro Jahr. Wer einmal linear begonnen hat, bleibt für dieses Wirtschaftsgut bei linear.`,
+      },
+    ],
+    workedExamples: [
+      {
+        title: 'Beispiel: Maschine für 50.000 € mit degressiver AfA (Kauf 2026)',
+        description: `10 Jahre Nutzungsdauer, dreifacher linearer Satz = 30 %. Erstes volles Jahr: 50.000 € × 30 % = ${eur(afaYear(AFA_COST, AFA_LIFE, 'degressive30'))}, zweites Jahr: 30 % vom Restbuchwert = ${eur(AFA_PLAN[1].used)}.`,
+        inputs: { assetCost: 50000, usefulLifeYears: 10, afaMethod: 'degressive30' },
+        resultSummary: `${eur(afaYear(AFA_COST, AFA_LIFE, 'degressive30'))} AfA im ersten vollen Jahr`,
+      },
+    ],
+  },
+
+  rabattrechner: {
+    sections: [
+      {
+        title: 'Rabatt-Tabelle für zwei typische Preise',
+        content:
+          table(['Rabatt', 'Endpreis bei 79,99 €', 'Ersparnis', 'Endpreis bei 249,00 €', 'Ersparnis'], RAB_ROWS) +
+          '\n\nKopfrechnen mit Zehnteln: 10 % sind der Preis mit dem Komma eine Stelle nach links, 20 % das Doppelte davon, 5 % die Hälfte. 25 % ist ein Viertel, 50 % die Hälfte.',
+      },
+      {
+        title: 'Doppelrabatt, Rückrechnung und Rabattsatz aus zwei Preisen',
+        content:
+          `**Zwei Rabatte nacheinander:** 20 % Sale auf 120 € ergeben ${eur(RAB_STEP1)}. Gibt die Kasse darauf weitere 10 %, zahlen Sie ${eur(RAB_STEP2)}. Das sind insgesamt ${pct(RAB_COMBINED, 0)} und nicht 30 %, denn bei 30 % auf einmal läge der Preis bei ${eur(RAB_SINGLE30)}. Im Rechner geben Sie den zweiten Rabatt deshalb mit dem ersten Endpreis als neuem Ursprungspreis ein.\n\n` +
+          `**Ursprungspreis zurückrechnen:** Ein Artikel kostet nach 25 % Rabatt ${eur(RAB_SALE)}. Der alte Preis ist ${eur(RAB_SALE)} ÷ 0,75 = ${eur(RAB_ORIG)}. Probe im Rechner: ${eur(RAB_ORIG)} minus 25 % = ${eur(RAB_ORIG_CHECK)}.\n\n` +
+          `**Rabattsatz aus altem und neuem Preis:** (${eur0(RAB_FROM_OLD)} − ${eur0(RAB_FROM_NEW)}) ÷ ${eur0(RAB_FROM_OLD)} × 100 = ${pct(RAB_FROM_RATE, 2)}. Diesen Wert können Sie als Rabatt eintragen, der Rechner liefert dann wieder ${eur(RAB_FROM_CHECK)}.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Auf welchen Preis bezieht sich ein Rabatt mit durchgestrichenem Preis?',
+        answer: 'Wirbt ein Händler gegenüber Verbrauchern mit einer Preisermäßigung, muss er nach § 11 PAngV den niedrigsten Gesamtpreis angeben, den er in den 30 Tagen vor der Ermäßigung verlangt hat. War ein Artikel vor zwei Wochen schon günstiger, ist dieser Preis die Bezugsgröße. Ausnahmen gelten für individuelle Preisnachlässe und für verderbliche Ware, die wegen drohenden Verderbs reduziert wird.',
+      },
+      {
+        question: 'Wird der Rabatt vor oder nach der Mehrwertsteuer abgezogen?',
+        answer: `Für das Ergebnis ist das egal. 100 € netto plus ${MWST_PERCENT} % Mehrwertsteuer ergeben ${eur(RAB_VAT_GROSS)}, davon 20 % Rabatt sind ${eur(RAB_VAT_A)}. Ziehen Sie die 20 % zuerst vom Nettopreis ab und schlagen dann die Steuer auf, landen Sie ebenfalls bei ${eur(RAB_VAT_B)}. Für Verbraucher reicht es deshalb, den Rabatt vom angezeigten Bruttopreis zu rechnen.`,
+      },
+    ],
+  },
+
+  'mwst-rechner': {
+    sections: [
+      {
+        title: 'Enthaltene Mehrwertsteuer in gängigen Bruttobeträgen',
+        content:
+          table(['Brutto', `Netto (${MWST_PERCENT} %)`, `MwSt (${MWST_PERCENT} %)`, `Netto (${MWST_REDUCED} %)`, `MwSt (${MWST_REDUCED} %)`], MWST_ROWS) +
+          `\n\nAls Merkhilfe: In jedem Bruttobetrag mit ${MWST_PERCENT} % stecken rund 15,97 % Steuer (19/119), bei ${MWST_REDUCED} % rund 6,54 % (7/107).`,
+      },
+      {
+        title: 'Restaurantrechnung 2026: zwei Steuersätze auf einem Beleg',
+        content:
+          `Seit dem 1. Januar 2026 gilt für Speisen in der Gastronomie dauerhaft der ermäßigte Satz von ${MWST_REDUCED} %, Getränke bleiben bei ${MWST_PERCENT} %. Auf einer Rechnung über 46 € Essen und 14 € Getränke (brutto) stecken deshalb:\n\n` +
+          `- **Speisen:** 46 € ÷ 1,07 = ${eur(prim(MWST_FOOD))} netto, ${eur(sec(MWST_FOOD, 'vatAmount'))} Steuer\n` +
+          `- **Getränke:** 14 € ÷ 1,19 = ${eur(prim(MWST_DRINKS))} netto, ${eur(sec(MWST_DRINKS, 'vatAmount'))} Steuer\n` +
+          `- **Zusammen:** ${eur(MWST_RESTAURANT_TAX)} Umsatzsteuer statt ${eur(MWST_ALL19)}, wenn alles mit ${MWST_PERCENT} % belegt wäre\n\n` +
+          'Rechnen Sie gemischte Belege also nie mit einem einzigen Satz. Für Geschäftsessen, bei denen Sie die Vorsteuer ziehen, muss die Rechnung beide Sätze getrennt ausweisen.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was muss auf einer Kleinbetragsrechnung bis 250 € stehen?',
+        answer: `Nach § 33 UStDV reichen bei einem Gesamtbetrag bis 250 € brutto: Name und Anschrift des Verkäufers, Ausstellungsdatum, Menge und Art der Ware oder Leistung, der Bruttobetrag und der Steuersatz. Der Steuerbetrag muss nicht extra ausgewiesen sein. Sie rechnen ihn selbst heraus: Bei einem Beleg über 119 € mit ${MWST_PERCENT} % sind das ${eur(MWST_RECEIPT)} Vorsteuer.`,
+      },
+      {
+        question: 'Ist ein Umsatz mit 0 % Umsatzsteuer dasselbe wie ein steuerfreier Umsatz?',
+        answer: 'Nein. Beim Nullsteuersatz, etwa für Photovoltaikanlagen bis 30 kWp nach § 12 Abs. 3 UStG, fällt keine Steuer an, der Verkäufer darf die Vorsteuer aus seinen Einkäufen aber trotzdem abziehen. Bei steuerfreien Umsätzen, zum Beispiel ärztlichen Heilbehandlungen, ist der Vorsteuerabzug dagegen in der Regel ausgeschlossen. Für den Käufer ist der Preis in beiden Fällen ohne Umsatzsteuer.',
+      },
+    ],
+  },
+
+  'churn-rate-rechner': {
+    sections: [
+      {
+        title: 'Was eine monatliche Churn-Rate über das Jahr bedeutet',
+        content:
+          'Ausgangspunkt sind 1.000 Kunden ohne Neukunden. Die Jahres-Churn-Rate rechnet der Rechner mit 1 − (1 − Monats-Churn)¹²:\n\n' +
+          table(['Monats-Churn', 'Jahres-Churn', 'Ø Kundenlebensdauer', 'Kunden nach 12 Monaten'], CHURN_ROWS) +
+          '\n\nDie Lebensdauer ist ein Durchschnitt unter der Annahme, dass die Abwanderung jeden Monat gleich bleibt. In der Praxis kündigen viele Kunden in den ersten Monaten, wer länger bleibt, bleibt oft lange. Vergleichen Sie deshalb zusätzlich Kohorten nach Startmonat.',
+      },
+      {
+        title: 'Drei häufige Rechenfehler',
+        content:
+          `- **Neukunden in den Nenner nehmen:** Wer zu den 1.000 Startkunden die 200 Neukunden des Monats addiert, erhält bei 30 Kündigungen nur ${pct(CHURN_WRONG_DENOM, 1)} statt ${pct(prim(CHURN_BASE), 1)}. In den Nenner gehört nur der Bestand zu Monatsbeginn.\n` +
+          `- **Monatswert mal 12:** 3 % × 12 = ${pct(CHURN_NAIVE, 0)}. Weil jeden Monat nur noch die verbliebenen Kunden kündigen können, sind es tatsächlich ${pct(sec(CHURN_BASE, 'annualChurn'), 1)}.\n` +
+          '- **Kündigungseingang statt Vertragsende zählen:** Ein im März gekündigter Jahresvertrag, der im Dezember endet, gehört in den Dezember. Sonst springt die Quote in Monaten mit vielen Kündigungsschreiben, obwohl der Umsatz noch fließt.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie rechne ich eine jährliche Churn-Rate in eine monatliche um?',
+        answer: `Mit Monats-Churn = 1 − (1 − Jahres-Churn)^(1/12). Aus 20 % pro Jahr werden so ${pct(CHURN_FROM_ANNUAL, 2)} pro Monat, nicht 20 % ÷ 12 = 1,67 %. Probe im Rechner: ${num(CHURN_FROM_ANNUAL * 10, 1)} Kündigungen bei 1.000 Kunden ergeben wieder ${pct(CHURN_FROM_ANNUAL_CHECK, 1)} im Jahr.`,
+      },
+      {
+        question: 'Wie viele Neukunden brauche ich, um bei 3 % Churn nicht zu schrumpfen?',
+        answer: `Bei 1.000 Kunden genau so viele, wie kündigen: 30 pro Monat. Bei 49 € Monatsumsatz je Kunde ersetzen sie ${eur(sec(CHURN_BASE, 'lostMrr'))} wegfallenden Umsatz. Wächst der Kundenstamm, steigt die Zahl mit: Bei 2.000 Kunden und gleicher Quote sind es schon 60 Neukunden, nur um den Bestand zu halten.`,
+      },
+    ],
+  },
+
+  zinseszinsrechner: {
+    sections: [
+      {
+        title: '100 € im Monat bei 5 %: wie der Zinsanteil mit der Laufzeit wächst',
+        content:
+          'Monatliche Zinsgutschrift, Einzahlung am Monatsende, kein Startkapital:\n\n' +
+          table(['Laufzeit', 'Eingezahlt', 'Endkapital', 'davon Zinsen', 'Zinsanteil am Endkapital'], ZZ_ROWS) +
+          `\n\nNach ${ZZ_FIRST.years} Jahren machen die Zinsen erst ${pct(ZZ_FIRST.share, 0)} des Guthabens aus. Bei ${ZZ_CROSS.years} Jahren Laufzeit stammt schon mehr als die Hälfte aus Zinsen und Zinseszinsen, obwohl die monatliche Rate nie gestiegen ist. Die 5 % sind eine Annahme: Tagesgeld bringt meist weniger, Aktienfonds schwanken und haben keinen festen Zins.`,
+      },
+      {
+        title: 'Zehn Jahre später anfangen: was das kostet',
+        content:
+          `Alle mit 5 % Zins und monatlicher Gutschrift:\n\n` +
+          `- **150 € über 35 Jahre:** ${eur0(sec(ZZ_EARLY, 'totalDeposits'))} eingezahlt, ${eur0(prim(ZZ_EARLY))} Endkapital\n` +
+          `- **150 € über 25 Jahre:** ${eur0(sec(ZZ_LATE, 'totalDeposits'))} eingezahlt, ${eur0(prim(ZZ_LATE))} Endkapital\n` +
+          `- **300 € über 25 Jahre:** ${eur0(sec(ZZ_LATE_DOUBLE, 'totalDeposits'))} eingezahlt, ${eur0(prim(ZZ_LATE_DOUBLE))} Endkapital\n` +
+          `- **150 € über 25 Jahre mit 3 % Sparratendynamik:** ${eur0(sec(ZZ_LATE_DYN, 'totalDeposits'))} eingezahlt, ${eur0(prim(ZZ_LATE_DYN))} Endkapital\n\n` +
+          'Wer zehn Jahre später startet, muss die Sparrate verdoppeln, um ungefähr auf das Ergebnis des frühen Sparers zu kommen, und zahlt dafür deutlich mehr eigenes Geld ein. Die Dynamik-Option im Rechner bildet ab, dass die Rate mit dem Gehalt mitwächst.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Zinsen bringen 10.000 € in 10 Jahren?',
+        answer: `Bei jährlicher Zinsgutschrift und ohne weitere Einzahlungen: ${ZZ_ONCE.map(({ rate, r }) => `${pct(rate, 0)} ergeben ${eur(sec(r, 'totalInterest'))}`).join(', ')} Zinsen vor Steuern. Bei monatlicher Gutschrift ist es etwas mehr, weil die Zinsen schon im Laufe des Jahres mitverzinst werden.`,
+      },
+      {
+        question: 'Was ist der Unterschied zwischen vorschüssiger und nachschüssiger Einzahlung?',
+        answer: `Vorschüssig wird die Rate am Monatsanfang eingezahlt und verzinst sich im selben Monat schon mit, nachschüssig erst am Monatsende. Mit den Standardwerten (10.000 € Start, 150 € monatlich, 5 %, 15 Jahre) ergibt das ${eur(prim(ZZ_START))} statt ${eur(prim(ZZ_END))}, also ${eur(prim(ZZ_START) - prim(ZZ_END))} mehr. Sparpläne mit Ausführung zu Monatsbeginn entsprechen der vorschüssigen Variante.`,
       },
     ],
   },

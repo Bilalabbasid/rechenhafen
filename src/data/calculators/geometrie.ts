@@ -206,7 +206,7 @@ export const GEOMETRIE_CALCULATORS: CalculatorDefinition[] = [
       details: 'Volumen V = pi · r² · h. Mantelfläche M = 2 · pi · r · h. Gesamtoberfläche O = 2 · pi · r² + 2 · pi · r · h. 1 Kubikdezimeter (dm³) Zylindervolumen entspricht exakt einem Liter Flüssigkeit.',
     },
     faqs: [
-      { question: 'Wie berechnet man das Fassungsvermögen einer Regentonne in Litern?', answer: 'Messen Sie Innenradius r und Füllhöhe h in Dezimetern (dm): Das berechnete Volumen in dm³ entspricht direkt der Literzahl (z. B. r=3 dm, h=8 dm -> V ≈ 226 Liter).' },
+      { question: 'Wie berechnet man das Fassungsvermögen einer Regentonne in Litern?', answer: 'Messen Sie Innenradius r (halber Innendurchmesser) und Füllhöhe h in Zentimetern und geben Sie beide ein: Der Rechner zeigt das Volumen in cm³ und daneben in Litern (1.000 cm³ = 1 Liter). Beispiel: r = 30 cm, h = 80 cm ergibt rund 226.195 cm³, also etwa 226 Liter.' },
       { question: 'Was ist ein gleichseitiger Zylinder?', answer: 'Ein Zylinder, dessen Höhe h exakt seinem Durchmesser d (h = 2r) entspricht; er besitzt das minimale Oberflächen-zu-Volumen-Verhältnis aller Kreiszylinder.' },
       { question: 'Wie berechnet man das Volumen eines Zylinders?', answer: 'Grundfläche mal Höhe: V = π · r² · h. Bei r = 5 cm und h = 15 cm ist V = π · 25 · 15 ≈ 1.178,1 cm³, also rund 1,18 Liter (1.000 cm³ = 1 Liter). Kennen Sie nur den Durchmesser d, nehmen Sie r = d / 2.' },
     ],

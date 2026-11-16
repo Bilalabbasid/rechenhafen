@@ -477,7 +477,11 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
 
   if (isMinijob) {
     // Minijob (§ 8 SGB IV): AN zahlt nur den RV-Eigenanteil, AG Pauschalbeiträge; Lohnsteuer pauschal durch den AG.
-    anRv = monthlyGross * config.minijobRvEigenanteil;
+    // Unter 175 € gilt die Mindestbeitragsbemessungsgrundlage (§ 163 Abs. 8 SGB VI): voller Beitrag aus 175 €,
+    // der Arbeitgeber trägt weiter nur seine 15 % des echten Verdienstes, den Rest der Minijobber.
+    anRv = monthlyGross < 175
+      ? 175 * rvRate - monthlyGross * config.minijobPauschaleRv
+      : monthlyGross * config.minijobRvEigenanteil;
     agRv = monthlyGross * config.minijobPauschaleRv;
     anAv = 0; agAv = 0; anPv = 0; agPv = 0; anPvBase = 0;
     anKv = 0; anKvAllgemein = 0; anKvZusatz = 0;
@@ -646,12 +650,14 @@ export function calculateBruttoNetto(inputs: Record<string, any>): CalculationRe
   else if (!noKvPv && !isPrivateKv && pvAdjustmentRate < 0) pvHelp += ` − Abschlag für ${numChildren} Kinder (${formatCurrency(Math.abs(anPvAdjustment))}).`;
   else if (!noKvPv && !isPrivateKv) pvHelp += numChildren === 1 ? ', kein Kinderlosenzuschlag mit 1 Kind.' : ', kein Kinderlosenzuschlag unter 23 Jahren.';
   const rvHelp = isMinijob
-    ? `Minijob: Eigenanteil ${pct(config.minijobRvEigenanteil)} (Befreiung auf Antrag möglich).`
+    ? monthlyGross < 175
+      ? `Minijob unter 175 €: voller Beitrag aus der Mindestbemessung von 175 € abzüglich 15 % Arbeitgeberanteil (Befreiung auf Antrag möglich).`
+      : `Minijob: Eigenanteil ${pct(config.minijobRvEigenanteil)} (Befreiung auf Antrag möglich).`
     : ub
       ? `${pct(rvRate / 2)} auf die reduzierte Bemessungsgrundlage im Übergangsbereich (${formatCurrency(ub.beArbeitnehmer)} statt ${formatCurrency(monthlyGross)}).`
       : `${pct(rvRate / 2)} bis ${formatCurrency(config.bbgRentenversicherungMonat)} Brutto (BBG).`;
   const employmentLabel = isMinijob
-    ? `Minijob (bis ${formatCurrency(config.minijobGrenze)}): keine Lohnsteuer für Sie, nur ${pct(config.minijobRvEigenanteil)} Rentenversicherung`
+    ? `Minijob (bis ${formatCurrency(config.minijobGrenze)}): keine Lohnsteuer für Sie, ${monthlyGross < 175 ? 'Rentenbeitrag aus der Mindestbemessung von 175 €' : `nur ${pct(config.minijobRvEigenanteil)} Rentenversicherung`}`
     : isWerkstudent
       ? `Werkstudent: nur Rentenversicherung${ub ? ', im Übergangsbereich reduziert' : ''}`
       : ub
@@ -1001,8 +1007,16 @@ export function calculateMinijob(inputs: Record<string, any>): CalculationResult
   const earnings = Math.min(config.minijobGrenze, Math.max(0, Number(inputs.earnings) || config.minijobGrenze));
   const hasRvOptOut = inputs.rvOptOut === 'yes' || inputs.rvOptOut === true;
 
-  // Rentenversicherung Eigenanteil (3,6 %): 18,6 % Mindestbeitrag abzüglich 15 % AG-Pauschale
-  const anRv = hasRvOptOut ? 0 : earnings * config.minijobRvEigenanteil;
+  // Rentenversicherung Eigenanteil (3,6 %): 18,6 % Beitrag abzüglich 15 % AG-Pauschale.
+  // Unter 175 € gilt die Mindestbeitragsbemessungsgrundlage (§ 163 Abs. 8 SGB VI): Der volle Beitrag
+  // wird aus 175 € berechnet, der Arbeitgeber trägt weiter nur 15 % des echten Verdienstes, den Rest der Minijobber.
+  const RV_MIN_BASE = 175;
+  const belowMinBase = !hasRvOptOut && earnings < RV_MIN_BASE;
+  const anRv = hasRvOptOut
+    ? 0
+    : belowMinBase
+      ? RV_MIN_BASE * config.beitragssatzRentenversicherung - earnings * config.minijobPauschaleRv
+      : earnings * config.minijobRvEigenanteil;
   const netEarnings = earnings - anRv;
 
   // AG-Pauschalabgaben mit den Umlagesätzen der Minijob-Zentrale (2026: 13 + 15 + 2 + 0,8 + 0,22 + 0,15 = 31,17 %)
@@ -1023,7 +1037,7 @@ export function calculateMinijob(inputs: Record<string, any>): CalculationResult
     },
     secondary: [
       { id: 'grossEarnings', label: 'Minijob-Verdienst (brutto)', value: earnings, formattedValue: formatCurrency(earnings) },
-      { id: 'rvContribution', label: `RV-Eigenanteil (${formatNumber(config.minijobRvEigenanteil * 100, 1)} %)`, value: anRv, formattedValue: formatCurrency(anRv) },
+      { id: 'rvContribution', label: belowMinBase ? `RV-Eigenanteil (Mindestbemessung ${RV_MIN_BASE} €)` : `RV-Eigenanteil (${formatNumber(config.minijobRvEigenanteil * 100, 1)} %)`, value: anRv, formattedValue: formatCurrency(anRv) },
       { id: 'limit', label: 'Aktuelle Geringfügigkeitsgrenze', value: config.minijobGrenze, formattedValue: formatCurrency(config.minijobGrenze) },
       { id: 'agTotalCosts', label: 'Gesamtkosten für Arbeitgeber', value: totalAgCosts, formattedValue: formatCurrency(totalAgCosts) },
       { id: 'agLumpSum', label: `AG-Pauschalabgaben (${formatNumber(agRate * 100, 2)} %)`, value: totalAgCosts - earnings, formattedValue: formatCurrency(totalAgCosts - earnings) },

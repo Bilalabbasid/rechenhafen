@@ -64,9 +64,9 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Berechnung der gesamten Netto-Wandfläche geteilt durch die Herstellerangabe der Deckkraft in m² je Liter.',
     workedExample: {
       title: 'Beispiel: Raum 5m × 4m mit 2,5m Höhe und 5m² Fensterabzug',
-      description: 'Netto-Wandfläche: 40 m². Bei 2 Anstrichen und 7 m²/l Deckkraft = ca. 11,4 Liter Farbe (2 × 10L Eimer).',
-      inputs: { roomLength: 5.0, roomWidth: 4.0, roomHeight: 2.5, openingDeductionSqm: 5.0, coats: 2, coveragePerLiter: 7.0 },
-      resultSummary: '11,4 Liter Farbe',
+      description: 'Netto-Wandfläche: 40 m². Bei 2 Anstrichen sind 80 m² zu streichen, mit 10 % Reserve 88 m². Bei 7 m²/l Ergiebigkeit = ca. 12,6 Liter Farbe (2 × 10-Liter-Eimer).',
+      inputs: { roomLength: 5.0, roomWidth: 4.0, roomHeight: 2.5, openingDeductionSqm: 5.0, coats: 2, coveragePerLiter: 7.0, wasteReservePercent: '10' },
+      resultSummary: '12,6 Liter Farbe',
     },
     content: {
       intro: 'Dieser Farbrechner kalkuliert den genauen Farbbedarf in Litern für Wand- und Deckenanstriche aus Raummaßen, Deckkraft und Untergrundsaugfähigkeit.',
@@ -107,7 +107,7 @@ export const BAUEN_CALCULATORS: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Mengenrechner bestimmt den Quadratmeterbedarf für Laminat, Parkett, Vinyl oder Fliesen inklusive maßgeschneidertem Verschnittaufschlag. Mehr erfahren: [Wie viel Laminat brauche ich? Pakete, Gewicht und Verschnitt berechnen](/ratgeber/laminat-bedarf-gewicht-verschnitt/)',
-      details: 'Raumfläche = Länge · Breite. Für rechtwinklige Räume im Standardverband genügen ca. 5 bis 7 Prozent Verschnitt; bei diagonalem Verlegemuster, unregelmäßigen Winkeln oder Erkern sollten 10 bis 12 Prozent eingerechnet werden.',
+      details: 'Raumfläche = Länge · Breite. Für rechtwinklige Räume bei gerader Verlegung genügen meist 5 bis 10 Prozent Verschnitt; bei diagonalem Verlegemuster, unregelmäßigen Winkeln oder Erkern sollten 10 bis 15 Prozent eingerechnet werden.',
     },
     faqs: [
       { question: 'Muss Bodenbelag vor der Verlegung akklimatisiert werden?', answer: 'Ja, Parkett, Laminat und Klick-Vinyl sollten mindestens 48 Stunden ungeöffnet flach liegend im Verlegeraum bei normaler Raumtemperatur gelagert werden.' },

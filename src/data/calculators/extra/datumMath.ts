@@ -29,17 +29,24 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       if (birthYear < 1947) targetAgeYears = 65;
       else if (birthYear <= 1958) { targetAgeYears = 65; targetAgeMonths = birthYear - 1946; }
       else if (birthYear <= 1963) { targetAgeYears = 66; targetAgeMonths = (birthYear - 1958) * 2; }
-      const rentYear = birthYear + targetAgeYears + Math.floor((birthMonth + targetAgeMonths) / 12);
-      const rentMonth = ((birthMonth + targetAgeMonths - 1) % 12) + 1;
+      // Jahrgang 1958: 65 Jahre + 12 Monate = 66 Jahre (§ 235 Abs. 2 SGB VI)
+      targetAgeYears += Math.floor(targetAgeMonths / 12);
+      targetAgeMonths %= 12;
+      // Rentenbeginn (§ 99 Abs. 1 SGB VI): Kalendermonat nach dem Monat, in dem die Regelaltersgrenze erreicht wird.
+      // Bei Geburt am 2. bis 31. eines Monats ist das der Folgemonat des "Geburtsmonats" im Rentenjahr.
+      const monthIndex = birthYear * 12 + (birthMonth - 1) + targetAgeYears * 12 + targetAgeMonths + 1;
+      const rentYear = Math.floor(monthIndex / 12);
+      const rentMonth = (monthIndex % 12) + 1;
       const rentStartDate = `01.${rentMonth < 10 ? '0' + rentMonth : rentMonth}.${rentYear}`;
       const yearsLeft = Math.max(0, rentYear - 2026);
+      const ageText = `${targetAgeYears} Jahre${targetAgeMonths > 0 ? ' ' + targetAgeMonths + ' Monate' : ''}`;
       return {
-        primary: { id: 'rentDate', label: 'Voraussichtlicher Rentenbeginn', value: rentYear, formattedValue: rentStartDate, highlight: true },
+        primary: { id: 'rentDate', label: 'Voraussichtlicher Rentenbeginn', value: rentYear, formattedValue: rentStartDate, highlight: true, helpText: 'Gilt bei Geburt am 2. bis 31. des Monats. Wer am 1. geboren ist, erreicht die Altersgrenze schon am Vortag und kann einen Monat früher beginnen.' },
         secondary: [
-          { id: 'age', label: 'Ihre Regelaltersgrenze', value: targetAgeYears + targetAgeMonths / 12, formattedValue: `${targetAgeYears} Jahre ${targetAgeMonths > 0 ? targetAgeMonths + ' Monate' : ''}` },
+          { id: 'age', label: 'Ihre Regelaltersgrenze', value: targetAgeYears + targetAgeMonths / 12, formattedValue: ageText },
           { id: 'yearsLeft', label: 'Verbleibende Jahre bis zur Rente (ab 2026)', value: yearsLeft, formattedValue: `ca. ${yearsLeft} Jahre` },
         ],
-        summaryText: `Bei Geburtsjahrgang ${birthYear} erreichen Sie Ihre Regelaltersgrenze mit ${targetAgeYears} Jahren${targetAgeMonths > 0 ? ' und ' + targetAgeMonths + ' Monaten' : ''}. Ihr regulärer Rentenbeginn ist der ${rentStartDate}.`,
+        summaryText: `Bei Geburtsjahrgang ${birthYear} erreichen Sie Ihre Regelaltersgrenze mit ${targetAgeYears} Jahren${targetAgeMonths > 0 ? ' und ' + targetAgeMonths + ' Monaten' : ''}. Ihr regulärer Rentenbeginn ist der ${rentStartDate} (bei Geburt am 1. des Monats einen Monat früher).`,
       };
     },
     formula: 'Rentenalter = 65 bis 67 Jahre (ab Jahrgang 1964 gilt Regelaltersgrenze 67 Jahre)',
@@ -55,8 +62,8 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       details: 'Nach § 35 und § 235 SGB VI wird die Regelaltersgrenze für Versicherte der Geburtsjahrgänge 1947 bis 1963 schrittweise von 65 auf 67 Jahre angehoben. Für alle ab dem 1. Januar 1964 Geborenen gilt ausnahmslos das vollendete 67. Lebensjahr.',
     },
     faqs: [
-      { question: 'Wann kann man abschlagsfrei vor der Regelaltersgrenze in Rente gehen?', answer: 'Als besonders langjährig Versicherter mit mindestens 45 Beitragsjahren kann man bis zu zwei Jahre vor der Regelaltersgrenze ohne Rentenabschläge in den Ruhestand treten.' },
-      { question: 'Wie hoch ist der Rentenabschlag bei vorzeitigem Rentenbeginn?', answer: 'Der Abschlag beträgt 0,3 Prozent für jeden Monat, den die Rente vor Erreichen der persönlichen Regelaltersgrenze in Anspruch genommen wird (max. 14,4 % bei 4 Jahren früher).' },
+      { question: 'Wann kann man abschlagsfrei vor der Regelaltersgrenze in Rente gehen?', answer: 'Mit 45 Jahren Wartezeit (Altersrente für besonders langjährig Versicherte, § 38 und § 236b SGB VI). Die Altersgrenze dafür lag bei 63 Jahren für vor 1953 Geborene und steigt je Jahrgang um 2 Monate; ab Jahrgang 1964 gilt das vollendete 65. Lebensjahr. Welche Zeiten auf die 45 Jahre angerechnet werden, prüft die Deutsche Rentenversicherung.' },
+      { question: 'Wie hoch ist der Rentenabschlag bei vorzeitigem Rentenbeginn?', answer: 'Der Abschlag beträgt 0,3 Prozent für jeden Monat, den die Rente vor Erreichen der persönlichen Regelaltersgrenze in Anspruch genommen wird (§ 77 SGB VI). Beispiel: Altersrente für langjährig Versicherte mit 63 statt 67 Jahren = 48 Monate × 0,3 % = 14,4 %.' },
     ],
     relatedSlugs: ['rentenluecke-rechner', 'altersrechner', 'arbeitstage-rechner', 'lebenszeit-in-stunden', 'betriebliche-altersvorsorge-rechner'],
   },
@@ -163,8 +170,8 @@ export const EXTRA_DATUM_MATH: CalculatorDefinition[] = [
       details: 'Nach deutschem Tarifrecht (z. B. TVöD § 23) wird die Dienstzeit ab dem offiziellen Tag des Diensteintritts berechnet. Unterbrechungen (wie Elternzeit oder Sonderurlaub) können je nach Tarifvertrag ausgenommen sein.',
     },
     faqs: [
-      { question: 'Welche Jubiläumszuwendungen sind im öffentlichen Dienst tariflich vorgesehen?', answer: 'Nach dem TVöD erhalten Beschäftigte bei Vollendung einer 25-jährigen Dienstzeit ein Jubiläumsgeld von 350 Euro, bei 40 Jahren 500 Euro sowie einen freien Tag.' },
-      { question: 'Zählt die Ausbildungszeit zur Dienstzeit für das Jubiläum?', answer: 'Im öffentlichen Dienst zählt die Ausbildung beim selben Dienstherrn voll zur Dienstzeit; in der Privatwirtschaft hängt dies von der jeweiligen Betriebsvereinbarung ab.' },
+      { question: 'Welche Jubiläumszuwendungen sind im öffentlichen Dienst tariflich vorgesehen?', answer: 'Nach dem TVöD erhalten Beschäftigte bei Vollendung einer 25-jährigen Dienstzeit ein Jubiläumsgeld von 350 Euro, bei 40 Jahren 500 Euro (§ 23 Abs. 2 TVöD) sowie jeweils einen Arbeitstag Arbeitsbefreiung (§ 29 TVöD).' },
+      { question: 'Zählt die Ausbildungszeit zur Dienstzeit für das Jubiläum?', answer: 'Das entscheidet der jeweilige Tarifvertrag oder die Betriebsvereinbarung. Im TVöD ist Beschäftigungszeit die beim selben Arbeitgeber im Arbeitsverhältnis zurückgelegte Zeit (§ 34 Abs. 3 TVöD); ob eine vorangegangene Ausbildung angerechnet wird, klären Sie am besten mit der Personalabteilung.' },
     ],
     relatedSlugs: ['tage-zwischen-zwei-daten', 'datum-plus-tage', 'alter-in-tagen', 'arbeitstage-rechner', 'werktage-rechner'],
   },

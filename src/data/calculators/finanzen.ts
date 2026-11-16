@@ -63,9 +63,9 @@ export const FINANZEN_CALCULATORS: CalculatorDefinition[] = [
     formulaExplanation: 'Der Zinseszins entsteht dadurch, dass gutgeschriebene Zinsen im nächsten Zeitraum wieder mitverzinst werden. Dadurch wächst das Guthaben über die Zeit exponentiell.',
     workedExample: {
       title: 'Beispiel: 10.000 € Start + 150 € mtl. bei 5 % über 15 Jahre',
-      description: 'Eingezahltes Eigenkapital: 37.000 €. Endvermögen: ca. 62.435 €. Zinsertrag: ca. 25.435 €.',
+      description: 'Eingezahltes Eigenkapital: 37.000 €. Endvermögen bei monatlicher Zinsgutschrift und Einzahlung am Monatsende: ca. 61.230 €. Zinsertrag: ca. 24.230 €.',
       inputs: { initialAmount: 10000, monthlyContribution: 150, annualRate: 5.0, years: 15, compoundFrequency: '12' },
-      resultSummary: '62.435,00 € (über 25.000 € Zinsgewinn)',
+      resultSummary: '61.230,38 € (über 24.000 € Zinsgewinn)',
     },
     content: {
       intro: 'Der Zinseszinseffekt beschreibt das exponentielle Vermögenswachstum, wenn erwirtschaftete Zinsen oder Erträge reinvestiert werden und in den Folgeperioden selbst Zinsen abwerfen.',

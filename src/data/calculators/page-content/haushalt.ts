@@ -331,6 +331,35 @@ const LB_2_THRIFTY = lb(2, 0, 'thrifty');
 const LB_FAMILY = lb(2, 1, 'standard');
 const LB_FAMILY_WEEK = num(LB_FAMILY, 'weekly');
 
+// ---------------------------------------------------------------------------
+// Gasverbrauch m³ in kWh (11 ct/kWh ist ein Beispiel-Arbeitspreis, kein Marktpreis)
+// ---------------------------------------------------------------------------
+const GV_PRICE = 11;
+const gv = (m3: number, bw: number, z: number) =>
+  run('gasverbrauch-kwh-m3-rechner', { inputMode: 'volume', gasCubicMeters: m3, brennwert: bw, zustandszahl: z, gasPricePerKwh: GV_PRICE });
+const GV_M3 = 1200;
+const GV_CASES: Array<[string, number, number]> = [
+  ['L-Gas, Lage im Tiefland', 9.8, 0.96],
+  ['L-Gas, Mittelgebirge', 9.8, 0.9],
+  ['H-Gas, niedriger Brennwert', 10.4, 0.95],
+  ['H-Gas, Standardwerte des Rechners', 10.8, 0.95],
+  ['H-Gas, hoher Brennwert', 11.4, 0.95],
+];
+const GV_TABLE = table(
+  ['Netzgebiet (Beispiel)', 'Brennwert', 'Zustandszahl', 'kWh aus 1.200 m³', 'Arbeitspreis-Kosten'],
+  GV_CASES.map(([label, bw, z]) => {
+    const r = gv(GV_M3, bw, z);
+    return [label, `${formatNumber(bw, 1, 1)} kWh/m³`, formatNumber(z, 2, 2), kwhTxt(num(r, 'kwh')), eur(num(r, 'consumptionCost'))];
+  }),
+);
+const GV_MIN = num(gv(GV_M3, 9.8, 0.9), 'kwh');
+const GV_MAX = num(gv(GV_M3, 11.4, 0.95), 'kwh');
+const GV_READ = run('gasverbrauch-kwh-m3-rechner', { inputMode: 'readings', meterReadingOld: 4815, meterReadingNew: 5962, brennwert: 10.8, zustandszahl: 0.95, gasPricePerKwh: GV_PRICE });
+const GV_KWH_PER_M3 = num(gv(100, 10.8, 0.95), 'reference100Kwh') / 100;
+const GV_PLAN_KWH = 12000;
+const GV_PLAN_M3 = GV_PLAN_KWH / GV_KWH_PER_M3;
+const GV_HS_HI = 1.11; // Verhältnis Brennwert/Heizwert bei Erdgas, physikalischer Richtwert
+
 export const HAUSHALT_PAGE_CONTENT: PageContentMap = {
   stromkostenrechner: {
     sections: [
@@ -675,6 +704,36 @@ export const HAUSHALT_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Wie teile ich das Monatsbudget auf die Wocheneinkäufe auf?',
         answer: `Der Wochenwert im Ergebnis ist Monatsbudget × 12 ÷ 52. Bei ${txt(LB_FAMILY, 'totalMonth')} für 2 Erwachsene und 1 Kind sind das ${eur(LB_FAMILY_WEEK)} pro Woche. Monate mit fünf Einkaufswochen brauchen dann ${eur(LB_FAMILY_WEEK * 5)}, Monate mit vier nur ${eur(LB_FAMILY_WEEK * 4)} – legen Sie den Rest aus kurzen Monaten für die langen zurück.`,
+      },
+    ],
+  },
+
+  'gasverbrauch-kwh-m3-rechner': {
+    sections: [
+      {
+        title: 'Dieselben 1.200 m³, unterschiedliche Kilowattstunden',
+        content:
+          `Wie viel Energie in einem Kubikmeter steckt, hängt vom Netzgebiet ab. Gerechnet mit ${formatNumber(GV_PRICE, 0)} ct/kWh als Beispielpreis:\n\n${GV_TABLE}\n\n` +
+          `Zwischen dem niedrigsten und dem höchsten Fall liegen ${kwhTxt(GV_MAX - GV_MIN)}, obwohl der Zähler exakt dasselbe Volumen zeigt. Deshalb rechnen Versorger in kWh ab und nicht in m³. Vergleichen Sie Ihren Verbrauch mit Nachbarn oder früheren Wohnungen immer in kWh, sonst vergleichen Sie unterschiedliche Gasqualitäten.`,
+      },
+      {
+        title: 'Zählerstand ablesen und mit der Abrechnung vergleichen',
+        content:
+          '1. **Zählerstand notieren:** Beim üblichen Balgengaszähler zählen nur die Ziffern vor dem Komma (meist schwarz). Die Stellen dahinter (meist rot) sind Bruchteile eines Kubikmeters.\n' +
+          '2. **Zählernummer prüfen:** Sie muss mit der Nummer auf der Rechnung übereinstimmen, sonst wird womöglich der Zähler einer anderen Wohnung abgerechnet.\n' +
+          `3. **Differenz bilden:** Von 4.815 auf 5.962 m³ sind es ${formatNumber(num(GV_READ, 'consumedM3'), 0)} m³. Mit Brennwert 10,8 und Zustandszahl 0,95 aus der Rechnung ergibt das ${txt(GV_READ, 'kwh')}.\n` +
+          '4. **Mit der Rechnung vergleichen:** Kleine Abweichungen entstehen, weil der Netzbetreiber einen über den Zeitraum gemittelten Abrechnungsbrennwert ansetzt. Große Unterschiede deuten auf einen geschätzten Zählerstand oder einen Ablesefehler hin.\n\n' +
+          `Umgekehrt lässt sich ein Ziel in Zählerstände übersetzen: Wer im Jahr höchstens ${kwhTxt(GV_PLAN_KWH)} verbrauchen will, darf bei ${formatNumber(GV_KWH_PER_M3, 2)} kWh je m³ rund ${formatNumber(GV_PLAN_M3, 0)} m³ verbrauchen. Notieren Sie den Zählerstand monatlich, dann sehen Sie früh, ob der Winter das Budget sprengt.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was ist der Unterschied zwischen Brennwert und Heizwert beim Gas?',
+        answer: `Der Brennwert (Hs) enthält auch die Wärme, die beim Kondensieren des Wasserdampfs im Abgas frei wird, der Heizwert (Hi) nicht. Bei Erdgas ist der Brennwert rund ${formatNumber((GV_HS_HI - 1) * 100, 0)} % höher. Abgerechnet wird nach Brennwert. Wirkungsgrade von Heizkesseln werden dagegen oft auf den Heizwert bezogen, deshalb stehen in Datenblättern von Brennwertkesseln Werte über 100 %.`,
+      },
+      {
+        question: 'Warum weicht meine eigene Umrechnung von den kWh auf der Gasrechnung ab?',
+        answer: 'Meist aus einem von drei Gründen: Der Versorger hat einen Zählerstand geschätzt statt abgelesen, der Abrechnungszeitraum beginnt oder endet an einem anderen Tag als Ihre Ablesung, oder der Brennwert hat sich während des Zeitraums geändert und wird anteilig gewichtet. Prüfen Sie die Ablesedaten auf der Rechnung und rechnen Sie mit genau diesen Zählerständen und Faktoren nach.',
       },
     ],
   },

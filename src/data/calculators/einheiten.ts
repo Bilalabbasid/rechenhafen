@@ -94,7 +94,7 @@ export const EINHEITEN_CALCULATORS: CalculatorDefinition[] = [
     ],
     content: {
       intro: 'Dieser Längenkonverter rechnet Längenmaße zwischen dem metrischen SI-System (Millimeter, Zentimeter, Meter, Kilometer) und dem angloamerikanischen Maßsystem (Inch, Fuß, Yard, Meile, Seemeile) um.',
-      details: 'Die offizielle völkerrechtliche Definition nach NIST lautet seit dem internationalen Abkommen von 1959: 1 Inch (Zoll) = exakt 25,4 Millimeter. 1 Fuß (Foot) = 12 Zoll = 30,48 cm. 1 Yard = 3 Fuß = 91,44 cm. 1 Landmeile = 1.609,344 Meter. Für nautische und maritime Berechnungen gilt: 1 Seemeile = exakt 1.852 Meter.',
+      details: 'Seit dem internationalen Yard-and-Pound-Abkommen von 1959 gilt: 1 Inch (Zoll) = exakt 25,4 Millimeter. 1 Fuß (Foot) = 12 Zoll = 30,48 cm. 1 Yard = 3 Fuß = 91,44 cm. 1 Landmeile = 1.609,344 Meter. Für nautische und maritime Berechnungen gilt: 1 Seemeile = exakt 1.852 Meter.',
     },
     faqs: [
       { question: 'Wie viele Kilometer sind eine Meile?', answer: 'Eine Landmeile (Statute Mile) entspricht genau 1,609344 Kilometern. Umgekehrt ist ein Kilometer rund 0,621 Meilen. 100 km/h sind also etwa 62 mph.' },

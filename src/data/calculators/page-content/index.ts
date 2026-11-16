@@ -9,6 +9,10 @@ import { HAUSHALT_PAGE_CONTENT } from './haushalt';
 import { FAMILIE_PAGE_CONTENT } from './familie';
 import { GESUNDHEIT_PAGE_CONTENT } from './gesundheit';
 import { FINANZEN_BUSINESS_PAGE_CONTENT } from './finanzenBusiness';
+import { BAUEN_PAGE_CONTENT } from './bauen';
+import { KOCHEN_PAGE_CONTENT } from './kochen';
+import { DATUM_PAGE_CONTENT } from './datum';
+import { GEOMETRIE_PAGE_CONTENT } from './geometrie';
 
 /** Date of the last content batch; pages with an overlay report it as their content update. */
 export const PAGE_CONTENT_UPDATED_AT = '2026-11-15';
@@ -25,4 +29,8 @@ export const PAGE_CONTENT: PageContentMap = {
   ...FAMILIE_PAGE_CONTENT,
   ...GESUNDHEIT_PAGE_CONTENT,
   ...FINANZEN_BUSINESS_PAGE_CONTENT,
+  ...BAUEN_PAGE_CONTENT,
+  ...KOCHEN_PAGE_CONTENT,
+  ...DATUM_PAGE_CONTENT,
+  ...GEOMETRIE_PAGE_CONTENT,
 };

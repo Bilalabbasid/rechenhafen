@@ -16,6 +16,14 @@ import {
 
 export { calculateTagerechner, calculateTageBisWeihnachten };
 
+/** "1 Jahr, 2 Monate, 1 Tag" with correct singular/plural (Altersrechner, Altersunterschied). */
+function ymd(years: number, months: number, days: number, withAnd = false): string {
+  const y = `${years} ${years === 1 ? 'Jahr' : 'Jahre'}`;
+  const m = `${months} ${months === 1 ? 'Monat' : 'Monate'}`;
+  const d = `${days} ${days === 1 ? 'Tag' : 'Tage'}`;
+  return withAnd ? `${y}, ${m} und ${d}` : `${y}, ${m}, ${d}`;
+}
+
 export function calculateAge(inputs: Record<string, any>): CalculationResult {
   if (inputs.birthDate === undefined || inputs.birthDate === null || String(inputs.birthDate).trim() === '') {
     return {
@@ -69,21 +77,15 @@ export function calculateAge(inputs: Record<string, any>): CalculationResult {
   const totalMonths = years * 12 + months;
   const totalHours = totalDays * 24;
 
-  // Next birthday calculation with leap year safety (29. Februar)
-  let nextBdayYear = targetParts.year;
-  let nextBdayDay = birthParts.day;
-  const nextBdayMonth = birthParts.month;
-  if (birthParts.month === 2 && birthParts.day === 29 && !isLeapYear(nextBdayYear)) {
-    nextBdayDay = 28;
-  }
-  let nextBdayDayNum = dateToDayNumber(nextBdayYear, nextBdayMonth, nextBdayDay);
+  // Next birthday. 29. Februar in Gemeinjahren: das Lebensjahr ist mit Ablauf des 28.02. vollendet
+  // (§ 187 Abs. 2 Satz 2, § 188 Abs. 2 BGB), der neue Lebensabschnitt beginnt am 1. März – wie in calculateCalendarDiff.
+  const birthdayDayNum = (year: number) =>
+    birthParts.month === 2 && birthParts.day === 29 && !isLeapYear(year)
+      ? dateToDayNumber(year, 3, 1)
+      : dateToDayNumber(year, birthParts.month, birthParts.day);
+  let nextBdayDayNum = birthdayDayNum(targetParts.year);
   if (nextBdayDayNum < targetDayNum) {
-    nextBdayYear += 1;
-    let bDay = birthParts.day;
-    if (birthParts.month === 2 && birthParts.day === 29 && !isLeapYear(nextBdayYear)) {
-      bDay = 28;
-    }
-    nextBdayDayNum = dateToDayNumber(nextBdayYear, nextBdayMonth, bDay);
+    nextBdayDayNum = birthdayDayNum(targetParts.year + 1);
   }
   const daysUntilNext = nextBdayDayNum - targetDayNum;
 
@@ -92,7 +94,7 @@ export function calculateAge(inputs: Record<string, any>): CalculationResult {
       id: 'years',
       label: 'Exaktes Alter',
       value: years,
-      formattedValue: `${years} Jahre, ${months} Monate, ${days} Tage`,
+      formattedValue: ymd(years, months, days),
       highlight: true,
     },
     secondary: [
@@ -102,7 +104,7 @@ export function calculateAge(inputs: Record<string, any>): CalculationResult {
       { id: 'totalHours', label: 'Gelebte Stunden', value: totalHours, formattedValue: `${formatNumber(totalHours, 0)} Stunden` },
       { id: 'daysUntilNext', label: 'Tage bis zum nächsten Geburtstag', value: daysUntilNext, formattedValue: `${daysUntilNext} Tage` },
     ],
-    summaryText: `Sie sind ${years} Jahre, ${months} Monate und ${days} Tage alt (entspricht ${formatNumber(totalDays, 0)} Tagen). Der nächste Geburtstag ist in ${daysUntilNext} Tagen.`,
+    summaryText: `Sie sind ${ymd(years, months, days, true)} alt (entspricht ${formatNumber(totalDays, 0)} Tagen). ${daysUntilNext === 0 ? 'Heute ist Geburtstag.' : `Der nächste Geburtstag ist in ${daysUntilNext === 1 ? 'einem Tag' : `${daysUntilNext} Tagen`}.`}`,
   };
 }
 
@@ -727,42 +729,25 @@ export function calculateArbeitszeit(inputs: Record<string, any>): CalculationRe
 }
 
 export function calculateAgeDifference(inputs: Record<string, any>): CalculationResult {
-  const d1 = new Date(inputs.datePerson1 || '1990-05-15');
-  const d2 = new Date(inputs.datePerson2 || '1993-11-20');
+  // Timezone-safe calendar arithmetic; also handles month ends (31.01. vs. 01.03.) without negative days.
+  const diff = calculateCalendarDiff(inputs.datePerson1 || '1990-05-15', inputs.datePerson2 || '1993-11-20', false);
 
-  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) {
+  if (!diff) {
     return {
       primary: { id: 'diff', label: 'Altersunterschied', value: 0, formattedValue: '-' },
       error: 'Bitte gültige Geburtsdaten für beide Personen eingeben.',
     };
   }
 
-  const elder = d1 < d2 ? d1 : d2;
-  const younger = d1 < d2 ? d2 : d1;
-  const elderLabel = d1 < d2 ? 'Person 1 ist älter' : (d1 > d2 ? 'Person 2 ist älter' : 'Beide gleich alt');
-
-  let years = younger.getFullYear() - elder.getFullYear();
-  let months = younger.getMonth() - elder.getMonth();
-  let days = younger.getDate() - elder.getDate();
-
-  if (days < 0) {
-    months--;
-    const prevMonthDays = new Date(younger.getFullYear(), younger.getMonth(), 0).getDate();
-    days += prevMonthDays;
-  }
-  if (months < 0) {
-    years--;
-    months += 12;
-  }
-
-  const totalDays = Math.floor((younger.getTime() - elder.getTime()) / (1000 * 60 * 60 * 24));
+  const elderLabel = diff.isSameDay ? 'Beide gleich alt' : diff.isReversed ? 'Person 2 ist älter' : 'Person 1 ist älter';
+  const { years, months, days, totalDays } = diff;
 
   return {
     primary: {
       id: 'ageDiff',
       label: 'Altersunterschied',
       value: years,
-      formattedValue: `${years} Jahre, ${months} Monate, ${days} Tage`,
+      formattedValue: ymd(years, months, days),
       highlight: true,
     },
     secondary: [
@@ -770,7 +755,7 @@ export function calculateAgeDifference(inputs: Record<string, any>): Calculation
       { id: 'totalDays', label: 'Unterschied in Tagen', value: totalDays, formattedValue: `${formatNumber(totalDays, 0)} Tage` },
       { id: 'totalWeeks', label: 'Unterschied in Wochen', value: Math.floor(totalDays / 7), formattedValue: `${formatNumber(Math.floor(totalDays / 7), 0)} Wochen` },
     ],
-    summaryText: `Der Altersunterschied beträgt ${years} Jahre, ${months} Monate und ${days} Tage (${formatNumber(totalDays, 0)} Tage). ${elderLabel}.`,
+    summaryText: `Der Altersunterschied beträgt ${ymd(years, months, days, true)} (${formatNumber(totalDays, 0)} Tage). ${elderLabel}.`,
   };
 }
 

@@ -514,7 +514,7 @@ export const LEGAL_VALUES_2026: GermanLegalValues = {
     validFrom: '2026-01-01',
     verified: true,
     checkedAt: '2026-10-25',
-    description: 'Gesetzlicher Festpreis für CO2-Zertifikate im nationalen Brennstoffemissionshandel',
+    description: 'Mindestpreis des Preiskorridors 2026 (55 bis 65 € je Tonne) für CO2-Zertifikate im nationalen Brennstoffemissionshandel',
   },
 
   // Arbeitgeber-Umlagen & Minijob-Pauschalen

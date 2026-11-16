@@ -1,6 +1,7 @@
 import { CalculationResult } from '@/types/calculator';
 import { formatNumber } from '@/lib/formatters';
 import { EXTRA_EINHEITEN_KOCHEN } from '../extra/einheitenKochen';
+import { calculateLengthConversion } from '@/lib/calculators/einheiten';
 import { PageContentMap } from './types';
 
 // ---------------------------------------------------------------------------
@@ -418,6 +419,150 @@ const maxStd80 = maxSheets(80, STD);
 const a4w = 210 / 25.4;
 const a4h = 297 / 25.4;
 
+// ---------------------------------------------------------------------------
+// Kraft
+// ---------------------------------------------------------------------------
+const kraft = engine('kraft-umrechner');
+const kraftRows: Array<[string, number, string]> = [
+  ['1 N', 1, 'n'],
+  ['10 N', 10, 'n'],
+  ['100 N', 100, 'n'],
+  ['1 kN', 1, 'kn'],
+  ['10 kN', 10, 'kn'],
+  ['25 kN', 25, 'kn'],
+  ['100 kN', 100, 'kn'],
+];
+const kraftTable = table(
+  ['Kraft', 'Newton', 'Kilopond', 'Pound-force', 'entspricht Masse'],
+  kraftRows.map(([label, v, unit]) => {
+    const r = kraft({ inputValue: v, inputUnit: unit });
+    const kg = val(r, 'tonnes') * 1000;
+    return [label, n(val(r, 'n'), 1), n(val(r, 'kp'), 2), n(val(r, 'lbf'), 2), kg < 1000 ? `${n(kg, kg < 10 ? 2 : 1)} kg` : `${n(kg / 1000, 3)} t`];
+  })
+);
+const kraftPerson = kraft({ inputValue: 80, inputUnit: 'kp' });
+const kraftMoon = val(kraftPerson, 'n') * (1.62 / 9.80665);
+const kraft1kN = kraft({ inputValue: 1, inputUnit: 'kn' });
+const kraft10kN = kraft({ inputValue: 10, inputUnit: 'kn' });
+const kraftStrap = kraft({ inputValue: 25, inputUnit: 'kn' });
+
+// ---------------------------------------------------------------------------
+// Gewicht / Masse
+// ---------------------------------------------------------------------------
+const gewicht = engine('gewicht-masse-umrechner');
+const lbsRows = [120, 140, 160, 180, 200, 220, 250];
+const lbsTable = table(
+  ['Pfund (lbs)', 'Kilogramm', 'Kopfrechnung (Hälfte minus 10 %)'],
+  lbsRows.map((lb) => {
+    const r = gewicht({ inputValue: lb, inputUnit: 'lbs' });
+    return [`${lb} lbs`, `${n(val(r, 'kg'), 2)} kg`, `${n(lb / 2 - lb / 20, 1)} kg`];
+  })
+);
+const ozRows = [1, 4, 8, 16];
+const ozTable = table(
+  ['Unzen (oz)', 'Gramm'],
+  ozRows.map((oz) => [`${oz} oz`, `${n(val(gewicht({ inputValue: oz, inputUnit: 'oz' }), 'g'), 1)} g`])
+);
+const stoneLbs = 11 * 14 + 4;
+const stoneKg = val(gewicht({ inputValue: stoneLbs, inputUnit: 'lbs' }), 'kg');
+const lbInGram = val(gewicht({ inputValue: 1, inputUnit: 'lbs' }), 'g');
+const lb180 = val(gewicht({ inputValue: 180, inputUnit: 'lbs' }), 'kg');
+
+// ---------------------------------------------------------------------------
+// Zoll in cm
+// ---------------------------------------------------------------------------
+const zoll = engine('zoll-in-cm-rechner');
+const zollCm = (inch: number) => val(zoll({ inches: inch }), 'cm');
+const zoll14 = zoll({ inches: 14 });
+const zoll14Diag = val(zoll14, 'cm');
+const zoll1610W = (zoll14Diag * 16) / Math.sqrt(16 * 16 + 10 * 10);
+const zoll1610H = (zoll14Diag * 10) / Math.sqrt(16 * 16 + 10 * 10);
+const zoll169Area = val(zoll14, 'width16_9') * val(zoll14, 'height16_9');
+const zoll1610Area = zoll1610W * zoll1610H;
+
+// ---------------------------------------------------------------------------
+// Geschwindigkeit
+// ---------------------------------------------------------------------------
+const tempo = engine('geschwindigkeit-umrechner');
+const tempoRows = [30, 50, 70, 100, 130];
+const tempoTable = table(
+  ['km/h', 'm/s (Weg in 1 Sekunde)', 'mph', 'Knoten'],
+  tempoRows.map((kmh) => {
+    const r = tempo({ inputValue: kmh, inputUnit: 'kmh' });
+    return [`${kmh} km/h`, `${n(val(r, 'ms'), 2)} m`, n(val(r, 'mph'), 1), n(val(r, 'kn'), 1)];
+  })
+);
+const paceRows: Array<[string, number]> = [
+  ['7:00', 7],
+  ['6:00', 6],
+  ['5:30', 5.5],
+  ['5:00', 5],
+  ['4:30', 4.5],
+  ['4:00', 4],
+];
+const paceTable = table(
+  ['Pace (min/km)', 'km/h', 'mph', 'Zeit für 10 km'],
+  paceRows.map(([label, minPerKm]) => {
+    const r = tempo({ inputValue: 60 / minPerKm, inputUnit: 'kmh' });
+    const total = minPerKm * 10;
+    const h = Math.floor(total / 60);
+    const m = Math.round(total - h * 60);
+    return [label, n(val(r, 'kmh'), 2), n(val(r, 'mph'), 2), h > 0 ? `${h}:${String(m).padStart(2, '0')} h` : `${m} min`];
+  })
+);
+const tempo50 = tempo({ inputValue: 50, inputUnit: 'kmh' });
+const soundAt = (celsius: number) => 331.3 * Math.sqrt(1 + celsius / 273.15);
+const soundCold = tempo({ inputValue: soundAt(0), inputUnit: 'ms' });
+const soundHigh = tempo({ inputValue: soundAt(-56.5), inputUnit: 'ms' });
+
+// ---------------------------------------------------------------------------
+// Zeit
+// ---------------------------------------------------------------------------
+const zeit = engine('zeit-umrechner');
+const zeitMinRows = [5, 10, 12, 15, 20, 30, 40, 45, 50];
+const zeitMinTable = table(
+  ['Minuten', 'Dezimalstunden'],
+  zeitMinRows.map((m) => [`${m} min`, n(val(zeit({ value: m, fromUnit: 'minutes', toUnit: 'hours' }), 'hours'), 4)])
+);
+const zeitMillion = zeit({ value: 1000000, fromUnit: 'seconds', toUnit: 'days' });
+const zeitBillion = zeit({ value: 1000000000, fromUnit: 'seconds', toUnit: 'years' });
+const zeitPregnancy = zeit({ value: 40, fromUnit: 'weeks', toUnit: 'days' });
+const zeitYearWeeks = zeit({ value: 1, fromUnit: 'years', toUnit: 'weeks' });
+const zeitMonth = zeit({ value: 1 / 12, fromUnit: 'years', toUnit: 'hours' });
+
+// ---------------------------------------------------------------------------
+// Länge
+// ---------------------------------------------------------------------------
+const laenge = (value: number, fromUnit: string, toUnit: string) => calculateLengthConversion({ value, fromUnit, toUnit });
+const heightRows: Array<[number, number]> = [
+  [5, 4],
+  [5, 6],
+  [5, 9],
+  [5, 11],
+  [6, 0],
+  [6, 2],
+];
+const heightTable = table(
+  ['Angabe', 'Zoll gesamt', 'Zentimeter'],
+  heightRows.map(([ft, inch]) => {
+    const total = ft * 12 + inch;
+    return [`${ft}′${inch}″`, `${total} in`, `${n(Number(laenge(total, 'in', 'cm').primary.value), 1)} cm`];
+  })
+);
+const raceRows: Array<[string, number]> = [
+  ['5 km', 5],
+  ['10 km', 10],
+  ['Halbmarathon (21,0975 km)', 21.0975],
+  ['Marathon (42,195 km)', 42.195],
+];
+const raceTable = table(
+  ['Strecke', 'Meilen'],
+  raceRows.map(([label, km]) => [label, `${n(Number(laenge(km, 'km', 'mi').primary.value), 2)} mi`])
+);
+const len180In = Number(laenge(180, 'cm', 'in').primary.value);
+const len180Ft = Math.floor(len180In / 12);
+const len180Rest = len180In - len180Ft * 12;
+
 export const EINHEITEN_PAGE_CONTENT: PageContentMap = {
   'volumen-umrechner': {
     sections: [
@@ -802,6 +947,180 @@ export const EINHEITEN_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Wie groß ist DIN A4 in Zoll, und was ist US Letter?',
         answer: `DIN A4 misst ${n(a4w, 2)} × ${n(a4h, 2)} Zoll. Das US-Format Letter ist mit 8,5 × 11 Zoll (215,9 × 279,4 mm) etwas breiter und kürzer. Druckt ein amerikanisches Dokument auf A4, fehlen deshalb gelegentlich Ränder oder die letzte Zeile.`,
+      },
+    ],
+  },
+
+  'kraft-umrechner': {
+    sections: [
+      {
+        title: 'Newton, Kilopond und Pound-force nebeneinander',
+        content:
+          `${kraftTable}\n\nDie Spalte „entspricht Masse“ zeigt, welche Masse auf der Erde (Normfallbeschleunigung 9,80665 m/s²) genau diese Gewichtskraft erzeugt. Die beliebte Faustregel „10 kN sind eine Tonne“ liegt damit um rund 2 % zu niedrig: 10 kN entsprechen ${n(val(kraft10kN, 'tonnes') * 1000, 0)} kg.`,
+      },
+      {
+        title: 'Gewichtskraft selbst ausrechnen',
+        content:
+          'Die Gewichtskraft ist Masse mal Fallbeschleunigung (F = m · g). Für eine Person mit 80 kg:\n\n' +
+          `1. **Masse in kg:** 80 kg. Im Rechner entspricht das der Eingabe 80 kp, weil 1 kp die Gewichtskraft von 1 kg ist.\n` +
+          `2. **Mal g:** 80 × 9,80665 m/s² = ${n(val(kraftPerson, 'n'), 1)} N oder ${n(val(kraftPerson, 'kn'), 3)} kN.\n` +
+          `3. **Anderer Himmelskörper:** Auf dem Mond (g ≈ 1,62 m/s²) wirken nur ${n(kraftMoon, 1)} N, die Masse bleibt aber 80 kg.\n\n` +
+          'Der Rechner geht immer von der Erde aus. Für dynamische Belastungen, etwa einen Sturz ins Seil oder einen Ruck beim Abschleppen, reicht die statische Rechnung nicht: Dabei tritt kurzzeitig ein Vielfaches der Gewichtskraft auf.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel Kilogramm sind 1 kN?',
+        answer: `1 Kilonewton ist die Gewichtskraft von ${n(val(kraft1kN, 'tonnes') * 1000, 2)} kg auf der Erde, also rund 102 kg. Umgekehrt erzeugt 1 kg eine Gewichtskraft von 9,81 N. Streng genommen ist das keine Umrechnung zwischen gleichen Größen, denn Newton misst eine Kraft und Kilogramm eine Masse; die Verbindung ist die Erdanziehung.`,
+      },
+      {
+        question: 'Was bedeutet die Angabe daN auf Spanngurten?',
+        answer: `daN steht für Dekanewton, also 10 Newton, und liegt sehr nah an der Gewichtskraft von 1 kg. Ein Zurrgurt mit „LC 2.500 daN“ darf im geraden Zug mit 25 kN belastet werden. Das entspricht ${n(val(kraftStrap, 'kp'), 0)} kp bzw. der Gewichtskraft von ${n(val(kraftStrap, 'tonnes'), 2)} t. Wie viel Ladung ein Gurt tatsächlich sichert, hängt von Zurrart, Winkel und Reibung ab und steht nicht allein in dieser Zahl.`,
+      },
+    ],
+  },
+
+  'gewicht-masse-umrechner': {
+    sections: [
+      {
+        title: 'Körpergewicht in Pfund (lbs) und Kilogramm',
+        content:
+          `${lbsTable}\n\nDie Kopfrechnung „Hälfte minus 10 %“ liegt nur knapp unter dem genauen Wert, weil 1 lb nicht 0,45 kg, sondern 0,45359237 kg wiegt. Für Küchenrezepte aus den USA und Großbritannien sind die Unzen wichtiger:\n\n${ozTable}`,
+      },
+      {
+        title: 'Stone, deutsches Pfund und Zentner',
+        content:
+          'Im Vereinigten Königreich wird das Körpergewicht oft in Stone angegeben. 1 Stone sind 14 englische Pfund. Der Rechner kennt die Einheit nicht direkt, mit einem Zwischenschritt klappt es trotzdem:\n\n' +
+          `1. **In Pfund umrechnen:** 11 st 4 lb = 11 × 14 + 4 = ${stoneLbs} lbs\n` +
+          `2. **Pfund eingeben:** ${stoneLbs} lbs ergeben im Rechner ${n(stoneKg, 2)} kg\n\n` +
+          'Im deutschen Alltag sind die Begriffe anders belegt: Ein Pfund auf dem Markt sind 500 g, ein Zentner 50 kg und ein Doppelzentner 100 kg. Diese Einheiten haben mit dem englischen Pfund nur den Namen gemeinsam.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel wiegt ein englisches Pfund im Vergleich zum deutschen Pfund?',
+        answer: `Ein englisches Pfund (lb) wiegt ${n(lbInGram, 2)} g, ein deutsches Pfund 500 g. Wer ein Rezept mit „1 lb Butter“ mit 500 g nachkocht, nimmt also rund ${n(500 - lbInGram, 0)} g zu viel. Bei Backrezepten kann das das Ergebnis spürbar verändern.`,
+      },
+      {
+        question: 'Wie rechne ich lbs schnell im Kopf in kg um?',
+        answer: `Halbieren und davon 10 % abziehen. Bei 180 lbs: 90 − 9 = 81 kg, genau sind es ${n(lb180, 2)} kg. Für Hantelscheiben im Fitnessstudio reicht die Faustregel; für Medikamentendosierungen oder Gepäckgrenzen im Flugzeug sollten Sie den genauen Wert aus dem Rechner nehmen.`,
+      },
+    ],
+  },
+
+  'zoll-in-cm-rechner': {
+    sections: [
+      {
+        title: 'Zollmaße außerhalb von Bildschirmen',
+        content:
+          `- **Fahrradrahmen:** Die Rahmenhöhe wird oft in Zoll angegeben. Ein 18-Zoll-Rahmen misst ${n(zollCm(18), 2)} cm, ein 20-Zoll-Rahmen ${n(zollCm(20), 2)} cm. Die Laufradgröße (etwa „28 Zoll“) ist dagegen eine historische Bezeichnung und entspricht nicht exakt dem Durchmesser.\n` +
+          `- **Autofelgen:** Eine 17-Zoll-Felge hat ${n(zollCm(17), 2)} cm Felgendurchmesser. Der ganze Reifen ist deutlich größer; das rechnet der [Reifen-Abrollumfang-Rechner](/rechner/reifen-abrollumfang-rechner/).\n` +
+          `- **Rohrgewinde:** Hier täuscht die Zollangabe. Ein Gewinde G ½ hat außen rund 21 mm Durchmesser, nicht ${n(zollCm(0.5) * 10, 1)} mm. Die Bezeichnung geht auf die lichte Weite alter Rohre zurück, nicht auf das Gewinde selbst. Messen Sie Gewinde deshalb nicht mit dem Zollrechner nach, sondern vergleichen Sie mit einer Gewindetabelle.`,
+      },
+      {
+        title: 'Gleiche Diagonale, andere Fläche: 16:9 und 16:10',
+        content:
+          'Der Rechner gibt Breite und Höhe für das Fernsehformat 16:9 aus. Viele Laptops haben aber 16:10. Für jedes Seitenverhältnis a:b gilt: Breite = Diagonale × a ÷ √(a² + b²), Höhe = Diagonale × b ÷ √(a² + b²).\n\n' +
+          `Beispiel 14-Zoll-Laptop (${n(zoll14Diag, 2)} cm Diagonale):\n\n` +
+          table(
+            ['Format', 'Breite', 'Höhe', 'Bildfläche'],
+            [
+              ['16:9', `${n(val(zoll14, 'width16_9'), 2)} cm`, `${n(val(zoll14, 'height16_9'), 2)} cm`, `${n(zoll169Area, 0)} cm²`],
+              ['16:10', `${n(zoll1610W, 2)} cm`, `${n(zoll1610H, 2)} cm`, `${n(zoll1610Area, 0)} cm²`],
+            ]
+          ) +
+          `\n\nDas 16:10-Display ist ${n(zoll169Area > 0 ? (zoll1610Area / zoll169Area - 1) * 100 : 0, 1)} % größer, obwohl beide als „14 Zoll“ verkauft werden.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Was bedeutet W32 L34 bei Jeans in Zentimetern?',
+        answer: `W32 steht für eine Bundweite von 32 Zoll, also ${n(zollCm(32), 2)} cm Umfang; L34 für eine Innenbeinlänge von 34 Zoll bzw. ${n(zollCm(34), 2)} cm. Messen Sie zum Vergleich eine gut sitzende Hose flach liegend und verdoppeln Sie die Bundbreite.`,
+      },
+      {
+        question: 'Zählt bei der Zollangabe eines Smartphones die Fläche oder die Diagonale?',
+        answer: `Immer die Diagonale des sichtbaren Displays. Abgerundete Ecken werden bei vielen Herstellern so gemessen, als wäre das Display rechteckig. Weil Smartphones meist schmaler als 16:9 sind, ist die Fläche bei gleicher Zollzahl kleiner, als der Rechner für 16:9 angibt.`,
+      },
+    ],
+  },
+
+  'geschwindigkeit-umrechner': {
+    sections: [
+      {
+        title: 'Typische Tempi: wie weit Sie in einer Sekunde kommen',
+        content:
+          `${tempoTable}\n\nDie m/s-Spalte ist zugleich der Weg pro Sekunde. Bei 50 km/h legt ein Auto ${n(val(tempo50, 'ms'), 1)} m zurück, bevor der Fuß nach einer Sekunde Reaktionszeit überhaupt auf der Bremse steht. Wie lang der gesamte Anhalteweg ist, zeigt der [Bremsweg-Rechner](/rechner/bremsweg-rechner/).`,
+      },
+      {
+        title: 'Lauf-Pace in km/h und mph umrechnen',
+        content:
+          'Läufer rechnen in Minuten pro Kilometer. Die Umrechnung: km/h = 60 ÷ Pace in Minuten (Sekunden vorher in Dezimalminuten umwandeln, 5:30 sind 5,5 Minuten).\n\n' +
+          `${paceTable}\n\nAuf Laufbändern, die nur mph anzeigen, tragen Sie den km/h-Wert in den Rechner ein und lesen die mph ab.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viele Meter legt man bei 50 km/h in einer Sekunde zurück?',
+        answer: `${n(val(tempo50, 'ms'), 2)} Meter. Dafür teilen Sie die km/h durch 3,6. Bei 100 km/h ist es doppelt so viel, also rund 28 Meter pro Sekunde. Ein kurzer Blick aufs Handy von zwei Sekunden bedeutet innerorts damit knapp 28 Meter Blindflug.`,
+      },
+      {
+        question: 'Warum ist die Mach-Angabe des Rechners nur ein Näherungswert?',
+        answer: `Die Schallgeschwindigkeit hängt von der Lufttemperatur ab. Der Rechner nimmt 343 m/s bei 20 °C an. Bei 0 °C sind es rund ${n(val(soundCold, 'ms'), 0)} m/s (${n(val(soundCold, 'kmh'), 0)} km/h), in rund 11 km Reiseflughöhe bei etwa −56,5 °C nur noch rund ${n(val(soundHigh, 'ms'), 0)} m/s (${n(val(soundHigh, 'kmh'), 0)} km/h). Ein Flugzeug erreicht dort Mach 1 also schon bei deutlich geringerer Geschwindigkeit als am Boden.`,
+      },
+    ],
+  },
+
+  'zeit-umrechner': {
+    sections: [
+      {
+        title: 'Minuten in Dezimalstunden für Stundenzettel',
+        content:
+          `Zeiterfassungen und Rechnungen arbeiten oft mit Dezimalstunden. Die Umrechnung ist Minuten ÷ 60:\n\n${zeitMinTable}\n\n` +
+          'Ein häufiger Fehler: 1:30 h als 1,30 h abrechnen. Richtig sind 1,5 h. Bei einem Stundensatz von 60 € macht das 12 € Unterschied pro Eintrag. Für ganze Arbeitstage mit Pausen eignet sich der [Arbeitszeitrechner](/rechner/arbeitszeitrechner/) besser.',
+      },
+      {
+        title: 'Große Zahlen anschaulich gemacht',
+        content:
+          `- **1 Million Sekunden** sind ${shown(zeitMillion, 'human')}, also ${n(val(zeitMillion, 'days'), 2)} Tage.\n` +
+          `- **1 Milliarde Sekunden** sind ${n(val(zeitBillion, 'years'), 2)} Jahre zu je 365,25 Tagen.\n` +
+          `- **40 Schwangerschaftswochen** sind ${n(val(zeitPregnancy, 'days'), 0)} Tage.\n\n` +
+          'Bei Jahren rechnet der Rechner mit 365,25 Tagen, dem Durchschnitt mit Schaltjahr. Ein einzelnes Kalenderjahr hat 365 oder 366 Tage, der gregorianische Kalender kommt langfristig auf 365,2425 Tage, weil drei von vier vollen Jahrhunderten kein Schaltjahr sind. Für exakte Zeiträume zwischen zwei Kalenderdaten nehmen Sie deshalb einen Datumsrechner.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viele Wochen hat ein Jahr?',
+        answer: `Rechnerisch ${n(val(zeitYearWeeks, 'weeks'), 2)} Wochen (365,25 Tage ÷ 7). Ein normales Kalenderjahr hat 52 Wochen und einen Tag, ein Schaltjahr 52 Wochen und zwei Tage. Nach ISO 8601 hat ein Jahr deshalb 52 oder 53 Kalenderwochen.`,
+      },
+      {
+        question: 'Wie viele Stunden hat ein Monat?',
+        answer: `Das hängt vom Monat ab: Ein Februar hat 672 Stunden (im Schaltjahr 696), ein Monat mit 30 Tagen 720 und einer mit 31 Tagen 744 Stunden. Im Durchschnitt sind es ${n(val(zeitMonth, 'hours'), 1)} Stunden, das ist ein Zwölftel von 365,25 Tagen.`,
+      },
+    ],
+  },
+
+  'laengen-umrechner': {
+    sections: [
+      {
+        title: 'Körpergröße in Fuß und Zoll (5′11″) umrechnen',
+        content:
+          'Amerikanische und britische Größenangaben kombinieren Fuß und Zoll. Rechnen Sie zuerst alles in Zoll um (Fuß × 12 + Zoll) und geben Sie diesen Wert mit „Zoll“ als Ausgangseinheit ein:\n\n' +
+          `${heightTable}\n\nVorsicht bei Schreibweisen wie „5.11“ in Formularen oder Tabellen: Gemeint sind meist 5 Fuß 11 Zoll, nicht 5,11 Fuß. Wer 5,11 Fuß eingibt, erhält ${n(Number(laenge(5.11, 'ft', 'cm').primary.value), 1)} cm statt rund 180 cm.`,
+      },
+      {
+        title: 'Laufstrecken in Meilen',
+        content:
+          `${raceTable}\n\nIn Trainingsplänen aus den USA steht oft „Easy Run 4 miles“. Tragen Sie die Meilen ein und wählen Kilometer als Ziel, dann sehen Sie die Strecke in der gewohnten Einheit. Für Seestrecken gilt eine andere Meile: Die Seemeile ist mit 1.852 m gut 15 % länger als die Landmeile.`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie gebe ich 180 cm in Fuß und Zoll an?',
+        answer: `180 cm sind ${n(len180In, 2)} Zoll. Teilen Sie durch 12: ${len180Ft} Fuß bleiben, der Rest sind ${n(len180Rest, 1)} Zoll. Üblich ist die Schreibweise 5′11″ (gerundet). Der Strich steht für Fuß, der Doppelstrich für Zoll.`,
+      },
+      {
+        question: 'Ist eine Meile in den USA und in Großbritannien gleich lang?',
+        answer: 'Ja, beide verwenden seit 1959 die internationale Meile mit genau 1.609,344 m. In den USA gab es daneben für die Landvermessung noch die „Survey Mile“, die um rund 3 mm länger war. Sie wurde Ende 2022 offiziell abgeschafft, für Alltag und Navigation hatte der Unterschied ohnehin keine Bedeutung.',
       },
     ],
   },

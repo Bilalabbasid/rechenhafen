@@ -166,7 +166,7 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       details: 'Aus Brutto zu Netto: Netto = Brutto / 1,19 (bei 19 %) bzw. Brutto / 1,07 (bei 7 %). Niemals darf man 19 % vom Bruttobetrag abziehen, da die 19 % auf den 100-Prozent-Nettobetrag aufgeschlagen wurden (19/119 ≈ 15,966 %).',
     },
     faqs: [
-      { question: 'Welche Produkte unterliegen in Deutschland dem ermäßigten Steuersatz von 7 %?', answer: 'Grundnahrungsmittel (Milch, Brot, Fleisch, Gemüse), Bücher, Zeitungen, Fahrkarten im Nahverkehr und Übernachtungen in Hotels.' },
+      { question: 'Welche Produkte unterliegen in Deutschland dem ermäßigten Steuersatz von 7 %?', answer: 'Grundnahrungsmittel (Milch, Brot, Fleisch, Gemüse), Bücher, Zeitungen, Bahnfahrkarten, Fahrkarten im Nahverkehr und Übernachtungen in Hotels. Seit dem 1. Januar 2026 gehören auch Speisen im Restaurant dazu (§ 12 Abs. 2 Nr. 15 UStG), Getränke bleiben bei 19 %.' },
       { question: 'Was ist der Unterschied zwischen Vorsteuer und Umsatzsteuer?', answer: 'Umsatzsteuer nimmt der Unternehmer von seinen Kunden ein; Vorsteuer zahlt er selbst auf Einkäufe an andere Firmen; an das Finanzamt wird nur die Zahllast (Umsatzsteuer minus Vorsteuer) überwiesen.' },
       { question: 'Ist Mehrwertsteuer dasselbe wie Umsatzsteuer?', answer: 'Ja. Umsatzsteuer ist der gesetzliche Begriff aus dem Umsatzsteuergesetz (UStG), Mehrwertsteuer der umgangssprachliche. Gemeint ist dieselbe Steuer mit 19 % Regelsatz und 7 % ermäßigtem Satz (§ 12 UStG).' },
       { question: 'Wie rechne ich die Mehrwertsteuer aus dem Bruttobetrag heraus?', answer: 'Teilen Sie den Bruttobetrag durch 1,19 (bei 7 % durch 1,07), dann erhalten Sie den Nettobetrag. Die Differenz ist die enthaltene Mehrwertsteuer. Bei 119 € brutto sind das 119 / 1,19 = 100 € netto und 19 € Steuer. 19 % vom Bruttobetrag abzuziehen wäre falsch: Das ergäbe 96,39 €.' },
@@ -246,7 +246,7 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
     category: 'business',
     subcategory: 'Preise & Margen',
     metaTitle: 'Rabattrechner – Ersparnis & reduzierten Preis berechnen',
-    metaDescription: 'Berechnen Sie den reduzierten Preis nach Prozentrabatt oder ermitteln Sie den genauen Rabattsatz aus Original- und Sonderpreis.',
+    metaDescription: 'Berechnen Sie den reduzierten Preis und die Ersparnis in Euro nach einem Prozentrabatt – mit Tabelle für gängige Rabattsätze und Rechenweg für Doppelrabatte.',
     h1: 'Rabattrechner – Preisnachlass & Ersparnis berechnen',
     shortDescription: 'Ermittelt den Endpreis nach Rabattabzug und den konkreten Sparbetrag in Euro.',
     searchKeywords: ['rabattrechner', 'rabatt berechnen', 'prozent rabatt abziehen', 'sale rechner preis'],
@@ -264,12 +264,12 @@ export const BUSINESS_CALCULATORS: CalculatorDefinition[] = [
       resultSummary: '96,00 € Endpreis (24,00 € Ersparnis)',
     },
     content: {
-      intro: 'Dieser Rabattrechner ermittelt den reduzierten Endpreis, die absolute Ersparnis in Euro und kumulierte Staffelrabatte im Handel.',
+      intro: 'Dieser Rabattrechner ermittelt aus Ursprungspreis und Rabattsatz den reduzierten Endpreis und die Ersparnis in Euro.',
       details: 'Endpreis = Ausgangspreis · (1 - Rabattprozentsatz / 100). Bei aufeinanderfolgenden Rabatten (z. B. 20 % Sale plus 10 % Treuerabatt) werden die Prozente multiplikativ verknüpft: 0,80 · 0,90 = 0,72 (Gesamtrabatt: 28 %).',
     },
     faqs: [
       { question: 'Warum schadet übermäßiges Rabattieren der Marge überproportional?', answer: 'Bei 20 % Marge vernichtet ein Preisnachlass von 10 % genau die Hälfte des gesamten Gewinns: Um denselben Deckungsbeitrag zu erzielen, muss der Absatz verdoppelt werden.' },
-      { question: 'Was ist ein Naturalrabatt (Zugabe oder Draufgabe)?', answer: 'Bei Draufgabe erhält der Kunde bei Kauf von z. B. 10 Stück 2 Stück kostenlos dazu; bei Zugabe erhält er 10 Stück, zahlt aber nur 8 (entspricht rechnerisch 20 % Rabatt).' },
+      { question: 'Was ist ein Naturalrabatt (Draufgabe oder Dreingabe)?', answer: 'Bei der Draufgabe bezahlt der Kunde z. B. 10 Stück und erhält 2 weitere kostenlos dazu (12 Stück zum Preis von 10, rechnerisch 16,67 % Rabatt); bei der Dreingabe erhält er 10 Stück, zahlt aber nur 8 (rechnerisch 20 % Rabatt).' },
     ],
     relatedSlugs: ['skontorechner', 'mwst-rechner', 'prozentrechner', 'marge-rechner'],
   },

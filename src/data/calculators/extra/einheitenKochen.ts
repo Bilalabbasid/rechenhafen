@@ -565,8 +565,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "68,04 kg"
     },
     content: {
-      intro: 'Dieser Massenkonverter rechnet physikalische Massen zwischen Milligramm, Gramm, Kilogramm, Tonnen sowie imperialen Pfund (lb), Unzen (oz) und Steinen (Stone) um.',
-      details: 'Seit dem International Avoirdupois Agreement gilt: 1 englisches Pfund (Pound lb) = exakt 0,45359237 kg. 1 Unze (Ounce oz) = 1/16 lb ≈ 28,3495 Gramm. Das deutsche Apotheker- oder Zollpfund wurde historisch auf genau 500 g gerundet.',
+      intro: 'Dieser Massenkonverter rechnet physikalische Massen zwischen Milligramm, Gramm, Kilogramm, Tonnen sowie dem englischen Pfund (lb) und der Unze (oz) um.',
+      details: 'Seit dem International Avoirdupois Agreement gilt: 1 englisches Pfund (Pound lb) = exakt 0,45359237 kg. 1 Unze (Ounce oz) = 1/16 lb ≈ 28,3495 Gramm. Das deutsche Zollpfund des Zollvereins war auf genau 500 g festgelegt; daher stammt das umgangssprachliche Pfund von 500 g, das deutlich schwerer ist als das englische lb.',
     },
     faqs: [
       { question: 'Was ist der Unterschied zwischen einer Feinunze (Troy Ounce) und einer normalen Unze?', answer: 'Gold und Silber werden in Feinunzen (oz. tr.) gehandelt: 1 Feinunze wiegt exakt 31,1034768 Gramm, während eine gewöhnliche Handelsunze nur ca. 28,35 g wiegt.' },
@@ -744,12 +744,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       let ms = val / 3.6;
       if (unit === 'ms') ms = val;
       else if (unit === 'mph') ms = val * 0.44704;
-      else if (unit === 'kn') ms = val * 0.514444;
+      else if (unit === 'kn') ms = (val * 1852) / 3600; // 1 Knoten = 1.852 m pro Stunde (exakt)
       else if (unit === 'mach') ms = val * 343; // Schallgeschwindigkeit bei 20°C Luft
       
       const kmh = ms * 3.6;
       const mph = ms / 0.44704;
-      const kn = ms / 0.514444;
+      const kn = (ms * 3600) / 1852;
       const mach = ms / 343;
       
       return {
@@ -781,13 +781,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Unser Geschwindigkeitsumrechner konvertiert Tempo-Angaben zwischen den weltweit gängigen Maßeinheiten: Kilometer pro Stunde (km/h), Meter pro Sekunde (m/s), Meilen pro Stunde (mph) sowie nautischen Knoten (kn) und Schallgeschwindigkeit (Mach).',
-      details: 'Die wichtigste Umrechnungsregel in der Physik und im Alltag lautet: km/h geteilt durch 3,6 ergibt m/s (z. B. 100 km/h ≈ 27,78 m/s). Der Faktor 3,6 entsteht exakt aus 3.600 Sekunden pro Stunde geteilt durch 1.000 Meter pro Kilometer. Für die Seefahrt und Luftfahrt gilt: 1 Knoten = 1 Seemeile pro Stunde = 1,852 km/h. Für den angloamerikanischen Raum gilt: 1 mph = 1,609344 km/h. Berechnen Sie passende Distanzen mit unserem [Längen-Umrechner](/rechner/laengen-umrechner/) oder Reisezeiten mit unserem [Spritkostenrechner](/rechner/spritkostenrechner/).',
+      details: 'Die wichtigste Umrechnungsregel in der Physik und im Alltag lautet: km/h geteilt durch 3,6 ergibt m/s (z. B. 100 km/h ≈ 27,78 m/s). Der Faktor 3,6 entsteht exakt aus 3.600 Sekunden pro Stunde geteilt durch 1.000 Meter pro Kilometer. Für die Seefahrt und Luftfahrt gilt: 1 Knoten = 1 Seemeile pro Stunde = 1,852 km/h. Für den angloamerikanischen Raum gilt: 1 mph = 1,609344 km/h. Berechnen Sie passende Distanzen mit unserem [Längen-Umrechner](/rechner/laengen-umrechner/) oder Reisezeiten mit unserem [Fahrzeit-Rechner](/rechner/fahrzeit-rechner/).',
     },
     faqs: [
-      { question: 'Wie rechnet man km/h im Kopf schnell in m/s um?', answer: 'Teilen Sie die km/h durch 3,6. Als praktische Faustregel für den Kopf: Teilen Sie den km/h-Wert durch 10 und multiplizieren Sie das Ergebnis mit knapp 3 (z. B. 50 km/h / 10 = 5; 5 × 2,8 ≈ 13,9 m/s).' },
+      { question: 'Wie rechnet man km/h im Kopf schnell in m/s um?', answer: 'Teilen Sie die km/h durch 3,6. Als praktische Faustregel für den Kopf: Teilen Sie den km/h-Wert durch 10 und multiplizieren Sie das Ergebnis mit knapp 3 (z. B. 50 km/h / 10 = 5; 5 × 2,8 = 14 m/s, exakt sind es 13,89 m/s).' },
       { question: 'Was entspricht 1 Knoten in km/h?', answer: '1 Knoten (kn) ist definiert als eine Seemeile (1.852 Meter) pro Stunde. Somit entspricht 1 Knoten exakt 1,852 km/h bzw. ca. 0,514 m/s.' },
       { question: 'Wie schnell ist Mach 1 bei normalen Temperaturen?', answer: 'Mach 1 bezeichnet die Schallgeschwindigkeit. In trockener Luft bei 20 °C auf Meereshöhe beträgt die Schallgeschwindigkeit ca. 343 m/s bzw. 1.234,8 km/h.' },
-      { question: 'Wie viel km/h sind 70 mph im Großbritannien- oder USA-Urlaub?', answer: '70 mph (das typische Autobahn-Tempolimit in den USA und Großbritannien) entsprechen ca. 112,65 km/h.' },
+      { question: 'Wie viel km/h sind 70 mph im Großbritannien- oder USA-Urlaub?', answer: '70 mph entsprechen ca. 112,65 km/h. Das ist das Tempolimit auf britischen Autobahnen (Motorways); in den USA legt jeder Bundesstaat seine Höchstgeschwindigkeiten selbst fest, 70 mph sind dort auf vielen Interstates üblich.' },
     ],
     relatedSlugs: ['drehzahl-umfangsgeschwindigkeit-rechner', 'laengen-umrechner', 'zeit-umrechner', 'spritkostenrechner', 'kraftstoffverbrauch-umrechner'],
   },
@@ -1561,7 +1561,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     category: "einheiten",
     subcategory: "Physik & Mechanik",
     metaTitle: 'Kraft Umrechner – Newton, Kilonewton, Kilopond',
-    metaDescription: 'Rechnen Sie physikalische Kräfte und Zugkräfte um: Newton (N), Kilonewton (kN), Meganewton (MN), Kilopond (kp), Pound-force (lbf) und Dyn (dyn).',
+    metaDescription: 'Rechnen Sie physikalische Kräfte und Zugkräfte um: Newton (N), Kilonewton (kN), Meganewton (MN), Kilopond (kp) und Pound-force (lbf) – mit der entsprechenden Masse in Tonnen.',
     h1: 'Kraft Umrechner – Newton, kN, Kilopond & Pound-force',
     shortDescription: 'Konvertiert physikalische Kräfte zwischen Newton, kN und lbf.',
     searchKeywords: ["kraft umrechner newton kilonewton kn","kilonewton in tonnen umrechnen fahrstuhllast","kilopond kp in newton n","pound force lbf in newton rechner"],
@@ -1635,7 +1635,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     formula: "1 N = 1 kg × m/s²; 1 kN = 1.000 N; 1 kp = 9,80665 N; 1 lbf ≈ 4,44822 N",
     formulaExplanation: "1 Newton ist die Kraft, die einem ruhenden Körper der Masse 1 Kilogramm eine Beschleunigung von 1 m/s² erteilt. Auf der Erde entspricht eine Masse von 100 Gramm ungefähr 1 Newton Gewichtskraft.",
     workedExample: {
-          "title": "Beispiel: 10 kN Bruchlast eines Kletterseils in Tonnen",
+          "title": "Beispiel: 10 kN Zugkraft einer Seilwinde in Tonnen",
           "inputValues": [
                 {
                       "label": "Kraft",
@@ -1645,10 +1645,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "steps": [
                 "Masse = 10.000 N / 9,81 m/s² = 1.019,4 kg ≈ 1,02 Tonnen"
           ],
-          "result": "1,02 Tonnen Belastbarkeit"
+          "result": "Gewichtskraft von ca. 1,02 Tonnen"
     },
     content: {
-      intro: 'Dieser physikalische Kraftrechner transformiert Einheiten zwischen Newton (N), Kilonewton (kN), Dyn und veralteten Einheiten wie Kilopond (kp) und Pound-force (lbf).',
+      intro: 'Dieser physikalische Kraftrechner transformiert Einheiten zwischen Newton (N), Kilonewton (kN), Meganewton (MN) und veralteten oder angloamerikanischen Einheiten wie Kilopond (kp) und Pound-force (lbf).',
       details: 'Nach dem 2. Newtonschen Axiom (F = m · a) beschleunigt 1 Newton eine Masse von 1 kg um 1 m/s². 1 Kilopond (kp) entspricht der Gewichtskraft von 1 kg auf der Erde: 1 kp = 9,80665 N.',
     },
     faqs: [
@@ -2063,7 +2063,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     ],
     calculate: calculateZollCmConversion,
     formula: "1 Zoll (Inch) = exakt 2,54 cm = 25,4 mm | cm = Zoll × 2,54 | Zoll = cm / 2,54",
-    formulaExplanation: "Das internationale Zoll (Inch) ist seit 1959 per NIST-Definition exakt an das metrische System gebunden: 1 in = 2,54 cm. Für 16:9-Bildschirme errechnen sich Breite und Höhe aus der Diagonale über den Satz des Pythagoras (Breite = Diagonale × 16 / √337, Höhe = Diagonale × 9 / √337).",
+    formulaExplanation: "Das internationale Zoll (Inch) ist seit dem internationalen Yard-and-Pound-Abkommen von 1959 exakt an das metrische System gebunden: 1 in = 2,54 cm. Für 16:9-Bildschirme errechnen sich Breite und Höhe aus der Diagonale über den Satz des Pythagoras (Breite = Diagonale × 16 / √337, Höhe = Diagonale × 9 / √337).",
     workedExample: {
       title: "Beispiel: 55-Zoll-Fernseher Bildschirmmaße",
       inputValues: [
@@ -3239,7 +3239,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
   {
     id: "hefe-umrechner",
     slug: "hefe-umrechner",
-    name: "Hefe-Rechner (Frische Hefe in Trockenhefe & Vorteig umrechnen)",
+    name: "Hefe-Rechner (Frische Hefe in Trockenhefe & Mehlmenge umrechnen)",
     shortName: "Hefe-Rechner",
     category: "kochen-backen",
     subcategory: "Backzutaten",
@@ -3307,7 +3307,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           { id: 'cubes', label: 'Frische Hefe (Würfel à 42 g)', value: cubes, formattedValue: formatMeasure(cubes, 2) + ' Würfel' },
           { id: 'flour', label: 'Standard-Mehlmenge (Faustformel)', value: flourG, formattedValue: 'ca. ' + formatMeasure(flourG, 0) + ' g Mehl' },
         ],
-        summaryText: val + ' ' + (unit === 'cube' ? 'Würfel Hefe' : 'Einheiten') + ' entsprechen genau ' + formatMeasure(freshG, 0) + ' g frischer Hefe bzw. ' + formatMeasure(dryG, 1) + ' g Trockenhefe (' + formatMeasure(dryBags, 1) + ' Päckchen).',
+        summaryText: formatMeasure(val, 2) + ' ' + (unit === 'cube' ? 'Würfel Hefe' : unit === 'freshG' ? 'g frische Hefe' : unit === 'dryBags' ? 'Päckchen Trockenhefe' : 'g Trockenhefe') + ' entsprechen ' + formatMeasure(freshG, 0) + ' g frischer Hefe bzw. ' + formatMeasure(dryG, 1) + ' g Trockenhefe (' + formatMeasure(dryBags, 1) + ' Päckchen).',
       };
     },
     formula: "Verhältnis: 1 g Trockenhefe = 3 g frische Hefe; 1 Würfel frisch (42 g) = 2 Päckchen trocken (14 g)",
@@ -3327,7 +3327,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "1 Päckchen Trockenhefe (7 g)"
     },
     content: {
-      intro: 'Dieser Hefe-Konverter rechnet zwischen frischer Hefe (Hefewürfel), Trockenhefe und langer kalter Teigführung um.',
+      intro: 'Dieser Hefe-Konverter rechnet zwischen frischer Hefe (Hefewürfel), Gramm frischer Hefe, Päckchen Trockenhefe und Gramm Trockenhefe um und nennt die Mehlmenge, für die diese Hefemenge nach der Faustregel reicht.',
       details: 'Verhältnis: 1 Würfel Frischhefe (42 Gramm) entspricht exakt 2 Päckchen Trockenhefe (je 7 Gramm). 1 Päckchen Trockenhefe reicht für 500 g Weizenmehl.',
     },
     faqs: [
@@ -4082,7 +4082,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Ofenrechner rechnet Backtemperaturen und Backzeiten zwischen Umluft (Heißluft) und Ober-/Unterhitze verlässlich um.',
-      details: 'Faustregel: Umluft = Ober-/Unterhitze minus 20 °C (z. B. 200 °C Ober-/Unterhitze entsprechen 180 °C Umluft). Durch den beschleunigten Wärmetransport per Gebläse verkürzt sich die Backzeit oft zusätzlich um 10 bis 15 Prozent.',
+      details: 'Faustregel: Umluft = Ober-/Unterhitze minus 20 °C (z. B. 200 °C Ober-/Unterhitze entsprechen 180 °C Umluft). Durch den beschleunigten Wärmetransport per Gebläse verkürzt sich die Backzeit oft zusätzlich etwas; der Rechner setzt dafür 10 Prozent an.',
     },
     faqs: [
       { question: 'Wann sollte man Ober-/Unterhitze statt Umluft wählen?', answer: 'Für empfindliche Teige (Biskuit, Soufflés, Brot), da das Umluftgebläse die Teigoberfläche vorzeitig austrocknet und das Aufgehen behindern kann.' },
@@ -4196,7 +4196,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       } else if (meat === 'porkRoast') {
         ovenTemp = 160;
         minsPerKg = 70;
-        targetTemp = done === 'medium' ? 68 : 75; // Schwein meist mindestens 68-75 °C
+        targetTemp = done === 'wellDone' ? 75 : 70; // BfR: im Kern mindestens 70 °C für 2 Minuten; rosa Garstufen gibt es hier nicht
       } else if (meat === 'pulledPork') {
         ovenTemp = 110;
         minsPerKg = 240; // Sehr langes Smoken
@@ -4204,25 +4204,26 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       } else if (meat === 'poultry') {
         ovenTemp = 180;
         minsPerKg = 50;
-        targetTemp = 75; // Geflügel zwingend min. 75 °C wegen Salmonellengefahr
+        targetTemp = 75; // BfR: mindestens 70 °C für 2 Minuten im Kern; 75 °C lässt Spielraum für Messfehler
       } else if (meat === 'lamb') {
         ovenTemp = 140;
         minsPerKg = 60;
-        targetTemp = done === 'mediumRare' ? 58 : done === 'medium' ? 64 : 74;
+        targetTemp = done === 'rare' || done === 'mediumRare' ? 58 : done === 'medium' ? 64 : 74;
       }
       
       const totalTimeMins = Math.round(weight * minsPerKg);
       const hours = Math.floor(totalTimeMins / 60);
       const mins = totalTimeMins % 60;
-      
+      const durationText = hours > 0 ? hours + ' Std.' + (mins > 0 ? ' ' + mins + ' Min.' : '') : mins + ' Min.';
+
       return {
         primary: { id: 'targetCoreTemp', label: 'Optimale Ziel-Kerntemperatur', value: targetTemp, formattedValue: targetTemp + ' °C', highlight: true },
         secondary: [
-          { id: 'estTime', label: 'Geschätzte Gardauer ca.', value: totalTimeMins, formattedValue: (hours > 0 ? hours + ' Std. ' + mins + ' Min.' : mins + ' Min.') },
+          { id: 'estTime', label: 'Geschätzte Gardauer ca.', value: totalTimeMins, formattedValue: durationText },
           { id: 'ovenTemp', label: 'Empfohlene Ofentemperatur', value: ovenTemp, formattedValue: ovenTemp + ' °C' },
           { id: 'restingTime', label: 'Ruhezeit vor dem Anschneiden', value: 10, formattedValue: 'ca. 5 bis 10 Minuten (im Alufolien-Mantel)' },
         ],
-        summaryText: 'Für ' + weight + ' kg Fleisch wird eine Kerntemperatur von ' + targetTemp + ' °C empfohlen. Bei ' + ovenTemp + ' °C Ofentemperatur beträgt die Gardauer ca. ' + (hours > 0 ? hours + ' Std. ' + mins + ' Min.' : mins + ' Minuten') + '.',
+        summaryText: 'Für ' + formatMeasure(weight, 2) + ' kg Fleisch wird eine Kerntemperatur von ' + targetTemp + ' °C empfohlen. Bei ' + ovenTemp + ' °C Ofentemperatur beträgt die Gardauer ca. ' + durationText.replace(/\.$/, '') + '.',
       };
     },
     formula: "Garzeit ≈ Fleischgewicht (kg) × Spezifische Min./kg; Messung an der dicksten Fleischstelle",
@@ -4248,7 +4249,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Garzeitrechner ermittelt die Ziel-Kerntemperaturen für Rind, Schwein, Geflügel und Lamm mit Einstichthermometer für das perfekte Garergebnis (Rare, Medium, Well Done).',
-      details: 'Rindermedaillons Medium: 54–56 °C (Rosa). Schweinefilet: 58–62 °C. Geflügel (Hähnchen, Pute): Aus Hygienegründen (Salmonellen-Abtötung) zwingend durchgaren auf mindestens 72–75 °C Kerntemperatur.',
+      details: 'Das Bundesinstitut für Risikobewertung (BfR) empfiehlt, Fleisch so zu garen, dass im Kern mindestens zwei Minuten lang 70 °C erreicht werden; das tötet Keime wie Salmonellen und Campylobacter ab. Für Geflügel und Schwein nennt der Rechner deshalb keine rosa Garstufen (Schwein 70 °C, durch 75 °C; Geflügel immer 75 °C). Rare- und Medium-Werte für Rind und Lamm sind Garstufen für ganze Stücke, kein Hygienewert.',
     },
     faqs: [
       { question: 'Steigt die Kerntemperatur während der Ruhephase nach dem Braten noch an?', answer: 'Ja, durch den Temperaturausgleich zwischen heißer Fleischkruste und dem Kern steigt die Temperatur beim Ruhen in Alufolie noch um 2 bis 4 °C an (vorher aus der Pfanne nehmen!).' },
@@ -4336,7 +4337,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           { id: 'water', label: 'Wasser (kalt)', value: waterG, formattedValue: formatMeasure(waterG, 0) + ' g (ml)', highlight: true },
           { id: 'salt', label: 'Meersalz fein', value: saltG, formattedValue: formatMeasure(saltG, 1) + ' g' },
           { id: 'freshYeast', label: 'Frische Hefe (für 24h Gare)', value: freshYeastG, formattedValue: formatMeasure(freshYeastG, 2) + ' g (trocken: ' + formatMeasure(dryYeastG, 2) + ' g)' },
-          { id: 'totalDough', label: 'Gesamtteiggewicht', value: totalDoughWeight, formattedValue: totalDoughWeight + ' g (' + count + ' Ballen à ' + ballWeight + ' g)' },
+          { id: 'totalDough', label: 'Gesamtteiggewicht', value: totalDoughWeight, formattedValue: formatMeasure(totalDoughWeight, 0) + ' g (' + count + ' Ballen à ' + ballWeight + ' g)' },
         ],
         summaryText: 'Für ' + count + ' Pizzen à ' + ballWeight + ' g (Hydratation ' + hydrVal + ' %) benötigen Sie ' + formatMeasure(flourG, 0) + ' g Mehl, ' + formatMeasure(waterG, 0) + ' g Wasser, ' + formatMeasure(saltG, 1) + ' g Salz und ' + formatMeasure(freshYeastG, 1) + ' g frische Hefe.',
       };
@@ -4542,7 +4543,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           },
           {
             "value": "stir15",
-            "label": "Kurz aufgekocht / 15 Min. köcheln (ca. 40 % verbleibender Alkohol)"
+            "label": "15 Minuten köcheln oder backen, untergerührt (ca. 40 % verbleibender Alkohol)"
           },
           {
             "value": "simmer30",
@@ -4597,7 +4598,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         secondary: [
           { id: 'perPortion', label: 'Alkoholmenge je Portion', value: remainingPerPortionG, formattedValue: formatMeasure(remainingPerPortionG, 2) + ' g je Portion' },
           { id: 'retentionPct', label: 'Verbliebener Anteil des Ausgangsalkohols', value: retentionRate * 100, formattedValue: (retentionRate * 100) + ' %' },
-          { id: 'safetyHint', label: 'Eignung für Kinder & Schwangere', value: 0, formattedValue: remainingPerPortionG < 0.2 ? 'Spuren (vergleichbar mit reifem Fruchtsaft)' : 'Nicht empfohlen für Schwangere & Kinder' },
+          { id: 'safetyHint', label: 'Eignung für Kinder & Schwangere', value: 0, formattedValue: remainingPerPortionG < 0.2 ? 'Nur noch Spuren – für Kinder und Schwangere trotzdem alkoholfrei kochen' : 'Nicht empfohlen für Schwangere & Kinder' },
         ],
         qualifications: [
           'Sicherheitshinweis: Die Berechnung dient rein kulinarischen Zwecken in der Küche. Kein Ergebnis dieser Seite darf herangezogen werden, um Fahrtauglichkeit, Verkehrssicherheit oder einen Blutalkoholwert zu beurteilen.',
@@ -4632,13 +4633,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Entgegen der Annahme verkocht Alkohol beim Kochen und Schmoren von Wein- oder Biersaucen nur langsam und bleibt über längere Zeit nachweisbar. Mit unserem Küchenrechner ermitteln Sie den thermisch verbleibenden Alkoholgehalt in Saucen, Schmorgerichten und Gebäck.',
-      details: 'Sicherheitshinweis zur Verkehrssicherheit: Die thermische Verdampfung von Ethanol beim Kochen oder Backen steht in keinem Zusammenhang mit dem menschlichen Alkoholabbau im Körper. Kein Ergebnis dieses Rechners darf als Entscheidungshilfe herangezogen werden, ob jemand ein Kraftfahrzeug führen darf, fahrtüchtig ist oder die notwendige Fahrtüchtigkeit besitzt. Untersuchungen des US Department of Agriculture (USDA): Nach kurzem Aufkochen verbleiben ca. 75 % Alkohol; nach 30 Minuten Köcheln noch ca. 35 %; erst nach 2,5 bis 3 Stunden Schmoren sinkt der Alkoholanteil auf ca. 5 Prozent.',
+      details: 'Sicherheitshinweis zur Verkehrssicherheit: Die thermische Verdampfung von Ethanol beim Kochen oder Backen steht in keinem Zusammenhang mit dem menschlichen Alkoholabbau im Körper. Kein Ergebnis dieses Rechners darf als Entscheidungshilfe herangezogen werden, ob jemand ein Kraftfahrzeug führen darf, fahrtüchtig ist oder die notwendige Fahrtüchtigkeit besitzt. Untersuchungen des US Department of Agriculture (USDA): Beim Flambieren verbleiben ca. 75 % Alkohol, wird Alkohol nur in kochende Flüssigkeit gegeben und der Topf sofort vom Herd genommen, sogar ca. 85 %; nach 30 Minuten Köcheln noch ca. 35 %; erst nach 2,5 bis 3 Stunden Schmoren sinkt der Alkoholanteil auf ca. 5 Prozent.',
     },
     faqs: [
-      { question: 'Verkocht Alkohol beim Kochen und Backen wirklich vollständig?', answer: 'Nein, das ist ein weit verbreiteter Irrglaube. Selbst nach 30 Minuten leichtem Köcheln verbleiben rund 35 Prozent des ursprünglich zugegebenen Alkohols in der Sauce. Erst nach über zwei Stunden Schmorzeit sinkt der Wert auf rund fünf bis zehn Prozent.' },
+      { question: 'Verkocht Alkohol beim Kochen und Backen wirklich vollständig?', answer: 'Nein, das ist ein weit verbreiteter Irrglaube. Selbst nach 30 Minuten leichtem Köcheln verbleiben rund 35 Prozent des ursprünglich zugegebenen Alkohols in der Sauce. Erst nach zwei Stunden Schmorzeit sinkt der Wert auf rund zehn Prozent, nach zweieinhalb Stunden auf etwa fünf Prozent.' },
       { question: 'Darf das Ergebnis genutzt werden, um die Fahrtüchtigkeit zu prüfen?', answer: 'Nein, keinesfalls! Die Berechnung beschreibt ausschließlich physikalische Verdampfungsprozesse im Kochtopf. Sie liefert keinerlei Aussage über Blutalkoholkonzentrationen oder Fahrtüchtigkeit. Wer Alkohol konsumiert hat, darf sich keinesfalls auf Küchenberechnungen stützen, um über das Autofahren zu entscheiden.' },
       { question: 'Dürfen Kinder Gerichte essen, die mit Wein oder Bier zubereitet wurden?', answer: 'Nein. Da auch nach längerer Kochzeit nennenswerte Mengen Ethanol in der Sauce verbleiben und sich Kinder zudem an den typischen Alkoholgeschmack gewöhnen können, sollten Gerichte für Kinder, Schwangere und abstinente Personen stets komplett alkoholfrei zubereitet werden (z. B. mit Brühe, Traubensaft und Balsamico).' },
-      { question: 'Warum verdampft Alkohol bei 78 °C nicht sofort aus der Sauce?', answer: 'Wasser und Ethanol bilden ein azeotropes Gemisch mit wechselseitigen molekularen Bindungen. Dadurch liegt die gemeinsame Siedetemperatur höher als 78 °C, und der Alkohol entweicht erst nach und nach zusammen mit dem aufsteigenden Wasserdampf.' },
+      { question: 'Warum verdampft Alkohol bei 78 °C nicht sofort aus der Sauce?', answer: '78 °C ist der Siedepunkt von reinem Alkohol. In einer Sauce ist der Alkohol stark mit Wasser verdünnt, und ein solches Gemisch siedet deutlich über 78 °C, umso näher an 100 °C, je weniger Alkohol es enthält. Der Alkohol entweicht deshalb nicht auf einen Schlag, sondern nach und nach zusammen mit dem Wasserdampf. Ein Deckel auf dem Topf bremst das zusätzlich.' },
     ],
     relatedSlugs: ['cocktail-alkoholgehalt-rechner', 'fleisch-kerntemperatur-garzeit-rechner', 'portionsrechner', 'wasser-reis-verhaeltnis-rechner'],
     trustMeta: {
@@ -4711,7 +4712,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         amountStr = (count * 70) + ' g';
         tip = 'Macht Rührteige wunderbar saftig. Ideal für Schoko- und Gewürzkuchen; kein Eigengeschmack spürbar.';
       } else if (sub === 'banana') {
-        amountStr = (count * 0.5) + ' Banane(n) (ca. ' + (count * 50) + ' g)';
+        amountStr = formatMeasure(count * 0.5, 1) + ' Banane(n) (ca. ' + (count * 50) + ' g)';
         tip = 'Sehr reife Banane mit der Gabel zerdrücken. Bringt Eigensüße mit – Zuckermenge im Teig evtl. leicht reduzieren!';
       } else if (sub === 'flaxseed') {
         amountStr = (count * 1) + ' EL gemahlene Leinsamen + ' + (count * 3) + ' EL warmes Wasser';
@@ -4728,7 +4729,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         primary: { id: 'subAmount', label: 'Benötigte Ersatzmenge', value: count, formattedValue: amountStr, highlight: true },
         secondary: [
           { id: 'tip', label: 'Praxistipp zur Zubereitung', value: 0, formattedValue: tip },
-          { id: 'standardEggs', label: 'Entspricht Hühnereiern', value: count, formattedValue: count + ' Ei(er) Größe M (ca. ' + (count * 55) + ' g)' },
+          { id: 'standardEggs', label: 'Entspricht Hühnereiern', value: count, formattedValue: count + ' Ei(er) Größe M (ca. ' + (count * 50) + ' g ohne Schale)' },
         ],
         summaryText: 'Um ' + count + ' Ei(er) zu ersetzen, benötigen Sie ' + amountStr + '. ' + tip,
       };
@@ -4754,8 +4755,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "140 g Apfelmark (ca. 4-5 gehäufte Esslöffel)"
     },
     content: {
-      intro: 'Dieser Rezeptrechner kalkuliert die Aufteilung und den Ersatz von Hühnereiern (Größe M ca. 50 g: 30 g Eiklar, 20 g Eidotter) oder vegane Alternativen (Aquafaba, Leinsamen, Apfelmus).',
-      details: '1 ganzes Ei lässt sich beim Backen durch 1 EL geschrotete Leinsamen in 3 EL Wasser (Leinsamen-Ei), 60 g Apfelmus oder eine halbe reife Banane ersetzen. Eischnee lässt sich 1:1 durch aufgeschlagenes Kichererbsenwasser (Aquafaba) ersetzen.',
+      intro: 'Dieser Rezeptrechner ermittelt, wie viel pflanzlichen Ersatz Sie für eine bestimmte Zahl Hühnereier (Größe M, ohne Schale ca. 50 g) brauchen: Apfelmark, Banane, Leinsamen, Seidentofu oder Aquafaba.',
+      details: '1 ganzes Ei lässt sich beim Backen durch 1 EL gemahlene Leinsamen in 3 EL Wasser (Leinsamen-Ei), etwa 70 g Apfelmark, eine halbe reife Banane oder 60 g Seidentofu ersetzen. Für Eischnee rechnet der Rechner mit 3 EL (ca. 45 ml) aufgeschlagenem Kichererbsenwasser (Aquafaba) je Eiweiß.',
     },
     faqs: [
       { question: 'Was kann man mit übrig gebliebenem Eiklar machen?', answer: 'Baisers (Meringue), Macarons, Eiweiß-Omelettes zubereiten oder portionsweise in Eiswürfelbehältern einfrieren (aufgetaut normal aufschlagbar).' },
@@ -5682,7 +5683,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "je 77 g Anstellgut, Mehl und Wasser"
     },
     content: {
-      intro: 'Dieser Sauerteigrechner steuert die dreistufige oder einstufige Sauerteigführung (Anstellgut, Mehl, Wasser) für Roggen- und Weizensauerteige.',
+      intro: 'Dieser Sauerteigrechner berechnet eine einstufige Sauerteigführung: wie viel Anstellgut, Mehl und Wasser Sie mischen, damit genau die Sauerteigmenge aus dem Rezept plus eine Reserve für das nächste Anstellgut entsteht.',
       details: 'Formel: Sauerteig-Hydratation = (Wasser / Mehl) · 100. Standard-Sauerteig wird meist mit TA 200 (100 % Hydratation, 1:1 Mehl zu Wasser) geführt. Der Sauerteiganteil am Gesamtrezept liegt üblicherweise bei 15 bis 35 Prozent des Gesamtmehls.',
     },
     faqs: [
@@ -5838,10 +5839,10 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     category: "kochen-backen",
     subcategory: "Getränke",
     metaTitle: 'Kaffee-Rechner: Kaffeepulver pro Tasse in Gramm',
-    metaDescription: 'Berechnen Sie das optimale Verhältnis von Kaffeemehl zu Wasser nach SCA Golden Cup Standard (60 g Kaffee auf 1 Liter Wasser) für Filterkaffee und andere Brühmethoden.',
+    metaDescription: 'Berechnen Sie Kaffeemehl in Gramm für Filterkaffee: 55, 60 oder 65 g Kaffee auf 1 Liter Wasser, je nach Tassenzahl, Tassengröße und gewünschter Stärke.',
     h1: 'Kaffee Rechner – Wie viel Kaffeepulver brauche ich pro Tasse?',
     shortDescription: 'Berechnet Kaffeemehl in Gramm nach Tassenanzahl und Brühmethode.',
-    searchKeywords: ["kaffee rechner kaffeemehl gramm pro tasse","golden cup ratio sca 60g pro liter","french press kaffee menge berechnen","filterkaffee wieviel kaffeepulver pro tasse"],
+    searchKeywords: ["kaffee rechner kaffeemehl gramm pro tasse","golden cup ratio sca gramm kaffee pro liter","french press kaffee menge berechnen","filterkaffee wieviel kaffeepulver pro tasse"],
     inputs: [
           {
                 "id": "cupsCount",
@@ -5881,11 +5882,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                 "options": [
                       {
                             "value": "mild",
-                            "label": "Mild (ca. 55 g Kaffee / 1.000 ml Wasser – Verhältnis 1:18)"
+                            "label": "Mild / SCA-Bezugswert (55 g Kaffee / 1.000 ml Wasser – Verhältnis ca. 1:18)"
                       },
                       {
                             "value": "standard",
-                            "label": "Ausgewogen / SCA Golden Cup (60 g / 1.000 ml – Verhältnis 1:16,7)"
+                            "label": "Ausgewogen (60 g / 1.000 ml – Verhältnis 1:16,7)"
                       },
                       {
                             "value": "strong",
@@ -5899,7 +5900,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const cupMl = Number(inputs.cupSizeMl) || 150;
       const totalWaterMl = cups * cupMl;
       
-      let ratioGPerLiter = 60; // SCA Golden Cup
+      let ratioGPerLiter = 60; // Standard des Rechners; SCA-Bezugswert ist 55 g je kg Wasser (Option "mild")
       if (inputs.strength === 'mild') ratioGPerLiter = 55;
       else if (inputs.strength === 'strong') ratioGPerLiter = 65;
       
@@ -5909,17 +5910,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       return {
         primary: { id: 'coffeeG', label: 'Benötigtes Kaffeemehl', value: coffeeGrams, formattedValue: formatMeasure(coffeeGrams, 1) + ' g', highlight: true },
         secondary: [
-          { id: 'waterMl', label: 'Gesamte Wassermenge', value: totalWaterMl, formattedValue: totalWaterMl + ' ml (' + formatMeasure(totalWaterMl / 1000, 2) + ' Liter)' },
-          { id: 'coffeeSpoons', label: 'Kaffeelote / gehäufte EL (ca. 7g)', value: spoonsCount, formattedValue: 'ca. ' + spoonsCount + ' Lote' },
+          { id: 'waterMl', label: 'Gesamte Wassermenge', value: totalWaterMl, formattedValue: formatMeasure(totalWaterMl, 0) + ' ml (' + formatMeasure(totalWaterMl / 1000, 2) + ' Liter)' },
+          { id: 'coffeeSpoons', label: 'Kaffeelote / gehäufte EL (ca. 7g)', value: spoonsCount, formattedValue: 'ca. ' + formatMeasure(spoonsCount, 1) + ' Lote' },
           { id: 'waterTemp', label: 'Optimale Wassertemperatur', value: 94, formattedValue: '92 °C bis 96 °C (nicht kochend!)' },
         ],
-        summaryText: 'Für ' + cups + ' Tassen Kaffee (' + totalWaterMl + ' ml Wasser) benötigen Sie exakt ' + formatMeasure(coffeeGrams, 1) + ' g frisch gemahlenes Kaffeemehl (ca. ' + spoonsCount + ' Kaffeelote).',
+        summaryText: 'Für ' + cups + ' Tassen Kaffee (' + formatMeasure(totalWaterMl, 0) + ' ml Wasser) benötigen Sie exakt ' + formatMeasure(coffeeGrams, 1) + ' g frisch gemahlenes Kaffeemehl (ca. ' + formatMeasure(spoonsCount, 1) + ' Kaffeelote).',
       };
     },
     formula: "Kaffeemehl (g) = (Wassermenge in ml / 1.000) × Brühverhältnis (55 bis 65 g/l)",
-    formulaExplanation: "Die Specialty Coffee Association (SCA) empfiehlt die \"Golden Cup Ratio\" von 60 Gramm Kaffee pro 1.000 ml Wasser für eine ideale Extraktion von 18 % bis 22 % der Aromastoffe.",
+    formulaExplanation: "Die Specialty Coffee Association (SCA) arbeitet in ihrem Brühstandard mit 55 Gramm Kaffee je Kilogramm Wasser; als Ziel gilt eine Extraktion von 18 % bis 22 % der löslichen Bestandteile. Viele mögen Filterkaffee etwas kräftiger, deshalb rechnet die Standardeinstellung mit 60 g je Liter.",
     workedExample: {
-          "title": "Beispiel: 4 Standard-Tassen (à 150 ml = 600 ml Wasser) nach Golden Cup Ratio",
+          "title": "Beispiel: 4 Standard-Tassen (à 150 ml = 600 ml Wasser) mit 60 g je Liter",
           "inputValues": [
                 {
                       "label": "Tassen",
@@ -5937,8 +5938,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "36,0 g Kaffeemehl"
     },
     content: {
-      intro: 'Das Brew-Ratio (Brühverhältnis) nach den Standards der Specialty Coffee Association (SCA) garantiert die optimale Extraktion von Aromastoffen ohne Bitterkeit.',
-      details: 'Goldener SCA-Standard: 60 Gramm gemahlener Röstkaffee auf 1.000 Gramm (1 Liter) Wasser (Verhältnis 1:16,6). Für Espresso in der Siebträgermaschine gilt ein Brühverhältnis von 1:2 bis 1:2,5 (z. B. 18 g Kaffeemehl ergeben 36 g flüssigen Espresso in 25–30 Sekunden).',
+      intro: 'Das Brühverhältnis (Brew Ratio) legt fest, wie viel Kaffeemehl auf eine bestimmte Wassermenge kommt. Dieser Rechner multipliziert Ihre Wassermenge mit 55, 60 oder 65 g Kaffee je Liter.',
+      details: 'Die SCA nennt 55 g Kaffee je Kilogramm Wasser als Bezugswert (ca. 1:18); die Standardeinstellung dieses Rechners liegt mit 60 g je Liter (1:16,7) etwas kräftiger. Für Espresso in der Siebträgermaschine gilt ein Brühverhältnis von 1:2 bis 1:2,5 (z. B. 18 g Kaffeemehl ergeben 36 g flüssigen Espresso in 25–30 Sekunden).',
     },
     faqs: [
       { question: 'Welche Wassertemperatur ist für Filterkaffee optimal?', answer: 'Zwischen 92 °C und 96 °C; kochendes Wasser (100 °C) verbrennt Kaffeebestandteile und löst bittere Gerbstoffe, zu kaltes Wasser (< 90 °C) führt zu säuerlichem, unterextrahiertem Kaffee.' },
@@ -6113,23 +6114,27 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                 "options": [
                       {
                             "value": "ferment",
-                            "label": "Gemüse fermentieren (Sauerkraut, Kimchi – ca. 2,0 bis 2,5 %)"
+                            "label": "Gemüse fermentieren (Sauerkraut, Kimchi – Rechner: 2 %)"
                       },
                       {
                             "value": "brinePoultry",
-                            "label": "Wet Brining Geflügel / Grillfleisch (ca. 4,0 bis 5,0 %)"
+                            "label": "Wet Brining Geflügel / Grillfleisch (Rechner: 5 %)"
                       },
                       {
                             "value": "fishSmoke",
-                            "label": "Forelle / Fisch räuchern (ca. 6,0 bis 7,0 % – ca. 12 Std.)"
+                            "label": "Forelle / Fisch räuchern (Rechner: 6 %)"
                       },
                       {
                             "value": "fishQuick",
-                            "label": "Fisch Schnell-Lake (ca. 10,0 % – ca. 2 Std.)"
+                            "label": "Fisch Schnell-Lake (Rechner: 10 %)"
                       },
                       {
                             "value": "porkCure",
-                            "label": "Schinken / Kasseler nasspökeln (ca. 12,0 bis 14,0 %)"
+                            "label": "Schinken / Kasseler nasspökeln (Rechner: 12 %)"
+                      },
+                      {
+                            "value": "custom",
+                            "label": "Eigene Konzentration eingeben"
                       }
                 ]
           },
@@ -6141,12 +6146,17 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
                 "min": 0.5,
                 "max": 25,
                 "step": 0.5,
-                "unit": "%"
+                "unit": "%",
+                dependsOn: { field: "purpose", value: "custom" }
           }
     ],
     calculate: (inputs: Record<string, any>) => {
       const waterL = inputs.waterLiters !== undefined && inputs.waterLiters !== '' ? Math.max(0, Number(inputs.waterLiters)) : 1;
-      const pct = inputs.customPercent !== undefined && inputs.customPercent !== '' ? Math.max(0, Number(inputs.customPercent)) : 6.0;
+      // Voreinstellungen je Verwendungszweck; nur "custom" nutzt das Eingabefeld (früher wurde der Zweck ignoriert)
+      const PRESET_PCT: Record<string, number> = { ferment: 2, brinePoultry: 5, fishSmoke: 6, fishQuick: 10, porkCure: 12 };
+      const purpose = inputs.purpose || 'custom';
+      const customPct = inputs.customPercent !== undefined && inputs.customPercent !== '' ? Math.max(0, Number(inputs.customPercent)) : 6.0;
+      const pct = PRESET_PCT[purpose] !== undefined ? PRESET_PCT[purpose] : customPct;
       
       // Nach Definition der Massenprozent-Lake:
       // Salz (g) = (Wassermenge in g * Prozent) / (100 - Prozent)
@@ -6157,17 +6167,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const spoonsCount = Math.round((saltGrams / 18) * 10) / 10; // ca. 18g je gestr. EL
       
       return {
-        primary: { id: 'saltAmount', label: 'Benötigte Salzmenge', value: saltGrams, formattedValue: saltGrams + ' g Salz', highlight: true },
+        primary: { id: 'saltAmount', label: 'Benötigte Salzmenge', value: saltGrams, formattedValue: formatMeasure(saltGrams, 0) + ' g Salz', highlight: true },
         secondary: [
-          { id: 'waterAmount', label: 'Wasser', value: waterL, formattedValue: waterL + ' Liter (' + waterG + ' g)' },
-          { id: 'spoons', label: 'Entspricht Esslöffeln Salz', value: spoonsCount, formattedValue: 'ca. ' + spoonsCount + ' gestr. EL' },
+          { id: 'waterAmount', label: 'Wasser', value: waterL, formattedValue: formatMeasure(waterL, 2) + ' Liter (' + formatMeasure(waterG, 0) + ' g)' },
+          { id: 'spoons', label: 'Entspricht Esslöffeln Salz', value: spoonsCount, formattedValue: 'ca. ' + formatMeasure(spoonsCount, 1) + ' gestr. EL' },
           { id: 'densityHint', label: 'Gesamtmasse der Salzlake', value: totalLakeWeightG, formattedValue: formatMeasure(totalLakeWeightG / 1000, 2) + ' kg' },
+          { id: 'usedPct', label: 'Gerechnete Konzentration (Salz je Wasser)', value: pct, formattedValue: formatMeasure(pct, 1) + ' %' },
         ],
-        summaryText: 'Für ' + waterL + ' Liter Wasser bei ' + pct + ' % Salzkonzentration benötigen Sie genau ' + saltGrams + ' g Salz (ca. ' + spoonsCount + ' Esslöffel).',
+        summaryText: 'Für ' + formatMeasure(waterL, 2) + ' Liter Wasser bei ' + formatMeasure(pct, 1) + ' % Salz (bezogen auf das Wasser) benötigen Sie ' + formatMeasure(saltGrams, 0) + ' g Salz (ca. ' + formatMeasure(spoonsCount, 1) + ' Esslöffel).',
       };
     },
     formula: "Salz (g) = Wasservolumen (ml) × (Konzentration % / 100)",
-    formulaExplanation: "Für eine 6%-ige Lake lösen Sie genau 60 Gramm Salz pro 1 Liter Wasser auf. Bei unjodiertem Meersalz oder Steinsalz löst sich das Salz rückstandsfrei auf.",
+    formulaExplanation: "Für eine 6%-ige Lake lösen Sie 60 Gramm Salz in 1 Liter Wasser auf. Wählen Sie einen Verwendungszweck, rechnet der Rechner mit dessen Voreinstellung; mit „Eigene Konzentration“ geben Sie den Prozentwert selbst ein.",
     workedExample: {
           "title": "Beispiel: 3 Liter 6%-ige Salzlake zum Forellenräuchern",
           "inputValues": [
@@ -6187,12 +6198,12 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "180 g Salz (ca. 10 Esslöffel)"
     },
     content: {
-      intro: 'Dieser Pökelrechner ermittelt die exakte Salzkonzentration (Grad Baumé / Prozent) für Nasspökellaken zur Haltbarmachung von Fleisch, Fisch und Käse.',
-      details: 'Salzgehalt in % = (Salzgewicht / Gesamtgewicht aus Wasser + Salz) · 100. Für Schinken und Pastrami werden Laken mit 8 bis 12 % Salzgehalt verwendet; bei Nitritpökelsalz (NPS mit 0,5 % NaNO2) schützt das Nitrit vor Clostridium botulinum.',
+      intro: 'Dieser Salzlake-Rechner ermittelt die Salzmenge in Gramm für eine Lake mit einer bestimmten Prozentangabe, etwa zum Fermentieren von Gemüse, zum Einlegen von Fisch vor dem Räuchern oder zum Nasspökeln.',
+      details: 'Der Rechner bezieht die Prozentangabe auf das Wasser: Salz (g) = Wasser (g) × Prozent / 100. Wer die Prozentangabe auf die fertige Lake (Wasser + Salz) bezieht, braucht etwas mehr Salz. Zum Pökeln wird Nitritpökelsalz verwendet, also Kochsalz mit einem kleinen Anteil Natriumnitrit; maßgeblich für Menge und Pökeldauer ist die Anleitung auf der Packung.',
     },
     faqs: [
-      { question: 'Wie lange muss Fleisch in der Lake reifen?', answer: 'Als Richtwert gilt ca. 1 Tag Pökelzeit pro Zentimeter Fleischdicke an der dicksten Stelle bei konstanter Kühlschranktemperatur von 4 bis 6 °C.' },
-      { question: 'Wie viel Salz benötigt man für eine 10-prozentige Pökellake mit 5 Litern Wasser?', answer: 'Auf 5.000 g Wasser kommen 555 Gramm Salz (denn 555 / 5555 ≈ 10,0 %).' },
+      { question: 'Wie lange muss Fleisch in der Lake reifen?', answer: 'Viele Pökelanleitungen nennen als Faustregel etwa einen Tag je Zentimeter Fleischdicke an der dicksten Stelle; verbindlich ist die Angabe des verwendeten Pökelsalzes. Die Lake mit dem Fleisch steht die ganze Zeit im Kühlschrank; für rohes Fleisch wird meist eine Lagertemperatur von höchstens 4 °C angegeben.' },
+      { question: 'Wie viel Salz benötigt man für eine 10-prozentige Pökellake mit 5 Litern Wasser?', answer: 'Der Rechner nimmt 10 % vom Wasser: 5.000 g × 0,10 = 500 g Salz. Soll das Salz 10 % der fertigen Lake ausmachen, sind es 5.000 × 10 / 90 ≈ 556 g (556 g von 5.556 g Lake).' },
     ],
     relatedSlugs: ['fleisch-kerntemperatur-garzeit-rechner', 'kuehlschrank-haltbarkeit-rechner', 'portionsrechner', 'marmelade-geliermittel-rechner'],
   },
@@ -6400,18 +6411,18 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const totalBaguettes = Math.ceil((totalEaters * breadPerPersonG) / 250); // 250g Stange
       
       return {
-        primary: { id: 'cheese', label: style === 'meatFondue' ? 'Fleisch Gesamtmenge' : 'Raclette- / Fonduekäse Gesamt', value: style === 'meatFondue' ? totalMeatG : totalCheeseG, formattedValue: (style === 'meatFondue' ? totalMeatG : totalCheeseG) + ' g (' + formatMeasure((style === 'meatFondue' ? totalMeatG : totalCheeseG) / 1000, 2) + ' kg)', highlight: true },
+        primary: { id: 'cheese', label: style === 'meatFondue' ? 'Fleisch Gesamtmenge' : 'Raclette- / Fonduekäse Gesamt', value: style === 'meatFondue' ? totalMeatG : totalCheeseG, formattedValue: formatMeasure(style === 'meatFondue' ? totalMeatG : totalCheeseG, 0) + ' g (' + formatMeasure((style === 'meatFondue' ? totalMeatG : totalCheeseG) / 1000, 2) + ' kg)', highlight: true },
         secondary: [
-          { id: 'meat', label: 'Fleisch für Tischgrill / Fondue', value: totalMeatG, formattedValue: totalMeatG > 0 ? totalMeatG + ' g (' + formatMeasure(totalMeatG / 1000, 2) + ' kg)' : 'Nicht ausgewählt' },
-          { id: 'potatoes', label: 'Pellkartoffeln (Drillinge / festkochend)', value: totalPotatoesG, formattedValue: totalPotatoesG + ' g (' + formatMeasure(totalPotatoesG / 1000, 2) + ' kg)' },
+          { id: 'meat', label: 'Fleisch für Tischgrill / Fondue', value: totalMeatG, formattedValue: totalMeatG > 0 ? formatMeasure(totalMeatG, 0) + ' g (' + formatMeasure(totalMeatG / 1000, 2) + ' kg)' : 'Nicht ausgewählt' },
+          { id: 'potatoes', label: 'Pellkartoffeln (Drillinge / festkochend)', value: totalPotatoesG, formattedValue: formatMeasure(totalPotatoesG, 0) + ' g (' + formatMeasure(totalPotatoesG / 1000, 2) + ' kg)' },
           { id: 'baguettes', label: 'Baguette-Stangen (à 250 g)', value: totalBaguettes, formattedValue: totalBaguettes + ' Stange(n)' },
-          { id: 'eaters', label: 'Berechnungsgrundlage Esser', value: totalEaters, formattedValue: totalEaters + ' Vollportionen' },
+          { id: 'eaters', label: 'Berechnungsgrundlage Esser', value: totalEaters, formattedValue: formatMeasure(totalEaters, 1) + ' Vollportionen' },
         ],
-        summaryText: 'Für ' + adults + ' Erwachsene und ' + kids + ' Kinder (' + totalEaters + ' Portionen) benötigen Sie ca. ' + (style === 'meatFondue' ? formatMeasure(totalMeatG / 1000, 2) + ' kg Fleisch' : formatMeasure(totalCheeseG / 1000, 2) + ' kg Käse') + ', ' + formatMeasure(totalPotatoesG / 1000, 2) + ' kg Kartoffeln und ' + totalBaguettes + ' Baguettes.',
+        summaryText: 'Für ' + adults + ' Erwachsene und ' + kids + ' Kinder (' + formatMeasure(totalEaters, 1) + ' Portionen) benötigen Sie ca. ' + (style === 'meatFondue' ? formatMeasure(totalMeatG / 1000, 2) + ' kg Fleisch' : formatMeasure(totalCheeseG / 1000, 2) + ' kg Käse') + ', ' + formatMeasure(totalPotatoesG / 1000, 2) + ' kg Kartoffeln und ' + totalBaguettes + ' Baguettes.',
       };
     },
-    formula: "Käse = Portionen × 200 bis 250 g; Fleisch = Portionen × 200 bis 250 g; Kartoffeln = Portionen × 150 bis 200 g",
-    formulaExplanation: "Bei reinen Käse-Events plant man 200 bis 250 g Käse pro Erwachsenem. Bei kombiniertem Tischgrill teilt sich die Menge gleichmäßig auf Käse und Fleisch auf.",
+    formula: "Portionen = Erwachsene + Kinder × 0,5; Menge = Portionen × Menge pro Person des gewählten Menüs; Baguettes = Brotmenge ÷ 250 g (aufgerundet)",
+    formulaExplanation: "Der Rechner setzt pro Erwachsenem an: klassisches Raclette 220 g Käse, 200 g Kartoffeln und 100 g Brot; Raclette mit Tischgrill 180 g Käse, 150 g Fleisch, 150 g Kartoffeln und 100 g Brot; Fleischfondue 250 g Fleisch, 150 g Kartoffeln und 120 g Brot; Käsefondue 220 g Käse, 200 g Brot und 100 g Kartoffeln. Kinder zählen als halbe Portion.",
     workedExample: {
           "title": "Beispiel: 6 Erwachsene zum klassischen Raclette-Abend",
           "inputValues": [
@@ -6433,7 +6444,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Mengenplaner kalkuliert Fleisch-, Käse-, Kartoffel- und Beilagenmengen für gesellige Fondue- und Raclette-Abende ohne Reste oder Engpässe.',
-      details: 'Pro erwachsener Person kalkuliert man: Käsefondue ca. 200 bis 250 g Käse; Fleischfondue (Chinoise/Fett) ca. 250 bis 300 g Fleisch; Raclette ca. 200 bis 250 g Raclettekäse plus 200 g Kartoffeln und 150 g Beilagen.',
+      details: 'Übliche Planungswerte pro erwachsener Person: Käsefondue ca. 200 bis 250 g Käse; Fleischfondue (Chinoise/Fett) ca. 250 bis 300 g Fleisch; Raclette ca. 200 bis 250 g Raclettekäse plus etwa 200 g Kartoffeln. Der Rechner nimmt jeweils einen festen Wert aus diesem Bereich.',
     },
     faqs: [
       { question: 'Welche Käsesorten eignen sich für das klassische Schweizer Fondue Moitié-Moitié?', answer: 'Traditionell zu gleichen Teilen (50/50) reifer Vacherin Fribourgeois AOP und Gruyère AOP, geschmolzen in trockenem Weißwein mit einem Schuss Kirschwasser.' },
@@ -6526,9 +6537,9 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
         tip = 'Immer mit sauberem Löffel entnehmen! Verhindert das Eintragen von Schimmelsporen.';
       } else if (food === 'rawEggs') {
         maxDays = 28;
-        zone = 'Oberes Türfach (ca. 6-8 °C)';
+        zone = 'Mittleres oder oberes Fach (das Türfach schwankt beim Öffnen zu stark)';
         freezeMonths = 0;
-        tip = 'Frische Eier müssen erst ab dem 18. Tag nach dem Legen in den Kühlschrank, halten dort aber viele Wochen.';
+        tip = 'Die 28 Tage sind das gesetzliche Mindesthaltbarkeitsdatum ab Legedatum – rechnen Sie ab dem Datum auf der Packung, nicht ab dem Einkauf. Nach Ablauf Eier nur noch durcherhitzt essen.';
       }
       
       return {
@@ -6576,7 +6587,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     category: "kochen-backen",
     subcategory: "Getränke",
     metaTitle: 'Tee Ziehzeit Rechner – Optimale Wassertemperatur & Ziehdauer',
-    metaDescription: 'Finden Sie die optimale Wassertemperatur und Ziehdauer für Grünen Tee (70–80 °C), Schwarzen Tee (90–95 °C) sowie Kräutertee nach Empfehlungen des BfR.',
+    metaDescription: 'Finden Sie die passende Wassertemperatur und Ziehdauer für Grünen Tee (70–80 °C), Schwarzen Tee (90–95 °C) sowie Kräuter- und Früchtetee (sprudelnd kochend, wie vom BfR empfohlen).',
     h1: 'Tee Ziehzeit Rechner – Temperatur & Ziehdauer für besten Geschmack',
     shortDescription: 'Ermittelt die ideale Wassertemperatur, Ziehzeit und Teeblatt-Dosierung je Tasse für Grüntee, Schwarztee, Oolong und Kräuteraufgüsse.',
     searchKeywords: ["tee ziehzeit rechner wassertemperatur grad","gruener tee temperatur 70 grad nicht bitter","schwarzer tee ziehzeit 3 minuten anregend","kraeutertee sprudelnd kochend ziehen lassen"],
@@ -6656,7 +6667,7 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       } else if (tea === 'herbal') {
         temp = 100;
         brewMins = 7;
-        effect = 'Gemäß BfR-Empfehlung zwingend mit sprudelnd kochendem Wasser aufgießen und 6 bis 8 Minuten abgedeckt ziehen lassen.';
+        effect = 'Laut BfR mit sprudelnd kochendem Wasser aufgießen und mindestens 5 Minuten ziehen lassen; abgedeckt bleibt der Aufguss heißer.';
       } else if (tea === 'fruit') {
         temp = 100;
         brewMins = 9;
@@ -6667,13 +6678,13 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
       const teabagsEquiv = Math.ceil(teaLeavesGrams / 2.0); // ca. 2g je Beutel
       
       return {
-        primary: { id: 'brewTime', label: 'Optimale Ziehzeit', value: brewMins, formattedValue: brewMins > 0 ? brewMins + ' Minuten' : 'Sofort schaumig schlagen (Matcha)', highlight: true },
+        primary: { id: 'brewTime', label: 'Optimale Ziehzeit', value: brewMins, formattedValue: brewMins > 0 ? formatMeasure(brewMins, 1) + ' Minuten' : 'Sofort schaumig schlagen (Matcha)', highlight: true },
         secondary: [
           { id: 'temperature', label: 'Optimale Wassertemperatur', value: temp, formattedValue: temp + ' °C' },
           { id: 'teaLeaves', label: 'Teeblätter-Menge', value: teaLeavesGrams, formattedValue: formatMeasure(teaLeavesGrams, 1) + ' g (ca. ' + teabagsEquiv + ' Beutel bzw. TL)' },
           { id: 'effectInfo', label: 'Geschmack & Wirkung', value: 0, formattedValue: effect },
         ],
-        summaryText: 'Für ' + waterMl + ' ml Wasser benötigen Sie ca. ' + formatMeasure(teaLeavesGrams, 1) + ' g Teeblätter. Wasser auf ' + temp + ' °C temperieren und ' + (brewMins > 0 ? brewMins + ' Minuten ziehen lassen' : 'schaumig schlagen') + '. ' + effect,
+        summaryText: 'Für ' + waterMl + ' ml Wasser benötigen Sie ca. ' + formatMeasure(teaLeavesGrams, 1) + ' g Teeblätter. Wasser auf ' + temp + ' °C temperieren und ' + (brewMins > 0 ? formatMeasure(brewMins, 1) + ' Minuten ziehen lassen' : 'schaumig schlagen') + '. ' + effect,
       };
     },
     formula: "Teemenge (g) = (Wasservolumen / 1.000) × 12 g; Echte Tees (Camellia sinensis): 60 bis 95 °C; Kräuter- & Früchtetee: 100 °C",
@@ -6699,11 +6710,11 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Teerechner optimiert Wassertemperatur, Ziehdauer und Blattmenge für Grüntee, Schwarztee, Weißen Tee, Oolong sowie Kräuter- und Früchteaufgüsse.',
-      details: 'Grüner Tee (z. B. Sencha oder Bancha) entfaltet seinen ausgewogenen Geschmack am besten bei 70 °C bis 80 °C und ca. 2 Minuten Ziehzeit; kochendes Wasser verbrennt zarte Blattstrukturen und macht den Tee adstringierend bitter. Schwarzer Tee (Darjeeling, Ceylon, Assam) verlangt 90 °C bis 95 °C heißes Wasser und 3 bis 4 Minuten Ziehzeit. Kräuter- und Früchtetees hingegen sind getrocknete Pflanzenteile, die nach offizieller Empfehlung des Bundesinstituts für Risikobewertung (BfR) ausnahmslos mit sprudelnd kochendem Wasser (100 °C) aufgegossen werden und mindestens 6 bis 10 Minuten ziehen müssen.',
+      details: 'Grüner Tee (z. B. Sencha oder Bancha) entfaltet seinen ausgewogenen Geschmack am besten bei 70 °C bis 80 °C und ca. 2 Minuten Ziehzeit; kochendes Wasser verbrennt zarte Blattstrukturen und macht den Tee adstringierend bitter. Schwarzer Tee (Darjeeling, Ceylon, Assam) verlangt 90 °C bis 95 °C heißes Wasser und 3 bis 4 Minuten Ziehzeit. Kräuter- und Früchtetees hingegen sind getrocknete Pflanzenteile, die nach Empfehlung des Bundesinstituts für Risikobewertung (BfR) mit sprudelnd kochendem Wasser aufgegossen werden und mindestens fünf Minuten ziehen sollten.',
     },
     faqs: [
-      { question: 'Warum muss Kräuter- und Früchtetee zwingend mit 100 °C kochendem Wasser zubereitet werden?', answer: 'Kräuter-, Blüten- und Früchtetees sind Naturprodukte aus dem Freilandanbau, die harmlose, aber sporenbildende Mikroorganismen tragen können. Das Bundesinstitut für Risikobewertung (BfR) empfiehlt daher dringend, solche Aufgussgetränke stets mit sprudelnd kochendem Wasser (100 °C) zu übergießen und mindestens 5 bis 8 Minuten abgedeckt ziehen zu lassen, um hygienische Unbedenklichkeit zu garantieren.' },
-      { question: 'Wirkt schwarzer Tee nach längerer Ziehzeit beruhigend?', answer: 'Nein, Koffein wird nicht abgebaut. In den ersten 2 bis 3 Minuten löst sich der Großteil des leicht wasserlöslichen Koffeins rasch in den Aufguss. Lässt man den Tee länger ziehen (4 bis 5 Minuten), lösen sich vermehrt hochmolekulare Gerbstoffe (Tannine). Diese binden das Koffein chemisch und verzögern dessen Aufnahme im Darmtrakt, während der Tee spürbar bitterer schmeckt.' },
+      { question: 'Warum muss Kräuter- und Früchtetee zwingend mit 100 °C kochendem Wasser zubereitet werden?', answer: 'Kräuter-, Blüten- und Früchtetees sind getrocknete Pflanzenteile, auf denen Bakterien, Hefen oder Schimmelpilze sitzen können, gelegentlich auch Krankheitserreger wie Salmonellen. Das Bundesinstitut für Risikobewertung (BfR) empfiehlt deshalb, sie mit sprudelnd kochendem Wasser aufzugießen und mindestens fünf Minuten ziehen zu lassen. Heißwasserspender mit 80 bis 85 °C reichen dafür nach BfR nicht aus.' },
+      { question: 'Wirkt schwarzer Tee nach längerer Ziehzeit beruhigend?', answer: 'Nein, Koffein wird nicht abgebaut. In den ersten 2 bis 3 Minuten löst sich der Großteil des leicht wasserlöslichen Koffeins rasch in den Aufguss. Lässt man den Tee länger ziehen (4 bis 5 Minuten), lösen sich vermehrt Gerbstoffe (Tannine), und der Tee schmeckt spürbar herber. Dass diese Gerbstoffe die Wirkung des Koffeins deutlich dämpfen, wird oft behauptet, ist aber nicht gut belegt.' },
       { question: 'Wie kühlt kochendes Wasser am schnellsten auf 70 bis 80 °C ab?', answer: 'Nach dem Aufkochen kühlt ein geschlossener Wasserkocher in etwa 6 bis 8 Minuten auf 75 °C ab. Schneller geht es durch das Umgießen in eine kalte Teekanne (Temperaturverlust ca. 10 °C) oder durch die Zugabe eines kleinen Schusses kaltem Leitungswasser.' },
     ],
     relatedSlugs: ['kaffee-wasser-verhaeltnis-rechner', 'temperatur-umrechner', 'zeit-umrechner'],
@@ -6820,8 +6831,8 @@ export const EXTRA_EINHEITEN_KOCHEN: CalculatorDefinition[] = [
           "result": "547 kcal pro Portion"
     },
     content: {
-      intro: 'Dieser Nährwertrechner summiert alle Zutaten eines Rezepts und ermittelt Gesamtkalorien, Makronährstoffe und die Nährwerttabelle pro 100 Gramm und pro Portion.',
-      details: 'Formel: Nährwert pro 100 g = (Gesamtnährwert aller Zutaten / Fertiges Gesamtgewicht) · 100. Berücksichtigt den typischen Feuchtigkeits- und Wasserverlust beim Backen und Schmoren.',
+      intro: 'Dieser Nährwertrechner rechnet aus den Gesamtmengen an Kohlenhydraten, Eiweiß und Fett eines Rezepts die Gesamtkalorien und teilt sie auf die Portionen auf. Die Makro-Summen tragen Sie selbst ein, etwa aus den Nährwertangaben der Zutaten.',
+      details: 'Formel: kcal = Kohlenhydrate × 4,1 + Eiweiß × 4,1 + Fett × 9,3; pro Portion wird durch die Portionszahl geteilt. Werte pro 100 g des fertigen Gerichts rechnet der Rechner nicht aus; dafür teilen Sie die Gesamtkalorien durch das gewogene Endgewicht und multiplizieren mit 100.',
     },
     faqs: [
       { question: 'Warum wiegt das fertige Gericht weniger als die Summe der rohen Zutaten?', answer: 'Beim Braten und Backen verdampft Wasser; die Kalorienkonzentration pro 100 Gramm Fertiggericht steigt dadurch an, während die Gesamtkalorienzahl unverändert bleibt.' },

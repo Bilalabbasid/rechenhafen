@@ -88,7 +88,9 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const volumeM3 = a * (tMm / 1000) * waste;
       const weightKg = volumeM3 * density;
       const sacks = Math.ceil(weightKg / sackKg);
-      const dryingDays = tMm <= 40 ? tMm * 1 : 40 + (tMm - 40) * 2; // Faustregel Belegreife
+      // Faustregel Belegreife (Zementestrich): 1 Woche je cm bis 4 cm, danach 2 Wochen je weiterem cm
+      const tCm = tMm / 10;
+      const dryingDays = Math.round(tCm <= 4 ? tCm * 7 : 28 + (tCm - 4) * 14);
       
       return {
         primary: { id: 'sacks', label: 'Benötigte Säcke Fertigestrich', value: sacks, formattedValue: sacks + ' Säcke (' + sackKg + ' kg)', highlight: true },
@@ -160,7 +162,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
                       },
                       {
                             "value": "roof",
-                            "label": "Steildach / oberste Geschossdecke (GEG max. 0,14 W/m²K)"
+                            "label": "Dachfläche / oberste Geschossdecke (GEG max. 0,24 W/m²K)"
                       },
                       {
                             "value": "basement",
@@ -224,7 +226,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       const rThermal = 0.17 + (lambda > 0 ? (tM / lambda) : 0);
       const uWert = 1 / rThermal;
       
-      const gegLimit = inputs.component === 'roof' ? 0.14 : inputs.component === 'wall' ? 0.24 : 0.30;
+      // GEG Anlage 7: Außenwand 0,24 (Nr. 1), Dachfläche/oberste Geschossdecke 0,24 (Nr. 5a/5b), Decke gegen unbeheizt 0,30 (Nr. 6a/6b)
+      const gegLimit = inputs.component === 'roof' ? 0.24 : inputs.component === 'wall' ? 0.24 : 0.30;
       const gegCompliant = uWert <= gegLimit;
       // Erforderliche Dicke für GEG:
       const rReq = 1 / gegLimit;
@@ -271,7 +274,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       details: 'Formel: U = 1 / (Rsi + Summe(d / lambda) + Rse), wobei d die Schichtdicke in Metern und lambda die Wärmeleitfähigkeit des Dämmstoffs (z. B. 0,032 bis 0,040 W/(m·K)) ist. Je kleiner der U-Wert, desto besser die Dämmung.',
     },
     faqs: [
-      { question: 'Welche U-Werte fordert das GEG für Dach und Fassade bei Sanierung?', answer: 'Das GEG verlangt bei Erneuerung für Außenwände maximal 0,24 W/(m²·K) und für Steildächer bzw. oberste Geschossdecken maximal 0,14 bzw. 0,24 W/(m²·K).' },
+      { question: 'Welche U-Werte fordert das GEG für Dach und Fassade bei Sanierung?', answer: 'Nach GEG Anlage 7 gilt bei Erneuerung für Außenwände sowie für Dachflächen und oberste Geschossdecken jeweils maximal 0,24 W/(m²·K), für Flachdächer mit Abdichtung 0,20 W/(m²·K) und für Kellerdecken gegen unbeheizte Räume 0,30 W/(m²·K).' },
       { question: 'Was ist der Unterschied zwischen Wärmeleitstufe (WLS) und U-Wert?', answer: 'Die WLS (z. B. 035) beschreibt die Materialeigenschaft des Dämmstoffs; der U-Wert ist die Gesamteigenschaft des fertigen Bauteils inklusive Schichtdicke.' },
     ],
     relatedSlugs: ['holz-balken-durchbiegung-rechner', 'fassadenfarbe-rechner', 'trockenbau-gipskarton-rechner', 'farbmengen-rechner', 'heizkostenvergleich-rechner', 'gaskostenrechner'],
@@ -580,9 +583,9 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           ],
           "steps": [
                 "Steine: 15 m² × 32 × 1,05 = 504 Steine",
-                "Mörtel: 15 m² × 18 kg = 270 kg"
+                "Mörtel: 15 m² × 18 kg × 1,05 = 283,5 -> 284 kg (284 / 25 = 11,4 -> 12 Säcke)"
           ],
-          "result": "504 Steine und 11 Säcke Mörtel (à 25 kg)"
+          "result": "504 Steine und 12 Säcke Mörtel (à 25 kg)"
     },
     content: {
       intro: 'Dieser Baustoffkalkulator berechnet die Stückzahl von Mauersteinen (Kalksandstein, Porenbeton, Ziegel) und den Mörtelbedarf pro Quadratmeter Wandfläche.',
@@ -590,7 +593,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Was bedeutet das Mauerwerksmaß nach DIN 4172 (Achtelmeter)?', answer: 'Das deutsche Bauraster basiert auf dem Modul von 12,5 cm (Achtelmeter: 12,5 cm, 25 cm, 37,5 cm etc.), um Bauten ohne aufwendiges Zerschneiden von Steinen zu planen.' },
-      { question: 'Wie viel Mörtel benötigt man für 1 m² Mauerwerk?', answer: 'Bei Dickbettmörtel ca. 30 bis 40 Liter Mörtel pro m² Wand; bei Plansteinen mit Dünnbettmörtel werden nur rund 3 bis 5 kg Trockenkleber benötigt.' },
+      { question: 'Wie viel Mörtel benötigt man für 1 m² Mauerwerk?', answer: 'Der Rechner setzt als Richtwert je m² Wand rund 18 kg (2DF) bzw. 25 kg (NF) Trockenmörtel für Normalmörtel und 2,5 bis 3,5 kg Dünnbettmörtel für Plansteine an. Der tatsächliche Bedarf steigt mit der Wanddicke; maßgeblich ist die Verbrauchsangabe auf dem Mörtelsack.' },
     ],
     relatedSlugs: ['betonrechner', 'estrich-rechner', 'putz-rechner', 'fliesenkleber-rechner'],
   },
@@ -602,7 +605,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
     metaTitle: 'Fliesenkleber Rechner – Verbrauch in kg & Säcken',
-    metaDescription: 'Berechnen Sie den Bedarf an Fliesenkleber und Fugenbunt nach Quadratmetern, Zahnspachtel-Größe (6, 8, 10, 12 mm) und Fliesenabmessungen.',
+    metaDescription: 'Berechnen Sie den Bedarf an Fliesenkleber und Fugenmörtel nach Quadratmetern, Zahnspachtel-Größe (6, 8, 10, 12 mm) und Fugenbreite.',
     h1: 'Fliesenkleber Rechner – Materialbedarf für Fliesen & Fugen',
     shortDescription: 'Berechnet den Fliesenkleber- und Fugenmörtelbedarf nach Fläche und Zahnung.',
     searchKeywords: ["fliesenkleber rechner verbrauch kg m2","fugenmoertel rechner fliesen","zahnung fliesenkleber verbrauch","flexkleber saecke berechnen"],
@@ -714,12 +717,12 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Verbrauchsrechner ermittelt die benötigte Menge an Fliesenkleber in Kilogramm und 25-kg-Säcken basierend auf Raumfläche, Zahnspachtelgröße und Untergrund. Eine vollständige Übersicht zur passenden Kelle für jedes Format finden Sie in unserer [Zahnspachtel Größen Tabelle](/ratgeber/zahnspachtel-groessen-tabelle-fliesen/).',
-      details: 'Formel: Verbrauch = Fläche in m² · Kleberverbrauch (kg/m²) · Sicherheitsreserve. Richtwerte für den Kleberverbrauch: 6-mm-Zahnung ca. 2,4 kg/m²; 8-mm-Zahnung ca. 3,2 kg/m²; 10-mm-Zahnung ca. 4,0 kg/m²; 12-mm-Zahnung bzw. Mittelbett ca. 5,0 kg/m². Bei Großformaten ab 30 × 60 cm sowie bei Fußbodenheizung empfiehlt der ZDB zwingend das kombinierte Buttering-Floating-Verfahren.',
+      details: 'Formel: Verbrauch = Fläche in m² · Kleberverbrauch (kg/m²) · Sicherheitsreserve. Richtwerte für den Kleberverbrauch: 6-mm-Zahnung ca. 2,4 kg/m²; 8-mm-Zahnung ca. 3,2 kg/m²; 10-mm-Zahnung ca. 4,0 kg/m²; 12-mm-Zahnung bzw. Mittelbett ca. 5,0 kg/m². Bei Großformaten sowie bei Fußbodenheizung wird in der Regel das kombinierte Buttering-Floating-Verfahren empfohlen; maßgeblich sind die Angaben des Kleberherstellers.',
     },
     faqs: [
       { question: 'Woher weiß ich, welche Zahnspachtel-Größe ich für meine Fliesen brauche?', answer: 'Die Wahl der Zahnung richtet sich nach Kantenlänge der Fliese und Untergrund. Ausführliche Richtwerte, Tabellen und Praxistipps finden Sie in unserem Ratgeber: [Zahnspachtel Größen Tabelle: Welche Zahnung für welche Fliese?](/ratgeber/zahnspachtel-groessen-tabelle-fliesen/).' },
       { question: 'Welche Zahnung benötigt man für Fliesen ab 60 × 60 cm?', answer: 'Für großformatige Fliesen empfiehlt sich mindestens eine 10-mm- oder 12-mm-Zahnung sowie das Floating-Buttering-Verfahren (Kleber auf Untergrund und Fliesenrückseite).' },
-      { question: 'Welcher Fliesenkleber eignet sich für Fußbodenheizungen?', answer: 'Zwingend ein flexibler Kleber (Klassifizierung C2 TE S1 nach DIN EN 12004), der thermische Spannungen und Dehnungen des Estrichs rissfrei ausgleicht.' },
+      { question: 'Welcher Fliesenkleber eignet sich für Fußbodenheizungen?', answer: 'Empfohlen wird ein verformbarer Flexkleber (z. B. Klassifizierung C2 TE S1 nach DIN EN 12004), der thermische Spannungen und Dehnungen des Estrichs aufnehmen kann.' },
     ],
     relatedSlugs: ['bodenbelag-rechner', 'estrich-rechner', 'farbmengen-rechner'],
   },
@@ -857,11 +860,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Erdbau-Rechner kalkuliert das Aushubvolumen für Baugruben, Streifenfundamente oder Pools und berücksichtigt den Auflockerungsfaktor des Bodens.',
-      details: 'Festes Bodenvolumen = Länge · Breite · Tiefe. Durch das Ausgraben lockert sich Erdreich auf: Der Auflockerungsfaktor beträgt je nach Bodenklasse 1,2 (Sand/Kies) bis 1,4 (bindiger Ton/Lehm). Das Abfuhrvolumen ist entsprechend größer.',
+      details: 'Festes Bodenvolumen = Länge · Breite · Tiefe. Durch das Ausgraben lockert sich Erdreich auf: Der Rechner setzt als Auflockerungsfaktor 1,15 (Sand/Kies), 1,25 (Lehm/Mutterboden) bzw. 1,35 (Ton/bindiger Boden) an. Das Abfuhrvolumen ist entsprechend größer.',
     },
     faqs: [
       { question: 'Warum benötigt man für den Erdaushub einen Böschungswinkel?', answer: 'Nach DIN 4124 dürfen Baugruben ab 1,25 m Tiefe nicht senkrecht abgegraben werden: Bei nichtbindigen Böden ist ein Böschungswinkel von max. 45° einzuhalten, um Einsturzgefahr zu verhindern.' },
-      { question: 'Wie viele LKW-Ladungen entsprechen 50 m³ festem Aushub?', answer: 'Bei einem Auflockerungsfaktor von 1,3 entstehen 65 m³ loses Schüttgut. Ein 4-Achs-Kipper fasst ca. 10 m³, sodass etwa 7 LKW-Fuhren erforderlich sind.' },
+      { question: 'Wie viele LKW-Ladungen entsprechen 50 m³ festem Aushub?', answer: 'Bei Lehmboden (Faktor 1,25, 1,8 t/m³) entstehen 62,5 m³ loses Schüttgut mit rund 90 Tonnen. Bei 18 t Nutzlast eines 4-Achs-Kippers sind das 5 Fahrten. Passt das lose Volumen einer Ladung nicht in die Mulde, sind es entsprechend mehr; das Muldenvolumen nennt das Fuhrunternehmen.' },
     ],
     relatedSlugs: ['betonrechner', 'fundament-rechner', 'pflastersteine-rechner', 'baugrund-tragfaehigkeit-rechner'],
   },
@@ -982,8 +985,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "2.160 Pflastersteine und 2,56 t Splitt"
     },
     content: {
-      intro: 'Dieser Mengenrechner ermittelt die Quadratmeter an Pflastersteinen, die Randeinfassungen und den Unterbau (Schottertragschicht und Pflastersplitt).',
-      details: 'Pflasterfläche = Länge · Breite. Für befahrbare PKW-Einfahrten ist ein Unterbau aus mindestens 20 bis 30 cm verdichtetem Frostschutz-Schotter (Körnung 0/32) plus 3 bis 5 cm Pflasterbettung (Splitt 2/5 mm) nach RStO vorgeschrieben.',
+      intro: 'Dieser Mengenrechner ermittelt die Anzahl der Pflastersteine inklusive Verschnitt und die Menge an Bettungssplitt. Randeinfassungen und die Schottertragschicht sind nicht enthalten.',
+      details: 'Pflasterfläche = Länge · Breite. Für befahrbare PKW-Einfahrten wird üblicherweise ein Unterbau aus 20 bis 30 cm verdichtetem Frostschutz- bzw. Schottermaterial (z. B. 0/32) plus 3 bis 5 cm Pflasterbettung (Splitt 2/5 mm) geplant; die genaue Dicke hängt von Untergrund und Belastung ab.',
     },
     faqs: [
       { question: 'Wie stark müssen Pflastersteine für eine PKW-Einfahrt sein?', answer: 'Für normale PKW-Nutzung genügen 6 cm Steindicke; bei häufigem Rangieren oder gelegentlichem Befahren mit schweren Fahrzeugen sind 8 cm Steindicke erforderlich.' },
@@ -1088,8 +1091,9 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       // Ständerwerk:
       // UW-Profile (Boden & Decke): 2 * Wandlänge
       const uwMeters = Math.ceil(l * 2 * 1.05);
-      // CW-Profile (Ständer alle 62.5 cm + Anfang/Ende):
-      const cwCount = Math.ceil(l / 0.625) + 1;
+      // CW-Profile: Achsabstand passend zur Plattenbreite (60-cm-Platten: 60 cm, 125-cm-Platten: 62,5 cm), plus Anfang/Ende
+      const studSpacing = inputs.boardSize === '2500x1250' ? 0.625 : 0.6;
+      const cwCount = Math.ceil(l / studSpacing) + 1;
       const cwMeters = Math.ceil(cwCount * h * 1.05);
       
       // Schrauben: ca. 15-20 Stk./m² Plattenfläche
@@ -1108,8 +1112,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
         summaryText: 'Für ' + formatNumber(wallArea, 1) + ' m² Trockenbauwand benötigen Sie ' + platesCount + ' Gipskartonplatten, ' + cwCount + ' CW-Profile, ' + uwMeters + ' m UW-Profile und ca. ' + fillerKg + ' kg Spachtel.',
       };
     },
-    formula: "Platten = Wandfläche × Lagenfaktor (2 oder 4) × Verschnitt / Plattenfläche; CW-Profile = (Länge / 0,625 m) + 1",
-    formulaExplanation: "Der Standard-Achsabstand für Ständerprofile beträgt 62,5 cm (passend zur Plattenbreite von 60 cm bzw. 125 cm). Eine doppelte Beplankung verbessert Brand- und Schallschutz erheblich.",
+    formula: "Platten = Wandfläche × Lagenfaktor (2 oder 4) × Verschnitt / Plattenfläche; CW-Profile = (Länge / Achsabstand) + 1 (Achsabstand 0,60 m bei 60-cm-Platten, 0,625 m bei 125-cm-Platten)",
+    formulaExplanation: "Die Ständer stehen so, dass jeder Plattenstoß auf einem Profil liegt: bei 60 cm breiten Platten alle 60 cm, bei 125 cm breiten Platten alle 62,5 cm (halbe Plattenbreite). Eine doppelte Beplankung verbessert Brand- und Schallschutz deutlich.",
     workedExample: {
           "title": "Beispiel: 5 m × 2,6 m Trennwand, doppelt beplankt mit 2,6×0,6m Platten",
           "inputValues": [
@@ -1129,13 +1133,13 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "steps": [
                 "Plattenfläche = 13 × 4 × 1,10 = 57,2 m²",
                 "Plattenanzahl = 57,2 / 1,56 = 37 Platten",
-                "CW-Profile = (5 / 0,625) + 1 = 9 Profile à 2,60 m"
+                "CW-Profile = (5 / 0,60) = 8,33 -> 9, plus 1 = 10 Profile à 2,60 m"
           ],
-          "result": "37 Gipskartonplatten und 9 CW-Ständer"
+          "result": "37 Gipskartonplatten und 10 CW-Ständer"
     },
     content: {
-      intro: 'Dieser Materialrechner kalkuliert die Anzahl der Gipskartonplatten, UW- und CW-Ständerprofile, Dämmwolle und Schnellbauschrauben für Ständerwände und Decken.',
-      details: 'Wandfläche = Länge · Raumhöhe. Bei beidseitiger Doppelbeplankung (Standard für optimalen Schall- und Brandschutz nach DIN 4102) wird die vierfache Wandfläche an Platten benötigt. Profilabstand: typisch 62,5 cm (halbes Plattenmaß).',
+      intro: 'Dieser Materialrechner kalkuliert die Anzahl der Gipskartonplatten, UW- und CW-Ständerprofile, Schnellbauschrauben und Fugenspachtel für Ständerwände (Dämmwolle für das Ständerfach ist nicht enthalten).',
+      details: 'Wandfläche = Länge · Raumhöhe. Bei beidseitiger Doppelbeplankung (besserer Schall- und Brandschutz) wird die vierfache Wandfläche an Platten benötigt. Profilabstand: 60 cm bei 60 cm breiten Platten, 62,5 cm (halbes Plattenmaß) bei 125 cm breiten Platten.',
     },
     faqs: [
       { question: 'Welche Plattenart gehört in Feuchträume (Bad)?', answer: 'Immer imprägnierte Gipskartonplatten (grün, Typ GKBI / DIN EN 520 Typ H2), die Feuchtigkeitsaufnahme und Schimmelbildung hemmen.' },
@@ -1188,7 +1192,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           },
           {
                 "id": "dim2",
-                "label": "Breite / Durchmesser",
+                "label": "Breite (bei Punktfundament: Kantenlänge, quadratisch)",
                 "type": "number",
                 "defaultValue": 0.3,
                 "min": 0.1,
@@ -1276,11 +1280,11 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Fundamentplaner berechnet das Betonvolumen für Punktfundamente (Zaun, Carport), Streifenfundamente (Gartenmauer) oder durchgehende Fundamentplatten.',
-      details: 'Streifenfundament = Länge · Breite · frostfreie Tiefe (in Deutschland nach DIN 1054 mindestens 80 bis 100 cm unter Geländeoberkante, um Frosthebungen sicher auszuschließen).',
+      details: 'Streifenfundament = Länge · Breite · frostfreie Tiefe (in Deutschland in der Regel mindestens 80 cm unter Geländeoberkante, in kalten Lagen auch mehr, um Frosthebungen auszuschließen).',
     },
     faqs: [
       { question: 'Warum muss ein Fundament frostfrei gegründet werden?', answer: 'Wasser im gefrierenden Boden dehnt sich um ca. 9 % aus. Liegt das Fundament oberhalb der Frostgrenze, hebt der gefrierende Boden das Bauwerk im Winter an, was zu schweren Rissen führt.' },
-      { question: 'Muss ein Fundament mit Stahl bewehrt werden?', answer: 'Für schwere Lasten oder ungleichmäßige Baugrundverhältnisse sind Baustahlmatten (z. B. Q188) oder Bewehrungskörbe aus Betonstahl zwingend erforderlich.' },
+      { question: 'Muss ein Fundament mit Stahl bewehrt werden?', answer: 'Bei Gebäuden, schweren Lasten oder ungleichmäßigem Baugrund legt der Tragwerksplaner die Bewehrung fest (z. B. Baustahlmatten oder Bewehrungskörbe aus Betonstahl). Kleine Punktfundamente für Zaun- oder Carportpfosten werden oft unbewehrt ausgeführt; im Zweifel entscheidet die Statik.' },
     ],
     relatedSlugs: ['beton-mischungsverhaeltnis-rechner', 'zaun-pfosten-rechner', 'schalungssteine-rechner', 'betonrechner', 'estrich-rechner', 'aushub-erdarbeiten-rechner'],
   },
@@ -1977,7 +1981,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       };
     },
     formula: "Farbe (Liter) = Nettofläche (m²) × Verbrauch (l/m²) × Anzahl Anstriche × 1,05",
-    formulaExplanation: "Rauputz hat durch seine Kornstruktur eine bis zu 50 % größere reale Oberfläche als glatte Wände, was den Farbbedarf spürbar steigert.",
+    formulaExplanation: "Rauputz hat durch seine Kornstruktur eine größere reale Oberfläche als eine glatte Wand. Der Rechner setzt deshalb je Anstrich 160 ml/m² (glatt), 220 ml/m² (2-mm-Scheibenputz) bzw. 300 ml/m² (grober Reibeputz) an.",
     workedExample: {
           "title": "Beispiel: 186 m² Fassade mit 2 mm Scheibenputz (2 Anstriche)",
           "inputValues": [
@@ -2002,7 +2006,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Fassadenrechner ermittelt die benötigte Menge an Außenwandfarbe (Silikonharz, Silikat, Acryl) unter Berücksichtigung von Strukturputz und Witterungsschutz.',
-      details: 'Fassadenfläche = 2 · (Hauslänge + Hausbreite) · Traufhöhe + Giebeldreiecke abzüglich Fensteröffnungen. Raue Putzstrukturen (Reibeputz, Kratzputz) erhöhen den Farbverbrauch um 25 bis 40 Prozent gegenüber glatten Wänden.',
+      details: 'Fassadenfläche = Hausumfang · durchschnittliche Fassadenhöhe abzüglich Fenster- und Türöffnungen; Giebeldreiecke fließen über die mittlere Höhe ein. Mit den Richtwerten dieses Rechners braucht 2-mm-Scheibenputz rund 38 Prozent und grober Reibeputz rund 88 Prozent mehr Farbe als eine glatte Wand.',
     },
     faqs: [
       { question: 'Welche Fassadenfarbe ist am besten gegen Algen und Pilze geschützt?', answer: 'Silikonharzfarben mit Abperleffekt (Lotuseffekt) oder mineralische Silikatfarben, die durch ihre hohe Alkalität (pH-Wert) Algenbildung natürlich hemmen.' },
@@ -2276,17 +2280,17 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "steps": [
                 "RM = 5 × 0,71 = 3,55 Raummeter",
                 "Energie = 3,55 RM × 2.100 kWh = 7.455 kWh",
-                "Entspricht ca. 745 Liter Heizöl"
+                "Entspricht ca. 746 Liter Heizöl (7.455 kWh / 10 kWh je Liter)"
           ],
           "result": "3,55 RM (7.455 kWh Energie)"
     },
     content: {
       intro: 'Dieser Holzumrechner transformiert die forstwirtschaftlichen Maße Festmeter (FM), Raummeter (RM) und Schüttraummeter (SRM) deterministisch ineinander.',
-      details: '1 Festmeter (1 m³ massives Holz ohne Luft) entspricht ca. 1,4 bis 1,5 Raummetern (geschichtetes Scheitholz mit Luft) und ca. 2,3 bis 2,5 Schüttraummetern (lose geschüttete Scheite im Container).',
+      details: 'Der Rechner verwendet das Verhältnis 1 Festmeter (1 m³ massives Holz ohne Luft) ≈ 1,43 Raummeter (geschichtetes Scheitholz mit Luft) ≈ 2,0 Schüttraummeter (lose geschüttete Scheite). Die realen Faktoren schwanken mit Scheitlänge, Spaltung und Stapelweise.',
     },
     faqs: [
       { question: 'Welcher Brennwertunterschied besteht zwischen Buche und Fichte?', answer: 'Buchenholz liefert rund 2.100 kWh pro Raummeter und brennt ruhig mit langanhaltender Glut; Fichtenholz liefert nur ca. 1.500 kWh/RM, brennt schnell an und eignet sich ideal als Anzündholz.' },
-      { question: 'Wie trocken muss Kaminholz nach Bundes-Immissionsschutzgesetz (BImSchV) sein?', answer: 'Nach § 3 Abs. 1 Nr. 4 der 1. BImSchV darf der Feuchtegehalt von Brennholz maximal 25 Prozent (entspricht einem Wassergehalt unter 20 %) betragen.' },
+      { question: 'Wie trocken muss Kaminholz nach der 1. BImSchV sein?', answer: 'Nach § 3 Abs. 3 der 1. BImSchV darf naturbelassenes Scheitholz (§ 3 Abs. 1 Nr. 4) nur verbrannt werden, wenn sein Feuchtegehalt unter 25 Prozent bezogen auf das Trocken- bzw. Darrgewicht liegt; das entspricht einem Wassergehalt von unter 20 Prozent.' },
     ],
     relatedSlugs: ['heizkostenvergleich-rechner', 'gaskostenrechner', 'stromkostenrechner'],
   },
@@ -2419,10 +2423,10 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Mörtelrechner ermittelt den Trockenmörtelbedarf in Kilogramm und Säcken für Grundputz, Unterputz und mineralischen Oberputz.',
-      details: 'Menge in kg = Wandfläche in m² · Schichtdicke in mm · spezifischer Materialverbrauch (typisch ca. 1,3 bis 1,5 kg pro m² und mm Schichtdicke). Ein 25-kg-Sack reicht bei 10 mm Dicke für rund 1,7 m² Wandfläche.',
+      details: 'Menge in kg = Wandfläche in m² · Schichtdicke in mm · spezifischer Materialverbrauch (in diesem Rechner 1,0 kg für Gipsputz, 1,3 kg für Kalk-Zement-Putz und 1,5 kg für Zementputz je m² und mm Schichtdicke). Ein 25-kg-Sack reicht bei 10 mm Dicke damit ohne Verlustzuschlag für rund 2,5 m² Gipsputz, 1,9 m² Kalk-Zement-Putz bzw. 1,7 m² Zementputz.',
     },
     faqs: [
-      { question: 'Wie dick muss Innenputz auf Mauerwerk aufgetragen werden?', answer: 'Nach DIN V 18550 beträgt die durchschnittliche Mindestputzdicke bei einlagigem Innenputz 10 mm, um Unebenheiten des Mauerwerks auszugleichen.' },
+      { question: 'Wie dick muss Innenputz auf Mauerwerk aufgetragen werden?', answer: 'Für einlagigen Innenputz auf Mauerwerk werden üblicherweise rund 10 bis 15 mm geplant, damit Unebenheiten des Mauerwerks ausgeglichen werden. Die Mindest- und Höchstschichtdicke des jeweiligen Produkts steht im Datenblatt des Herstellers.' },
       { question: 'Wann benötigt man ein Armierungsgewebe im Putz?', answer: 'Zwingend bei Materialwechseln im Untergrund (z. B. Übergang von Beton auf Ziegel), über Rollladenkästen und bei Wärmedämmverbundsystemen (WDVS).' },
     ],
     relatedSlugs: ['bausteine-mauerwerk-rechner', 'farbmengen-rechner', 'estrich-rechner'],
@@ -2524,7 +2528,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       };
     },
     formula: "Matten = ceil((Zaunlänge - Torbreiten) / 2,50 m); Pfosten = Matten + 1",
-    formulaExplanation: "Genormte Doppelstabmatten sind exakt 2.510 mm breit. Das Achsmaß von Pfostenmitte zu Pfostenmitte beträgt bei fachgerechter Montage genau 2,52 m.",
+    formulaExplanation: "Übliche Doppelstabmatten sind rund 2,50 m breit. Das genaue Achsmaß von Pfostenmitte zu Pfostenmitte gibt der Hersteller des Pfostensystems vor.",
     workedExample: {
           "title": "Beispiel: 25 m Gartenzaun mit 2 Ecken und 1 Tor (1,0 m)",
           "inputValues": [
@@ -2551,7 +2555,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     content: {
       intro: 'Dieser Zaunrechner kalkuliert die Anzahl der Zaunpfosten, Zaunmatten (Doppelstabmatten) und Pfostenfundamente entlang der Grundstücksgrenze.',
-      details: 'Pfostenanzahl = Abrunden(Zaunlänge / Pfostenabstand) + 1 (für den Endpfosten) plus Zusatzpfosten für Tore und Ecken. Standard-Doppelstabmatten haben eine Breite von exakt 2,50 Metern.',
+      details: 'Mattenanzahl = Aufrunden((Zaunlänge − 1 m je Tor) / 2,50 m); Pfostenanzahl = Matten + 1. Eckpfosten sind in dieser Zahl enthalten, Torpfosten nicht (sie gehören meist zum Torset). Standard-Doppelstabmatten sind rund 2,50 Meter breit.',
     },
     faqs: [
       { question: 'Wie tief müssen Zaunpfosten einbetoniert werden?', answer: 'Mindestens 60 bis 80 cm tief, um eine frostfreie und sturmsichere Verankerung gegen Hebelkräfte bei Windlast zu gewährleisten.' },
@@ -2715,17 +2719,18 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "steps": [
                 "Ertrag = 120 × 750 × 0,85 × 0,90 = 68.850 Liter",
                 "Gartenbedarf = 250 m² × 60 l = 15.000 Liter",
-                "Speicher = 15.000 × (21 / 365) = 863 Liter -> mind. 1.500 l empfohlen"
+                "Speicher = min(68.850; 15.000) × (21 / 365) = 863 Liter",
+                "Aufgerundet auf volle 500 Liter = 1.000 Liter"
           ],
-          "result": "1.500 bis 3.000 Liter Zisterne"
+          "result": "1.000 Liter Zisterne (1,0 m³)"
     },
     content: {
       intro: 'Dieser Dimensionierungsrechner ermittelt das optimale Speichervolumen einer Regenwasserzisterne nach DIN 1989-1 aus Dachfläche, Standort und Wasserbedarf.',
-      details: 'Zisternengröße = Min(Jährlicher Regenertrag, Jährlicher Betriebswasserbedarf) · 0,06 (für 21 bis 22 Tage Sicherheitsreserve bei Trockenheit). Typische Behältergrößen liegen zwischen 3.000 und 6.000 Litern.',
+      details: 'Zisternengröße = Min(Jährlicher Regenertrag, Jährlicher Betriebswasserbedarf) · 0,06 (für 21 bis 22 Tage Sicherheitsreserve bei Trockenheit). Der Rechner rundet das Ergebnis auf volle 500 Liter auf.',
     },
     faqs: [
       { question: 'Welche Verbraucher im Haus dürfen mit Zisternenwasser betrieben werden?', answer: 'Nach der Trinkwasserverordnung darf Regenwasser für Toilettenspülung, Waschmaschine und Gartenbewässerung genutzt werden; eine Verwechslung mit Trinkwasserleitungen muss ausgeschlossen sein.' },
-      { question: 'Wie viel Prozent Trinkwasser spart eine Zisterne im Einfamilienhaus?', answer: 'Bis zu 50 Prozent des gesamten häuslichen Trinkwasserbedarfs können durch Regenwassernutzung für WC, Garten und Waschmaschine eingespart werden.' },
+      { question: 'Wie viel Trinkwasser spart eine Zisterne im Einfamilienhaus?', answer: 'Der Rechner setzt für WC-Spülung und Waschmaschine 34 Liter pro Person und Tag an; bei 4 Personen sind das 49.640 Liter im Jahr, dazu 60 Liter je m² Garten. Wie viel davon tatsächlich ersetzt wird, begrenzt der Regenertrag des Dachs: Gespart wird höchstens der kleinere der beiden Werte.' },
     ],
     relatedSlugs: ['drainage-gefaelle-rechner', 'dachflaeche-rechner', 'fundament-rechner', 'aushub-erdarbeiten-rechner'],
   },
@@ -2879,7 +2884,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       { question: 'Ersetzt der Rechner den statischen oder normativen Nachweis nach DIN 18065?', answer: 'Nein. Der Rechner ist eine ergonomische Planungshilfe basierend auf der Schrittmaßformel. Eine vollständige Prüfung nach DIN 18065 und Landesbauordnung umfasst zusätzlich Mindestlaufbreiten, Absturzsicherungen, Geländerhöhen, Rutschklassen und Brandschutzauflagen.' },
       { question: 'Welcher Neigungswinkel gilt bei Wohnhaustreppen als optimal?', answer: 'Ein Steigungswinkel zwischen 30° und 37° gilt im Wohnungsbau als ergonomisch ausgewogen und sicher zu begehen.' },
     ],
-    relatedSlugs: ['bodenbelag-rechner', 'estrich-rechner', 'bodenbelag-rechner'],
+    relatedSlugs: ['bodenbelag-rechner', 'estrich-rechner', 'trockenbau-gipskarton-rechner'],
   },
   {
     id: "kies-splitt-rechner",
@@ -3350,7 +3355,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     category: "bauen-renovieren",
     subcategory: "Rohbau & Boden",
     metaTitle: 'Gefälle Rechner – Steigung in Prozent, Promille',
-    metaDescription: 'Berechnen Sie das Gefälle von Terrassen (min. 2 %), Abwasserrohren nach DIN EN 12056 (1-2 cm/m) und Garagenauffahrten nach Länge und Höhenunterschied.',
+    metaDescription: 'Berechnen Sie das Gefälle von Terrassen (ca. 2 %), Abwasser- und Drainagerohren (cm/m) und Garagenauffahrten nach Länge und Höhenunterschied.',
     h1: 'Gefälle Rechner – Gefälle in %, cm/m & Höhenunterschied ermitteln',
     shortDescription: 'Berechnet Gefälle in Prozent, Grad und Höhenunterschied in Zentimetern.',
     searchKeywords: ["gefaelle rechner prozent cm m","terrasse gefaelle berechnen 2 prozent","abwasserrohr gefaelle din 12056","hoehenunterschied laenge gefaelle"],
@@ -3470,8 +3475,8 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "8 cm Höhenunterschied"
     },
     content: {
-      intro: 'Dieser Neigungsrechner kalkuliert den Höhenunterschied und das Mindestgefälle für Drainagerohre und Abwasserleitungen nach DIN EN 12056 und DIN 4095.',
-      details: 'Gefälle in % = (Höhenunterschied / Rohrlänge) · 100. Für erdverlegte Abwasserleitungen gilt ein Mindestgefälle von 1,0 bis 2,0 Prozent (1 bis 2 cm pro Meter), um Ablagerungen und Verstopfungen zu vermeiden.',
+      intro: 'Dieser Neigungsrechner rechnet zwischen Gefälle in Prozent, Zentimetern pro Meter, Grad und Höhenunterschied um, etwa für Drainagerohre, Abwasserleitungen und Terrassen.',
+      details: 'Gefälle in % = (Höhenunterschied / Rohrlänge) · 100. Für Abwasserleitungen werden häufig 1 bis 2 Prozent (1 bis 2 cm pro Meter) geplant; das verbindliche Mindestgefälle je Leitungsart und Nennweite legt die Entwässerungsplanung nach den einschlägigen Normen (u. a. DIN 1986-100) fest.',
     },
     faqs: [
       { question: 'Kann ein Gefälle bei Abwasserrohren auch zu steil sein?', answer: 'Ja, bei über 5 Prozent Gefälle fließt das Abwasser zu schnell ab und lässt feste Bestandteile zurück; dies führt paradoxerweise zu Verstopfungen.' },
@@ -3629,7 +3634,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
       details: 'Vorhandene Bodenpressung = Bauwerkslast / Fundamentfläche. Feste Sande und Kiese tragen typischerweise 200 bis 300 kN/m²; weiche Tone oder organische Böden oft unter 100 kN/m².',
     },
     faqs: [
-      { question: 'Wann ist ein geotechnisches Baugrundgutachten Pflicht?', answer: 'Vor jedem Neubau: Das Gutachten ermittelt Bodenarten, Schichtenaufbau, Tragfähigkeit und den maßgeblichen Bemessungswasserstand (Grundwasser).' },
+      { question: 'Wann ist ein geotechnisches Baugrundgutachten Pflicht?', answer: 'Eine bundesweit einheitliche Pflicht für jedes Bauvorhaben gibt es nicht. Für einen Neubau braucht der Tragwerksplaner aber belastbare Bodenkennwerte, und die liefert in der Regel ein Baugrundgutachten: Es ermittelt Bodenarten, Schichtenaufbau, Tragfähigkeit und den maßgeblichen Bemessungswasserstand (Grundwasser).' },
       { question: 'Was sind ungleichmäßige Setzungen?', answer: 'Wenn sich verschiedene Gebäudeteile wegen inhomogenen Bodens unterschiedlich stark senken; dies führt zu schweren diagonalen Rissen im Tragwerk.' },
     ],
     relatedSlugs: ['fundament-rechner', 'betonrechner', 'aushub-erdarbeiten-rechner'],
@@ -3763,14 +3768,14 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "steps": [
                 "I = (100 × 200³) / 12 = 66.666.667 mm⁴",
                 "q = 2,5 × 0,65 = 1,625 N/mm",
-                "f = (5 × 1,625 × 4000⁴) / (384 × 11000 × 66,67 Mio) = 7,37 mm",
+                "f = (5 × 1,625 × 4000⁴) / (384 × 11000 × 66,67 Mio) = 7,39 mm",
                 "Limit L/300 = 4000 / 300 = 13,33 mm"
           ],
           "result": "7,4 mm Durchbiegung (weit unter dem Limit 13,3 mm)"
     },
     content: {
       intro: 'Die statische Vorbemessung nach Eurocode 5 (DIN EN 1995-1-1) prüft die Durchbiegung von Decken- und Dachbalken unter Gleichlast im Grenzzustand der Gebrauchstauglichkeit.',
-      details: 'Zulässige Durchbiegung: w_max ≤ Stützweite L / 300 für charakteristische Lasten (bzw. L / 200 für Enddurchbiegung). Die Steifigkeit hängt in der vierten Potenz von der Balkenhöhe h ab (Flächenträgheitsmoment I = (b · h³) / 12).',
+      details: 'Zulässige Durchbiegung: w_max ≤ Stützweite L / 300 für charakteristische Lasten (bzw. L / 200 für Enddurchbiegung). Die Steifigkeit hängt in der dritten Potenz von der Balkenhöhe h ab (Flächenträgheitsmoment I = (b · h³) / 12), die Durchbiegung in der vierten Potenz von der Spannweite.',
     },
     faqs: [
       { question: 'Warum ist die Balkenhöhe so viel wichtiger als die Balkenbreite?', answer: 'Weil die Höhe mit der dritten Potenz in die Biegesteifigkeit einfließt: Ein doppelt so hoher Balken biegt sich bei gleicher Belastung um den Faktor 8 weniger durch.' },
@@ -4304,7 +4309,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { id: 'innerVol', label: 'Innenvolumen (Füllvolumen)', value: innerVolLiters, formattedValue: formatNumber(innerVolLiters, 2) + ' Liter' },
           { id: 'innerDiameter', label: 'Innendurchmesser (d)', value: d_inner_mm, formattedValue: formatNumber(d_inner_mm, 1) + ' mm' },
         ],
-        summaryText: 'Ein ' + l_m + ' m langes Rohr (D ' + D_mm + ' mm, Wandstärke ' + s_mm + ' mm) wiegt ca. ' + formatNumber(weightKg, 2) + ' kg und fasst ' + formatNumber(innerVolLiters, 2) + ' Liter Flüssigkeit.',
+        summaryText: 'Ein ' + formatNumber(l_m, 2) + ' m langes Rohr (D ' + formatNumber(D_mm, 2) + ' mm, Wandstärke ' + formatNumber(s_mm, 2) + ' mm) wiegt ca. ' + formatNumber(weightKg, 2) + ' kg und fasst ' + formatNumber(innerVolLiters, 2) + ' Liter Flüssigkeit.',
       };
     },
     formula: "V_Material = π × (R² - r²) × L; Masse = V_Material × Dichte; Innendurchmesser d = D - 2s",
@@ -4484,7 +4489,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
                 "id": "sideB",
                 "label": "Schenkel links (b – für Umfang)",
                 "type": "number",
-                "defaultValue": 6,
+                "defaultValue": 5.4,
                 "min": 0.1,
                 "max": 1000,
                 "step": 0.1,
@@ -4494,7 +4499,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
                 "id": "sideD",
                 "label": "Schenkel rechts (d – für Umfang)",
                 "type": "number",
-                "defaultValue": 6,
+                "defaultValue": 5.4,
                 "min": 0.1,
                 "max": 1000,
                 "step": 0.1,
@@ -4663,7 +4668,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "A = 51,96 cm², U = 32 cm"
     },
     content: {
-      intro: 'Ein Parallelogramm (Raute/Rhomboid) ist ein Viereck, bei dem die jeweils gegenüberliegenden Seiten parallel und gleich lang sind.',
+      intro: 'Ein Parallelogramm ist ein Viereck, bei dem die jeweils gegenüberliegenden Seiten parallel und gleich lang sind. Rechteck, Raute und Quadrat sind Sonderfälle davon; ein Parallelogramm ohne rechte Winkel und mit ungleich langen Nachbarseiten heißt Rhomboid.',
       details: 'Fläche A = Grundseite a · Höhe h_a = a · b · sin(alpha). Umfang U = 2 · (a + b). Gegenüberliegende Innenwinkel sind exakt gleich groß; benachbarte Winkel ergänzen sich zu 180°.',
     },
     faqs: [
@@ -5127,7 +5132,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { id: 'circumradius', label: 'Umkreisradius (r_u = a)', value: rU, formattedValue: formatNumber(rU, 2) + ' cm' },
           { id: 'wrenchSize', label: 'Schlüsselweite (SW = 2 · r_i)', value: sWeite, formattedValue: formatNumber(sWeite, 2) + ' cm' },
         ],
-        summaryText: 'Ein regelmäßiges Sechseck mit Seite a = ' + a + ' cm hat einen Flächeninhalt von ' + formatNumber(area, 2) + ' cm² (Umfang ' + u + ' cm, Inkreisradius ' + formatNumber(rI, 2) + ' cm).',
+        summaryText: 'Ein regelmäßiges Sechseck mit Seite a = ' + formatNumber(a, 2) + ' cm hat einen Flächeninhalt von ' + formatNumber(area, 2) + ' cm² (Umfang ' + formatNumber(u, 2) + ' cm, Inkreisradius ' + formatNumber(rI, 2) + ' cm).',
       };
     },
     formula: "A = (3 × √3 / 2) × a² ≈ 2,598 × a²; U = 6 × a; r_i = (√3 / 2) × a; r_u = a",
@@ -5153,7 +5158,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Warum bauen Bienen ihre Waben sechseckig?', answer: 'Das Sechseck ist die mathematisch effizienteste Form für lückenlose Parkettierungen: Es maximiert das Speichervolumen bei minimalem Wachs-Umfang (Bienenwaben-Satz).' },
-      { question: 'Welche Schlüsselweite (SW) hat eine Sechskantschraube mit Seitenlänge 10 mm?', answer: 'Die Schlüsselweite entspricht dem doppelten Inkreisradius: SW = Wurzel(3) · a ≈ 1,732 · 10 mm ≈ 17,32 mm (Standard M10 nutzt typisch SW 16 oder 17).' },
+      { question: 'Welche Schlüsselweite (SW) hat ein Sechskant mit 10 mm Kantenlänge?', answer: 'Die Schlüsselweite entspricht dem doppelten Inkreisradius: SW = Wurzel(3) · a ≈ 1,732 · 10 mm ≈ 17,32 mm.' },
     ],
     relatedSlugs: ['dreieck-flaeche-rechner', 'kreis-umfang-rechner', 'rechteckrechner'],
   },
@@ -5319,7 +5324,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { id: 'segmentArea', label: 'Kreissegment-Fläche (Abschnitt)', value: aSegment, formattedValue: formatNumber(aSegment, 2) + ' cm²' },
           { id: 'chordLength', label: 'Sehnenlänge (s)', value: s, formattedValue: formatNumber(s, 2) + ' cm' },
         ],
-        summaryText: 'Bei Radius ' + r + ' cm und Winkel ' + alpha + '° beträgt die Bogenlänge ' + formatNumber(b, 2) + ' cm, die Sektorfläche ' + formatNumber(aSektor, 2) + ' cm² und das Kreissegment ' + formatNumber(aSegment, 2) + ' cm².',
+        summaryText: 'Bei Radius ' + formatNumber(r, 2) + ' cm und Winkel ' + formatNumber(alpha, 2) + '° beträgt die Bogenlänge ' + formatNumber(b, 2) + ' cm, die Sektorfläche ' + formatNumber(aSektor, 2) + ' cm² und das Kreissegment ' + formatNumber(aSegment, 2) + ' cm².',
       };
     },
     formula: "b = (α / 180°) × π × r; A_Sektor = (α / 360°) × π × r²; s = 2r × sin(α/2); A_Segment = A_Sektor - A_Dreieck",
@@ -5421,7 +5426,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           { id: 'gon', label: 'Neugrad in Gon (gon)', value: gon, formattedValue: formatNumber(gon, 4) + ' gon' },
           { id: 'trig', label: 'Trigonometrie (sin / cos)', value: 0, formattedValue: 'sin = ' + formatNumber(sinVal, 4) + ' | cos = ' + formatNumber(cosVal, 4) },
         ],
-        summaryText: val + ' ' + String(unit || 'DEG').toUpperCase() + ' entsprechen genau ' + formatNumber(deg, 2) + ' Grad, ' + formatNumber(rad, 4) + ' Radiant (' + formatNumber(piMultiple, 2) + ' π) und ' + formatNumber(gon, 2) + ' Gon.',
+        summaryText: formatNumber(val, 4) + (unit === 'rad' ? ' rad' : unit === 'gon' ? ' gon' : '°') + ' entsprechen genau ' + formatNumber(deg, 2) + ' Grad, ' + formatNumber(rad, 4) + ' Radiant (' + formatNumber(piMultiple, 2) + ' π) und ' + formatNumber(gon, 2) + ' Gon.',
       };
     },
     formula: "rad = deg × (π / 180°); deg = rad × (180° / π); gon = deg / 0,9",
@@ -6126,7 +6131,7 @@ export const EXTRA_BAUEN_GEOMETRIE: CalculatorDefinition[] = [
           "result": "Major = 618 px, Minor = 382 px"
     },
     content: {
-      intro: 'Der Goldene Schnitt (Phi ≈ 1,6180339887) beschreibt das harmonische Teilungsverhältnis (a+b)/a = a/b, das seit der Antike Architektur, Kunst und Fotografie prägt.',
+      intro: 'Der Goldene Schnitt (Phi ≈ 1,6180339887) beschreibt das Teilungsverhältnis (a+b)/a = a/b, das schon Euklid als Teilung im „äußeren und mittleren Verhältnis“ beschrieb und das heute als Gestaltungsregel in Design, Architektur und Fotografie genutzt wird.',
       details: 'Teilt man eine Gesamtstrecke im Goldenen Schnitt (Major a und Minor b), macht der größere Teil rund 61,8 % und der kleinere Teil ca. 38,2 % der Gesamtstrecke aus. Phi lässt sich exakt ausdrücken als (1 + Wurzel(5)) / 2.',
     },
     faqs: [

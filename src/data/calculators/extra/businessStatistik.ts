@@ -1614,7 +1614,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     },
     faqs: [
       { question: 'Was ist der Unterschied zwischen Customer Churn und Revenue Churn?', answer: 'Customer Churn misst die Anzahl der abgesprungenen Kunden; Revenue Churn misst den verlorenen monatlich wiederkehrenden Umsatz (MRR); durch Upgrades bestehender Kunden kann Net Revenue Churn sogar negativ sein (starkes Wachstum!).' },
-      { question: 'Was ist eine gesunde Churn-Rate im B2B-SaaS-Bereich?', answer: 'Im Enterprise-B2B-Sektor gilt eine jährliche Churn-Rate von unter 5 bis 7 Prozent als hervorragend; im B2C-Geschäft liegen Monats-Churn-Raten oft bei 3 bis 7 Prozent.' },
+      { question: 'Was ist eine gesunde Churn-Rate im B2B-SaaS-Bereich?', answer: 'Einen allgemein gültigen Grenzwert gibt es nicht. Verträge mit Jahreslaufzeit und hohem Wechselaufwand, wie sie im Geschäft mit Unternehmen üblich sind, haben meist eine deutlich niedrigere Abwanderung als monatlich kündbare Verbraucher-Abos. Aussagekräftig ist der Vergleich mit Ihren eigenen Vormonaten und mit Anbietern gleicher Preisklasse und Vertragsform.' },
     ],
     relatedSlugs: ['customer-lifetime-value-clv-rechner', 'kundengewinnungskosten-cac-rechner', 'lead-conversion-rate-rechner'],
   },
@@ -1728,10 +1728,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
     category: "business",
     subcategory: "Steuern & Buchhaltung",
     metaTitle: 'AfA Rechner – Lineare & degressive Abschreibung',
-    metaDescription: 'Berechnen Sie die jährliche steuerliche Abschreibung (AfA) linear nach offizieller BMF-Nutzungsdauer oder degressiv – mit Abschreibungsbetrag und Restbuchwert für jedes Jahr.',
+    metaDescription: 'Berechnen Sie die steuerliche Abschreibung (AfA) linear nach BMF-Nutzungsdauer oder degressiv mit bis zu 30 % – mit AfA-Satz und den Beträgen für das erste und zweite Jahr.',
     h1: 'AfA Rechner – Lineare & Degressive Abschreibung ermitteln',
     shortDescription: 'Berechnet jährliche Abschreibungsbeträge und Restbuchwerte.',
-    searchKeywords: ["afa rechner lineare degressive abschreibung formel","abschreibungstabelle bmf nutzungsdauer jahre","degressive afa 2024 wachstumschancengesetz 20 prozent","restbuchwert abschreibungsplan berechnen"],
+    searchKeywords: ["afa rechner lineare degressive abschreibung formel","abschreibungstabelle bmf nutzungsdauer jahre","degressive afa 2026 30 prozent investitionssofortprogramm","restbuchwert abschreibungsplan berechnen"],
     inputs: [
           {
                 "id": "assetCost",
@@ -1765,8 +1765,12 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
                             "label": "Lineare Abschreibung (gleichbleibende Jahresbeträge)"
                       },
                       {
+                            "value": "degressive30",
+                            "label": "Degressive AfA (3-fach linear, max. 30 % – Anschaffung 07/2025 bis 12/2027)"
+                      },
+                      {
                             "value": "degressive20",
-                            "label": "Degressive AfA (max. 20 % p.a. – Wachstumschancengesetz)"
+                            "label": "Degressive AfA (2-fach linear, max. 20 % – Anschaffung 04/2024 bis 12/2024)"
                       }
                 ]
           }
@@ -1785,9 +1789,10 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
       let secondYearAmount = linearAnnualAmount;
       let usedRatePct = linearRatePct;
 
-      if (method === 'degressive20') {
-        // Nach § 7 Abs. 2 EStG: bis zum 2-fachen des linearen Satzes, max. 20%
-        usedRatePct = Math.min(20, linearRatePct * 2);
+      if (method === 'degressive20' || method === 'degressive30') {
+        // § 7 Abs. 2 EStG: Anschaffung 01.07.2025–31.12.2027 bis zum 3-fachen des linearen Satzes, max. 30 %;
+        // Anschaffung 01.04.–31.12.2024 (Wachstumschancengesetz) bis zum 2-fachen, max. 20 %.
+        usedRatePct = method === 'degressive30' ? Math.min(30, linearRatePct * 3) : Math.min(20, linearRatePct * 2);
         firstYearAmount = cost * (usedRatePct / 100);
         const bookValueAfterYear1 = cost - firstYearAmount;
         secondYearAmount = bookValueAfterYear1 * (usedRatePct / 100);
@@ -1803,7 +1808,7 @@ export const EXTRA_BUSINESS_STATISTIK: CalculatorDefinition[] = [
           { id: 'taxSave', label: 'Geschätzte Steuerersparnis Jahr 1 (bei 30 % Steuern)', value: taxSavingsYear1, formattedValue: 'ca. ' + formatCurrency(taxSavingsYear1) },
           { id: 'linearComp', label: 'Vergleich: Lineare Standard-AfA', value: linearAnnualAmount, formattedValue: formatCurrency(linearAnnualAmount) + ' / Jahr' },
         ],
-        summaryText: 'Bei ' + formatCurrency(cost) + ' Anschaffungskosten und ' + years + ' Jahren Nutzungsdauer beträgt die AfA im ersten Jahr ' + formatCurrency(firstYearAmount) + ' (AfA-Satz ' + formatPercent(usedRatePct) + '). Das mindert Ihren steuerlichen Gewinn sofort!',
+        summaryText: 'Bei ' + formatCurrency(cost) + ' Anschaffungskosten und ' + years + ' Jahren Nutzungsdauer beträgt die AfA im ersten vollen Jahr ' + formatCurrency(firstYearAmount) + ' (AfA-Satz ' + formatPercent(usedRatePct) + '). Wird das Wirtschaftsgut unterjährig angeschafft, gibt es im ersten Jahr nur die Monate ab dem Anschaffungsmonat.',
       };
     },
     formula: "Linear: AfA = Anschaffungskosten / Nutzungsdauer; Degressiv: AfA_t = Buchwert_(t-1) × AfA-Satz",

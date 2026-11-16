@@ -4,6 +4,8 @@ import { EXTRA_AUTO_ARBEIT } from '../extra/autoArbeit';
 import { calculateCommuterAllowance, calculateEVCharging, calculateTravelTime } from '@/lib/calculators/auto';
 import { LEGAL_VALUES_2026 } from '@/legal/de';
 import { formatNumber, formatCurrency, formatPercent } from '@/lib/formatters';
+import { calculateCarCO2 } from '@/lib/calculators/co2';
+import { CO2_PRICE_2026_CORRIDOR } from '@/data/emissions';
 
 // ---------------------------------------------------------------------------
 // Alle Zahlen in Tabellen und Antworten stammen aus der calculate-Funktion des
@@ -313,6 +315,37 @@ const PD_30 = num(pend(30), 'totalAllowance');
 const PD_30_OVER = PD_30 - AN_PAUSCH;
 const PD_2025_DAY_30 = 20 * 0.3 + 10 * 0.38; // Rechtslage 2025: 0,30 € für km 1–20, 0,38 € ab km 21
 const PD_2026_DAY_30 = num(pend(30), 'perDay');
+
+// ---------------------------------------------------------------------------
+// CO₂-Rechner Auto (calculateCarCO2, Rechenweg A/B) und CO₂-Preiskorridor 2026 (§ 10 Abs. 2 BEHG)
+// ---------------------------------------------------------------------------
+const co2 = (fuelType: string, consumption: number, distanceKm = 15000) =>
+  calculateCarCO2({ tripMode: 'annual', distanceKm, fuelType, consumption, method: 'direct' });
+const CO2_LEVELS: Record<string, number[]> = {
+  benzin: [5, 6, 7, 8, 10],
+  diesel: [4, 5, 6, 7, 8],
+  electric: [14, 16, 18, 20, 22],
+};
+const co2Row = (fuel: string, unit: string) =>
+  CO2_LEVELS[fuel].map((c) => {
+    const r = co2(fuel, c);
+    return `${n1(c)} ${unit}: ${n(num(r, 'co2PerKm'), 0)} g/km`;
+  });
+const CO2_TABLE = table(
+  ['Benziner', 'Diesel', 'Elektroauto (Strommix)'],
+  [0, 1, 2, 3, 4].map((i) => [co2Row('benzin', 'l')[i], co2Row('diesel', 'l')[i], co2Row('electric', 'kWh')[i]]),
+);
+const CO2_B7 = co2('benzin', 7);
+const CO2_D6 = co2('diesel', 6);
+const CO2_B6 = co2('benzin', 6);
+const CO2_E18 = co2('electric', 18);
+const CO2_BENZIN_FACTOR = num(CO2_B7, 'factorUsed');
+const CO2_DIESEL_FACTOR = num(CO2_D6, 'factorUsed');
+const CO2_MWST = 1 + LEGAL_VALUES_2026.mwstNormalsatz.value;
+const CO2_CT_PER_L = (factor: number, price: number) => (factor * price) / 10; // kg/l × €/t ÷ 1.000 × 100 ct
+const CO2_B7_T = num(CO2_B7, 'co2Total');
+const CO2_COST_MIN = CO2_B7_T * CO2_PRICE_2026_CORRIDOR.min * CO2_MWST;
+const CO2_COST_MAX = CO2_B7_T * CO2_PRICE_2026_CORRIDOR.max * CO2_MWST;
 
 export const AUTO_PAGE_CONTENT: PageContentMap = {
   'bremsweg-rechner': {
@@ -645,6 +678,40 @@ export const AUTO_PAGE_CONTENT: PageContentMap = {
       {
         question: 'Darf ich einen längeren Weg als den kürzesten ansetzen?',
         answer: 'Ja, wenn er offensichtlich verkehrsgünstiger ist und Sie ihn regelmäßig für die Fahrt zur Arbeit nutzen (§ 9 Abs. 1 Satz 3 Nr. 4 EStG), etwa eine Umgehungsstraße oder Autobahn statt einer staugeplagten Ortsdurchfahrt. Notieren Sie, warum Sie diesen Weg fahren, falls das Finanzamt nachfragt.',
+      },
+    ],
+  },
+
+  'co2-auto-rechner': {
+    sections: [
+      {
+        title: 'Gramm CO₂ pro Kilometer nach Verbrauch',
+        content:
+          `Direkte Emissionen mit den Faktoren des Rechners (Benzin ${n(CO2_BENZIN_FACTOR, 3)} kg/l, Diesel ${n(CO2_DIESEL_FACTOR, 3)} kg/l, Strommix 2025):\n\n${CO2_TABLE}\n\n` +
+          `So lesen Sie die Tabelle: Ein Diesel mit 6 l/100 km (${n(num(CO2_D6, 'co2PerKm'), 0)} g/km) liegt knapp unter einem Benziner mit 7 l (${n(num(CO2_B7, 'co2PerKm'), 0)} g/km), aber über einem Benziner mit 6 l (${n(num(CO2_B6, 'co2PerKm'), 0)} g/km). Pro Liter stößt Diesel mehr aus, entscheidend ist der Verbrauch. Beim E-Auto hängt der Wert am Strommix: Laden Sie überwiegend mit eigenem Solarstrom, liegt er deutlich niedriger als in der Tabelle.`,
+      },
+      {
+        title: 'Was der CO₂-Preis 2026 an der Zapfsäule ausmacht',
+        content:
+          `Der nationale CO₂-Preis liegt 2026 in einem Korridor von ${eur0(CO2_PRICE_2026_CORRIDOR.min)} bis ${eur0(CO2_PRICE_2026_CORRIDOR.max)} je Tonne (§ 10 Abs. 2 BEHG). Wird er voll an der Tankstelle weitergegeben, steckt rechnerisch so viel im Literpreis:\n\n` +
+          table(
+            ['Kraftstoff', `bei ${eur0(CO2_PRICE_2026_CORRIDOR.min)}/t`, `bei ${eur0(CO2_PRICE_2026_CORRIDOR.max)}/t`],
+            [
+              ['Benzin', `${n2(CO2_CT_PER_L(CO2_BENZIN_FACTOR, CO2_PRICE_2026_CORRIDOR.min) * CO2_MWST)} ct/l`, `${n2(CO2_CT_PER_L(CO2_BENZIN_FACTOR, CO2_PRICE_2026_CORRIDOR.max) * CO2_MWST)} ct/l`],
+              ['Diesel', `${n2(CO2_CT_PER_L(CO2_DIESEL_FACTOR, CO2_PRICE_2026_CORRIDOR.min) * CO2_MWST)} ct/l`, `${n2(CO2_CT_PER_L(CO2_DIESEL_FACTOR, CO2_PRICE_2026_CORRIDOR.max) * CO2_MWST)} ct/l`],
+            ],
+          ) +
+          `\n\nDie Werte enthalten ${formatPercent(LEGAL_VALUES_2026.mwstNormalsatz.value * 100, 0)} Mehrwertsteuer. Für das Standardbeispiel (15.000 km, 7 l Benzin, ${n(CO2_B7_T, 2)} t CO₂) sind das ${eur0(CO2_COST_MIN)} bis ${eur0(CO2_COST_MAX)} im Jahr. Den CO₂-Preis für andere Brennstoffe rechnet der [CO₂-Preis-Rechner](/rechner/co2-preis-rechner/).`,
+      },
+    ],
+    faqs: [
+      {
+        question: 'Wie viel CO₂ stößt ein Auto mit 6 Litern Verbrauch aus?',
+        answer: `Ein Benziner mit 6 l/100 km kommt auf rund ${n(num(CO2_B6, 'co2PerKm'), 0)} g CO₂ pro Kilometer, ein Diesel mit 6 l auf rund ${n(num(CO2_D6, 'co2PerKm'), 0)} g. Bei 15.000 km im Jahr sind das ${n(num(CO2_B6, 'co2Total'), 2)} bzw. ${n(num(CO2_D6, 'co2Total'), 2)} Tonnen. Ein E-Auto mit 18 kWh/100 km liegt beim Strommix 2025 bei ${n(num(CO2_E18, 'co2PerKm'), 0)} g/km.`,
+      },
+      {
+        question: 'Warum weicht das Ergebnis vom CO₂-Wert im Fahrzeugschein ab?',
+        answer: 'Der Wert in der Zulassungsbescheinigung (Feld V.7) stammt aus dem genormten WLTP-Prüfzyklus. Der Rechner nutzt dagegen Ihren tatsächlichen Verbrauch. Wer viel Kurzstrecke, Autobahn mit hohem Tempo oder im Winter fährt, liegt oft über dem Prüfwert. Für die Kfz-Steuer zählt allein der WLTP-Wert, für Ihre persönliche Klimabilanz ist der echte Verbrauch aussagekräftiger.',
       },
     ],
   },
