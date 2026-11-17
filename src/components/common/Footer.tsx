@@ -26,6 +26,15 @@ export default function Footer() {
           <div className={styles.privacyBadge}>
             <ShieldCheck size={16} /> Lokale Berechnung im Browser – Keine Eingabedaten verlassen Ihr Endgerät
           </div>
+          <p className={styles.footerText} style={{ marginTop: 'var(--space-3)', fontSize: '0.85rem' }}>
+            Alle Rechner laufen auf Ihrem eigenen Gerät. Wir speichern keine Daten über Sie und legen keine Profile an.
+            Die Werbung auf dieser Website liefert Google
+            aus; Google kann dabei Cookies setzen und Daten verarbeiten. Mehr dazu in der{' '}
+            <Link href="/datenschutz/" className={styles.footerLink}>
+              Datenschutzerklärung
+            </Link>
+            .
+          </p>
         </div>
 
         <div>

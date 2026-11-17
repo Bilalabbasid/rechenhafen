@@ -1510,7 +1510,10 @@ export default function CalculatorRunner({
           {/* Privacy Signal */}
           <div className={styles.privacyNotice}>
             <ShieldCheck size={15} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
-            <span>Die Berechnung erfolgt lokal in Ihrem Browser. Keine Datenübertragung.</span>
+            <span>
+              Dieser Rechner läuft vollständig auf Ihrem eigenen Gerät. Wir speichern Ihre Eingaben nicht und geben sie an
+              niemanden weiter, auch nicht an Google.
+            </span>
           </div>
 
           {/* Regulated Year Notice */}
