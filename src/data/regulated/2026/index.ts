@@ -153,7 +153,7 @@ export const GERMAN_DATA_2026: Record<string, RegulatedValue> = {
   },
   kindergeld_betrag: {
     key: 'kindergeld_betrag',
-    value: 255,
+    value: 259,
     unit: '€/Monat',
     description: 'Gesetzliches Kindergeld pro Kind (§ 66 EStG / BKKG)',
     year: 2026,

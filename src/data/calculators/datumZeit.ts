@@ -1249,7 +1249,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
     faqs: [
       { question: 'Wie berechnet man eine 14-tägige Frist nach BGB?', answer: 'Nach § 187 Abs. 1 BGB zählt der Tag des Zugangs nicht mit; die Frist beginnt am darauffolgenden Tag und endet mit Ablauf des 14. Tages.' },
       { question: 'Fällt das Ergebnis bei Addition von Vielfachen von 7 immer auf denselben Wochentag?', answer: 'Ja, jede Addition von 7, 14, 21, 28 etc. Tagen landet exakt auf demselben Wochentag wie das Startdatum.' },
-      { question: 'Wie ermittelt man den spätesten Absendetermin bei einer 4-wöchigen Kündigungsfrist?', answer: 'Wählen Sie „Tage abziehen“, ziehen Sie 28 Kalendertage vom Fristende ab und rechnen Sie 2 bis 3 Tage Postlaufzeit als Puffer ein.' },
+      { question: 'Wie ermittelt man den spätesten Absendetermin bei einer 4-wöchigen Kündigungsfrist?', answer: 'Im Arbeitsverhältnis gilt nach § 622 Abs. 1 BGB eine Grundkündigungsfrist von vier Wochen zum 15. oder zum Ende eines Kalendermonats. Ziehen Sie mit „Tage abziehen“ 28 Kalendertage von diesem Beendigungstermin ab: Für das Ende am 31.03. muss die Kündigung spätestens am 03.03. zugehen. Entscheidend ist der Zugang beim Empfänger, nicht das Absenden; planen Sie für die Post einige Tage Puffer ein. Längere Fristen aus Vertrag oder Betriebszugehörigkeit gehen vor.' },
       { question: 'Was geschieht beim Abziehen über einen Schalttag hinweg?', answer: 'Fällt der 29. Februar in den Zeitraum, wird er automatisch als vollwertiger Tag mitgezählt.' },
     ],
     relatedSlugs: ['tage-zwischen-zwei-daten', 'dienstjubilaeum-rechner', 'alter-in-tagen', 'arbeitstage-rechner'],
@@ -1284,7 +1284,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
       details: 'Die Subtraktion erfolgt taggenau rückwärts über Monats- und Jahresgrenzen hinweg. Unverzichtbar für Vorbereitungszeiten bei Veranstaltungen, Hochzeiten oder Bauprojekten.',
     },
     faqs: [
-      { question: 'Wie ermittelt man den spätesten Absendetermin bei einer 4-wöchigen Kündigungsfrist?', answer: 'Subtrahieren Sie 28 Kalendertage vom Monatsende und rechnen Sie 2 bis 3 Tage Postlaufzeit als Puffer ein.' },
+      { question: 'Wie ermittelt man den spätesten Absendetermin bei einer 4-wöchigen Kündigungsfrist?', answer: 'Die vier Wochen des § 622 Abs. 1 BGB laufen immer auf den 15. oder das Monatsende zu. Rechnen Sie deshalb vom gewünschten Endtermin 28 Tage zurück: Soll das Arbeitsverhältnis am 15.06. enden, muss die Kündigung bis zum 18.05. beim Empfänger sein. Weil der Zugang zählt, sollten Sie bei Briefpost einige Tage früher absenden. Vertragliche oder tarifliche Fristen können länger sein.' },
       { question: 'Was geschieht bei Subtraktion über einen Schalttag hinweg?', answer: 'Fällt der 29. Februar in das Rückwärts-Intervall, zieht der Rechner diesen Tag vollautomatisch als vollwertigen Tag ab.' },
     ],
     relatedSlugs: ['datum-plus-tage', 'tage-zwischen-zwei-daten', 'tage-zwischen-zwei-daten'],
@@ -1485,7 +1485,7 @@ export const DATUM_ZEIT_CALCULATORS: CalculatorDefinition[] = [
         },
         {
           title: 'Praxistipps für präzise Frist- und Terminberechnungen',
-          content: 'Beachten Sie bei der Planung von Fristen und wichtigen Ereignissen folgende Besonderheiten:\n\n- **Kalendertage vs. Werktage:** Ein Countdown zählt alle fortlaufenden 24-Stunden-Tage. Für gesetzliche Kündigungsfristen oder Bankarbeitstage nutzen Sie bitte unseren [Werktage-Rechner](/rechner/werktage-rechner/).\n- **Zeitzonendifferenzen:** Bei internationalen Events richtet sich der Countdown stets nach der Systemzeit Ihres Endgeräts.\n- **Schaltjahre:** Der 29. Februar in Schaltjahren wird von unserem Kalenderalgorithmus vollautomatisch als vollwertiger 86.400-Sekunden-Tag eingerechnet.',
+          content: 'Beachten Sie bei der Planung von Fristen und wichtigen Ereignissen folgende Besonderheiten:\n\n- **Kalendertage vs. Werktage:** Ein Countdown zählt alle fortlaufenden 24-Stunden-Tage. Für gesetzliche Kündigungsfristen oder Bankarbeitstage nutzen Sie bitte unseren [Arbeitstage- und Werktage-Rechner](/rechner/arbeitstage-rechner/).\n- **Zeitzonendifferenzen:** Bei internationalen Events richtet sich der Countdown stets nach der Systemzeit Ihres Endgeräts.\n- **Schaltjahre:** Der 29. Februar in Schaltjahren wird von unserem Kalenderalgorithmus vollautomatisch als vollwertiger 86.400-Sekunden-Tag eingerechnet.',
         },
       ],
     },

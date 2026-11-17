@@ -12,6 +12,9 @@ import CategoryCard from '@/components/common/CategoryCard';
 import CategoryCalculatorsView from '@/components/calculator/CategoryCalculatorsView';
 import PopularDateCalculators from '@/components/calculator/PopularDateCalculators';
 import CategoryFocusCalculators from '@/components/calculator/CategoryFocusCalculators';
+import CategoryGuide from '@/components/calculator/CategoryGuide';
+import { CATEGORY_GUIDES } from '@/data/category-guides';
+import { ALL_CALCULATORS } from '@/data/calculators';
 import AdSlot from '@/components/common/AdSlot';
 import styles from '@/styles/layout.module.css';
 import cardsStyles from '@/styles/cards.module.css';
@@ -176,9 +179,24 @@ export default async function CategoryPage({ params }: PageProps) {
       {/* Interactive Category Search & Calculators Grid */}
       <CategoryCalculatorsView
         calculators={serializedCalcs}
-        subcategories={cat.subcategories}
+        subcategories={[
+          // configured chips that have at least one live calculator, then any subcategory the list misses
+          ...cat.subcategories.filter((s) => calculators.some((c) => c.subcategory === s)),
+          ...Array.from(new Set(calculators.map((c) => c.subcategory).filter((s): s is string => Boolean(s)))).filter(
+            (s) => !cat.subcategories.includes(s),
+          ),
+        ]}
         categoryName={cat.name}
       />
+
+      {/* Kategorie-eigener Leitfaden: Fragen → Rechner, Eckwerte, FAQ */}
+      {CATEGORY_GUIDES[cat.slug] && (
+        <CategoryGuide
+          guide={CATEGORY_GUIDES[cat.slug]}
+          categoryName={cat.name}
+          calculatorNames={Object.fromEntries(ALL_CALCULATORS.map((c) => [c.slug, c.shortName || c.name]))}
+        />
+      )}
 
       {/* Zero-CLS Werbefläche am Ende der Rechnerliste */}
       <div style={{ margin: 'var(--space-8) 0' }}>
@@ -214,7 +232,7 @@ export default async function CategoryPage({ params }: PageProps) {
                   Passende Ratgeber & Fachartikel zu {cat.name}
                 </h2>
                 <p style={{ margin: '2px 0 0', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                  Hintergründe, Praxistipps und Rechenanleitungen unserer Fachredaktion
+                  Hintergründe, Praxistipps und Rechenanleitungen zu diesem Thema
                 </p>
               </div>
               <Link href="/ratgeber/" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary)' }}>
