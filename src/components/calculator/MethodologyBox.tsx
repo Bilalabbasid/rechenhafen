@@ -139,25 +139,6 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
         </div>
       )}
 
-      {isLegalOrTax && !isHealth && (
-        <div style={{
-          display: 'flex',
-          gap: '10px',
-          background: 'var(--color-surface-hover)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-md)',
-          padding: '12px 14px',
-          marginBottom: 'var(--space-4)',
-          fontSize: '0.875rem',
-          color: 'var(--color-text-secondary)',
-        }}>
-          <Scale size={18} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--color-primary)' }} />
-          <div>
-            <strong>Rechtliche Grundlagen & Gesetzesstand 2026:</strong> Die Berechnungen stützen sich auf die amtlichen Gesetzestexte der Bundesrepublik Deutschland (u. a. BGB, EStG, BUrlG, UStG, PAngV). Die Ergebnisse dienen der unverbindlichen Erstorientierung und ersetzen keine Rechts-, Steuer- oder Rentenberatung im Einzelfall.
-          </div>
-        </div>
-      )}
-
       {isElectricityEmissionCalc && (
         <div style={{
           display: 'flex',
@@ -174,17 +155,6 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
           <div>
             <strong>Emissions- & Energiedaten:</strong> Berechnungen zu CO₂-Einsparungen und Energieverbräuchen orientieren sich an den offiziellen Kennzahlen des Umweltbundesamtes (UBA, z. B. deutscher Strommix im Datenjahr {EMISSION_FACTORS.strom_mix_de_generation_2025.referenceYear}: {EMISSION_FACTORS.strom_mix_de_generation_2025.value} g CO₂/kWh bei der Erzeugung).
           </div>
-        </div>
-      )}
-
-      {isFinance && (
-        <div style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
-          <strong>Finanzmathematische Annahmen:</strong>
-          <ul style={{ margin: '4px 0 0', paddingLeft: '20px' }}>
-            <li>Zinssätze und Renditen werden für den gewählten Zeithorizont als konstant modelliert.</li>
-            <li>Zinseszinsberechnungen erfolgen unterjährig monatlich bzw. dekursiv gemäß üblicher Bankpraxis.</li>
-            <li>Individuelle Transaktionskosten, Verwahrgebühren oder nach Ende der Zinsbindung geänderte Marktzinsen sind separat einzukalkulieren.</li>
-          </ul>
         </div>
       )}
 
