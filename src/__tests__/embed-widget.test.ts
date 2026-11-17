@@ -10,7 +10,8 @@ describe('embeddable calculator widget', () => {
       expect(getCalculatorBySlug(e.slug), e.slug).toBeDefined();
       expect(isCalculatorIndexable(e.slug), e.slug).toBe(true);
     }
-    expect(isEmbeddable('brutto-netto-rechner')).toBe(false);
+    expect(isEmbeddable('brutto-netto-rechner')).toBe(true);
+    expect(isEmbeddable('einkommensteuerrechner')).toBe(false);
   });
 
   it('embed code links back with a visible brand anchor outside the iframe', () => {

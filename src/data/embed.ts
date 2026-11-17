@@ -8,6 +8,16 @@
  */
 export const EMBEDDABLE_CALCULATORS = [
   {
+    slug: 'brutto-netto-rechner',
+    audience: 'Finanz-, Karriere- und Bewerbungsblogs',
+    height: 1500,
+  },
+  {
+    slug: 'prozentrechner',
+    audience: 'Lern-, Nachhilfe- und Mathematikseiten',
+    height: 1000,
+  },
+  {
     slug: 'schalungssteine-rechner',
     audience: 'Heimwerker-, Hausbau- und Gartenblogs',
     height: 980,

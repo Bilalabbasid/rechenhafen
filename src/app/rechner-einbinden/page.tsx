@@ -29,7 +29,7 @@ export default function RechnerEinbindenPage() {
           Rechner kostenlos auf Ihrer Website einbinden
         </h1>
         <p>
-          Sie schreiben über Hausbau, Backen oder Kochen? Dann können Sie Ihren Leserinnen und Lesern einen unserer Rechner direkt in
+          Sie schreiben über Gehalt und Finanzen, Mathe und Schule, Hausbau, Backen oder Kochen? Dann können Sie Ihren Leserinnen und Lesern einen unserer Rechner direkt in
           Ihren Artikel einbauen. Kopieren Sie einfach den Code und fügen Sie ihn als HTML-Block ein – zum Beispiel in WordPress über
           den Block „Individuelles HTML“.
         </p>
