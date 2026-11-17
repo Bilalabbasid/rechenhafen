@@ -89,7 +89,7 @@ export default function UeberUnsPage() {
             <p style={{ marginTop: 'var(--space-2)' }}>{SITE_OWNER.editorBio.trim()}</p>
           )}
           <p style={{ marginTop: 'var(--space-2)' }}>
-            <strong>Warum RechenHafen existiert:</strong> Viele bestehende Rechner im deutschsprachigen Internet sind mit aufdringlicher Werbung überladen, verlangen unnötige Kontaktdaten für einfache Rechenergebnisse oder basieren auf veralteten Gesetzesständen. RechenHafen wurde geschaffen, um allen Bürgern, Selbstständigen und Fachkräften eine verlässliche Orientierung zu bieten: kostenlose, transparente Berechnungen direkt im Browser, ohne Datenspeicherung und mit klar nachvollziehbaren Formeln.
+            <strong>Warum RechenHafen existiert:</strong> Viele bestehende Rechner im deutschsprachigen Internet sind mit aufdringlicher Werbung überladen, verlangen unnötige Kontaktdaten für einfache Rechenergebnisse oder basieren auf veralteten Gesetzesständen. RechenHafen wurde geschaffen, um allen Bürgern, Selbstständigen und Fachkräften eine verlässliche Orientierung zu bieten: kostenlose, transparente Berechnungen direkt im Browser, ohne dass Ihre Eingaben gespeichert werden, und mit klar nachvollziehbaren Formeln.
           </p>
         </section>
 

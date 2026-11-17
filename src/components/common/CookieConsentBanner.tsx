@@ -94,9 +94,9 @@ export default function CookieConsentBanner() {
               }}
             >
               <strong style={{ color: 'var(--color-text-primary)' }}>Datenschutz & Reichweitenmessung:</strong>{' '}
-              Wir verwenden Google Analytics 4 zur datenschutzkonformen Analyse der Websitenutzung. Es werden
-              weder persönliche Daten, Werbeprofile noch Ihre Rechner-Eingaben oder -Ergebnisse übermittelt.
-              Weitere Informationen finden Sie in unserer{' '}
+              Mit Ihrer Zustimmung nutzen wir Google Analytics 4, um zu sehen, welche Rechner genutzt werden.
+              Google setzt dafür Cookies. Ihre Rechner-Eingaben und Ergebnisse werden nie übertragen. Für Werbung
+              (Google AdSense) gelten eigene Einstellungen. Weitere Informationen finden Sie in unserer{' '}
               <Link
                 href="/datenschutz/"
                 style={{

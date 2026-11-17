@@ -240,16 +240,17 @@ export default function MethodologyBox({ category, slug, timeSensitiveMeta, trus
       <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 'var(--space-3)', marginTop: 'var(--space-3)', fontSize: '0.825rem', color: 'var(--color-text-muted)' }}>
         {hasDinRounding ? (
           <>
-            Rundung kaufmännisch nach <strong>DIN 1333</strong>. Alle Details zur Qualitätssicherung und den Berechnungsmodellen finden Sie in unserer{' '}
-            <Link href="/ueber-uns/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-              Redaktionsmethodik & Prüfpipeline →
+            Rundung kaufmännisch nach <strong>DIN 1333</strong>. Wie Formeln und Rechtswerte geprüft werden, steht in unserer{' '}
+            <Link href="/methodik/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+              Methodik & Quellen →
             </Link>
           </>
         ) : (
           <>
-            Transparenz & Qualitätssicherung: Alle Berechnungsgrundlagen werden redaktionell geprüft. Weitere Details in unserer{' '}
-            <Link href="/ueber-uns/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
-              Methodik & Qualitätssicherung →
+            Gesetzliche Werte und Formeln gleichen wir mit amtlichen Quellen ab und sichern die Rechenwege mit automatischen
+            Tests. Mehr dazu in unserer{' '}
+            <Link href="/methodik/" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>
+              Methodik & Quellen →
             </Link>
           </>
         )}
