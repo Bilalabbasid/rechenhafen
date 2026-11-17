@@ -124,14 +124,16 @@ export default function DatenschutzPage() {
             Google und seine Partner setzen dafür Cookies und ähnliche Technologien ein und lesen sie aus. Dabei werden unter
             anderem Ihre IP-Adresse, Geräte- und Browserinformationen, die aufgerufene Seite sowie Interaktionen mit Anzeigen
             verarbeitet, um Anzeigen auszuliefern, ihre Wirkung zu messen und Betrug zu verhindern. Mit Ihrer Einwilligung
-            können Anzeigen auch auf Ihre Interessen zugeschnitten werden (personalisierte Werbung).
+            können Anzeigen auch auf Ihre Interessen zugeschnitten werden (personalisierte Werbung). Ebenfalls nur mit Ihrer
+            Einwilligung dürfen Google und seine Partner laut Einwilligungsfenster auch genaue Standortdaten verwenden.
           </p>
           <p>
             Ihre Einwilligung holen wir über das Einwilligungsfenster von Google ein, das beim ersten Besuch erscheint
             (Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG). Sie ist freiwillig und kann jederzeit über den
             Link zu den Datenschutzeinstellungen auf der Seite widerrufen werden. Lehnen Sie ab, können weiterhin
             nicht personalisierte Anzeigen erscheinen; Google verwendet dann nach eigenen Angaben keine Cookies für
-            personalisierte Werbung.
+            personalisierte Werbung. Ihre Auswahl speichert Google höchstens 390 Tage lang in einem Cookie namens
+            „FCCDCF“, damit das Fenster nicht bei jedem Besuch erneut erscheint.
           </p>
           <p>
             Google kann Daten auch an Server der Google LLC in den USA übermitteln. Google LLC ist nach dem EU-US Data Privacy

@@ -27,7 +27,9 @@ export default function CookieSettingsButton() {
         background: 'none',
         border: 'none',
         padding: 0,
-        font: 'inherit',
+        // only the typeface is inherited; size and colour come from .footerLink like the other footer links
+        fontFamily: 'inherit',
+        lineHeight: 'inherit',
         cursor: 'pointer',
         textAlign: 'left',
       }}
